@@ -1,3 +1,3 @@
-# JPHP for Spring MVC
+# GUI Extension for JPHP
 
-This extension allows you to use php templates in your spring applications via JPHP.
+Based on JavaFX 8.
