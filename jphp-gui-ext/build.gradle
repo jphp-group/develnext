@@ -1,0 +1,7 @@
+
+def javaFxHome = "${System.properties['java.home']}";
+
+dependencies {
+    //compile files("$javaFxHome/lib/jfxrt.jar")
+    compile 'org.controlsfx:controlsfx:8.20.8'
+}

@@ -1,0 +1,27 @@
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws
+/api/
+/classes/
+/build/
+/lib/
+/out/
+.idea/
+sdk/.idea/
+settings.xml
+/target/
+/site/
+/scripts/
+/jphp-cli/target
+
+/.gradle/
+build/
+
+gradle.properties
+secret.asc

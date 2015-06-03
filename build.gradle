@@ -1,0 +1,86 @@
+def javaVersion    = '1.7';
+def jphpVersion    = '0.6.+';
+def projectVersion = '0.7.0';
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.1'
+    }
+}
+
+allprojects {
+    apply plugin: 'idea'
+    apply plugin: 'signing'
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    project.group = 'org.develnext'
+    project.version = projectVersion
+
+    repositories {
+        mavenLocal()
+        jcenter()
+        mavenCentral()
+    }
+
+    task sourcesJar(type: Jar, dependsOn: 'classes') {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+}
+
+configure(subprojects) {
+    apply plugin: 'maven'
+    apply plugin: 'java'
+    apply plugin: 'com.jfrog.bintray'
+
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+
+    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+    javadoc.failOnError = false
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    jar.dependsOn += [sourcesJar, javadocJar]
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+
+    signing {
+        sign configurations.archives
+    }
+
+    bintray {
+        user = rootProject.hasProperty('bintray.user') ? rootProject.getProperty("bintray.user") : "";
+        key = rootProject.hasProperty('bintray.apikey') ? rootProject.getProperty("bintray.apikey") : "";
+
+        configurations = ['archives']
+
+        pkg {
+            repo = "maven"
+            name = "jphp-compiler"
+            websiteUrl = 'http://github.com/jphp-compiler'
+            vcsUrl = 'http://github.com/jphp-compiler'
+            licenses = ["Apache-2.0"]
+            publish = true
+        }
+    }
+}
+
+project(':jphp-gui-ext') {
+    dependencies {
+        compile "org.develnext:jphp-runtime:$jphpVersion";
+    }
+}
+
+

@@ -1,0 +1,18 @@
+apply plugin: 'application'
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+sourceSets {
+    main.resources.srcDirs = ['src']
+}
+
+dependencies {
+    compile 'org.develnext:jphp-core:0.6.+'
+    compile project(':jphp-gui-ext')
+}
+
+mainClassName = 'php.runtime.launcher.Launcher'

@@ -1,0 +1,3 @@
+
+include 'jphp-gui-ext',
+        'sandbox'

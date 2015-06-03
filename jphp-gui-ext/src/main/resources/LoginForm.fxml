@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="203.0" prefWidth="402.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextField layoutX="28.0" layoutY="39.0" prefHeight="31.0" prefWidth="349.0" AnchorPane.leftAnchor="28.0" AnchorPane.rightAnchor="25.0" />
+      <TextField layoutX="28.0" layoutY="102.0" prefHeight="31.0" prefWidth="349.0" AnchorPane.leftAnchor="28.0" AnchorPane.rightAnchor="25.0" />
+      <Button layoutX="274.0" layoutY="152.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="103.0" text="Login" AnchorPane.bottomAnchor="26.0" AnchorPane.rightAnchor="25.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Label layoutX="36.0" layoutY="22.0" prefHeight="17.0" prefWidth="96.0" text="Login *:" />
+      <Label layoutX="36.0" layoutY="85.0" prefHeight="17.0" prefWidth="96.0" text="Password *:" />
+   </children>
+</AnchorPane>
