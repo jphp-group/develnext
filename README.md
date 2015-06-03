@@ -1,2 +1,0 @@
-# javafx
-JavaFX Extension
