@@ -72,6 +72,11 @@ public class UXForm extends UXWindow {
     @Signature
     public void __construct(StageStyle style) {
         __wrappedObject = new Stage(style);
+
+        AnchorPane layout = new AnchorPane();
+        Scene scene = new Scene(layout);
+
+        getWrappedObject().setScene(scene);
     }
 
     @Setter

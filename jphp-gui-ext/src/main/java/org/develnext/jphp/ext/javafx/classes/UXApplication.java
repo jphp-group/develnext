@@ -11,21 +11,12 @@ import php.runtime.Memory;
 import php.runtime.annotation.Reflection.Abstract;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Signature;
-import php.runtime.env.DieException;
 import php.runtime.env.Environment;
 import php.runtime.ext.core.classes.stream.ResourceStream;
 import php.runtime.ext.core.classes.stream.Stream;
-import php.runtime.ext.java.JavaObject;
 import php.runtime.invoke.Invoker;
-import php.runtime.lang.BaseException;
 import php.runtime.lang.BaseWrapper;
-import php.runtime.memory.ObjectMemory;
 import php.runtime.reflection.ClassEntity;
-
-import javax.swing.*;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXApplication")
@@ -94,6 +85,8 @@ public class UXApplication extends BaseWrapper<Application> {
             try {
                 thread.setContextClassLoader(onStart.getEnvironment().scope.getClassLoader());
                 UXApplication.onStart.callAny(stage);
+            } catch (Exception throwable) {
+                onStart.getEnvironment().catchUncaught(throwable);
             } finally {
                 thread.setContextClassLoader(old);
             }

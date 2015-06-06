@@ -32,7 +32,11 @@ allprojects {
     }
 }
 
-configure(subprojects) {
+configure([
+        project(':jphp-gui-ext'),
+        project(':jphp-gui-designer-ext'),
+        project(':jphp-gui-framework')
+]) {
     apply plugin: 'maven'
     apply plugin: 'java'
     apply plugin: 'com.jfrog.bintray'
@@ -83,4 +87,10 @@ project(':jphp-gui-ext') {
     }
 }
 
+project(':jphp-gui-framework') {
+    dependencies {
+        compile project(':jphp-gui-ext')
+        compile "org.develnext:jphp-json-ext:$jphpVersion"
+    }
+}
 

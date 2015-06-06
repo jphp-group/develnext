@@ -11,8 +11,8 @@ sourceSets {
 }
 
 dependencies {
-    compile 'org.develnext:jphp-core:0.6.+'
-    compile project(':jphp-gui-ext')
+    compile project(':jphp-gui-designer-ext')
+    compile project(':jphp-gui-framework')
 }
 
 mainClassName = 'php.runtime.launcher.Launcher'
