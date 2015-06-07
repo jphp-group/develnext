@@ -16,4 +16,18 @@ class UXPane extends UXParent
      * @var UXList
      */
     public $children;
+
+    /**
+     * @param UXNode $node
+     */
+    public function add(UXNode $node)
+    {
+    }
+
+    /**
+     * @param UXNode $node
+     */
+    public function remove(UXNode $node)
+    {
+    }
 }

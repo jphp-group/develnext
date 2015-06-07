@@ -29,6 +29,16 @@ class UXForm extends UXWindow
     public $modality;
 
     /**
+     * @var bool
+     */
+    public $alwaysOnTop;
+
+    /**
+     * @var bool
+     */
+    public $maximized;
+
+    /**
      * @var UXWindow
      */
     public $owner;
@@ -42,20 +52,32 @@ class UXForm extends UXWindow
     /**
      * @param string $style (optional) - DECORATED, UNDECORATED, TRANSPARENT, UTILITY
      */
-    public function __construct($style) {}
+    public function __construct($style)
+    {
+    }
 
     /**
      * ...
      */
-    public function showAndWait() {}
+    public function showAndWait()
+    {
+    }
 
     /**
      * ...
      */
-    public function toBack() {}
+    public function toBack()
+    {
+    }
 
     /**
      * ...
      */
-    public function toFront() {}
+    public function toFront()
+    {
+    }
+
+    public function maximize()
+    {
+    }
 }

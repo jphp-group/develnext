@@ -81,6 +81,10 @@ abstract public class EventProvider<T> {
     }
 
     public static EventProvider get(Object object, String event) {
+        if (object == null) {
+            return null;
+        }
+
         Class<?> cls = object.getClass();
 
         while (cls != null) {

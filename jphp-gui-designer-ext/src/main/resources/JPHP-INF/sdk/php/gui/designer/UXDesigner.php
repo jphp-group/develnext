@@ -2,6 +2,7 @@
 namespace php\gui\designer;
 
 use php\gui\layout\UXPane;
+use php\gui\UXForm;
 use php\gui\UXNode;
 
 /**
@@ -47,6 +48,24 @@ class UXDesigner
      * @param UXPane $area
      */
     public function __construct(UXPane $area)
+    {
+    }
+
+    /**
+     * @return UXForm
+     */
+    public function getSelectionRectangle()
+    {
+    }
+
+    /**
+     * @param int $x
+     * @param int $y
+     * @param int $w
+     * @param int $h
+     * @return UXNode[]
+     */
+    public function getNodesInArea($x, $y, $w, $h)
     {
     }
 
@@ -112,6 +131,20 @@ class UXDesigner
      * @return bool
      */
     public function getNodeLock(UXNode $node)
+    {
+    }
+
+    /**
+     * @param callable $handler
+     */
+    public function onAreaMouseDown(callable $handler)
+    {
+    }
+
+    /**
+     * @param callable $handler
+     */
+    public function onAreaMouseUp(callable $handler)
     {
     }
 }

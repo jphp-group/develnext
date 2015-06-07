@@ -9,30 +9,29 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
-import php.runtime.annotation.Reflection.Getter;
-import php.runtime.annotation.Reflection.Namespace;
-import php.runtime.annotation.Reflection.Setter;
-import php.runtime.annotation.Reflection.Signature;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
+import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseObject;
 import php.runtime.reflection.ClassEntity;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Namespace(GuiDesignerExtension.NS)
 public class UXDesigner extends BaseObject {
@@ -43,14 +42,20 @@ public class UXDesigner extends BaseObject {
     protected int snapSize = 8;
     protected boolean snapEnabled = true;
     protected boolean helpersEnabled = true;
+    protected boolean selectionEnabled = true;
 
     protected boolean dragged = false;
     protected boolean resizing = false;
 
     private Canvas dots;
 
+    private Stage selectionRectangle = null;
+
     private Map<Node, Item> nodes = new LinkedHashMap<>();
     private Map<Node, Selection> selections = new LinkedHashMap<>();
+
+    protected Invoker onAreaMouseDown;
+    protected Invoker onAreaMouseUp;
 
     public UXDesigner(Environment env, ClassEntity clazz) {
         super(env, clazz);
@@ -99,6 +104,16 @@ public class UXDesigner extends BaseObject {
     }
 
     @Getter
+    protected boolean getSelectionEnabled() {
+        return selectionEnabled;
+    }
+
+    @Setter
+    protected void setSelectionEnabled(boolean value) {
+        selectionEnabled = value;
+    }
+
+    @Getter
     protected boolean getSnapEnabled() {
         return snapEnabled;
     }
@@ -130,7 +145,7 @@ public class UXDesigner extends BaseObject {
     }
 
     @Signature
-    public void __construct(Pane area) {
+    public void __construct(final Pane area) {
         this.area = area;
         ChangeListener<Number> resizeListener = new ChangeListener<Number>() {
             @Override
@@ -141,6 +156,136 @@ public class UXDesigner extends BaseObject {
 
         area.widthProperty().addListener(resizeListener);
         area.heightProperty().addListener(resizeListener);
+
+        selectionRectangle = new Stage(StageStyle.UNDECORATED);
+        selectionRectangle.setTitle("...");
+        final AnchorPane selectionRectangleLayout = new AnchorPane();
+        selectionRectangleLayout.setMouseTransparent(true);
+        selectionRectangle.setScene(new Scene(selectionRectangleLayout));
+        selectionRectangle.setOpacity(0.5);
+
+        selectionRectangleLayout.setStyle("-fx-background-color: black;");
+
+        area.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (isEditing()) {
+                    return;
+                }
+
+                if (onAreaMouseDown != null && onAreaMouseDown.callAny(event).toBoolean()) {
+                    event.consume();
+                    return;
+                }
+
+                if (selectionEnabled) {
+                    selectionRectangle.setX(event.getScreenX());
+                    selectionRectangle.setY(event.getScreenY());
+                    selectionRectangle.setWidth(1);
+                    selectionRectangle.setHeight(1);
+                }
+
+                event.consume();
+            }
+        });
+
+        area.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (isEditing()) {
+                    return;
+                }
+
+                if (selectionEnabled) {
+                    double width = event.getScreenX() - selectionRectangle.getX();
+                    selectionRectangle.setWidth(width);
+                    double height = event.getScreenY() - selectionRectangle.getY();
+                    selectionRectangle.setHeight(height);
+
+                    if (width > 2 && height > 2) {
+                        selectionRectangle.show();
+                    }
+                }
+
+                event.consume();
+            }
+        });
+
+        area.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (isEditing()) {
+                    return;
+                }
+
+                if (onAreaMouseUp != null && onAreaMouseUp.callAny(event).toBoolean()) {
+                    event.consume();
+                    return;
+                }
+
+                selectionRectangle.hide();
+
+                if (!event.isShiftDown()) {
+                    unselectAll();
+                }
+
+                if (selectionEnabled) {
+                    Point2D fromXY = area.screenToLocal(selectionRectangle.getX(), selectionRectangle.getY());
+                    double width = selectionRectangle.getWidth();
+                    double height = selectionRectangle.getHeight();
+
+                    for (Node node : getNodesInArea(fromXY.getX(), fromXY.getY(), width, height)) {
+                        selectNode(node);
+                    }
+                }
+
+                event.consume();
+            }
+        });
+    }
+
+    @Signature
+    public Stage getSelectionRectangle() {
+        return selectionRectangle;
+    }
+
+    @Signature
+    public void onAreaMouseDown(@Nullable Invoker invoker) {
+        onAreaMouseDown = invoker;
+    }
+
+    @Signature
+    public void onAreaMouseUp(@Nullable Invoker invoker) {
+        onAreaMouseUp = invoker;
+    }
+
+    @Signature
+    public List<Node> getNodesInArea(double x, double y, double w, double h) {
+        List<Node> result = new ArrayList<>();
+
+        for (Node node : nodes.keySet()) {
+            double nx = node.getLayoutX();
+            double ny = node.getLayoutY();
+            double nw = node.getBoundsInLocal().getWidth();
+            double nh = node.getBoundsInLocal().getHeight();
+
+            Point2D center = new Point2D(x + Math.round(w / 2), y + Math.round(h / 2));
+            Point2D nCenter = new Point2D(nx + Math.round(nw / 2), ny + Math.round(nh / 2));
+
+            double _w, _h = 0;
+
+            _w = Math.abs(center.getX() - nCenter.getX());
+            _h = Math.abs(center.getY() - nCenter.getY());
+
+            boolean checkW = _w < (w / 2 + nw / 2);
+            boolean checkH = _h < (h / 2 + nh / 2);
+
+            if (checkW && checkH) {
+                result.add(node);
+            }
+        }
+
+        return result;
     }
 
     @Signature
@@ -374,6 +519,8 @@ public class UXDesigner extends BaseObject {
         protected int startW = 0;
         protected int startH = 0;
 
+        protected int nodeX, nodeY, nodeW, nodeH;
+
         protected int resizeX = 0;
         protected int resizeY = 0;
         protected int resizeW = 0;
@@ -422,7 +569,7 @@ public class UXDesigner extends BaseObject {
             border.setVisible(false);
             border.setMouseTransparent(true);
             border.setFill(Color.TRANSPARENT);
-            border.setStroke(Color.GRAY);
+            border.setStroke(Color.BLACK);
             border.getStrokeDashArray().addAll(2d);
 
             area.getChildren().addAll(border);
@@ -448,7 +595,8 @@ public class UXDesigner extends BaseObject {
         }
 
         public void update() {
-            update(node.getLayoutX(), node.getLayoutY(), node.getLayoutBounds());
+            Bounds bounds = node.getLayoutBounds();
+            update(node.getLayoutX(), node.getLayoutY(), bounds);
         }
 
         protected void updateResized() {
@@ -563,8 +711,15 @@ public class UXDesigner extends BaseObject {
                     border.setVisible(true);
                     resizePoint = (Rectangle) event.getSource();
 
-                    startX = (int) node.getLayoutX();
-                    startY = (int) node.getLayoutY();
+                    Point2D localPoint = area.sceneToLocal(new Point2D(event.getSceneX(), event.getSceneY()));
+
+                    nodeX = (int) node.getLayoutX();
+                    nodeY = (int) node.getLayoutY();
+                    nodeW = (int) node.getLayoutBounds().getWidth();
+                    nodeH = (int) node.getLayoutBounds().getHeight();
+
+                    startX = (int) localPoint.getX();
+                    startY = (int) localPoint.getY();
 
                     resizeX = (int) node.getLayoutX();
                     resizeY = (int) node.getLayoutY();
@@ -619,8 +774,8 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = area.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize((int) (localPoint.getX() - startX - POINT_SIZE_HALF), e);
-                    resizeH = normalize((int) (localPoint.getY() - startY - POINT_SIZE_HALF), e);
+                    resizeW = normalize((int) (nodeW + (localPoint.getX() - startX)), e);
+                    resizeH = normalize((int) (nodeH + (localPoint.getY() - startY)), e);
 
                     updateResized();
                 }
@@ -631,7 +786,7 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = area.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize((int) (localPoint.getX() - startX - POINT_SIZE_HALF), e);
+                    resizeW = normalize((int) (nodeW + (localPoint.getX() - startX)), e);
 
                     updateResized();
                 }
@@ -642,7 +797,7 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = area.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeH = normalize((int) (localPoint.getY() - startY - POINT_SIZE_HALF), e);
+                    resizeH = normalize((int) (nodeH + (localPoint.getY() - startY)), e);
 
                     updateResized();
                 }
@@ -653,8 +808,8 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = area.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeH = normalize(startH + (int) (startY - localPoint.getY() - POINT_SIZE_HALF), e);
-                    resizeY = normalize(startY - (resizeH - startH - POINT_SIZE_HALF), e);
+                    resizeH = normalize(startH + (int) (startY - localPoint.getY()), e);
+                    resizeY = normalize((int) (node.getLayoutY() - (resizeH - startH)), e);
 
                     updateResized();
                 }
@@ -665,8 +820,8 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = area.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize(startW + (int) (startX - localPoint.getX() - POINT_SIZE_HALF), e);
-                    resizeX = normalize(startX - (resizeW - startW - POINT_SIZE_HALF), e);
+                    resizeW = normalize(startW + (int) (startX - localPoint.getX()), e);
+                    resizeX = normalize((int) (node.getLayoutX() - (resizeW - startW)), e);
 
                     updateResized();
                 }
@@ -677,10 +832,10 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = area.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize((int) (localPoint.getX() - startX - POINT_SIZE_HALF), e);
+                    resizeW = normalize((int) (nodeW + (localPoint.getX() - startX)), e);
 
-                    resizeH = normalize(startH + (int) (startY - localPoint.getY() - POINT_SIZE_HALF), e);
-                    resizeY = normalize(startY - (resizeH - startH - POINT_SIZE_HALF), e);
+                    resizeH = normalize(startH + (int) (startY - localPoint.getY()), e);
+                    resizeY = normalize((int) (node.getLayoutY() - (resizeH - startH)), e);
 
                     updateResized();
                 }
@@ -691,11 +846,11 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = area.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize(startW + (int) (startX - localPoint.getX() - POINT_SIZE_HALF), e);
-                    resizeX = normalize(startX - (resizeW - startW - POINT_SIZE_HALF), e);
+                    resizeW = normalize(startW + (int) (startX - localPoint.getX()), e);
+                    resizeX = normalize((int) (node.getLayoutX() - (resizeW - startW)), e);
 
-                    resizeH = normalize(startH + (int) (startY - localPoint.getY() - POINT_SIZE_HALF), e);
-                    resizeY = normalize(startY - (resizeH - startH - POINT_SIZE_HALF), e);
+                    resizeH = normalize(startH + (int) (startY - localPoint.getY()), e);
+                    resizeY = normalize((int) (node.getLayoutY() - (resizeH - startH)), e);
 
                     updateResized();
                 }
@@ -706,10 +861,10 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = area.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize(startW + (int) (startX - localPoint.getX() - POINT_SIZE_HALF), e);
-                    resizeX = normalize(startX - (resizeW - startW - POINT_SIZE_HALF), e);
+                    resizeW = normalize(startW + (int) (startX - localPoint.getX()), e);
+                    resizeX = normalize((int) (node.getLayoutX() - (resizeW - startW)), e);
 
-                    resizeH = normalize((int) (localPoint.getY() - startY - POINT_SIZE_HALF), e);
+                    resizeH = normalize((int) (nodeH + (localPoint.getY() - startY)), e);
 
                     updateResized();
                 }

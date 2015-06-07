@@ -1,9 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.Name;
@@ -49,25 +46,5 @@ public class UXLoader extends BaseWrapper<FXMLLoader> {
     @Signature
     public Memory load(Environment env, InputStream stream) throws IOException {
         return Memory.wrap(env, getWrappedObject().load(stream));
-    }
-
-    @Signature
-    public Stage loadAsStage(InputStream stream) throws IOException {
-        Parent layout;
-        if (stream == null) {
-            layout = getWrappedObject().load();
-        } else {
-            layout = getWrappedObject().load(stream);
-        }
-
-        Stage stage = new Stage();
-        stage.setScene(new Scene(layout));
-
-        return stage;
-    }
-
-    @Signature
-    public Stage loadAsStage() throws IOException {
-        return loadAsStage(null);
     }
 }

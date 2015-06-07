@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -86,13 +87,47 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
         getWrappedObject().sizeToScene();
     }
 
+
+    @Getter
+    public ObservableList<Node> getChildren() {
+        Pane root = (Pane) getWrappedObject().getScene().getRoot();
+        return root == null ? null : root.getChildren();
+    }
+
+    @Signature
+    public void add(Node node) {
+        ObservableList<Node> children = getChildren();
+
+        if (children != null) {
+            children.add(node);
+        } else {
+            throw new IllegalStateException("Unable to add node");
+        }
+    }
+
+    @Signature
+    public boolean remove(Node node) {
+        ObservableList<Node> children = getChildren();
+
+        if (children != null) {
+            return children.remove(node);
+        } else {
+            throw new IllegalStateException("Unable to remove node");
+        }
+    }
+
     @Signature
     @SuppressWarnings("unchecked")
     public void on(String event, Invoker invoker, String group) {
-        EventProvider eventProvider = EventProvider.get(getWrappedObject(), event);
+        Object target = getWrappedObject();
+        EventProvider eventProvider = EventProvider.get(target, event);
+
+        if (eventProvider == null) {
+            eventProvider = EventProvider.get(target = getWrappedObject().getScene().getRoot(), event);
+        }
 
         if (eventProvider != null) {
-            eventProvider.on(getWrappedObject(), event, group, invoker);
+            eventProvider.on(target, event, group, invoker);
         } else {
             throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
         }
@@ -106,10 +141,15 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     @Signature
     @SuppressWarnings("unchecked")
     public void off(String event, @Nullable String group) {
-        EventProvider eventProvider = EventProvider.get(getWrappedObject(), event);
+        Object target = getWrappedObject();
+        EventProvider eventProvider = EventProvider.get(target, event);
+
+        if (eventProvider == null) {
+            eventProvider = EventProvider.get(target = getWrappedObject().getScene().getRoot(), event);
+        }
 
         if (eventProvider != null) {
-            eventProvider.off(getWrappedObject(), event, group);
+            eventProvider.off(target, event, group);
         } else {
             throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
         }
@@ -122,10 +162,15 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
 
     @Signature
     public void trigger(String event, @Nullable Event e) {
-        EventProvider eventProvider = EventProvider.get(getWrappedObject(), event);
+        Object target = getWrappedObject();
+        EventProvider eventProvider = EventProvider.get(target, event);
+
+        if (eventProvider == null) {
+            eventProvider = EventProvider.get(target = getWrappedObject().getScene().getRoot(), event);
+        }
 
         if (eventProvider != null) {
-            eventProvider.trigger(getWrappedObject(), event, e);
+            eventProvider.trigger(target, event, e);
         } else {
             throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
         }

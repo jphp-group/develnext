@@ -1,11 +1,9 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.Window;
+import javafx.stage.*;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -30,6 +28,9 @@ public class UXForm extends UXWindow {
         @Property boolean fullScreen();
         @Property boolean iconified();
         @Property boolean resizable();
+
+        @Property boolean alwaysOnTop();
+        @Property boolean maximized();
 
         void show();
         void showAndWait();
@@ -97,5 +98,16 @@ public class UXForm extends UXWindow {
     @Setter
     protected void setModality(Modality modality) {
         getWrappedObject().initModality(modality);
+    }
+
+    @Signature
+    public void maximize() {
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+
+        getWrappedObject().setX(bounds.getMinX());
+        getWrappedObject().setY(bounds.getMinY());
+        getWrappedObject().setWidth(bounds.getWidth());
+        getWrappedObject().setHeight(bounds.getHeight());
     }
 }

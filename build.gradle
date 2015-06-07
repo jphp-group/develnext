@@ -1,6 +1,10 @@
 def javaVersion    = '1.7';
-def jphpVersion    = '0.6.+';
 def projectVersion = '0.7.0';
+def jphpVersion    = projectVersion + "-SNAPSHOT";
+
+if (Boolean.getBoolean("release")) {
+    jphpVersion = projectVersion
+}
 
 buildscript {
     repositories {
@@ -83,14 +87,14 @@ configure([
 
 project(':jphp-gui-ext') {
     dependencies {
-        compile "org.develnext:jphp-runtime:$jphpVersion";
+        compile "org.develnext:jphp-runtime:$jphpVersion"
     }
 }
 
 project(':jphp-gui-framework') {
     dependencies {
         compile project(':jphp-gui-ext')
-        compile "org.develnext:jphp-json-ext:$jphpVersion"
+        compile "org.develnext:jphp-core:$jphpVersion"
     }
 }
 

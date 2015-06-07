@@ -2,6 +2,7 @@
 namespace php\gui;
 use php\gui\event\UXEvent;
 use php\gui\layout\UXPane;
+use php\lang\IllegalStateException;
 
 /**
  * Class UXWindow
@@ -32,6 +33,12 @@ abstract class UXWindow
      * @var UXPane
      */
     public $layout;
+
+    /**
+     * @readonly
+     * @var UXList
+     */
+    public $children;
 
     /**
      * ...
@@ -71,6 +78,23 @@ abstract class UXWindow
      * @param UXEvent $e (optional)
      */
     public function trigger($event, UXEvent $e) {}
+
+    /**
+     * @param UXNode $node
+     * @throws IllegalStateException
+     */
+    public function add(UXNode $node)
+    {
+    }
+
+    /**
+     * @param UXNode $node
+     * @return bool
+     * @throws IllegalStateException
+     */
+    public function remove(UXNode $node)
+    {
+    }
 
     /**
      * @param string $id

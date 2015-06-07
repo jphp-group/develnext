@@ -24,10 +24,4 @@ class UXLoader
      * @return UXNode
      */
     public function load($source) {}
-
-    /**
-     * @param string|File|Stream $source (optional)
-     * @return UXForm
-     */
-    public function loadAsStage($source) {}
 }

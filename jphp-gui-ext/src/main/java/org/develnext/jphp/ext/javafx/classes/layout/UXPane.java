@@ -39,4 +39,15 @@ public class UXPane extends UXParent {
     public void __construct() {
         __wrappedObject = new Pane();
     }
+
+    @Signature
+    public void add(Node node) {
+        getChildren().add(node);
+    }
+
+    @Signature
+    public boolean remove(Node node) {
+        return getChildren().remove(node);
+    }
+
 }
