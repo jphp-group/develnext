@@ -27,11 +27,13 @@ import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+import org.develnext.jphp.ext.javafx.bind.CursorMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.KeyCombinationMemoryOperation;
 import org.develnext.jphp.ext.javafx.classes.*;
 import org.develnext.jphp.ext.javafx.classes.event.*;
 import org.develnext.jphp.ext.javafx.classes.layout.UXAnchorPane;
 import org.develnext.jphp.ext.javafx.classes.layout.UXPane;
+import org.develnext.jphp.ext.javafx.classes.layout.UXScrollPane;
 import org.develnext.jphp.ext.javafx.classes.layout.UXStackPane;
 import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
@@ -42,13 +44,9 @@ import php.runtime.ext.support.Extension;
 import php.runtime.memory.support.MemoryOperation;
 
 import java.awt.event.InputEvent;
-import java.util.HashMap;
-import java.util.Map;
 
 public class JavaFXExtension extends Extension {
     public final static String NS = "php\\gui\\";
-
-    protected static final Map<String, EventProvider> eventProviders = new HashMap<String, EventProvider>();
 
     @Override
     public Status getStatus() {
@@ -63,6 +61,7 @@ public class JavaFXExtension extends Extension {
     @Override
     public void onRegister(CompileScope scope) {
         registerMemoryOperation(KeyCombinationMemoryOperation.class);
+        registerMemoryOperation(CursorMemoryOperation.class);
 
         registerWrapperClass(scope, ObservableList.class, UXList.class);
         registerWrapperClass(scope, Application.class, UXApplication.class);
@@ -107,6 +106,9 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, HTMLEditor.class, UXHtmlEditor.class);
         registerWrapperClass(scope, WebEngine.class, UXWebEngine.class);
         registerWrapperClass(scope, WebView.class, UXWebView.class);
+        registerWrapperClass(scope, Tab.class, UXTab.class);
+        registerWrapperClass(scope, TabPane.class, UXTabPane.class);
+        registerWrapperClass(scope, ScrollPane.class, UXScrollPane.class);
 
         MemoryOperation.registerWrapper(InputEvent.class, UXEvent.class);
         MemoryOperation.registerWrapper(ActionEvent.class, UXEvent.class);

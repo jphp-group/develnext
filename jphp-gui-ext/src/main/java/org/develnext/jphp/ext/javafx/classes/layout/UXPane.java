@@ -12,12 +12,12 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "layout\\UXPane")
-public class UXPane extends UXParent {
+public class UXPane<T extends Pane> extends UXParent<T> {
     interface WrappedInterface {
 
     }
 
-    public UXPane(Environment env, Pane wrappedObject) {
+    public UXPane(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -26,8 +26,8 @@ public class UXPane extends UXParent {
     }
 
     @Override
-    public Pane getWrappedObject() {
-        return (Pane) super.getWrappedObject();
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 
     @Getter

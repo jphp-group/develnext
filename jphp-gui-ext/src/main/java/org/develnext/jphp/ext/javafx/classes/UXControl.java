@@ -10,7 +10,7 @@ import php.runtime.reflection.ClassEntity;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXControl")
-public class UXControl extends UXParent {
+public class UXControl<T extends Control> extends UXParent<Control> {
     interface WrappedInterface {
         @Property boolean resizable();
 
@@ -21,7 +21,7 @@ public class UXControl extends UXParent {
         @Setter void setTooltip(@Nullable Tooltip tooltip);
     }
 
-    public UXControl(Environment env, Control wrappedObject) {
+    public UXControl(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -30,8 +30,9 @@ public class UXControl extends UXParent {
     }
 
     @Override
-    public Control getWrappedObject() {
-        return (Control) super.getWrappedObject();
+    @SuppressWarnings("unchecked")
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 
     @Signature

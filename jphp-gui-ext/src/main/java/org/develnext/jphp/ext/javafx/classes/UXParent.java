@@ -9,13 +9,13 @@ import php.runtime.reflection.ClassEntity;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXParent")
-public class UXParent extends UXNode {
+public class UXParent<T extends Parent> extends UXNode<Parent> {
     interface WrappedInterface {
         void layout();
         void requestLayout();
     }
 
-    public UXParent(Environment env, Parent wrappedObject) {
+    public UXParent(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -24,7 +24,8 @@ public class UXParent extends UXNode {
     }
 
     @Override
-    public Parent getWrappedObject() {
-        return (Parent) super.getWrappedObject();
+    @SuppressWarnings("unchecked")
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 }

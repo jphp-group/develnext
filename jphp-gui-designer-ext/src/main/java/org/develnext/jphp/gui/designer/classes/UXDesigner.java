@@ -778,6 +778,7 @@ public class UXDesigner extends BaseObject {
                     resizeH = normalize((int) (nodeH + (localPoint.getY() - startY)), e);
 
                     updateResized();
+                    e.consume();
                 }
             });
 
@@ -789,6 +790,7 @@ public class UXDesigner extends BaseObject {
                     resizeW = normalize((int) (nodeW + (localPoint.getX() - startX)), e);
 
                     updateResized();
+                    e.consume();
                 }
             });
 
@@ -800,6 +802,7 @@ public class UXDesigner extends BaseObject {
                     resizeH = normalize((int) (nodeH + (localPoint.getY() - startY)), e);
 
                     updateResized();
+                    e.consume();
                 }
             });
 
@@ -812,6 +815,7 @@ public class UXDesigner extends BaseObject {
                     resizeY = normalize((int) (node.getLayoutY() - (resizeH - startH)), e);
 
                     updateResized();
+                    e.consume();
                 }
             });
 
@@ -824,6 +828,8 @@ public class UXDesigner extends BaseObject {
                     resizeX = normalize((int) (node.getLayoutX() - (resizeW - startW)), e);
 
                     updateResized();
+
+                    e.consume();
                 }
             });
 
@@ -838,6 +844,8 @@ public class UXDesigner extends BaseObject {
                     resizeY = normalize((int) (node.getLayoutY() - (resizeH - startH)), e);
 
                     updateResized();
+
+                    e.consume();
                 }
             });
 
@@ -853,6 +861,8 @@ public class UXDesigner extends BaseObject {
                     resizeY = normalize((int) (node.getLayoutY() - (resizeH - startH)), e);
 
                     updateResized();
+
+                    e.consume();
                 }
             });
 
@@ -867,6 +877,8 @@ public class UXDesigner extends BaseObject {
                     resizeH = normalize((int) (nodeH + (localPoint.getY() - startY)), e);
 
                     updateResized();
+
+                    e.consume();
                 }
             });
         }

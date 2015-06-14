@@ -2,10 +2,10 @@ package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
@@ -27,7 +27,7 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
         @Property double opacity();
 
         @Property boolean focused();
-        @Property boolean showing();
+        @Property("visible") boolean showing();
 
         void hide();
         void sizeToScene();
@@ -55,8 +55,18 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
-    public void __construct(StageStyle style) {
-        __wrappedObject = new Stage(style);
+    public void __construct(Stage stage) {
+        __wrappedObject = stage;
+    }
+
+    @Getter
+    protected Cursor getCursor() {
+        return getWrappedObject().getScene().getCursor();
+    }
+
+    @Setter
+    protected void setCursor(Cursor cursor) {
+        getWrappedObject().getScene().setCursor(cursor);
     }
 
     @Getter
@@ -92,6 +102,11 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     public ObservableList<Node> getChildren() {
         Pane root = (Pane) getWrappedObject().getScene().getRoot();
         return root == null ? null : root.getChildren();
+    }
+
+    @Signature
+    public void setCursor() {
+        getWrappedObject().getScene().setCursor(Cursor.SW_RESIZE);
     }
 
     @Signature

@@ -1,6 +1,7 @@
 <?php
 namespace ide;
 
+use ide\editors\AbstractEditor;
 use ide\forms\SplashForm;
 use php\gui\framework\Application;
 use php\gui\UXForm;
@@ -16,10 +17,15 @@ class Ide extends Application
      */
     protected $splash;
 
+    /**
+     * @var string[]
+     */
+    protected $editors;
+
     public function launch()
     {
         parent::launch(function() {
-            $this->splash = $splash = new SplashForm(new UXForm('UNDECORATED'));
+            $this->splash = $splash = new SplashForm();
             $splash->show();
         });
     }
@@ -30,6 +36,28 @@ class Ide extends Application
     public function getSplash()
     {
         return $this->splash;
+    }
+
+    /**
+     * @param $editorClass
+     */
+    public function registerEditor($editorClass)
+    {
+        $this->editors[$editorClass] = $editorClass;
+    }
+
+    public function getEditor($path)
+    {
+        /** @var AbstractEditor $editor */
+        foreach ($this->editors as $editorClass) {
+            $editor = new $editorClass($path);
+
+            if ($editor->isValid()) {
+                return $editor;
+            }
+        }
+
+        return null;
     }
 
     /**

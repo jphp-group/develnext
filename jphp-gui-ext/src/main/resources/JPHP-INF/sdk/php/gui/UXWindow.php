@@ -14,7 +14,6 @@ use php\lang\IllegalStateException;
  * @property double $height
  * @property double $opacity
  * @property bool $focused
- * @property bool $showing
  */
 abstract class UXWindow
 {
@@ -39,6 +38,16 @@ abstract class UXWindow
      * @var UXList
      */
     public $children;
+
+    /**
+     * @var bool
+     */
+    public $visible;
+
+    /**
+     * @var string
+     */
+    public $cursor;
 
     /**
      * ...

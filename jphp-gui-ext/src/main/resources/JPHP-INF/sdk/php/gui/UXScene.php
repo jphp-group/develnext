@@ -13,6 +13,11 @@ class UXScene
     public $root;
 
     /**
+     * @var string
+     */
+    public $cursor;
+
+    /**
      * @param UXParent $parent
      * @param double[] $size (optional)
      */

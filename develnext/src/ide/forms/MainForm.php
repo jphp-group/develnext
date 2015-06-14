@@ -6,10 +6,14 @@ use php\gui\designer\UXDesigner;
 use php\gui\framework\AbstractForm;
 use php\gui\UXButton;
 use php\gui\UXForm;
+use php\gui\UXImage;
+use php\gui\UXImageView;
+use php\gui\UXTab;
+use php\gui\UXTabPane;
 
 /**
- * @property UXButton button1
- * @property UXButton button2
+ * @property UXTabPane fileTabPane
+ * @property UXTabPane $projectTabs
  */
 class MainForm extends AbstractForm
 {
@@ -17,6 +21,17 @@ class MainForm extends AbstractForm
     {
         parent::show();
 
-        $this->_origin->maximized = true;
+        $this->maximized = true;
+
+        $tab = new UXTab();
+        $tab->text = 'Form1';
+        $tab->style = '-fx-cursor: hand;';
+        $tab->closable = false;
+
+        $editor = Ide::get()->getEditor('d:/sample.fxml');
+        $editor->load();
+        $tab->content = $editor->makeUi();
+
+        $this->fileTabPane->tabs->add($tab);
     }
 }

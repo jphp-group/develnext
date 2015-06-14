@@ -2,5 +2,4 @@
 include 'jphp-gui-ext',
         'jphp-gui-designer-ext',
         'jphp-gui-framework',
-        'develnext',
-        'sandbox'
+        'develnext'

@@ -44,15 +44,14 @@ class UXForm extends UXWindow
     public $owner;
 
     /**
-     * @readonly
      * @var string
      */
     public $style;
 
     /**
-     * @param string $style (optional) - DECORATED, UNDECORATED, TRANSPARENT, UTILITY
+     * @param UXForm $form (optional)
      */
-    public function __construct($style)
+    public function __construct(UXForm $form)
     {
     }
 

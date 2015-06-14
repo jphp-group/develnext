@@ -2,7 +2,6 @@ package org.develnext.jphp.ext.javafx.classes.layout;
 
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Signature;
@@ -10,7 +9,7 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "layout\\UXAnchorPane")
-public class UXAnchorPane extends UXPane {
+public class UXAnchorPane extends UXPane<AnchorPane> {
     interface WrappedInterface {
 
     }

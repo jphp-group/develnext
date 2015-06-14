@@ -27,9 +27,9 @@ class UXImage {
     public $progress;
 
     /**
-     * @param Stream $stream
+     * @param Stream|string $stream
      */
-    public function __construct(Stream $stream) {}
+    public function __construct($stream) {}
 
     /**
      * ...

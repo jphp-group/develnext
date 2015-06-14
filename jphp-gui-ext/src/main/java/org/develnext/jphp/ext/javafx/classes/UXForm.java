@@ -62,17 +62,12 @@ public class UXForm extends UXWindow {
 
     @Signature
     public void __construct() {
-        __wrappedObject = new Stage();
-
-        AnchorPane layout = new AnchorPane();
-        Scene scene = new Scene(layout);
-
-        getWrappedObject().setScene(scene);
+        __construct(null);
     }
 
     @Signature
-    public void __construct(StageStyle style) {
-        __wrappedObject = new Stage(style);
+    public void __construct(@Nullable Stage stage) {
+        __wrappedObject = stage == null ? new Stage() : stage;
 
         AnchorPane layout = new AnchorPane();
         Scene scene = new Scene(layout);
@@ -98,6 +93,15 @@ public class UXForm extends UXWindow {
     @Setter
     protected void setModality(Modality modality) {
         getWrappedObject().initModality(modality);
+    }
+
+    @Setter
+    protected void setVisible(boolean value) {
+        if (value) {
+            getWrappedObject().show();
+        } else {
+            getWrappedObject().hide();
+        }
     }
 
     @Signature

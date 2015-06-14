@@ -16,12 +16,12 @@ class SplashForm extends AbstractForm
 {
     protected function init()
     {
-        $this->_origin->centerOnScreen();
+        $this->centerOnScreen();
 
         $this->version->text = $this->_app->getVersion();
 
         Timer::run(2000, function() {
-            if ($this->_app->getMainForm()->isShowing()) {
+            if ($this->_app->getMainForm()->visible) {
                 $this->hide();
             }
         });

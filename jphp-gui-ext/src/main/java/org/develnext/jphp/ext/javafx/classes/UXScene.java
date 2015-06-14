@@ -1,9 +1,11 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
@@ -41,6 +43,16 @@ public class UXScene extends BaseWrapper<Scene> {
         } else {
             __wrappedObject = new Scene(parent);
         }
+    }
+
+    @Reflection.Getter
+    protected Cursor getCursor() {
+        return getWrappedObject().getCursor();
+    }
+
+    @Reflection.Setter
+    protected void setCursor(Cursor cursor) {
+        getWrappedObject().setCursor(cursor);
     }
 
     @Signature

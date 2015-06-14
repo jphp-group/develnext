@@ -1,6 +1,7 @@
 package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Labeled;
 import javafx.scene.text.Font;
@@ -26,6 +27,7 @@ public class UXLabeled extends UXControl {
         @Property boolean wrapText();
 
         @Property Font font();
+        @Property Node graphic();
     }
 
     public UXLabeled(Environment env, Labeled wrappedObject) {
