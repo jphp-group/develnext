@@ -164,6 +164,8 @@ class FormEditor extends AbstractEditor
         $this->designer = new UXDesigner($this->layout);
         $this->designer->onAreaMouseDown([$this, '_onAreaMouseDown']);
         $this->designer->onNodeClick([$this, '_onNodeClick']);
+        $this->designer->onNodePick([$this, '_onNodePick']);
+        $this->designer->onChanged([$this, '_onChanged']);
 
         foreach ($this->layout->children as $node) {
             $this->designer->registerNode($node);
@@ -223,6 +225,20 @@ class FormEditor extends AbstractEditor
         }
     }
 
+    protected function _onChanged()
+    {
+        $this->_onNodePick();
+    }
+
+    protected function _onNodePick()
+    {
+        $node = $this->designer->pickedNode;
+
+        if ($node) {
+            $this->updateProperties($node);
+        }
+    }
+
     protected function _onNodeClick(UXMouseEvent $e)
     {
         $selected = $this->elementTypePane->getSelected();
@@ -231,12 +247,6 @@ class FormEditor extends AbstractEditor
             $this->designer->unselectAll();
             $this->elementTypePane->clearSelected();
             return true;
-        } else {
-            $node = $e->target;
-
-            if ($node) {
-                $this->updateProperties($node);
-            }
         }
     }
 

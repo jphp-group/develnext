@@ -10,7 +10,6 @@ import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
-import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
 
 @Reflection.Abstract
@@ -43,17 +42,6 @@ public class UXEvent extends BaseWrapper<Event> {
     @Getter
     protected Memory getTarget(Environment env) throws Throwable {
         Object target = getWrappedObject().getTarget();
-
-        if (target == null) {
-            return Memory.NULL;
-        }
-
-        MemoryOperation operation = MemoryOperation.get(target.getClass(), null);
-
-        if (operation == null) {
-            return Memory.NULL;
-        }
-
-        return operation.unconvert(env, env.trace(), target);
+        return Memory.wrap(env, target);
     }
 }

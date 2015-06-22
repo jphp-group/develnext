@@ -54,12 +54,15 @@ public class UXDesigner extends BaseObject {
 
     private Stage selectionRectangle = null;
 
+    private Node picked = null;
     private Map<Node, Item> nodes = new LinkedHashMap<>();
     private Map<Node, Selection> selections = new LinkedHashMap<>();
 
     protected Invoker onAreaMouseDown;
     protected Invoker onAreaMouseUp;
     protected Invoker onNodeClick;
+    protected Invoker onNodePick;
+    protected Invoker onChanged;
 
     protected ContextMenu contextMenu;
 
@@ -101,6 +104,11 @@ public class UXDesigner extends BaseObject {
         for (Selection selection : selections.values()) {
             selection.update();
         }
+    }
+
+    @Getter
+    public Node getPickedNode() {
+        return picked;
     }
 
     @Getter
@@ -331,6 +339,16 @@ public class UXDesigner extends BaseObject {
     }
 
     @Signature
+    public void onNodePick(@Nullable Invoker invoker) {
+        onNodePick = invoker;
+    }
+
+    @Signature
+    public void onChanged(@Nullable Invoker invoker) {
+        onChanged = invoker;
+    }
+
+    @Signature
     public List<Node> getNodesInArea(double x, double y, double w, double h) {
         List<Node> result = new ArrayList<>();
 
@@ -396,6 +414,7 @@ public class UXDesigner extends BaseObject {
             selection.destroy();
         }
 
+        picked = null;
         selections.clear();
     }
 
@@ -549,6 +568,12 @@ public class UXDesigner extends BaseObject {
                         contextMenu.show(node, e.getScreenX(), e.getScreenY());
                     }
                 }
+
+                picked = node;
+
+                if (onNodePick != null) {
+                    onNodePick.callAny();
+                }
             }
         });
 
@@ -564,6 +589,10 @@ public class UXDesigner extends BaseObject {
                         selection.update();
 
                         area.getChildren().remove(selection.dragImageView);
+                    }
+
+                    if (onChanged != null) {
+                        onChanged.callAny();
                     }
                 }
 
@@ -843,6 +872,10 @@ public class UXDesigner extends BaseObject {
 
                     if (node instanceof Region) {
                         ((Region) node).setPrefSize(resizeW, resizeH);
+                    }
+
+                    if (onChanged != null) {
+                        onChanged.callAny();
                     }
 
                     event.consume();

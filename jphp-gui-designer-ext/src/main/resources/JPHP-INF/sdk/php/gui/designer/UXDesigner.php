@@ -51,6 +51,11 @@ class UXDesigner
     public $contextMenu = null;
 
     /**
+     * @var UXNode|null
+     */
+    public $pickedNode = null;
+
+    /**
      * @param UXPane $area
      */
     public function __construct(UXPane $area)
@@ -166,6 +171,20 @@ class UXDesigner
      * @param callable $handler (MouseEvent $e): bool
      */
     public function onNodeClick(callable $handler)
+    {
+    }
+
+    /**
+     * @param callable $handler
+     */
+    public function onNodePick(callable $handler)
+    {
+    }
+
+    /**
+     * @param callable $handler
+     */
+    public function onChanged(callable $handler)
     {
     }
 
