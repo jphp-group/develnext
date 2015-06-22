@@ -72,4 +72,18 @@ class UXMenuItem
      * @param UXEvent $e (optional)
      */
     public function trigger($event, UXEvent $e) {}
+
+    /**
+     * @return bool
+     */
+    public function isSeparator()
+    {
+    }
+
+    /**
+     * @return UXMenuItem
+     */
+    public static function createSeparator()
+    {
+    }
 }

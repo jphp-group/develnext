@@ -67,6 +67,11 @@ abstract class UXNode
     public $classes;
 
     /**
+     * @var mixed
+     */
+    public $userData = null;
+
+    /**
      * ...
      */
     public function autosize() {}
@@ -94,6 +99,16 @@ abstract class UXNode
      * @param double $y
      */
     public function relocate($x, $y) {}
+
+    /**
+     * Send to front
+     */
+    public function toFront() {}
+
+    /**
+     * Send to back
+     */
+    public function toBack() {}
 
     /**
      * @param string $event

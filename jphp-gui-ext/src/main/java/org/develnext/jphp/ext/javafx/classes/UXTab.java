@@ -1,9 +1,12 @@
 package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
@@ -17,11 +20,14 @@ public class UXTab extends BaseWrapper<Tab> {
         @Property boolean disable();
         @Property boolean disabled();
 
-        @Property Node content();
-        @Property Node graphic();
+        @Property @Nullable Node content();
+        @Property @Nullable Node graphic();
         @Property String id();
         @Property boolean selected();
         @Property String style();
+
+        @Property @Nullable Tooltip tooltip();
+        @Property @Nullable ContextMenu contextMenu();
 
         @Property String text();
     }

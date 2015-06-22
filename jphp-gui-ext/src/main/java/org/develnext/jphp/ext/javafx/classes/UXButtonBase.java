@@ -10,12 +10,12 @@ import php.runtime.reflection.ClassEntity;
 
 @Abstract
 @Reflection.Name(JavaFXExtension.NS + "UXButtonBase")
-public class UXButtonBase extends UXLabeled {
+public class UXButtonBase<T extends ButtonBase> extends UXLabeled<ButtonBase> {
     interface WrappedInterface {
         @Property boolean armed();
     }
 
-    public UXButtonBase(Environment env, ButtonBase wrappedObject) {
+    public UXButtonBase(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -24,7 +24,8 @@ public class UXButtonBase extends UXLabeled {
     }
 
     @Override
-    public ButtonBase getWrappedObject() {
-        return (ButtonBase) super.getWrappedObject();
+    @SuppressWarnings("unchecked")
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 }

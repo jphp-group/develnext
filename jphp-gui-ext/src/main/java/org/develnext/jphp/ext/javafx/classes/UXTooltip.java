@@ -46,11 +46,6 @@ public class UXTooltip<T extends Tooltip> extends UXPopupWindow<Tooltip> {
     }
 
     @Signature
-    public void __construct(String text) {
-        __wrappedObject = new Tooltip(text);
-    }
-
-    @Signature
     public static void install(Node node, Tooltip tooltip) {
         Tooltip.install(node, tooltip);
     }

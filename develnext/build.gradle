@@ -10,9 +10,4 @@ sourceSets {
     main.resources.srcDirs = ['src']
 }
 
-dependencies {
-    compile project(':jphp-gui-designer-ext')
-    compile project(':jphp-gui-framework')
-}
-
 mainClassName = 'php.runtime.launcher.Launcher'

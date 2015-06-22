@@ -53,17 +53,13 @@
                             </Tab>
                             <Tab style="-fx-cursor: hand;" text="Свойства">
                               <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <AnchorPane id="propTabPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TreeTableView id="propTable" layoutX="16.0" layoutY="40.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columns>
-                                              <TreeTableColumn id="propTable" editable="false" prefWidth="117.0" sortable="false" text="Свойство" />
-                                              <TreeTableColumn prefWidth="113.0" sortable="false" text="Значение" />
-                                            </columns>
-                                             <columnResizePolicy>
-                                                <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                             </columnResizePolicy>
-                                          </TreeTableView>
+                                          <ScrollPane fitToWidth="true" layoutX="32.0" layoutY="89.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <content>
+                                                <VBox id="properties" prefWidth="230.0" />
+                                             </content>
+                                          </ScrollPane>
                                        </children></AnchorPane>
                               </content>
                             </Tab>

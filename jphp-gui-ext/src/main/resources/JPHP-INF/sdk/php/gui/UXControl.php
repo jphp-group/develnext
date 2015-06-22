@@ -1,11 +1,12 @@
 <?php
 namespace php\gui;
+use php\gui\layout\UXRegion;
 
 /**
  * Class UXControl
  * @package php\gui
  */
-abstract class UXControl extends UXParent
+abstract class UXControl extends UXRegion
 {
     /**
      * @var UXTooltip

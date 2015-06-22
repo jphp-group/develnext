@@ -1,9 +1,7 @@
 package org.develnext.jphp.gui.designer;
 
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
-import org.develnext.jphp.gui.designer.classes.UXDesignPane;
-import org.develnext.jphp.gui.designer.classes.UXDesigner;
-import org.develnext.jphp.gui.designer.classes.UXWriter;
+import org.develnext.jphp.gui.designer.classes.*;
 import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
 
@@ -20,5 +18,7 @@ public class GuiDesignerExtension extends Extension {
         registerClass(scope, UXDesigner.class);
         registerClass(scope, UXWriter.class);
         registerClass(scope, UXDesignPane.class);
+        registerClass(scope, UXDesignProperties.class);
+        registerClass(scope, UXDesignPropertyEditor.class);
     }
 }

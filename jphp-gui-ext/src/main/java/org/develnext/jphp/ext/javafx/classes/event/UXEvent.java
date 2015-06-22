@@ -48,6 +48,12 @@ public class UXEvent extends BaseWrapper<Event> {
             return Memory.NULL;
         }
 
-        return MemoryOperation.get(target.getClass(), null).unconvert(env, env.trace(), target);
+        MemoryOperation operation = MemoryOperation.get(target.getClass(), null);
+
+        if (operation == null) {
+            return Memory.NULL;
+        }
+
+        return operation.unconvert(env, env.trace(), target);
     }
 }

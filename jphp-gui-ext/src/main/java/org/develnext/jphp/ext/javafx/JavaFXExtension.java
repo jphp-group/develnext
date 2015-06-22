@@ -11,13 +11,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.InputMethodEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.web.HTMLEditor;
@@ -28,13 +23,11 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.develnext.jphp.ext.javafx.bind.CursorMemoryOperation;
+import org.develnext.jphp.ext.javafx.bind.InsetsMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.KeyCombinationMemoryOperation;
 import org.develnext.jphp.ext.javafx.classes.*;
 import org.develnext.jphp.ext.javafx.classes.event.*;
-import org.develnext.jphp.ext.javafx.classes.layout.UXAnchorPane;
-import org.develnext.jphp.ext.javafx.classes.layout.UXPane;
-import org.develnext.jphp.ext.javafx.classes.layout.UXScrollPane;
-import org.develnext.jphp.ext.javafx.classes.layout.UXStackPane;
+import org.develnext.jphp.ext.javafx.classes.layout.*;
 import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
@@ -62,6 +55,7 @@ public class JavaFXExtension extends Extension {
     public void onRegister(CompileScope scope) {
         registerMemoryOperation(KeyCombinationMemoryOperation.class);
         registerMemoryOperation(CursorMemoryOperation.class);
+        registerMemoryOperation(InsetsMemoryOperation.class);
 
         registerWrapperClass(scope, ObservableList.class, UXList.class);
         registerWrapperClass(scope, Application.class, UXApplication.class);
@@ -76,19 +70,25 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Tooltip.class, UXTooltip.class);
         registerWrapperClass(scope, ContextMenu.class, UXContextMenu.class);
         registerWrapperClass(scope, MenuItem.class, UXMenuItem.class);
+       // MemoryOperation.registerWrapper(SeparatorMenuItem.class, UXMenuItem.class);
         registerWrapperClass(scope, Scene.class, UXScene.class);
 
         registerWrapperClass(scope, Node.class, UXNode.class);
         registerWrapperClass(scope, Parent.class, UXParent.class);
+        registerWrapperClass(scope, Region.class, UXRegion.class);
         registerWrapperClass(scope, Control.class, UXControl.class);
 
         registerWrapperClass(scope, Pane.class, UXPane.class);
         registerWrapperClass(scope, AnchorPane.class, UXAnchorPane.class);
         registerWrapperClass(scope, StackPane.class, UXStackPane.class);
+        registerWrapperClass(scope, VBox.class, UXVBox.class);
+        registerWrapperClass(scope, HBox.class, UXHBox.class);
 
         registerWrapperClass(scope, Labeled.class, UXLabeled.class);
         registerWrapperClass(scope, ButtonBase.class, UXButtonBase.class);
         registerWrapperClass(scope, Button.class, UXButton.class);
+        registerWrapperClass(scope, ToggleGroup.class, UXToggleGroup.class);
+        registerWrapperClass(scope, ToggleButton.class, UXToggleButton.class);
         registerWrapperClass(scope, CheckBox.class, UXCheckbox.class);
         registerWrapperClass(scope, ImageView.class, UXImageView.class);
         registerWrapperClass(scope, MenuBar.class, UXMenuBar.class);
@@ -109,6 +109,15 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Tab.class, UXTab.class);
         registerWrapperClass(scope, TabPane.class, UXTabPane.class);
         registerWrapperClass(scope, ScrollPane.class, UXScrollPane.class);
+        registerWrapperClass(scope, TitledPane.class, UXTitledPane.class);
+        registerWrapperClass(scope, SplitPane.class, UXSplitPane.class);
+
+        registerWrapperClass(scope, Cell.class, UXCell.class);
+        registerWrapperClass(scope, TableView.class, UXTableView.class);
+        registerWrapperClass(scope, TableColumnBase.class, UXTableColumn.class);
+        registerWrapperClass(scope, TableCell.class, UXTableCell.class);
+        MemoryOperation.registerWrapper(TableColumn.class, UXTableColumn.class);
+        MemoryOperation.registerWrapper(IndexedCell.class, UXCell.class);
 
         MemoryOperation.registerWrapper(InputEvent.class, UXEvent.class);
         MemoryOperation.registerWrapper(ActionEvent.class, UXEvent.class);
@@ -116,6 +125,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Event.class, UXEvent.class);
 
         registerWrapperClass(scope, MouseEvent.class, UXMouseEvent.class);
+        registerWrapperClass(scope, KeyEvent.class, UXKeyEvent.class);
         registerWrapperClass(scope, WindowEvent.class, UXWindowEvent.class);
         registerWrapperClass(scope, ContextMenuEvent.class, UXContextMenuEvent.class);
         registerWrapperClass(scope, DragEvent.class, UXDragEvent.class);
@@ -123,6 +133,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, FXMLLoader.class, UXLoader.class);
 
         registerClass(scope, UXDialog.class);
+        registerClass(scope, UXClipboard.class);
 
         registerEvents();
     }

@@ -66,6 +66,42 @@ public class WindowEventProvider extends EventProvider<Window> {
                 return target.getOnCloseRequest();
             }
         });
+
+        setHandler("keyPress", new Handler() {
+            @Override
+            public void set(Window target, EventHandler eventHandler) {
+                target.getScene().setOnKeyTyped(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Window target) {
+                return target.getScene().getOnKeyTyped();
+            }
+        });
+
+        setHandler("keyDown", new Handler() {
+            @Override
+            public void set(Window target, EventHandler eventHandler) {
+                target.getScene().setOnKeyPressed(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Window target) {
+                return target.getScene().getOnKeyPressed();
+            }
+        });
+
+        setHandler("keyUp", new Handler() {
+            @Override
+            public void set(Window target, EventHandler eventHandler) {
+                target.getScene().setOnKeyReleased(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Window target) {
+                return target.getScene().getOnKeyReleased();
+            }
+        });
     }
 
     @Override

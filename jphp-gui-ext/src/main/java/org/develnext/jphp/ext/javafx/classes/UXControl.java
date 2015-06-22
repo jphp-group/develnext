@@ -4,21 +4,19 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Tooltip;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXControl")
-public class UXControl<T extends Control> extends UXParent<Control> {
+public class UXControl<T extends Control> extends UXRegion<Control> {
     interface WrappedInterface {
         @Property boolean resizable();
 
-        @Getter ContextMenu getContextMenu();
-        @Setter void setContextMenu(@Nullable ContextMenu menu);
-
-        @Getter Tooltip getTooltip();
-        @Setter void setTooltip(@Nullable Tooltip tooltip);
+        @Property @Nullable ContextMenu contextMenu();
+        @Property @Nullable Tooltip tooltip();
     }
 
     public UXControl(Environment env, T wrappedObject) {

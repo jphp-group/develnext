@@ -16,6 +16,16 @@ class UXScrollPane extends UXControl
     public $content;
 
     /**
+     * @var bool
+     */
+    public $fitToWidth = false;
+
+    /**
+     * @var bool
+     */
+    public $fitToHeight = false;
+
+    /**
      * @param UXNode $node (optional)
      */
     public function __construct(UXNode $node)

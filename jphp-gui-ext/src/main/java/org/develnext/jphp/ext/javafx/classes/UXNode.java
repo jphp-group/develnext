@@ -28,7 +28,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     interface WrappedInterface {
         @Property double baselineOffset();
         @Property BlendMode blendMode();
-        @Property Node clip();
+        @Property @Nullable Node clip();
         @Property Orientation contentBias();
         @Property DepthTest depthTest();
         @Property String id();
@@ -63,6 +63,8 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
         @Property("classes") ObservableList<String> styleClass();
 
+        @Property @Nullable Object userData();
+
         void autosize();
         boolean contains(double localX, double localY);
 
@@ -91,6 +93,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T getWrappedObject() {
         return (T) super.getWrappedObject();
     }

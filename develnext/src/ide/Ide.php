@@ -2,9 +2,25 @@
 namespace ide;
 
 use ide\editors\AbstractEditor;
+use ide\formats\AbstractFormat;
+use ide\formats\form\context\DeleteMenuCommand;
+use ide\formats\form\ButtonFormElement;
+use ide\formats\form\context\LockMenuCommand;
+use ide\formats\form\context\ToBackMenuCommand;
+use ide\formats\form\context\ToFrontMenuCommand;
+use ide\formats\form\LabelFormElement;
+use ide\formats\form\TextFieldFormElement;
+use ide\formats\FormFormat;
+use ide\formats\GuiFormFormat;
 use ide\forms\SplashForm;
 use php\gui\framework\Application;
+use php\gui\UXDialog;
 use php\gui\UXForm;
+use php\gui\UXImage;
+use php\gui\UXImageView;
+use php\gui\UXTab;
+use php\io\File;
+use php\io\Stream;
 
 /**
  * Class Ide
@@ -18,9 +34,9 @@ class Ide extends Application
     protected $splash;
 
     /**
-     * @var string[]
+     * @var AbstractFormat[]
      */
-    protected $editors;
+    protected $formats = [];
 
     public function launch()
     {
@@ -39,25 +55,76 @@ class Ide extends Application
     }
 
     /**
-     * @param $editorClass
+     * @param AbstractFormat $format
      */
-    public function registerEditor($editorClass)
+    public function registerFormat(AbstractFormat $format)
     {
-        $this->editors[$editorClass] = $editorClass;
+        $this->formats[] = $format;
     }
 
-    public function getEditor($path)
+    /**
+     * @param string $path
+     * @return UXImageView
+     */
+    public function getImage($path)
     {
-        /** @var AbstractEditor $editor */
-        foreach ($this->editors as $editorClass) {
-            $editor = new $editorClass($path);
+        if ($path === null) {
+            return null;
+        }
 
-            if ($editor->isValid()) {
-                return $editor;
+        if ($path instanceof UXImage) {
+            $image = $path;
+        } elseif ($path instanceof UXImageView) {
+            return $path;
+        } elseif ($path instanceof Stream) {
+            $image = new UXImage($path);
+        } else {
+            $image = new UXImage('res://.data/img/' . $path);
+        }
+
+        $result = new UXImageView();
+        $result->image = $image;
+
+        return $result;
+    }
+
+    /**
+     * @param $path
+     * @return AbstractFormat|null
+     */
+    public function getFormat($path)
+    {
+        /** @var AbstractFormat $format */
+        foreach ($this->formats as $format) {
+            if ($format->isValid($path)) {
+                return $format;
             }
         }
 
         return null;
+    }
+
+    /**
+     * @param $path
+     * @return AbstractEditor
+     */
+    public function createEditor($path)
+    {
+        $format = $this->getFormat($path);
+
+        if ($format) {
+            $editor = $format->createEditor($path);
+            $editor->setFormat($format);
+
+            return $editor;
+        }
+
+        return null;
+    }
+
+    public function registerAll()
+    {
+        $this->registerFormat(new GuiFormFormat());
     }
 
     /**

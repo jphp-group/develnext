@@ -18,9 +18,9 @@ class UXKeyEvent extends UXEvent
     public $text;
 
     /**
-     * @var int
+     * @var string
      */
-    public $code;
+    public $codeName;
 
     /**
      * @var bool

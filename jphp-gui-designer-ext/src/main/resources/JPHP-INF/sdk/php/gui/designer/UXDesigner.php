@@ -2,6 +2,7 @@
 namespace php\gui\designer;
 
 use php\gui\layout\UXPane;
+use php\gui\UXContextMenu;
 use php\gui\UXForm;
 use php\gui\UXNode;
 
@@ -43,6 +44,11 @@ class UXDesigner
      * @var bool
      */
     public $helpersEnabled = true;
+
+    /**
+     * @var UXContextMenu
+     */
+    public $contextMenu = null;
 
     /**
      * @param UXPane $area
@@ -135,6 +141,14 @@ class UXDesigner
     }
 
     /**
+     * @param UXNode $node
+     * @return bool
+     */
+    public function isRegisteredNode(UXNode $node)
+    {
+    }
+
+    /**
      * @param callable $handler
      */
     public function onAreaMouseDown(callable $handler)
@@ -145,6 +159,20 @@ class UXDesigner
      * @param callable $handler
      */
     public function onAreaMouseUp(callable $handler)
+    {
+    }
+
+    /**
+     * @param callable $handler (MouseEvent $e): bool
+     */
+    public function onNodeClick(callable $handler)
+    {
+    }
+
+    /**
+     * ...
+     */
+    public function update()
     {
     }
 }

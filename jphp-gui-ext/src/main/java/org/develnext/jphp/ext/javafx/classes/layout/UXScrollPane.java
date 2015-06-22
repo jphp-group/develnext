@@ -14,6 +14,9 @@ import php.runtime.reflection.ClassEntity;
 public class UXScrollPane extends UXControl<ScrollPane> {
     interface WrappedInterface {
         @Property Node content();
+
+        @Property boolean fitToWidth();
+        @Property boolean fitToHeight();
     }
 
     public UXScrollPane(Environment env, ScrollPane wrappedObject) {

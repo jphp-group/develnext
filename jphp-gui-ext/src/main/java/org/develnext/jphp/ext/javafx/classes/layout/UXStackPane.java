@@ -1,10 +1,14 @@
 package org.develnext.jphp.ext.javafx.classes.layout;
 
+import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
+
+import java.util.List;
 
 @Reflection.Name(JavaFXExtension.NS + "layout\\UXStackPane")
 public class UXStackPane extends UXPane {
@@ -20,8 +24,13 @@ public class UXStackPane extends UXPane {
         super(env, clazz);
     }
 
-    @Reflection.Signature
+    @Signature
     public void __construct() {
         __wrappedObject = new StackPane();
+    }
+
+    @Signature
+    public void __construct(List<Node> children) {
+        __wrappedObject = new StackPane(children.toArray(new Node[children.size()]));
     }
 }

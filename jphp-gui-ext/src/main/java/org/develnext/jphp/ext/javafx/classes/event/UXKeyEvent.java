@@ -35,7 +35,7 @@ public class UXKeyEvent extends UXEvent {
     }
 
     @Getter
-    public int getCode() {
-        return getWrappedObject().getCode().ordinal();
+    public String getCodeName() {
+        return getWrappedObject().getCode().getName();
     }
 }

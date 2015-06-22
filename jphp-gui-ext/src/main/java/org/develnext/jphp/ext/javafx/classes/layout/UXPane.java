@@ -4,7 +4,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
-import org.develnext.jphp.ext.javafx.classes.UXParent;
 import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Signature;
@@ -12,7 +11,7 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "layout\\UXPane")
-public class UXPane<T extends Pane> extends UXParent<T> {
+public class UXPane<T extends Pane> extends UXRegion<T> {
     interface WrappedInterface {
 
     }

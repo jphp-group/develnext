@@ -9,6 +9,7 @@ import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 @Reflection.Name(JavaFXExtension.NS + "UXImage")
@@ -30,8 +31,8 @@ public class UXImage extends BaseWrapper<Image> {
     }
 
     @Signature
-    public void __construct(InputStream stream) {
-        __wrappedObject = new Image(stream);
+    public void __construct(InputStream is) throws IOException {
+        __wrappedObject = new Image(is);
     }
 
     @Signature

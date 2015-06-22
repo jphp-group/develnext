@@ -9,7 +9,7 @@ use php\gui\UXParent;
  * Class UXPane
  * @package php\gui
  */
-class UXPane extends UXParent
+class UXPane extends UXRegion
 {
     /**
      * @readonly

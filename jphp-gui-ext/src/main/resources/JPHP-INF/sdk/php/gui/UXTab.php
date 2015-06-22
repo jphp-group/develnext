@@ -51,4 +51,9 @@ class UXTab
      * @var string
      */
     public $style;
+
+    /**
+     * @var UXTooltip
+     */
+    public $tooltip;
 }

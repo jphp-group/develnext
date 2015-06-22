@@ -140,7 +140,6 @@ public class UXDesignPane extends UXAnchorPane {
         return y > height - borderWidth && y < height;
     }
 
-
     @Getter
     public boolean isEditing() {
         return resizing;

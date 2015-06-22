@@ -3,6 +3,7 @@ package org.develnext.jphp.gui.designer.classes;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
@@ -13,8 +14,10 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -56,6 +59,9 @@ public class UXDesigner extends BaseObject {
 
     protected Invoker onAreaMouseDown;
     protected Invoker onAreaMouseUp;
+    protected Invoker onNodeClick;
+
+    protected ContextMenu contextMenu;
 
     public UXDesigner(Environment env, ClassEntity clazz) {
         super(env, clazz);
@@ -85,6 +91,31 @@ public class UXDesigner extends BaseObject {
 
             area.getChildren().addAll(dots);
             dots.toBack();
+        }
+    }
+
+    @Signature
+    public void update() {
+        dots.toBack();
+
+        for (Selection selection : selections.values()) {
+            selection.update();
+        }
+    }
+
+    @Getter
+    public ContextMenu getContextMenu() {
+        return contextMenu;
+    }
+
+    @Setter
+    public void setContextMenu(@Nullable ContextMenu contextMenu) {
+        this.contextMenu = contextMenu;
+
+        for (Node node : nodes.keySet()) {
+            if (node instanceof Control) {
+                ((Control) node).setContextMenu(contextMenu);
+            }
         }
     }
 
@@ -166,14 +197,41 @@ public class UXDesigner extends BaseObject {
 
         selectionRectangleLayout.setStyle("-fx-background-color: black;");
 
+        area.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (contextMenu != null) {
+                    for (MenuItem menuItem : contextMenu.getItems()) {
+                        if (menuItem != null && !menuItem.isDisable()
+                                && menuItem.getAccelerator() != null && menuItem.getAccelerator().match(event)) {
+                            menuItem.getOnAction().handle(new ActionEvent(menuItem, null));
+
+                            event.consume();
+                            return;
+                        }
+                    }
+                }
+            }
+        });
+
         area.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                if (event.getX() > area.getPrefWidth() || event.getY() > area.getPrefHeight()) {
+                    return;
+                }
+
                 if (isEditing()) {
                     return;
                 }
 
                 if (onAreaMouseDown != null && onAreaMouseDown.callAny(event).toBoolean()) {
+                    event.consume();
+                    return;
+                }
+
+                if (contextMenu != null && event.getButton() == MouseButton.SECONDARY) {
+                    contextMenu.show(area, event.getScreenX(), event.getScreenY());
                     event.consume();
                     return;
                 }
@@ -192,6 +250,10 @@ public class UXDesigner extends BaseObject {
         area.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                if (event.getX() > area.getPrefWidth() || event.getY() > area.getPrefHeight()) {
+                    return;
+                }
+
                 if (isEditing()) {
                     return;
                 }
@@ -214,6 +276,10 @@ public class UXDesigner extends BaseObject {
         area.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                if (event.getX() > area.getPrefWidth() || event.getY() > area.getPrefHeight()) {
+                    return;
+                }
+
                 if (isEditing()) {
                     return;
                 }
@@ -260,6 +326,11 @@ public class UXDesigner extends BaseObject {
     }
 
     @Signature
+    public void onNodeClick(@Nullable Invoker invoker) {
+        onNodeClick = invoker;
+    }
+
+    @Signature
     public List<Node> getNodesInArea(double x, double y, double w, double h) {
         List<Node> result = new ArrayList<>();
 
@@ -290,11 +361,11 @@ public class UXDesigner extends BaseObject {
 
     @Signature
     public Set<Node> getSelectedNodes() {
-        return null;
+        return selections.keySet();
     }
 
     @Signature
-    public Collection<Node> getNodes() {
+    public Set<Node> getNodes() {
         return nodes.keySet();
     }
 
@@ -352,6 +423,10 @@ public class UXDesigner extends BaseObject {
     public void setNodeLock(Node node, boolean lock) {
         if (nodes.containsKey(node)) {
             nodes.get(node).setLocked(lock);
+
+            if (selections.containsKey(node)) {
+                selections.get(node).setLocked(lock);
+            }
         }
     }
 
@@ -365,12 +440,23 @@ public class UXDesigner extends BaseObject {
     }
 
     @Signature
+    public boolean isRegisteredNode(final Node node) {
+        return nodes.containsKey(node);
+    }
+
+    @Signature
     public void registerNode(final Node node) {
         if (nodes.containsKey(node)) {
             throw new RuntimeException("Node already registered");
         }
 
         nodes.put(node, new Item(node));
+
+        if (node instanceof Control) {
+            ((Control) node).setContextMenu(contextMenu);
+        }
+
+        node.setOnKeyPressed(area.getOnKeyPressed());
 
         node.setOnDragDetected(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
@@ -427,6 +513,12 @@ public class UXDesigner extends BaseObject {
             public void handle(MouseEvent e) {
                 Node node = (Node) e.getSource();
 
+                if (onNodeClick != null) {
+                    if (onNodeClick.callAny(e).toBoolean()) {
+                        return;
+                    }
+                }
+
                 if (!dragged) {
                     boolean isSelected = selections.get(node) != null;
 
@@ -450,6 +542,12 @@ public class UXDesigner extends BaseObject {
                 for (Selection selection : selections.values()) {
                     selection.dragImageView.setMouseTransparent(true);
                     selection.dragImageView.relocate(selection.node.getLayoutX(), selection.node.getLayoutY());
+                }
+
+                if (e.getButton() == MouseButton.SECONDARY) {
+                    if (contextMenu != null && !(node instanceof Control)) {
+                        contextMenu.show(node, e.getScreenX(), e.getScreenY());
+                    }
                 }
             }
         });

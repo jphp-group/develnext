@@ -4,6 +4,7 @@ import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
@@ -31,6 +32,10 @@ public class UXMenuItem extends BaseWrapper<MenuItem> {
         @Setter void setAccelerator(@Nullable KeyCombination keyCombination);
     }
 
+    public UXMenuItem(Environment env, SeparatorMenuItem wrappedObject) {
+        super(env, wrappedObject);
+    }
+
     public UXMenuItem(Environment env, MenuItem wrappedObject) {
         super(env, wrappedObject);
     }
@@ -51,7 +56,7 @@ public class UXMenuItem extends BaseWrapper<MenuItem> {
 
     @Signature
     public void __construct(String text, @Nullable UXNode graphic) {
-        __wrappedObject = new MenuItem(text, graphic.getWrappedObject());
+        __wrappedObject = new MenuItem(text, graphic == null ? null : graphic.getWrappedObject());
     }
 
     @Signature
@@ -97,5 +102,15 @@ public class UXMenuItem extends BaseWrapper<MenuItem> {
         } else {
             throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
         }
+    }
+
+    @Signature
+    public boolean isSeparator() {
+        return getWrappedObject() instanceof SeparatorMenuItem;
+    }
+
+    @Signature
+    public static UXMenuItem createSeparator(Environment env) {
+        return new UXMenuItem(env, new SeparatorMenuItem());
     }
 }

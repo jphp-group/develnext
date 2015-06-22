@@ -1,5 +1,6 @@
 <?php
 namespace ide\editors;
+use ide\formats\AbstractFormat;
 use php\gui\layout\UXPane;
 use php\gui\UXNode;
 
@@ -13,6 +14,11 @@ abstract class AbstractEditor
     protected $file;
 
     /**
+     * @var AbstractFormat
+     */
+    protected $format;
+
+    /**
      * AbstractEditor constructor.
      * @param string $file
      */
@@ -21,10 +27,44 @@ abstract class AbstractEditor
         $this->file = $file;
     }
 
-    abstract public function isValid();
+    /**
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param AbstractFormat $format
+     */
+    public function setFormat($format)
+    {
+        $this->format = $format;
+    }
+
+    /**
+     * @return AbstractFormat
+     */
+    public function getFormat()
+    {
+        return $this->format;
+    }
+
+    abstract public function getTitle();
 
     abstract public function load();
     abstract public function save();
+
+    public function getIcon()
+    {
+        return null;
+    }
+
+    public function getTooltip()
+    {
+        return null;
+    }
 
     /**
      * @return UXNode

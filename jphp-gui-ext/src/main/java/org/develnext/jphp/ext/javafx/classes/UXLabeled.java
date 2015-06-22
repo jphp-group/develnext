@@ -8,29 +8,43 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
-import php.runtime.annotation.Reflection.Abstract;
-import php.runtime.annotation.Reflection.Property;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Abstract
 @Reflection.Name(JavaFXExtension.NS + "UXLabeled")
-public class UXLabeled extends UXControl {
+public class UXLabeled<T extends Labeled> extends UXControl<Labeled> {
     interface WrappedInterface {
-        @Property Pos alignment();
-        @Property ContentDisplay contentDisplay();
-        @Property String ellipsisString();
-        @Property double graphicTextGap();
-        @Property String text();
-        @Property TextAlignment textAlignment();
-        @Property boolean underline();
-        @Property boolean wrapText();
+        @Property
+        Pos alignment();
 
-        @Property Font font();
-        @Property Node graphic();
+        @Property
+        ContentDisplay contentDisplay();
+
+        @Property
+        String ellipsisString();
+
+        @Property
+        double graphicTextGap();
+
+        @Property
+        String text();
+
+        @Property
+        TextAlignment textAlignment();
+
+        @Property
+        boolean underline();
+
+        @Property
+        boolean wrapText();
+
+        @Property @Nullable
+        Font font();
     }
 
-    public UXLabeled(Environment env, Labeled wrappedObject) {
+    public UXLabeled(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -39,7 +53,18 @@ public class UXLabeled extends UXControl {
     }
 
     @Override
-    public Labeled getWrappedObject() {
-        return (Labeled) super.getWrappedObject();
+    @SuppressWarnings("unchecked")
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
+    }
+
+    @Setter
+    public void setGraphic(@Nullable Node node) {
+        getWrappedObject().setGraphic(node);
+    }
+
+    @Getter
+    public Node getGraphic() {
+        return getWrappedObject().getGraphic();
     }
 }

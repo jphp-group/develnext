@@ -11,10 +11,20 @@ abstract class UXLabeled extends UXControl
     /**
      * @var string
      */
+    public $alignment = 'BASELINE_CENTER';
+
+    /**
+     * @var string
+     */
     public $text;
 
     /**
      * @var UXFont
      */
     public $font;
+
+    /**
+     * @var UXNode
+     */
+    public $graphic;
 }

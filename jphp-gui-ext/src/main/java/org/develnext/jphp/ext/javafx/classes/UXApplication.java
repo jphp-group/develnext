@@ -12,6 +12,7 @@ import php.runtime.annotation.Reflection.Abstract;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
+import php.runtime.exceptions.CriticalException;
 import php.runtime.ext.core.classes.stream.ResourceStream;
 import php.runtime.ext.core.classes.stream.Stream;
 import php.runtime.invoke.Invoker;
@@ -86,7 +87,13 @@ public class UXApplication extends BaseWrapper<Application> {
                 thread.setContextClassLoader(onStart.getEnvironment().scope.getClassLoader());
                 UXApplication.onStart.callAny(stage);
             } catch (Exception throwable) {
+                if (throwable instanceof CriticalException) {
+                    throwable.printStackTrace();
+                }
+
                 onStart.getEnvironment().catchUncaught(throwable);
+            } catch (Throwable throwable) {
+                throw throwable;
             } finally {
                 thread.setContextClassLoader(old);
             }
