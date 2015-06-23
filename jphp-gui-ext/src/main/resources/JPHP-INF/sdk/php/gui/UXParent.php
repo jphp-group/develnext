@@ -9,6 +9,11 @@ namespace php\gui;
 abstract class UXParent extends UXNode
 {
     /**
+     * @var UXList
+     */
+    public $childrenUnmodifiable;
+
+    /**
      * Executes a top-down layout pass on the scene graph under this parent.
      */
     public function layout() {}
@@ -17,9 +22,4 @@ abstract class UXParent extends UXNode
      * Requests a layout pass to be performed before the next scene is rendered.
      */
     public function requestLayout() {}
-
-    /**
-     * @return UXNode[]
-     */
-    public function getChildren() {}
 }

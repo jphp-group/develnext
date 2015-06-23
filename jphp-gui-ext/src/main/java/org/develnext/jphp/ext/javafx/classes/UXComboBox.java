@@ -2,13 +2,15 @@ package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ComboBoxBase;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SingleSelectionModel;
+import javafx.util.Callback;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
-import php.runtime.annotation.Reflection.Name;
-import php.runtime.annotation.Reflection.Property;
-import php.runtime.annotation.Reflection.Signature;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
+import php.runtime.invoke.Invoker;
 import php.runtime.lang.ForeachIterator;
 import php.runtime.reflection.ClassEntity;
 
@@ -19,7 +21,7 @@ public class UXComboBox extends UXComboBoxBase {
         @Property int visibleRowCount();
     }
 
-    public UXComboBox(Environment env, ComboBoxBase wrappedObject) {
+    public UXComboBox(Environment env, ComboBox wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -43,5 +45,46 @@ public class UXComboBox extends UXComboBoxBase {
         while (iterator.next()) {
             getWrappedObject().getItems().add(Memory.unwrap(env, iterator.getValue()));
         }
+    }
+
+    @Getter
+    public Object getSelected() {
+        SingleSelectionModel selectionModel = getWrappedObject().getSelectionModel();
+        return selectionModel.getSelectedItem();
+    }
+
+    @Setter
+    public void setSelected(Object value) {
+        getWrappedObject().getSelectionModel().select(value);
+    }
+
+    @Getter
+    public int getSelectedIndex() {
+        SingleSelectionModel selectionModel = getWrappedObject().getSelectionModel();
+        return selectionModel.getSelectedIndex();
+    }
+
+    @Setter
+    public void setSelectedIndex(int value) {
+        getWrappedObject().getSelectionModel().select(value);
+    }
+
+    @Signature
+    public void onCellRender(final Environment env, @Nullable final Invoker handler) {
+        getWrappedObject().setCellFactory(new Callback<ListView, ListCell>() {
+            @Override
+            public ListCell call(ListView param) {
+                return new ListCell() {
+                    @Override
+                    protected void updateItem(Object item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (handler != null) {
+                            handler.callAny(UXComboBox.this, new UXListCell(env, this), item, empty);
+                        }
+                    }
+                };
+            }
+        });
     }
 }

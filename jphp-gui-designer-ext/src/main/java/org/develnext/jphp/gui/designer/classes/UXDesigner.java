@@ -397,6 +397,12 @@ public class UXDesigner extends BaseObject {
 
         if (selection == null) {
             selections.put(node, selection = new Selection(node));
+
+            picked = node;
+
+            if (onNodePick != null) {
+                onNodePick.callAny();
+            }
         } else {
             selection.update();
         }

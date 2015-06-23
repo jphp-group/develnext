@@ -13,6 +13,12 @@ class UXScene
     public $root;
 
     /**
+     * @readonly
+     * @var UXWindow
+     */
+    public $window;
+
+    /**
      * @var string
      */
     public $cursor;

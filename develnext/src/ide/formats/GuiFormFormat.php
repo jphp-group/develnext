@@ -18,6 +18,7 @@ use ide\formats\form\elements\LabelFormElement;
 use ide\formats\form\elements\TextFieldFormElement;
 use ide\formats\form\tags\AnchorPaneFormElementTag;
 use ide\formats\form\tags\ButtonFormElementTag;
+use ide\formats\form\tags\DataFormElementTag;
 use ide\formats\form\tags\LabeledFormElementTag;
 use ide\formats\form\tags\LabelFormElementTag;
 use ide\formats\form\tags\NodeFormElementTag;
@@ -36,6 +37,7 @@ class GuiFormFormat extends AbstractFormFormat
 
         // Element tags.
         $this->register(new NodeFormElementTag());
+        $this->register(new DataFormElementTag());
         $this->register(new LabeledFormElementTag());
         $this->register(new AnchorPaneFormElementTag());
         $this->register(new ButtonFormElementTag());

@@ -12,11 +12,14 @@ use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXMouseEvent;
+use php\gui\framework\DataUtils;
+use php\gui\framework\Timer;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXScrollPane;
 use php\gui\UXContextMenu;
 use php\gui\UXDialog;
+use php\gui\UXLabel;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXSplitPane;
@@ -24,6 +27,7 @@ use php\gui\UXTooltip;
 use php\io\File;
 use php\lib\Items;
 use php\lib\String;
+use php\time\Time;
 use php\util\Configuration;
 
 /**
@@ -69,7 +73,7 @@ class FormEditor extends AbstractEditor
     /**
      * @var UXDesignProperties[]
      */
-    protected $typeProperties = [];
+    protected static $typeProperties = [];
 
     public function __construct($file, AbstractFormDumper $dumper)
     {
@@ -200,6 +204,10 @@ class FormEditor extends AbstractEditor
         if ($selected) {
             $node = $selected->createElement();
 
+            if (!$node->id) {
+                $node->id = 'element' . (sizeof($this->designer->getNodes()) + 1);
+            }
+
             $size = $selected->getDefaultSize();
             $position = [$e->x, $e->y];
 
@@ -222,6 +230,14 @@ class FormEditor extends AbstractEditor
             if (!$e->controlDown) {
                 $this->elementTypePane->clearSelected();
             }
+
+            $data = DataUtils::get($node);
+
+            foreach ($selected->getDefaultData() as $key => $value) {
+                $data->set($key, $value);
+            }
+        } else {
+            $this->updateProperties($this);
         }
     }
 
@@ -235,7 +251,13 @@ class FormEditor extends AbstractEditor
         $node = $this->designer->pickedNode;
 
         if ($node) {
-            $this->updateProperties($node);
+            if (!static::$typeProperties[get_class($node)]) {
+                $this->updateProperties(null);
+            }
+
+            Timer::run(100, function () use ($node) {
+                $this->updateProperties($node);
+            });
         }
     }
 
@@ -250,7 +272,7 @@ class FormEditor extends AbstractEditor
         }
     }
 
-    protected function updateProperties(UXNode $node)
+    protected function updateProperties($node)
     {
         $element = $this->format->getFormElement($node);
 
@@ -258,24 +280,43 @@ class FormEditor extends AbstractEditor
         $mainForm = Ide::get()->getMainForm();
         $pane = $mainForm->getPropertiesPane();
 
-        $properties = $this->typeProperties[get_class($node)];
+        $properties = static::$typeProperties[get_class($node)];
 
-        if (!$properties) {
+        if (!$properties && $element) {
             $properties = new UXDesignProperties();
             $properties->target = $node;
 
             $element->createProperties($properties);
 
-            $this->typeProperties[get_class($node)] = $properties;
+            static::$typeProperties[get_class($node)] = $properties;
         }
 
-        $properties->target = $node;
-        $properties->update();
+        if ($properties) {
+            $properties->target = $node;
+            $properties->update();
+        }
 
         $pane->children->clear();
 
-        foreach ($properties->getGroupPanes() as $groupPane) {
-            $pane->children->add($groupPane);
+        if ($properties) {
+            foreach ($properties->getGroupPanes() as $groupPane) {
+                $pane->children->add($groupPane);
+            }
+        }
+
+        if (!$properties || !$properties->getGroupPanes()) {
+            $hint = new UXLabel('Список пуст.');
+
+            if ($node === null) {
+                $hint->text = 'Подождите ...';
+            }
+
+            $hint->style = '-fx-font-style: italic;';
+            $hint->maxSize = [10000, 10000];
+            $hint->padding = 20;
+            $hint->alignment = 'BASELINE_CENTER';
+
+            $pane->children->add($hint);
         }
     }
 }

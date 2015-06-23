@@ -1,5 +1,6 @@
 <?php
 namespace php\gui;
+use php\gui\text\UXFont;
 
 /**
  * Class UXTextInputControl
@@ -16,6 +17,11 @@ abstract class UXTextInputControl extends UXControl
      * @var string
      */
     public $text;
+
+    /**
+     * @var UXFont
+     */
+    public $font;
 
     /**
      * @readonly

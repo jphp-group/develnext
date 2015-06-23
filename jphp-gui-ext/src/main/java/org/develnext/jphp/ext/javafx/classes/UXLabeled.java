@@ -4,6 +4,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Labeled;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
@@ -66,5 +68,21 @@ public class UXLabeled<T extends Labeled> extends UXControl<Labeled> {
     @Getter
     public Node getGraphic() {
         return getWrappedObject().getGraphic();
+    }
+
+    @Setter
+    public void setTextColor(Color color) {
+        getWrappedObject().setTextFill(color);
+    }
+
+    @Getter
+    public Color getTextColor() {
+        Paint textFill = getWrappedObject().getTextFill();
+
+        if (textFill instanceof Color) {
+            return (Color) textFill;
+        }
+
+        return null;
     }
 }

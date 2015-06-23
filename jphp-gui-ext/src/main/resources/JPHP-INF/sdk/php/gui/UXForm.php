@@ -44,6 +44,7 @@ class UXForm extends UXWindow
     public $owner;
 
     /**
+     * DECORATED, UNDECORATED, TRANSPARENT, UTILITY, UNIFIED
      * @var string
      */
     public $style;

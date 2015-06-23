@@ -15,6 +15,16 @@ class UXComboBox extends UXComboBoxBase
     public $items;
 
     /**
+     * @var mixed
+     */
+    public $selected;
+
+    /**
+     * @var int
+     */
+    public $selectedIndex;
+
+    /**
      * @var int
      */
     public $visibleRowCount;
@@ -23,4 +33,11 @@ class UXComboBox extends UXComboBoxBase
      * @param array|Traversable $items (optional)
      */
     public function __construct($items) {}
+
+    /**
+     * @param callable|null $handler (UXComboBox $self, UXListCell $cell, mixed $value, bool $empty)
+     */
+    public function onCellRender(callable $handler)
+    {
+    }
 }

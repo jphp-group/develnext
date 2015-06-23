@@ -26,6 +26,7 @@ class NodeFormElementTag extends AbstractFormElementTag
     public function writeAttributes($node, DomElement $element)
     {
         /** @var UXNode $node */
+        $element->setAttribute('id', $node->id);
 
         $element->setAttribute('layoutX', $node->x);
         $element->setAttribute('layoutY', $node->y);

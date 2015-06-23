@@ -1,5 +1,6 @@
 <?php
 namespace php\gui;
+
 use php\gui\event\UXEvent;
 use php\gui\layout\UXPane;
 use php\lang\IllegalStateException;
@@ -52,44 +53,67 @@ abstract class UXWindow
     /**
      * ...
      */
-    public function show() {}
+    public function show()
+    {
+    }
 
     /**
      * ...
      */
-    public function hide() {}
+    public function hide()
+    {
+    }
 
     /**
      * ...
      */
-    public function centerOnScreen() {}
+    public function centerOnScreen()
+    {
+    }
 
     /**
      * ...
      */
-    public function sizeToScene() {}
+    public function sizeToScene()
+    {
+    }
 
     /**
      * @param string $event
      * @param callable $handler
      * @param string $group
      */
-    public function on($event, callable $handler, $group = 'general') { }
+    public function on($event, callable $handler, $group = 'general')
+    {
+    }
 
     /**
      * @param string $event
      * @param string $group (optional)
      */
-    public function off($event, $group) {}
+    public function off($event, $group)
+    {
+    }
 
     /**
      * @param string $event
      * @param UXEvent $e (optional)
      */
-    public function trigger($event, UXEvent $e) {}
+    public function trigger($event, UXEvent $e)
+    {
+    }
+
+    /**
+     * @param string $property
+     * @param callable $listener (UXWindow $self, $property, $oldValue, $newValue)
+     */
+    public function watch($property, callable $listener)
+    {
+    }
 
     /**
      * @param UXNode $node
+     *
      * @throws IllegalStateException
      */
     public function add(UXNode $node)
@@ -98,6 +122,7 @@ abstract class UXWindow
 
     /**
      * @param UXNode $node
+     *
      * @return bool
      * @throws IllegalStateException
      */
@@ -107,12 +132,17 @@ abstract class UXWindow
 
     /**
      * @param string $id
+     *
      * @return UXNode|null
      */
-    public function __get($id) {}
+    public function __get($id)
+    {
+    }
 
     /**
      * @param string $id
      */
-    public function __isset($id) {}
+    public function __isset($id)
+    {
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 namespace php\gui;
+use php\gui\paint\UXColor;
 use php\gui\text\UXFont;
 
 /**
@@ -27,4 +28,9 @@ abstract class UXLabeled extends UXControl
      * @var UXNode
      */
     public $graphic;
+
+    /**
+     * @var UXColor
+     */
+    public $textColor;
 }

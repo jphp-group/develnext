@@ -39,6 +39,17 @@ abstract class AbstractFormElement
     /**
      * @return array
      */
+    public function getDefaultData()
+    {
+        return [
+            'enabled' => true,
+            'visible' => true,
+        ];
+    }
+
+    /**
+     * @return array
+     */
     public function getDefaultSize()
     {
         return [100, 100];

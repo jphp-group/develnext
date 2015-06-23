@@ -1,5 +1,8 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.geometry.Bounds;
@@ -20,6 +23,7 @@ import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 @Abstract
@@ -82,6 +86,8 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
         void toBack();
         void toFront();
+
+        void requestFocus();
     }
 
     public UXNode(Environment env, T wrappedObject) {
@@ -107,6 +113,16 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         } else {
             return this;
         }
+    }
+
+    @Getter
+    public boolean getEnabled() {
+        return !getWrappedObject().isDisable();
+    }
+
+    @Setter
+    public void setEnabled(boolean value) {
+        getWrappedObject().setDisable(!value);
     }
 
     @Getter
@@ -199,12 +215,8 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Getter
-    protected UXParent getParent(Environment env) {
-        if (getWrappedObject().getParent() == null) {
-            return null;
-        }
-
-        return new UXParent(env, getWrappedObject().getParent());
+    protected Memory getParent(Environment env) {
+        return Memory.wrap(env, getWrappedObject().getParent());
     }
 
     @Getter
@@ -225,6 +237,28 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
             eventProvider.on(getWrappedObject(), event, group, invoker);
         } else {
             throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
+        }
+    }
+
+    @Signature
+    public void watch(final String property, final Invoker invoker) throws InvocationTargetException, IllegalAccessException {
+        String name = property + "Property";
+
+        Class<? extends Node> aClass = getWrappedObject().getClass();
+
+        try {
+            Method method = aClass.getMethod(name);
+
+            ReadOnlyProperty bindProperty = (ReadOnlyProperty) method.invoke(getWrappedObject());
+
+            bindProperty.addListener(new ChangeListener() {
+                @Override
+                public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+                    invoker.callAny(UXNode.this, property, oldValue, newValue);
+                }
+            });
+        } catch (NoSuchMethodException | ClassCastException e) {
+            throw new IllegalArgumentException("Unable to find the '" + property + "' property for watching");
         }
     }
 

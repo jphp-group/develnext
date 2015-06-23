@@ -9,6 +9,11 @@ abstract class AbstractFormElementTag
     abstract public function getTagName();
     abstract public function getElementClass();
 
+    public function isFinal()
+    {
+        return false;
+    }
+
     public function isAbstract()
     {
         return (new \ReflectionClass($this->getElementClass()))->isAbstract();

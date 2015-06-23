@@ -35,6 +35,13 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     }
 
     @Signature
+    public void addAll(Environment env, ForeachIterator iterator) throws Throwable {
+        while (iterator.next()) {
+            env.invokeMethod(this, "add", iterator.getValue());
+        }
+    }
+
+    @Signature
     @SuppressWarnings("unchecked")
     public boolean remove(Environment env, Memory object) {
         return getWrappedObject().remove((T) Memory.unwrap(env, object));

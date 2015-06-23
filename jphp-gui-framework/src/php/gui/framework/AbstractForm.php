@@ -4,8 +4,10 @@ namespace php\gui\framework;
 use Exception;
 use php\gui\event\UXEvent;
 use php\gui\UXApplication;
+use php\gui\UXData;
 use php\gui\UXForm;
 use php\gui\UXLoader;
+use php\gui\UXNode;
 use php\io\IOException;
 use php\io\Stream;
 use php\lib\Items;
@@ -94,6 +96,10 @@ abstract class AbstractForm extends UXForm
             $this->title = $this->_config->get('form.title');
         }
 
+        if ($this->_config->has('form.resizable')) {
+            $this->resizable = $this->_config->get('form.resizable');
+        }
+
         if ($this->_config->has('form.alwaysOnTop')) {
             $this->alwaysOnTop = $this->_config->get('form.alwaysOnTop');
         }
@@ -122,6 +128,16 @@ abstract class AbstractForm extends UXForm
 
         Stream::tryAccess($path, function (Stream $stream) use ($loader) {
             $this->layout = $loader->load($stream);
+
+            DataUtils::scan($this->layout, function (UXData $data, UXNode $node) {
+                if ($data->has('enabled')) {
+                    $node->enabled = $data->get('enabled');
+                }
+
+                if ($data->has('visible')) {
+                    $node->visible = $data->get('visible');
+                }
+            });
         });
     }
 

@@ -3,6 +3,7 @@ package org.develnext.jphp.ext.javafx.classes;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
@@ -21,6 +22,7 @@ import java.util.List;
 public class UXScene extends BaseWrapper<Scene> {
     interface WrappedInterface {
         @Property Parent root();
+        @Property Window window();
     }
 
     public UXScene(Environment env, Scene wrappedObject) {

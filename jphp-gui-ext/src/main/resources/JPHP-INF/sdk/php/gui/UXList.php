@@ -19,6 +19,13 @@ class UXList implements Iterator, Countable, ArrayAccess
     }
 
     /**
+     * @param array $objects
+     */
+    public function addAll(array $objects)
+    {
+    }
+
+    /**
      * @param mixed $object
      */
     public function remove($object)

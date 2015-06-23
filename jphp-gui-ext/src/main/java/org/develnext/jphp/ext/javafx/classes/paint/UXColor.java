@@ -46,8 +46,21 @@ public class UXColor extends BaseWrapper<Color> {
     }
 
     @Signature
+    public String getWebValue() {
+        int r = (int)Math.round(getWrappedObject().getRed() * 255.0);
+        int g = (int)Math.round(getWrappedObject().getGreen() * 255.0);
+        int b = (int)Math.round(getWrappedObject().getBlue() * 255.0);
+
+        return String.format("#%02x%02x%02x" , r, g, b);
+    }
+
+    @Signature
     public static Color of(String colorString) {
-        return Color.web(colorString);
+        try {
+            return Color.web(colorString);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     @Signature

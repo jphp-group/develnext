@@ -1,5 +1,6 @@
 <?php
 namespace php\gui;
+
 use php\gui\event\UXEvent;
 
 /**
@@ -61,6 +62,27 @@ abstract class UXNode
     public $position;
 
     /**
+     * @var bool
+     */
+    public $visible = true;
+
+    /**
+     * @var bool
+     */
+    public $enabled = true;
+
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $focused = false;
+
+    /**
+     * @var bool
+     */
+    public $focusTraversable = true;
+
+    /**
      * @readonly
      * @var UXList of string
      */
@@ -74,58 +96,92 @@ abstract class UXNode
     /**
      * ...
      */
-    public function autosize() {}
+    public function autosize()
+    {
+    }
 
     /**
      * @param string $selector
+     *
      * @return UXNode
      */
-    public function lookup($selector) {}
+    public function lookup($selector)
+    {
+    }
 
     /**
      * @param $selector
+     *
      * @return UXNode[]
      */
-    public function lookupAll($selector) {}
+    public function lookupAll($selector)
+    {
+    }
 
     /**
      * @param double $width
      * @param double $height
      */
-    public function resize($width, $height) {}
+    public function resize($width, $height)
+    {
+    }
 
     /**
      * @param double $x
      * @param double $y
      */
-    public function relocate($x, $y) {}
+    public function relocate($x, $y)
+    {
+    }
 
     /**
      * Send to front
      */
-    public function toFront() {}
+    public function toFront()
+    {
+    }
 
     /**
      * Send to back
      */
-    public function toBack() {}
+    public function toBack()
+    {
+    }
+
+    public function requestFocus()
+    {
+    }
 
     /**
      * @param string $event
      * @param callable $handler
      * @param string $group
      */
-    public function on($event, callable $handler, $group = 'general') { }
+    public function on($event, callable $handler, $group = 'general')
+    {
+    }
 
     /**
      * @param string $event
      * @param string $group (optional)
      */
-    public function off($event, $group) {}
+    public function off($event, $group)
+    {
+    }
 
     /**
      * @param string $event
      * @param UXEvent $e (optional)
      */
-    public function trigger($event, UXEvent $e) {}
+    public function trigger($event, UXEvent $e)
+    {
+    }
+
+    /**
+     * @param string $property
+     * @param callable $listener (UXNode $self, $property, $oldValue, $newValue)
+     */
+    public function watch($property, callable $listener)
+    {
+    }
 }

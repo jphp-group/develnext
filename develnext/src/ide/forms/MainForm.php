@@ -14,7 +14,7 @@ use php\gui\UXTab;
 use php\gui\UXTabPane;
 
 /**
- * @property UXTabPane fileTabPane
+ * @property UXTabPane $fileTabPane
  * @property UXTabPane $projectTabs
  * @property UXVBox $properties
  */

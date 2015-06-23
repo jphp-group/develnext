@@ -26,6 +26,7 @@ import org.develnext.jphp.ext.javafx.bind.CursorMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.InsetsMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.KeyCombinationMemoryOperation;
 import org.develnext.jphp.ext.javafx.classes.*;
+import org.develnext.jphp.ext.javafx.classes.data.Data;
 import org.develnext.jphp.ext.javafx.classes.event.*;
 import org.develnext.jphp.ext.javafx.classes.layout.*;
 import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
@@ -100,6 +101,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Hyperlink.class, UXHyperlink.class);
         registerWrapperClass(scope, ComboBoxBase.class, UXComboBoxBase.class);
         registerWrapperClass(scope, ComboBox.class, UXComboBox.class);
+        registerWrapperClass(scope, ChoiceBox.class, UXChoiceBox.class);
         registerWrapperClass(scope, ColorPicker.class, UXColorPicker.class);
         registerWrapperClass(scope, ProgressIndicator.class, UXProgressIndicator.class);
         registerWrapperClass(scope, ProgressBar.class, UXProgressBar.class);
@@ -116,6 +118,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, TableView.class, UXTableView.class);
         registerWrapperClass(scope, TableColumnBase.class, UXTableColumn.class);
         registerWrapperClass(scope, TableCell.class, UXTableCell.class);
+        registerWrapperClass(scope, ListCell.class, UXListCell.class);
         MemoryOperation.registerWrapper(TableColumn.class, UXTableColumn.class);
         MemoryOperation.registerWrapper(IndexedCell.class, UXCell.class);
 
@@ -131,6 +134,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, DragEvent.class, UXDragEvent.class);
 
         registerWrapperClass(scope, FXMLLoader.class, UXLoader.class);
+        registerWrapperClass(scope, Data.class, UXData.class);
 
         registerClass(scope, UXDialog.class);
         registerClass(scope, UXClipboard.class);
@@ -146,6 +150,7 @@ public class JavaFXExtension extends Extension {
         registerEventProvider(new MenuEventProvider());
         registerEventProvider(new ButtonBaseEventProvider());
         registerEventProvider(new ComboBoxBaseEventProvider());
+        registerEventProvider(new ChoiceBoxEventProvider());
     }
 
     protected void registerEventProvider(EventProvider eventProvider) {

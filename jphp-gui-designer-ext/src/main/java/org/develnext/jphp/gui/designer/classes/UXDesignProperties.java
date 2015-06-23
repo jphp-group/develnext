@@ -3,15 +3,19 @@ package org.develnext.jphp.gui.designer.classes;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.develnext.jphp.ext.javafx.classes.UXTableCell;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
@@ -149,7 +153,7 @@ public class UXDesignProperties extends BaseObject {
 
             setStyle("-fx-font-size: 11px; -fx-font-family: Tahoma;");
 
-            prefHeightProperty().bind(fixedCellSizeProperty().multiply(Bindings.size(getItems()).add(1.1)));
+            prefHeightProperty().bind(fixedCellSizeProperty().multiply(Bindings.size(getItems())));
             minHeightProperty().bind(prefHeightProperty());
             maxHeightProperty().bind(prefHeightProperty());
 
@@ -178,10 +182,31 @@ public class UXDesignProperties extends BaseObject {
                 }
             });
 
+            nameColumn.setCellFactory(new Callback<TableColumn, TableCell>() {
+                @Override
+                public TableCell call(TableColumn param) {
+                    return new NameCell<>();
+                }
+            });
             valueColumn.setCellFactory(new Callback<TableColumn, TableCell>() {
                 @Override
                 public TableCell call(TableColumn param) {
                     return new EditingCell<>();
+                }
+            });
+
+            widthProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    //Don't show header
+                    Pane header = (Pane) lookup("TableHeaderRow");
+
+                    if (header.isVisible()){
+                        header.setMaxHeight(0);
+                        header.setMinHeight(0);
+                        header.setPrefHeight(0);
+                        header.setVisible(false);
+                    }
                 }
             });
 
@@ -199,34 +224,22 @@ public class UXDesignProperties extends BaseObject {
         }
     }
 
+    static class NameCell<S, T> extends TableCell<S, T> {
+        @Override
+        protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+
+            setAlignment(Pos.BASELINE_RIGHT);
+            setPadding(new Insets(1, 5, 1, 1));
+            setText(item == null ? null :item.toString());
+            setTextFill(Color.GRAY.darker());
+        }
+    }
+
     static class EditingCell<S, T> extends TableCell<S, T> {
-        private final TextField mTextField;
-        private final Button dialogButton;
-
-        private final HBox content;
-
         public EditingCell() {
             super();
-
             setPadding(new Insets(0));
-
-            dialogButton = new Button("...");
-            dialogButton.setPrefWidth(20);
-            dialogButton.setPadding(new Insets(1, 4, 1, 4));
-            dialogButton.setCursor(Cursor.HAND);
-
-            mTextField = new TextField();
-            mTextField.setPadding(new Insets(2));
-            mTextField.setStyle("-fx-background-insets: 0; -fx-background-color: -fx-control-inner-background; -fx-background-radius: 0;");
-
-            content = new HBox(mTextField, dialogButton);
-
-            mTextField.setOnMouseReleased(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    EditingCell.this.getTableRow().updateSelected(true);
-                }
-            });
         }
 
         @Override
@@ -234,7 +247,6 @@ public class UXDesignProperties extends BaseObject {
             super.updateItem(item, empty);
 
             setText(null);
-            setGraphic(content);
 
             PropertyValue value = (PropertyValue) item;
 

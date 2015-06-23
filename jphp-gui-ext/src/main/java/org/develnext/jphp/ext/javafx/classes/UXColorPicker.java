@@ -14,6 +14,7 @@ import php.runtime.reflection.ClassEntity;
 public class UXColorPicker extends UXComboBoxBase {
     interface WrappedInterface {
         @Property ObservableList<Color> customColors();
+        @Property Color value();
     }
 
     public UXColorPicker(Environment env, ColorPicker wrappedObject) {

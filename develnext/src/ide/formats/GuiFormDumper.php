@@ -7,6 +7,7 @@ use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
 use php\gui\designer\UXDesigner;
 use php\gui\layout\UXPane;
+use php\gui\UXData;
 use php\gui\UXDialog;
 use php\gui\UXLoader;
 use php\gui\UXNode;
@@ -89,11 +90,15 @@ class GuiFormDumper extends AbstractFormDumper
 
         $import = $document->createProcessingInstruction('import', 'java.lang.*');
         $document->insertBefore($import, $document->getDocumentElement());
+
+        $import = $document->createProcessingInstruction('import', 'org.develnext.jphp.ext.javafx.classes.data.*');
+        $document->insertBefore($import, $document->getDocumentElement());
     }
 
     public function createElementTag(UXNode $node, DomDocument $document, $ignoreUnregistered = true)
     {
-        if ($ignoreUnregistered && $this->designer && !$this->designer->isRegisteredNode($node)) {
+        if ($ignoreUnregistered && $this->designer
+            && (!$this->designer->isRegisteredNode($node) && !($node instanceof UXData))) {
             return null;
         }
 
@@ -122,15 +127,21 @@ class GuiFormDumper extends AbstractFormDumper
         $tag->writeAttributes($node, $element);
         $tag->writeContent($node, $element, $document, $this);
 
-        while ($class != null) {
-            $class = $class->getParentClass();
+        if (!$tag->isFinal()) {
+            while ($class != null) {
+                $class = $class->getParentClass();
 
-            if ($class != null) {
-                $tag = $this->formElementTags[$class->getName()];
+                if ($class != null) {
+                    $tag = $this->formElementTags[$class->getName()];
 
-                if ($tag != null) {
-                    $tag->writeAttributes($node, $element);
-                    $tag->writeContent($node, $element, $document, $this);
+                    if ($tag != null) {
+                        $tag->writeAttributes($node, $element);
+                        $tag->writeContent($node, $element, $document, $this);
+
+                        if ($tag->isFinal()) {
+                            break;
+                        }
+                    }
                 }
             }
         }
