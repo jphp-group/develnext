@@ -6,6 +6,7 @@ use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXHBox;
 use php\gui\UXButton;
 use php\gui\UXWindow;
+use php\xml\DomElement;
 
 /**
  * Class TextPropertyEditor
@@ -39,5 +40,10 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
         });
 
         return new UXHBox([$this->textField, $this->dialogButton]);
+    }
+
+    public function getCode()
+    {
+        return 'text';
     }
 }

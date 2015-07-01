@@ -5,9 +5,12 @@ use ide\editors\form\FormElementTypePane;
 use ide\editors\menu\ContextMenu;
 use ide\formats\AbstractFormFormat;
 use ide\formats\form\AbstractFormDumper;
+use ide\formats\form\AbstractFormElement;
 use ide\formats\FormFormat;
+use ide\formats\PhpCodeFormat;
 use ide\forms\MainForm;
 use ide\Ide;
+use ide\project\ProjectFile;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
@@ -23,9 +26,12 @@ use php\gui\UXLabel;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXSplitPane;
+use php\gui\UXTab;
+use php\gui\UXTabPane;
 use php\gui\UXTooltip;
 use php\io\File;
 use php\lib\Items;
+use php\lib\Str;
 use php\lib\String;
 use php\time\Time;
 use php\util\Configuration;
@@ -39,6 +45,11 @@ use php\util\Configuration;
 class FormEditor extends AbstractEditor
 {
     const BORDER_SIZE = 8;
+
+    /**
+     * @var string
+     */
+    protected $codeFile;
 
     /**
      * @var UXPane
@@ -71,6 +82,11 @@ class FormEditor extends AbstractEditor
     protected $formDumper;
 
     /**
+     * @var CodeEditor
+     */
+    protected $codeEditor;
+
+    /**
      * @var UXDesignProperties[]
      */
     protected static $typeProperties = [];
@@ -80,16 +96,23 @@ class FormEditor extends AbstractEditor
         parent::__construct($file);
 
         $this->formDumper = $dumper;
-    }
 
-    public function getTitle()
-    {
-        return File::of($this->file)->getName();
-    }
+        $phpFile = $file;
 
-    public function getIcon()
-    {
-        return 'icons/window16.png';
+        if (Str::endsWith($phpFile, '.fxml')) {
+            $phpFile = Str::sub($phpFile, 0, Str::length($phpFile) - 5);
+        }
+
+        $phpFile .= '.php';
+
+        if ($file instanceof ProjectFile) {
+            if ($link = $file->findLinkByExtension('php')) {
+                $phpFile = $link;
+            }
+        }
+
+        $this->codeFile = $phpFile;
+        $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
     }
 
     public function getTooltip()
@@ -138,11 +161,19 @@ class FormEditor extends AbstractEditor
     public function load()
     {
         $this->formDumper->load($this);
+
+        if (File::of($this->codeFile)->exists()) {
+            $this->codeEditor->load();
+        }
     }
 
     public function save()
     {
         $this->formDumper->save($this);
+
+        if (File::of($this->codeFile)->exists()) {
+            $this->codeEditor->save();
+        }
     }
 
     public function makeUi()
@@ -151,6 +182,45 @@ class FormEditor extends AbstractEditor
             throw new \Exception("Cannot open unloaded form");
         }
 
+        $codeEditor = $this->makeCodeEditor();
+        $designer = $this->makeDesigner();
+
+        $tabs = new UXTabPane();
+        $tabs->side = 'LEFT';
+        $tabs->tabClosingPolicy = 'UNAVAILABLE';
+
+        $codeTab = new UXTab();
+        $codeTab->text = 'Исходный код';
+        $codeTab->content = $codeEditor;
+        $codeTab->style = '-fx-cursor: hand;';
+        $codeTab->graphic = Ide::get()->getImage($this->codeEditor->getIcon());
+        $codeTab->tooltip = UXTooltip::of($this->codeFile);
+
+        $eventsTab = new UXTab();
+        $eventsTab->text = 'События';
+
+        $designerTab = new UXTab();
+        $designerTab->text = 'Дизайн';
+        $designerTab->content = $designer;
+        $designerTab->style = '-fx-cursor: hand;';
+        $designerTab->graphic = Ide::get()->getImage($this->getIcon());
+
+        $tabs->tabs->add($designerTab);
+
+        if (File::of($this->codeFile)->exists()) {
+            $tabs->tabs->add($codeTab);
+        }
+
+        return $tabs;
+    }
+
+    protected function makeCodeEditor()
+    {
+        return $this->codeEditor->makeUi();
+    }
+
+    protected function makeDesigner()
+    {
         $area = new UXAnchorPane();
 
         $viewer = new UXScrollPane($area);
@@ -233,8 +303,12 @@ class FormEditor extends AbstractEditor
 
             $data = DataUtils::get($node);
 
-            foreach ($selected->getDefaultData() as $key => $value) {
-                $data->set($key, $value);
+            foreach ($selected->getInitProperties() as $key => $property) {
+                if ($property['virtual']) {
+                    $data->set($key, $property['value']);
+                } else if ($key !== 'width' && $key !== 'height') {
+                    $node->{$key} = $property['value'];
+                }
             }
         } else {
             $this->updateProperties($this);
@@ -243,6 +317,7 @@ class FormEditor extends AbstractEditor
 
     protected function _onChanged()
     {
+        $this->save();
         $this->_onNodePick();
     }
 
@@ -251,11 +326,7 @@ class FormEditor extends AbstractEditor
         $node = $this->designer->pickedNode;
 
         if ($node) {
-            if (!static::$typeProperties[get_class($node)]) {
-                $this->updateProperties(null);
-            }
-
-            Timer::run(100, function () use ($node) {
+            Timer::run(50, function () use ($node) {
                 $this->updateProperties($node);
             });
         }
@@ -272,6 +343,14 @@ class FormEditor extends AbstractEditor
         }
     }
 
+    public static function initializeElement(AbstractFormElement $element)
+    {
+        $properties = new UXDesignProperties();
+        $element->createProperties($properties);
+
+        return static::$typeProperties[get_class($element)] = $properties;
+    }
+
     protected function updateProperties($node)
     {
         $element = $this->format->getFormElement($node);
@@ -280,16 +359,7 @@ class FormEditor extends AbstractEditor
         $mainForm = Ide::get()->getMainForm();
         $pane = $mainForm->getPropertiesPane();
 
-        $properties = static::$typeProperties[get_class($node)];
-
-        if (!$properties && $element) {
-            $properties = new UXDesignProperties();
-            $properties->target = $node;
-
-            $element->createProperties($properties);
-
-            static::$typeProperties[get_class($node)] = $properties;
-        }
+        $properties = $element ? static::$typeProperties[get_class($element)] : null;
 
         if ($properties) {
             $properties->target = $node;

@@ -43,44 +43,39 @@
                      <children>
                         <TabPane id="projectTabs" layoutY="-3.0" prefHeight="557.0" prefWidth="232.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <tabs>
-                            <Tab style="-fx-cursor: hand;" text="Проект">
-                              <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                              <Tab closable="false" text="Проект">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TreeView id="projectTree" layoutX="16.0" layoutY="25.0" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                       </children></AnchorPane>
-                              </content>
-                            </Tab>
-                            <Tab id="propertiesTab" style="-fx-cursor: hand;" text="Свойства">
-                              <content>
-                                <AnchorPane id="propTabPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                       <children>
-                                          <ScrollPane fitToWidth="true" layoutX="32.0" layoutY="89.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <content>
-                                                <VBox id="properties" prefWidth="230.0" spacing="2.0">
-                                                   <padding>
-                                                      <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                                   </padding></VBox>
-                                             </content>
-                                          </ScrollPane>
-                                       </children></AnchorPane>
-                              </content>
-                            </Tab>
+                                          <SplitPane dividerPositions="0.3" layoutX="22.0" layoutY="72.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <items>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                                   <children>
+                                                      <TreeView id="projectTree" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                   </children>
+                                                </AnchorPane>
+                                                <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+                                                   <content>
+                                                      <VBox id="properties" prefWidth="230.0" spacing="2.0">
+                                                         <padding>
+                                                            <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                                         </padding>
+                                                      </VBox>
+                                                   </content>
+                                                </ScrollPane>
+                                            </items>
+                                          </SplitPane>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
                           </tabs>
                         </TabPane>
                      </children>
                   </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                      <children>
-                        <TabPane id="fileTabPane" prefHeight="555.0" prefWidth="660.0" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                          <tabs>
-                            <Tab text="Welcome">
-                              <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                              </content>
-                            </Tab>
-                          </tabs>
-                        </TabPane>
+                        <TabPane id="fileTabPane" prefHeight="555.0" prefWidth="660.0" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
               </items>

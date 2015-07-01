@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.effect.BlendMode;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
+import org.develnext.jphp.ext.javafx.support.StyleManager;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -19,6 +20,7 @@ import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.memory.ArrayMemory;
+import php.runtime.memory.StringMemory;
 import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
 
@@ -90,6 +92,9 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         void requestFocus();
     }
 
+    protected final StyleManager styleManager = new StyleManager(this);
+
+
     public UXNode(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
@@ -113,6 +118,25 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         } else {
             return this;
         }
+    }
+
+    @Getter
+    public String getClassesString() {
+        StringBuilder sb = new StringBuilder();
+
+        for (String s : getWrappedObject().getStyleClass()) {
+            sb.append(s.trim()).append(" ");
+        }
+
+        return sb.toString();
+    }
+
+    @Setter
+    public void setClassesString(String value) {
+        String[] strings = value.split(" ");
+
+        getWrappedObject().getStyleClass().clear();
+        getWrappedObject().getStyleClass().addAll(strings);
     }
 
     @Getter
@@ -226,6 +250,23 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         }
 
         return new UXScene(env, getWrappedObject().getScene());
+    }
+
+    @Signature
+    public Memory css(Environment env, Memory... args) {
+        if (args == null || args.length == 0) {
+            return ArrayMemory.ofStringMap(styleManager.all()).toConstant();
+        } else if (args.length == 1) {
+            if (args[0].isArray()) {
+                styleManager.set(args[0].toValue(ArrayMemory.class).toStringMap());
+            } else {
+                return StringMemory.valueOf(styleManager.get(args[0].toString()));
+            }
+        } else {
+            styleManager.set(args[0].toString(), args[1].toString());
+        }
+
+        return Memory.NULL;
     }
 
     @Signature

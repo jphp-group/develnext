@@ -2,6 +2,7 @@
 namespace ide\formats;
 
 use ide\editors\AbstractEditor;
+use php\io\File;
 
 /**
  * Class AbstractFormat
@@ -9,6 +10,37 @@ use ide\editors\AbstractEditor;
  */
 abstract class AbstractFormat
 {
+    /**
+     * @var AbstractFormat[]
+     */
+    protected $requireFormats = [];
+
+    public function getIcon()
+    {
+        return null;
+    }
+
+    public function getTitle($path)
+    {
+        return File::of($path)->getName();
+    }
+
+    /**
+     * @param AbstractFormat $format
+     */
+    protected function requireFormat(AbstractFormat $format)
+    {
+        $this->requireFormats[get_class($format)] = $format;
+    }
+
+    /**
+     * @return AbstractFormat[]
+     */
+    public function getRequireFormats()
+    {
+        return $this->requireFormats;
+    }
+
     /**
      * @param $file
      * @return AbstractEditor

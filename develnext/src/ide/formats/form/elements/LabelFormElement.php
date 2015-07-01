@@ -1,6 +1,12 @@
 <?php
 namespace ide\formats\form\elements;
 
+use ide\editors\value\BooleanPropertyEditor;
+use ide\editors\value\ColorPropertyEditor;
+use ide\editors\value\FontPropertyEditor;
+use ide\editors\value\IntegerPropertyEditor;
+use ide\editors\value\PositionPropertyEditor;
+use ide\editors\value\TextPropertyEditor;
 use ide\formats\form\AbstractFormElement;
 use php\gui\designer\UXDesignProperties;
 use php\gui\UXLabel;
@@ -33,14 +39,6 @@ class LabelFormElement extends AbstractFormElement
     public function getDefaultSize()
     {
         return [100, 20];
-    }
-
-    /**
-     * @param UXDesignProperties $properties
-     */
-    public function createProperties(UXDesignProperties $properties)
-    {
-        // TODO: Implement createProperties() method.
     }
 
     public function isOrigin($any)

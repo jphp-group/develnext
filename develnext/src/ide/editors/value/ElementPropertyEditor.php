@@ -5,6 +5,7 @@ use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\framework\DataUtils;
 use php\gui\UXNode;
 use php\gui\UXTableCell;
+use php\xml\DomElement;
 
 /**
  * Class ElementPropertyEditor
@@ -18,6 +19,11 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     protected $content;
 
     /**
+     * @var string
+     */
+    protected $tooltip;
+
+    /**
      * @var callable
      */
     protected $getter;
@@ -26,6 +32,11 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
      * @var callable
      */
     protected $setter;
+
+    /**
+     * @var ElementPropertyEditor[]
+     */
+    protected static $editors = [];
 
     /**
      * ElementPropertyEditor constructor.
@@ -41,7 +52,14 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
         $this->content = $this->makeUi();
     }
 
+    /**
+     * @return string
+     */
+    abstract public function getCode();
 
+    /**
+     * @return UXNode
+     */
     abstract public function makeUi();
 
     /**
@@ -50,11 +68,31 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     abstract public function updateUi($value);
 
     /**
+     * @param DomElement $element
+     *
+     * @return ElementPropertyEditor
+     */
+    abstract public function unserialize(DomElement $element);
+
+    /**
+     * @param string $tooltip
+     */
+    public function setTooltip($tooltip)
+    {
+        $this->tooltip = $tooltip;
+    }
+
+    /**
      * @param $value
      *
      * @return mixed
      */
     public function getNormalizedValue($value)
+    {
+        return $value;
+    }
+
+    public function getCssNormalizedValue($value)
     {
         return $value;
     }
@@ -100,6 +138,24 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
         return $this;
     }
 
+    /**
+     * @return $this
+     */
+    public function setAsCssProperty()
+    {
+        $this->setter = function (ElementPropertyEditor $editor, $value) {
+            $target = $this->designProperties->target;
+            $target->css($editor->code, $editor->getCssNormalizedValue($value));
+        };
+
+        $this->getter = function (ElementPropertyEditor $editor) {
+            $target = $this->designProperties->target;
+            return $target->css($editor->code);
+        };
+
+        return $this;
+    }
+
     public function applyValue($value, $updateUi = true)
     {
         $value = $this->getNormalizedValue($value);
@@ -125,5 +181,30 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             $getter = $this->getter;
             return $getter($this);
         }
+    }
+
+    /**
+     * @param ElementPropertyEditor $editor
+     */
+    public static function register(ElementPropertyEditor $editor)
+    {
+        static::$editors[$editor->getCode()] = $editor;
+    }
+
+    /**
+     * @param $code
+     *
+     * @return ElementPropertyEditor
+     * @throws \Exception
+     */
+    public static function getByCode($code)
+    {
+        $editor = static::$editors[$code];
+
+        if (!$editor) {
+            throw new \Exception("Unable to find the '$code' editor");
+        }
+
+        return $editor;
     }
 }

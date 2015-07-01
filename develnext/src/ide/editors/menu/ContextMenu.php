@@ -1,10 +1,12 @@
 <?php
 namespace ide\editors\menu;
+
 use ide\editors\AbstractEditor;
 use php\gui\UXContextMenu;
-use php\gui\UXDialog;
+use php\gui\UXMenu;
 use php\gui\UXMenuItem;
 use ide\Ide;
+use php\lang\IllegalArgumentException;
 
 /**
  * Class ContextMenu
@@ -23,10 +25,15 @@ class ContextMenu
     protected $editor;
 
     /**
+     * @var UXMenu[]
+     */
+    protected $groups = [];
+
+    /**
      * @param AbstractEditor $editor
      * @param array $commands
      */
-    public function __construct(AbstractEditor $editor, array $commands = [])
+    public function __construct(AbstractEditor $editor = null, array $commands = [])
     {
         $this->editor = $editor;
         $this->root = new UXContextMenu();
@@ -36,7 +43,30 @@ class ContextMenu
         }
     }
 
-    public function add(AbstractMenuCommand $command)
+    public function addSeparator($group = null)
+    {
+        $menu = $this->root;
+
+        if ($group) {
+            $menu = $this->groups[$group];
+
+            if (!$menu) {
+                throw new IllegalArgumentException("Group $group not found");
+            }
+        }
+
+        $menu->items->add(UXMenuItem::createSeparator());
+    }
+
+    public function addGroup($code, $title, $icon = null)
+    {
+        $menuItem = new UXMenu($title, Ide::get()->getImage($icon));
+        $this->root->items->add($menuItem);
+
+        $this->groups[$code] = $menuItem;
+    }
+
+    public function add(AbstractMenuCommand $command, $group = null)
     {
         $menuItem = new UXMenuItem($command->getName(), Ide::get()->getImage($command->getIcon()));
         $menuItem->accelerator = $command->getAccelerator();
@@ -49,10 +79,20 @@ class ContextMenu
             $command->onExecute($e, $this->editor);
         });
 
-        $this->root->items->add($menuItem);
+        $menu = $this->root;
+
+        if ($group) {
+            $menu = $this->groups[$group];
+
+            if (!$menu) {
+                throw new IllegalArgumentException("Group $group not found");
+            }
+        }
+
+        $menu->items->add($menuItem);
 
         if ($command->withSeparator()) {
-            $this->root->items->add(UXMenuItem::createSeparator());
+            $menu->items->add(UXMenuItem::createSeparator());
         }
     }
 

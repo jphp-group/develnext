@@ -1,0 +1,6 @@
+<element extends="LabeledFormElement">
+    <init>
+        <property code="width" value="200" />
+        <property code="height" value="30" />
+    </init>
+</element>

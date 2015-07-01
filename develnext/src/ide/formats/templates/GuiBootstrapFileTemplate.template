@@ -1,0 +1,12 @@
+<?php
+
+// Generated.
+
+use php\gui\framework\Application;
+
+#BEFORE_CODE#
+
+$app = new Application();
+$app->launch();
+
+#AFTER_CODE#

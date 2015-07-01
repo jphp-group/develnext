@@ -20,5 +20,8 @@ public class GuiDesignerExtension extends Extension {
         registerClass(scope, UXDesignPane.class);
         registerClass(scope, UXDesignProperties.class);
         registerClass(scope, UXDesignPropertyEditor.class);
+
+        registerClass(scope, FileSystemWatcher.WrapWatchKey.class);
+        registerClass(scope, FileSystemWatcher.class);
     }
 }

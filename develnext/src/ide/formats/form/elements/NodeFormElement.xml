@@ -1,0 +1,21 @@
+<element>
+    <init>
+        <property code="visible" virtual="1" />
+        <property code="enabled" virtual="1" />
+    </init>
+
+    <properties group="general" title="Главное" />
+    <properties group="extra" title="Дополнительно">
+        <property code="id" name="ID" editor="text" tooltip="Уникальный индетификатор элемента в рамках формы" />
+        <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />
+
+        <property code="visible" name="Видимость" editor="boolean" virtual="1" tooltip="Видимость элемента на форме в момент старта" />
+        <property code="enabled" name="Доступность" editor="boolean" virtual="1" tooltip="Доступность элемента на форме в момент старта" />
+
+        <property code="x" name="Позиция X" editor="integer" />
+        <property code="y" name="Позиция Y" editor="integer" />
+
+        <property code="width" name="Ширина" editor="integer" />
+        <property code="height" name="Высота" editor="integer" />
+    </properties>
+</element>

@@ -15,9 +15,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.web.HTMLEditor;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
+import javafx.scene.web.*;
 import javafx.stage.PopupWindow;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -71,6 +69,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Tooltip.class, UXTooltip.class);
         registerWrapperClass(scope, ContextMenu.class, UXContextMenu.class);
         registerWrapperClass(scope, MenuItem.class, UXMenuItem.class);
+        registerWrapperClass(scope, Menu.class, UXMenu.class);
        // MemoryOperation.registerWrapper(SeparatorMenuItem.class, UXMenuItem.class);
         registerWrapperClass(scope, Scene.class, UXScene.class);
 
@@ -113,6 +112,8 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, ScrollPane.class, UXScrollPane.class);
         registerWrapperClass(scope, TitledPane.class, UXTitledPane.class);
         registerWrapperClass(scope, SplitPane.class, UXSplitPane.class);
+        registerWrapperClass(scope, TreeItem.class, UXTreeItem.class);
+        registerWrapperClass(scope, TreeView.class, UXTreeView.class);
 
         registerWrapperClass(scope, Cell.class, UXCell.class);
         registerWrapperClass(scope, TableView.class, UXTableView.class);
@@ -125,6 +126,9 @@ public class JavaFXExtension extends Extension {
         MemoryOperation.registerWrapper(InputEvent.class, UXEvent.class);
         MemoryOperation.registerWrapper(ActionEvent.class, UXEvent.class);
         MemoryOperation.registerWrapper(InputMethodEvent.class, UXEvent.class);
+        MemoryOperation.registerWrapper(TreeView.EditEvent.class, UXEvent.class);
+        MemoryOperation.registerWrapper(ListView.EditEvent.class, UXEvent.class);
+        MemoryOperation.registerWrapper(TreeTableView.EditEvent.class, UXEvent.class);
         registerWrapperClass(scope, Event.class, UXEvent.class);
 
         registerWrapperClass(scope, MouseEvent.class, UXMouseEvent.class);
@@ -132,6 +136,8 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, WindowEvent.class, UXWindowEvent.class);
         registerWrapperClass(scope, ContextMenuEvent.class, UXContextMenuEvent.class);
         registerWrapperClass(scope, DragEvent.class, UXDragEvent.class);
+        registerWrapperClass(scope, WebEvent.class, UXWebEvent.class);
+        registerWrapperClass(scope, WebErrorEvent.class, UXWebErrorEvent.class);
 
         registerWrapperClass(scope, FXMLLoader.class, UXLoader.class);
         registerWrapperClass(scope, Data.class, UXData.class);
@@ -151,6 +157,9 @@ public class JavaFXExtension extends Extension {
         registerEventProvider(new ButtonBaseEventProvider());
         registerEventProvider(new ComboBoxBaseEventProvider());
         registerEventProvider(new ChoiceBoxEventProvider());
+        registerEventProvider(new WebEngineEventProvider());
+        registerEventProvider(new TreeViewEventProvider());
+        registerEventProvider(new TabEventProvider());
     }
 
     protected void registerEventProvider(EventProvider eventProvider) {

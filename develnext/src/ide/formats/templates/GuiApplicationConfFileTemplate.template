@@ -1,0 +1,9 @@
+# MAIN CONFIGURATION
+
+app.name = #PROJECT_NAME#
+app.version = 1
+
+# APP
+app.namespace = app
+app.mainForm = #MAIN_FORM#
+app.showMainForm = 1

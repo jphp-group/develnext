@@ -5,7 +5,10 @@ use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\AbstractFormElementTag;
+use php\lang\Environment;
 use php\lang\IllegalArgumentException;
+use php\lang\Thread;
+use php\lang\ThreadPool;
 use php\lib\String;
 
 /**
@@ -87,6 +90,7 @@ abstract class AbstractFormFormat extends AbstractFormat
     {
         if ($any instanceof AbstractFormElement) {
             $this->formElements[] = $any;
+            FormEditor::initializeElement($any);
         } else if ($any instanceof AbstractMenuCommand) {
             $this->contextCommands[] = $any;
         } else if ($any instanceof AbstractFormElementTag) {
@@ -94,5 +98,10 @@ abstract class AbstractFormFormat extends AbstractFormat
         } else {
             throw new IllegalArgumentException("Cannot register $any");
         }
+    }
+
+    public function registerDone()
+    {
+
     }
 }

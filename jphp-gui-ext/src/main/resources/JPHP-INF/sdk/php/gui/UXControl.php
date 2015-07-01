@@ -14,6 +14,11 @@ abstract class UXControl extends UXRegion
     public $tooltip = null;
 
     /**
+     * @var string
+     */
+    public $tooltipText = null;
+
+    /**
      * @var UXContextMenu
      */
     public $contextMenu = null;

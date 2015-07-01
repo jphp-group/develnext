@@ -4,9 +4,7 @@ import javafx.scene.text.FontSmoothingType;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
-import php.runtime.annotation.Reflection.Name;
-import php.runtime.annotation.Reflection.Property;
-import php.runtime.annotation.Reflection.Signature;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
@@ -79,5 +77,30 @@ public class UXWebView extends UXParent {
     @Override
     protected void setHeight(double v) {
         getWrappedObject().setPrefHeight(v);
+    }
+
+
+    @Getter
+    public double[] getMinSize() {
+        return new double[] { getWrappedObject().getMinWidth(), getWrappedObject().getMinHeight() };
+    }
+
+    @Setter
+    public void setMinSize(double[] args) {
+        if (args.length >= 2) {
+            getWrappedObject().setMinSize(args[0], args[1]);
+        }
+    }
+
+    @Getter
+    public double[] getMaxSize() {
+        return new double[] { getWrappedObject().getMaxWidth(), getWrappedObject().getMaxHeight() };
+    }
+
+    @Setter
+    public void setMaxSize(double[] args) {
+        if (args.length >= 2) {
+            getWrappedObject().setMaxSize(args[0], args[1]);
+        }
     }
 }

@@ -18,5 +18,4 @@ function dump($arg)
 }
 
 $app = new Ide();
-$app->registerAll();
 $app->launch();

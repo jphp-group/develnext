@@ -8,6 +8,7 @@ use php\gui\paint\UXColor;
 use php\gui\UXButton;
 use php\gui\UXColorPicker;
 use php\gui\UXWindow;
+use php\xml\DomElement;
 
 class ColorPropertyEditor extends ElementPropertyEditor
 {
@@ -28,6 +29,12 @@ class ColorPropertyEditor extends ElementPropertyEditor
         }
 
         return $value;
+    }
+
+    public function getCssNormalizedValue($value)
+    {
+        /** @var UXColor $value */
+        return $value instanceof UXColor ? $value->getWebValue() : (string) $value;
     }
 
     public function makeUi()
@@ -83,5 +90,20 @@ class ColorPropertyEditor extends ElementPropertyEditor
     public function updateUi($value)
     {
         $this->colorPicker->value = $value;
+    }
+
+    public function getCode()
+    {
+        return 'color';
+    }
+
+    /**
+     * @param DomElement $element
+     *
+     * @return ElementPropertyEditor
+     */
+    public function unserialize(DomElement $element)
+    {
+        return new static();
     }
 }

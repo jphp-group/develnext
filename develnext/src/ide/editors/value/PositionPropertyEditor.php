@@ -19,4 +19,9 @@ class PositionPropertyEditor extends EnumPropertyEditor
             'BOTTOM_RIGHT' => 'Низ, справа'
         ]);
     }
+
+    public function getCode()
+    {
+        return 'position';
+    }
 }

@@ -28,6 +28,10 @@ class NodeFormElementTag extends AbstractFormElementTag
         /** @var UXNode $node */
         $element->setAttribute('id', $node->id);
 
+        if ($node->style) {
+            $element->setAttribute('style', $node->style);
+        }
+
         $element->setAttribute('layoutX', $node->x);
         $element->setAttribute('layoutY', $node->y);
 

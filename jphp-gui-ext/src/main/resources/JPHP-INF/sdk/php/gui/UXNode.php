@@ -153,6 +153,15 @@ abstract class UXNode
     }
 
     /**
+     * @param string|array $name (optional)
+     * @param string $value (optional)
+     * @return string|array|void
+     */
+    public function css($name, $value)
+    {
+    }
+
+    /**
      * @param string $event
      * @param callable $handler
      * @param string $group

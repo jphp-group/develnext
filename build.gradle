@@ -104,6 +104,7 @@ project(':develnext') {
         compile project(':jphp-gui-framework')
 
         compile "org.develnext:jphp-xml-ext:$jphpVersion"
+        compile "org.develnext:jphp-json-ext:$jphpVersion"
     }
 }
 

@@ -576,10 +576,6 @@ public class UXDesigner extends BaseObject {
                 }
 
                 picked = node;
-
-                if (onNodePick != null) {
-                    onNodePick.callAny();
-                }
             }
         });
 

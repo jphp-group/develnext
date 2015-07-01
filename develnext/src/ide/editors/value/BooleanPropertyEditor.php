@@ -4,6 +4,8 @@ namespace ide\editors\value;
 use php\gui\layout\UXHBox;
 use php\gui\UXCheckbox;
 use php\gui\UXLabel;
+use php\gui\UXTooltip;
+use php\xml\DomElement;
 
 /**
  * Class BooleanPropertyEditor
@@ -37,6 +39,18 @@ class BooleanPropertyEditor extends ElementPropertyEditor
         return new UXHBox([$checkbox, $label]);
     }
 
+    public function setTooltip($tooltip)
+    {
+        parent::setTooltip($tooltip);
+
+        if ($this->tooltip) {
+            $tooltip = UXTooltip::of($tooltip);
+
+            $this->label->tooltip = $tooltip;
+            $this->checkbox->tooltip = $tooltip;
+        }
+    }
+
     /**
      * @param $value
      * @param bool $updateCheckbox
@@ -48,5 +62,20 @@ class BooleanPropertyEditor extends ElementPropertyEditor
         if ($updateCheckbox) {
             $this->checkbox->selected = (bool)$value;
         }
+    }
+
+    public function getCode()
+    {
+        return 'boolean';
+    }
+
+    /**
+     * @param DomElement $element
+     *
+     * @return ElementPropertyEditor
+     */
+    public function unserialize(DomElement $element)
+    {
+        return new static();
     }
 }

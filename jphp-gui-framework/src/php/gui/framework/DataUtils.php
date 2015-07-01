@@ -49,6 +49,10 @@ class DataUtils
             $layout = $node->parent;
         }
 
+        if (!$layout) {
+            throw new IllegalArgumentException("The node must have parent value");
+        }
+
         $data = $layout->lookup('#data-' . $node->id);
 
         if (!$data) {
@@ -80,5 +84,21 @@ class DataUtils
         }
 
         return null;
+    }
+
+    /**
+     * @param UXNode $node
+     *
+     * @throws IllegalArgumentException
+     */
+    public static function remove(UXNode $node)
+    {
+        $data = static::get($node);
+
+        $parent = $data->parent;
+
+        if (isset($parent->children)) {
+            $parent->children->remove($data);
+        }
     }
 }

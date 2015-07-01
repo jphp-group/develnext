@@ -18,4 +18,9 @@ class IntegerPropertyEditor extends SimpleTextPropertyEditor
     {
         return parent::makeUi();
     }
+
+    public function getCode()
+    {
+        return 'integer';
+    }
 }

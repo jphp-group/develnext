@@ -1,0 +1,7 @@
+<?php
+#HEADER#
+
+class #CLASS# extends #EXTENDS#
+{
+
+}

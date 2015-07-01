@@ -51,14 +51,17 @@ abstract class AbstractEditor
         return $this->format;
     }
 
-    abstract public function getTitle();
-
     abstract public function load();
     abstract public function save();
 
+    public function getTitle()
+    {
+        return $this->format->getTitle($this->file);
+    }
+
     public function getIcon()
     {
-        return null;
+        return $this->format->getIcon();
     }
 
     public function getTooltip()

@@ -1,9 +1,20 @@
 <?php
 namespace ide\formats\form;
 
+use ide\editors\value\ElementPropertyEditor;
+use ide\editors\value\SimpleTextPropertyEditor;
+use ide\editors\value\TextPropertyEditor;
 use php\gui\designer\UXDesignProperties;
 use php\gui\UXImage;
 use php\gui\UXNode;
+use php\io\IOException;
+use php\io\Stream;
+use php\lib\Items;
+use php\lib\String;
+use php\util\Flow;
+use php\xml\DomDocument;
+use php\xml\DomElement;
+use php\xml\XmlProcessor;
 
 /**
  * Class AbstractFormElement
@@ -11,6 +22,29 @@ use php\gui\UXNode;
  */
 abstract class AbstractFormElement
 {
+    /**
+     * @var FormElementConfig
+     */
+    protected $config;
+
+    /**
+     * @var array
+     */
+    protected $initProperties = [];
+
+    /**
+     * @var DomDocument[]
+     */
+    protected static $configs = [];
+
+    /**
+     * AbstractFormElement constructor.
+     */
+    public function __construct()
+    {
+        $this->config = FormElementConfig::of(get_class($this));
+    }
+
     abstract public function isOrigin($any);
 
     /**
@@ -23,10 +57,27 @@ abstract class AbstractFormElement
      */
     abstract public function createElement();
 
+    public function applyProperties(UXDesignProperties $properties)
+    {
+        if ($this->config) {
+            foreach ($this->config->getPropertyGroups() as $code => $group) {
+                $properties->addGroup($code, $group['title']);
+            }
+
+            foreach ($this->config->getProperties() as $code => $property) {
+                $editorFactory = $property['editorFactory'];
+                $properties->addProperty($property['group'], $property['code'], $property['name'], $editorFactory());
+            }
+        }
+    }
+
     /**
      * @param UXDesignProperties $properties
      */
-    abstract public function createProperties(UXDesignProperties $properties);
+    public function createProperties(UXDesignProperties $properties)
+    {
+        $this->applyProperties($properties);
+    }
 
     /**
      * @return null|string|UXImage
@@ -39,24 +90,28 @@ abstract class AbstractFormElement
     /**
      * @return array
      */
-    public function getDefaultData()
+    public function getInitProperties()
     {
-        return [
-            'enabled' => true,
-            'visible' => true,
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaultSize()
-    {
-        return [100, 100];
+        return $this->config ? $this->config->getInitProperties() : [];
     }
 
     public function getGroup()
     {
         return 'Главное';
+    }
+
+    public function getDefaultSize()
+    {
+        $size = [150, 30];
+
+        if ($this->initProperties['width']) {
+            $size[0] = (int) $this->initProperties['width']['value'];
+        }
+
+        if ($this->initProperties['height']) {
+            $size[1] = (int) $this->initProperties['height']['value'];
+        }
+
+        return $size;
     }
 }

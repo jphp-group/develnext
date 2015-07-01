@@ -51,9 +51,12 @@ class UXTooltip extends UXPopupWindow
     public $wrapText;
 
     /**
-     * @param string $text (optional)
+     * @param string $text
+     * @param UXNode $graphic (optional)
      */
-    public function __construct($text) {}
+    public static function of($text, UXNode $graphic)
+    {
+    }
 
     /**
      * @param UXNode $node

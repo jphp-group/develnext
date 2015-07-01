@@ -45,4 +45,9 @@ class FontPropertyEditor extends TextPropertyEditor
 
         $this->textField->font = UXFont::of($value->family, $this->textField->font->size);
     }
+
+    public function getCode()
+    {
+        return 'font';
+    }
 }

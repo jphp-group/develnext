@@ -4,6 +4,8 @@ namespace php\gui;
 /**
  * Class UXTab
  * @package php\gui
+ *
+ * Events: close, closeRequest, change
  */
 class UXTab
 {
@@ -56,4 +58,30 @@ class UXTab
      * @var UXTooltip
      */
     public $tooltip;
+
+
+    /**
+     * @param string $event
+     * @param callable $handler
+     * @param string $group
+     */
+    public function on($event, callable $handler, $group = 'general')
+    {
+    }
+
+    /**
+     * @param string $event
+     * @param string $group (optional)
+     */
+    public function off($event, $group)
+    {
+    }
+
+    /**
+     * @param string $event
+     * @param UXEvent $e (optional)
+     */
+    public function trigger($event, UXEvent $e)
+    {
+    }
 }

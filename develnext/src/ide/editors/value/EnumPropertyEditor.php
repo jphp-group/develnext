@@ -4,6 +4,7 @@ use php\gui\UXChoiceBox;
 use php\lib\Items;
 use php\gui\layout\UXHBox;
 use php\lib\String;
+use php\xml\DomElement;
 
 /**
  * Class EnumPropertyEditor
@@ -84,5 +85,31 @@ class EnumPropertyEditor extends ElementPropertyEditor
 
             $i++;
         }
+    }
+
+    public function getCode()
+    {
+        return 'enum';
+    }
+
+    /**
+     * @param DomElement $element
+     *
+     * @return ElementPropertyEditor
+     */
+    public function unserialize(DomElement $element)
+    {
+        $editor = new static([]);
+
+        if (!$editor->variants) {
+            /** @var DomElement $el */
+            foreach ($element->findAll('variants/variant') as $el) {
+                $editor->variants[$el->getAttribute('value')] = $el->getTextContent();
+            }
+
+            $editor->variantKeys = Items::keys($editor->variants);
+        }
+
+        return $editor;
     }
 }

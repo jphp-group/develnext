@@ -39,14 +39,6 @@ class TextFieldFormElement extends AbstractFormElement
         return [150, 20];
     }
 
-    /**
-     * @param UXDesignProperties $properties
-     */
-    public function createProperties(UXDesignProperties $properties)
-    {
-        // TODO: Implement createProperties() method.
-    }
-
     public function isOrigin($any)
     {
         return $any instanceof UXTextField;

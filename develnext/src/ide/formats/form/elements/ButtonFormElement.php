@@ -47,26 +47,6 @@ class ButtonFormElement extends AbstractFormElement
         return [150, 35];
     }
 
-    /**
-     * @param UXDesignProperties $properties
-     */
-    public function createProperties(UXDesignProperties $properties)
-    {
-        $properties->addGroup('general', 'Главное');
-        $properties->addGroup('extra', 'Дополнительно');
-
-        $properties->addProperty('general', 'text', 'Текст', new TextPropertyEditor());
-        $properties->addProperty('general', 'textColor', 'Цвет текста', new ColorPropertyEditor());
-        $properties->addProperty('general', 'font', 'Шрифт', new FontPropertyEditor());
-
-        $properties->addProperty('general', 'alignment', 'Выравнивание', new PositionPropertyEditor());
-
-        $properties->addProperty('extra', 'enabled', 'Доступность', (new BooleanPropertyEditor())->setAsDataProperty());
-        $properties->addProperty('extra', 'visible', 'Видимость', (new BooleanPropertyEditor())->setAsDataProperty());
-        $properties->addProperty('extra', 'x', 'Позиция X', new IntegerPropertyEditor());
-        $properties->addProperty('extra', 'y', 'Позиция Y', new IntegerPropertyEditor());
-    }
-
     public function isOrigin($any)
     {
         return $any instanceof UXButton;

@@ -7,6 +7,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection.Name;
+import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
@@ -43,6 +44,18 @@ public class UXTooltip<T extends Tooltip> extends UXPopupWindow<Tooltip> {
     @Signature
     public void __construct() {
         __wrappedObject = new Tooltip();
+    }
+
+    @Signature
+    public static Tooltip of(String text) {
+        return new Tooltip(text);
+    }
+
+    @Signature
+    public static Tooltip of(String text, @Nullable Node graphic) {
+        Tooltip tooltip = new Tooltip(text);
+        tooltip.setGraphic(graphic);
+        return tooltip;
     }
 
     @Signature

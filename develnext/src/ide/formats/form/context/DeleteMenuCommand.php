@@ -6,6 +6,7 @@ namespace ide\formats\form\context {
     use ide\editors\menu\AbstractMenuCommand;
     use ide\Ide;
     use php\gui\event\UXKeyEvent;
+    use php\gui\framework\DataUtils;
     use php\gui\UXDialog;
     use php\lib\Items;
 
@@ -42,7 +43,8 @@ namespace ide\formats\form\context {
                 $designer->unselectNode($node);
                 $designer->unregisterNode($node);
 
-                $editor->getLayout()->remove($node);
+                DataUtils::remove($node);
+                $node->parent->remove($node);
             }
 
             $nodes = Items::toList($designer->getNodes());

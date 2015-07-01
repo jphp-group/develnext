@@ -5,6 +5,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Tooltip;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
+import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
@@ -31,6 +32,34 @@ public class UXControl<T extends Control> extends UXRegion<Control> {
     @SuppressWarnings("unchecked")
     public T getWrappedObject() {
         return (T) super.getWrappedObject();
+    }
+
+    @Setter
+    public void setTooltipText(Memory value) {
+        if (value.isNull()) {
+            getWrappedObject().setTooltip(null);
+            return;
+        }
+
+        Tooltip tooltip = getWrappedObject().getTooltip();
+
+        if (tooltip == null) {
+            tooltip = new Tooltip();
+            getWrappedObject().setTooltip(tooltip);
+        }
+
+        tooltip.setText(value.toString());
+    }
+
+    @Getter
+    public String getTooltipText() {
+        Tooltip tooltip = getWrappedObject().getTooltip();
+
+        if (tooltip != null) {
+            return tooltip.getText();
+        }
+
+        return null;
     }
 
     @Signature

@@ -2,6 +2,16 @@
 namespace ide;
 
 use ide\editors\AbstractEditor;
+use ide\editors\value\BooleanPropertyEditor;
+use ide\editors\value\ColorPropertyEditor;
+use ide\editors\value\ElementPropertyEditor;
+use ide\editors\value\EnumPropertyEditor;
+use ide\editors\value\FloatPropertyEditor;
+use ide\editors\value\FontPropertyEditor;
+use ide\editors\value\IntegerPropertyEditor;
+use ide\editors\value\PositionPropertyEditor;
+use ide\editors\value\SimpleTextPropertyEditor;
+use ide\editors\value\TextPropertyEditor;
 use ide\formats\AbstractFormat;
 use ide\formats\form\context\DeleteMenuCommand;
 use ide\formats\form\ButtonFormElement;
@@ -12,7 +22,11 @@ use ide\formats\form\LabelFormElement;
 use ide\formats\form\TextFieldFormElement;
 use ide\formats\FormFormat;
 use ide\formats\GuiFormFormat;
+use ide\formats\PhpCodeFormat;
 use ide\forms\SplashForm;
+use ide\project\AbstractProjectTemplate;
+use ide\project\Project;
+use ide\project\templates\DefaultGuiProjectTemplate;
 use php\gui\framework\Application;
 use php\gui\UXDialog;
 use php\gui\UXForm;
@@ -38,9 +52,21 @@ class Ide extends Application
      */
     protected $formats = [];
 
+    /**
+     * @var AbstractProjectTemplate[]
+     */
+    protected $projectTemplates = [];
+
+    /**
+     * @var Project
+     */
+    protected $openedProject = null;
+
     public function launch()
     {
         parent::launch(function() {
+            $this->registerAll();
+
             $this->splash = $splash = new SplashForm();
             $splash->show();
         });
@@ -55,11 +81,45 @@ class Ide extends Application
     }
 
     /**
+     * @param AbstractProjectTemplate $template
+     */
+    public function registerProjectTemplate(AbstractProjectTemplate $template)
+    {
+        $class = get_class($template);
+
+        if (isset($this->projectTemplates[$class])) {
+            return;
+        }
+
+        $this->projectTemplates[$class] = $template;
+    }
+
+    /**
      * @param AbstractFormat $format
      */
     public function registerFormat(AbstractFormat $format)
     {
-        $this->formats[] = $format;
+        $class = get_class($format);
+
+        if (isset($this->formats[$class])) {
+            return;
+        }
+
+        $this->formats[$class] = $format;
+
+        foreach ($format->getRequireFormats() as $el) {
+            $this->registerFormat($el);
+        }
+    }
+
+    /**
+     * @param $class
+     *
+     * @return AbstractFormat
+     */
+    public function getRegisteredFormat($class)
+    {
+        return $this->formats[$class];
     }
 
     /**
@@ -105,6 +165,22 @@ class Ide extends Application
     }
 
     /**
+     * @return Project
+     */
+    public function getOpenedProject()
+    {
+        return $this->openedProject;
+    }
+
+    /**
+     * @param Project $openedProject
+     */
+    public function setOpenedProject($openedProject)
+    {
+        $this->openedProject = $openedProject;
+    }
+
+    /**
      * @param $path
      * @return AbstractEditor
      */
@@ -124,7 +200,20 @@ class Ide extends Application
 
     public function registerAll()
     {
+        ElementPropertyEditor::register(new SimpleTextPropertyEditor());
+        ElementPropertyEditor::register(new TextPropertyEditor());
+        ElementPropertyEditor::register(new IntegerPropertyEditor());
+        ElementPropertyEditor::register(new FloatPropertyEditor());
+        ElementPropertyEditor::register(new ColorPropertyEditor());
+        ElementPropertyEditor::register(new FontPropertyEditor());
+        ElementPropertyEditor::register(new EnumPropertyEditor([]));
+        ElementPropertyEditor::register(new PositionPropertyEditor());
+        ElementPropertyEditor::register(new BooleanPropertyEditor());
+
+        $this->registerFormat(new PhpCodeFormat());
         $this->registerFormat(new GuiFormFormat());
+
+        $this->registerProjectTemplate(new DefaultGuiProjectTemplate());
     }
 
     /**

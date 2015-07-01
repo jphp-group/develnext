@@ -2,7 +2,9 @@
 namespace ide\systems;
 
 use ide\Ide;
+use ide\utils\FileUtils;
 use php\gui\UXTab;
+use php\gui\UXTabPane;
 use php\io\File;
 
 class FileSystem
@@ -11,6 +13,11 @@ class FileSystem
      * @var AbstractEditor[]
      */
     static protected $openedEditors = [];
+
+    /**
+     * @var UXTab
+     */
+    static protected $addTab;
 
     /**
      * @var UXTab[]
@@ -27,16 +34,33 @@ class FileSystem
      */
     static function refresh($path)
     {
-        $info = static::$openedFiles[$path];
+        $hash = FileUtils::hashName($path);
+        $info = static::$openedFiles[$hash];
 
         if (!$info) {
             static::open($path, false);
             return;
         }
+    }
 
-        if (File::of($path)->lastModified() > $info['time']) {
-            // TODO: dialog to reload file?
-        }
+    /**
+     * @return array
+     */
+    static function getOpened()
+    {
+        return static::$openedFiles;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return bool
+     */
+    static function isOpened($path)
+    {
+        $hash = FileUtils::hashName($path);
+
+        return isset(static::$openedFiles[$hash]);
     }
 
     /**
@@ -46,15 +70,23 @@ class FileSystem
      */
     static function open($path, $switchToTab = true)
     {
-        $editor = static::$openedEditors[$path];
-        $tab    = static::$openedTabs[$path];
-        $info   = (array) static::$openedFiles[$path];
+        $hash = FileUtils::hashName($path);
+
+        $editor = static::$openedEditors[$hash];
+        $tab    = static::$openedTabs[$hash];
+        $info   = (array) static::$openedFiles[$hash];
 
         if (!$editor) {
             $editor = Ide::get()->createEditor($path);
+
+            if (!$editor) {
+                return null;
+            }
+
             $editor->load();
 
-            $info['time'] = File::of($path)->lastModified();
+            $info['file'] = $path;
+            $info['mtime'] = File::of($path)->lastModified();
         }
 
         if (!$tab) {
@@ -65,27 +97,72 @@ class FileSystem
             $tab->graphic = Ide::get()->getImage($editor->getIcon());
             $tab->content = $editor->makeUi();
 
-            Ide::get()->getMainForm()->{'fileTabPane'}->tabs->add($tab);
+            $tab->on('close', function () use ($path) {
+                static::close($path);
+            });
+
+            static::addTab($tab);
         }
 
         if ($switchToTab) {
             Ide::get()->getMainForm()->{'fileTabPane'}->selectTab($tab);
         }
 
-        static::$openedFiles[$path] = $info;
+        static::$openedFiles[$hash] = $info;
+        static::$openedTabs[$hash] = $tab;
+        static::$openedEditors[$hash] = $editor;
 
         return $editor;
     }
 
     static function close($path)
     {
-        $editor = static::$openedTabs[$path];
-        $tab    = static::$openedTabs[$path];
+        $hash = FileUtils::hashName($path);
+
+        $editor = static::$openedTabs[$hash];
+        $tab    = static::$openedTabs[$hash];
 
         if ($tab) {
             Ide::get()->getMainForm()->{'fileTabPane'}->tabs->remove($tab);
         }
 
-        unset(static::$openedTabs[$path], static::$openedEditors[$path]);
+        unset(static::$openedTabs[$hash], static::$openedEditors[$hash], static::$openedFiles[$hash]);
+    }
+
+    private static function addTab(UXTab $tab)
+    {
+        /** @var UXTabPane $fileTabPane */
+        $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+
+        static::hideAddTab();
+        $fileTabPane->tabs->add($tab);
+        static::showAddTab();
+    }
+
+    private static function hideAddTab()
+    {
+        if (static::$addTab) {
+            /** @var UXTabPane $fileTabPane */
+            $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+
+            $fileTabPane->tabs->remove(static::$addTab);
+        }
+    }
+
+    private static function showAddTab()
+    {
+        /** @var UXTabPane $fileTabPane */
+        $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+
+        if (!static::$addTab) {
+            $tab = new UXTab();
+            $tab->closable = false;
+            $tab->graphic = Ide::get()->getImage('icons/plus16.png');
+            $tab->style = '-fx-cursor: hand; -fx-padding: 1px 7px;';
+
+            static::$addTab = $tab;
+        }
+
+        $fileTabPane->tabs->add(static::$addTab);
     }
 }
