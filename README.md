@@ -9,7 +9,7 @@
 - jphp 0.7.1 (not published yet!)
 - java 1.8+ (jre)
 - gradle 2.4+
-- launcher4j 3.8
+- launch4j 3.8
 
 ### How to get the DevelNext IDE distrubutive?
 
