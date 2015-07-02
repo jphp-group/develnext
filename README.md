@@ -1,3 +1,36 @@
-# GUI Extension for JPHP
+# DevelNext
 
-Based on JavaFX 8.
+> GUI and IDE for php based on jphp
+
+---
+
+**Dependencies**
+
+- jphp 0.7.1 (not published yet!)
+- java 1.8+ (jre)
+- gradle 2.4+
+- launcher4j 3.8
+
+### How to get the DevelNext IDE distrubutive?
+
+Install JDK, close repo and use the following console commands:
+
+```
+cd /path/to/repo
+
+./gradlew distIde -Drelease=true
+```
+
+You can find the builded distrubutive in `develnext/build/install/develnext`.
+
+### Как получить дистрибутив DevelNext?
+
+Установите JDK (Java), склонируйте репозиторий и используйте следующие консольные команды:
+
+```
+cd /path/to/repo
+
+./gradlew distIde -Drelease=true
+```
+
+Найти собранный дистрибутив можно будет в папке `develnext/build/install/develnext`.
