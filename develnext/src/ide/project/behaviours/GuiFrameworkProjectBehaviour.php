@@ -25,6 +25,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 {
     const FORMS_DIRECTORY = 'src/.forms';
 
+    /** @var string */
+    protected $mainForm = 'MainForm';
+
     /**
      * ...
      */
@@ -40,12 +43,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function getMainForm()
     {
-        return 'MainForm';
+        return $this->mainForm;
     }
 
     public function doCreate()
     {
-        $mainForm = $this->createForm('MainForm');
+        $mainForm = $this->createForm($this->mainForm);
 
         FileSystem::open($mainForm);
     }
@@ -77,6 +80,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $formsItem->onUpdate(function () {
             $this->updateFormsInTree();
         });
+
+        FileSystem::open($this->makeForm($this->mainForm));
 
         WatcherSystem::addPathRecursive($this->project->getFile(self::FORMS_DIRECTORY));
     }
@@ -140,6 +145,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->makeDirectory('src/JPHP-INF');
 
         $this->project->makeDirectory('src/app');
-        $this->project->makeDirectory('src/app/forms/');
+
+        $this->project->makeDirectory('src/app/forms');
+
+        $this->project->getFile('src/app/forms')->setHiddenInTree(true);
     }
 }

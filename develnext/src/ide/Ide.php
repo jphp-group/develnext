@@ -1,6 +1,9 @@
 <?php
 namespace ide;
 
+use ide\commands\NewProjectCommand;
+use ide\commands\OpenProjectCommand;
+use ide\commands\SaveProjectCommand;
 use ide\editors\AbstractEditor;
 use ide\editors\value\BooleanPropertyEditor;
 use ide\editors\value\ColorPropertyEditor;
@@ -13,28 +16,29 @@ use ide\editors\value\PositionPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
 use ide\formats\AbstractFormat;
-use ide\formats\form\context\DeleteMenuCommand;
 use ide\formats\form\ButtonFormElement;
-use ide\formats\form\context\LockMenuCommand;
-use ide\formats\form\context\ToBackMenuCommand;
-use ide\formats\form\context\ToFrontMenuCommand;
 use ide\formats\form\LabelFormElement;
 use ide\formats\form\TextFieldFormElement;
 use ide\formats\FormFormat;
 use ide\formats\GuiFormFormat;
 use ide\formats\PhpCodeFormat;
+use ide\forms\MainForm;
 use ide\forms\SplashForm;
+use ide\misc\AbstractCommand;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\project\templates\DefaultGuiProjectTemplate;
+use ide\systems\WatcherSystem;
 use php\gui\framework\Application;
-use php\gui\UXDialog;
-use php\gui\UXForm;
 use php\gui\UXImage;
 use php\gui\UXImageView;
-use php\gui\UXTab;
+use php\gui\UXMenu;
 use php\io\File;
+use php\io\IOException;
 use php\io\Stream;
+use php\lang\System;
+use php\lib\Str;
+use php\util\Configuration;
 
 /**
  * Class Ide
@@ -58,18 +62,40 @@ class Ide extends Application
     protected $projectTemplates = [];
 
     /**
+     * @var AbstractCommand[]
+     */
+    protected $commands = [];
+
+    /**
+     * @var callable
+     */
+    protected $afterShow = [];
+
+    /**
+     * @var Configuration[]
+     */
+    protected $configurations = [];
+
+    /**
      * @var Project
      */
     protected $openedProject = null;
 
     public function launch()
     {
-        parent::launch(function() {
-            $this->registerAll();
+        parent::launch(
+            function () {
+                $this->registerAll();
 
-            $this->splash = $splash = new SplashForm();
-            $splash->show();
-        });
+                $this->splash = $splash = new SplashForm();
+                $splash->show();
+            },
+            function () {
+                foreach ($this->afterShow as $handle) {
+                    $handle();
+                }
+            }
+        );
     }
 
     /**
@@ -78,6 +104,84 @@ class Ide extends Application
     public function getSplash()
     {
         return $this->splash;
+    }
+
+    public function setTitle($value)
+    {
+        $title = $this->getName() . ' ' . $this->getVersion();
+
+        if ($value) {
+            $title = $value . ' - ' . $title;
+        }
+
+        $this->getMainForm()->title = $title;
+    }
+
+    /**
+     * @param string $name
+     * @return Configuration
+     */
+    public function getUserConfig($name)
+    {
+        if ($config = $this->configurations[$name]) {
+            return $config;
+        }
+
+        $config = new Configuration();
+
+        try {
+            $config->load(Stream::getContents($this->getFile("$name.conf")));
+        } catch (IOException $e) {
+            // ...
+        }
+
+        return $this->configurations[$name] = $config;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $def
+     *
+     * @return string
+     */
+    public function getUserConfigValue($key, $def = null)
+    {
+        return $this->getUserConfig('ide')->get($key, $def);
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function setUserConfigValue($key, $value)
+    {
+        $this->getUserConfig('ide')->set($key, $value);
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return File
+     */
+    public function getFile($path)
+    {
+        $home = System::getProperty('user.home');
+
+        $ideHome = File::of("$home/.DevelNext");
+
+        if (!$ideHome->isDirectory()) {
+            $ideHome->mkdirs();
+        }
+
+        return File::of("$ideHome/$path");
+    }
+
+    /**
+     * @return project\AbstractProjectTemplate[]
+     */
+    public function getProjectTemplates()
+    {
+        return $this->projectTemplates;
     }
 
     /**
@@ -112,6 +216,87 @@ class Ide extends Application
         }
     }
 
+    public function unregisterCommands()
+    {
+        /** @var MainForm $mainForm */
+        $mainForm = $this->getMainForm();
+
+        if (!$mainForm) {
+            return;
+        }
+
+        foreach ($this->commands as $data) {
+            /** @var AbstractCommand $command */
+            $command = $data['command'];
+
+            if ($command->isAlways()) {
+                continue;
+            }
+
+            if ($data['headUi']) {
+                $mainForm->getHeadPane()->remove($data['headUi']);
+            }
+
+            if ($data['menuItem']) {
+                /** @var UXMenu $menu */
+                $menu = $mainForm->{'menu' . Str::upperFirst($command->getCategory())};
+
+                if ($menu instanceof UXMenu) {
+                    $menu->items->remove($data['menuItem']);
+                }
+            }
+        }
+
+        $this->commands = [];
+    }
+
+    /**
+     * @param AbstractCommand $command
+     */
+    public function registerCommand(AbstractCommand $command)
+    {
+        $data = [
+            'command' => $command,
+        ];
+
+        $headUi = $command->makeUiForHead();
+
+        if ($headUi) {
+            $data['headUi'] = $headUi;
+
+            $this->afterShow(function () use ($headUi) {
+                /** @var MainForm $mainForm */
+                $mainForm = $this->getMainForm();
+
+                if (!is_array($headUi)) {
+                    $headUi = [$headUi];
+                }
+
+                foreach ($headUi as $ui) $mainForm->getHeadPane()->add($ui);
+            });
+        }
+
+        $menuItem = $command->makeMenuItem();
+
+        if ($menuItem) {
+            $data['menuItem'] = $menuItem;
+
+            $this->afterShow(function () use ($menuItem, $command) {
+                /** @var MainForm $mainForm */
+                $mainForm = $this->getMainForm();
+
+                /** @var UXMenu $menu */
+                $menu = $mainForm->{'menu' . Str::upperFirst($command->getCategory())};
+
+                if ($menu instanceof UXMenu) {
+                    $menu->items->add($menuItem);
+                }
+            });
+        }
+
+        $this->commands[get_class($command)] = $data;
+    }
+
     /**
      * @param $class
      *
@@ -124,6 +309,7 @@ class Ide extends Application
 
     /**
      * @param string $path
+     *
      * @return UXImageView
      */
     public function getImage($path)
@@ -150,6 +336,7 @@ class Ide extends Application
 
     /**
      * @param $path
+     *
      * @return AbstractFormat|null
      */
     public function getFormat($path)
@@ -178,10 +365,12 @@ class Ide extends Application
     public function setOpenedProject($openedProject)
     {
         $this->openedProject = $openedProject;
+        $this->setTitle($openedProject->getName() . " - [" . $openedProject->getRootDir() . "]");
     }
 
     /**
      * @param $path
+     *
      * @return AbstractEditor
      */
     public function createEditor($path)
@@ -214,6 +403,21 @@ class Ide extends Application
         $this->registerFormat(new GuiFormFormat());
 
         $this->registerProjectTemplate(new DefaultGuiProjectTemplate());
+
+        $this->registerCommand(new NewProjectCommand());
+        $this->registerCommand(new OpenProjectCommand());
+        $this->registerCommand(new SaveProjectCommand());
+
+        $ideConfig = $this->getUserConfig('ide');
+
+        if (!$ideConfig->has('projectDirectory')) {
+            $ideConfig->set('projectDirectory', File::of(System::getProperty('user.home') . '/DevelNextProjects/'));
+        }
+    }
+
+    protected function afterShow(callable $handle)
+    {
+        $this->afterShow[] = $handle;
     }
 
     /**
@@ -223,5 +427,23 @@ class Ide extends Application
     public static function get()
     {
         return parent::get();
+    }
+
+    public function shutdown()
+    {
+        WatcherSystem::shutdown();
+
+        $stream = null;
+
+        foreach ($this->configurations as $name => $config) {
+            try {
+                $stream = Stream::of($this->getFile("$name.conf"), 'w+');
+                $config->save($stream);
+            } catch (IOException $e) {
+                throw $e;
+            } finally {
+                if ($stream) $stream->close();
+            }
+        }
     }
 }

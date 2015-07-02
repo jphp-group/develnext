@@ -1,5 +1,7 @@
 apply plugin: 'application'
 
+project.version = '1.0'
+
 repositories {
     mavenLocal()
     jcenter()
@@ -11,3 +13,26 @@ sourceSets {
 }
 
 mainClassName = 'php.runtime.launcher.Launcher'
+
+task distIde(dependsOn: ['installDist']) {
+    if (System.properties['os.name'].toLowerCase().contains('windows')) {
+        exec {
+            commandLine "$project.rootDir/develnext-tools/Launch4j/launch4jc.exe"
+            args "$project.rootDir/develnext/launcher/winLauncher.xml"
+        }
+    }
+
+    doLast {
+        copy {
+            from "$project.rootDir/develnext-tools"
+            into "$project.buildDir/install/$project.name/tools"
+        }
+
+        copy {
+            from "$project.rootDir/develnext/launcher/DevelNext.exe"
+            into "$project.buildDir/install/$project.name"
+        }
+    }
+}
+
+

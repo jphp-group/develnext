@@ -97,7 +97,8 @@ class FileSystem
             $tab->graphic = Ide::get()->getImage($editor->getIcon());
             $tab->content = $editor->makeUi();
 
-            $tab->on('close', function () use ($path) {
+            $tab->on('close', function () use ($path, $editor) {
+                $editor->close();
                 static::close($path);
             });
 

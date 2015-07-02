@@ -23,6 +23,8 @@ class WatcherSystem
     /** @var callable[] */
     protected static $handlers = [];
 
+    protected static $enabled = true;
+
     static function addListener($handler)
     {
         static::$handlers[] = $handler;
@@ -35,15 +37,27 @@ class WatcherSystem
 
     static function trigger($event)
     {
-        UXApplication::runLater(function () use ($event) {
-            $project = Ide::get()->getOpenedProject();
+        if (static::$enabled) {
+            UXApplication::runLater(function () use ($event) {
+                $project = Ide::get()->getOpenedProject();
 
-            $file = $project ? new ProjectFile($project, $event['context']) : null;
+                $file = $project ? new ProjectFile($project, $event['context']) : null;
 
-            foreach (static::$handlers as $handler) {
-                $handler($file, $event);
-            }
-        });
+                foreach (static::$handlers as $handler) {
+                    $handler($file, $event);
+                }
+            });
+        }
+    }
+
+    static function off()
+    {
+        static::$enabled = false;
+    }
+
+    static function on()
+    {
+        static::$enabled = true;
     }
 
     static function clear()

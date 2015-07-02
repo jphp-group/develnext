@@ -54,6 +54,11 @@ abstract class AbstractEditor
     abstract public function load();
     abstract public function save();
 
+    public function close()
+    {
+        $this->save();
+    }
+
     public function getTitle()
     {
         return $this->format->getTitle($this->file);

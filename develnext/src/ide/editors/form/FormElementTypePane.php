@@ -99,8 +99,8 @@ class FormElementTypePane
     protected function createHeaderUi()
     {
         $vbox = new UXVBox();
-        $vbox->spacing = 4;
-        $vbox->padding = 10;
+        $vbox->spacing = 2;
+        $vbox->padding = 5;
 
         $button = new UXToggleButton('Курсор');
         $button->toggleGroup = $this->toggleGroup;
@@ -121,7 +121,8 @@ class FormElementTypePane
     protected function createGroupUi($group, $elements)
     {
         $vbox = new UXVBox();
-        $vbox->spacing = 4;
+        $vbox->spacing = 2;
+        $vbox->padding = 5;
 
         /** @var AbstractFormElement $element */
         foreach ($elements as $element) {

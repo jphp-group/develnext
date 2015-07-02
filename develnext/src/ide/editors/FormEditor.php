@@ -176,6 +176,14 @@ class FormEditor extends AbstractEditor
         }
     }
 
+    public function close()
+    {
+        parent::close();
+
+        $this->updateProperties(null);
+    }
+
+
     public function makeUi()
     {
         if (!$this->layout) {
@@ -378,7 +386,7 @@ class FormEditor extends AbstractEditor
             $hint = new UXLabel('Список пуст.');
 
             if ($node === null) {
-                $hint->text = 'Подождите ...';
+                $hint->text = '...';
             }
 
             $hint->style = '-fx-font-style: italic;';

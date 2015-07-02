@@ -13,12 +13,19 @@ trait DialogFormMixin
      *
      * @return bool
      */
-    public function showDialog($x, $y)
+    public function showDialog($x = null, $y = null)
     {
         /** @var AbstractForm|DialogFormMixin $this */
 
-        $this->x = $x;
-        $this->y = $y;
+        $this->centerOnScreen();
+
+        if ($x !== null) {
+            $this->x = $x;
+        }
+
+        if ($y !== null) {
+            $this->y = $y;
+        }
 
         $this->showAndWait();
         return $this->result !== null;

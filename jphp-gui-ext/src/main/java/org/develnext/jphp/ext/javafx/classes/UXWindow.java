@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.MenuButton;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -19,6 +20,7 @@ import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -138,6 +140,11 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
+    public void addStylesheet(String path) {
+        getWrappedObject().getScene().getStylesheets().add(path);
+    }
+
+    @Signature
     @SuppressWarnings("unchecked")
     public void on(String event, Invoker invoker, String group) {
         Object target = getWrappedObject();
@@ -220,8 +227,15 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
-    public Memory __get(Environment env, String name) {
+    public Memory __get(Environment env, String name) throws NoSuchFieldException, IllegalAccessException {
         Node node = getWrappedObject().getScene().lookup("#" + name);
+
+        if (node instanceof MenuButton && node.getClass().getName().endsWith("MenuBarButton")) {
+            Field field = node.getClass().getDeclaredField("menu");
+            field.setAccessible(true);
+            return Memory.wrap(env, field.get(node));
+        }
+
         return Memory.wrap(env, node);
     }
 

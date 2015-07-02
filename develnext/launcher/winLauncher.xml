@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar></jar>
+  <outfile>DevelNext.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <manifest></manifest>
+  <icon>DevelNext.ico</icon>
+  <classPath>
+    <mainClass>php.runtime.launcher.Launcher</mainClass>
+    <cp>lib/*</cp>
+  </classPath>
+  <jre>
+    <path>tools/jre</path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <minVersion></minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>jreOnly</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+    <initialHeapSize>50</initialHeapSize>
+    <maxHeapSize>1024</maxHeapSize>
+  </jre>
+  <versionInfo>
+    <fileVersion>0.1.0.0</fileVersion>
+    <txtFileVersion>-</txtFileVersion>
+    <fileDescription>RAD Studio for PHP</fileDescription>
+    <copyright>2014, OpenSource</copyright>
+    <productVersion>0.1.0.0</productVersion>
+    <txtProductVersion>-</txtProductVersion>
+    <productName>DevelNext</productName>
+    <companyName></companyName>
+    <internalName>DevelNext</internalName>
+    <originalFilename>DevelNext.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>

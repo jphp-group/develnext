@@ -1,6 +1,8 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Nullable;
@@ -13,6 +15,7 @@ import php.runtime.reflection.ClassEntity;
 public class UXMenu extends UXMenuItem {
     interface WrappedInterface {
         @Property boolean showing();
+        @Property ObservableList<MenuItem> items();
 
         void show();
         void hide();

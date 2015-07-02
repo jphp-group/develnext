@@ -16,10 +16,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.web.*;
-import javafx.stage.PopupWindow;
-import javafx.stage.Stage;
-import javafx.stage.Window;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 import org.develnext.jphp.ext.javafx.bind.CursorMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.InsetsMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.KeyCombinationMemoryOperation;
@@ -114,6 +111,10 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, SplitPane.class, UXSplitPane.class);
         registerWrapperClass(scope, TreeItem.class, UXTreeItem.class);
         registerWrapperClass(scope, TreeView.class, UXTreeView.class);
+        registerWrapperClass(scope, Separator.class, UXSeparator.class);
+        registerWrapperClass(scope, ListView.class, UXListView.class);
+        registerWrapperClass(scope, FileChooser.class, UXFileChooser.class);
+        registerWrapperClass(scope, DirectoryChooser.class, UXDirectoryChooser.class);
 
         registerWrapperClass(scope, Cell.class, UXCell.class);
         registerWrapperClass(scope, TableView.class, UXTableView.class);

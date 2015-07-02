@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="513.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Separator layoutX="21.0" layoutY="46.0" prefHeight="32.0" prefWidth="573.0" />
+      <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="21.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
+      <Label layoutX="61.0" layoutY="14.0" prefHeight="32.0" prefWidth="533.0" text="Открыть проект">
+         <font>
+            <Font name="Tahoma" size="17.0" />
+         </font>
+      </Label>
+      <Button id="pathButton" layoutX="22.0" layoutY="467.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" text="..." AnchorPane.bottomAnchor="21.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Label layoutX="22.0" layoutY="443.0" prefHeight="24.0" prefWidth="559.0" text="Папка проектов:" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="33.0" />
+      <TextField id="pathField" disable="true" editable="false" layoutX="54.0" layoutY="467.0" prefHeight="25.0" prefWidth="533.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="27.0" />
+      <ListView id="projectList" layoutX="32.0" layoutY="137.0" prefHeight="292.0" prefWidth="550.0" AnchorPane.bottomAnchor="84.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="137.0" />
+      <Label layoutX="32.0" layoutY="113.0" prefHeight="24.0" prefWidth="550.0" text="Проекты:" />
+      <Label layoutX="122.0" layoutY="79.0" prefHeight="24.0" prefWidth="459.0" text="Выбрать файл проекта и открыть" AnchorPane.leftAnchor="122.0" AnchorPane.rightAnchor="33.0" />
+      <Button id="openButton" layoutX="33.0" layoutY="78.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Обзор ..." />
+   </children>
+</AnchorPane>

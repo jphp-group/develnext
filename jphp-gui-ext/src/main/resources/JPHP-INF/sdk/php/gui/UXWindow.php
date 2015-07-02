@@ -131,6 +131,13 @@ abstract class UXWindow
     }
 
     /**
+     * @param string $path
+     */
+    public function addStylesheet($path)
+    {
+    }
+
+    /**
      * @param string $id
      *
      * @return UXNode|null

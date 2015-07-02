@@ -30,7 +30,6 @@ class GuiApplicationConfFileTemplate extends AbstractFileTemplate
         parent::__construct();
 
         $this->project = $project;
-        $this->behaviour = $this->project->getBehaviour(GuiFrameworkProjectBehaviour::class);
     }
 
 
@@ -39,6 +38,8 @@ class GuiApplicationConfFileTemplate extends AbstractFileTemplate
      */
     public function getArguments()
     {
+        $this->behaviour = $this->project->getBehaviour(GuiFrameworkProjectBehaviour::class);
+
         return [
             'PROJECT_NAME' => $this->project->getName(),
             'MAIN_FORM'    => $this->behaviour->getMainForm(),

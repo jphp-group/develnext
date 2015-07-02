@@ -11,6 +11,7 @@ use php\gui\UXData;
 use php\gui\UXDialog;
 use php\gui\UXLoader;
 use php\gui\UXNode;
+use php\io\IOException;
 use php\io\Stream;
 use php\xml\DomDocument;
 use php\xml\XmlProcessor;
@@ -68,9 +69,12 @@ class GuiFormDumper extends AbstractFormDumper
 
         $this->appendImports($this->designer->getNodes(), $document);
 
-        Stream::tryAccess($editor->getFile(), function (Stream $output) use ($document) {
-            $this->processor->formatTo($document, $output);
-        }, 'w+');
+        try {
+            $stream = Stream::of($editor->getFile(), 'w');
+            $this->processor->formatTo($document, $stream);
+        } finally {
+            if ($stream) $stream->close();
+        }
     }
 
     /**
@@ -86,6 +90,9 @@ class GuiFormDumper extends AbstractFormDumper
         $document->insertBefore($import, $document->getDocumentElement());
 
         $import = $document->createProcessingInstruction('import', 'javafx.scene.control.*');
+        $document->insertBefore($import, $document->getDocumentElement());
+
+        $import = $document->createProcessingInstruction('import', 'javafx.scene.text.*');
         $document->insertBefore($import, $document->getDocumentElement());
 
         $import = $document->createProcessingInstruction('import', 'java.lang.*');

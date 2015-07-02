@@ -67,6 +67,11 @@ class Project
     protected $tree;
 
     /**
+     * @var AbstractProjectTemplate
+     */
+    protected $template;
+
+    /**
      * Project constructor.
      *
      * @param string $rootDir
@@ -305,6 +310,7 @@ class Project
     {
         $this->filesData  = $this->config->createFiles($this);
         $this->behaviours = $this->config->createBehaviours($this);
+        $this->template   = $this->config->getTemplate();
 
         $this->tree->clear();
 
@@ -320,6 +326,9 @@ class Project
 
         $this->config->setProjectFiles($this->filesData);
         $this->config->setBehaviours($this->behaviours);
+
+        $this->config->setProject($this);
+
         $this->config->save();
     }
 
@@ -433,5 +442,21 @@ class Project
         }
 
         return $o;
+    }
+
+    /**
+     * @param AbstractProjectTemplate $template
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+    }
+
+    /**
+     * @return AbstractProjectTemplate
+     */
+    public function getTemplate()
+    {
+        return $this->template;
     }
 }

@@ -39,8 +39,8 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
      */
     public function makeProject(Project $project)
     {
-        $project->register(new PhpProjectBehaviour());
         $project->register(new GuiFrameworkProjectBehaviour());
+        $project->register(new PhpProjectBehaviour());
 
         $project->setIgnoreRules([
             '*.log', '*.tmp'

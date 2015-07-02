@@ -8,6 +8,7 @@ use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
 use php\gui\designer\UXDesigner;
 use php\gui\framework\AbstractForm;
+use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXButton;
 use php\gui\UXForm;
@@ -22,6 +23,7 @@ use php\gui\UXTreeView;
  * @property UXTabPane $projectTabs
  * @property UXVBox $properties
  * @property UXTreeView $projectTree
+ * @property UXHBox $headPane
  */
 class MainForm extends AbstractForm
 {
@@ -39,7 +41,15 @@ class MainForm extends AbstractForm
      */
     public function doClose()
     {
-        WatcherSystem::shutdown();
+        Ide::get()->shutdown();
+    }
+
+    /**
+     * @return UXHBox
+     */
+    public function getHeadPane()
+    {
+        return $this->headPane;
     }
 
     /**

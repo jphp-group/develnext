@@ -118,7 +118,7 @@ class Application
         return $this->launched;
     }
 
-    public function launch(callable $handler = null)
+    public function launch(callable $handler = null, callable $after = null)
     {
         $mainFormClass = $this->mainFormClass;
         $showMainForm  = $this->config->getBoolean('app.showMainForm');
@@ -127,7 +127,7 @@ class Application
             throw new Exception("Unable to start the application without the main form class or the class '$mainFormClass' not found");
         }
 
-        UXApplication::launch(function(UXForm $mainForm) use ($mainFormClass, $showMainForm, $handler) {
+        UXApplication::launch(function(UXForm $mainForm) use ($mainFormClass, $showMainForm, $handler, $after) {
             static::$instance = $this;
 
             if ($handler) {
@@ -138,6 +138,10 @@ class Application
 
             if ($showMainForm) {
                 $this->mainForm->show();
+            }
+
+            if ($after) {
+                $after();
             }
         });
     }

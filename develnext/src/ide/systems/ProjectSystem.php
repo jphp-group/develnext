@@ -3,6 +3,7 @@ namespace ide\systems;
 use ide\Ide;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
+use ide\utils\FileUtils;
 use php\io\File;
 
 /**
@@ -11,16 +12,23 @@ use php\io\File;
  */
 class ProjectSystem
 {
+    protected static function clear()
+    {
+        WatcherSystem::clear();
+        WatcherSystem::clearListeners();
+        Ide::get()->unregisterCommands();
+    }
+
     /**
      * @param AbstractProjectTemplate $template
      * @param string $path
      */
     static function create(AbstractProjectTemplate $template, $path)
     {
-        WatcherSystem::clear();
-        WatcherSystem::clearListeners();
+        static::clear();
 
         $project = Project::createForFile($path);
+        $project->setTemplate($template);
 
         $template->makeProject($project);
         Ide::get()->setOpenedProject($project);
@@ -28,6 +36,8 @@ class ProjectSystem
         $project->create();
         $project->recoverFiles();
         $project->open();
+
+        static::save();
     }
 
     /**
@@ -35,17 +45,16 @@ class ProjectSystem
      */
     static function open($fileName)
     {
-        WatcherSystem::clear();
-        WatcherSystem::clearListeners();
+        static::clear();
+
+        static::close();
 
         $file = File::of($fileName);
 
-        $project = new Project($file->getPath(), $file->getName());
+        $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
         $project->load();
         $project->recoverFiles();
         $project->open();
-
-        static::close();
 
         Ide::get()->setOpenedProject($project);
     }

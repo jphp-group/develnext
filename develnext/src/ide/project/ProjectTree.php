@@ -172,6 +172,12 @@ class ProjectTree
 
         $func = function (ProjectTreeItem $root, $path) use (&$func) {
             foreach (File::of($path)->findFiles() as $file) {
+                $file = $this->project->getAbsoluteFile($file);
+
+                if ($file->isHiddenInTree()) {
+                    continue;
+                }
+
                 $item = $this->createItemForFile($file);
 
                 $root->add($item);
@@ -188,10 +194,12 @@ class ProjectTree
     protected function doClick(UXMouseEvent $e)
     {
         /** @var ProjectTreeItem $focused */
-        $focused = $this->tree->focusedItem->value;
+        if ($this->tree->focusedItem) {
+            $focused = $this->tree->focusedItem->value;
 
-        if ($focused && $e->clickCount > 1 && $focused->getFile()) {
-            FileSystem::open($this->project->getAbsoluteFile($focused->getFile()));
+            if ($focused && $e->clickCount > 1 && $focused->getFile()) {
+                FileSystem::open($this->project->getAbsoluteFile($focused->getFile()));
+            }
         }
     }
 

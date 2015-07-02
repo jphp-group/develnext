@@ -2,8 +2,11 @@
 namespace ide\project;
 use Exception;
 use ide\Ide;
+use php\format\ProcessorException;
+use php\io\IOException;
 use php\io\Stream;
 use php\lang\System;
+use php\lib\Str;
 use php\time\Time;
 use php\xml\DomDocument;
 use php\xml\DomElement;
@@ -62,6 +65,25 @@ class ProjectConfig
         $this->update();
     }
 
+    /**
+     * @param string $filename
+     *
+     * @return Project
+     */
+    public static function createForFile($filename)
+    {
+        $file = File::of($filename);
+
+        $name = $file->getName();
+
+        if (Str::endsWith($name, '.dnproject')) {
+            $name = Str::sub($name, 0, Str::length($name) - 10);
+        }
+
+        return new ProjectConfig($file->getParent(), $name);
+    }
+
+
     public function save()
     {
         $parentFile = File::of($this->configPath)->getParentFile();
@@ -78,8 +100,12 @@ class ProjectConfig
     public function reload()
     {
         if (File::of($this->configPath)->isFile()) {
-            $this->document = $this->processor->parse(Stream::getContents($this->configPath));
-            $this->validate();
+            try {
+                $this->document = $this->processor->parse(Stream::getContents($this->configPath));
+                $this->validate();
+            } catch (ProcessorException $e) {
+                $this->document = $this->processor->createDocument();
+            }
         } else {
             $this->document = $this->processor->createDocument();
         }
@@ -162,6 +188,20 @@ class ProjectConfig
     public function getIdeName()
     {
         return $this->getProperty('ideName');
+    }
+
+    /**
+     * @return AbstractProjectTemplate
+     */
+    public function getTemplate()
+    {
+        $templateClass = $this->getProperty('template');
+
+        if (class_exists($templateClass)) {
+            return new $templateClass();
+        }
+
+        return null;
     }
 
     /**
@@ -286,5 +326,17 @@ class ProjectConfig
         if (!$this->document->find('/project')) {
             throw new Exception("Invalid project configuration!");
         }
+    }
+
+    /**
+     * @param Project $project
+     */
+    public function setProject(Project $project)
+    {
+        /** @var DomElement $domProject */
+        $domProject = $this->document->find('/project');
+
+        $domProject->setAttribute('name', $project->getName());
+        $domProject->setAttribute('template', get_class($project->getTemplate()));
     }
 }

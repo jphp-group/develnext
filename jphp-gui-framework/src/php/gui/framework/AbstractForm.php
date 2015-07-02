@@ -48,6 +48,10 @@ abstract class AbstractForm extends UXForm
         $this->applyConfig();
 
         $this->init();
+
+        if (Stream::exists('res://.theme/style.css')) {
+            $this->addStylesheet('/.theme/style.css');
+        }
     }
 
     /**

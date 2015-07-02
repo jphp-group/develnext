@@ -6,6 +6,7 @@ use ide\formats\form\AbstractFormElement;
 use ide\formats\form\AbstractFormElementTag;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXDialog;
+use php\lib\Str;
 use php\lib\String;
 use php\xml\DomDocument;
 use php\xml\DomElement;
@@ -48,19 +49,31 @@ class AnchorPaneFormElementTag extends AbstractFormElementTag
         $minWidth = $node->minWidth;
         $minHeight = $node->minHeight;
 
-        if (String::equalsIgnoreCase($minWidth, '-infinity')) {
+        $maxWidth = $node->maxWidth;
+        $maxHeight = $node->maxHeight;
+
+        if (Str::equalsIgnoreCase($minWidth, '-infinity')) {
             $minWidth = '-Infinity';
         }
 
-        if (String::equalsIgnoreCase($minHeight, '-infinity')) {
+        if (Str::equalsIgnoreCase($minHeight, '-infinity')) {
             $minHeight = '-Infinity';
         }
+
+        if (Str::equalsIgnoreCase($maxWidth, '-infinity')) {
+            $maxWidth = '-Infinity';
+        }
+
+        if (Str::equalsIgnoreCase($maxHeight, '-infinity')) {
+            $maxHeight = '-Infinity';
+        }
+
 
         $element->setAttributes([
             'minWidth' => $minWidth,
             'minHeight' => $minHeight,
-            'maxWidth' => $node->maxWidth,
-            'maxHeight' => $node->maxHeight,
+            'maxWidth' => $maxWidth,
+            'maxHeight' => $maxHeight,
         ]);
     }
 }
