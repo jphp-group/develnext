@@ -1,3 +1,5 @@
+import java.sql.Date
+
 apply plugin: 'application'
 
 project.version = '1.0'
@@ -13,6 +15,29 @@ sourceSets {
 }
 
 mainClassName = 'php.runtime.launcher.Launcher'
+
+task distIdeZip(type: Zip, dependsOn: ['clean', 'distIde']) {
+    def ver = new Date(System.currentTimeMillis()).format("yyyyMMddhh");
+
+    from "$project.buildDir/install/$project.name"
+    archiveName "DevelNext.NigthlyBuild.${ver}.zip"
+
+    doLast {
+        def uploadPath = System.getProperty("uploadPath", "E:/Upload")
+
+        if (new File(uploadPath).isDirectory()) {
+            copy {
+                from distIdeZip.archivePath
+                into "$uploadPath/YandexDisk"
+            }
+
+            copy {
+                from distIdeZip.archivePath
+                into "$uploadPath/mega"
+            }
+        }
+    }
+}
 
 task distIde(dependsOn: ['installDist']) {
     doLast {
@@ -30,6 +55,11 @@ task distIde(dependsOn: ['installDist']) {
 
         copy {
             from "$project.rootDir/develnext/launcher/DevelNext.exe"
+            into "$project.buildDir/install/$project.name"
+        }
+
+        copy {
+            from "$project.rootDir/develnext/misc"
             into "$project.buildDir/install/$project.name"
         }
     }
