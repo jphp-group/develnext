@@ -1,7 +1,7 @@
 <element>
     <init>
-        <property code="visible" virtual="1" />
-        <property code="enabled" virtual="1" />
+        <property code="visible" virtual="1" value="1" />
+        <property code="enabled" virtual="1" value="1" />
     </init>
 
     <properties group="general" title="Главное" />

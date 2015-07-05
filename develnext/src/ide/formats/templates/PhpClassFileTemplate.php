@@ -87,7 +87,7 @@ class PhpClassFileTemplate extends AbstractFileTemplate
         }
 
         foreach ($this->imports as $import) {
-            $header .= "use $import\n";
+            $header .= "use $import;\n";
         }
 
         return [

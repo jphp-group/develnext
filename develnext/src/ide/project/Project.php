@@ -11,6 +11,7 @@ use ide\utils\FileUtils;
 use php\io\File;
 use php\io\FileStream;
 use php\io\Stream;
+use php\lib\Items;
 use php\lib\Str;
 use php\time\Time;
 use php\util\Flow;
@@ -324,6 +325,8 @@ class Project
     {
         $this->trigger(__FUNCTION__);
 
+        FileSystem::saveAll();
+
         $this->config->setProjectFiles($this->filesData);
         $this->config->setBehaviours($this->behaviours);
 
@@ -335,7 +338,7 @@ class Project
     /**
      * Восстановить целостность файлов проекта.
      */
-    public function recoverFiles()
+    public function recover()
     {
         $this->trigger(__FUNCTION__);
     }
@@ -458,5 +461,11 @@ class Project
     public function getTemplate()
     {
         return $this->template;
+    }
+
+    public function close()
+    {
+        $this->save();
+        $this->tree->clear(true);
     }
 }

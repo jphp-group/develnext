@@ -15,11 +15,11 @@ public class CursorMemoryOperation extends MemoryOperation<Cursor> {
 
     @Override
     public Cursor convert(Environment env, TraceInfo trace, Memory arg) throws Throwable {
-        return Cursor.cursor(arg.toString());
+        return arg.isNull() ? null : Cursor.cursor(arg.toString());
     }
 
     @Override
     public Memory unconvert(Environment env, TraceInfo trace, Cursor arg) throws Throwable {
-        return StringMemory.valueOf(arg.toString());
+        return arg == null ? Memory.NULL : StringMemory.valueOf(arg.toString());
     }
 }

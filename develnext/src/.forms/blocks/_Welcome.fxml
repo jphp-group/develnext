@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="424.0" prefWidth="697.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="14.0" layoutY="14.0" prefHeight="32.0" prefWidth="309.0" text="Добро пожаловать">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Separator layoutX="14.0" layoutY="55.0" prefHeight="3.0" prefWidth="682.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+      <VBox layoutX="14.0" layoutY="72.0" prefHeight="329.0" prefWidth="334.0" spacing="7.0">
+         <children>
+            <Button id="createProjectButton" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="48.0" prefWidth="105.0" styleClass="icon-new32" text="Создать проект">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+            <Button id="openProjectButton" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="48.0" prefWidth="105.0" styleClass="icon-open32" text="Открыть проект">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

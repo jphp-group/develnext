@@ -7,7 +7,7 @@ use php\gui\UXWindow;
  * Class UXWindowEvent
  * @package php\gui\event
  */
-class UXWindowEvent {
+class UXWindowEvent extends UXEvent {
     /**
      * @var UXWindow
      */

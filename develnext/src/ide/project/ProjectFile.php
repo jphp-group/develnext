@@ -227,7 +227,11 @@ class ProjectFile extends File
     public function serialize(DomElement $element, DomDocument $document)
     {
         $element->setAttribute('src', $this->getRelativePath());
-        $element->setAttribute('generated', $this->isGenerated());
+
+        if ($this->isGenerated()) {
+            $element->setAttribute('generated', $this->isGenerated());
+        }
+
         $element->setAttribute('inRootDir', $this->isInRootDir());
 
         if ($this->links) {

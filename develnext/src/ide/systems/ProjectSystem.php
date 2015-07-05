@@ -1,5 +1,6 @@
 <?php
 namespace ide\systems;
+use ide\forms\MainForm;
 use ide\Ide;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
@@ -34,7 +35,7 @@ class ProjectSystem
         Ide::get()->setOpenedProject($project);
 
         $project->create();
-        $project->recoverFiles();
+        $project->recover();
         $project->open();
 
         static::save();
@@ -53,7 +54,7 @@ class ProjectSystem
 
         $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
         $project->load();
-        $project->recoverFiles();
+        $project->recover();
         $project->open();
 
         Ide::get()->setOpenedProject($project);
@@ -80,12 +81,18 @@ class ProjectSystem
     {
         $project = Ide::get()->getOpenedProject();
 
+        if ($project) {
+            $project->close();
+        }
+
+        static::clear();
+
         foreach (FileSystem::getOpened() as $hash => $info) {
-            if ($project->isContainsFile($info['file'])) {
+            if ($project && $project->isContainsFile($info['file'])) {
                 FileSystem::close($info['file']);
             }
         }
 
-        Ide::get()->setOpenedProject($project);
+        Ide::get()->setOpenedProject(null);
     }
 }

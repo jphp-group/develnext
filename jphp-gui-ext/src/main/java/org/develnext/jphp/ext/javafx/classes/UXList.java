@@ -52,6 +52,17 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         getWrappedObject().clear();
     }
 
+    @Signature
+    public Memory last(Environment env) {
+        ObservableList<T> list = getWrappedObject();
+
+        if (list.isEmpty()) {
+            return Memory.NULL;
+        } else {
+            return Memory.wrap(env, list.get(list.size() - 1));
+        }
+    }
+
     @Override
     @Signature
     public Memory current(Environment env, Memory... args) {

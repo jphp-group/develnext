@@ -40,6 +40,13 @@ class UXList implements Iterator, Countable, ArrayAccess
     }
 
     /**
+     * @return mixed|null null if not found
+     */
+    public function last()
+    {
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function current()

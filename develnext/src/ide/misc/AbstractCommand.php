@@ -15,6 +15,16 @@ abstract class AbstractCommand
 
     abstract public function onExecute();
 
+    public function withBeforeSeparator()
+    {
+        return false;
+    }
+
+    public function withAfterSeparator()
+    {
+        return false;
+    }
+
     public function isAlways()
     {
         return false;
@@ -39,6 +49,11 @@ abstract class AbstractCommand
     {
         $button = new UXButton();
         $button->tooltipText = $this->getName();
+
+        if ($this->getAccelerator()) {
+            $button->tooltipText .= ' (' . $this->getAccelerator() . ')';
+        }
+
         $button->graphic = Ide::get()->getImage($this->getIcon());
         $button->css('cursor', 'hand');
         $button->padding = [4, 5];

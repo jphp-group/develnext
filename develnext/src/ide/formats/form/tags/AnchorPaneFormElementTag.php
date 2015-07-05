@@ -23,6 +23,11 @@ class AnchorPaneFormElementTag extends AbstractFormElementTag
         return UXAnchorPane::class;
     }
 
+    public function isFinal()
+    {
+        return true;
+    }
+
     public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
     {
         /** @var UXAnchorPane $node */
@@ -68,12 +73,14 @@ class AnchorPaneFormElementTag extends AbstractFormElementTag
             $maxHeight = '-Infinity';
         }
 
-
         $element->setAttributes([
             'minWidth' => $minWidth,
             'minHeight' => $minHeight,
             'maxWidth' => $maxWidth,
             'maxHeight' => $maxHeight,
         ]);
+
+        $element->setAttribute('prefWidth', $node->size[0]);
+        $element->setAttribute('prefHeight', $node->size[1]);
     }
 }

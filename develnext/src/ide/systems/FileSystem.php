@@ -1,6 +1,7 @@
 <?php
 namespace ide\systems;
 
+use ide\editors\AbstractEditor;
 use ide\Ide;
 use ide\utils\FileUtils;
 use php\gui\UXTab;
@@ -64,6 +65,16 @@ class FileSystem
     }
 
     /**
+     * ...
+     */
+    static function saveAll()
+    {
+        foreach (static::$openedEditors as $editor) {
+            $editor->save();
+        }
+    }
+
+    /**
      * @param $path
      * @param bool $switchToTab
      * @return AbstractEditor|null
@@ -98,7 +109,6 @@ class FileSystem
             $tab->content = $editor->makeUi();
 
             $tab->on('close', function () use ($path, $editor) {
-                $editor->close();
                 static::close($path);
             });
 
@@ -120,8 +130,13 @@ class FileSystem
     {
         $hash = FileUtils::hashName($path);
 
-        $editor = static::$openedTabs[$hash];
+        /** @var AbstractEditor $editor */
+        $editor = static::$openedEditors[$hash];
         $tab    = static::$openedTabs[$hash];
+
+        if ($editor) {
+            $editor->close();
+        }
 
         if ($tab) {
             Ide::get()->getMainForm()->{'fileTabPane'}->tabs->remove($tab);

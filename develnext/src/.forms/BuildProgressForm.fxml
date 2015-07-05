@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="314.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ListView id="consoleList" layoutX="14.0" layoutY="59.0" prefHeight="193.0" prefWidth="572.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="59.0" />
+      <Label id="workTitle" layoutX="57.0" layoutY="10.0" text="Сборка проекта">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label id="statusLabel" layoutX="57.0" layoutY="33.0" text="Подождите ..." textFill="#909090" />
+      <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="17.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" />
+      <CheckBox id="closeAfterDoneCheckbox" layoutX="123.0" layoutY="268.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="288.0" selected="true" text="Закрыть после выполнения" AnchorPane.bottomAnchor="14.0" />
+      <Button id="closeButton" layoutX="14.0" layoutY="268.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="90.0" styleClass="icon-exit" text="Закрыть" AnchorPane.bottomAnchor="14.0">
+         <cursor>
+            <Cursor fx:constant="DEFAULT" />
+         </cursor>
+      </Button>
+   </children>
+</AnchorPane>

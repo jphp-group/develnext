@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="114.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label id="messageLabel" layoutX="57.0" layoutY="14.0" prefHeight="30.0" prefWidth="531.0" text="..." wrapText="true">
+         <font>
+            <Font size="13.0" />
+         </font>
+      </Label>
+      <HBox id="buttonBox" alignment="BASELINE_LEFT" layoutX="17.0" layoutY="53.0" prefHeight="30.0" prefWidth="568.0" spacing="7.0" AnchorPane.bottomAnchor="17.0" AnchorPane.leftAnchor="17.0" AnchorPane.rightAnchor="15.0" />
+      <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
+   </children>
+</AnchorPane>

@@ -216,7 +216,7 @@ class ProjectConfig
             $this->document->find('/project')->appendChild($domFiles);
         }
 
-        foreach ($domFiles->findAll('/file') as $domFile) {
+        foreach ($domFiles->findAll('file') as $domFile) {
             $domFiles->removeChild($domFile);
         }
 
@@ -240,7 +240,7 @@ class ProjectConfig
             $this->document->find('/project')->appendChild($domBehaviours);
         }
 
-        foreach ($domBehaviours->findAll('/behaviour') as $domBehavior) {
+        foreach ($domBehaviours->findAll('behaviour') as $domBehavior) {
             $domBehaviours->removeChild($domBehavior);
         }
 
@@ -278,6 +278,8 @@ class ProjectConfig
      */
     public function createBehaviours(Project $project)
     {
+        $behaviours = [];
+
         /** @var DomElement $domBehaviour */
         foreach ($this->document->findAll('/project/behaviours/behaviour') as $domBehaviour) {
             $class = $domBehaviour->getAttribute('class');
@@ -287,8 +289,12 @@ class ProjectConfig
             if ($behaviour instanceof AbstractProjectBehaviour) {
                 $behaviour = $project->register($behaviour);
                 $behaviour->unserialize($domBehaviour);
+
+                $behaviours[get_class($behaviour)] = $behaviour;
             }
         }
+
+        return $behaviours;
     }
 
     protected function update()
@@ -324,7 +330,7 @@ class ProjectConfig
     protected function validate()
     {
         if (!$this->document->find('/project')) {
-            throw new Exception("Invalid project configuration!");
+            throw new ProcessorException("Invalid project configuration!");
         }
     }
 

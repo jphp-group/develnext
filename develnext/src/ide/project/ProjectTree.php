@@ -203,7 +203,7 @@ class ProjectTree
         }
     }
 
-    public function clear()
+    public function clear($absolutely = false)
     {
         if (!$this->treeProjectItem) {
             $this->treeProjectItem = $projectRoot = new ProjectTreeItem('Проект');
@@ -212,9 +212,14 @@ class ProjectTree
             $this->tree->root = $projectRoot->getOrigin();
         }
 
-        /** @var ProjectTreeItem $item */
-        foreach ($this->treeProjectItem->getChildren() as $item) {
-            $item->children->clear();
+        if ($absolutely) {
+            $this->tree->root->children->clear();
+            $this->treeProjectItems = [];
+        } else {
+            /** @var ProjectTreeItem $item */
+            foreach ($this->treeProjectItem->getChildren() as $item) {
+                $item->children->clear();
+            }
         }
     }
 

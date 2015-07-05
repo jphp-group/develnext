@@ -4,6 +4,7 @@ namespace ide\forms;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
 use ide\project\ProjectConfig;
+use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\utils\FileUtils;
 use php\gui\event\UXMouseEvent;
@@ -27,6 +28,7 @@ use php\lib\Str;
  * @property UXImageView $icon
  * @property UXListView $projectList
  * @property UXTextField $pathField
+ * @property UXButton $openButton
  *
  * Class OpenProjectForm
  * @package ide\forms
@@ -35,12 +37,23 @@ class OpenProjectForm extends AbstractForm
 {
     use DialogFormMixin;
 
-    /** @var UXFileChooser */
+    /** @var UXDirectoryChooser */
     protected $directoryChooser;
+
+    /** @var UXFileChooser */
+    protected static $fileChooser;
 
     public function init()
     {
         $this->directoryChooser = new UXDirectoryChooser();
+
+        if (!self::$fileChooser) {
+            self::$fileChooser = new UXFileChooser();
+            self::$fileChooser->extensionFilters = [
+                ['description' => 'DevelNext Projects', 'extensions' => ['*.dnproject']]
+            ];
+            self::$fileChooser->initialDirectory = Ide::get()->getUserConfigValue('projectDirectory');
+        }
 
         $this->icon->image = Ide::get()->getImage('icons/open32.png')->image;
         $this->modality = 'APPLICATION_MODAL';
@@ -117,6 +130,17 @@ class OpenProjectForm extends AbstractForm
     public function doShow()
     {
         $this->update();
+    }
+
+    /**
+     * @event openButton.click
+     */
+    public function doOpenButtonClick()
+    {
+        if ($file = self::$fileChooser->execute()) {
+            $this->hide();
+            ProjectSystem::open($file);
+        }
     }
 
     /**

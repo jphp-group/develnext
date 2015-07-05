@@ -20,6 +20,7 @@ class TextFieldFormElementTag extends AbstractFormElementTag
     public function writeAttributes($node, DomElement $element)
     {
         /** @var UXTextField $node */
+        $element->setAttribute('editable', $node->editable);
         $element->setAttribute('alignment', $node->alignment);
         $element->setAttribute('prefColumnCount', $node->prefColumnCount);
     }

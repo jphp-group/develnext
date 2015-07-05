@@ -1,3 +1,20 @@
+/* icons .. */
+.icon-exit { -fx-graphic: url("/.data/img/icons/exit16.png"); }
+.icon-exit32 { -fx-graphic: url("/.data/img/icons/exit32.png"); }
+
+.icon-refresh { -fx-graphic: url("/.data/img/icons/refresh16.png"); }
+.icon-refresh32 { -fx-graphic: url("/.data/img/icons/refresh32.png"); }
+
+.icon-open { -fx-graphic: url("/.data/img/icons/open16.png"); }
+.icon-open32 { -fx-graphic: url("/.data/img/icons/open32.png"); }
+
+.icon-new { -fx-graphic: url("/.data/img/icons/new16.png"); }
+.icon-new32 { -fx-graphic: url("/.data/img/icons/new32.png"); }
+
+.button {
+    -fx-cursor: hand;
+}
+
 .list-cell .for-selected {
     -fx-pref-width: 0;
     -fx-pref-height: 0;

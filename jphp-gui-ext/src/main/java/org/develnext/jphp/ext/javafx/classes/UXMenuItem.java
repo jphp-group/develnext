@@ -20,7 +20,7 @@ public class UXMenuItem extends BaseWrapper<MenuItem> {
         @Property String id();
         @Property String text();
         @Property String style();
-        @Property Node graphic();
+        @Property @Nullable Node graphic();
         @Property ContextMenu parentPopup();
 
         @Property boolean disable();

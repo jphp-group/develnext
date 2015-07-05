@@ -140,10 +140,20 @@ class Application
                 $this->mainForm->show();
             }
 
+            $this->launched = true;
+
             if ($after) {
                 $after();
             }
         });
+    }
+
+    /**
+     * Exit from application.
+     */
+    public function shutdown()
+    {
+        UXApplication::shutdown();
     }
 
     /**

@@ -1,10 +1,12 @@
 <?php
 namespace ide\project\behaviours;
 
+use ide\commands\ExecuteProjectCommand;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
 use ide\formats\templates\GuiBootstrapFileTemplate;
 use ide\formats\templates\GuiFormFileTemplate;
 use ide\formats\templates\PhpClassFileTemplate;
+use ide\Ide;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\ProjectFile;
 use ide\project\ProjectTree;
@@ -16,6 +18,7 @@ use php\gui\UXTreeItem;
 use php\gui\UXTreeView;
 use php\io\File;
 use php\lib\Str;
+use php\util\Regex;
 
 /**
  * Class GuiFrameworkProjectBehaviour
@@ -33,12 +36,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
      */
     public function inject()
     {
-        $this->project->on('recoverFiles', [$this, 'doRecoverFiles']);
+        $this->project->on('recover', [$this, 'doRecover']);
         $this->project->on('create', [$this, 'doCreate']);
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('updateTree', [$this, 'doUpdateTree']);
 
         WatcherSystem::addListener([$this, 'doWatchFile']);
+
+        Ide::get()->registerCommand(new ExecuteProjectCommand());
     }
 
     public function getMainForm()
@@ -49,7 +54,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function doCreate()
     {
         $mainForm = $this->createForm($this->mainForm);
-
         FileSystem::open($mainForm);
     }
 
@@ -84,6 +88,25 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         FileSystem::open($this->makeForm($this->mainForm));
 
         WatcherSystem::addPathRecursive($this->project->getFile(self::FORMS_DIRECTORY));
+
+        /** @var GradleProjectBehaviour $gradleBehavior */
+        $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
+
+        $buildConfig = $gradleBehavior->getConfig();
+
+        $buildConfig->addPlugin('application');
+        $buildConfig->setDefine('mainClassName', '"php.runtime.launcher.Launcher"');
+        $buildConfig->setSourceSet('main.resources.srcDirs', 'src');
+
+        $buildConfig->addRepository('jcenter');
+        $buildConfig->addRepository('mavenCentral');
+        $buildConfig->addRepository('local', new File("lib/"));
+
+        $buildConfig->setDependency('asm-all');
+        $buildConfig->setDependency('jphp-runtime');
+        $buildConfig->setDependency('jphp-core');
+        $buildConfig->setDependency('jphp-gui-ext');
+        $buildConfig->setDependency('jphp-gui-framework');
     }
 
     public function doUpdateTree(ProjectTree $tree, $path)
@@ -91,8 +114,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         // ... todo.
     }
 
-    public function doRecoverFiles()
+    public function doRecover()
     {
+        if (!$this->project->hasBehaviour(GradleProjectBehavior::class)) {
+            $this->project->register(new GradleProjectBehaviour());
+        }
+
         $this->_recoverDirectories();
 
         $this->project->defineFile('src/JPHP-INF/.bootstrap.php', new GuiBootstrapFileTemplate());
@@ -149,5 +176,61 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->makeDirectory('src/app/forms');
 
         $this->project->getFile('src/app/forms')->setHiddenInTree(true);
+    }
+
+    public function synchronizeDependencies()
+    {
+        /** @var GradleProjectBehaviour $gradleBehavior */
+        $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
+
+        $buildConfig = $gradleBehavior->getConfig();
+
+        $libPath = $this->project->getFile('lib/');
+        $libPath->mkdirs();
+
+        foreach ($buildConfig->getDependencies() as $dep) {
+            if (!$dep[0] && !$dep[2]) {
+                $libFile = $this->findLibFile($dep[1]);
+
+                if ($libFile) {
+                    FileUtils::copyFile($libFile, "$libPath/$dep[1].jar");
+                }
+            }
+        }
+    }
+
+    private function findLibFile($name)
+    {
+        /** @var File[] $libPaths */
+        $libPaths = [Ide::get()->getOwnFile('lib/')];
+
+        if (Ide::get()->isDevelopment()) {
+            $ownFile = Ide::get()->getOwnFile('build/install/develnext/lib');
+            $libPaths[] = $ownFile;
+        }
+
+        $regex = Regex::of('(\.[0-9]|\-[0-9])');
+
+        $name = $regex->with($name)->replace('');
+
+        foreach ($libPaths as $libPath) {
+            foreach ($libPath->findFiles() as $file) {
+                $filename = $regex->with($file->getName())->replace('');
+
+                if (Str::endsWith($filename, '.jar') || Str::endsWith($filename, '-SNAPSHOT.jar')) {
+                    $filename = Str::sub($filename, 0, Str::length($filename) - 4);
+
+                    if (Str::endsWith($filename, '-SNAPSHOT')) {
+                        $filename = Str::sub($filename, 0, Str::length($filename) - 9);
+                    }
+
+                    if ($filename == $name) {
+                        return $file;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -2,6 +2,7 @@
 namespace ide\utils;
 
 use php\io\File;
+use php\io\Stream;
 use php\lang\System;
 use php\lib\Str;
 
@@ -108,5 +109,18 @@ class FileUtils
         }
 
         return $name;
+    }
+
+    public static function copyFile($origin, $dest)
+    {
+        try {
+            $in = Stream::of($origin);
+            $out = Stream::of($dest, 'w+');
+
+            $out->write($in->readFully());
+        } finally {
+            if ($out) $out->close();
+            if ($in) $in->close();
+        }
     }
 }

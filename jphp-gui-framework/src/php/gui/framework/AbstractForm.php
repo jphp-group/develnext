@@ -10,6 +10,7 @@ use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\io\IOException;
 use php\io\Stream;
+use php\lang\IllegalStateException;
 use php\lib\Items;
 use php\lib\String;
 use php\util\Configuration;
@@ -133,25 +134,34 @@ abstract class AbstractForm extends UXForm
         Stream::tryAccess($path, function (Stream $stream) use ($loader) {
             $this->layout = $loader->load($stream);
 
-            DataUtils::scan($this->layout, function (UXData $data, UXNode $node) {
-                if ($data->has('enabled')) {
-                    $node->enabled = $data->get('enabled');
-                }
+            if ($this->layout) {
+                DataUtils::scan($this->layout, function (UXData $data, UXNode $node = null) {
+                    if ($node) {
+                        if ($data->has('enabled')) {
+                            $node->enabled = $data->get('enabled');
+                        }
 
-                if ($data->has('visible')) {
-                    $node->visible = $data->get('visible');
-                }
-            });
+                        if ($data->has('visible')) {
+                            $node->visible = $data->get('visible');
+                        }
+                    }
+                });
+            }
         });
     }
 
     /**
      * @param object $handler
+     *
+     * @throws Exception
+     * @throws IllegalStateException
      */
     protected function loadBindings($handler)
     {
         $class = new ReflectionClass($handler);
         $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
+
+        $events = [];
 
         foreach ($methods as $method) {
             $comment = $method->getDocComment();
@@ -164,7 +174,15 @@ abstract class AbstractForm extends UXForm
                 if (String::startsWith($line, '@event ')) {
                     $event = String::trim(String::sub($line, 7));
 
-                    $this->bind($event, [$handler, $method->getName()]);
+                    if (isset($events[$event])) {
+                        throw new IllegalStateException(
+                            "Unable to bind '$event' for {$method->getName()}(), this event already bound for {$events[$event]}()"
+                        );
+                    }
+
+                    $methodName = $events[$event] = $method->getName();
+
+                    $this->bind($event, [$handler, $methodName]);
                 }
             }
         }

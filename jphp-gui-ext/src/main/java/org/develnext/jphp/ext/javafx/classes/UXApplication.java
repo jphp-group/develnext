@@ -64,6 +64,11 @@ public class UXApplication extends BaseWrapper<Application> {
     }
 
     @Signature
+    public static void shutdown() {
+        Platform.exit();
+    }
+
+    @Signature
     public static void launch(Invoker onStart) {
         Environment.addThreadSupport();
 
