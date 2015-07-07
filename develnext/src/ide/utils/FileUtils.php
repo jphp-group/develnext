@@ -20,7 +20,7 @@ class FileUtils
     {
         File::of($path)->find(function($dir, $name) use ($handle) {
             if ($name !== '.' && $name !== '..') {
-                $filename = $dir . DIRECTORY_SEPARATOR . $name;
+                $filename = $dir . '/' . $name;
 
                 $handle($filename);
 
@@ -115,6 +115,13 @@ class FileUtils
     {
         try {
             $in = Stream::of($origin);
+
+            $parent = File::of($dest)->getParentFile();
+
+            if (!$parent->isDirectory()) {
+                $parent->mkdirs();
+            }
+
             $out = Stream::of($dest, 'w+');
 
             $out->write($in->readFully());

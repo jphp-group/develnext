@@ -57,6 +57,16 @@ abstract class AbstractFormElement
      */
     abstract public function createElement();
 
+    /**
+     * @param $node
+     *
+     * @return mixed
+     */
+    public function getTarget($node)
+    {
+        return $node;
+    }
+
     public function applyProperties(UXDesignProperties $properties)
     {
         if ($this->config) {

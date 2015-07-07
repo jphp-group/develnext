@@ -33,6 +33,8 @@ public class UXTab extends BaseWrapper<Tab> {
         @Property @Nullable ContextMenu contextMenu();
 
         @Property String text();
+
+        @Property Object userData();
     }
 
     public UXTab(Environment env, Tab wrappedObject) {

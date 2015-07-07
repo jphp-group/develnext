@@ -44,6 +44,7 @@ use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\System;
+use php\lib\Items;
 use php\lib\Str;
 use php\util\Configuration;
 
@@ -363,7 +364,7 @@ class Ide extends Application
             return;
         }
 
-        foreach ($this->commands as $data) {
+        foreach ($this->commands as $code => $data) {
             /** @var AbstractCommand $command */
             $command = $data['command'];
 
@@ -383,9 +384,9 @@ class Ide extends Application
                     $menu->items->remove($data['menuItem']);
                 }
             }
-        }
 
-        $this->commands = [];
+            unset($this->commands[$code]);
+        }
     }
 
     /**

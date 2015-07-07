@@ -3,6 +3,6 @@
         <property code="text" name="Текст" editor="text" />
         <property code="font" name="Шрифт" editor="font" />
         <property code="alignment" name="Выравнивание" editor="position" />
-        <property code="editable" name="Редактируемость" editor="boolean" />
+        <property code="editable" name="Редактируемое" editor="boolean" />
     </properties>
 </element>

@@ -13,6 +13,7 @@
           <Menu id="menuAccount" mnemonicParsing="false" text="Аккаунт" />
             <Menu id="menuRun" mnemonicParsing="false" text="Запуск" />
           <Menu id="menuHelp" mnemonicParsing="false" text="Помощь" />
+            <Menu id="menuCreate" disable="true" mnemonicParsing="false" text="Создать" />
         </menus>
          <opaqueInsets>
             <Insets />

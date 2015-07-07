@@ -59,7 +59,9 @@ class FormElementTypePane
 
         /** @var AbstractFormElement $element */
         foreach ($elements as $element) {
-            $groups[$element->getGroup()][] = $element;
+            if ($element->getName()) {
+                $groups[$element->getGroup()][] = $element;
+            }
         }
 
         $this->createHeaderUi();

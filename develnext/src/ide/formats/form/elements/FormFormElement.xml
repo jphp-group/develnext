@@ -1,0 +1,19 @@
+<element>
+    <properties group="general" title="Главное">
+        <property code="form.title" name="Заголовок" editor="text" tooltip="Заголовок окна" formConfig="1" />
+        <property code="form.alwaysOnTop" name="Поверх всех окон" editor="boolean" tooltip="Всегда отображать окно поверх всех других окон" />
+        <property code="form.resizable" name="Изменяемые размеры" editor="boolean" formConfig="1" defaultValue="1"
+                  tooltip="Возможность изменять размеры окна - высоту и ширину" />
+        <property code="form.style" name="Стиль" editor="enum" formConfig="1" defaultValue="DECORATED">
+            <variants>
+                <variant value="DECORATED">Стаднарт</variant>
+                <variant value="UNDECORATED">Без рамок</variant>
+                <variant value="TRANSPARENT">Прозрачный</variant>
+                <variant value="UTILITY">Утилита</variant>
+            </variants>
+        </property>
+    </properties>
+    <properties group="extra" title="Дополнительно">
+        <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />
+    </properties>
+</element>

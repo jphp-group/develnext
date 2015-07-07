@@ -145,6 +145,10 @@ class Application
             if ($after) {
                 $after();
             }
+
+            if (Stream::exists('res://.debug/bootstrap.php')) {
+                include 'res://.debug/bootstrap.php';
+            }
         });
     }
 

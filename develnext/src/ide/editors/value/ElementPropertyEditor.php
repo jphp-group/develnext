@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\value;
 
+use ide\editors\FormEditor;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\framework\DataUtils;
 use php\gui\UXNode;
@@ -107,6 +108,27 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     {
         $cell->graphic = $this->content;
         $this->updateUi($this->getNormalizedValue($this->getValue()));
+    }
+
+    public function setAsFormConfigProperty($defaultValue)
+    {
+        $this->setter = function (ElementPropertyEditor $editor, $value) {
+            $target = $this->designProperties->target;
+
+            if ($target->userData instanceof FormEditor) {
+                $target->userData->getConfig()->set($editor->code, $value);
+            }
+        };
+
+        $this->getter = function (ElementPropertyEditor $editor) use ($defaultValue) {
+            $target = $this->designProperties->target;
+
+            if ($target->userData instanceof FormEditor) {
+                return $target->userData->getConfig()->get($editor->code, $defaultValue);
+            }
+
+            return '';
+        };
     }
 
     /**

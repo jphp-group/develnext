@@ -30,6 +30,7 @@ use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXTooltip;
 use php\io\File;
+use php\io\Stream;
 use php\lib\Items;
 use php\lib\Str;
 use php\lib\String;
@@ -50,6 +51,11 @@ class FormEditor extends AbstractEditor
      * @var string
      */
     protected $codeFile;
+
+    /**
+     * @var string
+     */
+    protected $configFile;
 
     /**
      * @var UXPane
@@ -95,23 +101,32 @@ class FormEditor extends AbstractEditor
     {
         parent::__construct($file);
 
+        $this->config = new Configuration();
         $this->formDumper = $dumper;
 
         $phpFile = $file;
+        $confFile = $file;
 
         if (Str::endsWith($phpFile, '.fxml')) {
             $phpFile = Str::sub($phpFile, 0, Str::length($phpFile) - 5);
+            $confFile = $phpFile;
         }
 
-        $phpFile .= '.php';
+        $phpFile  .= '.php';
+        $confFile .= '.conf';
 
         if ($file instanceof ProjectFile) {
             if ($link = $file->findLinkByExtension('php')) {
                 $phpFile = $link;
             }
+
+            if ($link = $file->findLinkByExtension('conf')) {
+                $confFile = $link;
+            }
         }
 
         $this->codeFile = $phpFile;
+        $this->configFile = $confFile;
         $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
     }
 
@@ -121,6 +136,14 @@ class FormEditor extends AbstractEditor
         $tooltip->text = (new File($this->file))->getPath();
 
         return $tooltip;
+    }
+
+    /**
+     * @return Configuration
+     */
+    public function getConfig()
+    {
+        return $this->config;
     }
 
     /**
@@ -165,6 +188,10 @@ class FormEditor extends AbstractEditor
         if (File::of($this->codeFile)->exists()) {
             $this->codeEditor->load();
         }
+
+        if (File::of($this->configFile)->exists()) {
+            $this->config->load($this->configFile);
+        }
     }
 
     public function save()
@@ -174,6 +201,10 @@ class FormEditor extends AbstractEditor
         if (File::of($this->codeFile)->exists()) {
             $this->codeEditor->save();
         }
+
+        Stream::tryAccess($this->configFile, function (Stream $stream) {
+            $this->config->save($stream);
+        }, 'w+');
     }
 
     public function close()
@@ -183,6 +214,12 @@ class FormEditor extends AbstractEditor
         $this->updateProperties(null);
     }
 
+    public function open()
+    {
+        parent::open();
+
+        $this->updateProperties($this);
+    }
 
     public function makeUi()
     {
@@ -370,7 +407,7 @@ class FormEditor extends AbstractEditor
         $properties = $element ? static::$typeProperties[get_class($element)] : null;
 
         if ($properties) {
-            $properties->target = $node;
+            $properties->target = $element->getTarget($node);
             $properties->update();
         }
 

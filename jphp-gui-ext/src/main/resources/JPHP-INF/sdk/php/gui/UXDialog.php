@@ -23,4 +23,13 @@ class UXDialog
     public static function confirm($text)
     {
     }
+
+    /**
+     * @param $text
+     * @param $default
+     * @return string|null
+     */
+    public static function input($text, $default = '')
+    {
+    }
 }

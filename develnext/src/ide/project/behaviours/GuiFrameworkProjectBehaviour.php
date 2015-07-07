@@ -1,6 +1,7 @@
 <?php
 namespace ide\project\behaviours;
 
+use ide\commands\CreateFormProjectCommand;
 use ide\commands\ExecuteProjectCommand;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
 use ide\formats\templates\GuiBootstrapFileTemplate;
@@ -44,6 +45,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         WatcherSystem::addListener([$this, 'doWatchFile']);
 
         Ide::get()->registerCommand(new ExecuteProjectCommand());
+        Ide::get()->registerCommand(new CreateFormProjectCommand());
     }
 
     public function getMainForm()
@@ -136,10 +138,17 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function makeForm($name)
     {
         $form = $this->project->getFile("src/.forms/$name.fxml");
+        $conf = $this->project->getFile("src/.forms/$name.conf");
+        $conf->setHiddenInTree(true);
+
         $sources = $this->project->getFile("src/app/forms/$name.php");
 
         if ($sources->exists() && !$form->findLinkByExtension('php')) {
             $form->addLink($sources);
+        }
+
+        if (!$form->findLinkByExtension('conf')) {
+            $form->addLink($conf);
         }
 
         return $form;
@@ -156,8 +165,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         ]);
 
         $sources = $this->project->createFile("src/app/forms/$name.php", $template);
+        $conf = $this->project->getFile("src/.forms/$name.conf");
+        $conf->setHiddenInTree(true);
 
         $form->addLink($sources);
+        $form->addLink($conf);
 
         return $form;
     }
@@ -196,6 +208,23 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                     FileUtils::copyFile($libFile, "$libPath/$dep[1].jar");
                 }
             }
+        }
+    }
+
+    public function synchronizeDebugFiles()
+    {
+        $debugDir = Ide::get()->getOwnFile('debug/gui');
+
+        if (!$debugDir->isDirectory() && Ide::get()->isDevelopment()) {
+            $debugDir = Ide::get()->getOwnFile('misc/debug/gui');
+        }
+
+        if ($debugDir->isDirectory()) {
+            FileUtils::scan($debugDir, function ($file) use ($debugDir) {
+                $name = FileUtils::relativePath($debugDir, $file);
+
+                FileUtils::copyFile($file, $this->project->getFile('src/.debug/' . $name));
+            });
         }
     }
 

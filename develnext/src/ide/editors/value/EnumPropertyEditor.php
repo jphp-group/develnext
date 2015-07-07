@@ -99,17 +99,14 @@ class EnumPropertyEditor extends ElementPropertyEditor
      */
     public function unserialize(DomElement $element)
     {
-        $editor = new static([]);
+        $variants = [];
 
-        if (!$editor->variants) {
-            /** @var DomElement $el */
-            foreach ($element->findAll('variants/variant') as $el) {
-                $editor->variants[$el->getAttribute('value')] = $el->getTextContent();
-            }
-
-            $editor->variantKeys = Items::keys($editor->variants);
+        /** @var DomElement $el */
+        foreach ($element->findAll('variants/variant') as $el) {
+            $variants[$el->getAttribute('value')] = $el->getTextContent();
         }
 
+        $editor = new static($variants);
         return $editor;
     }
 }

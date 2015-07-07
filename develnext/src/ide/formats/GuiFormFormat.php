@@ -15,6 +15,7 @@ use ide\formats\form\context\ToFrontMenuCommand;
 use ide\formats\form\context\UpMenuCommand;
 use ide\formats\form\elements\ButtonFormElement;
 use ide\formats\form\elements\CheckboxFormElement;
+use ide\formats\form\elements\FormFormElement;
 use ide\formats\form\elements\LabelFormElement;
 use ide\formats\form\elements\TextFieldFormElement;
 use ide\formats\form\tags\AnchorPaneFormElementTag;
@@ -36,6 +37,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->requireFormat(new PhpCodeFormat());
 
         // Element types.
+        $this->register(new FormFormElement());
         $this->register(new ButtonFormElement());
         $this->register(new LabelFormElement());
         $this->register(new TextFieldFormElement());

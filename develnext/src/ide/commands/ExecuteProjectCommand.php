@@ -49,8 +49,9 @@ class ExecuteProjectCommand extends AbstractCommand
             /** @var GuiFrameworkProjectBehaviour $guiBehavior */
             $guiBehavior = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
             $guiBehavior->synchronizeDependencies();
+            $guiBehavior->synchronizeDebugFiles();
 
-            $process = new Process([$ide->getGradleProgram(), 'run'], $project->getRootDir(), $ide->makeEnvironment());
+            $process = new Process([$ide->getGradleProgram(), 'run', '--no-daemon'], $project->getRootDir(), $ide->makeEnvironment());
             $process = $process->start();
 
             $dialog = new BuildProgressForm();

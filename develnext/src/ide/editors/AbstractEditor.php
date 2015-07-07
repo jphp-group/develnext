@@ -59,6 +59,11 @@ abstract class AbstractEditor
         $this->save();
     }
 
+    public function open()
+    {
+        // nop.
+    }
+
     public function getTitle()
     {
         return $this->format->getTitle($this->file);

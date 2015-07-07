@@ -6,9 +6,11 @@ use ide\Ide;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
 use php\gui\UXButton;
+use php\gui\UXControl;
 use php\gui\UXForm;
 use php\gui\UXImageView;
 use php\gui\UXLabel;
+use php\gui\UXNode;
 
 /**
  * @property UXHBox $buttonBox
@@ -53,6 +55,11 @@ class MessageBoxForm extends AbstractForm
         $i = 0;
         foreach ($this->buttons as $value => $button)
         {
+            if ($button instanceof UXNode) {
+                $this->buttonBox->add($button);
+                continue;
+            }
+
             $ui = new UXButton($button);
             $ui->minWidth = 100;
             $ui->maxHeight = 10000;
@@ -61,7 +68,7 @@ class MessageBoxForm extends AbstractForm
                 $ui->style = '-fx-font-weight: bold';
             }
 
-            $ui->on('click', function() use ($value) {
+            $ui->on('action', function() use ($value) {
                 $this->setResult($value);
                 $this->hide();
             });

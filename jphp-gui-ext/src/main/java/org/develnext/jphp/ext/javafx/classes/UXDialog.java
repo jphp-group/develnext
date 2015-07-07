@@ -2,12 +2,15 @@ package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseObject;
 import php.runtime.reflection.ClassEntity;
+
+import java.util.Optional;
 
 @Name(JavaFXExtension.NS + "UXDialog")
 public class UXDialog extends BaseObject {
@@ -43,5 +46,25 @@ public class UXDialog extends BaseObject {
         ButtonType result = alert.showAndWait().orElse(null);
 
         return result != ButtonType.CANCEL;
+    }
+
+    @Signature
+    public static String input(String text) {
+        return input(text, "");
+    }
+
+    @Signature
+    public static String input(String text, String defaultValue) {
+        TextInputDialog dialog = new TextInputDialog(defaultValue);
+
+        dialog.setContentText(text);
+
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isPresent()) {
+            return result.get();
+        }
+
+        return null;
     }
 }

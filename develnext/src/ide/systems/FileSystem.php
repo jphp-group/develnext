@@ -2,8 +2,16 @@
 namespace ide\systems;
 
 use ide\editors\AbstractEditor;
+use ide\editors\menu\ContextMenu;
 use ide\Ide;
 use ide\utils\FileUtils;
+use php\gui\event\UXEvent;
+use php\gui\event\UXMouseEvent;
+use php\gui\framework\Timer;
+use php\gui\UXButton;
+use php\gui\UXContextMenu;
+use php\gui\UXDialog;
+use php\gui\UXMenu;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\io\File;
@@ -107,9 +115,23 @@ class FileSystem
             $tab->style = '-fx-cursor: hand;';
             $tab->graphic = Ide::get()->getImage($editor->getIcon());
             $tab->content = $editor->makeUi();
+            $tab->userData = $editor;
 
             $tab->on('close', function () use ($path, $editor) {
                 static::close($path);
+            });
+
+            $tab->on('change', function () {
+                Timer::run(100, function () {
+                    /** @var UXTabPane $fileTabPane */
+                    $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+
+                    $tab = $fileTabPane->selectedTab;
+
+                    if ($tab->userData instanceof AbstractEditor) {
+                        $tab->userData->open();
+                    }
+                });
             });
 
             static::addTab($tab);
@@ -173,8 +195,25 @@ class FileSystem
         if (!static::$addTab) {
             $tab = new UXTab();
             $tab->closable = false;
-            $tab->graphic = Ide::get()->getImage('icons/plus16.png');
-            $tab->style = '-fx-cursor: hand; -fx-padding: 1px 7px;';
+
+            $button = new UXButton();
+            $tab->graphic = $button;
+
+            $button->graphic = Ide::get()->getImage('icons/plus16.png');
+            $tab->style = '-fx-cursor: hand; -fx-padding: 1px 0px;';
+
+            $button->on('click', function (UXMouseEvent $e) {
+                $contextMenu = new UXContextMenu();
+
+                /** @var UXMenu $menu */
+                $menu = Ide::get()->getMainForm()->{'menuCreate'};
+
+                foreach ($menu->items as $item) {
+                    $contextMenu->items->add($item);
+                }
+
+                $contextMenu->show(Ide::get()->getMainForm(), $e->screenX, $e->screenY);
+            });
 
             static::$addTab = $tab;
         }

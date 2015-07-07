@@ -59,6 +59,10 @@ class UXTab
      */
     public $tooltip;
 
+    /**
+     * @var mixed
+     */
+    public $userData;
 
     /**
      * @param string $event

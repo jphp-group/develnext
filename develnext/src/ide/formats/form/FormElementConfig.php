@@ -291,6 +291,10 @@ class FormElementConfig
                         $editor->setAsCssProperty();
                     }
 
+                    if ($property->getAttribute('formConfig')) {
+                        $editor->setAsFormConfigProperty($property->getAttribute('defaultValue'));
+                    }
+
                     $editor->setTooltip($property->getAttribute('tooltip'));
 
                     return $editor;

@@ -52,6 +52,11 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
     @Signature
     public Object callFunction(Environment env, String name, ArrayMemory args) {
         JSObject window = (JSObject) getWrappedObject().executeScript("window");
+
+        if (window == null) {
+            throw new IllegalStateException("Unable to find window object");
+        }
+
         return window.call(name, args.toStringArray());
     }
 
