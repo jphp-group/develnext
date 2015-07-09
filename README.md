@@ -1,6 +1,6 @@
 # DevelNext
 
-> GUI and IDE for php based on jphp
+> GUI and IDE for php based on jphp, for beginners only.
 
 ---
 
