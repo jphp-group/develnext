@@ -51,6 +51,8 @@ namespace ide\formats\form\context {
 
             if ($node = $nodes[sizeof($nodes) - 1]) {
                 $designer->selectNode($node);
+            } else {
+                $editor->selectForm();
             }
         }
     }

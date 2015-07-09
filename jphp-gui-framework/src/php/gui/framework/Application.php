@@ -93,6 +93,8 @@ class Application
         return $this->mainForm;
     }
 
+
+
     public function setMainFormClass($class)
     {
         if ($this->getNamespace()) {

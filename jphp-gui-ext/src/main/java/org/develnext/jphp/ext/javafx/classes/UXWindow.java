@@ -41,6 +41,7 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
         void sizeToScene();
 
         void centerOnScreen();
+        void requestFocus();
     }
 
     public UXWindow(Environment env, T wrappedObject) {

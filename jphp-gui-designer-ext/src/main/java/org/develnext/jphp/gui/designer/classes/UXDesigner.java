@@ -14,7 +14,10 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -483,7 +486,7 @@ public class UXDesigner extends BaseObject {
 
         node.setOnKeyPressed(area.getOnKeyPressed());
 
-        node.setOnDragDetected(new EventHandler<MouseEvent>() {
+        EventHandler<MouseEvent> onDragDetected = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
                 if (getNodeLock(node)) {
                     return;
@@ -505,9 +508,11 @@ public class UXDesigner extends BaseObject {
 
                 e.consume();
             }
-        });
+        };
+        node.setOnDragDetected(onDragDetected);
+        node.addEventFilter(MouseEvent.DRAG_DETECTED, onDragDetected);
 
-        node.setOnMouseDragged(new EventHandler<MouseEvent>() {
+        EventHandler<MouseEvent> onMouseDragged = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
                 if (getNodeLock(node)) {
                     return;
@@ -532,9 +537,11 @@ public class UXDesigner extends BaseObject {
 
                 e.consume();
             }
-        });
+        };
+        node.setOnMouseDragged(onMouseDragged);
+        node.addEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
 
-        node.setOnMousePressed(new EventHandler<MouseEvent>() {
+        EventHandler<MouseEvent> onMousePressed = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
                 Node node = (Node) e.getSource();
 
@@ -577,9 +584,12 @@ public class UXDesigner extends BaseObject {
 
                 picked = node;
             }
-        });
+        };
 
-        node.setOnMouseReleased(new EventHandler<MouseEvent>() {
+        node.setOnMousePressed(onMousePressed);
+        node.addEventFilter(MouseEvent.MOUSE_PRESSED, onMousePressed);
+
+        EventHandler<MouseEvent> onMouseReleased = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
                 if (!getNodeLock(node) && dragged) {
                     for (Selection selection : selections.values()) {
@@ -600,7 +610,10 @@ public class UXDesigner extends BaseObject {
 
                 dragged = false;
             }
-        });
+        };
+
+        node.setOnMouseReleased(onMouseReleased);
+        node.addEventFilter(MouseEvent.MOUSE_RELEASED, onMouseReleased);
     }
 
     public class Item {

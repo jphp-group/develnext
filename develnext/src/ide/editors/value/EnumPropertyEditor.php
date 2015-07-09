@@ -42,6 +42,7 @@ class EnumPropertyEditor extends ElementPropertyEditor
     public function makeUi()
     {
         $this->choiceBox = new UXChoiceBox();
+        $this->choiceBox->maxWidth = 300;
         $this->choiceBox->items->addAll($this->variants);
 
         $this->choiceBox->style = "-fx-background-insets: 0; -fx-background-radius: 0; -fx-background-color: -fx-control-inner-background;";

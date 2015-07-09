@@ -1,0 +1,4 @@
+<element extends="ProgressIndicatorFormElement">
+    <properties>
+    </properties>
+</element>

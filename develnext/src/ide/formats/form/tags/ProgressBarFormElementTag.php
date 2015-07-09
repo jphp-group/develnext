@@ -2,24 +2,27 @@
 namespace ide\formats\form\tags;
 
 use ide\formats\form\AbstractFormElementTag;
-use php\gui\UXTextField;
+use php\gui\UXButton;
+use php\gui\UXLabel;
+use php\gui\UXProgressBar;
+use php\gui\UXProgressIndicator;
 use php\xml\DomElement;
 
-class TextFieldFormElementTag extends AbstractFormElementTag
+class ProgressBarFormElementTag extends AbstractFormElementTag
 {
     public function getTagName()
     {
-        return 'TextField';
+        return 'ProgressBar';
     }
 
     public function getElementClass()
     {
-        return UXTextField::class;
+        return UXProgressBar::class;
     }
 
     public function writeAttributes($node, DomElement $element)
     {
-        /** @var UXTextField $node */
-        $element->setAttribute('prefColumnCount', $node->prefColumnCount);
+        /** @var UXProgressBar $node */
+
     }
 }

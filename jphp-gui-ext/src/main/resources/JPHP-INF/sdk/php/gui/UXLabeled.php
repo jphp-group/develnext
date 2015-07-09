@@ -17,6 +17,21 @@ abstract class UXLabeled extends UXControl
     /**
      * @var string
      */
+    public $textAlignment = 'LEFT';
+
+    /**
+     * @var bool
+     */
+    public $wrapText = false;
+
+    /**
+     * @var bool
+     */
+    public $underline = false;
+
+    /**
+     * @var string
+     */
     public $text;
 
     /**
@@ -33,4 +48,9 @@ abstract class UXLabeled extends UXControl
      * @var UXColor
      */
     public $textColor;
+
+    /**
+     * @var string
+     */
+    public $ellipsisString = '...';
 }

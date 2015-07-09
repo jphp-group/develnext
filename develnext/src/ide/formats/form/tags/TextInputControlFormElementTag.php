@@ -22,7 +22,7 @@ class TextInputControlFormElementTag extends AbstractFormElementTag
     {
         /** @var UXTextInputControl $node */
         $element->setAttribute('text', $node->text);
-        $element->setAttribute('editable', $node->editable);
+        $element->setAttribute('editable', $node->editable ? 'true' : 'false');
         $element->setAttribute('promptText', $node->promptText);
     }
 }

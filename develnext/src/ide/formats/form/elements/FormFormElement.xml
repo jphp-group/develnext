@@ -1,15 +1,25 @@
 <element>
     <properties group="general" title="Главное">
         <property code="form.title" name="Заголовок" editor="text" tooltip="Заголовок окна" formConfig="1" />
-        <property code="form.alwaysOnTop" name="Поверх всех окон" editor="boolean" tooltip="Всегда отображать окно поверх всех других окон" />
+        <property code="form.alwaysOnTop" name="Поверх всех окон" editor="boolean" formConfig="1" tooltip="Всегда отображать окно поверх всех других окон" />
         <property code="form.resizable" name="Изменяемые размеры" editor="boolean" formConfig="1" defaultValue="1"
                   tooltip="Возможность изменять размеры окна - высоту и ширину" />
+
+        <property code="form.maximized" name="На весь экран" editor="boolean" formConfig="1" tooltip="Раскрытость окна на весь экран при создании" />
+
         <property code="form.style" name="Стиль" editor="enum" formConfig="1" defaultValue="DECORATED">
             <variants>
                 <variant value="DECORATED">Стаднарт</variant>
                 <variant value="UNDECORATED">Без рамок</variant>
                 <variant value="TRANSPARENT">Прозрачный</variant>
                 <variant value="UTILITY">Утилита</variant>
+            </variants>
+        </property>
+        <property code="form.modality" name="Модальность" editor="enum" formConfig="1" defaultValue="NONE">
+            <variants>
+                <variant value="NONE">Отсутствует</variant>
+                <variant value="WINDOW_MODAL">Есть, в рамках окна</variant>
+                <variant value="APPLICATION_MODAL">Есть, в рамках всего приложения</variant>
             </variants>
         </property>
     </properties>

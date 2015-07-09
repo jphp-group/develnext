@@ -2,24 +2,26 @@
 namespace ide\formats\form\tags;
 
 use ide\formats\form\AbstractFormElementTag;
+use php\gui\UXTextArea;
 use php\gui\UXTextField;
 use php\xml\DomElement;
 
-class TextFieldFormElementTag extends AbstractFormElementTag
+class TextAreaFormElementTag extends AbstractFormElementTag
 {
     public function getTagName()
     {
-        return 'TextField';
+        return 'TextArea';
     }
 
     public function getElementClass()
     {
-        return UXTextField::class;
+        return UXTextArea::class;
     }
 
     public function writeAttributes($node, DomElement $element)
     {
-        /** @var UXTextField $node */
+        /** @var UXTextArea $node */
+        $element->setAttribute('wrapText', $node->wrapText ? 'true' : 'false');
         $element->setAttribute('prefColumnCount', $node->prefColumnCount);
     }
 }

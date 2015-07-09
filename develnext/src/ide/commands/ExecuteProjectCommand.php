@@ -51,18 +51,13 @@ class ExecuteProjectCommand extends AbstractCommand
             $guiBehavior->synchronizeDependencies();
             $guiBehavior->synchronizeDebugFiles();
 
-            $process = new Process([$ide->getGradleProgram(), 'run', '--no-daemon'], $project->getRootDir(), $ide->makeEnvironment());
+            $process = new Process([$ide->getGradleProgram(), 'run', '--daemon'], $project->getRootDir(), $ide->makeEnvironment());
             $process = $process->start();
 
             $dialog = new BuildProgressForm();
             $dialog->addConsoleLine('> gradle run', 'green');
             $dialog->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
             $dialog->show($process);
-
-            /*
-            var_dump($process->getOutput()->readFully());
-            var_dump($process->getInput()->readFully());
-            var_dump(Str::decode($process->getError()->readFully(), "cp866"));  */
         }
     }
 }

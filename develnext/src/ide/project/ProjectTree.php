@@ -9,6 +9,7 @@ use php\gui\event\UXMouseEvent;
 use php\gui\UXTreeItem;
 use php\gui\UXTreeView;
 use php\io\File;
+use php\util\Regex;
 
 /**
  * Class ProjectTreeItem
@@ -133,6 +134,11 @@ class ProjectTree
     protected $treeProjectItems = [];
 
     /**
+     * @var Regex[]
+     */
+    protected $ignoreList = [];
+
+    /**
      * @var ContextMenu
      */
     protected $contextMenu;
@@ -165,6 +171,11 @@ class ProjectTree
         $this->clear();
     }
 
+    public function addIgnoreRule($regex)
+    {
+        $this->ignoreList[$regex] = Regex::of($regex);
+    }
+
     public function updateDirectory($code, $path)
     {
         $formsItem = $this->getItem($code);
@@ -175,6 +186,20 @@ class ProjectTree
                 $file = $this->project->getAbsoluteFile($file);
 
                 if ($file->isHiddenInTree()) {
+                    continue;
+                }
+
+                $ignore = false;
+
+                foreach ($this->ignoreList as $regex) {
+                    if (Regex::match($regex->getPattern(), $file->getRelativePath())) {
+                   // if ($regex->with($file->getRelativePath())->matches()) {
+                        $ignore = true;
+                        break;
+                    }
+                }
+
+                if ($ignore) {
                     continue;
                 }
 

@@ -21,6 +21,7 @@ use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXScrollPane;
 use php\gui\UXContextMenu;
+use php\gui\UXData;
 use php\gui\UXDialog;
 use php\gui\UXLabel;
 use php\gui\UXLoader;
@@ -221,6 +222,12 @@ class FormEditor extends AbstractEditor
         $this->updateProperties($this);
     }
 
+    public function selectForm()
+    {
+        $this->designer->unselectAll();
+        $this->updateProperties($this);
+    }
+
     public function makeUi()
     {
         if (!$this->layout) {
@@ -287,6 +294,10 @@ class FormEditor extends AbstractEditor
         $this->designer->onChanged([$this, '_onChanged']);
 
         foreach ($this->layout->children as $node) {
+            if ($node instanceof UXData) {
+                continue;
+            }
+
             $this->designer->registerNode($node);
         }
 

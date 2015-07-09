@@ -149,6 +149,8 @@ class FormElementTypePane
 
         $pane = new UXTitledPane($group, $vbox);
         $pane->animated = false;
+        $pane->padding = [1, 3];
+
         $this->layout->add($pane);
     }
 }

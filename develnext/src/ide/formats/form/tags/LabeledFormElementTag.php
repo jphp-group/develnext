@@ -25,6 +25,10 @@ class LabeledFormElementTag extends AbstractFormElementTag
         /** @var UXLabeled $node */
         $element->setAttribute('text', $node->text);
         $element->setAttribute('alignment', $node->alignment);
+        $element->setAttribute('textAlignment', $node->textAlignment);
+        $element->setAttribute('wrapText', $node->wrapText ? 'true' : 'false');
+        $element->setAttribute('underline', $node->underline ? 'true' : 'false');
+        $element->setAttribute('ellipsisString', $node->ellipsisString);
 
         $textColor = $node->textColor;
 

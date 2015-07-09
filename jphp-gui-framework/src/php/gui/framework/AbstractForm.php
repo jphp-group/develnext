@@ -63,6 +63,16 @@ abstract class AbstractForm extends UXForm
         return $this->_config;
     }
 
+    public function show()
+    {
+        parent::show();
+
+        if ($this->_config && $this->_config->get('maximized')) {
+            $this->maximized = true;
+        }
+    }
+
+
     protected function init()
     {
         // nop.
@@ -89,7 +99,7 @@ abstract class AbstractForm extends UXForm
 
     protected function applyConfig()
     {
-        if ($this->_config->get('form.style')) {
+        if ($this->_config->has('form.style')) {
             try {
                 $this->style = $this->_config->get('form.style');
             } catch (Exception $e) {
@@ -97,16 +107,22 @@ abstract class AbstractForm extends UXForm
             }
         }
 
-        if ($this->_config->has('form.title')) {
-            $this->title = $this->_config->get('form.title');
+        // only for non primary forms.
+        if ($this->_app->getMainForm() && $this->_config->has('form.modality')) {
+            try {
+                $this->modality = $this->_config->get('form.modality');
+            } catch (Exception $e) {
+                $this->modality = 'NONE';
+            }
         }
 
-        if ($this->_config->has('form.resizable')) {
-            $this->resizable = $this->_config->get('form.resizable');
-        }
-
-        if ($this->_config->has('form.alwaysOnTop')) {
-            $this->alwaysOnTop = $this->_config->get('form.alwaysOnTop');
+        foreach ([
+                     'title', 'resizable', 'alwaysOnTop',
+                     'minHeight', 'minWidth', 'maxHeight', 'maxWidth'
+                 ] as $key) {
+            if ($this->_config->has("form.$key")) {
+                $this->{$key} = $this->_config->get("form.$key");
+            }
         }
     }
 

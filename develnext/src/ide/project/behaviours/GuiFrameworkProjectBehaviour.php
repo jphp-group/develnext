@@ -91,6 +91,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         WatcherSystem::addPathRecursive($this->project->getFile(self::FORMS_DIRECTORY));
 
+        $tree->addIgnoreRule('^src\\/\\.forms\\/.*\\.conf$');
+
         /** @var GradleProjectBehaviour $gradleBehavior */
         $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
 
@@ -139,7 +141,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     {
         $form = $this->project->getFile("src/.forms/$name.fxml");
         $conf = $this->project->getFile("src/.forms/$name.conf");
-        $conf->setHiddenInTree(true);
 
         $sources = $this->project->getFile("src/app/forms/$name.php");
 
