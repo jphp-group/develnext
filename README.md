@@ -6,7 +6,7 @@
 
 **Dependencies**
 
-- jphp 0.7.1 (not published yet!)
+- jphp 0.7.2 (not published yet!)
 - java 1.8+ (jre)
 - gradle 2.4+
 - launch4j 3.8
