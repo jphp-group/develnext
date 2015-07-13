@@ -33,9 +33,6 @@ public class UXTableColumn extends BaseWrapper<TableColumnBase> {
         int minWidth();
 
         @Property
-        int modelIndex();
-
-        @Property
         boolean editable();
 
         @Property
@@ -58,8 +55,6 @@ public class UXTableColumn extends BaseWrapper<TableColumnBase> {
 
         @Property
         boolean visible();
-
-        void sizeWidthToFit();
     }
 
     public UXTableColumn(Environment env, TableColumn wrappedObject) {
