@@ -57,7 +57,8 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
             throw new IllegalStateException("Unable to find window object");
         }
 
-        return window.call(name, args.toStringArray());
+        Object[] objectArgs = args.toStringArray();
+        return window.call(name, objectArgs);
     }
 
     private static class Bridge {
