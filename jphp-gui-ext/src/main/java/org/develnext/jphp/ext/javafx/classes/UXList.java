@@ -32,7 +32,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     @SuppressWarnings("unchecked")
     public boolean add(Environment env, Memory object) {
         return getWrappedObject().add((T) Memory.unwrap(env, object));
-}
+    }
 
     @Signature
     public void addAll(Environment env, ForeachIterator iterator) throws Throwable {
@@ -47,7 +47,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         if (object.isObject()) {
             return getWrappedObject().remove((T) Memory.unwrap(env, object));
         }
-        
+
         int sizeBefore = getWrappedObject().size();
         getWrappedObject().remove(object.toInteger());
         return sizeBefore != getWrappedObject().size();
