@@ -16,6 +16,7 @@ use ide\editors\value\FontPropertyEditor;
 use ide\editors\value\IntegerPropertyEditor;
 use ide\editors\value\PositionPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
+use ide\editors\value\StringListPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
 use ide\formats\AbstractFormat;
 use ide\formats\form\ButtonFormElement;
@@ -36,10 +37,13 @@ use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use php\gui\framework\Application;
+use php\gui\layout\UXAnchorPane;
+use php\gui\UXAlert;
 use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
+use php\gui\UXTextArea;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
@@ -110,6 +114,39 @@ class Ide extends Application
         if (isset($env['DEVELNEXT_MODE'])) {
             $this->mode = $env['DEVELNEXT_MODE'];
         }
+
+        /*set_exception_handler(function (\BaseException $e) {
+            static $showError;
+
+            if (!$showError) {
+                $showError = true;
+
+                $dialog = new UXAlert('ERROR');
+                $dialog->title = 'Ошибка';
+                $dialog->headerText = 'Произошла ошибка в вашей программе';
+                $dialog->contentText = $e->getMessage();
+                $dialog->setButtonTypes(['Остановить', 'Игнорировать']);
+
+                $pane = new UXAnchorPane();
+                $pane->maxWidth = 100000;
+
+                $content = new UXTextArea("Ошибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
+                $content->padding = 10;
+                UXAnchorPane::setAnchor($content, 0);
+
+                $pane->add($content);
+                $dialog->expandableContent = $pane;
+                $dialog->expanded = true;
+
+                switch ($dialog->showAndWait()) {
+                    case 'Остановить':
+                        Ide::get()->shutdown();
+                        break;
+                }
+
+                $showError = false;
+            }
+        });  */
     }
 
     public function launch()
@@ -152,6 +189,17 @@ class Ide extends Application
         $env['GRADLE_HOME'] = $this->getGradlePath();
 
         return $env;
+    }
+
+    public function getLaunch4JProgram()
+    {
+        $launch4jPath = $this->getOwnFile('tools/Launch4j/launch4jc.exe');
+
+        if ($this->isDevelopment() && !$launch4jPath->exists()) {
+            $launch4jPath = $this->getOwnFile('../develnext-tools/Launch4j/launch4jc.exe');
+        }
+
+        return $launch4jPath && $launch4jPath->exists() ? $launch4jPath->getCanonicalFile() : null;
     }
 
     public function getGradleProgram()
@@ -373,7 +421,13 @@ class Ide extends Application
             }
 
             if ($data['headUi']) {
-                $mainForm->getHeadPane()->remove($data['headUi']);
+                if (is_array($data['headUi'])) {
+                    foreach ($data['headUi'] as $ui) {
+                        $mainForm->getHeadPane()->remove($ui);
+                    }
+                } else {
+                    $mainForm->getHeadPane()->remove($data['headUi']);
+                }
             }
 
             if ($data['menuItem']) {
@@ -573,6 +627,7 @@ class Ide extends Application
         ElementPropertyEditor::register(new EnumPropertyEditor([]));
         ElementPropertyEditor::register(new PositionPropertyEditor());
         ElementPropertyEditor::register(new BooleanPropertyEditor());
+        ElementPropertyEditor::register(new StringListPropertyEditor());
 
         $this->registerFormat(new WelcomeFormat());
         $this->registerFormat(new PhpCodeFormat());
@@ -623,6 +678,12 @@ class Ide extends Application
 
     public function shutdown()
     {
+        $project = $this->getOpenedProject();
+
+        if ($project) {
+            $project->save();
+        }
+
         $this->mainForm->hide();
 
         WatcherSystem::shutdown();

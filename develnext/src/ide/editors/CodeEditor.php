@@ -1,11 +1,16 @@
 <?php
 namespace ide\editors;
 
+use ide\misc\AbstractCommand;
+use ide\utils\Json;
+use ide\utils\UiUtils;
 use php\format\JsonProcessor;
 use php\gui\event\UXWebErrorEvent;
 use php\gui\event\UXWebEvent;
 use php\gui\framework\Timer;
 use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXHBox;
+use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\gui\UXNode;
 use php\gui\UXWebEngine;
@@ -14,8 +19,13 @@ use php\io\File;
 use php\io\IOException;
 use php\io\ResourceStream;
 use php\io\Stream;
+use php\lang\IllegalArgumentException;
+use php\lib\Char;
+use php\lib\Mirror;
 use php\lib\Str;
 use php\net\URLConnection;
+use php\time\Time;
+use php\util\Scanner;
 
 /**
  * Class CodeEditor
@@ -23,16 +33,50 @@ use php\net\URLConnection;
  */
 class CodeEditor extends AbstractEditor
 {
+    /**
+     * @var UXWebView
+     */
     protected $webView;
 
     protected $mode;
+
+    /**
+     * @var string
+     */
+    protected $value;
 
     /**
      * @var UXWebEngine
      */
     protected $webEngine;
 
+    /**
+     * @var JsonProcessor
+     */
     protected $json;
+
+    /** @var array */
+    protected $handlers = [];
+
+    /**
+     * @var bool
+     */
+    protected $lockHandlers = false;
+
+    /**
+     * @var null|array
+     */
+    protected $editableArea = null;
+
+    /**
+     * @var array
+     */
+    protected $doOnSucceed = [];
+
+    /**
+     * @var AbstractCommand[]
+     */
+    protected $commands = [];
 
     public function getIcon()
     {
@@ -50,11 +94,15 @@ class CodeEditor extends AbstractEditor
         $codeMirrorPath = $url->toExternalForm();
         $codeMirrorPath = Str::replace($codeMirrorPath, '/codemirror.css', '');
 
+        $url = new ResourceStream('/.data/vendor/jquery/jquery-1.11.1.js');
+        $jqueryPath = $url->toExternalForm();
+
         $content = <<<"CONTENT"
 <!doctype html>
 <html>
     <head>
         <link rel="stylesheet" href="$codeMirrorPath/codemirror.css">
+        <script src="$jqueryPath"></script>
         <script src="$codeMirrorPath/codemirror.js"></script>
         <script src="$codeMirrorPath/addon/comment/comment.js"></script>
         <script src="$codeMirrorPath/addon/comment/continuecomment.js"></script>
@@ -74,19 +122,89 @@ class CodeEditor extends AbstractEditor
         CODE_EDITOR = CodeMirror.fromTextArea(document.getElementById("editor"), #OPTIONS#);
         CODE_EDITOR.setSize("100%", "100%");
 
-        CODE_EDITOR.on('change', function (cm, e) {
+        function bindEvents() {
+            CODE_EDITOR.on('beforeChange', function (cm, change) {
+                var result = trigger('beforeChange', change);
+
+                if (result && result["cancel"]) {
+                    change.cancel();
+                }
+            });
+
+            CODE_EDITOR.on('change', function (cm, change) {
+                 change.value = getValue();
+                 trigger('change', change)
+            });
+            CODE_EDITOR.on('cursorActivity', function (cm) { trigger('cursorActivity') });
+            CODE_EDITOR.on('keyHandled', function (cm, name, e) { trigger('keyHandled', {name: name, event: event}) });
+            CODE_EDITOR.on('gutterClick', function (cm, line, gutter) { trigger('keyHandled', {line: line, gutter: gutter}) });
+        }
+
+        function unbindEvents() {
+            CODE_EDITOR.off('beforeChange');
+            CODE_EDITOR.off('change');
+            CODE_EDITOR.off('cursorActivity');
+            CODE_EDITOR.off('keyHandled');
+            CODE_EDITOR.off('gutterClick');
+        }
+
+        function trigger(event, args) {
             if (typeof PHP !== "undefined") {
-                PHP.run('change', e);
+                args = args || [];
+
+                var result = PHP.run(JSON.stringify({event: event, args: args}));
+
+                return result ? JSON.parse(result) : result;
             }
-        });
+        }
 
         function setValue(value) {
+            unbindEvents();
             CODE_EDITOR.setValue(value);
+            bindEvents();
         }
 
         function getValue() {
             return CODE_EDITOR.getValue();
         }
+
+        function highlightArea(beginLine, endLine) {
+            beginLine = parseInt(beginLine);
+            endLine = parseInt(endLine);
+
+            for (var i = 0; i < CODE_EDITOR.lineCount(); i++) {
+                if (i >= beginLine && i < endLine) {
+                    CODE_EDITOR.removeLineClass(i, "background", "highlight-area");
+                    CODE_EDITOR.removeLineClass(i, "text", "highlight-area-text");
+                } else {
+                    CODE_EDITOR.addLineClass(i, "background", "highlight-area");
+                    CODE_EDITOR.addLineClass(i, "text", "highlight-area-text");
+                }
+            }
+        }
+
+        function jumpToLine(line, offset) {
+            CODE_EDITOR.focus();
+            CODE_EDITOR.execCommand('goDocStart');
+
+            //CODE_EDITOR.extendSelection(CodeMirror.Pos(line, offset))
+            for (var i = 0; i < line; i++) {
+                CODE_EDITOR.moveVEx(1, "line");
+            }
+
+            for (var i = 0; i < offset; i++) {
+                CODE_EDITOR.execCommand('goCharRight');
+            }
+
+            var myHeight = CODE_EDITOR.getScrollInfo().clientHeight;
+            var coords = CODE_EDITOR.charCoords({line: line, ch: 0}, "local");
+            CODE_EDITOR.scrollTo(null, (coords.top + coords.bottom - myHeight) / 2);
+        }
+
+        $(function(){
+            bindEvents();
+            alert("~editor:loaded~");
+        });
     </script>
 </body>
 </html>
@@ -122,28 +240,165 @@ CONTENT;
         $this->webEngine->loadContent($content);
 
         $this->webEngine->on('alert', function (UXWebEvent $e) {
-            UXDialog::show($e->data);
+            if ($e->data == "~editor:loaded~") {
+                $this->webEngine->addSimpleBridge('PHP', [$this, 'editorBridgeHandler']);
+            } else {
+                UXDialog::show($e->data);
+            }
         });
 
-        $this->webEngine->on('error', function (UXWebErrorEvent $e) {
-            UXDialog::show($e->message);
+        $this->webEngine->watchState(function ($self, $old, $new) {
+            if ($new == 'SUCCEEDED') {
+                $doOnSucceed = $this->doOnSucceed;
+                $this->doOnSucceed = [];
+
+                UXApplication::runLater(function () use ($doOnSucceed) {
+                    foreach ($doOnSucceed as $handler) {
+                        $handler();
+                    }
+                });
+            }
         });
 
-        $this->webEngine->waitState('SUCCEEDED', function () {
-            // fixme it doesn't work properly
-            $this->webEngine->addBridge('PHP', [$this, 'editorBridgeHandler']);
+        $this->on('beforeChange', [$this, 'doBeforeChange']);
+        $this->on('change', [$this, 'doChange']);
+    }
+
+    /**
+     * @param $any
+     *
+     * @throws IllegalArgumentException
+     */
+    public function register($any)
+    {
+        if ($any instanceof AbstractCommand) {
+            $any->setTarget($this);
+            $this->commands[Mirror::typeOf($any, true)] = $any;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    protected function editorBridgeHandler($data)
+    {
+        if ($this->lockHandlers) {
+            return null;
+        }
+
+        $data = Json::decode($data);
+
+        $event = $data['event'];
+        $args  = $data['args'];
+
+        $result = $this->trigger($event, $args);
+
+        return Json::encode($result);
+    }
+
+    private $eventUpdates = 0;
+
+    protected function doChange($change)
+    {
+        $i = ++$this->eventUpdates;
+
+        $this->value = $change['value'];
+
+        Timer::run(1000, function () use ($i) {
+            if ($i == $this->eventUpdates) {
+                $this->trigger('update', []);
+            }
         });
     }
 
-    protected function editorBridgeHandler($event, ...$args)
+    protected function doBeforeChange($change)
     {
-        // todo!!!!!!!!!!!!
-        UXDialog::show($event);
+        if ($this->editableArea) {
+            $line = $change['from']['line'];
+            // TODO: сделать плавающий endLine
+
+            if ($line >= $this->editableArea['endLine'] || $line < $this->editableArea['beginLine']) {
+                return ['cancel' => true];
+            }
+        }
+    }
+
+    protected function waitState(callable $handler)
+    {
+        if ($this->webEngine->state == 'SUCCEEDED') {
+            $handler();
+            return;
+        }
+
+        $this->doOnSucceed[] = $handler;
+    }
+
+    public function setEditableArea($beginLine, $endLine)
+    {
+        $this->editableArea = [
+            'beginLine' => $beginLine,
+            'endLine' => $endLine,
+        ];
+
+        $this->waitState(function () use ($beginLine, $endLine) {
+            $this->webEngine->callFunction('highlightArea', [$beginLine, $endLine]);
+        });
+    }
+
+    public function trigger($event, array $args)
+    {
+        $result = null;
+
+        foreach ((array) $this->handlers[$event] as $handler) {
+            $result = $handler($args);
+
+            if ($result) {
+                return $result;
+            }
+        }
+    }
+
+    public function on($event, callable $handler, $group = 'general')
+    {
+        $this->handlers[$event][$group] = $handler;
+    }
+
+    public function off($event, $group = null)
+    {
+        if ($group === null) {
+            unset($this->handlers[$event]);
+        } else {
+            unset($this->handlers[$event][$group]);
+        }
     }
 
     public function getTitle()
     {
         return File::of($this->file)->getName();
+    }
+
+    public function jumpToLine($line, $offset = 0)
+    {
+        $this->waitState(function () use ($line, $offset) {
+            $this->webView->requestFocus();
+
+            $this->webEngine->callFunction('jumpToLine', [$line, $offset]);
+        });
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        UXApplication::runLater(function() use ($value) {
+            $this->waitState(function () use ($value) {
+                $this->webEngine->callFunction('setValue', [$value]);
+            });
+        });
     }
 
     public function load()
@@ -154,17 +409,13 @@ CONTENT;
             $content = '';
         }
 
-        $this->webEngine->waitState('SUCCEEDED', function () use ($content) {
-            $this->webEngine->callFunction('setValue', [$content]);
-        });
+        $this->setValue($content);
     }
 
     public function save()
     {
-        $this->webEngine->waitState('SUCCEEDED', function () {
-            $content = $this->webEngine->callFunction('getValue', []);
-            Stream::putContents($this->file, $content);
-        });
+        $value = $this->getValue();
+        Stream::putContents($this->file, $value);
     }
 
     /**
@@ -181,12 +432,21 @@ CONTENT;
     public function makeUi()
     {
         $ui = new UXAnchorPane();
+
+        $commandPane = UiUtils::makeCommandPane($this->commands);
+        $commandPane->padding = 3;
+        $commandPane->spacing = 4;
+        $commandPane->fillHeight = true;
+        $commandPane->height = 30;
+
+        $ui->add($commandPane);
         $ui->add($this->webView);
 
-        UXAnchorPane::setBottomAnchor($this->webView, 0);
-        UXAnchorPane::setTopAnchor($this->webView, 0);
-        UXAnchorPane::setLeftAnchor($this->webView, 0);
-        UXAnchorPane::setRightAnchor($this->webView, 0);
+        UXAnchorPane::setAnchor($commandPane, 0);
+        UXAnchorPane::setAnchor($this->webView, 0);
+
+        $commandPane->bottomAnchor = null;
+        $this->webView->topAnchor = 30;
 
         return $ui;
     }

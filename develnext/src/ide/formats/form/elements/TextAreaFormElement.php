@@ -26,6 +26,11 @@ class TextAreaFormElement extends AbstractFormElement
         return 'icons/textArea16.png';
     }
 
+    public function getIdPattern()
+    {
+        return "textArea%s";
+    }
+
     /**
      * @return UXNode
      */

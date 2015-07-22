@@ -18,6 +18,16 @@ class UXDialog
 
     /**
      * @param $text
+     * @param UXNode $content
+     * @param $expanded
+     * @param $type
+     */
+    public static function showExpanded($text, UXNode $content, $expanded, $type = 'NONE')
+    {
+    }
+
+    /**
+     * @param $text
      * @return bool
      */
     public static function confirm($text)

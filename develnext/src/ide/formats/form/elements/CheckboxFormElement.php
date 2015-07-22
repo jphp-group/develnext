@@ -34,6 +34,12 @@ class CheckboxFormElement extends AbstractFormElement
         return 'icons/checkbox16.png';
     }
 
+
+    public function getIdPattern()
+    {
+        return "checkbox%s";
+    }
+
     /**
      * @return UXNode
      */

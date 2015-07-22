@@ -7,7 +7,6 @@ import php.runtime.env.Environment;
 import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
 import php.runtime.memory.support.MemoryOperation;
-import php.runtime.memory.support.MemoryUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,7 +54,11 @@ public class ScriptEventHandler<T extends Event> implements EventHandler<T> {
         }
 
         for (Invoker invoker : invokerMap.values()) {
-            invoker.callNoThrow(event);
+            try {
+                invoker.call(event);
+            } catch (Throwable throwable) {
+                env.wrapThrow(throwable);
+            }
         }
     }
 }

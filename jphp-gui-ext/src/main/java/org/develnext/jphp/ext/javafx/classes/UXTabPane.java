@@ -49,6 +49,16 @@ public class UXTabPane extends UXControl<TabPane> {
         return null;
     }
 
+    @Getter
+    public int getSelectedIndex() {
+        return getWrappedObject().getSelectionModel().getSelectedIndex();
+    }
+
+    @Setter
+    public void setSelectedIndex(int index) {
+        getWrappedObject().getSelectionModel().select(index);
+    }
+
     @Setter
     protected void setSelectedTab(Tab tab) {
         selectTab(tab);

@@ -18,6 +18,11 @@ class UXTabPane extends UXControl
     public $selectedTab;
 
     /**
+     * @var int
+     */
+    public $selectedIndex = -1;
+
+    /**
      * @var string
      */
     public $tabClosingPolicy;

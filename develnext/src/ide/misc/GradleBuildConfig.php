@@ -54,6 +54,11 @@ class GradleBuildConfig
     protected $dependencies = [];
 
     /**
+     * @var string[]
+     */
+    protected $codeBlocks = [];
+
+    /**
      * @var string
      */
     protected $projectName;
@@ -192,9 +197,13 @@ class GradleBuildConfig
             $this->writeSourceSets($stream);
 
             $this->writeDependencies($stream);
+
+            $this->writeCodeBlocks($stream);
         } finally {
             if ($stream) $stream->close();
         }
+
+        $this->codeBlocks = [];
     }
 
     public function load()
@@ -253,9 +262,16 @@ class GradleBuildConfig
         }
     }
 
+    public function removePlugin($plugin)
+    {
+        $name = Str::split($plugin, ':')[0];
+        unset($this->plugins[$name]);
+    }
+
     public function addPlugin($plugin)
     {
-        $this->plugins[$plugin] = $plugin;
+        $name = Str::split($plugin, ':')[0];
+        $this->plugins[$name] = $plugin;
     }
 
     public function addRepository($name, $value = null)
@@ -340,9 +356,18 @@ class GradleBuildConfig
         if ($this->plugins) {
             $stream->write("\n");
 
+            $stream->write("plugins {\n");
+
             foreach ($this->plugins as $plugin) {
-                $stream->write("apply plugin: '$plugin'\n");
+                list($id, $version) = Str::split($plugin, ':');
+
+                if ($version) {
+                    $stream->write("id '$id' version '$version'\n");
+                } else {
+                    $stream->write("id '$id'\n");
+                }
             }
+            $stream->write("}\n");
 
             $stream->write("\n");
         }
@@ -406,5 +431,27 @@ class GradleBuildConfig
 
             $stream->write("}\n");
         }
+    }
+
+    protected function writeCodeBlocks(Stream $stream)
+    {
+        if ($this->codeBlocks) {
+            $stream->write("\n\n");
+
+            foreach ($this->codeBlocks as $code) {
+                $stream->write($code);
+                $stream->write("\n\n");
+            }
+        }
+    }
+
+    public function appendCodeBlock($name, $code)
+    {
+        $this->codeBlocks[$name] = $code;
+    }
+
+    public function removeCodeBlock($name)
+    {
+        unset($this->codeBlocks[$name]);
     }
 }

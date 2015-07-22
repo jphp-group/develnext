@@ -36,4 +36,16 @@ class UXHBox extends UXPane
     public function requestLayout()
     {
     }
+
+    /**
+     * @param UXNode $node
+     * @param string $value ALWAYS, SOMETIMES, NEVER
+     */
+    static function setHgrow(UXNode $node, $value)
+    {
+    }
+
+    static function getHgrow(UXNode $node)
+    {
+    }
 }

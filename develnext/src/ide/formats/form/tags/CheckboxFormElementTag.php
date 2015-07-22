@@ -23,7 +23,7 @@ class CheckboxFormElementTag extends AbstractFormElementTag
         /** @var UXCheckbox $node */
 
         if ($node->selected) {
-            $element->setAttribute('selected', "1");
+            $element->setAttribute('selected', "true");
         }
     }
 }

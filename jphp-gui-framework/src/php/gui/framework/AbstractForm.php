@@ -148,7 +148,11 @@ abstract class AbstractForm extends UXForm
         $path = static::DEFAULT_PATH . $this->getResourceName() . '.fxml';
 
         Stream::tryAccess($path, function (Stream $stream) use ($loader) {
-            $this->layout = $loader->load($stream);
+            try {
+                $this->layout = $loader->load($stream);
+            } catch (IOException $e) {
+                throw new IOException("Unable to load {$stream->getPath()}, {$e->getMessage()}");
+            }
 
             if ($this->layout) {
                 DataUtils::scan($this->layout, function (UXData $data, UXNode $node = null) {

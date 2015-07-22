@@ -78,15 +78,14 @@ abstract class UXWebEngine
      * @param string $name
      * @param callable $handler
      */
-    public function addBridge($name, callable $handler)
+    public function addSimpleBridge($name, callable $handler)
     {
     }
 
     /**
-     * @param string $state
-     * @param callable $handler (UXWebEngine $self)
+     * @param callable $handler (UXWebEngine $self, $old, $new)
      */
-    public function waitState($state, callable $handler)
+    public function watchState(callable $handler)
     {
     }
 

@@ -18,6 +18,7 @@ use php\io\Stream;
 use php\lang\Process;
 use php\lang\ThreadPool;
 use php\util\Scanner;
+use php\util\SharedQueue;
 
 /**
  * @property UXImageView $icon
@@ -45,6 +46,15 @@ class BuildProgressForm extends AbstractForm
      */
     protected $processDone = false;
 
+    /** @var callable */
+    protected $onExitProcess;
+
+    /** @var callable */
+    protected $stopProcedure;
+
+    /** @var SharedQueue */
+    protected $tasks;
+
     protected function init()
     {
         $this->threadPool = ThreadPool::createFixed(3);
@@ -58,15 +68,72 @@ class BuildProgressForm extends AbstractForm
         });
     }
 
+    /**
+     * @param array $tasksOrProcesses
+     */
+    public function watch(array $tasksOrProcesses)
+    {
+        $tasks = new SharedQueue($tasksOrProcesses);
+
+        $process = $tasks->poll();
+
+        if ($process instanceof Process) {
+            // nop
+        } else if (is_callable($process)) {
+            $process = $process();
+        }
+
+        $func = function ($exitCode) use ($tasks, &$func) {
+            if ($exitCode == 0) {
+                $process = $tasks->poll();
+
+                if ($process instanceof Process) {
+                    // nop.
+                } else if (is_callable($process)) {
+                    $process = $process();
+                }
+
+                if ($process) {
+                    $this->watchProcess($process, $func);
+
+                    return true;
+                }
+            }
+        };
+
+        $this->watchProcess($process, $func);
+    }
+
     public function show(Process $process = null)
     {
-        $this->process = $process;
-
-        $this->threadPool->execute(function () {
-            $this->doProgress($this->process->getInput());
-        });
+        if ($process) {
+            $this->watchProcess($process);
+        }
 
         parent::show();
+    }
+
+    public function watchProcess(Process $process, callable $onExit = null)
+    {
+        $this->threadPool->execute(function () use ($process, $onExit) {
+            $this->doProgress($process, $onExit);
+        });
+    }
+
+    /**
+     * @param callable $onExitProcess
+     */
+    public function setOnExitProcess($onExitProcess)
+    {
+        $this->onExitProcess = $onExitProcess;
+    }
+
+    /**
+     * @param callable $stopProcedure
+     */
+    public function setStopProcedure($stopProcedure)
+    {
+        $this->stopProcedure = $stopProcedure;
     }
 
     /**
@@ -85,9 +152,19 @@ class BuildProgressForm extends AbstractForm
     public function doClose(UXEvent $e)
     {
         if (!$this->processDone) {
-            UXDialog::show('Дождитесь сборки для закрытия прогресса.');
-            $e->consume();
-            return;
+            if ($this->stopProcedure) {
+                $stopProcedure = $this->stopProcedure;
+
+                if (!$stopProcedure()) {
+                    $e->consume();
+                    return;
+                }
+            } else {
+                UXDialog::show('Дождитесь сборки для закрытия прогресса.');
+                $e->consume();
+
+                return;
+            }
         }
 
         $this->threadPool->shutdown();
@@ -100,7 +177,9 @@ class BuildProgressForm extends AbstractForm
      */
     public function doCloseAfterDoneCheckboxClick(UXMouseEvent $e)
     {
-        Ide::get()->setUserConfigValue('builder.closerAfterDone', $e->target->selected ? "1" : "0");
+        if ($e->target) {
+            Ide::get()->setUserConfigValue('builder.closerAfterDone', $e->target->selected ? "1" : "0");
+        }
     }
 
     /**
@@ -108,7 +187,7 @@ class BuildProgressForm extends AbstractForm
      */
     public function hide()
     {
-        $this->threadPool->shutdown();
+        $this->threadPool->shutdownNow();
         parent::hide();
     }
 
@@ -128,11 +207,13 @@ class BuildProgressForm extends AbstractForm
     }
 
     /**
-     * @param Stream $stream
+     * @param Process $process
+     * @param callable $onExit
+     *
      */
-    public function doProgress(Stream $stream)
+    public function doProgress(Process $process, callable $onExit = null)
     {
-        $scanner = new Scanner($stream);
+        $scanner = new Scanner($process->getInput());
 
         UXApplication::runLater(function () {
             $this->closeButton->enabled = false;
@@ -146,13 +227,21 @@ class BuildProgressForm extends AbstractForm
             });
         }
 
+        $scanner = new Scanner($process->getError());
+
+        while ($scanner->hasNextLine()) {
+            $line = $scanner->nextLine();
+
+            UXApplication::runLater(function () use ($line) {
+                $this->addConsoleLine($line, 'red');
+            });
+        }
+
         $self = $this;
-        $exitValue = $this->process->getExitValue();
+        $exitValue = $process->getExitValue();
         $this->processDone = true;
 
-        $func = function() use ($self, $exitValue) {
-            $self->closeButton->enabled = true;
-
+        $func = function() use ($self, $exitValue, $onExit) {
             if ($exitValue) {
                 $self->addConsoleLine('');
                 $self->addConsoleLine('(!) Ошибка запуска, что-то пошло не так', 'red');
@@ -160,8 +249,24 @@ class BuildProgressForm extends AbstractForm
                 $self->addConsoleLine('');
             }
 
+            if ($onExit) {
+                $nextProcess = $onExit($exitValue);
+
+                if ($nextProcess) {
+                    return;
+                }
+            }
+
+            $self->closeButton->enabled = true;
+
             if (!$exitValue && $self->closeAfterDoneCheckbox->selected) {
                 $self->hide();
+            }
+
+            $onExitProcess = $this->onExitProcess;
+
+            if ($onExitProcess) {
+                $onExitProcess($exitValue);
             }
         };
 

@@ -42,6 +42,16 @@ abstract class UXNode
     /**
      * @var double
      */
+    public $screenX;
+
+    /**
+     * @var double
+     */
+    public $screenY;
+
+    /**
+     * @var double
+     */
     public $width;
 
     /**
@@ -92,6 +102,11 @@ abstract class UXNode
      * @var mixed
      */
     public $userData = null;
+
+    /**
+     * @var double|null
+     */
+    public $leftAnchor, $rightAnchor, $topAnchor, $bottomAnchor = null;
 
     /**
      * ...
@@ -149,6 +164,18 @@ abstract class UXNode
     }
 
     public function requestFocus()
+    {
+    }
+
+    public function hide()
+    {
+    }
+
+    public function show()
+    {
+    }
+
+    public function toggle()
     {
     }
 

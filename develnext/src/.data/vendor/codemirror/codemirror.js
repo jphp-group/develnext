@@ -28,7 +28,7 @@
   var ie = ie_upto10 || ie_11up;
   var ie_version = ie && (ie_upto10 ? document.documentMode || 6 : ie_11up[1]);
   var webkit = /WebKit\//.test(navigator.userAgent);
-  var qtwebkit = webkit && /Qt\/\d+\.\d+/.test(navigator.userAgent);
+  var qtwebkit = webkit && (/Qt\/\d+\.\d+/.test(navigator.userAgent));
   var chrome = /Chrome\//.test(navigator.userAgent);
   var presto = /Opera\//.test(navigator.userAgent);
   var safari = /Apple Computer/.test(navigator.vendor);
@@ -36,6 +36,7 @@
   var phantom = /PhantomJS/.test(navigator.userAgent);
 
   var ios = /AppleWebKit/.test(navigator.userAgent) && /Mobile\/\w+/.test(navigator.userAgent);
+
   // This is woefully incomplete. Suggestions for alternative methods welcome.
   var mobile = ios || /Android|webOS|BlackBerry|Opera Mini|Opera Mobi|IEMobile/i.test(navigator.userAgent);
   var mac = ios || /Mac/.test(navigator.platform);
@@ -1104,9 +1105,12 @@
       var updateInput = cm.curOp.updateInput;
       var changeEvent = {from: from, to: to, text: multiPaste ? multiPaste[i % multiPaste.length] : textLines,
                          origin: origin || (paste ? "paste" : cm.state.cutIncoming ? "cut" : "+input")};
+
       makeChange(cm.doc, changeEvent);
       signalLater(cm, "inputRead", cm, changeEvent);
     }
+
+
     if (inserted && !paste)
       triggerElectric(cm, inserted);
 
@@ -1218,6 +1222,7 @@
 
       on(te, "input", function() {
         if (ie && ie_version >= 9 && input.hasSelection) input.hasSelection = null;
+
         input.poll();
       });
 
@@ -1367,10 +1372,15 @@
     fastPoll: function() {
       var missed = false, input = this;
       input.pollingFast = true;
+
       function p() {
         var changed = input.poll();
-        if (!changed && !missed) {missed = true; input.polling.set(60, p);}
-        else {input.pollingFast = false; input.slowPoll();}
+
+        if (!changed && !missed) {
+          missed = true; input.polling.set(60, p);
+        } else {
+          input.pollingFast = false; input.slowPoll();
+        }
       }
       input.polling.set(20, p);
     },
@@ -1393,8 +1403,10 @@
         return false;
 
       var text = input.value;
+
       // If nothing changed, bail.
       if (text == prevInput && !cm.somethingSelected()) return false;
+
       // Work around nonsensical selection resetting in IE9/10, and
       // inexplicable appearance of private area unicode characters on
       // some key combos in Mac (#2689).
@@ -1422,12 +1434,14 @@
         if (text.length > 1000 || text.indexOf("\n") > -1) input.value = self.prevInput = "";
         else self.prevInput = text;
 
+
         if (self.composing) {
           self.composing.range.clear();
           self.composing.range = cm.markText(self.composing.start, cm.getCursor("to"),
                                              {className: "CodeMirror-composing"});
         }
       });
+
       return true;
     },
 
@@ -4242,6 +4256,7 @@
       if (text) this.text = text;
       if (origin !== undefined) this.origin = origin;
     };
+
     signal(doc, "beforeChange", doc, obj);
     if (doc.cm) signal(doc.cm, "beforeChange", doc.cm, obj);
 
@@ -4790,6 +4805,7 @@
   CodeMirror.prototype = {
     constructor: CodeMirror,
     focus: function(){window.focus(); this.display.input.focus();},
+    receivedFocus: function(){window.focus(); this.display.input.receivedFocus();},
 
     setOption: function(option, value) {
       var options = this.options, old = options[option];
@@ -5094,6 +5110,8 @@
       return cur;
     },
 
+
+
     moveV: methodOp(function(dir, unit) {
       var cm = this, doc = this.doc, goals = [];
       var collapse = !cm.display.shift && !doc.extend && doc.sel.somethingSelected();
@@ -5108,6 +5126,26 @@
           addToScrollPos(cm, null, charCoords(cm, pos, "div").top - headPos.top);
         return pos;
       }, sel_move);
+
+      if (goals.length) for (var i = 0; i < doc.sel.ranges.length; i++)
+        doc.sel.ranges[i].goalColumn = goals[i];
+    }),
+
+    moveVEx: methodOp(function(dir, unit) {
+      var cm = this, doc = this.doc, goals = [];
+      var collapse = !cm.display.shift && !doc.extend && doc.sel.somethingSelected();
+
+      doc.extendSelectionsBy(function(range) {
+        if (collapse)
+          return dir < 0 ? range.from() : range.to();
+
+        var headPos = cursorCoords(cm, range.head, "div");
+        if (range.goalColumn != null) headPos.left = range.goalColumn;
+        goals.push(headPos.left);
+        var pos = findPosV(cm, headPos, dir, unit);
+        return pos;
+      }, sel_move);
+
       if (goals.length) for (var i = 0; i < doc.sel.ranges.length; i++)
         doc.sel.ranges[i].goalColumn = goals[i];
     }),

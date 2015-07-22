@@ -66,4 +66,12 @@ public class UXAnchorPane extends UXPane<AnchorPane> {
     public static double getBottomAnchor(Node node) {
         return AnchorPane.getBottomAnchor(node);
     }
+
+    @Signature
+    public static void setAnchor(Node node, double value) {
+        AnchorPane.setBottomAnchor(node, value);
+        AnchorPane.setTopAnchor(node, value);
+        AnchorPane.setRightAnchor(node, value);
+        AnchorPane.setLeftAnchor(node, value);
+    }
 }

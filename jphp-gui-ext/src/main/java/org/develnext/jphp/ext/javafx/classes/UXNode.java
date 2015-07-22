@@ -7,9 +7,11 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
+import javafx.geometry.Point2D;
 import javafx.scene.DepthTest;
 import javafx.scene.Node;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.layout.AnchorPane;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.StyleManager;
@@ -20,6 +22,7 @@ import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.memory.ArrayMemory;
+import php.runtime.memory.DoubleMemory;
 import php.runtime.memory.StringMemory;
 import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
@@ -121,6 +124,34 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Getter
+    public double getScreenX() {
+        double layoutX = getWrappedObject().getLayoutX();
+
+        Point2D pt = getWrappedObject().localToScreen(layoutX, 0);
+        return pt.getX();
+    }
+
+    @Setter
+    public void setScreenX(double value) {
+        Point2D pt = getWrappedObject().screenToLocal(value, 0);
+        getWrappedObject().setLayoutX(pt.getX());
+    }
+
+    @Getter
+    public double getScreenY() {
+        double layoutY = getWrappedObject().getLayoutY();
+
+        Point2D pt = getWrappedObject().localToScreen(0, layoutY);
+        return pt.getY();
+    }
+
+    @Setter
+    public void setScreenY(double value) {
+        Point2D pt = getWrappedObject().screenToLocal(0, value);
+        getWrappedObject().setLayoutY(pt.getY());
+    }
+
+    @Getter
     public String getClassesString() {
         StringBuilder sb = new StringBuilder();
 
@@ -194,6 +225,50 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     @Setter
     protected void setHeight(double v) {
         getWrappedObject().prefHeight(v);
+    }
+
+    @Setter
+    public void setLeftAnchor(Memory v) {
+        AnchorPane.setLeftAnchor(getWrappedObject(), v.isNull() ? null : v.toDouble());
+    }
+
+    @Getter
+    public Memory getLeftAnchor() {
+        Double anchor = AnchorPane.getLeftAnchor(getWrappedObject());
+        return anchor == null ? Memory.NULL : DoubleMemory.valueOf(anchor);
+    }
+
+    @Setter
+    public void setRightAnchor(Memory v) {
+        AnchorPane.setRightAnchor(getWrappedObject(), v.isNull() ? null : v.toDouble());
+    }
+
+    @Getter
+    public Memory getRightAnchor() {
+        Double anchor = AnchorPane.getRightAnchor(getWrappedObject());
+        return anchor == null ? Memory.NULL : DoubleMemory.valueOf(anchor);
+    }
+
+    @Setter
+    public void setTopAnchor(Memory v) {
+        AnchorPane.setTopAnchor(getWrappedObject(), v.isNull() ? null : v.toDouble());
+    }
+
+    @Getter
+    public Memory getTopAnchor() {
+        Double anchor = AnchorPane.getTopAnchor(getWrappedObject());
+        return anchor == null ? Memory.NULL : DoubleMemory.valueOf(anchor);
+    }
+
+    @Setter
+    public void setBottomAnchor(Memory v) {
+        AnchorPane.setBottomAnchor(getWrappedObject(), v.isNull() ? null : v.toDouble());
+    }
+
+    @Getter
+    public Memory getBottomAnchor() {
+        Double anchor = AnchorPane.getBottomAnchor(getWrappedObject());
+        return anchor == null ? Memory.NULL : DoubleMemory.valueOf(anchor);
     }
 
     @Signature

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="614.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Separator layoutX="21.0" layoutY="46.0" prefHeight="32.0" prefWidth="573.0" />
+      <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="21.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
+      <Label layoutX="61.0" layoutY="14.0" prefHeight="32.0" prefWidth="533.0" text="Собрать проект">
+         <font>
+            <Font name="Tahoma" size="17.0" />
+         </font>
+      </Label>
+      <ListView id="list" layoutX="32.0" layoutY="103.0" prefHeight="296.0" prefWidth="550.0" AnchorPane.bottomAnchor="81.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="103.0" />
+      <Label layoutX="33.0" layoutY="78.0" prefHeight="24.0" prefWidth="550.0" text="Вариант сборки:" />
+      <Button id="buildButton" layoutX="33.0" layoutY="419.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="112.0" text="Собрать" AnchorPane.bottomAnchor="29.0">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

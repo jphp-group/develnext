@@ -111,6 +111,25 @@ class FileUtils
         return $name;
     }
 
+    public static function copyDirectory($directory, $newDirectory)
+    {
+        $directory = File::of($directory);
+        $newDirectory = File::of($newDirectory);
+
+        $newDirectory->mkdirs();
+
+        self::scan($directory, function ($filename) use ($directory, $newDirectory) {
+            $name = FileUtils::relativePath($directory, $filename);
+            $newName = File::of("$newDirectory/$name");
+
+            if (File::of($filename)->isDirectory()) {
+                $newName->mkdirs();
+            } else {
+                FileUtils::copyFile($filename, $newName);
+            }
+        });
+    }
+
     public static function copyFile($origin, $dest)
     {
         try {

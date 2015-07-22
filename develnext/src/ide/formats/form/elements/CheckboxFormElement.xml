@@ -1,4 +1,7 @@
 <element extends="LabeledFormElement">
+    <properties>
+        <property code="selected" name="Выделенный" editor="boolean" />
+    </properties>
     <init>
         <property code="width" value="200" />
         <property code="height" value="30" />

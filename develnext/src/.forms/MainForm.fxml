@@ -40,13 +40,13 @@
                                                 </AnchorPane>
                                                 <AnchorPane prefHeight="200.0" prefWidth="200.0">
                                                    <children>
-                                                      <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                      <ScrollPane fitToHeight="true" fitToWidth="true" layoutY="14.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <content>
-                                                            <VBox id="properties" prefWidth="230.0" spacing="2.0">
+                                                            <AnchorPane id="properties" prefHeight="200.0" prefWidth="200.0">
                                                                <padding>
                                                                   <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                                                                </padding>
-                                                            </VBox>
+                                                            </AnchorPane>
                                                          </content>
                                                       </ScrollPane>
                                                    </children>
@@ -57,11 +57,7 @@
                                     </AnchorPane>
                                 </content>
                               </Tab>
-                              <Tab closable="false" text="Аккаунт">
-                                <content>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                </content>
-                              </Tab>
+                              <Tab closable="false" text="Аккаунт" />
                           </tabs>
                         </TabPane>
                      </children>

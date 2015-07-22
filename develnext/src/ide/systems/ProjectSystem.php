@@ -5,6 +5,7 @@ use ide\Ide;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\utils\FileUtils;
+use php\gui\framework\Timer;
 use php\io\File;
 
 /**
@@ -47,7 +48,6 @@ class ProjectSystem
     static function open($fileName)
     {
         static::clear();
-
         static::close();
 
         $file = File::of($fileName);

@@ -27,6 +27,11 @@ class LabelFormElement extends AbstractFormElement
         return 'icons/label16.png';
     }
 
+    public function getIdPattern()
+    {
+        return "label%s";
+    }
+
     /**
      * @return UXNode
      */

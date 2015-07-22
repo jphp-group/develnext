@@ -323,3 +323,7 @@ div.CodeMirror-cursors {
 
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext { background: none; }
+
+
+.highlight-area {  }
+.highlight-area-text { opacity: 0.6; }

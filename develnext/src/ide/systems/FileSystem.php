@@ -15,6 +15,7 @@ use php\gui\UXMenu;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\io\File;
+use php\lib\Items;
 
 class FileSystem
 {
@@ -83,6 +84,23 @@ class FileSystem
     }
 
     /**
+     * @return null|string
+     */
+    static function getSelected()
+    {
+        /** @var UXTabPane $fileTabPane */
+        $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+
+        $tab = $fileTabPane->selectedTab;
+
+        if ($tab && $tab->userData instanceof AbstractEditor) {
+            return $tab->userData->getFile();
+        }
+
+        return null;
+    }
+
+    /**
      * @param $path
      * @param bool $switchToTab
      * @return AbstractEditor|null
@@ -117,8 +135,8 @@ class FileSystem
             $tab->content = $editor->makeUi();
             $tab->userData = $editor;
 
-            $tab->on('close', function () use ($path, $editor) {
-                static::close($path);
+            $tab->on('closeRequest', function (UXEvent $e) use ($path, $editor) {
+                static::close($path, false);
             });
 
             $tab->on('change', function () {
@@ -148,7 +166,7 @@ class FileSystem
         return $editor;
     }
 
-    static function close($path)
+    static function close($path, $removeTab = true)
     {
         $hash = FileUtils::hashName($path);
 
@@ -156,15 +174,15 @@ class FileSystem
         $editor = static::$openedEditors[$hash];
         $tab    = static::$openedTabs[$hash];
 
+        unset(static::$openedTabs[$hash], static::$openedEditors[$hash], static::$openedFiles[$hash]);
+
         if ($editor) {
             $editor->close();
         }
 
-        if ($tab) {
+        if ($removeTab && $tab) {
             Ide::get()->getMainForm()->{'fileTabPane'}->tabs->remove($tab);
         }
-
-        unset(static::$openedTabs[$hash], static::$openedEditors[$hash], static::$openedFiles[$hash]);
     }
 
     private static function addTab(UXTab $tab)

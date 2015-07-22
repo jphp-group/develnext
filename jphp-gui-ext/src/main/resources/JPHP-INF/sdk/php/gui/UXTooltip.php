@@ -53,6 +53,7 @@ class UXTooltip extends UXPopupWindow
     /**
      * @param string $text
      * @param UXNode $graphic (optional)
+     * @return UXTooltip
      */
     public static function of($text, UXNode $graphic)
     {

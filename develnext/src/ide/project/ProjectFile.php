@@ -224,6 +224,17 @@ class ProjectFile extends File
         return null;
     }
 
+    /**
+     * @param callable $callback
+     */
+    public function scan(callable $callback)
+    {
+        FileUtils::scan($this, function ($filename) use ($callback) {
+            $name = FileUtils::relativePath($this, $filename);
+            $callback($name, File::of($filename));
+        });
+    }
+
     public function serialize(DomElement $element, DomDocument $document)
     {
         $element->setAttribute('src', $this->getRelativePath());

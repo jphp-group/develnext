@@ -40,11 +40,7 @@ namespace ide\formats\form\context {
             $nodes = $designer->getSelectedNodes();
 
             foreach ($nodes as $node) {
-                $designer->unselectNode($node);
-                $designer->unregisterNode($node);
-
-                DataUtils::remove($node);
-                $node->parent->remove($node);
+                $editor->deleteNode($node);
             }
 
             $nodes = Items::toList($designer->getNodes());

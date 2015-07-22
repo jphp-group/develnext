@@ -1367,6 +1367,7 @@ is being used to size a border should also be in pixels.
 .tab-pane {
     -fx-tab-min-height: 1.8333em; /* 22 */
     -fx-tab-max-height: 1.8333em; /* 22 */
+    -fx-close-tab-animation: none;
 }
 .tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
     -fx-alignment: CENTER;

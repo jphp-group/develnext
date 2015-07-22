@@ -76,6 +76,16 @@ class FormElementConfig
     protected $allPropertyGroups;
 
     /**
+     * @var array
+     */
+    protected $eventTypes = [];
+
+    /**
+     * @var array
+     */
+    protected $allEventTypes;
+
+    /**
      * FormElementConfig constructor.
      *
      * @param $type
@@ -176,6 +186,10 @@ class FormElementConfig
         return $this->allPropertyGroups;
     }
 
+    public function getEventTypes()
+    {
+        return $this->allEventTypes;
+    }
 
     protected function readDocument()
     {
@@ -192,6 +206,7 @@ class FormElementConfig
 
         $this->readInitPropertiesFromDocument();
         $this->readPropertiesFromDocument();
+        $this->readEventTypesFromDocument();
 
         $this->processParents();
     }
@@ -205,6 +220,15 @@ class FormElementConfig
         while ($one->parent) {
             $tree[] = $one->parent;
             $one = $one->parent;
+        }
+
+        $eventTypes = [];
+
+        /** @var FormElementConfig $one */
+        foreach ($tree as $one) {
+            foreach ($one->eventTypes as $code => $eventType) {
+                $eventTypes[$code] = $eventType;
+            }
         }
 
         $tree = Items::reverse($tree);
@@ -237,6 +261,7 @@ class FormElementConfig
         $this->allInitProperties = $initProperties;
         $this->allProperties = $properties;
         $this->allPropertyGroups = $propertyGroups;
+        $this->allEventTypes = $eventTypes;
     }
 
     protected function readInitPropertiesFromDocument()
@@ -311,6 +336,31 @@ class FormElementConfig
                     'editorFactory' => $editorFactory,
                 ];
             }
+        }
+    }
+
+    protected function readEventTypesFromDocument()
+    {
+        /** @var DomElement $eventType */
+        foreach ($this->document->findAll("/element/eventTypes/eventType") as $eventType) {
+            $code = $eventType->getAttribute('code');
+            $name = $eventType->getAttribute('name');
+            $description = $eventType->getAttribute('description');
+
+            $icon = $eventType->getAttribute('icon');
+            $kind = $eventType->getAttribute('kind');
+
+            $kind = "ide\\formats\\form\\event\\{$kind}Kind";
+
+            $kind = new $kind();
+
+            $this->eventTypes[$code] = [
+                'code'        => $code,
+                'name'        => $name,
+                'description' => $description,
+                'icon'        => $icon,
+                'kind'        => $kind,
+            ];
         }
     }
 }

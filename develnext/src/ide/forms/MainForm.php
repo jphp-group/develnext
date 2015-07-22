@@ -9,14 +9,17 @@ use ide\systems\WatcherSystem;
 use php\gui\designer\UXDesigner;
 use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
+use php\gui\UXAlert;
 use php\gui\UXButton;
 use php\gui\UXForm;
 use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
+use php\gui\UXTextArea;
 use php\gui\UXTreeView;
 
 /**

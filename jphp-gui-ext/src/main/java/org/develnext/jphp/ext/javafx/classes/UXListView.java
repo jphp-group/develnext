@@ -72,7 +72,7 @@ public class UXListView extends UXControl<ListView> {
     }
 
     @Getter
-    public List getSelectedItems() {
+    public List<Object> getSelectedItems() {
         return getWrappedObject().getSelectionModel().getSelectedItems();
     }
 

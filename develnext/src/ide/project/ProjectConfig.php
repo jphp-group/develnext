@@ -2,6 +2,8 @@
 namespace ide\project;
 use Exception;
 use ide\Ide;
+use ide\systems\FileSystem;
+use ide\utils\FileUtils;
 use php\format\ProcessorException;
 use php\io\IOException;
 use php\io\Stream;
@@ -228,6 +230,31 @@ class ProjectConfig
         }
     }
 
+    public function setOpenedFiles(array $files, $selectedFile)
+    {
+        $domOpenedFiles = $this->document->find('/project/openedFiles');
+
+        if (!$domOpenedFiles) {
+            $domOpenedFiles = $this->document->createElement('openedFiles');
+            $this->document->find('/project')->appendChild($domOpenedFiles);
+        }
+
+        foreach ($domOpenedFiles->findAll('file') as $domOpenedFile) {
+            $domOpenedFiles->removeChild($domOpenedFile);
+        }
+
+        foreach ($files as $file) {
+            $domFile = $this->document->createElement('file');
+            $domFile->setAttribute('src', $file);
+
+            if (FileUtils::hashName($selectedFile) == FileUtils::hashName($file)) {
+                $domFile->setAttribute('selected', '1');
+            }
+
+            $domOpenedFiles->appendChild($domFile);
+        }
+    }
+
     /**
      * @param AbstractProjectBehaviour[] $behaviours
      */
@@ -269,6 +296,36 @@ class ProjectConfig
         }
 
         return $files;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOpenedFiles()
+    {
+        $files = [];
+
+        /** @var DomElement $file */
+        foreach ($this->document->findAll('/project/openedFiles/file') as $file) {
+            $files[] = $file->getAttribute('src');
+        }
+
+        return $files;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSelectedFile()
+    {
+        /** @var DomElement $file */
+        foreach ($this->document->findAll('/project/openedFiles/file') as $file) {
+            if ($file->getAttribute('selected')) {
+                return $file->getAttribute('src');
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 namespace ide\project\behaviours;
 
+use ide\build\WindowsApplicationBuildType;
+use ide\commands\BuildProjectCommand;
 use ide\commands\CreateFormProjectCommand;
 use ide\commands\ExecuteProjectCommand;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
@@ -15,6 +17,7 @@ use ide\project\ProjectTreeItem;
 use ide\systems\FileSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
+use php\gui\framework\Timer;
 use php\gui\UXTreeItem;
 use php\gui\UXTreeView;
 use php\io\File;
@@ -44,7 +47,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         WatcherSystem::addListener([$this, 'doWatchFile']);
 
+        $buildProjectCommand = new BuildProjectCommand();
+        $buildProjectCommand->register(new WindowsApplicationBuildType());
+
         Ide::get()->registerCommand(new ExecuteProjectCommand());
+        Ide::get()->registerCommand($buildProjectCommand);
         Ide::get()->registerCommand(new CreateFormProjectCommand());
     }
 
@@ -86,8 +93,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $formsItem->onUpdate(function () {
             $this->updateFormsInTree();
         });
-
-        FileSystem::open($this->makeForm($this->mainForm));
 
         WatcherSystem::addPathRecursive($this->project->getFile(self::FORMS_DIRECTORY));
 
@@ -137,6 +142,33 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree->updateDirectory('forms', $this->project->getFile(self::FORMS_DIRECTORY));
     }
 
+    public function recoveryForm($filename)
+    {
+        $name = Str::sub($filename, 0, Str::length($filename) - 5);
+
+        $form = $this->project->getAbsoluteFile($filename);
+        $conf = $this->project->getAbsoluteFile($name . ".conf");
+
+        $sources = $form->findLinkByExtension('php');
+
+        $rel = FileUtils::relativePath($this->project->getFile("src/.forms/"), $filename);
+        $rel = Str::sub($rel, 0, Str::length($rel) - 5);
+        $rel = Str::replace($rel, '\\', '/');
+
+        if (!$sources) {
+            $sources = $this->project->getFile("src/app/forms/$rel.php");
+            $form->addLink($sources);
+        }
+
+        if (!$sources->exists()) {
+            $this->createForm($rel);
+        }
+
+        if (!$form->findLinkByExtension('conf')) {
+            $form->addLink($conf);
+        }
+    }
+
     public function makeForm($name)
     {
         $form = $this->project->getFile("src/.forms/$name.fxml");
@@ -165,12 +197,26 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             'php\\gui\\framework\\AbstractForm'
         ]);
 
-        $sources = $this->project->createFile("src/app/forms/$name.php", $template);
-        $conf = $this->project->getFile("src/.forms/$name.conf");
-        $conf->setHiddenInTree(true);
+        $sources = $form->findLinkByExtension('php');
 
-        $form->addLink($sources);
-        $form->addLink($conf);
+        if (!$sources) {
+            $sources = $this->project->createFile("src/app/forms/$name.php", $template);
+            $form->addLink($sources);
+        } else {
+            if (!$sources->exists()) {
+                $sources->applyTemplate($template);
+                $sources->updateTemplate(true);
+            }
+        }
+
+        $conf = $form->findLinkByExtension('conf');
+
+        if (!$conf) {
+            $conf = $this->project->getFile("src/.forms/$name.conf");
+            $form->addLink($conf);
+        }
+
+        $conf->setHiddenInTree(true);
 
         return $form;
     }
@@ -188,7 +234,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->project->makeDirectory('src/app/forms');
 
-        $this->project->getFile('src/app/forms')->setHiddenInTree(true);
+        $formsPath = $this->project->getFile('src/app/forms');
+        $formsPath->setHiddenInTree(true);
+
+        $this->project->getFile('src/.forms')->scan(function ($name, File $file) {
+            if ($file->isFile() && Str::endsWith($name, '.fxml')) {
+                $this->recoveryForm($file);
+            }
+        });
     }
 
     public function synchronizeDependencies()

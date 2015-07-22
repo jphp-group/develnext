@@ -142,6 +142,7 @@ public class JavaFXExtension extends Extension {
 
         registerWrapperClass(scope, FXMLLoader.class, UXLoader.class);
         registerWrapperClass(scope, Data.class, UXData.class);
+        registerWrapperClass(scope, Alert.class, UXAlert.class);
 
         registerClass(scope, UXDialog.class);
         registerClass(scope, UXClipboard.class);

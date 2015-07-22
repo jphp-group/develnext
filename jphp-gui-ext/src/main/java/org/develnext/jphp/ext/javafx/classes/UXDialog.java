@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
@@ -33,6 +34,25 @@ public class UXDialog extends BaseObject {
     @Signature
     public static String show(String text) {
         return show(text, Alert.AlertType.INFORMATION);
+    }
+
+    @Signature
+    public static String showExpanded(String text, Node content, boolean expanded) {
+        return showExpanded(text, content, expanded, Alert.AlertType.NONE);
+    }
+
+    @Signature
+    public static String showExpanded(String text, Node content, boolean expanded, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(null);
+        //alert.setContentText(text);
+        alert.setHeaderText(text);
+
+        alert.getDialogPane().setExpanded(expanded);
+        alert.getDialogPane().setExpandableContent(content);
+
+        ButtonType result = alert.showAndWait().orElse(null);
+        return result == null ? null : result.getButtonData().getTypeCode();
     }
 
     @Signature

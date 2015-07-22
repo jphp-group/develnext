@@ -57,4 +57,10 @@ class UXAnchorPane extends UXPane
      * @param double $value
      */
     static function setBottomAnchor(UXNode $node, $value) {}
+
+    /**
+     * @param UXNode $node
+     * @param double $value
+     */
+    static function setAnchor(UXNode $node, $value) {}
 }

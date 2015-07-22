@@ -5,6 +5,7 @@
     </init>
 
     <properties group="general" title="Главное" />
+
     <properties group="extra" title="Дополнительно">
         <property code="id" name="ID" editor="text" tooltip="Уникальный индетификатор элемента в рамках формы" />
         <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />
@@ -18,4 +19,19 @@
         <property code="width" name="Ширина" editor="integer" />
         <property code="height" name="Высота" editor="integer" />
     </properties>
+
+    <eventTypes>
+        <eventType code="click" name="Клик мышки" kind="MouseEvent" icon="icons/mouseEx16.png" />
+
+        <eventType code="mouseDown" name="Нажатие мышки" kind="MouseEvent" icon="icons/mouse16.png" />
+        <eventType code="mouseMove" name="Движение мышки" kind="MouseEvent" icon="icons/mouse16.png" />
+        <eventType code="mouseUp" name="Отжатие мышки" kind="MouseEvent" icon="icons/mouse16.png" />
+
+        <eventType code="mouseEnter" name="Курсор на объекте" kind="MouseEvent" icon="icons/cursor16.png" />
+        <eventType code="mouseExit" name="Курсор вне объекта" kind="MouseEvent" icon="icons/cursor16.png" />
+
+        <eventType code="keyDown" name="Нажатие клавиши" kind="KeyEvent" icon="icons/key16.png" />
+        <eventType code="keyPress" name="Клавиатура" kind="KeyEvent" icon="icons/keyboard16.png" />
+        <eventType code="keyUp" name="Отжатие клавишы" kind="KeyEvent" icon="icons/key16.png" />
+    </eventTypes>
 </element>

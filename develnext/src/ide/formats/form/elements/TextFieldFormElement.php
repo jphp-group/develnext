@@ -25,6 +25,11 @@ class TextFieldFormElement extends AbstractFormElement
         return 'icons/textField16.png';
     }
 
+    public function getIdPattern()
+    {
+        return "textField%s";
+    }
+
     /**
      * @return UXNode
      */

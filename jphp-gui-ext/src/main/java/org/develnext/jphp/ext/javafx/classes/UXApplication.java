@@ -13,11 +13,14 @@ import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.exceptions.CriticalException;
+import php.runtime.exceptions.CustomErrorException;
 import php.runtime.ext.core.classes.stream.ResourceStream;
 import php.runtime.ext.core.classes.stream.Stream;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
+
+import java.lang.management.ManagementFactory;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXApplication")
@@ -30,6 +33,16 @@ public class UXApplication extends BaseWrapper<Application> {
 
     public UXApplication(Environment env, ClassEntity clazz) {
         super(env, clazz);
+    }
+
+    @Signature
+    public static String getPid() {
+        // Should return something like '<pid>@<hostname>', at least in SUN / Oracle JVMs
+        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        final int index = jvmName.indexOf('@');
+
+        String pid = jvmName.substring(0, index);
+        return pid;
     }
 
     @Signature
@@ -96,7 +109,12 @@ public class UXApplication extends BaseWrapper<Application> {
                     throwable.printStackTrace();
                 }
 
-                onStart.getEnvironment().catchUncaught(throwable);
+                if (throwable instanceof CustomErrorException) {
+                    CustomErrorException error = (CustomErrorException) throwable;
+                    onStart.getEnvironment().error(error.getType(), error.getMessage());
+                } else {
+                    onStart.getEnvironment().catchUncaught(throwable);
+                }
             } catch (Throwable throwable) {
                 throw throwable;
             } finally {

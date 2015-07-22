@@ -95,6 +95,12 @@ project(':jphp-gui-ext') {
     }
 }
 
+project(':jphp-parser') {
+    dependencies {
+        compile "org.develnext:jphp-core:$jphpVersion"
+    }
+}
+
 project(':jphp-gui-framework') {
     dependencies {
         compile project(':jphp-gui-ext')
@@ -106,6 +112,7 @@ project(':develnext') {
     dependencies {
         compile project(':jphp-gui-designer-ext')
         compile project(':jphp-gui-framework')
+        compile project(':jphp-parser')
 
         compile "org.develnext:jphp-xml-ext:$jphpVersion"
         compile "org.develnext:jphp-json-ext:$jphpVersion"

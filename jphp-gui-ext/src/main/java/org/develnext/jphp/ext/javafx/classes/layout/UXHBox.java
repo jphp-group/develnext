@@ -3,8 +3,10 @@ package org.develnext.jphp.ext.javafx.classes.layout;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
@@ -38,5 +40,15 @@ public class UXHBox extends UXPane<HBox> {
     @Signature
     public void __construct(List<Node> children) {
         __wrappedObject = new HBox(children.toArray(new Node[children.size()]));
+    }
+
+    @Signature
+    public static void setHgrow(Node node, @Nullable Priority value) {
+        HBox.setHgrow(node, value);
+    }
+
+    @Signature
+    public static Priority getHgrow(Node node) {
+        return HBox.getHgrow(node);
     }
 }

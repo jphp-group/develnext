@@ -1,10 +1,15 @@
 <?php
 namespace php\gui\framework;
 
+use BaseException;
 use Exception;
 use php\format\JsonProcessor;
+use php\gui\layout\UXAnchorPane;
+use php\gui\UXAlert;
 use php\gui\UXApplication;
+use php\gui\UXDialog;
 use php\gui\UXForm;
+use php\gui\UXTextArea;
 use php\io\IOException;
 use php\io\Stream;
 use php\util\Configuration;
@@ -51,6 +56,30 @@ class Application
         } catch (IOException $e) {
             throw new Exception("Unable to find the '$configPath' config");
         }
+
+        set_exception_handler(function (BaseException $e) {
+            static $showed = false;
+
+            if ($showed) {
+                return;
+            }
+
+            $showed = true;
+
+            $dialog = new UXAlert('ERROR');
+            $dialog->title = 'Error';
+            $dialog->headerText = 'An error has occurred ...';
+            $dialog->contentText = $e->getMessage();
+            $dialog->setButtonTypes(['Stop', 'Ignore']);
+
+            switch ($dialog->showAndWait()) {
+                case 'Ignore':
+                    Application::get()->shutdown();
+                    break;
+            }
+
+            $showed = false;
+        });
     }
 
     /**

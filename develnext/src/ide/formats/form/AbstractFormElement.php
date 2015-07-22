@@ -45,6 +45,11 @@ abstract class AbstractFormElement
         $this->config = FormElementConfig::of(get_class($this));
     }
 
+    public function getIdPattern()
+    {
+        return (new \ReflectionClass($this))->getShortName() . "%s";
+    }
+
     abstract public function isOrigin($any);
 
     /**
@@ -103,6 +108,11 @@ abstract class AbstractFormElement
     public function getInitProperties()
     {
         return $this->config ? $this->config->getInitProperties() : [];
+    }
+
+    public function getEventTypes()
+    {
+        return $this->config ? $this->config->getEventTypes() : [];
     }
 
     public function getGroup()

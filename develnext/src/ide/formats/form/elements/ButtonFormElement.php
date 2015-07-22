@@ -33,6 +33,11 @@ class ButtonFormElement extends AbstractFormElement
         return 'icons/button16.png';
     }
 
+    public function getIdPattern()
+    {
+        return "button%s";
+    }
+
     /**
      * @return UXNode
      */

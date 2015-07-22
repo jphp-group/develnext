@@ -302,6 +302,18 @@ class Project
         $this->trigger(__FUNCTION__);
 
         $this->tree->update();
+
+        foreach ($this->config->getOpenedFiles() as $file) {
+            if (File::of($file)->exists()) {
+                FileSystem::open($this->getAbsoluteFile($file), false);
+            }
+        }
+
+        $selected = $this->config->getSelectedFile();
+
+        if ($selected) {
+            FileSystem::open($selected, true);
+        }
     }
 
     /**
@@ -327,6 +339,9 @@ class Project
 
         FileSystem::saveAll();
 
+        $files = Flow::of(FileSystem::getOpened())->map(function ($e) { return $e['file']; })->toArray();
+
+        $this->config->setOpenedFiles($files, FileSystem::getSelected());
         $this->config->setProjectFiles($this->filesData);
         $this->config->setBehaviours($this->behaviours);
 

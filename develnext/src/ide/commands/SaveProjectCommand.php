@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use ide\Ide;
 use ide\misc\AbstractCommand;
 use php\gui\UXSeparator;
 
@@ -37,6 +38,10 @@ class SaveProjectCommand extends AbstractCommand
 
     public function onExecute()
     {
+        $project = Ide::get()->getOpenedProject();
 
+        if ($project) {
+            $project->save();
+        }
     }
 }

@@ -1,0 +1,6 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="fixedCellSize" name="Размер ячейки" editor="integer" />
+        <property code="items" name="Список" editor="stringList" />
+    </properties>
+</element>

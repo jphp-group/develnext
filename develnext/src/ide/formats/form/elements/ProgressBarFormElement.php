@@ -20,6 +20,11 @@ class ProgressBarFormElement extends AbstractFormElement
         return 'icons/progressbar16.png';
     }
 
+    public function getIdPattern()
+    {
+        return "progressBar%s";
+    }
+
     /**
      * @return UXNode
      */

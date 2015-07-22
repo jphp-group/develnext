@@ -1,6 +1,7 @@
 package org.develnext.jphp.ext.javafx.classes;
 
-import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.Event;
 import javafx.scene.web.WebEngine;
@@ -12,7 +13,6 @@ import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
-import php.runtime.exceptions.CriticalException;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.memory.ArrayMemory;
@@ -50,33 +50,31 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
     }
 
     @Signature
-    public Object callFunction(Environment env, String name, ArrayMemory args) {
+    public Memory callFunction(Environment env, String name, ArrayMemory args) {
         JSObject window = (JSObject) getWrappedObject().executeScript("window");
 
         if (window == null) {
             throw new IllegalStateException("Unable to find window object");
         }
 
-        Object[] objectArgs = args.toStringArray();
-        return window.call(name, objectArgs);
+        return Memory.wrap(env, window.call(name, args.toStringArray()));
     }
 
-    private static class Bridge {
+    public static class Bridge {
         protected final Invoker handler;
 
         public Bridge(Invoker handler) {
             this.handler = handler;
         }
 
-        public void run() {
-            handler.callAny();
+        public String run(String arg1) {
+            return handler.callAny(arg1).toString();
         }
     }
 
     @Signature
-    public void addBridge(Environment env, String name, final Invoker handler) {
+    public void addSimpleBridge(Environment env, String name, final Invoker handler) {
         JSObject window = (JSObject) getWrappedObject().executeScript("window");
-
         window.setMember(name, new Bridge(handler));
     }
 
@@ -86,43 +84,17 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
     }
 
     @Signature
-    public void waitState(final Worker.State state, final Invoker invoker) {
-        Thread thread = new Thread(new Runnable() {
+    public void watchState(final Environment env, final Invoker invoker) {
+        getWrappedObject().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
             @Override
-            public void run() {
+            public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
                 try {
-                    final boolean[] done = {false};
-
-                    while (true) {
-
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                done[0] = getWrappedObject().getLoadWorker().getState() == state;
-                            }
-                        });
-
-                        if (!done[0]) {
-                            Thread.sleep(50);
-                            continue;
-                        }
-
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                invoker.callAny(UXWebEngine.this);
-                            }
-                        });
-
-                        break;
-                    }
-                } catch (InterruptedException e) {
-                    throw new CriticalException(e);
+                    invoker.callAny(UXWebEngine.this, oldValue, newValue);
+                } catch (Throwable e) {
+                    env.wrapThrow(e);
                 }
             }
         });
-
-        thread.start();
     }
 
     @Signature

@@ -26,6 +26,11 @@ class ProgressIndicatorFormElement extends AbstractFormElement
         return 'icons/progressIndicator16.png';
     }
 
+    public function getIdPattern()
+    {
+        return "progressIndicator%s";
+    }
+
     /**
      * @return UXNode
      */

@@ -10,6 +10,13 @@ use php\io\Stream;
 class UXApplication
 {
     /**
+     * @return string
+     */
+    public static function getPid()
+    {
+    }
+
+    /**
      * @param string|Stream $value css file
      */
     public static function setTheme($value)
