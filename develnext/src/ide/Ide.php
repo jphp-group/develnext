@@ -191,6 +191,17 @@ class Ide extends Application
         return $env;
     }
 
+    public function getInnoSetupProgram()
+    {
+        $innoPath = $this->getOwnFile('tools/innoSetup/Compil32.exe');
+
+        if ($this->isDevelopment() && !$innoPath->exists()) {
+            $innoPath = $this->getOwnFile('../develnext-tools/innoSetup/Compil32.exe');
+        }
+
+        return $innoPath && $innoPath->exists() ? $innoPath->getCanonicalFile() : null;
+    }
+
     public function getLaunch4JProgram()
     {
         $launch4jPath = $this->getOwnFile('tools/Launch4j/launch4jc.exe');

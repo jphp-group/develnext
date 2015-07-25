@@ -22,6 +22,10 @@ use php\util\Flow;
  */
 class Project
 {
+    const ENV_DEV  = 'dev';
+    const ENV_PROD = 'prod';
+    const ENV_TEST = 'test';
+
     /**
      * @var string
      */
@@ -356,6 +360,16 @@ class Project
     public function recover()
     {
         $this->trigger(__FUNCTION__);
+    }
+
+    /**
+     * @param string $environment dev, prod, test, etc.
+     */
+    public function compile($environment)
+    {
+        $this->save();
+
+        $this->trigger(__FUNCTION__, $environment);
     }
 
     /**

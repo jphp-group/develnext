@@ -4,9 +4,7 @@ namespace ide\commands;
 use ide\forms\BuildProgressForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
-use ide\project\behaviours\GradleProjectBehaviour;
-use ide\project\behaviours\GuiFrameworkProjectBehaviour;
-use php\gui\framework\Timer;
+use ide\project\Project;
 use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\io\IOException;
@@ -103,15 +101,10 @@ class ExecuteProjectCommand extends AbstractCommand
         );
 
         if ($project) {
-            $project->save();
+            $project->compile(Project::ENV_DEV);
 
             $this->stopButton->enabled = true;
             $this->startButton->enabled = false;
-
-            /** @var GuiFrameworkProjectBehaviour $guiBehavior */
-            $guiBehavior = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
-            $guiBehavior->synchronizeDependencies();
-            $guiBehavior->synchronizeDebugFiles();
 
             $this->process = $this->process->start();
 

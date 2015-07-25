@@ -11,6 +11,7 @@ use ide\formats\templates\GuiFormFileTemplate;
 use ide\formats\templates\PhpClassFileTemplate;
 use ide\Ide;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\Project;
 use ide\project\ProjectFile;
 use ide\project\ProjectTree;
 use ide\project\ProjectTreeItem;
@@ -44,6 +45,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('create', [$this, 'doCreate']);
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('updateTree', [$this, 'doUpdateTree']);
+        $this->project->on('build', [$this, 'doBuild']);
 
         WatcherSystem::addListener([$this, 'doWatchFile']);
 
@@ -64,6 +66,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     {
         $mainForm = $this->createForm($this->mainForm);
         FileSystem::open($mainForm);
+    }
+
+    public function doBuild($environment) {
+        $this->synchronizeDependencies();
+
+        if ($environment == Project::ENV_DEV) {
+            $this->synchronizeDebugFiles();
+        }
     }
 
     public function doWatchFile(ProjectFile $file, $event)
