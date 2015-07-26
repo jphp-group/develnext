@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="45.0" minWidth="445.0" prefHeight="166.0" prefWidth="465.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <CheckBox id="o_jre" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="417.0" text="Portable версия (добавить JRE)" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+      <CheckBox id="o_oneJar" layoutX="14.0" layoutY="42.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="417.0" text="Объединить все исходники в один исполняемый файл" />
+      <Separator layoutX="14.0" layoutY="69.0" prefHeight="17.0" prefWidth="437.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+      <AnchorPane layoutX="14.0" layoutY="89.0" />
+      <Label layoutX="14.0" layoutY="86.0" prefHeight="30.0" prefWidth="338.0" text="Иконка приложения" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="93.0">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Button id="openButton" layoutX="14.0" layoutY="116.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="92.0" styleClass="icon-open" text="Выбор" />
+      <TextField id="o_exeIcoPath" layoutX="118.0" layoutY="119.0" prefHeight="25.0" prefWidth="312.0" promptText="путь к .ico файлу" AnchorPane.leftAnchor="118.0" AnchorPane.rightAnchor="15.0" />
+   </children>
+</AnchorPane>

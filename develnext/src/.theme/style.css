@@ -2,6 +2,11 @@
 .icon-exit { -fx-graphic: url("/.data/img/icons/exit16.png"); }
 .icon-exit32 { -fx-graphic: url("/.data/img/icons/exit32.png"); }
 
+.icon-ok { -fx-graphic: url("/.data/img/icons/ok16.png"); }
+.icon-ok32 { -fx-graphic: url("/.data/img/icons/ok32.png"); }
+
+.icon-run { -fx-graphic: url("/.data/img/icons/run16.png"); }
+
 .icon-refresh { -fx-graphic: url("/.data/img/icons/refresh16.png"); }
 .icon-refresh32 { -fx-graphic: url("/.data/img/icons/refresh32.png"); }
 

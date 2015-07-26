@@ -115,7 +115,7 @@ class Ide extends Application
             $this->mode = $env['DEVELNEXT_MODE'];
         }
 
-        /*set_exception_handler(function (\BaseException $e) {
+        set_exception_handler(function (\BaseException $e) {
             static $showError;
 
             if (!$showError) {
@@ -146,7 +146,7 @@ class Ide extends Application
 
                 $showError = false;
             }
-        });  */
+        });
     }
 
     public function launch()
@@ -193,10 +193,10 @@ class Ide extends Application
 
     public function getInnoSetupProgram()
     {
-        $innoPath = $this->getOwnFile('tools/innoSetup/Compil32.exe');
+        $innoPath = $this->getOwnFile('tools/innoSetup/ISCC.exe');
 
         if ($this->isDevelopment() && !$innoPath->exists()) {
-            $innoPath = $this->getOwnFile('../develnext-tools/innoSetup/Compil32.exe');
+            $innoPath = $this->getOwnFile('../develnext-tools/innoSetup/ISCC.exe');
         }
 
         return $innoPath && $innoPath->exists() ? $innoPath->getCanonicalFile() : null;

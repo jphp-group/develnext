@@ -29,8 +29,6 @@ class BuildProjectCommand extends AbstractCommand
     public function makeUiForHead()
     {
         $button = $this->makeGlyphButton();
-        $button->text = 'Собрать';
-
         return $button;
     }
 

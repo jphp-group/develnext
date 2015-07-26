@@ -224,6 +224,14 @@ class Project
     }
 
     /**
+     * @return File
+     */
+    public function getIdeDir()
+    {
+        return File::of("$this->rootDir/.dn");
+    }
+
+    /**
      * @return string[]
      */
     public function getSourceRoots()
@@ -325,6 +333,12 @@ class Project
      */
     public function load()
     {
+        $dir = $this->getIdeDir();
+
+        if (!$dir->isDirectory()) {
+            $dir->mkdirs();
+        }
+
         $this->filesData  = $this->config->createFiles($this);
         $this->behaviours = $this->config->createBehaviours($this);
         $this->template   = $this->config->getTemplate();

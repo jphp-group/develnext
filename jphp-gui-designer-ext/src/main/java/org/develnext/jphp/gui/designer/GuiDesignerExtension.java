@@ -5,6 +5,8 @@ import org.develnext.jphp.gui.designer.classes.*;
 import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
 
+import java.awt.*;
+
 public class GuiDesignerExtension extends Extension {
     public static final String NS = JavaFXExtension.NS + "designer";
 
@@ -20,6 +22,7 @@ public class GuiDesignerExtension extends Extension {
         registerClass(scope, UXDesignPane.class);
         registerClass(scope, UXDesignProperties.class);
         registerClass(scope, UXDesignPropertyEditor.class);
+        registerWrapperClass(scope, Desktop.class, UXDesktop.class);
 
         registerClass(scope, FileSystemWatcher.WrapWatchKey.class);
         registerClass(scope, FileSystemWatcher.class);

@@ -303,24 +303,30 @@ class FormElementConfig
 
                 $editorFactory = function () use ($property) {
                     if ($property->hasAttribute('editor')) {
-                        $editor = ElementPropertyEditor::getByCode($property->getAttribute('editor'))->unserialize($property);
+                        if ($property->getAttribute('editor') == 'none') {
+                            $editor = null;
+                        } else {
+                            $editor = ElementPropertyEditor::getByCode($property->getAttribute('editor'))->unserialize($property);
+                        }
                     } else {
                         $editor = (new SimpleTextPropertyEditor())->unserialize($property);
                     }
 
-                    if ($property->getAttribute('virtual')) {
-                        $editor->setAsDataProperty();
-                    }
+                    if ($editor) {
+                        if ($property->getAttribute('virtual')) {
+                            $editor->setAsDataProperty();
+                        }
 
-                    if ($property->getAttribute('css')) {
-                        $editor->setAsCssProperty();
-                    }
+                        if ($property->getAttribute('css')) {
+                            $editor->setAsCssProperty();
+                        }
 
-                    if ($property->getAttribute('formConfig')) {
-                        $editor->setAsFormConfigProperty($property->getAttribute('defaultValue'));
-                    }
+                        if ($property->getAttribute('formConfig')) {
+                            $editor->setAsFormConfigProperty($property->getAttribute('defaultValue'));
+                        }
 
-                    $editor->setTooltip($property->getAttribute('tooltip'));
+                        $editor->setTooltip($property->getAttribute('tooltip'));
+                    }
 
                     return $editor;
                 };

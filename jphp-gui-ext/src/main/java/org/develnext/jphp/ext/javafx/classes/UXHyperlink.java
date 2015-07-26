@@ -2,7 +2,6 @@ package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Name;
@@ -32,16 +31,16 @@ public class UXHyperlink extends UXButtonBase {
 
     @Reflection.Signature
     public void __construct() {
-        __wrappedObject = new Label();
+        __wrappedObject = new Hyperlink();
     }
 
     @Reflection.Signature
     public void __construct(String text) {
-        __wrappedObject = new Label(text);
+        __wrappedObject = new Hyperlink(text);
     }
 
     @Reflection.Signature
-    public void __construct(String text, Node graphic) {
-        __wrappedObject = new Label(text, graphic);
+    public void __construct(String text, @Reflection.Nullable Node graphic) {
+        __wrappedObject = new Hyperlink(text, graphic);
     }
 }

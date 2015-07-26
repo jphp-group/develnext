@@ -21,14 +21,21 @@ class Launch4jConfigTemplate extends AbstractFileTemplate
     protected $icoFile;
 
     /**
+     * @var string
+     */
+    protected $jarFile;
+
+    /**
      * @return array
      */
     public function getArguments()
     {
         return [
-            'JRE_PATH' => $this->jrePath,
-            'EXE_NAME' => $this->exeName,
-            'ICO_FILE' => $this->icoFile,
+            'JRE_PATH'      => $this->jrePath,
+            'EXE_NAME'      => $this->exeName,
+            'ICO_FILE'      => $this->icoFile,
+            'JAR_FILE'      => $this->jarFile,
+            'DONT_WRAP_JAR' => $this->jarFile ? 'false' : 'true',
         ];
     }
 
@@ -46,6 +53,14 @@ class Launch4jConfigTemplate extends AbstractFileTemplate
     public function setJrePath($jrePath)
     {
         $this->jrePath = $jrePath;
+    }
+
+    /**
+     * @param string $jarFile
+     */
+    public function setJarFile($jarFile)
+    {
+        $this->jarFile = $jarFile;
     }
 
     /**

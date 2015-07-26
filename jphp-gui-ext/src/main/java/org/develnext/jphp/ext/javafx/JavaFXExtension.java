@@ -14,6 +14,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.web.*;
 import javafx.stage.*;
@@ -25,6 +27,8 @@ import org.develnext.jphp.ext.javafx.classes.data.Data;
 import org.develnext.jphp.ext.javafx.classes.event.*;
 import org.develnext.jphp.ext.javafx.classes.layout.*;
 import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
+import org.develnext.jphp.ext.javafx.classes.shape.UXCircle;
+import org.develnext.jphp.ext.javafx.classes.shape.UXShape;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.event.*;
@@ -123,6 +127,9 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, ListCell.class, UXListCell.class);
         MemoryOperation.registerWrapper(TableColumn.class, UXTableColumn.class);
         MemoryOperation.registerWrapper(IndexedCell.class, UXCell.class);
+
+        registerWrapperClass(scope, Shape.class, UXShape.class);
+        registerWrapperClass(scope, Circle.class, UXCircle.class);
 
         MemoryOperation.registerWrapper(InputEvent.class, UXEvent.class);
         MemoryOperation.registerWrapper(ActionEvent.class, UXEvent.class);

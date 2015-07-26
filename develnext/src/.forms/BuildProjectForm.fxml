@@ -18,10 +18,11 @@
       </Label>
       <ListView id="list" layoutX="32.0" layoutY="103.0" prefHeight="296.0" prefWidth="550.0" AnchorPane.bottomAnchor="81.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="103.0" />
       <Label layoutX="33.0" layoutY="78.0" prefHeight="24.0" prefWidth="550.0" text="Вариант сборки:" />
-      <Button id="buildButton" layoutX="33.0" layoutY="419.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="112.0" text="Собрать" AnchorPane.bottomAnchor="29.0">
+      <Button id="buildButton" layoutX="33.0" layoutY="419.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="112.0" styleClass="icon-ok" text="Собрать" AnchorPane.bottomAnchor="29.0">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
+      <Button id="cancelButton" layoutX="155.0" layoutY="419.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="112.0" text="Отмена" AnchorPane.bottomAnchor="29.0" />
    </children>
 </AnchorPane>

@@ -1,0 +1,5 @@
+<element extends="ComboBoxBaseFormElement">
+    <properties>
+        <property code="value" editor="none" />
+    </properties>
+</element>

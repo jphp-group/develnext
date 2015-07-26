@@ -81,7 +81,11 @@ abstract class AbstractFormElement
 
             foreach ($this->config->getProperties() as $code => $property) {
                 $editorFactory = $property['editorFactory'];
-                $properties->addProperty($property['group'], $property['code'], $property['name'], $editorFactory());
+                $editor = $editorFactory();
+
+                if ($editor) {
+                    $properties->addProperty($property['group'], $property['code'], $property['name'], $editor);
+                }
             }
         }
     }

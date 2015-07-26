@@ -149,4 +149,21 @@ class FileUtils
             if ($in) $in->close();
         }
     }
+
+    public static function deleteDirectory($directory)
+    {
+        self::scan($directory, function ($filename) {
+            $file = File::of($filename);
+
+            if (!$file->isDirectory()) {
+                $file->delete();
+            }
+        });
+
+        self::scan($directory, function ($filename) {
+            File::of($filename)->delete();
+        });
+
+        File::of($directory)->delete();
+    }
 }

@@ -1,0 +1,40 @@
+/*******************************************************************************
+ *                                                                             *
+ * Hyperlink                                                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+.hyperlink {
+    -fx-padding: 0.166667em 0.25em 0.166667em 0.25em; /* 2 3 2 3 */
+    -fx-cursor: hand;
+    -fx-content-display: LEFT;
+    -fx-text-fill: -fx-text-background-color;
+    -fx-border-color: transparent;
+    -fx-border-width: 0px;
+}
+.hyperlink,
+.hyperlink:hover,
+.hyperlink:hover:visited {
+    -fx-text-fill: -fx-accent;
+}
+.hyperlink:armed,
+.hyperlink:visited,
+.hyperlink:hover:armed {
+    -fx-text-fill: -fx-accent;
+}
+.hyperlink:hover,
+.hyperlink:hover:visited {
+    -fx-underline: true;
+}
+
+.hyperlink:visited,
+.hyperlink:visited:armed {
+    -fx-underline: false;
+}
+.hyperlink:focused {
+    -fx-border-style: segments(0.166667em, 0.166667em);
+    -fx-border-width: 0px;
+}
+.hyperlink:show-mnemonics > .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}

@@ -1,0 +1,6 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="fillColor" name="Цвет заливки" editor="color" />
+        <property code="strokeColor" name="Цвет оконтовки" editor="color" />
+    </properties>
+</element>

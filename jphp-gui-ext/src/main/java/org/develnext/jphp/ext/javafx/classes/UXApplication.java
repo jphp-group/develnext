@@ -1,6 +1,5 @@
 package org.develnext.jphp.ext.javafx.classes;
 
-import com.sun.javafx.css.StyleManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -46,18 +45,23 @@ public class UXApplication extends BaseWrapper<Application> {
     }
 
     @Signature
-    public static void setTheme(Memory value) {
-        StyleManager styleManager = StyleManager.getInstance();
+    public static void setTheme(final Memory value) {
+        new JFXPanel();
 
-        if (value.instanceOf(Stream.class)) {
-            if (value.instanceOf(ResourceStream.class)) {
-                styleManager.setDefaultUserAgentStylesheet(value.toObject(ResourceStream.class).getUrl().toExternalForm());
-            } else {
-                styleManager.setDefaultUserAgentStylesheet(value.toObject(Stream.class).getPath());
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                if (value.instanceOf(Stream.class)) {
+                    if (value.instanceOf(ResourceStream.class)) {
+                        Application.setUserAgentStylesheet(value.toObject(ResourceStream.class).getUrl().toExternalForm());
+                    } else {
+                        Application.setUserAgentStylesheet(value.toObject(Stream.class).getPath());
+                    }
+                } else {
+                    Application.setUserAgentStylesheet(value.toString());
+                }
             }
-        } else {
-            styleManager.setDefaultUserAgentStylesheet(value.toString());
-        }
+        });
     }
 
     @Signature

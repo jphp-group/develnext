@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="544.0" prefWidth="526.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Separator layoutX="14.0" layoutY="42.0" prefHeight="21.0" prefWidth="498.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+      <Label layoutX="52.0" layoutY="13.0" prefHeight="27.0" prefWidth="461.0" text="Настройка сборки" AnchorPane.leftAnchor="52.0" AnchorPane.rightAnchor="13.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Separator layoutX="14.0" layoutY="476.0" prefHeight="21.0" prefWidth="498.0" AnchorPane.bottomAnchor="47.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+      <Button id="saveButton" layoutX="14.0" layoutY="500.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" styleClass="icon-ok" text="Сохранить" AnchorPane.bottomAnchor="14.0">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+      <CheckBox id="showConfigCheckbox" layoutX="279.0" layoutY="507.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="231.0" selected="true" text="Открывать при каждой сборке" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="279.0" AnchorPane.rightAnchor="16.0" />
+      <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="14.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" />
+      <Pane layoutX="14.0" layoutY="53.0" prefHeight="431.0" prefWidth="498.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="53.0" />
+      <Button id="cancelButton" layoutX="144.0" layoutY="500.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="112.0" text="Отмена" AnchorPane.bottomAnchor="14.0" />
+   </children>
+</AnchorPane>

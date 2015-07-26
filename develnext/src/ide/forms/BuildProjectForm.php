@@ -3,11 +3,13 @@ namespace ide\forms;
 
 use ide\build\AbstractBuildType;
 use ide\Ide;
+use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXButton;
 use php\gui\UXDialog;
+use php\gui\UXHyperlink;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
@@ -40,11 +42,25 @@ class BuildProjectForm extends AbstractForm
             if ($item) {
                 $titleName = new UXLabel($item->getName());
                 $titleName->style = '-fx-font-weight: bold;';
+                $titleName->padding = 0;
 
                 $titleDescription = new UXLabel($item->getDescription());
                 $titleDescription->style = '-fx-text-fill: gray;';
 
-                $title = new UXVBox([$titleName, $titleDescription]);
+                $box = new UXHBox([$titleName]);
+                $box->spacing = 0;
+
+                if ($item->getConfigForm()) {
+                    $settingsLink = new UXHyperlink('(настройки)');
+                    $settingsLink->padding = [0, 5];
+                    $settingsLink->on('action', function () use ($item) {
+                        $item->showConfigDialog();
+                    });
+
+                    $box->add($settingsLink);
+                }
+
+                $title = new UXVBox([$box, $titleDescription]);
                 $title->spacing = 0;
 
                 $list = [];
@@ -76,6 +92,25 @@ class BuildProjectForm extends AbstractForm
     }
 
     /**
+     * @event cancelButton.action
+     */
+    public function doCancelButtonClick()
+    {
+        $this->hide();
+    }
+
+    /**
+     * @param UXMouseEvent $e
+     * @event list.click
+     */
+    public function doListClick(UXMouseEvent $e)
+    {
+        if ($e->clickCount > 1) {
+            $this->doBuildButtonClick();
+        }
+    }
+
+    /**
      * @event buildButton.action
      */
     public function doBuildButtonClick()
@@ -84,7 +119,9 @@ class BuildProjectForm extends AbstractForm
         $buildType = Items::first($this->list->selectedItems);
 
         if ($buildType) {
-            $buildType->onExecute(Ide::get()->getOpenedProject());
+            if ($buildType->fetchConfig()) {
+                $buildType->onExecute(Ide::get()->getOpenedProject());
+            }
         } else {
             UXDialog::show('Данная функция находится в разработке.', 'INFORMATION');
         }

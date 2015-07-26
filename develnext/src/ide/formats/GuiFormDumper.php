@@ -134,8 +134,7 @@ class GuiFormDumper extends AbstractFormDumper
 
         $element = $document->createElement($tag->getTagName());
 
-        $tag->writeAttributes($node, $element);
-        $tag->writeContent($node, $element, $document, $this);
+        $oTag = $tag;
 
         if (!$tag->isFinal()) {
             while ($class != null) {
@@ -155,6 +154,9 @@ class GuiFormDumper extends AbstractFormDumper
                 }
             }
         }
+
+        $oTag->writeAttributes($node, $element);
+        $oTag->writeContent($node, $element, $document, $this);
 
         return $element;
     }

@@ -50,6 +50,8 @@ abstract class AbstractForm extends UXForm
 
         $this->init();
 
+        $this->addStylesheet('/php/gui/framework/style.css');
+
         if (Stream::exists('res://.theme/style.css')) {
             $this->addStylesheet('/.theme/style.css');
         }
@@ -176,7 +178,7 @@ abstract class AbstractForm extends UXForm
      * @throws Exception
      * @throws IllegalStateException
      */
-    protected function loadBindings($handler)
+    public function loadBindings($handler)
     {
         $class = new ReflectionClass($handler);
         $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);

@@ -1,6 +1,8 @@
 <?php
 namespace ide\project\behaviours;
 
+use ide\build\OneJarBuildType;
+use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
 use ide\commands\BuildProjectCommand;
 use ide\commands\CreateFormProjectCommand;
@@ -45,15 +47,17 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('create', [$this, 'doCreate']);
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('updateTree', [$this, 'doUpdateTree']);
-        $this->project->on('build', [$this, 'doBuild']);
+        $this->project->on('compile', [$this, 'doCompile']);
 
         WatcherSystem::addListener([$this, 'doWatchFile']);
 
         $buildProjectCommand = new BuildProjectCommand();
         $buildProjectCommand->register(new WindowsApplicationBuildType());
+        $buildProjectCommand->register(new SetupWindowsApplicationBuildType());
+        $buildProjectCommand->register(new OneJarBuildType());
 
-        Ide::get()->registerCommand(new ExecuteProjectCommand());
         Ide::get()->registerCommand($buildProjectCommand);
+        Ide::get()->registerCommand(new ExecuteProjectCommand());
         Ide::get()->registerCommand(new CreateFormProjectCommand());
     }
 
@@ -68,7 +72,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         FileSystem::open($mainForm);
     }
 
-    public function doBuild($environment) {
+    public function doCompile($environment) {
         $this->synchronizeDependencies();
 
         if ($environment == Project::ENV_DEV) {
@@ -126,6 +130,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $buildConfig->setDependency('jphp-core');
         $buildConfig->setDependency('jphp-gui-ext');
         $buildConfig->setDependency('jphp-gui-framework');
+
+        $buildConfig->setDefine('jar.archiveName', '"dn-compiled-module.jar"');
     }
 
     public function doUpdateTree(ProjectTree $tree, $path)
