@@ -490,6 +490,7 @@ class FormEditor extends AbstractEditor
                     if ($this->layout->lookup("#$id")) {
                         do {
                             $id = Str::format($selected->getIdPattern(), $n);
+                            $n++;
                         } while ($this->layout->lookup("#$id"));
                     }
                 }

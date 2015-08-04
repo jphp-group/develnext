@@ -51,7 +51,7 @@ public class UXControl<T extends Control> extends UXRegion<Control> {
         tooltip.setText(value.toString());
     }
 
-    @Getter
+    @Getter(hiddenInDebugInfo = true)
     public String getTooltipText() {
         Tooltip tooltip = getWrappedObject().getTooltip();
 

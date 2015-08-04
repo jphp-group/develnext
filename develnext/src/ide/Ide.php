@@ -25,6 +25,8 @@ use ide\formats\form\TextFieldFormElement;
 use ide\formats\FormFormat;
 use ide\formats\GuiFormFormat;
 use ide\formats\PhpCodeFormat;
+use ide\formats\ScriptFormat;
+use ide\formats\ScriptModuleFormat;
 use ide\formats\WelcomeFormat;
 use ide\forms\MainForm;
 use ide\forms\SplashForm;
@@ -115,6 +117,8 @@ class Ide extends Application
             $this->mode = $env['DEVELNEXT_MODE'];
         }
 
+        restore_exception_handler();
+
         set_exception_handler(function (\BaseException $e) {
             static $showError;
 
@@ -147,6 +151,8 @@ class Ide extends Application
                 $showError = false;
             }
         });
+
+        restore_exception_handler();
     }
 
     public function launch()
@@ -577,7 +583,7 @@ class Ide extends Application
     public function getFormat($path)
     {
         /** @var AbstractFormat $format */
-        foreach ($this->formats as $format) {
+        foreach (Items::reverse($this->formats) as $format) {
             if ($format->isValid($path)) {
                 return $format;
             }
@@ -619,7 +625,10 @@ class Ide extends Application
 
         if ($format) {
             $editor = $format->createEditor($path);
-            $editor->setFormat($format);
+
+            if ($editor) {
+                $editor->setFormat($format);
+            }
 
             return $editor;
         }
@@ -643,6 +652,8 @@ class Ide extends Application
         $this->registerFormat(new WelcomeFormat());
         $this->registerFormat(new PhpCodeFormat());
         $this->registerFormat(new GuiFormFormat());
+        $this->registerFormat(new ScriptFormat());
+        $this->registerFormat(new ScriptModuleFormat());
 
         $this->registerProjectTemplate(new DefaultGuiProjectTemplate());
 
@@ -713,5 +724,19 @@ class Ide extends Application
         }
 
         parent::shutdown();
+    }
+
+    /**
+     * @param string $include
+     *
+     * @return File
+     */
+    public function getIncludeFile($include)
+    {
+        if ($this->isDevelopment()) {
+            return $this->getOwnFile("misc/include/" . $include);
+        } else {
+            return $this->getOwnFile("include/" . $include);
+        }
     }
 }

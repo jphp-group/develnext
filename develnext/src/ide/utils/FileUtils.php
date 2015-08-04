@@ -166,4 +166,14 @@ class FileUtils
 
         File::of($directory)->delete();
     }
+
+    public static function put($filename, $content, $encoding = 'UTF-8')
+    {
+        Stream::putContents($filename, Str::encode($content, $encoding));
+    }
+
+    public static function get($filename, $encoding = 'UTF-8')
+    {
+        return Str::decode(Stream::getContents($filename), $encoding);
+    }
 }

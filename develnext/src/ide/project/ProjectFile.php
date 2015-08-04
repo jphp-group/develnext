@@ -235,6 +235,19 @@ class ProjectFile extends File
         });
     }
 
+    public function delete()
+    {
+        if (parent::isDirectory()) {
+            FileUtils::deleteDirectory($this);
+        } else {
+            parent::delete();
+        }
+
+        foreach ($this->getLinks() as $link) {
+            $link->delete();
+        }
+    }
+
     public function serialize(DomElement $element, DomDocument $document)
     {
         $element->setAttribute('src', $this->getRelativePath());

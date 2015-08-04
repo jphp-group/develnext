@@ -11,6 +11,7 @@ import php.runtime.lang.ForeachIterator;
 import php.runtime.lang.spl.ArrayAccess;
 import php.runtime.lang.spl.Countable;
 import php.runtime.lang.spl.iterator.Iterator;
+import php.runtime.memory.ArrayMemory;
 import php.runtime.memory.LongMemory;
 import php.runtime.memory.ObjectMemory;
 import php.runtime.reflection.ClassEntity;
@@ -29,9 +30,33 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     }
 
     @Signature
+    public Memory __debugInfo(Environment env, Memory... args) {
+        ArrayMemory r = new ArrayMemory();
+
+        ForeachIterator iterator = getNewIterator(env);
+
+        while (iterator.next()) {
+            r.add(iterator.getValue().toImmutable());
+        }
+
+        return r.toConstant();
+    }
+
+    @Signature
     @SuppressWarnings("unchecked")
     public boolean add(Environment env, Memory object) {
         return getWrappedObject().add((T) Memory.unwrap(env, object));
+    }
+
+    @Signature
+    @SuppressWarnings("unchecked")
+    public void insert(Environment env, int index, Memory object) {
+        if (index >= 0) {
+            getWrappedObject().add(index, (T) Memory.unwrap(env, object));
+            return;
+        }
+
+        throw new IllegalArgumentException("index must be greater or equal to 0");
     }
 
     @Signature

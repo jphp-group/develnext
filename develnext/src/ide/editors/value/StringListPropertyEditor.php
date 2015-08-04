@@ -43,8 +43,6 @@ class StringListPropertyEditor extends TextPropertyEditor
     public function makeUi()
     {
         $result = parent::makeUi();
-        $this->textField->editable = false;
-
         return $result;
     }
 

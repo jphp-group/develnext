@@ -509,7 +509,7 @@ public class UXDesigner extends BaseObject {
                 e.consume();
             }
         };
-        node.setOnDragDetected(onDragDetected);
+        //node.setOnDragDetected(onDragDetected);
         node.addEventFilter(MouseEvent.DRAG_DETECTED, onDragDetected);
 
         EventHandler<MouseEvent> onMouseDragged = new EventHandler<MouseEvent>() {
@@ -538,7 +538,7 @@ public class UXDesigner extends BaseObject {
                 e.consume();
             }
         };
-        node.setOnMouseDragged(onMouseDragged);
+        //node.setOnMouseDragged(onMouseDragged);
         node.addEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
 
         EventHandler<MouseEvent> onMousePressed = new EventHandler<MouseEvent>() {
@@ -586,7 +586,7 @@ public class UXDesigner extends BaseObject {
             }
         };
 
-        node.setOnMousePressed(onMousePressed);
+        //node.setOnMousePressed(onMousePressed);
         node.addEventFilter(MouseEvent.MOUSE_PRESSED, onMousePressed);
 
         EventHandler<MouseEvent> onMouseReleased = new EventHandler<MouseEvent>() {
@@ -612,7 +612,7 @@ public class UXDesigner extends BaseObject {
             }
         };
 
-        node.setOnMouseReleased(onMouseReleased);
+        //node.setOnMouseReleased(onMouseReleased);
         node.addEventFilter(MouseEvent.MOUSE_RELEASED, onMouseReleased);
     }
 

@@ -38,6 +38,9 @@ class Application
     /** @var AbstractForm[] */
     protected $forms = [];
 
+    /** @var ScriptManager */
+    protected $scripts;
+
     /** @var Configuration */
     protected $config;
 
@@ -55,6 +58,14 @@ class Application
             $this->loadConfig($configPath);
         } catch (IOException $e) {
             throw new Exception("Unable to find the '$configPath' config");
+        }
+
+        $this->scripts = new ScriptManager();
+
+        try {
+            $this->scripts->addConfig('res://.system/scripts.json');
+        } catch (IOException $e) {
+            // nop.
         }
 
         set_exception_handler(function (BaseException $e) {

@@ -1,0 +1,20 @@
+<element>
+    <init>
+        <property code="interval" value="1000" />
+        <property code="repeatable" value="1" />
+    </init>
+
+    <properties group="general" title="Главное">
+        <property code="interval" name="Интервал" editor="integer" tooltip="Интервал в миллисекундах (1 сек = 1000 млсек)" />
+        <property code="repeatable" name="Повторять" editor="boolean" tooltip="Зацикленный таймер" />
+    </properties>
+
+    <properties group="extra" title="Дополнительно">
+        <property code="id" name="ID" editor="text" tooltip="Уникальный индетификатор элемента в рамках всей программы" />
+        <property code="enabled" name="Активность" editor="boolean" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="action" name="Действие" kind="ObjectEvent" icon="icons/mouseEx16.png" />
+    </eventTypes>
+</element>

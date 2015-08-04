@@ -101,16 +101,18 @@ class ExecuteProjectCommand extends AbstractCommand
         );
 
         if ($project) {
-            $project->compile(Project::ENV_DEV);
+            $this->processDialog = $dialog = new BuildProgressForm();
+            $dialog->addConsoleLine('> gradle run', 'green');
+            $dialog->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
+
+            $project->compile(Project::ENV_DEV, function ($log) use ($dialog) {
+                $dialog->addConsoleLine($log, 'blue');
+            });
 
             $this->stopButton->enabled = true;
             $this->startButton->enabled = false;
 
             $this->process = $this->process->start();
-
-            $this->processDialog = $dialog = new BuildProgressForm();
-            $dialog->addConsoleLine('> gradle run', 'green');
-            $dialog->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
 
             $dialog->show($this->process);
 

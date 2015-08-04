@@ -378,12 +378,13 @@ class Project
 
     /**
      * @param string $environment dev, prod, test, etc.
+     * @param callable $log
      */
-    public function compile($environment)
+    public function compile($environment, callable $log = null)
     {
         $this->save();
 
-        $this->trigger(__FUNCTION__, $environment);
+        $this->trigger(__FUNCTION__, $environment, $log);
     }
 
     /**

@@ -12,7 +12,7 @@ class UXDialog
      * @param string $type
      * @return null|string
      */
-    public static function show($text, $type = 'NONE')
+    public static function show($text, $type = 'INFORMATION')
     {
     }
 
@@ -22,7 +22,7 @@ class UXDialog
      * @param $expanded
      * @param $type
      */
-    public static function showExpanded($text, UXNode $content, $expanded, $type = 'NONE')
+    public static function showExpanded($text, UXNode $content, $expanded, $type = 'INFORMATION')
     {
     }
 

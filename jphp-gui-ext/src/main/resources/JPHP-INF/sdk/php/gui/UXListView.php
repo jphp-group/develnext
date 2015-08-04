@@ -51,6 +51,11 @@ class UXListView extends UXControl
     /**
      * @var int
      */
+    public $selectedIndex = -1;
+
+    /**
+     * @var int
+     */
     public $focusedIndex = -1;
 
     /**

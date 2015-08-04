@@ -24,17 +24,10 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     public function doWatchFile()
     {
-        $this->project->getTree()->updateDirectory('sources', $this->project->getFile(self::SOURCES_DIRECTORY));
+        // ...
     }
 
     public function doOpen()
     {
-        $projectTreeItem = $this->project->getTree()->getOrCreateItem('sources', 'Скрипты', 'icons/brickFolder16.png');
-
-        $projectTreeItem->onUpdate(function () {
-            $this->doWatchFile();
-        });
-
-        WatcherSystem::addPathRecursive($this->project->getFile(self::SOURCES_DIRECTORY));
     }
 }

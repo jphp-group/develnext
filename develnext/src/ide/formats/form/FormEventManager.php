@@ -2,6 +2,7 @@
 namespace ide\formats\form;
 
 use ide\formats\form\event\AbstractEventKind;
+use ide\utils\FileUtils;
 use ide\utils\PhpParser;
 use php\io\IOException;
 use php\io\Stream;
@@ -98,13 +99,13 @@ class FormEventManager
     {
         $binds = $this->findBinds($id);
 
-        $parser = new PhpParser(Stream::getContents($this->file));
+        $parser = new PhpParser(FileUtils::get($this->file));
 
         foreach ($binds as $bind) {
             $parser->removeLines($bind['eventLine'], $bind['endLine']);
         }
 
-        Stream::putContents($this->file, $parser->getContent());
+        FileUtils::put($this->file, $parser->getContent());
 
         return !!$binds;
     }
@@ -123,7 +124,7 @@ class FormEventManager
             $parser = new PhpParser(Stream::getContents($this->file));
             $parser->removeLines($bind['eventLine'], $bind['endLine']);
 
-            Stream::putContents($this->file, $parser->getContent());
+            FileUtils::put($this->file, $parser->getContent());
             return $bind;
         }
 
@@ -147,7 +148,7 @@ class FormEventManager
             $line = $info['endLine'];
         }
 
-        $scanner = new Scanner(Stream::getContents($this->file), 'UTF-8');
+        $scanner = new Scanner(FileUtils::get($this->file), 'UTF-8');
 
         $i = 0;
 
@@ -191,7 +192,7 @@ class FormEventManager
             $source = $parser->getContent();
         }
 
-        Stream::putContents($this->file, $source);
+        FileUtils::put($this->file, $source);
     }
 
     /**

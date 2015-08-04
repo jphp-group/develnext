@@ -61,9 +61,24 @@ public class UXListView extends UXControl<ListView> {
     public void setSelectedIndexes(int[] indexes) {
         MultipleSelectionModel selectionModel = getWrappedObject().getSelectionModel();
 
+        selectionModel.clearSelection();
+
         for (int index : indexes) {
             selectionModel.select(index);
         }
+    }
+
+    @Getter
+    public int getSelectedIndex() {
+        return getWrappedObject().getSelectionModel().getSelectedIndex();
+    }
+
+    @Setter
+    public void setSelectedIndex(int index) {
+        MultipleSelectionModel selectionModel = getWrappedObject().getSelectionModel();
+
+        selectionModel.clearSelection();
+        selectionModel.select(index);
     }
 
     @Getter

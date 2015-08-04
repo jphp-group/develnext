@@ -1,14 +1,19 @@
 <?php
 namespace ide\project;
 
+use Files;
 use ide\editors\menu\ContextMenu;
 use ide\Ide;
+use ide\misc\SimpleSingleCommand;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
+use php\gui\designer\UXDesktop;
 use php\gui\event\UXMouseEvent;
+use php\gui\UXApplication;
 use php\gui\UXTreeItem;
 use php\gui\UXTreeView;
 use php\io\File;
+use php\lib\Str;
 use php\util\Regex;
 
 /**
@@ -22,6 +27,9 @@ class ProjectTreeItem
     /** @var string */
     private $name;
     private $file;
+
+    /** @var bool */
+    private $disableDelete = false;
 
     /** @var callable */
     protected $onUpdate;
@@ -84,6 +92,22 @@ class ProjectTreeItem
     }
 
     /**
+     * @param boolean $disableDelete
+     */
+    public function setDisableDelete($disableDelete)
+    {
+        $this->disableDelete = $disableDelete;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDisableDelete()
+    {
+        return $this->disableDelete;
+    }
+
+    /**
      * Попытка обновить данные.
      */
     public function tryUpdate()
@@ -93,6 +117,11 @@ class ProjectTreeItem
         if ($onUpdate) {
             $onUpdate($this);
         }
+    }
+
+    public function insert($index, ProjectTreeItem $item)
+    {
+        $this->origin->children->insert($index, $item->origin);
     }
 
     public function add(ProjectTreeItem $item)
@@ -161,14 +190,59 @@ class ProjectTree
 
         $tree->rootVisible = false;
         $this->contextMenu = new ContextMenu();
-
-        $this->contextMenu->addGroup('add', 'Создать');
+        $this->contextMenu->getRoot()->on('show', [$this, 'doRequestContextMenu']);
+        $tree->contextMenu = $this->contextMenu->getRoot();
         $this->contextMenu->addSeparator();
 
         $tree->on('mouseUp', [$this, 'doClick']);
-        $tree->contextMenu = $this->contextMenu->getRoot();
 
         $this->clear();
+    }
+
+    protected function doRequestContextMenu()
+    {
+        $this->contextMenu->clear();
+
+        $item = $this->tree->focusedItem;
+
+        if ($item) {
+            /** @var ProjectTreeItem $item */
+            $item = $item->value;
+
+            if (Files::exists($item->getFile())) {
+                $this->contextMenu->addCommand(new SimpleSingleCommand('Открыть в проводнике', 'icons/open16.png', function () use ($item) {
+                    $desktop = new UXDesktop();
+                    $file = File::of($item->getFile());
+
+                    if ($file->isFile()) {
+                        $desktop->open($file->getParent());
+                    } else {
+                        $desktop->open($file);
+                    }
+                }));
+
+                $this->contextMenu->addSeparator();
+
+                if (!$item->isDisableDelete()) {
+                    $this->contextMenu->addCommand(new SimpleSingleCommand('Удалить', 'icons/delete16.png', function () use ($item) {
+                        $file = $item->getFile();
+
+                        if ($file instanceof ProjectFile) {
+                            $file->delete();
+                        } else {
+                            if (Files::isDir($file)) {
+                                FileUtils::deleteDirectory($file);
+                            } else {
+                                File::of($file)->delete();
+                            }
+                        }
+                    }));
+                }
+            }
+
+            /*$this->contextMenu->addGroup('add', 'Создать');
+            $this->contextMenu->addSeparator(); */
+        }
     }
 
     public function addIgnoreRule($regex)
@@ -176,44 +250,109 @@ class ProjectTree
         $this->ignoreList[$regex] = Regex::of($regex);
     }
 
-    public function updateDirectory($code, $path)
+    /**
+     * @param string|ProjectTreeItem $code
+     * @param $path
+     * @param bool $saveSelected
+     */
+    public function updateDirectory($code, $path, $saveSelected = true)
     {
-        $formsItem = $this->getItem($code);
-        $formsItem->clear();
+        $selected = $this->tree->selectedItems;
+        $focused = $this->tree->focusedItem;
 
-        $func = function (ProjectTreeItem $root, $path) use (&$func) {
-            foreach (File::of($path)->findFiles() as $file) {
-                $file = $this->project->getAbsoluteFile($file);
+        if ($code instanceof ProjectTreeItem) {
+            $formsItem = $code;
+        } else {
+            $formsItem = $this->getItem($code);
+            $formsItem->clear();
+        }
 
-                if ($file->isHiddenInTree()) {
-                    continue;
+        $files = [];
+
+        foreach ($formsItem->getChildren() as $item) {
+            /** @var ProjectTreeItem $e */
+            $e = $item->value;
+
+            $file = $this->project->getAbsoluteFile($e->getFile());
+
+            $ignore = false;
+
+            foreach ($this->ignoreList as $regex) {
+                if (Regex::match($regex->getPattern(), $file->getRelativePath())) {
+                    $ignore = true;
+                    break;
                 }
+            }
 
+            if (!$file->exists() || $file->isHiddenInTree() || $ignore) {
+                $formsItem->getOrigin()->children->remove($item);
+            } else if ($file->isDirectory()) {
+                $this->updateDirectory($e, $e->getFile(), false);
+            } else {
+                $formsItem->getOrigin()->children->clear();
+            }
+
+            $files[FileUtils::hashName($file)] = $file;
+        }
+
+        foreach (File::of($path)->findFiles() as $file) {
+            $file = $this->project->getAbsoluteFile($file);
+
+            if ($file->isHiddenInTree()) continue;
+
+            if (!$files[FileUtils::hashName($file)]) {
                 $ignore = false;
 
                 foreach ($this->ignoreList as $regex) {
                     if (Regex::match($regex->getPattern(), $file->getRelativePath())) {
-                   // if ($regex->with($file->getRelativePath())->matches()) {
                         $ignore = true;
                         break;
                     }
                 }
 
-                if ($ignore) {
-                    continue;
-                }
-
-                $item = $this->createItemForFile($file);
-
-                $root->add($item);
-
-                if ($file->isDirectory()) {
-                    $func($item, $file);
-                }
+                if ($ignore) continue;
             }
-        };
 
-        $func($formsItem, $path);
+            $children = $formsItem->getChildren();
+            $item = $this->createItemForFile($file);
+
+            if ($children->count()) {
+                $added = false;
+
+                foreach ($children as $i => $el) {
+                    $name = "{$el->value}";
+
+                    if ($file->isDirectory()) {
+                        $formsItem->insert($i, $item);
+                        $added = true;
+                        break;
+                    }
+
+                    if (Str::compare($file->getName(), $name) < 0) {
+                        $formsItem->insert($i, $item);
+                        $added = true;
+                        break;
+                    }
+                }
+
+                if (!$added) $formsItem->add($item);
+            } else {
+                $formsItem->add($item);
+            }
+
+            if ($file->isDirectory()) {
+                $this->updateDirectory($item, $file, false);
+            }
+        }
+
+        $formsItem->getOrigin()->update();
+
+        if ($saveSelected) {
+            UXApplication::runLater(function () use ($selected, $focused) {
+                $this->tree->selectedItems = $selected;
+                $this->tree->focusedItem = $focused;
+            });
+        }
     }
 
     protected function doClick(UXMouseEvent $e)
@@ -256,13 +395,13 @@ class ProjectTree
      *
      * @return ProjectTreeItem
      */
-    public function getOrCreateItem($code, $title, $icon = null)
+    public function getOrCreateItem($code, $title, $icon = null, $file = null)
     {
         if ($item = $this->treeProjectItems[$code]) {
             return $item;
         }
 
-        $item = new ProjectTreeItem($title);
+        $item = new ProjectTreeItem($title, $file);
         $item->getOrigin()->graphic = Ide::get()->getImage($icon);
         $this->treeProjectItem->add($item);
 

@@ -8,6 +8,7 @@ use php\gui\UXData;
 use php\gui\UXForm;
 use php\gui\UXLoader;
 use php\gui\UXNode;
+use php\gui\UXNodeWrapper;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
@@ -159,13 +160,16 @@ abstract class AbstractForm extends UXForm
             if ($this->layout) {
                 DataUtils::scan($this->layout, function (UXData $data, UXNode $node = null) {
                     if ($node) {
-                        if ($data->has('enabled')) {
-                            $node->enabled = $data->get('enabled');
+                        $class = get_class($node) . 'Wrapper';
+
+                        if (class_exists($class)) {
+                            $wrapper = new $class($node);
+                        } else {
+                            $wrapper = new UXNodeWrapper($node);
                         }
 
-                        if ($data->has('visible')) {
-                            $node->visible = $data->get('visible');
-                        }
+                        $wrapper->applyData($data);
+                        $data->free();
                     }
                 });
             }

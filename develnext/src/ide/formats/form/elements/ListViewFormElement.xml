@@ -2,5 +2,6 @@
     <properties>
         <property code="fixedCellSize" name="Размер ячейки" editor="integer" />
         <property code="items" name="Список" editor="stringList" />
+        <property code="multipleSelection" name="Множественный выбор" editor="boolean" virtual="1" />
     </properties>
 </element>

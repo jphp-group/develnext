@@ -179,6 +179,10 @@ abstract class UXNode
     {
     }
 
+    public function free()
+    {
+    }
+
     /**
      * @param string|array $name (optional)
      * @param string $value (optional)

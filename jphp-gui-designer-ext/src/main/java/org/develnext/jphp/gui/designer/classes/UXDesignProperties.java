@@ -231,7 +231,7 @@ public class UXDesignProperties extends BaseObject {
 
             setAlignment(Pos.BASELINE_RIGHT);
             setPadding(new Insets(1, 5, 1, 1));
-            setText(item == null ? null :item.toString());
+            setText(item == null ? null : item.toString());
             setTextFill(Color.GRAY.darker());
         }
     }

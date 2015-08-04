@@ -16,7 +16,7 @@ public class UXRegion<T extends Region> extends UXParent<Region> {
         @Property double minWidth();
         @Property double minHeight();
 
-        @Property Insets padding();
+        @Property(hiddenInDebugInfo = true) Insets padding();
     }
 
     public UXRegion(Environment env, T wrappedObject) {
@@ -38,7 +38,7 @@ public class UXRegion<T extends Region> extends UXParent<Region> {
         __wrappedObject = new Region();
     }
 
-    @Getter
+    @Getter(hiddenInDebugInfo = true)
     public double[] getMinSize() {
         return new double[] { getWrappedObject().getMinWidth(), getWrappedObject().getMinHeight() };
     }
@@ -50,7 +50,7 @@ public class UXRegion<T extends Region> extends UXParent<Region> {
         }
     }
 
-    @Getter
+    @Getter(hiddenInDebugInfo = true)
     public double[] getMaxSize() {
         return new double[] { getWrappedObject().getMaxWidth(), getWrappedObject().getMaxHeight() };
     }

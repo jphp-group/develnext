@@ -16,7 +16,7 @@ public class UXParent<T extends Parent> extends UXNode<Parent> {
         void layout();
         void requestLayout();
 
-        @Property ObservableList childrenUnmodifiable();
+        @Property(hiddenInDebugInfo = true) ObservableList childrenUnmodifiable();
     }
 
     public UXParent(Environment env, T wrappedObject) {

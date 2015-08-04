@@ -44,6 +44,8 @@ class ButtonFormElement extends AbstractFormElement
     public function createElement()
     {
         $button = new UXButton($this->getName());
+        $button->textAlignment = 'CENTER';
+        $button->alignment = 'CENTER';
         return $button;
     }
 

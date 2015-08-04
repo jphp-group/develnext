@@ -2,6 +2,7 @@
 namespace ide\editors\menu;
 
 use ide\editors\AbstractEditor;
+use ide\misc\AbstractCommand;
 use php\gui\UXContextMenu;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
@@ -43,6 +44,11 @@ class ContextMenu
         }
     }
 
+    public function clear()
+    {
+        $this->root->items->clear();
+    }
+
     public function addSeparator($group = null)
     {
         $menu = $this->root;
@@ -64,6 +70,18 @@ class ContextMenu
         $this->root->items->add($menuItem);
 
         $this->groups[$code] = $menuItem;
+    }
+
+    public function addCommand(AbstractCommand $command)
+    {
+        $menuItem = new UXMenuItem($command->getName(), Ide::get()->getImage($command->getIcon()));
+        $menuItem->accelerator = $command->getAccelerator();
+
+        $menuItem->on('action', function ($e) use ($command) {
+            $command->onExecute();
+        });
+
+        $this->root->items->add($menuItem);
     }
 
     public function add(AbstractMenuCommand $command, $group = null)

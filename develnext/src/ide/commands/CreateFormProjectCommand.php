@@ -17,7 +17,7 @@ class CreateFormProjectCommand extends AbstractCommand
 {
     public function getName()
     {
-        return 'Создать форму';
+        return 'Новая форма';
     }
 
     public function getIcon()

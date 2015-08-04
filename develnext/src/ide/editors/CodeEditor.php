@@ -2,6 +2,7 @@
 namespace ide\editors;
 
 use ide\misc\AbstractCommand;
+use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\utils\UiUtils;
 use php\format\JsonProcessor;
@@ -404,7 +405,7 @@ CONTENT;
     public function load()
     {
         try {
-            $content = Stream::getContents($this->file);
+            $content = FileUtils::get($this->file);
         } catch (IOException $e) {
             $content = '';
         }
@@ -415,7 +416,7 @@ CONTENT;
     public function save()
     {
         $value = $this->getValue();
-        Stream::putContents($this->file, $value);
+        FileUtils::put($this->file, $value);
     }
 
     /**

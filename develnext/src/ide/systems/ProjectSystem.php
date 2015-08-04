@@ -53,11 +53,11 @@ class ProjectSystem
         $file = File::of($fileName);
 
         $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
+        Ide::get()->setOpenedProject($project);
+
         $project->load();
         $project->recover();
         $project->open();
-
-        Ide::get()->setOpenedProject($project);
     }
 
     /**

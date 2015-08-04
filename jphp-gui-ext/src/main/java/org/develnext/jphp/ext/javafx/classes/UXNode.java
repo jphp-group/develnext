@@ -10,8 +10,10 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.DepthTest;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.StyleManager;
@@ -37,13 +39,13 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     interface WrappedInterface {
         @Property double baselineOffset();
         @Property BlendMode blendMode();
-        @Property @Nullable Node clip();
-        @Property Orientation contentBias();
-        @Property DepthTest depthTest();
+        @Property(hiddenInDebugInfo = true) @Nullable Node clip();
+        @Property(hiddenInDebugInfo = true) Orientation contentBias();
+        @Property(hiddenInDebugInfo = true) DepthTest depthTest();
         @Property String id();
         @Property("x") double layoutX();
         @Property("y") double layoutY();
-        @Property double opacity();
+        @Property(hiddenInDebugInfo = true) double opacity();
 
         @Property double rotate();
 
@@ -72,7 +74,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
         @Property("classes") ObservableList<String> styleClass();
 
-        @Property @Nullable Object userData();
+        @Property(hiddenInDebugInfo = true) @Nullable Object userData();
 
         void autosize();
         boolean contains(double localX, double localY);
@@ -151,7 +153,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         getWrappedObject().setLayoutY(pt.getY());
     }
 
-    @Getter
+    @Getter(hiddenInDebugInfo = true)
     public String getClassesString() {
         StringBuilder sb = new StringBuilder();
 
@@ -180,7 +182,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         getWrappedObject().setDisable(!value);
     }
 
-    @Getter
+    @Getter(hiddenInDebugInfo = true)
     protected double[] getPosition() {
         return new double[] { getWrappedObject().getLayoutX(), getWrappedObject().getLayoutY() };
     }
@@ -193,7 +195,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         }
     }
 
-    @Getter
+    @Getter(hiddenInDebugInfo = true)
     protected double[] getSize() {
         Bounds bounds = getWrappedObject().getLayoutBounds();
         return new double[] { bounds.getWidth(), bounds.getHeight() };
@@ -313,12 +315,12 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         return r.toConstant();
     }
 
-    @Getter
+    @Getter(hiddenInDebugInfo = true)
     protected Memory getParent(Environment env) {
         return Memory.wrap(env, getWrappedObject().getParent());
     }
 
-    @Getter
+    @Getter(hiddenInDebugInfo = true)
     protected UXScene getScene(Environment env) {
         if (getWrappedObject().getScene() == null) {
             return null;
@@ -409,5 +411,21 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         } else {
             throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
         }
+    }
+
+    @Signature
+    public boolean free() {
+        Parent parent = getWrappedObject().getParent();
+
+        if (parent instanceof Pane) {
+            return ((Pane) parent).getChildren().remove(getWrappedObject());
+        }
+
+        return false;
+    }
+
+    @Override
+    public int getPointer() {
+        return getWrappedObject().hashCode();
     }
 }

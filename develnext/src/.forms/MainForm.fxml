@@ -9,11 +9,11 @@
    <children>
       <MenuBar id="mainMenu" prefHeight="25.0" prefWidth="900.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
-          <Menu id="menuProject" mnemonicParsing="false" text="Проект" />
-          <Menu id="menuAccount" mnemonicParsing="false" text="Аккаунт" />
+            <Menu id="menuProject" mnemonicParsing="false" text="Проект" />
+            <Menu id="menuAccount" mnemonicParsing="false" text="Аккаунт" />
             <Menu id="menuRun" mnemonicParsing="false" text="Запуск" />
-          <Menu id="menuHelp" mnemonicParsing="false" text="Помощь" />
-            <Menu id="menuCreate" disable="true" mnemonicParsing="false" text="Создать" />
+            <Menu id="menuHelp" mnemonicParsing="false" text="Помощь" />
+            <Menu id="menuCreate" disable="true" mnemonicParsing="false" text="Создать" style="-fx-text-fill: transparent; -fx-pref-width: 0; -fx-font-size: 0; -fx-text-overrun: '';" />
         </menus>
          <opaqueInsets>
             <Insets />

@@ -187,7 +187,7 @@ class GradleBuildConfig
         }
 
         try {
-            Stream::putContents($this->documentFile, $this->processor->format($this->document));
+            FileUtils::put($this->documentFile, $this->processor->format($this->document));
             $stream = Stream::of($this->file, 'w+');
 
             $this->writePlugins($stream);

@@ -6,7 +6,9 @@ use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
 use ide\commands\BuildProjectCommand;
 use ide\commands\CreateFormProjectCommand;
+use ide\commands\CreateScriptModuleProjectCommand;
 use ide\commands\ExecuteProjectCommand;
+use ide\formats\ScriptFormat;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
 use ide\formats\templates\GuiBootstrapFileTemplate;
 use ide\formats\templates\GuiFormFileTemplate;
@@ -17,6 +19,8 @@ use ide\project\Project;
 use ide\project\ProjectFile;
 use ide\project\ProjectTree;
 use ide\project\ProjectTreeItem;
+use ide\scripts\elements\TimerScriptComponent;
+use ide\scripts\ScriptComponentManager;
 use ide\systems\FileSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
@@ -34,9 +38,15 @@ use php\util\Regex;
 class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 {
     const FORMS_DIRECTORY = 'src/.forms';
+    const SCRIPTS_DIRECTORY = 'src/.scripts';
 
     /** @var string */
     protected $mainForm = 'MainForm';
+
+    /**
+     * @var ScriptComponentManager
+     */
+    protected $scriptComponentManager;
 
     /**
      * ...
@@ -59,6 +69,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         Ide::get()->registerCommand($buildProjectCommand);
         Ide::get()->registerCommand(new ExecuteProjectCommand());
         Ide::get()->registerCommand(new CreateFormProjectCommand());
+        Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
+
+        $this->scriptComponentManager = new ScriptComponentManager();
+        $this->scriptComponentManager->register(new TimerScriptComponent());
     }
 
     public function getMainForm()
@@ -72,10 +86,45 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         FileSystem::open($mainForm);
     }
 
-    public function doCompile($environment) {
+    public function doCompile($environment, callable $log = null) {
+        /** @var GradleProjectBehaviour $gradleBehavior */
+        $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
+
+        $buildConfig = $gradleBehavior->getConfig();
+
+        $buildConfig->addRepository('jcenter');
+        $buildConfig->addRepository('mavenCentral');
+        $buildConfig->addRepository('local', new File("lib/"));
+
+        $buildConfig->setDependency('asm-all');
+        $buildConfig->setDependency('jphp-runtime');
+        $buildConfig->setDependency('jphp-core');
+        $buildConfig->setDependency('gson');
+        $buildConfig->setDependency('jphp-json-ext');
+        $buildConfig->setDependency('jphp-gui-ext');
+        $buildConfig->setDependency('jphp-gui-framework');
+        $buildConfig->setDependency('develnext-stdlib');
+
+        foreach ($this->scriptComponentManager->getComponents() as $component) {
+            $component->getType()->adaptForGradleBuild($buildConfig);
+        }
+
+        $buildConfig->save();
+
+        if ($log) {
+            $log(':dn-synchronize-dependencies');
+        }
+
         $this->synchronizeDependencies();
 
+        $this->updateScriptManager();
+        $this->scriptComponentManager->save($this->project->getFile('src/.system/scripts.json'));
+
         if ($environment == Project::ENV_DEV) {
+            if ($log) {
+                $log(':dn-synchronize-debug-files');
+            }
+
             $this->synchronizeDebugFiles();
         }
     }
@@ -90,6 +139,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                 case 'ENTRY_DELETE':
                     if (Str::startsWith($path, self::FORMS_DIRECTORY)) {
                         $this->updateFormsInTree();
+                    } else if (Str::startsWith($path, self::SCRIPTS_DIRECTORY)) {
+                        $this->updateScriptsInTree();
+                        $this->updateScriptManager();
                     }
 
                     break;
@@ -101,16 +153,27 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     {
         $tree = $this->project->getTree();
 
-        $formsItem = $tree->getOrCreateItem('forms', 'Формы', 'icons/forms16.png');
+        $formsItem = $tree->getOrCreateItem('forms', 'Формы', 'icons/forms16.png', $this->project->getFile(self::FORMS_DIRECTORY));
         $formsItem->setExpanded(true);
+        $formsItem->setDisableDelete(true);
 
         $formsItem->onUpdate(function () {
             $this->updateFormsInTree();
         });
 
         WatcherSystem::addPathRecursive($this->project->getFile(self::FORMS_DIRECTORY));
-
         $tree->addIgnoreRule('^src\\/\\.forms\\/.*\\.conf$');
+        $tree->addIgnoreRule('^src\\/\\.scripts\\/.*\\.json');
+
+        $projectTreeItem = $tree->getOrCreateItem(
+            'scripts', 'Модули', 'icons/brickFolder16.png', $this->project->getFile(self::SCRIPTS_DIRECTORY)
+        );
+        $projectTreeItem->setDisableDelete(true);
+
+        $projectTreeItem->onUpdate(function () {
+            $this->updateScriptsInTree();
+        });
+        WatcherSystem::addPathRecursive($this->project->getFile(self::SCRIPTS_DIRECTORY));
 
         /** @var GradleProjectBehaviour $gradleBehavior */
         $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
@@ -121,17 +184,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $buildConfig->setDefine('mainClassName', '"php.runtime.launcher.Launcher"');
         $buildConfig->setSourceSet('main.resources.srcDirs', 'src');
 
-        $buildConfig->addRepository('jcenter');
-        $buildConfig->addRepository('mavenCentral');
-        $buildConfig->addRepository('local', new File("lib/"));
-
-        $buildConfig->setDependency('asm-all');
-        $buildConfig->setDependency('jphp-runtime');
-        $buildConfig->setDependency('jphp-core');
-        $buildConfig->setDependency('jphp-gui-ext');
-        $buildConfig->setDependency('jphp-gui-framework');
-
         $buildConfig->setDefine('jar.archiveName', '"dn-compiled-module.jar"');
+
+        $this->updateScriptManager();
     }
 
     public function doUpdateTree(ProjectTree $tree, $path)
@@ -156,6 +211,19 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree = $this->project->getTree();
 
         $tree->updateDirectory('forms', $this->project->getFile(self::FORMS_DIRECTORY));
+    }
+
+    public function updateScriptManager()
+    {
+        $this->scriptComponentManager->removeAll();
+        $this->scriptComponentManager->updateByPath($this->project->getFile(self::SCRIPTS_DIRECTORY));
+    }
+
+    public function updateScriptsInTree()
+    {
+        $tree = $this->project->getTree();
+
+        $tree->updateDirectory('scripts', $this->project->getFile(self::SCRIPTS_DIRECTORY));
     }
 
     public function recoveryForm($filename)
@@ -244,6 +312,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->makeDirectory('src/.data/img');
         $this->project->makeDirectory('src/.forms');
         $this->project->makeDirectory('src/.system');
+        $this->project->makeDirectory('src/.scripts');
+        $this->project->makeDirectory('src/.scripts/~Default');
         $this->project->makeDirectory('src/JPHP-INF');
 
         $this->project->makeDirectory('src/app');
@@ -296,6 +366,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                 FileUtils::copyFile($file, $this->project->getFile('src/.debug/' . $name));
             });
         }
+    }
+
+    /**
+     * @return ScriptComponentManager
+     */
+    public function getScriptComponentManager()
+    {
+        return $this->scriptComponentManager;
     }
 
     private function findLibFile($name)
