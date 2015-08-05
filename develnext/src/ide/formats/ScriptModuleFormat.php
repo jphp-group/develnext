@@ -3,6 +3,7 @@ namespace ide\formats;
 
 use Files;
 use ide\editors\AbstractEditor;
+use ide\editors\ScriptModuleEditor;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use php\io\File;
@@ -25,7 +26,7 @@ class ScriptModuleFormat extends AbstractFormat
      */
     public function createEditor($file)
     {
-        // TODO: Implement createEditor() method.
+        return new ScriptModuleEditor($file);
     }
 
     public function getIcon()
@@ -59,7 +60,9 @@ class ScriptModuleFormat extends AbstractFormat
 
         if ($project) {
             $path = $project->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY);
-            return Str::startsWith(File::of($file)->getPath(), $path->getPath()) && Files::isDir($path);
+            return Str::startsWith(File::of($file)->getPath(), $path->getPath())
+                && Files::isDir($path)
+                && File::of($file)->getPath() != $path->getPath();
         }
 
         return false;

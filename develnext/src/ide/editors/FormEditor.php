@@ -60,12 +60,13 @@ use php\util\Flow;
  *
  * @property AbstractFormFormat $format
  */
-class FormEditor extends AbstractEditor
+class FormEditor extends AbstractModuleEditor
 {
     const BORDER_SIZE = 8;
+
     protected $designerCodeEditor;
 
-    /** @var  UXSplitPane */
+    /** @var UXSplitPane */
     protected $viewerAndEvents;
 
     /** @var UXTab */
@@ -591,7 +592,7 @@ class FormEditor extends AbstractEditor
             $properties->update();
         }
 
-        $eventTab = $tabs->tabs[1];
+        $eventTab = $tabs ? $tabs->tabs[1] : null;
 
         if (!$selected && $eventTab && $eventTab->content) {
             $list = $eventTab->content->lookup('#list');
@@ -605,7 +606,9 @@ class FormEditor extends AbstractEditor
             }
         }
 
-        $eventTab->content = $this->makeEventTypePane($node, $element, $selected);
+        if ($eventTab) {
+            $eventTab->content = $this->makeEventTypePane($node, $element, $selected);
+        }
     }
 
     protected function updateProperties($node)

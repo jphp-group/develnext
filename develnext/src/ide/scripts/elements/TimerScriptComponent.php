@@ -17,4 +17,9 @@ class TimerScriptComponent extends AbstractScriptComponent
     {
         return TimerScript::class;
     }
+
+    public function getDescription()
+    {
+        return 'Таймер - код, который выполнится через определенное время или будет выполнятся каждые промежутки времени';
+    }
 }

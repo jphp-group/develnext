@@ -74,6 +74,8 @@ abstract class AbstractScriptComponent
         return null;
     }
 
+    abstract  public function getDescription();
+
     /**
      * @return array
      */
