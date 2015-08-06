@@ -1,7 +1,10 @@
 <?php
 namespace ide\editors\form;
+use ide\editors\menu\ContextMenu;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
+use ide\scripts\AbstractScriptComponent;
+use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXVBox;
 use php\gui\text\UXFont;
 use php\gui\UXButton;
@@ -42,11 +45,25 @@ class FormElementTypePane
     protected $unselectedButton;
 
     /**
-     * @param AbstractFormElement[] $elements
+     * @var UXButton[]
      */
-    public function __construct(array $elements)
+    protected $buttons = [];
+
+    protected $selectable;
+
+    /**
+     * @var mixed
+     */
+    protected $selected = null;
+
+    /**
+     * @param AbstractFormElement[]|AbstractScriptComponent[] $elements
+     * @param bool $selectable
+     */
+    public function __construct(array $elements, $selectable = true)
     {
         $this->toggleGroup = new UXToggleGroup();
+        $this->selectable = $selectable;
 
         $this->layout = new UXVBox();
         $this->layout->maxWidth = 250;
@@ -80,10 +97,14 @@ class FormElementTypePane
     }
 
     /**
-     * @return AbstractFormElement
+     * @return AbstractFormElement|AbstractScriptComponent
      */
     public function getSelected()
     {
+        if ($this->selected) {
+            return $this->selected;
+        }
+
         $selected = $this->toggleGroup->selected;
 
         if ($selected) {
@@ -96,28 +117,32 @@ class FormElementTypePane
     public function clearSelected()
     {
         $this->toggleGroup->selected = $this->unselectedButton;
+        $this->selected = null;
     }
 
     protected function createHeaderUi()
     {
-        $vbox = new UXVBox();
-        $vbox->spacing = 2;
-        $vbox->padding = 5;
+        if ($this->selectable) {
+            $vbox = new UXVBox();
+            $vbox->spacing = 2;
+            $vbox->padding = 5;
 
-        $button = new UXToggleButton('Курсор');
-        $button->toggleGroup = $this->toggleGroup;
-        $button->graphic = Ide::get()->getImage('icons/cursor16.png');
-        $button->height = 23;
-        $button->maxWidth = 10000;
-        $button->style = '-fx-cursor: hand; -fx-font-weight: bold;';
-        $button->alignment = 'BASELINE_LEFT';
-        $button->selected = true;
+            $button = new UXToggleButton('Курсор');
 
-        $this->unselectedButton = $button;
+            $button->toggleGroup = $this->toggleGroup;
+            $button->graphic = Ide::get()->getImage('icons/cursor16.png');
+            $button->height = 23;
+            $button->maxWidth = 10000;
+            $button->style = '-fx-cursor: hand; -fx-font-weight: bold;';
+            $button->alignment = 'BASELINE_LEFT';
+            $button->selected = true;
 
-        $vbox->add($button);
+            $this->unselectedButton = $button;
 
-        $this->layout->add($vbox);
+            $vbox->add($button);
+
+            $this->layout->add($vbox);
+        }
     }
 
     protected function createGroupUi($group, $elements)
@@ -128,11 +153,14 @@ class FormElementTypePane
 
         /** @var AbstractFormElement $element */
         foreach ($elements as $element) {
-            $button = new UXToggleButton($element->getName());
-            $button->toggleGroup = $this->toggleGroup;
+            $button = $this->selectable ? new UXToggleButton($element->getName()) : new UXButton($element->getName());
+
+            if ($this->selectable) {
+                $button->toggleGroup = $this->toggleGroup;
+            }
+
             $button->height = 23;
             $button->maxWidth = 10000;
-            $button->style = '-fx-cursor: hand;';
             $button->alignment = 'BASELINE_LEFT';
 
             $button->userData = $element;
@@ -145,6 +173,7 @@ class FormElementTypePane
             $button->tooltip = $tooltip;
 
             $vbox->add($button);
+            $this->buttons[] = $button;
         }
 
         $pane = new UXTitledPane($group, $vbox);
@@ -152,5 +181,18 @@ class FormElementTypePane
         $pane->padding = [1, 3];
 
         $this->layout->add($pane);
+    }
+
+    public function setContextMenu(ContextMenu $contextMenu)
+    {
+        foreach ($this->buttons as $button) {
+            $button->on('click', function (UXMouseEvent $e) use ($contextMenu, $button) {
+                $target = $button;
+                $this->selected = $button->userData;
+                $contextMenu->getRoot()->show(Ide::get()->getMainForm(), $target->screenX, $target->screenY + $target->height);
+            });
+        }
+
+        $contextMenu->getRoot()->on('hide', function () { $this->clearSelected(); });
     }
 }

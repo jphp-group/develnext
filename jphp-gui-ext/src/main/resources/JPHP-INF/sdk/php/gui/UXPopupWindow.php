@@ -30,6 +30,13 @@ class UXPopupWindow extends UXWindow
     public function show(UXWindow $window, $screenX, $screenY) {}
 
     /**
+     * @param UXNode $node
+     * @param double $offsetX (optional)
+     * @param double $offsetY (optional)
+     */
+    public function showByNode(UXNode $node, $offsetX, $offsetY) {}
+
+    /**
      * ...
      */
     public function hide() {}

@@ -443,9 +443,6 @@ class FormEditor extends AbstractModuleEditor
 
         $area->add($designPane);
 
-        $elementPane = new UXScrollPane();
-        $elementPane->maxWidth = 250;
-
         $this->elementTypePane = new FormElementTypePane($this->format->getFormElements());
 
         $designerCodeEditor = new UXAnchorPane();
@@ -486,7 +483,7 @@ class FormEditor extends AbstractModuleEditor
                 $id = Str::format($selected->getIdPattern(), "");
 
                 if ($this->layout->lookup("#$id")) {
-                    $id = Str::format($selected->getIdPattern(), "Second");
+                    $id = Str::format($selected->getIdPattern(), "Alt");
 
                     if ($this->layout->lookup("#$id")) {
                         do {

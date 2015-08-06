@@ -6,6 +6,8 @@ use ide\editors\AbstractEditor;
 use ide\editors\ScriptModuleEditor;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\scripts\AbstractScriptComponent;
+use ide\scripts\elements\TimerScriptComponent;
 use php\io\File;
 use php\lib\Str;
 
@@ -13,11 +15,19 @@ use php\lib\Str;
  * Class ScriptModuleFormat
  * @package ide\formats
  */
-class ScriptModuleFormat extends AbstractFormat
+class ScriptModuleFormat extends AbstractFormFormat
 {
     static protected $systemModules = [
         '~Default' => 'Главный модуль'
     ];
+
+    /**
+     * ScriptModuleFormat constructor.
+     */
+    public function __construct()
+    {
+        $this->register(new TimerScriptComponent());
+    }
 
     /**
      * @param $file
@@ -66,15 +76,5 @@ class ScriptModuleFormat extends AbstractFormat
         }
 
         return false;
-    }
-
-    /**
-     * @param $any
-     *
-     * @return mixed
-     */
-    public function register($any)
-    {
-
     }
 }

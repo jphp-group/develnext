@@ -72,7 +72,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
 
         $this->scriptComponentManager = new ScriptComponentManager();
-        $this->scriptComponentManager->register(new TimerScriptComponent());
     }
 
     public function getMainForm()

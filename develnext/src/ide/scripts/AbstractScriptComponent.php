@@ -4,26 +4,14 @@ use ide\formats\form\AbstractFormElement;
 use ide\formats\form\FormElementConfig;
 use ide\misc\GradleBuildConfig;
 use php\gui\designer\UXDesignProperties;
+use php\gui\UXNode;
 
 /**
  * Class AbstractScriptComponent
  * @package ide\scripts
  */
-abstract class AbstractScriptComponent
+abstract class AbstractScriptComponent extends AbstractFormElement
 {
-    /**
-     * @var FormElementConfig
-     */
-    protected $config;
-
-    /**
-     * AbstractScriptComponent constructor.
-     */
-    public function __construct()
-    {
-        $this->config = FormElementConfig::of(get_class($this));
-    }
-
     /**
      * @return string
      */
@@ -57,15 +45,6 @@ abstract class AbstractScriptComponent
         }
     }
 
-
-    /**
-     * @param UXDesignProperties $properties
-     */
-    public function createProperties(UXDesignProperties $properties)
-    {
-        $this->applyProperties($properties);
-    }
-
     /**
      * @return null|string|UXImage
      */
@@ -74,23 +53,18 @@ abstract class AbstractScriptComponent
         return null;
     }
 
-    abstract  public function getDescription();
+    abstract public function getDescription();
+
+    public function getPlaceholder(ScriptComponentContainer $container)
+    {
+        return $this->getDescription();
+    }
 
     /**
-     * @return array
+     * @return UXNode
      */
-    public function getInitProperties()
+    public function createElement()
     {
-        return $this->config ? $this->config->getInitProperties() : [];
-    }
-
-    public function getEventTypes()
-    {
-        return $this->config ? $this->config->getEventTypes() : [];
-    }
-
-    public function getGroup()
-    {
-        return 'Главное';
+        // TODO: Implement createElement() method.
     }
 }

@@ -19,11 +19,6 @@ use php\xml\XmlProcessor;
 class ScriptComponentManager
 {
     /**
-     * @var AbstractScriptComponent[]
-     */
-    protected $types = [];
-
-    /**
      * @var ScriptComponentContainer[]
      */
     protected $components = [];
@@ -38,9 +33,9 @@ class ScriptComponentManager
         foreach ($this->components as $component) {
             if ($component->getConfigPath() && File::of($component->getConfigPath())->exists()) {
                 $scripts[] = [
-                    'id'         => $component->id,
-                    'type'       => get_class($component->getType()),
-                    'file'       => FileUtils::relativePath(File::of($path)->getParent(), $component->getConfigPath()),
+                    'id' => $component->id,
+                    'type' => get_class($component->getType()),
+                    'file' => FileUtils::relativePath(File::of($path)->getParent(), $component->getConfigPath()),
                     'properties' => $component->getProperties(),
                 ];
             }
@@ -49,6 +44,17 @@ class ScriptComponentManager
         Json::toFile($path, [
             'scripts' => $scripts,
         ]);
+    }
+
+    public function saveContainer(ScriptComponentContainer $container)
+    {
+        Json::toFile(
+            $container->getConfigPath(),
+            [
+                'type' => get_class($container->getType()),
+                'properties' => (array)$container->getProperties(),
+            ]
+        );
     }
 
     /**
@@ -75,14 +81,6 @@ class ScriptComponentManager
         unset($this->components[$container->id]);
     }
 
-    /**
-     * @return AbstractScriptComponent[]
-     */
-    public function getTypes()
-    {
-        return $this->types;
-    }
-
     public function removeAll()
     {
         $this->components = [];
@@ -95,12 +93,12 @@ class ScriptComponentManager
                 try {
                     $data = Json::fromFile($filename);
 
-                    $id = $data['id'];
+                    $id = FileUtils::stripExtension(File::of($filename)->getName());
                     $type = $data['type'];
-                    $file = $data['file'];
 
-                    if ($id && $type && $file) {
+                    if ($id && $type) {
                         $component = new ScriptComponentContainer(new $type, $id);
+                        $component->setConfigPath($filename);
 
                         if (is_array($data['properties'])) {
                             foreach ($data['properties'] as $key => $value) {
@@ -108,9 +106,7 @@ class ScriptComponentManager
                             }
                         }
 
-                        if ($this->isRegistered($component->getType())) {
-                            $this->add($component);
-                        }
+                        $this->add($component);
                     }
 
                 } catch (ProcessorException $e) {
@@ -120,23 +116,5 @@ class ScriptComponentManager
                 }
             }
         });
-    }
-
-    /**
-     * @param AbstractScriptComponent $scriptComponent
-     */
-    public function register(AbstractScriptComponent $scriptComponent)
-    {
-        $this->components[get_class($scriptComponent)] = $scriptComponent;
-    }
-
-    /**
-     * @param AbstractScriptComponent $scriptComponent
-     *
-     * @return bool
-     */
-    public function isRegistered(AbstractScriptComponent $scriptComponent)
-    {
-        return isset($this->components[get_class($scriptComponent)]);
     }
 }
