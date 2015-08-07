@@ -64,7 +64,7 @@ public class UXControl<T extends Control> extends UXRegion<Control> {
 
     @Signature
     @Override
-    protected void setSize(double[] size) {
+    public void setSize(double[] size) {
         if (size.length >= 2) {
             getWrappedObject().setPrefSize(size[0], size[1]);
         }

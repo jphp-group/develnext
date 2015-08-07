@@ -411,21 +411,24 @@ class FormEditor extends AbstractModuleEditor
         return $this->codeEditor->makeUi();
     }
 
-    protected function makeDesigner()
+    protected function makeDesigner($fullArea = false)
     {
         $area = new UXAnchorPane();
 
         $viewer = new UXScrollPane($area);
 
-        $designPane = new UXDesignPane();
-        $designPane->size = $this->layout->size;
-        $designPane->position = [10, 10];
-        $designPane->add($this->layout);
+        if (!$fullArea) {
+            $designPane = new UXDesignPane();
+            $designPane->size = $this->layout->size;
+            $designPane->position = [10, 10];
+            $designPane->add($this->layout);
 
-        UXAnchorPane::setTopAnchor($this->layout, 0);
-        UXAnchorPane::setLeftAnchor($this->layout, 0);
-        UXAnchorPane::setBottomAnchor($this->layout, 0);
-        UXAnchorPane::setRightAnchor($this->layout, 0);
+            UXAnchorPane::setAnchor($this->layout, 0);
+        } else {
+            $this->layout->style = '-fx-border-width: 1px; -fx-border-style: dashed; -fx-border-color: silver;';
+            $this->layout->position = [10, 10];
+            $area->add($this->layout);
+        }
 
         $this->designer = new UXDesigner($this->layout);
         $this->designer->onAreaMouseDown([$this, '_onAreaMouseDown']);
@@ -441,7 +444,9 @@ class FormEditor extends AbstractModuleEditor
             $this->designer->registerNode($node);
         }
 
-        $area->add($designPane);
+        if (!$fullArea) {
+            $area->add($designPane);
+        }
 
         $this->elementTypePane = new FormElementTypePane($this->format->getFormElements());
 

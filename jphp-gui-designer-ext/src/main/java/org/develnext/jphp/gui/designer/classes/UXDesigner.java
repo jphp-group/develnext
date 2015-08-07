@@ -78,7 +78,7 @@ public class UXDesigner extends BaseObject {
             area.getChildren().removeAll(dots);
         }
 
-        if (helpersEnabled) {
+        if (snapSize > 2) {
             dots = new Canvas(area.getWidth(), area.getHeight());
             dots.setMouseTransparent(true);
 
@@ -796,7 +796,7 @@ public class UXDesigner extends BaseObject {
 
             sizeText.setVisible(resizing);
 
-            if (resizing) {
+            if (resizing && helpersEnabled) {
                 sizeText.setText("W: " + (int) bounds.getWidth() + ", H: " + (int) bounds.getHeight());
             }
         }
@@ -1032,7 +1032,7 @@ public class UXDesigner extends BaseObject {
         public void drag(double x, double y) {
             dragImageView.relocate(x, y);
 
-            sizeText.setVisible(dragged);
+            sizeText.setVisible(dragged && helpersEnabled);
 
             if (dragged) {
                 sizeText.setText("X: " + (int) x + ", Y: " + (int) y);

@@ -52,6 +52,8 @@ class ScriptComponentManager
             $container->getConfigPath(),
             [
                 'type' => get_class($container->getType()),
+                'x' => $container->getX(),
+                'y' => $container->getY(),
                 'properties' => (array)$container->getProperties(),
             ]
         );
@@ -96,9 +98,14 @@ class ScriptComponentManager
                     $id = FileUtils::stripExtension(File::of($filename)->getName());
                     $type = $data['type'];
 
+                    $x = (int) $data['x'];
+                    $y = (int) $data['y'];
+
                     if ($id && $type) {
                         $component = new ScriptComponentContainer(new $type, $id);
                         $component->setConfigPath($filename);
+                        $component->setX($x);
+                        $component->setY($y);
 
                         if (is_array($data['properties'])) {
                             foreach ($data['properties'] as $key => $value) {

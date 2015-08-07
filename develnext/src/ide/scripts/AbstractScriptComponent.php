@@ -2,8 +2,12 @@
 namespace ide\scripts;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\FormElementConfig;
+use ide\Ide;
 use ide\misc\GradleBuildConfig;
 use php\gui\designer\UXDesignProperties;
+use php\gui\layout\UXAnchorPane;
+use php\gui\UXApplication;
+use php\gui\UXLabel;
 use php\gui\UXNode;
 
 /**
@@ -65,6 +69,32 @@ abstract class AbstractScriptComponent extends AbstractFormElement
      */
     public function createElement()
     {
-        // TODO: Implement createElement() method.
+        $element = new UXAnchorPane();
+        $element->maxSize = $element->minSize = $element->size = [32, 32];
+
+        $element->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-background-color: silver; -fx-border-radius: 3px;';
+
+        $icon = Ide::get()->getImage($this->getIcon());
+
+        if ($icon) {
+            $icon->mouseTransparent = true;
+            $icon->position = [8, 8];
+            $element->add($icon);
+        }
+
+        $label = new UXLabel($this->getName());
+        $label->padding = [2, 4];
+        $label->position = [0, 32 + 7];
+        $label->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-background-color: white; -fx-border-radius: 3px;';
+
+        $label->watch('text', function () use ($label) {
+            UXApplication::runLater(function () use ($label) {
+                $label->x = - $label->width / 2;
+            });
+        });
+
+        $element->add($label);
+
+        return $element;
     }
 }

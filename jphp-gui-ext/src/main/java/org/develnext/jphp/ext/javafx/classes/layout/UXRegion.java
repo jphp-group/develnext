@@ -50,6 +50,15 @@ public class UXRegion<T extends Region> extends UXParent<Region> {
         }
     }
 
+    @Override
+    @Signature
+    public void setSize(double[] args) {
+        if (args.length >= 2) {
+            getWrappedObject().setPrefWidth(args[0]);
+            getWrappedObject().setPrefHeight(args[1]);
+        }
+    }
+
     @Getter(hiddenInDebugInfo = true)
     public double[] getMaxSize() {
         return new double[] { getWrappedObject().getMaxWidth(), getWrappedObject().getMaxHeight() };

@@ -104,6 +104,11 @@ abstract class UXNode
     public $userData = null;
 
     /**
+     * @var bool
+     */
+    public $mouseTransparent = false;
+
+    /**
      * @var double|null
      */
     public $leftAnchor, $rightAnchor, $topAnchor, $bottomAnchor = null;
