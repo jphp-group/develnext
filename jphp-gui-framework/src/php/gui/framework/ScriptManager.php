@@ -2,6 +2,8 @@
 namespace php\gui\framework;
 use Json;
 use php\format\ProcessorException;
+use php\gui\UXApplication;
+use php\gui\UXDialog;
 use php\io\Stream;
 use php\lib\Str;
 use php\lang\IllegalStateException;
@@ -15,30 +17,56 @@ use php\xml\XmlProcessor;
  */
 class ScriptManager
 {
-    /** @var AbstractScript */
+    /** @var AbstractScript[] */
     protected $scripts = [];
 
-    public function addConfig($path)
+    /**
+     * @param string $path
+     * @param string $baseUri
+     * @return array
+     */
+    public function addFromIndex($path, $baseUri = '')
     {
         $json = Json::fromFile($path);
 
-        if (is_array($json['scripts'])) {
-            foreach ($json['scripts'] as $script) {
-                $type = $script['type'];
-                $id = $script['id'];
-                $file = $script['file'];
-                $handler = $script['handler'];
+        $result = [];
 
-                /** @var AbstractScript $instance */
-                $instance = new $type('res://' . $file);
-
-                if ($handler) {
-                    $instance->loadBinds(new $handler());
-                }
-
-                $this->add($id, $instance);
+        if ($json && $json['scripts']) {
+            foreach ($json['scripts'] as $path) {
+                $result[] = $this->addFromConfig($baseUri . $path);
             }
         }
+
+        return $json;
+    }
+
+    /**
+     * @param string $path to json
+     * @return AbstractScript
+     * @throws \Exception
+     */
+    public function addFromConfig($path)
+    {
+        $json = Json::fromFile($path);
+
+        if ($json) {
+            $id = $json['id'];
+            $type = $json['type'];
+
+            /** @var AbstractScript $script */
+            $script = new $type();
+            $this->add($id, $script);
+
+            foreach ((array) $json['properties'] as $key => $value) {
+                $script->{$key} = $value;
+            }
+
+            $script->{'id'} = $id;
+
+            return $script;
+        }
+
+        throw new IllegalStateException("Unable to load script from $path");
     }
 
     /**
@@ -47,12 +75,20 @@ class ScriptManager
      */
     public function add($name, AbstractScript $script)
     {
-        $this->scripts[Str::lower($name)] = $script;
+        $this->scripts[$name] = $script;
+    }
+
+    /**
+     * @return AbstractScript[]
+     */
+    public function getScripts()
+    {
+        return $this->scripts;
     }
 
     public function __get($name)
     {
-        $script = $this->scripts[Str::lower($name)];
+        $script = $this->scripts[$name];
 
         if (!$script) {
             throw new IllegalStateException("Script '$name' not found");

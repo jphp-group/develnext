@@ -301,7 +301,7 @@ class FormElementConfig
                 $code = $property->getAttribute('code');
                 $name = $property->getAttribute('name');
 
-                $editorFactory = function () use ($property) {
+                $editorFactory = function () use ($property, $code) {
                     if ($property->hasAttribute('editor')) {
                         if ($property->getAttribute('editor') == 'none') {
                             $editor = null;
@@ -325,7 +325,13 @@ class FormElementConfig
                             $editor->setAsFormConfigProperty($property->getAttribute('defaultValue'));
                         }
 
-                        $editor->setTooltip($property->getAttribute('tooltip'));
+                        $tooltip = "[ ->$code ]";
+
+                        if ($property->getAttribute('tooltip')) {
+                            $tooltip .= " {$property->getAttribute('tooltip')}";
+                        }
+
+                        $editor->setTooltip($tooltip);
                     }
 
                     return $editor;

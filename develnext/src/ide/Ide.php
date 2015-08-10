@@ -13,7 +13,9 @@ use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\EnumPropertyEditor;
 use ide\editors\value\FloatPropertyEditor;
 use ide\editors\value\FontPropertyEditor;
+use ide\editors\value\IdPropertyEditor;
 use ide\editors\value\IntegerPropertyEditor;
+use ide\editors\value\ModuleListPropertyEditor;
 use ide\editors\value\PositionPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\StringListPropertyEditor;
@@ -60,7 +62,7 @@ use php\util\Configuration;
  */
 class Ide extends Application
 {
-    const JPHP_VERSION = '0.7.1';
+    const JPHP_VERSION = '0.7.2';
 
     /** @var string */
     private $OS;
@@ -116,49 +118,47 @@ class Ide extends Application
         if (isset($env['DEVELNEXT_MODE'])) {
             $this->mode = $env['DEVELNEXT_MODE'];
         }
-
-        restore_exception_handler();
-
-        set_exception_handler(function (\BaseException $e) {
-            static $showError;
-
-            if (!$showError) {
-                $showError = true;
-
-                $dialog = new UXAlert('ERROR');
-                $dialog->title = 'Ошибка';
-                $dialog->headerText = 'Произошла ошибка в вашей программе';
-                $dialog->contentText = $e->getMessage();
-                $dialog->setButtonTypes(['Остановить', 'Игнорировать']);
-
-                $pane = new UXAnchorPane();
-                $pane->maxWidth = 100000;
-
-                $content = new UXTextArea("Ошибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
-                $content->padding = 10;
-                UXAnchorPane::setAnchor($content, 0);
-
-                $pane->add($content);
-                $dialog->expandableContent = $pane;
-                $dialog->expanded = true;
-
-                switch ($dialog->showAndWait()) {
-                    case 'Остановить':
-                        Ide::get()->shutdown();
-                        break;
-                }
-
-                $showError = false;
-            }
-        });
-
-        restore_exception_handler();
     }
 
     public function launch()
     {
         parent::launch(
             function () {
+                restore_exception_handler();
+
+                set_exception_handler(function (\BaseException $e) {
+                    static $showError;
+
+                    if (!$showError) {
+                        $showError = true;
+
+                        $dialog = new UXAlert('ERROR');
+                        $dialog->title = 'Ошибка';
+                        $dialog->headerText = 'Произошла ошибка в вашей программе';
+                        $dialog->contentText = $e->getMessage();
+                        $dialog->setButtonTypes(['Остановить', 'Игнорировать']);
+
+                        $pane = new UXAnchorPane();
+                        $pane->maxWidth = 100000;
+
+                        $content = new UXTextArea("Ошибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
+                        $content->padding = 10;
+                        UXAnchorPane::setAnchor($content, 0);
+
+                        $pane->add($content);
+                        $dialog->expandableContent = $pane;
+                        $dialog->expanded = true;
+
+                        switch ($dialog->showAndWait()) {
+                            case 'Остановить':
+                                Ide::get()->shutdown();
+                                break;
+                        }
+
+                        $showError = false;
+                    }
+                });
+
                 $this->registerAll();
 
                 $this->splash = $splash = new SplashForm();
@@ -648,6 +648,8 @@ class Ide extends Application
         ElementPropertyEditor::register(new PositionPropertyEditor());
         ElementPropertyEditor::register(new BooleanPropertyEditor());
         ElementPropertyEditor::register(new StringListPropertyEditor());
+        ElementPropertyEditor::register(new ModuleListPropertyEditor());
+        ElementPropertyEditor::register(new IdPropertyEditor());
 
         $this->registerFormat(new WelcomeFormat());
         $this->registerFormat(new PhpCodeFormat());
@@ -702,11 +704,11 @@ class Ide extends Application
     {
         $project = $this->getOpenedProject();
 
+        $this->mainForm->hide();
+
         if ($project) {
             $project->save();
         }
-
-        $this->mainForm->hide();
 
         WatcherSystem::shutdown();
 
@@ -723,7 +725,11 @@ class Ide extends Application
             }
         }
 
-        parent::shutdown();
+        try {
+            parent::shutdown();
+        } catch (\Exception $e) {
+            System::halt(0);
+        }
     }
 
     /**

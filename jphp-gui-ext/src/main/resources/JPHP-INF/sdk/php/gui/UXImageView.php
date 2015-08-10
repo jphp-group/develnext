@@ -21,4 +21,14 @@ class UXImageView extends UXNode
      * @var bool
      */
     public $preserveRatio;
+
+    /**
+     * @var double
+     */
+    public $fitWidth;
+
+    /**
+     * @var double
+     */
+    public $fitHeight;
 }

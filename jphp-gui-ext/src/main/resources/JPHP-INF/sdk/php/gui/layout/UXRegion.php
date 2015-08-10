@@ -33,4 +33,9 @@ class UXRegion extends UXParent
      * @var array|double
      */
     public $padding = [0, 0, 0, 0];
+
+    /**
+     * @var double
+     */
+    public $paddingLeft = 0, $paddingTop = 0, $paddingRight = 0, $paddingBottom = 0;
 }

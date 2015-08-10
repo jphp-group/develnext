@@ -3,6 +3,7 @@ namespace php\gui\framework;
 
 use BaseException;
 use Exception;
+use Json;
 use php\format\JsonProcessor;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;
@@ -38,8 +39,8 @@ class Application
     /** @var AbstractForm[] */
     protected $forms = [];
 
-    /** @var ScriptManager */
-    protected $scripts;
+    /** @var AbstractModule[] */
+    protected $modules = [];
 
     /** @var Configuration */
     protected $config;
@@ -60,37 +61,7 @@ class Application
             throw new Exception("Unable to find the '$configPath' config");
         }
 
-        $this->scripts = new ScriptManager();
-
-        try {
-            $this->scripts->addConfig('res://.system/scripts.json');
-        } catch (IOException $e) {
-            // nop.
-        }
-
-        set_exception_handler(function (BaseException $e) {
-            static $showed = false;
-
-            if ($showed) {
-                return;
-            }
-
-            $showed = true;
-
-            $dialog = new UXAlert('ERROR');
-            $dialog->title = 'Error';
-            $dialog->headerText = 'An error has occurred ...';
-            $dialog->contentText = $e->getMessage();
-            $dialog->setButtonTypes(['Stop', 'Ignore']);
-
-            switch ($dialog->showAndWait()) {
-                case 'Ignore':
-                    Application::get()->shutdown();
-                    break;
-            }
-
-            $showed = false;
-        });
+        $this->loadModules();
     }
 
     /**
@@ -133,8 +104,6 @@ class Application
         return $this->mainForm;
     }
 
-
-
     public function setMainFormClass($class)
     {
         if ($this->getNamespace()) {
@@ -142,6 +111,32 @@ class Application
         }
 
         $this->mainFormClass = $class;
+    }
+
+    public function loadModules()
+    {
+        try {
+            $json = Json::fromFile('res://.system/modules.json');
+
+            if ($json && ($modules = $json['modules'])) {
+                foreach ($modules as $type) {
+                    /** @var AbstractModule $module */
+                    $module = new $type();
+
+                    $this->modules[$module->id] = $module;
+                }
+
+                foreach ($this->modules as $module) {
+                    if ($module->applyToApplication) {
+                        UXApplication::runLater(function () use ($module) {
+                            $module->apply($this);
+                        });
+                    }
+                }
+            }
+        } catch (IOException $e) {
+            ;
+        }
     }
 
     public function loadConfig($configPath)
@@ -153,6 +148,22 @@ class Application
         if ($this->config->has('app.mainForm')) {
             $this->setMainFormClass($this->config->get('app.mainForm'));
         }
+    }
+
+    /**
+     * @param $id
+     * @return AbstractModule
+     * @throws Exception
+     */
+    public function module($id)
+    {
+        $module = $this->modules[$id];
+
+        if (!$module) {
+            throw new Exception("Unable to find '$id' module");
+        }
+
+        return $module;
     }
 
     public function isLaunched()
@@ -171,6 +182,30 @@ class Application
 
         UXApplication::launch(function(UXForm $mainForm) use ($mainFormClass, $showMainForm, $handler, $after) {
             static::$instance = $this;
+
+            set_exception_handler(function (BaseException $e) {
+                static $showed = false;
+
+                if ($showed) {
+                    return;
+                }
+
+                $showed = true;
+
+                $dialog = new UXAlert('ERROR');
+                $dialog->title = 'Error';
+                $dialog->headerText = 'An error has occurred ...';
+                $dialog->contentText = $e->getMessage();
+                $dialog->setButtonTypes(['Stop', 'Ignore']);
+
+                switch ($dialog->showAndWait()) {
+                    case 'Ignore':
+                        Application::get()->shutdown();
+                        break;
+                }
+
+                $showed = false;
+            });
 
             if ($handler) {
                 $handler();

@@ -7,6 +7,8 @@
 
 .icon-run { -fx-graphic: url("/.data/img/icons/run16.png"); }
 
+.icon-plus { -fx-graphic: url("/.data/img/icons/plus16.png"); }
+
 .icon-refresh { -fx-graphic: url("/.data/img/icons/refresh16.png"); }
 .icon-refresh32 { -fx-graphic: url("/.data/img/icons/refresh32.png"); }
 

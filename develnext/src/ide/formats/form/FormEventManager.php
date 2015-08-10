@@ -4,10 +4,12 @@ namespace ide\formats\form;
 use ide\formats\form\event\AbstractEventKind;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
+use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lib\Items;
 use php\lib\Str;
+use php\util\Regex;
 use php\util\Scanner;
 use phpx\parser\SourceToken;
 use phpx\parser\SourceTokenizer;
@@ -121,7 +123,7 @@ class FormEventManager
         $bind = $this->findBind($id, $event);
 
         if ($bind) {
-            $parser = new PhpParser(Stream::getContents($this->file));
+            $parser = new PhpParser(FileUtils::get($this->file));
             $parser->removeLines($bind['eventLine'], $bind['endLine']);
 
             FileUtils::put($this->file, $parser->getContent());
@@ -129,6 +131,36 @@ class FormEventManager
         }
 
         return false;
+    }
+
+    /**
+     * @param string $oldId
+     * @param string $newId
+     */
+    public function renameBind($oldId, $newId)
+    {
+        $parser = new PhpParser(FileUtils::get($this->file));
+
+        $parser->processLines(0, 999999, function ($line) use ($oldId, $newId) {
+            $tmp = Str::trim($line);
+            $tmp = Regex::of('[ ]+?')->with($tmp)->replace(' ');
+
+            if (Str::startsWith($tmp, "* ") && Str::contains($tmp, "@event $oldId.")) {
+                $k = Str::pos($line, '@event ');
+
+                $line = Str::sub($line, 0, $k) . "@event $newId" . Str::sub($line, $k + Str::length("@event $oldId"));
+            } elseif (Str::startsWith($tmp, "function do" . Str::upperFirst($oldId))) {
+                $k = Str::pos($line, "function do");
+
+                $line = Str::sub($line, 0, $k)
+                    . "function do" . Str::upperFirst($newId)
+                    . Str::sub($line, $k + Str::length("function do $oldId") - 1);
+            }
+
+            return $line;
+        });
+
+        FileUtils::put($this->file, $parser->getContent());
     }
 
     /**

@@ -16,59 +16,39 @@ use ReflectionClass;
 abstract class AbstractScript
 {
     /**
-     * @var UXForm
+     * @var mixed
      */
-    protected $context;
+    protected $_context;
+
+    /**
+     * @var string
+     */
+    public $id = null;
+
+    /**
+     * @var bool
+     */
+    public $disabled = false;
 
     /**
      * @var callable[]
      */
     protected $handlers = [];
 
-    /**
-     * AbstractScript constructor.
-     *
-     * @param null|string $path
-     */
-    public function __construct($path = null)
+    public function apply($target)
     {
-        if ($path) {
-            Stream::tryAccess($path, function (Stream $stream) {
-                $processor = new XmlProcessor();
-                $document = $processor->parse($stream);
+        $this->_context = $target;
 
-                $this->loadProperties($document);
-            });
+        if (!$this->disabled) {
+            $this->applyImpl($target);
         }
     }
 
     /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
+     * @param $target
      * @return mixed
      */
-    abstract public function apply();
-
-    /**
-     * @param DomDocument $document
-     */
-    public function loadProperties(DomDocument $document)
-    {
-        /** @var DomElement $property */
-        foreach ($document->findAll('/script/properties/property') as $property) {
-            $code = $property->getAttribute('code');
-
-            if ($code) {
-                $this->{$code} = $property->getTextContent();
-            }
-        }
-    }
+    abstract protected function applyImpl($target);
 
     /**
      * @param string $eventType
@@ -81,43 +61,6 @@ abstract class AbstractScript
         }
     }
 
-    /**
-     * @param $handler class or object
-     *
-     * @throws IllegalStateException
-     */
-    public function loadBinds($handler)
-    {
-        $class = new ReflectionClass($handler);
-        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
-
-        $events = [];
-
-        foreach ($methods as $method) {
-            $comment = $method->getDocComment();
-
-            $scanner = new Scanner($comment);
-
-            while ($scanner->hasNextLine()) {
-                $line = String::trim($scanner->nextLine());
-
-                if (String::startsWith($line, '@event ')) {
-                    $event = String::trim(String::sub($line, 7));
-
-                    if (isset($events[$event])) {
-                        throw new IllegalStateException(
-                            "Unable to bind '$event' for {$method->getName()}(), this event already bound for {$events[$event]}()"
-                        );
-                    }
-
-                    $methodName = $events[$event] = $method->getName();
-
-                    $this->on($event, [$handler, $methodName]);
-                }
-            }
-        }
-    }
-
     public function on($event, callable $handler, $group = 'general')
     {
         $this->handlers[$event][$group] = $handler;
@@ -126,5 +69,14 @@ abstract class AbstractScript
     public function off($event)
     {
         unset($this->handlers[$event]);
+    }
+
+    public function __get($name)
+    {
+        if ($this->_context) {
+            return $this->_context->{$name};
+        }
+
+        return parent::_get($name);
     }
 }

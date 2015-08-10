@@ -20,12 +20,14 @@ use ide\formats\form\elements\ColorPickerFormElement;
 use ide\formats\form\elements\ComboBoxFormElement;
 use ide\formats\form\elements\FormFormElement;
 use ide\formats\form\elements\HyperlinkFormElement;
+use ide\formats\form\elements\ImageViewFormElement;
 use ide\formats\form\elements\LabelFormElement;
 use ide\formats\form\elements\ListViewFormElement;
 use ide\formats\form\elements\PasswordFieldFormElement;
 use ide\formats\form\elements\ProgressBarFormElement;
 use ide\formats\form\elements\ProgressIndicatorFormElement;
 use ide\formats\form\elements\SeparatorFormElement;
+use ide\formats\form\elements\SliderFormElement;
 use ide\formats\form\elements\TextAreaFormElement;
 use ide\formats\form\elements\TextFieldFormElement;
 use ide\formats\form\elements\ToggleButtonFormElement;
@@ -45,6 +47,7 @@ use ide\formats\form\tags\PasswordFieldFormElementTag;
 use ide\formats\form\tags\ProgressBarFormElementTag;
 use ide\formats\form\tags\ProgressIndicatorFormElementTag;
 use ide\formats\form\tags\SeparatorFormElementTag;
+use ide\formats\form\tags\SliderFormElementTag;
 use ide\formats\form\tags\TextAreaFormElementTag;
 use ide\formats\form\tags\TextFieldFormElementTag;
 use ide\formats\form\tags\TextInputControlFormElementTag;
@@ -70,7 +73,9 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new CheckboxFormElement());
         $this->register(new ComboBoxFormElement());
         $this->register(new ListViewFormElement());
+        //$this->register(new ImageViewFormElement());
         $this->register(new ProgressBarFormElement());
+        $this->register(new SliderFormElement());
         $this->register(new ProgressIndicatorFormElement());
         $this->register(new ColorPickerFormElement());
         $this->register(new SeparatorFormElement());
@@ -99,6 +104,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new HyperlinkFormElementTag());
         $this->register(new SeparatorFormElementTag());
         $this->register(new ColorPickerFormElementTag());
+        $this->register(new SliderFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());

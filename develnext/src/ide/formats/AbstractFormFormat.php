@@ -73,6 +73,7 @@ abstract class AbstractFormFormat extends AbstractFormat
     public function getFormElement($any)
     {
         foreach ($this->formElements as $element) {
+
             if ($element->isOrigin($any)) {
                 return $element;
             }

@@ -7,7 +7,7 @@
     <properties group="general" title="Главное" />
 
     <properties group="extra" title="Дополнительно">
-        <property code="id" name="ID" editor="text" tooltip="Уникальный индетификатор элемента в рамках формы" />
+        <property code="id" name="ID" editor="id" tooltip="Уникальный индетификатор элемента в рамках формы" />
         <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />
 
         <property code="visible" name="Видимость" editor="boolean" virtual="1" tooltip="Видимость элемента на форме в момент старта" />

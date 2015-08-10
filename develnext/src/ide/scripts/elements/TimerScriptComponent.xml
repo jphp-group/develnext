@@ -1,4 +1,4 @@
-<element>
+<element extends="ide\scripts\elements\AbstractComponent">
     <init>
         <property code="interval" value="1000" />
         <property code="repeatable" value="1" />
@@ -9,12 +9,7 @@
         <property code="repeatable" name="Повторять" editor="boolean" tooltip="Зацикленный таймер" />
     </properties>
 
-    <properties group="extra" title="Дополнительно">
-        <property code="id" name="ID" editor="text" tooltip="Уникальный индетификатор элемента в рамках всей программы" />
-        <property code="enabled" name="Активность" editor="boolean" />
-    </properties>
-
     <eventTypes>
-        <eventType code="action" name="Действие" kind="ObjectEvent" icon="icons/mouseEx16.png" />
+        <eventType code="action" name="Действие" kind="ObjectEvent" icon="icons/ok16.png" />
     </eventTypes>
 </element>

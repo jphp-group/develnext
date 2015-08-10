@@ -114,6 +114,13 @@ abstract class UXNode
     public $leftAnchor, $rightAnchor, $topAnchor, $bottomAnchor = null;
 
     /**
+     * UXNode constructor.
+     */
+    public function __construct()
+    {
+    }
+
+    /**
      * ...
      */
     public function autosize()

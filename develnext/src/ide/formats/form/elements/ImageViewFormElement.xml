@@ -1,0 +1,7 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="smooth" name="Сглаживание" editor="boolean" />
+        <property code="preserveRatio" name="Пропорциональность" editor="boolean" />
+        <property code="alignment" name="Выравнивание" editor="position" />
+    </properties>
+</element>

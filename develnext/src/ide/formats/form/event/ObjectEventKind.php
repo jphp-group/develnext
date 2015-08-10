@@ -15,7 +15,7 @@ class ObjectEventKind extends AbstractEventKind
     public function getArguments()
     {
         return [
-            ['target']
+            ['script']
         ];
     }
 }

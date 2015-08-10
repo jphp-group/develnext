@@ -13,6 +13,7 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
 use php\lib\Items;
+use php\lib\Str;
 use php\lib\String;
 use php\util\Configuration;
 use php\util\Scanner;
@@ -33,6 +34,9 @@ abstract class AbstractForm extends UXForm
     /** @var Configuration */
     protected $_config;
 
+    /** @var AbstractModule[] */
+    protected $_modules = [];
+
     /**
      * @param UXForm $origin
      * @throws Exception
@@ -42,7 +46,7 @@ abstract class AbstractForm extends UXForm
         parent::__construct($origin);
 
         $this->_app = Application::get();
-        $this->loadConfig();
+        $this->loadConfig(null, false);
 
         $this->loadDesign();
         $this->loadBindings($this);
@@ -75,10 +79,25 @@ abstract class AbstractForm extends UXForm
         }
     }
 
-
     protected function init()
     {
         // nop.
+    }
+
+    /**
+     * @param $id
+     * @return AbstractModule
+     * @throws Exception
+     */
+    protected function module($id)
+    {
+        $module = $this->_modules[$id];
+
+        if (!$module) {
+            throw new Exception("Unable to find '$id' module");
+        }
+
+        return $module;
     }
 
     protected function getResourceName()
@@ -115,7 +134,11 @@ abstract class AbstractForm extends UXForm
             try {
                 $this->modality = $this->_config->get('form.modality');
             } catch (Exception $e) {
-                $this->modality = 'NONE';
+                if ($this->_config->get('form.modality')) {
+                    $this->modality = 'APPLICATION_MODAL';
+                } else {
+                    $this->modality = 'NONE';
+                }
             }
         }
 
@@ -127,9 +150,27 @@ abstract class AbstractForm extends UXForm
                 $this->{$key} = $this->_config->get("form.$key");
             }
         }
+
+        $modules = $this->_config->getArray('modules', []);
+
+        foreach ($modules as $type) {
+            /** @var AbstractModule $module */
+            if (!Str::contains($type, '\\') && $this->_app->getNamespace()) {
+                $type = $this->_app->getNamespace() . "\\modules\\$type";
+            }
+
+            $module = new $type();
+            $this->_modules[$module->id] = $module;
+        }
+
+        foreach ($this->_modules as $module) {
+            UXApplication::runLater(function () use ($module) {
+                $module->apply($this);
+            });
+        }
     }
 
-    protected function loadConfig($path = null)
+    protected function loadConfig($path = null, $applyConfig = true)
     {
         if ($path === null) {
             $path = static::DEFAULT_PATH . $this->getResourceName() . '.conf';
@@ -141,7 +182,7 @@ abstract class AbstractForm extends UXForm
             $this->_config = new Configuration();
         }
 
-        $this->applyConfig();
+        if ($applyConfig) $this->applyConfig();
     }
 
     protected function loadDesign()
@@ -216,12 +257,12 @@ abstract class AbstractForm extends UXForm
 
     public function bind($event, callable $handler, $group = 'general')
     {
-        $parts = String::split($event, '.');
+        $parts = Str::split($event, '.');
 
         $eventName = Items::pop($parts);
 
         if ($parts) {
-            $id = String::join($parts, '.');
+            $id = Str::join($parts, '.');
             $node = $this->{$id};
         } else {
             $node = $this;

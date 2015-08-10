@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="406.0" prefWidth="406.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ListView id="list" layoutX="14.0" layoutY="58.0" prefHeight="286.0" prefWidth="378.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="58.0" />
+      <Button id="saveButton" defaultButton="true" layoutX="14.0" layoutY="420.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="114.0" text="Сохранить" AnchorPane.bottomAnchor="14.0">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+      <Button id="cancelButton" cancelButton="true" layoutX="137.0" layoutY="420.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="114.0" text="Отмена" AnchorPane.bottomAnchor="15.0" />
+      <Button id="createModuleButton" cancelButton="true" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="148.0" styleClass="icon-plus" text="Создать модуль" />
+   </children>
+</AnchorPane>

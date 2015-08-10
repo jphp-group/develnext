@@ -1,6 +1,8 @@
 <?php
 namespace ide\scripts;
 
+use ide\editors\form\FormNamedBlock;
+
 /**
  * Class ScriptComponentContainer
  * @package ide\scripts
@@ -32,6 +34,11 @@ class ScriptComponentContainer
      * @var string
      */
     protected $_configPath;
+
+    /**
+     * @var FormNamedBlock
+     */
+    protected $node;
 
     /**
      * ScriptComponentContainer constructor.
@@ -117,5 +124,18 @@ class ScriptComponentContainer
     public function setY($y)
     {
         $this->y = $y;
+    }
+
+    public function setIdeNode(FormNamedBlock $node)
+    {
+        $this->node = $node;
+    }
+
+    /**
+     * @return FormNamedBlock
+     */
+    public function getIdeNode()
+    {
+        return $this->node;
     }
 }

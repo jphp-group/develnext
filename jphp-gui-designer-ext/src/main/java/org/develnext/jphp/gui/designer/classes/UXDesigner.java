@@ -1,5 +1,6 @@
 package org.develnext.jphp.gui.designer.classes;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -68,6 +69,8 @@ public class UXDesigner extends BaseObject {
     protected Invoker onChanged;
 
     protected ContextMenu contextMenu;
+
+    protected boolean tmpLock = false;
 
     public UXDesigner(Environment env, ClassEntity clazz) {
         super(env, clazz);
@@ -225,6 +228,13 @@ public class UXDesigner extends BaseObject {
             }
         });
 
+        area.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+        });
+
         area.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -292,6 +302,11 @@ public class UXDesigner extends BaseObject {
                 }
 
                 if (isEditing()) {
+                    return;
+                }
+
+                if (tmpLock) {
+                    tmpLock = false;
                     return;
                 }
 
@@ -582,6 +597,8 @@ public class UXDesigner extends BaseObject {
                     }
                 }
 
+                e.consume();
+
                 picked = node;
             }
         };
@@ -606,7 +623,24 @@ public class UXDesigner extends BaseObject {
                     if (onChanged != null) {
                         onChanged.callAny();
                     }
+
+                    if (e.getButton() == MouseButton.PRIMARY) {
+                        e.consume();
+                    }
+                } else {
+                    for (Selection selection : selections.values()) {
+                        selection.update();
+                    }
                 }
+
+                tmpLock = true;
+
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        tmpLock = false;
+                    }
+                });
 
                 dragged = false;
             }

@@ -1,0 +1,10 @@
+<element>
+    <properties group="general" title="Главное">
+    </properties>
+    <properties group="binding" title="Взаимодействие">
+    </properties>
+    <properties group="extra" title="Дополнительно">
+        <property code="id" name="ID" editor="id" tooltip="Уникальный индетификатор скрипта в рамках своего модуля" />
+        <property code="disabled" name="Отключить" editor="boolean" tooltip="При отключении скрипт не будет выполнять своих действий" />
+    </properties>
+</element>

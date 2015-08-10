@@ -141,6 +141,7 @@ class BuildProgressForm extends AbstractForm
      */
     public function doOpen()
     {
+        $this->progress->progress = -1;
         $this->closeAfterDoneCheckbox->selected = Ide::get()->getUserConfigValue('builder.closeAfterDone', true);
     }
 
@@ -240,6 +241,10 @@ class BuildProgressForm extends AbstractForm
         $self = $this;
         $exitValue = $process->getExitValue();
         $this->processDone = true;
+
+        UXApplication::runLater(function() {
+            $this->progress->progress = 1;
+        });
 
         $func = function() use ($self, $exitValue, $onExit) {
             if ($exitValue) {

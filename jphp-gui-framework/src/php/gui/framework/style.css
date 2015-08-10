@@ -38,3 +38,7 @@
 .hyperlink:show-mnemonics > .mnemonic-underline {
     -fx-stroke: -fx-text-fill;
 }
+
+.tooltip {
+    -fx-font-size: 1em;
+}

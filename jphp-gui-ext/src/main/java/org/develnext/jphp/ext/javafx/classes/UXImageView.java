@@ -1,10 +1,10 @@
 package org.develnext.jphp.ext.javafx.classes;
 
-import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection.Name;
+import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
@@ -15,7 +15,9 @@ public class UXImageView extends UXNode<ImageView> {
     interface WrappedInterface {
         @Property boolean smooth();
         @Property boolean preserveRatio();
-        @Property Image image();
+        @Property double fitWidth();
+        @Property double fitHeight();
+        @Property @Nullable Image image();
     }
     public UXImageView(Environment env, ImageView wrappedObject) {
         super(env, wrappedObject);

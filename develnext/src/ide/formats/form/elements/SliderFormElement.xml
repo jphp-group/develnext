@@ -1,0 +1,20 @@
+<element extends="NodeFormElement" >
+    <properties>
+        <property code="orientation" name="Ориентация" editor="enum">
+            <variants>
+                <variant value="HORIZONTAL">Горизонтальная</variant>
+                <variant value="VERTICAL">Вертикальная</variant>
+            </variants>
+        </property>
+        <property code="min" name="Минимум" editor="float" />
+        <property code="max" name="Максимум" editor="float" />
+        <property code="value" name="Значение" editor="float" />
+
+        <property code="blockIncrement" name="Размер блока" editor="float" />
+        <property code="showTickMarks" name="Видимость меток" editor="boolean" />
+        <property code="showTickLabels" name="Видимость подсказок" editor="boolean" />
+
+        <property code="snapToTicks" name="Блочность" editor="boolean" />
+        <property code="majorTickUnit" name="Основных делений" editor="integer" />
+    </properties>
+</element>

@@ -43,7 +43,7 @@ if (!$mainForm->alwaysOnTop) {
 
 $mainForm->requestFocus();
 
-set_exception_handler(function (BaseException $e) {
+/*set_exception_handler(function (BaseException $e) {
     static $showed = false;
 
     if ($showed) {
@@ -76,4 +76,6 @@ set_exception_handler(function (BaseException $e) {
     }
 
     $showed = false;
-});
+});          */
+
+restore_exception_handler();

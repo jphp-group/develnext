@@ -15,6 +15,10 @@ use php\xml\DomElement;
 class TextPropertyEditor extends SimpleTextPropertyEditor
 {
     /**
+     * @var TextPropertyEditorForm
+     */
+    protected $editorForm;
+    /**
      * @var UXButton
      */
     protected $dialogButton;
@@ -23,6 +27,8 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
     {
         parent::makeUi();
 
+        $this->editorForm = new TextPropertyEditorForm();
+
         $this->dialogButton = new UXButton();
         $this->dialogButton->text = '...';
         $this->dialogButton->padding = [2, 4];
@@ -30,13 +36,7 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
         $this->dialogButton->width = 20;
 
         $this->dialogButton->on('click', function (UXMouseEvent $e) {
-            $dialog = new TextPropertyEditorForm();
-            $dialog->title = $this->name;
-            $dialog->setResult($this->getValue());
-
-            if ($dialog->showDialog($e->screenX, $e->screenY)) {
-                $this->applyValue($dialog->getResult());
-            }
+            $this->showDialog($e->screenX, $e->screenY);
         });
 
         return new UXHBox([$this->textField, $this->dialogButton]);
@@ -45,5 +45,21 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
     public function getCode()
     {
         return 'text';
+    }
+
+    public function showDialog($x = null, $y = null)
+    {
+        $dialog = $this->editorForm;
+
+        if ($dialog->visible) {
+            $dialog->hide();
+        }
+
+        $dialog->title = $this->name;
+        $dialog->setResult($this->getNormalizedValue($this->getValue()));
+
+        if ($dialog->showDialog($x, $y)) {
+            $this->applyValue($dialog->getResult());
+        }
     }
 }

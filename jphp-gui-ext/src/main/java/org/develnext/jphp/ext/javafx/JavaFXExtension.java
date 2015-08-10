@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx;
 
+import com.sun.javafx.scene.control.skin.CustomColorDialog;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -103,6 +104,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, ComboBox.class, UXComboBox.class);
         registerWrapperClass(scope, ChoiceBox.class, UXChoiceBox.class);
         registerWrapperClass(scope, ColorPicker.class, UXColorPicker.class);
+        registerWrapperClass(scope, CustomColorDialog.class, UXColorChooser.class);
         registerWrapperClass(scope, ProgressIndicator.class, UXProgressIndicator.class);
         registerWrapperClass(scope, ProgressBar.class, UXProgressBar.class);
         registerWrapperClass(scope, HTMLEditor.class, UXHtmlEditor.class);
@@ -119,6 +121,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, ListView.class, UXListView.class);
         registerWrapperClass(scope, FileChooser.class, UXFileChooser.class);
         registerWrapperClass(scope, DirectoryChooser.class, UXDirectoryChooser.class);
+        registerWrapperClass(scope, Slider.class, UXSlider.class);
 
         registerWrapperClass(scope, Cell.class, UXCell.class);
         registerWrapperClass(scope, TableView.class, UXTableView.class);

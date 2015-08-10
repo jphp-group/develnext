@@ -3,6 +3,7 @@ namespace ide\editors;
 
 use Files;
 use ide\editors\form\FormElementTypePane;
+use ide\editors\form\FormNamedBlock;
 use ide\editors\menu\ContextMenu;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\GuiFormDumper;
@@ -14,10 +15,13 @@ use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\scripts\AbstractScriptComponent;
 use ide\scripts\ScriptComponentContainer;
 use ide\scripts\ScriptComponentManager;
+use ide\utils\FileUtils;
+use ide\utils\Json;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractScript;
 use php\gui\framework\DataUtils;
+use php\gui\framework\ScriptManager;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
@@ -35,6 +39,7 @@ use php\gui\UXTabPane;
 use php\io\File;
 use php\lib\Items;
 use php\lib\Str;
+use stdClass;
 
 /**
  * Class ScriptModuleEditor
@@ -47,10 +52,27 @@ class ScriptModuleEditor extends FormEditor
     /** @var ScriptComponentManager */
     protected $manager;
 
+    /**
+     * @var array
+     */
+    protected $properties;
+
     public function __construct($file)
     {
         $this->manager = new ScriptComponentManager();
+        $this->properties = [];
+
         parent::__construct($file, new GuiFormDumper([]));
+    }
+
+    public function __set($name, $value)
+    {
+        $this->properties[$name] = $value;
+    }
+
+    public function __get($name)
+    {
+        return $this->properties[$name];
     }
 
     public function save()
@@ -58,16 +80,176 @@ class ScriptModuleEditor extends FormEditor
         foreach ($this->manager->getComponents() as $el) {
             $this->manager->saveContainer($el);
         }
+
+        if (File::of($this->codeFile)->exists()) {
+            $this->codeEditor->save();
+        }
+
+        /** @var ScriptComponentContainer[] $containers */
+        $containers = Items::sort($this->manager->getComponents(), function (ScriptComponentContainer $a, ScriptComponentContainer $b) {
+            $aScore = $a->getY() * 1000 + $a->getX();
+            $bScore = $b->getY() * 1000 + $b->getY();
+
+            if ($aScore == $bScore) {
+                return 0;
+            }
+
+            return $aScore > $bScore ? -1 : 1;
+        }, true);
+
+        $json = [
+            'properties' => $this->properties,
+            'scripts' => []
+        ];
+
+        foreach ($containers as $container) {
+            $path = FileUtils::relativePath($this->file, $container->getConfigPath());
+            $json['scripts'][] = $path;
+        }
+
+        $indexFile = FileUtils::stripExtension($this->codeFile) . ".json";
+        Json::toFile($indexFile, $json);
+    }
+
+    public function addContainer(ScriptComponentContainer $container)
+    {
+        $this->manager->add($container);
+
+        /** @var FormNamedBlock $node */
+        $node = $container->getType()->createElement();
+        $node->setTitle($container->id);
+
+        $container->setIdeNode($node);
+        $node->userData = $container;
+
+        $node->position = [$container->getX(), $container->getY()];
+
+        $node->watch('layoutX', function () use ($container, $node) {
+            $container->setX($node->x);
+        });
+        $node->watch('layoutY', function () use ($container, $node) {
+            $container->setY($node->y);
+        });
+
+        $this->layout->add($node);
     }
 
     public function load()
     {
+        $this->eventManager->load();
+
+        if (File::of($this->codeFile)->exists()) {
+            $this->codeEditor->load();
+        }
+
+        $indexFile = FileUtils::stripExtension($this->codeFile) . ".json";
+
+        if (Files::exists($indexFile)) {
+            $json = Json::fromFile($indexFile);
+            $this->properties = (array) $json['properties'];
+        }
+
         $this->layout = new UXAnchorPane();
+        $this->layout->padding = 3;
         $this->layout->minSize = [800, 600];
         $this->layout->size = [800, 600];
+        $this->layout->css('background-color', 'white');
+
+        $label = new UXLabel($this->getTitle());
+        $label->classes->add('ignore');
+        $label->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-border-style: dashed; -fx-background-color: #e6e6e6; -fx-border-radius: 3px;';
+        $label->position = [5, 8];
+        $label->leftAnchor = $label->rightAnchor = 5;
+        $label->padding = [5, 10];
+        $this->layout->add($label);
+
+        $files = File::of($this->file)->findFiles();
+
+        foreach ($files as $file) {
+            if (Str::endsWith($file, '.json')) {
+                $container = $this->manager->loadContainer($file);
+
+                if ($container) {
+                    $this->addContainer($container);
+                }
+            }
+        }
     }
 
-    protected function _odnAreaMouseDown(UXMouseEvent $e)
+    public function changeNodeId($container, $newId)
+    {
+        /** @var ScriptComponentContainer $container */
+        if (!$this->checkNodeId($newId)) {
+            return 'invalid';
+        }
+
+        if ($container && $container->id == $newId) {
+            return '';
+        }
+
+        foreach ($this->manager->getComponents() as $el) {
+            if ($el->id == $newId) {
+                return 'busy';
+            }
+        }
+
+        $oldId = $container->id;
+
+        if ($this->manager->renameId($container, $newId)) {
+            $this->eventManager->renameBind($oldId, $newId);
+            $container->getIdeNode()->setTitle($newId);
+
+            $this->codeEditor->load();
+        } else {
+            return 'invalid';
+        }
+
+        return '';
+    }
+
+    public function getNodeId($node)
+    {
+        /** @var ScriptComponentContainer $container */
+        $container = $node->userData;
+
+        if ($container instanceof ScriptComponentContainer) {
+            return $container->id;
+        }
+
+        return null;
+    }
+
+    protected function makeDesigner($fullArea = true)
+    {
+        return parent::makeDesigner(true);
+    }
+
+    public function deleteNode($node)
+    {
+        /** @var ScriptComponentContainer $container */
+        $container = $node->userData;
+
+        if (!($container instanceof ScriptComponentContainer)) {
+            return;
+        }
+
+        $this->manager->remove($container);
+
+        $designer = $this->designer;
+
+        $designer->unselectNode($node);
+        $designer->unregisterNode($node);
+
+        $node->parent->remove($node);
+
+        if ($container && $container->id && $this->eventManager->removeBinds($container->id)) {
+            $this->codeEditor->load();
+        }
+
+        File::of($container->getConfigPath())->delete();
+    }
+
+    protected function _onAreaMouseDown(UXMouseEvent $e)
     {
         $selected = $this->elementTypePane->getSelected();
 
@@ -78,13 +260,21 @@ class ScriptModuleEditor extends FormEditor
             $node = $selected->createElement();
 
             $container = new ScriptComponentContainer($selected, $this->makeId($selected->getIdPattern()));
-            $this->manager->add($container);
+            $container->setConfigPath("{$this->file}/{$container->id}.json");
+            $node->setTitle($container->id);
 
+            $node->userData = $container;
+
+            $this->manager->add($container);
 
             $size = $node->size;
 
-            $container->setX($e->x);
-            $container->setY($e->y);
+            $node->watch('layoutX', function () use ($container, $node) {
+                $container->setX($node->x);
+            });
+            $node->watch('layoutY', function () use ($container, $node) {
+                $container->setY($node->y);
+            });
 
             $position = [$e->x, $e->y];
 

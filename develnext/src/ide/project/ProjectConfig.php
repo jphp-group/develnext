@@ -292,7 +292,8 @@ class ProjectConfig
 
         /** @var DomElement $domFile */
         foreach ($this->document->findAll('/project/files/file') as $domFile) {
-            $files[] = ProjectFile::unserialize($project, $domFile);
+            $projectFile = ProjectFile::unserialize($project, $domFile);
+            $files[$projectFile->getNameHash()] = $projectFile;
         }
 
         return $files;

@@ -21,6 +21,7 @@ use php\io\IOException;
 use php\io\ResourceStream;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
+use php\lang\IllegalStateException;
 use php\lib\Char;
 use php\lib\Mirror;
 use php\lib\Str;
@@ -34,6 +35,7 @@ use php\util\Scanner;
  */
 class CodeEditor extends AbstractEditor
 {
+    protected $loaded;
     /**
      * @var UXWebView
      */
@@ -202,7 +204,7 @@ class CodeEditor extends AbstractEditor
             CODE_EDITOR.scrollTo(null, (coords.top + coords.bottom - myHeight) / 2);
         }
 
-        $(function(){
+        $(window).load(function(){
             bindEvents();
             alert("~editor:loaded~");
         });
@@ -240,24 +242,36 @@ CONTENT;
 
         $this->webEngine->loadContent($content);
 
+        $this->loaded = false;
+
         $this->webEngine->on('alert', function (UXWebEvent $e) {
             if ($e->data == "~editor:loaded~") {
+                $this->loaded = true;
                 $this->webEngine->addSimpleBridge('PHP', [$this, 'editorBridgeHandler']);
             } else {
                 UXDialog::show($e->data);
             }
         });
 
-        $this->webEngine->watchState(function ($self, $old, $new) {
-            if ($new == 'SUCCEEDED') {
-                $doOnSucceed = $this->doOnSucceed;
-                $this->doOnSucceed = [];
+        $applySucceed = function () {
+            $doOnSucceed = $this->doOnSucceed;
+            $this->doOnSucceed = [];
 
-                UXApplication::runLater(function () use ($doOnSucceed) {
-                    foreach ($doOnSucceed as $handler) {
-                        $handler();
-                    }
-                });
+            UXApplication::runLater(function () use ($doOnSucceed) {
+                foreach ($doOnSucceed as $handler) {
+                    $handler();
+                }
+            });
+        };
+
+        $this->webEngine->watchState(function ($self, $old, $new) use ($applySucceed) {
+            if ($new == 'SUCCEEDED') {
+                if (!$this->loaded) {
+                    Timer::run(100, $applySucceed);
+                    return;
+                }
+
+                $applySucceed();
             }
         });
 
@@ -325,8 +339,18 @@ CONTENT;
 
     protected function waitState(callable $handler)
     {
-        if ($this->webEngine->state == 'SUCCEEDED') {
-            $handler();
+        if ($this->webEngine->state == 'SUCCEEDED' || $this->loaded) {
+            $func = null;
+            $func = function () use ($handler, &$func) {
+                if (!$this->loaded) {
+                    Timer::run(100, $func);
+                    return;
+                }
+
+                $handler();
+            };
+
+            $func();
             return;
         }
 
@@ -381,7 +405,6 @@ CONTENT;
     {
         $this->waitState(function () use ($line, $offset) {
             $this->webView->requestFocus();
-
             $this->webEngine->callFunction('jumpToLine', [$line, $offset]);
         });
     }

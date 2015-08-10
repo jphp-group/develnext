@@ -1,4 +1,8 @@
 <element>
+    <properties group="bindings" title="Функционал">
+        <property code="modules" name="Модули (скрипты)" editor="moduleList" tooltip="Подключенные модули к форме" formConfig="1" />
+    </properties>
+
     <properties group="general" title="Главное">
         <property code="form.title" name="Заголовок" editor="text" tooltip="Заголовок окна" formConfig="1" />
         <property code="form.alwaysOnTop" name="Поверх всех окон" editor="boolean" formConfig="1" tooltip="Всегда отображать окно поверх всех других окон" />
@@ -15,13 +19,7 @@
                 <variant value="UTILITY">Утилита</variant>
             </variants>
         </property>
-        <property code="form.modality" name="Модальность" editor="enum" formConfig="1" defaultValue="NONE">
-            <variants>
-                <variant value="NONE">Отсутствует</variant>
-                <variant value="WINDOW_MODAL">Есть, в рамках окна</variant>
-                <variant value="APPLICATION_MODAL">Есть, в рамках всего приложения</variant>
-            </variants>
-        </property>
+        <property code="form.modality" name="Модальность" editor="boolean" formConfig="1" defaultValue="0" />
     </properties>
     <properties group="extra" title="Дополнительно">
         <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />

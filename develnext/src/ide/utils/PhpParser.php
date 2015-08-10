@@ -30,6 +30,31 @@ class PhpParser
     }
 
     /**
+     * @param $from
+     * @param $to
+     * @param callable $lineBuilder ($line) : newLine
+     */
+    public function processLines($from, $to, callable $lineBuilder)
+    {
+        $content = "";
+        $scanner = new Scanner($this->content);
+
+        $i = 0;
+
+        while ($scanner->hasNext()) {
+            if ($i >= $from && $i <= $to) {
+                $content .= $lineBuilder($scanner->nextLine()) . "\n";
+            } else {
+                $content .= $scanner->nextLine() . "\n";
+            }
+
+            $i++;
+        }
+
+        $this->content = $content;
+    }
+
+    /**
      * @param int $from
      * @param int $to
      */

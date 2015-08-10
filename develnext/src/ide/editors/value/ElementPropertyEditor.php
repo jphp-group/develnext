@@ -80,7 +80,7 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
      */
     public function setTooltip($tooltip)
     {
-        $this->tooltip = $tooltip;
+        $this->tooltip = "$tooltip";
     }
 
     /**

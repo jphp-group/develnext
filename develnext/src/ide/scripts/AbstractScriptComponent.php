@@ -1,5 +1,6 @@
 <?php
 namespace ide\scripts;
+use ide\editors\form\FormNamedBlock;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\FormElementConfig;
 use ide\Ide;
@@ -64,37 +65,22 @@ abstract class AbstractScriptComponent extends AbstractFormElement
         return $this->getDescription();
     }
 
+    public function getTarget($node)
+    {
+        if ($node->userData instanceof ScriptComponentContainer) {
+            return $node->userData;
+        }
+
+        return parent::getTarget($node);
+    }
+
+
     /**
-     * @return UXNode
+     * @return FormNamedBlock
      */
     public function createElement()
     {
-        $element = new UXAnchorPane();
-        $element->maxSize = $element->minSize = $element->size = [32, 32];
-
-        $element->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-background-color: silver; -fx-border-radius: 3px;';
-
-        $icon = Ide::get()->getImage($this->getIcon());
-
-        if ($icon) {
-            $icon->mouseTransparent = true;
-            $icon->position = [8, 8];
-            $element->add($icon);
-        }
-
-        $label = new UXLabel($this->getName());
-        $label->padding = [2, 4];
-        $label->position = [0, 32 + 7];
-        $label->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-background-color: white; -fx-border-radius: 3px;';
-
-        $label->watch('text', function () use ($label) {
-            UXApplication::runLater(function () use ($label) {
-                $label->x = - $label->width / 2;
-            });
-        });
-
-        $element->add($label);
-
-        return $element;
+        $block = new FormNamedBlock($this->getName(), $this->getIcon());
+        return $block;
     }
 }

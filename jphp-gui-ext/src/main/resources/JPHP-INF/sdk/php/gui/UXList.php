@@ -12,6 +12,20 @@ use Iterator;
 class UXList implements Iterator, Countable, ArrayAccess
 {
     /**
+     * @readonly
+     * @var int
+     */
+    public $count = 0;
+
+    /**
+     * @param $object
+     * @return bool
+     */
+    public function has($object)
+    {
+    }
+
+    /**
      * @param mixed $object
      */
     public function add($object)

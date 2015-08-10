@@ -24,7 +24,5 @@ class SeparatorFormElementTag extends AbstractFormElementTag
     {
         /** @var UXSeparator $node */
         $element->setAttribute('orientation', $node->orientation);
-        $element->setAttribute('orientation', $node->orientation);
-        $element->setAttribute('orientation', $node->orientation);
     }
 }

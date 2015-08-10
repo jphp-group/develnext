@@ -24,11 +24,14 @@ use ide\scripts\ScriptComponentManager;
 use ide\systems\FileSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
+use ide\utils\Json;
 use php\gui\framework\Timer;
 use php\gui\UXTreeItem;
 use php\gui\UXTreeView;
 use php\io\File;
+use php\io\Stream;
 use php\lib\Str;
+use php\util\Configuration;
 use php\util\Regex;
 
 /**
@@ -115,9 +118,19 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $this->synchronizeDependencies();
-
         $this->updateScriptManager();
-        $this->scriptComponentManager->save($this->project->getFile('src/.system/scripts.json'));
+
+        $modules = $this->scriptComponentManager->getModules();
+        $values = [];
+
+        foreach ($modules as $module) {
+            $values[] = 'app\\modules\\'
+                . Str::replace(FileUtils::relativePath($this->project->getFile(self::SCRIPTS_DIRECTORY), $module), '/', '\\');
+        }
+
+        Json::toFile($this->project->getFile('src/.system/modules.json'), [
+            'modules' => $values
+        ]);
 
         if ($environment == Project::ENV_DEV) {
             if ($log) {
@@ -126,6 +139,19 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
             $this->synchronizeDebugFiles();
         }
+    }
+
+    public function getScriptModules()
+    {
+        $this->updateScriptManager();
+
+        $modules = $this->scriptComponentManager->getModules();
+
+        foreach ($modules as &$module) {
+            $module = Str::replace(FileUtils::relativePath($this->project->getFile(self::SCRIPTS_DIRECTORY), $module), '/', '\\');
+        }
+
+        return $modules;
     }
 
     public function doWatchFile(ProjectFile $file, $event)
@@ -165,8 +191,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree->addIgnoreRule('^src\\/\\.scripts\\/.*\\.json');
 
         $projectTreeItem = $tree->getOrCreateItem(
-            'scripts', 'Модули', 'icons/brickFolder16.png', $this->project->getFile(self::SCRIPTS_DIRECTORY)
+            'scripts', 'Модули (скрипты)', 'icons/brickFolder16.png', $this->project->getFile(self::SCRIPTS_DIRECTORY)
         );
+        $projectTreeItem->setExpanded(true);
         $projectTreeItem->setDisableDelete(true);
 
         $projectTreeItem->onUpdate(function () {
@@ -225,6 +252,26 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree->updateDirectory('scripts', $this->project->getFile(self::SCRIPTS_DIRECTORY));
     }
 
+    public function recoveryModule($filename)
+    {
+        $file = $this->project->getAbsoluteFile($filename);
+
+        $sources = $file->findLinkByExtension('php');
+
+        $rel = FileUtils::relativePath($this->project->getFile(self::SCRIPTS_DIRECTORY), $filename);
+        //$rel = Str::sub($rel, 0, Str::length($rel) - 5);
+        $rel = Str::replace($rel, '\\', '/');
+
+        if (!$sources) {
+            $sources = $this->project->getFile("src/app/modules/$rel.php");
+            $file->addLink($sources);
+        }
+
+        if (!$sources->exists()) {
+            $this->createModule($rel);
+        }
+    }
+
     public function recoveryForm($filename)
     {
         $name = Str::sub($filename, 0, Str::length($filename) - 5);
@@ -234,7 +281,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $sources = $form->findLinkByExtension('php');
 
-        $rel = FileUtils::relativePath($this->project->getFile("src/.forms/"), $filename);
+        $rel = FileUtils::relativePath($this->project->getFile(self::FORMS_DIRECTORY), $filename);
         $rel = Str::sub($rel, 0, Str::length($rel) - 5);
         $rel = Str::replace($rel, '\\', '/');
 
@@ -268,6 +315,33 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         return $form;
+    }
+
+    public function createModule($name)
+    {
+        $this->project->makeDirectory("src/.scripts/$name");
+
+        $file = $this->project->getFile("src/.scripts/$name");
+
+        $template = new PhpClassFileTemplate($name, 'AbstractModule');
+        $template->setNamespace('app\\modules');
+        $template->setImports([
+            'php\\gui\\framework\\AbstractModule'
+        ]);
+
+        $sources = $file->findLinkByExtension('php');
+
+        if (!$sources) {
+            $sources = $this->project->createFile("src/app/modules/$name.php", $template);
+            $file->addLink($sources);
+        } else {
+            if (!$sources->exists()) {
+                $sources->applyTemplate($template);
+                $sources->updateTemplate(true);
+            }
+        }
+
+        return $file;
     }
 
     public function createForm($name)
@@ -312,7 +386,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->makeDirectory('src/.forms');
         $this->project->makeDirectory('src/.system');
         $this->project->makeDirectory('src/.scripts');
-        $this->project->makeDirectory('src/.scripts/~Default');
+        $this->project->makeDirectory('src/.scripts/MainModule');
         $this->project->makeDirectory('src/JPHP-INF');
 
         $this->project->makeDirectory('src/app');
@@ -325,6 +399,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->getFile('src/.forms')->scan(function ($name, File $file) {
             if ($file->isFile() && Str::endsWith($name, '.fxml')) {
                 $this->recoveryForm($file);
+            }
+        });
+
+        $this->project->getFile('src/.scripts')->scan(function ($name, File $file) {
+            if ($file->isDirectory()) {
+                $this->recoveryModule($file);
             }
         });
     }

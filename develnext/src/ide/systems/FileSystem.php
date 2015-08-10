@@ -88,13 +88,27 @@ class FileSystem
      */
     static function getSelected()
     {
+        $editor = static::getSelectedEditor();
+
+        if ($editor) {
+            return $editor->getFile();
+        }
+
+        return null;
+    }
+
+    /**
+     * @return AbstractEditor|null
+     */
+    static function getSelectedEditor()
+    {
         /** @var UXTabPane $fileTabPane */
         $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
 
         $tab = $fileTabPane->selectedTab;
 
         if ($tab && $tab->userData instanceof AbstractEditor) {
-            return $tab->userData->getFile();
+            return $tab->userData;
         }
 
         return null;

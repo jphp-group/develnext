@@ -3,6 +3,7 @@ package org.develnext.jphp.ext.javafx.classes.text;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
@@ -67,5 +68,15 @@ public class UXFont extends BaseWrapper<Font> {
     @Signature
     public static Font load(InputStream stream, double size) {
         return Font.loadFont(stream, size);
+    }
+
+    @Getter
+    public float getLineHeight() {
+        return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().getFontMetrics(getWrappedObject()).getLineHeight();
+    }
+
+    @Signature
+    public float calculateTextWidth(String text) {
+        return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().computeStringWidth(text, getWrappedObject());
     }
 }

@@ -20,7 +20,7 @@ class SplashForm extends AbstractForm
 
         $this->version->text = $this->_app->getVersion();
 
-        Timer::run(2000, function() {
+        Timer::run(4000, function() {
             if ($this->_app->getMainForm()->visible) {
                 $this->hide();
             }

@@ -4,6 +4,7 @@ import javafx.collections.ObservableList;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
@@ -40,6 +41,17 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         }
 
         return r.toConstant();
+    }
+
+    @Signature
+    public boolean has(Environment env, Memory object) {
+        for (T t : getWrappedObject()) {
+            if (Memory.wrap(env, t).equal(object)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Signature
@@ -141,6 +153,11 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     @Override
     public Memory count(Environment environment, Memory... memories) {
         return LongMemory.valueOf(getWrappedObject().size());
+    }
+
+    @Getter
+    public int getCount() {
+        return getWrappedObject().size();
     }
 
     @Override

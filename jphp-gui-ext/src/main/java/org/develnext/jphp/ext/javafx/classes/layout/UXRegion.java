@@ -50,6 +50,54 @@ public class UXRegion<T extends Region> extends UXParent<Region> {
         }
     }
 
+    @Getter
+    public double getPaddingLeft() {
+        return getWrappedObject().getPadding().getLeft();
+    }
+
+    @Setter
+    public void setPaddingLeft(double value) {
+        getWrappedObject().setPadding(new Insets(
+                getPaddingTop(), getPaddingRight(), getPaddingBottom(), value
+        ));
+    }
+
+    @Getter
+    public double getPaddingRight() {
+        return getWrappedObject().getPadding().getRight();
+    }
+
+    @Setter
+    public void setPaddingRight(double value) {
+        getWrappedObject().setPadding(new Insets(
+                getPaddingTop(), value, getPaddingBottom(), getPaddingLeft()
+        ));
+    }
+
+    @Getter
+    public double getPaddingTop() {
+        return getWrappedObject().getPadding().getTop();
+    }
+
+    @Setter
+    public void setPaddingTop(double value) {
+        getWrappedObject().setPadding(new Insets(
+                value, getPaddingRight(), getPaddingBottom(), getPaddingLeft()
+        ));
+    }
+
+    @Getter
+    public double getPaddingBottom() {
+        return getWrappedObject().getPadding().getBottom();
+    }
+
+    @Setter
+    public void setPaddingBottom(double value) {
+        getWrappedObject().setPadding(new Insets(
+                getPaddingTop(), getPaddingRight(), value, getPaddingLeft()
+        ));
+    }
+
     @Override
     @Signature
     public void setSize(double[] args) {

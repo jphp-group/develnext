@@ -169,6 +169,12 @@ class FileUtils
 
     public static function put($filename, $content, $encoding = 'UTF-8')
     {
+        $parent = File::of($filename)->getParentFile();
+
+        if ($parent && !$parent->isDirectory()) {
+            $parent->mkdirs();
+        }
+
         Stream::putContents($filename, Str::encode($content, $encoding));
     }
 

@@ -227,6 +227,8 @@ class ProjectTree
                     $this->contextMenu->addCommand(new SimpleSingleCommand('Удалить', 'icons/delete16.png', function () use ($item) {
                         $file = $item->getFile();
 
+                        FileSystem::close($file);
+
                         if ($file instanceof ProjectFile) {
                             $file->delete();
                         } else {

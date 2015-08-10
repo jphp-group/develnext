@@ -53,6 +53,7 @@ use php\lib\String;
 use php\time\Time;
 use php\util\Configuration;
 use php\util\Flow;
+use php\util\Regex;
 
 /**
  * Class FormEditor
@@ -247,6 +248,32 @@ class FormEditor extends AbstractModuleEditor
         }
     }
 
+    public function checkNodeId($newId)
+    {
+        return (Regex::match('^[A-Za-z\\_]{1}[A-Za-z0-9\\_]{1,60}$', $newId));
+    }
+
+    public function changeNodeId($node, $newId)
+    {
+        if (!$this->checkNodeId($newId)) {
+            return 'invalid';
+        }
+
+        if ($node->id == $newId) {
+            return '';
+        }
+
+        if ($this->layout->lookup("#$newId")) {
+            return 'busy';
+        }
+
+        $this->eventManager->renameBind($node->id, $newId);
+        $this->codeEditor->load();
+
+        $node->id = $newId;
+        return '';
+    }
+
     public function deleteNode($node)
     {
         $designer = $this->designer;
@@ -257,7 +284,7 @@ class FormEditor extends AbstractModuleEditor
         DataUtils::remove($node);
         $node->parent->remove($node);
 
-        if ($this->eventManager->removeBinds($node->id)) {
+        if ($this->eventManager->removeBinds($this->getNodeId($node))) {
             $this->codeEditor->load();
         }
     }
@@ -417,6 +444,11 @@ class FormEditor extends AbstractModuleEditor
 
         $viewer = new UXScrollPane($area);
 
+        $viewer->on('click', function ($e) {
+            $this->designer->unselectAll();
+            $this->_onAreaMouseDown($e);
+        });
+
         if (!$fullArea) {
             $designPane = new UXDesignPane();
             $designPane->size = $this->layout->size;
@@ -431,17 +463,20 @@ class FormEditor extends AbstractModuleEditor
         }
 
         $this->designer = new UXDesigner($this->layout);
-        $this->designer->onAreaMouseDown([$this, '_onAreaMouseDown']);
+        $this->designer->onAreaMouseDown(function ($e) { $this->_onAreaMouseDown($e); } );
         $this->designer->onNodeClick([$this, '_onNodeClick']);
         $this->designer->onNodePick([$this, '_onNodePick']);
         $this->designer->onChanged([$this, '_onChanged']);
 
+        /** @var UXNode $node */
         foreach ($this->layout->children as $node) {
             if ($node instanceof UXData) {
                 continue;
             }
 
-            $this->designer->registerNode($node);
+            if (!$node->classes->has('ignore')) {
+                $this->designer->registerNode($node);
+            }
         }
 
         if (!$fullArea) {
@@ -630,13 +665,11 @@ class FormEditor extends AbstractModuleEditor
             $selectedIndex = $tabs->selectedIndex;
 
             $eventTab = $tabs->tabs[1];
-
             if ($eventTab && $eventTab->content) {
                 $list = $eventTab->content->lookup('#list');
 
                 if ($list instanceof UXListView) {
                     $selected = Items::first($list->selectedItems);
-
                     if ($selected) {
                         $selectedEvent = $selected['type']['code'];
                     }
@@ -714,7 +747,7 @@ class FormEditor extends AbstractModuleEditor
 
     public function jumpToEventSource($node, $eventType)
     {
-        $bind = $this->eventManager->findBind($node->id, $eventType);
+        $bind = $this->eventManager->findBind($this->getNodeId($node), $eventType);
 
         if ($bind) {
             $this->switchToSmallSource();
@@ -723,6 +756,11 @@ class FormEditor extends AbstractModuleEditor
                 $this->codeEditor->jumpToLine($bind['beginLine'], $bind['beginPosition']);
             });
         }
+    }
+
+    public function getNodeId($node)
+    {
+        return $node->id;
     }
 
     protected function makeEventTypePane($node, AbstractFormElement $element, $selected = null)
@@ -743,7 +781,7 @@ class FormEditor extends AbstractModuleEditor
                 $menuItem = new UXMenuItem($type['name'], Ide::get()->getImage($type['icon']));
                 $menuItem->on('action', function () use ($node, $type) {
                     $this->switchToSmallSource();
-                    $this->eventManager->addBind($node->id, $type['code'], $type['kind']);
+                    $this->eventManager->addBind($this->getNodeId($node), $type['code'], $type['kind']);
 
                     Timer::run(100, function () use ($node, $type) {
                         $this->codeEditor->load();
@@ -753,7 +791,7 @@ class FormEditor extends AbstractModuleEditor
                     });
                 });
 
-                if ($this->eventManager->findBind($node->id, $type['code'])) {
+                if ($this->eventManager->findBind($this->getNodeId($node), $type['code'])) {
                     $menuItem->disable = true;
                 }
 
@@ -803,7 +841,7 @@ class FormEditor extends AbstractModuleEditor
             $selected = Items::first($list->selectedItems);
 
             if ($selected) {
-                if ($bind = $this->eventManager->removeBind($node->id, $selected['type']['code'])) {
+                if ($bind = $this->eventManager->removeBind($this->getNodeId($node), $selected['type']['code'])) {
 
                     Timer::run(100, function () use ($bind) {
                         $this->codeEditor->load();
@@ -870,7 +908,7 @@ class FormEditor extends AbstractModuleEditor
         });
 
         if ($node) {
-            $binds = $this->eventManager->findBinds($node->id);
+            $binds = $this->eventManager->findBinds($this->getNodeId($node));
 
             foreach ($binds as $code => $info) {
                 if ($eventType = $eventTypes[$code]) {

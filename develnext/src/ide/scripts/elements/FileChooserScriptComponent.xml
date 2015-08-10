@@ -1,0 +1,21 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="inputNode" value="textField" />
+        <property code="actionNode" value="button" />
+    </init>
+
+    <properties group="general" title="Главное">
+        <property code="saveDialog" name="Диалог сохранения" editor="boolean" tooltip="Показывать диалог для сохранения файлов" />
+        <property code="multiple" name="Множественный" editor="boolean" tooltip="Возможность выбрать в диалоге несколько файлов" />
+    </properties>
+
+    <properties group="binding" title="Взаимодействие">
+        <property code="inputNode" name="[Вывод]" editor="text" tooltip="ID компонентов, в которые будет выведен результат" />
+        <property code="actionNode" name="[Действие]" editor="text" tooltip="ID компонентов, при взаимодействии с которыми, будет открываться диалог" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="action" name="Действие" kind="ObjectEvent" icon="icons/ok16.png" />
+        <eventType code="cancel" name="Отмена диалога" kind="ObjectEvent" icon="icons/exit16.png" />
+    </eventTypes>
+</element>

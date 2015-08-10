@@ -30,10 +30,24 @@ class UXFont
     public $style;
 
     /**
+     * @readonly
+     * @var float
+     */
+    public $lineHeight;
+
+    /**
      * @param double $size
      * @param string $family (optional)
      */
     public function __construct($size, $family)
+    {
+    }
+
+    /**
+     * @param string $text
+     * @return float
+     */
+    public function calculateTextWidth($text)
     {
     }
 

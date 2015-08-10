@@ -2,6 +2,8 @@
 namespace script;
 
 use php\gui\framework\AbstractScript;
+use php\gui\UXApplication;
+use php\gui\UXDialog;
 use php\lang\InterruptedException;
 use php\lang\Thread;
 use php\xml\DomDocument;
@@ -33,9 +35,10 @@ class TimerScript extends AbstractScript
     protected $th;
 
     /**
+     * @param $target
      * @return mixed
      */
-    public function apply()
+    protected function applyImpl($target)
     {
         $this->start();
     }

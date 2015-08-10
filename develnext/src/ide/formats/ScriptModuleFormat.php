@@ -3,11 +3,18 @@ namespace ide\formats;
 
 use Files;
 use ide\editors\AbstractEditor;
+use ide\editors\form\FormNamedBlock;
 use ide\editors\ScriptModuleEditor;
+use ide\formats\form\context\DeleteMenuCommand;
+use ide\formats\form\context\SelectAllMenuCommand;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\scripts\AbstractScriptComponent;
+use ide\scripts\elements\DirectoryChooserScriptComponent;
+use ide\scripts\elements\FileChooserScriptComponent;
+use ide\scripts\elements\ModuleScriptComponent;
 use ide\scripts\elements\TimerScriptComponent;
+use ide\scripts\ScriptComponentContainer;
 use php\io\File;
 use php\lib\Str;
 
@@ -17,16 +24,19 @@ use php\lib\Str;
  */
 class ScriptModuleFormat extends AbstractFormFormat
 {
-    static protected $systemModules = [
-        '~Default' => 'Главный модуль'
-    ];
-
     /**
      * ScriptModuleFormat constructor.
      */
     public function __construct()
     {
+        $this->register(new ModuleScriptComponent());
         $this->register(new TimerScriptComponent());
+        $this->register(new FileChooserScriptComponent());
+        $this->register(new DirectoryChooserScriptComponent());
+
+        // Context Menu.
+        $this->register(new SelectAllMenuCommand());
+        $this->register(new DeleteMenuCommand());
     }
 
     /**
@@ -46,16 +56,6 @@ class ScriptModuleFormat extends AbstractFormFormat
 
     public function getTitle($path)
     {
-        $name = File::of($path)->getName();
-
-        if (Str::startsWith($name, '~')) {
-            $result = self::$systemModules[$name];
-
-            if ($result) {
-                return $result;
-            }
-        }
-
         return parent::getTitle($path);
     }
 
@@ -76,5 +76,25 @@ class ScriptModuleFormat extends AbstractFormFormat
         }
 
         return false;
+    }
+
+    /**
+     * @param $any
+     *
+     * @return AbstractFormElement|null
+     */
+    public function getFormElement($any)
+    {
+        foreach ($this->formElements as $element) {
+            if ($any && $any->userData instanceof ScriptComponentContainer) {
+                $any = $any->userData->getType();
+            }
+
+            if ($element->isOrigin($any)) {
+                return $element;
+            }
+        }
+
+        return null;
     }
 }

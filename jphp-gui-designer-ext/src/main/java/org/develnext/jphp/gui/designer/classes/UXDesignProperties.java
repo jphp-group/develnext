@@ -64,6 +64,10 @@ public class UXDesignProperties extends BaseObject {
         ArrayList<TitledPane> result = new ArrayList<>();
 
         for (TitledPane titledPane : groups.values()) {
+            if (((PropertyTableView)titledPane.getContent()).getItems().isEmpty()) {
+                continue;
+            }
+
             result.add(titledPane);
         }
 

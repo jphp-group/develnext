@@ -7,15 +7,15 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="314.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="328.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ListView id="consoleList" layoutX="14.0" layoutY="59.0" prefHeight="193.0" prefWidth="572.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="59.0" />
+      <ListView id="consoleList" layoutX="14.0" layoutY="59.0" prefHeight="184.0" prefWidth="572.0" AnchorPane.bottomAnchor="85.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="59.0" />
       <Label id="workTitle" layoutX="57.0" layoutY="10.0" text="Сборка проекта">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <Label id="statusLabel" layoutX="57.0" layoutY="33.0" text="Подождите ..." textFill="#909090" />
+      <Label id="statusLabel" layoutX="57.0" layoutY="30.0" prefHeight="27.0" prefWidth="178.0" text="Подождите ..." textFill="#909090" />
       <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="17.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" />
       <CheckBox id="closeAfterDoneCheckbox" layoutX="123.0" layoutY="268.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="288.0" selected="true" text="Закрыть после выполнения" AnchorPane.bottomAnchor="14.0" />
       <Button id="closeButton" layoutX="14.0" layoutY="268.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="90.0" styleClass="icon-exit" text="Закрыть" AnchorPane.bottomAnchor="14.0">
@@ -23,5 +23,6 @@
             <Cursor fx:constant="DEFAULT" />
          </cursor>
       </Button>
+      <ProgressBar id="progress" layoutX="14.0" layoutY="251.0" prefHeight="21.0" prefWidth="572.0" AnchorPane.bottomAnchor="56.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
    </children>
 </AnchorPane>

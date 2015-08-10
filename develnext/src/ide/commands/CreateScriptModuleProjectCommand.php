@@ -42,6 +42,9 @@ class CreateScriptModuleProjectCommand extends AbstractCommand
             $name = UXDialog::input('Придумайте название для модуля скриптов');
 
             if ($name !== null) {
+                /** @var GuiFrameworkProjectBehaviour $guiBehaviour */
+                $guiBehaviour = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
+
                 $path = GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY . '/' . $name;
 
                 if (File::of($path)->exists()) {
@@ -50,9 +53,10 @@ class CreateScriptModuleProjectCommand extends AbstractCommand
                     return;
                 }
 
-                $project->makeDirectory($path);
+                $file = $guiBehaviour->createModule($name);
+                FileSystem::open($file);
 
-                FileSystem::open($path);
+                return $name;
             }
         }
     }
