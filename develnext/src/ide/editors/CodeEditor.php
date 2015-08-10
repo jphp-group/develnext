@@ -403,9 +403,11 @@ CONTENT;
 
     public function jumpToLine($line, $offset = 0)
     {
-        $this->waitState(function () use ($line, $offset) {
-            $this->webView->requestFocus();
-            $this->webEngine->callFunction('jumpToLine', [$line, $offset]);
+        UXApplication::runLater(function() use ($line, $offset) {
+            $this->waitState(function () use ($line, $offset) {
+                $this->webView->requestFocus();
+                $this->webEngine->callFunction('jumpToLine', [$line, $offset]);
+            });
         });
     }
 

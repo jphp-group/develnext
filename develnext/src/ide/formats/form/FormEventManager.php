@@ -103,8 +103,11 @@ class FormEventManager
 
         $parser = new PhpParser(FileUtils::get($this->file));
 
+        $offset = 0;
+
         foreach ($binds as $bind) {
-            $parser->removeLines($bind['eventLine'], $bind['endLine']);
+            $parser->removeLines($bind['eventLine'] - $offset, $bind['endLine'] - $offset);
+            $offset += $bind['endLine'] - $bind['eventLine'] + 1;
         }
 
         FileUtils::put($this->file, $parser->getContent());
