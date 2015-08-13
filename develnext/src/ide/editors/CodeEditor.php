@@ -132,7 +132,7 @@ class CodeEditor extends AbstractEditor
         CODE_EDITOR.setTheme("ace/theme/#THEME#");
         CODE_EDITOR.getSession().setMode("ace/mode/#MODE#");
 
-        document.getElementById('editor').style.fontSize='12px';
+        document.getElementById('editor').style.fontSize='14px';
 
         /*CODE_EDITOR = CodeMirror.fromTextArea(document.getElementById("editor"), #OPTIONS#);
         CODE_EDITOR.setSize("100%", "100%");
