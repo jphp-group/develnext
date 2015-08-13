@@ -152,6 +152,7 @@ abstract class UXWindow
 
     /**
      * @param string $id
+     * @return bool
      */
     public function __isset($id)
     {

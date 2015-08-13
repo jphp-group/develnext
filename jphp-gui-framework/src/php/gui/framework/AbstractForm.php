@@ -274,4 +274,33 @@ abstract class AbstractForm extends UXForm
 
         $node->on($eventName, $handler, $group);
     }
+
+    public function __get($name)
+    {
+        foreach ($this->_modules as $module) {
+            if ($module->disabled) {
+                continue;
+            }
+
+            if ($script = $module->getScript($name)) {
+                return $script;
+            }
+        }
+
+        return parent::__get($name);
+    }
+
+    public function __isset($name) {
+        foreach ($this->_modules as $module) {
+            if ($module->disabled) {
+                continue;
+            }
+
+            if ($script = $module->getScript($name)) {
+                return true;
+            }
+        }
+
+        return parent::__isset($name);
+    }
 }

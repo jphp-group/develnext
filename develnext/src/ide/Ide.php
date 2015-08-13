@@ -136,7 +136,7 @@ class Ide extends Application
                         $dialog->title = 'Ошибка';
                         $dialog->headerText = 'Произошла ошибка в вашей программе';
                         $dialog->contentText = $e->getMessage();
-                        $dialog->setButtonTypes(['Остановить', 'Игнорировать']);
+                        $dialog->setButtonTypes(['Выход из программы', 'Продолжить']);
 
                         $pane = new UXAnchorPane();
                         $pane->maxWidth = 100000;
@@ -150,7 +150,7 @@ class Ide extends Application
                         $dialog->expanded = true;
 
                         switch ($dialog->showAndWait()) {
-                            case 'Остановить':
+                            case 'Выход из программы':
                                 Ide::get()->shutdown();
                                 break;
                         }

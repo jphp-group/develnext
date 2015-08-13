@@ -267,6 +267,12 @@ class FormEditor extends AbstractModuleEditor
             return 'busy';
         }
 
+        $data = DataUtils::get($node, $this->layout, false);
+
+        if ($data) {
+            $data->id = "data-$newId";
+        }
+
         $this->eventManager->renameBind($node->id, $newId);
         $this->codeEditor->load();
 

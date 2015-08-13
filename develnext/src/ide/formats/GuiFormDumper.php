@@ -6,6 +6,7 @@ use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
 use php\gui\designer\UXDesigner;
+use php\gui\framework\DataUtils;
 use php\gui\layout\UXPane;
 use php\gui\UXData;
 use php\gui\UXDialog;
@@ -58,6 +59,8 @@ class GuiFormDumper extends AbstractFormDumper
     public function save(FormEditor $editor)
     {
         $this->designer = $editor->getDesigner();
+
+        DataUtils::cleanup($editor->getLayout());
 
         $document = $this->processor->createDocument();
 

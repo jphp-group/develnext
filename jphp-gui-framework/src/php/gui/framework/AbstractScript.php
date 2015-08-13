@@ -79,4 +79,13 @@ abstract class AbstractScript
 
         return parent::_get($name);
     }
+
+    public function __isset($name)
+    {
+        if ($this->_context) {
+            return $this->_context->{$name} !== null;
+        }
+
+        return false;
+    }
 }

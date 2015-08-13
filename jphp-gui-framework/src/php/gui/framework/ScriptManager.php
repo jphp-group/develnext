@@ -96,4 +96,9 @@ class ScriptManager
 
         return $script;
     }
+
+    public function __isset($name)
+    {
+        return isset($this->scripts[$name]);
+    }
 }

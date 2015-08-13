@@ -18,7 +18,7 @@ abstract class AbstractModule extends AbstractScript
     /**
      * @var bool
      */
-    public $applyToApplication = true;
+    public $applyToApplication = false;
 
     /**
      * @var ScriptManager
@@ -123,5 +123,28 @@ abstract class AbstractModule extends AbstractScript
         }
 
         $this->trigger('action', $this, $target);
+    }
+
+    public function getScript($name)
+    {
+        if (isset($this->scriptManager->{$name})) {
+            return $this->scriptManager->{$name};
+        }
+
+        return null;
+    }
+
+    public function __get($name)
+    {
+        if (isset($this->scriptManager->{$name})) {
+            return $this->scriptManager->{$name};
+        }
+
+        return parent::__get($name);
+    }
+
+    public function __isset($name)
+    {
+        return isset($this->scriptManager->{$name}) || parent::__isset($name);
     }
 }

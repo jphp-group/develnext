@@ -24,9 +24,30 @@ class DataUtils
     {
         foreach ($layout->childrenUnmodifiable as $node) {
             if ($node instanceof UXData) {
-                $callback($node, static::getNode($layout, $node));
+                $nd = static::getNode($layout, $node);
+                if ($nd) {
+                    $callback($node, $nd);
+                }
             } else if ($node instanceof UXParent) {
                 static::scan($node, $callback);
+            }
+        }
+    }
+
+    /**
+     * @param UXParent $parent
+     */
+    public static function cleanup(UXParent $parent)
+    {
+        foreach ($parent->childrenUnmodifiable as $node) {
+            if ($node instanceof UXData) {
+                $nd = static::getNode($parent, $node);
+
+                if (!$nd) {
+                    $parent->children->remove($node);
+                }
+            } else if ($node instanceof UXParent) {
+                static::cleanup($node);
             }
         }
     }
@@ -36,10 +57,11 @@ class DataUtils
      *
      * @param UXPane|UXParent $layout
      *
+     * @param bool $create
      * @return UXData
      * @throws IllegalArgumentException
      */
-    public static function get(UXNode $node, UXParent $layout = null)
+    public static function get(UXNode $node, UXParent $layout = null, $create = true)
     {
         if (!$node->id) {
             throw new IllegalArgumentException("The node must have id value");
@@ -55,15 +77,11 @@ class DataUtils
 
         $data = $layout->lookup('#data-' . $node->id);
 
-        if (!$data) {
+        if (!$data && $create) {
             $data = new UXData();
             $data->id = 'data-' . $node->id;
 
             $layout->add($data);
-
-            $node->watch('id', function ($self, $prop, $old, $new) use ($data) {
-                $data->id = 'data-' . $self->id;
-            });
         }
 
         return $data;

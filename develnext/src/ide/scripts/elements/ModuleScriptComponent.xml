@@ -1,10 +1,9 @@
 <element>
     <init>
-        <property code="applyToApplication" value="1" />
+        <property code="applyToApplication" value="0" />
     </init>
 
     <properties group="general" title="Модуль">
-        <property code="applyToApplication" editor="boolean" name="Глобальный" tooltip="Глобальный модуль будет подключен при старте ко всей программе" />
         <property code="disabled" name="Отключить" editor="boolean" tooltip="При отключении модуль не будет выполнять все свои скрипты" />
     </properties>
 

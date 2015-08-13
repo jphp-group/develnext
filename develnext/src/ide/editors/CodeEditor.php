@@ -92,6 +92,10 @@ class CodeEditor extends AbstractEditor
 
         $this->mode = $mode;
 
+        $ace = new ResourceStream('/.data/vendor/ace/ace.js');
+        $acePath = $ace->toExternalForm();
+        $acePath = Str::replace($acePath, '/ace.js', '');
+
         $url = new ResourceStream('/.data/vendor/codemirror/codemirror.css');
 
         $codeMirrorPath = $url->toExternalForm();
@@ -106,23 +110,31 @@ class CodeEditor extends AbstractEditor
     <head>
         <link rel="stylesheet" href="$codeMirrorPath/codemirror.css">
         <script src="$jqueryPath"></script>
-        <script src="$codeMirrorPath/codemirror.js"></script>
-        <script src="$codeMirrorPath/addon/comment/comment.js"></script>
-        <script src="$codeMirrorPath/addon/comment/continuecomment.js"></script>
-        <script src="$codeMirrorPath/addon/selection/active-line.js"></script>
-        <script src="$codeMirrorPath/addon/selection/selection-pointer.js"></script>
-        <script src="$codeMirrorPath/addon/display/placeholder.js"></script>
-        #HEAD#
+        <script src="$acePath/ace.js"></script>
 
         <style>
           html { height: 100%; }
           body { height: 100%; padding: 0; margin: 0; }
+
+          #editor {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+            }
         </style>
     </head>
 <body>
-    <textarea id="editor"></textarea>
+    <pre id="editor"></pre>
     <script type="text/javascript">
-        CODE_EDITOR = CodeMirror.fromTextArea(document.getElementById("editor"), #OPTIONS#);
+        CODE_EDITOR = ace.edit("editor");
+        CODE_EDITOR.setTheme("ace/theme/#THEME#");
+        CODE_EDITOR.getSession().setMode("ace/mode/#MODE#");
+
+        document.getElementById('editor').style.fontSize='12px';
+
+        /*CODE_EDITOR = CodeMirror.fromTextArea(document.getElementById("editor"), #OPTIONS#);
         CODE_EDITOR.setSize("100%", "100%");
 
         function bindEvents() {
@@ -150,6 +162,7 @@ class CodeEditor extends AbstractEditor
             CODE_EDITOR.off('keyHandled');
             CODE_EDITOR.off('gutterClick');
         }
+        */
 
         function trigger(event, args) {
             if (typeof PHP !== "undefined") {
@@ -162,80 +175,33 @@ class CodeEditor extends AbstractEditor
         }
 
         function setValue(value) {
-            unbindEvents();
-            CODE_EDITOR.setValue(value);
-            bindEvents();
+            //unbindEvents();
+            CODE_EDITOR.setValue(value, -1);
+            //bindEvents();
         }
 
         function getValue() {
             return CODE_EDITOR.getValue();
         }
 
-        function highlightArea(beginLine, endLine) {
-            beginLine = parseInt(beginLine);
-            endLine = parseInt(endLine);
-
-            for (var i = 0; i < CODE_EDITOR.lineCount(); i++) {
-                if (i >= beginLine && i < endLine) {
-                    CODE_EDITOR.removeLineClass(i, "background", "highlight-area");
-                    CODE_EDITOR.removeLineClass(i, "text", "highlight-area-text");
-                } else {
-                    CODE_EDITOR.addLineClass(i, "background", "highlight-area");
-                    CODE_EDITOR.addLineClass(i, "text", "highlight-area-text");
-                }
-            }
-        }
-
         function jumpToLine(line, offset) {
             CODE_EDITOR.focus();
-            CODE_EDITOR.execCommand('goDocStart');
-
-            //CODE_EDITOR.extendSelection(CodeMirror.Pos(line, offset))
-            for (var i = 0; i < line; i++) {
-                CODE_EDITOR.moveVEx(1, "line");
-            }
-
-            for (var i = 0; i < offset; i++) {
-                CODE_EDITOR.execCommand('goCharRight');
-            }
-
-            var myHeight = CODE_EDITOR.getScrollInfo().clientHeight;
-            var coords = CODE_EDITOR.charCoords({line: line, ch: 0}, "local");
-            CODE_EDITOR.scrollTo(null, (coords.top + coords.bottom - myHeight) / 2);
+            CODE_EDITOR.gotoLine(parseInt(line) + 1, offset, true);
         }
 
         $(window).load(function(){
-            bindEvents();
+            CODE_EDITOR.clearSelection();
             alert("~editor:loaded~");
         });
     </script>
 </body>
 </html>
 CONTENT;
-        $head = '';
-
-        if ($mode) {
-            if (!$options['mode']) {
-                $options['mode'] = 'text/x-' . $mode;
-            }
-
-            $head .= '<script src="' . $codeMirrorPath . '/mode/htmlmixed/htmlmixed.js"></script>';
-            $head .= '<script src="' . $codeMirrorPath . '/mode/css/css.js"></script>';
-            $head .= '<script src="' . $codeMirrorPath . '/mode/xml/xml.js"></script>';
-            $head .= '<script src="' . $codeMirrorPath . '/mode/javascript/javascript.js"></script>';
-            $head .= '<script src="' . $codeMirrorPath . '/mode/clike/clike.js"></script>';
-
-            $head .= '<script src="' . $codeMirrorPath . '/mode/' . $mode . '/' . $mode . '.js"></script>';
-        }
-
-        if ($options['theme']) {
-            $head .= "<link rel='stylesheet' href='{$codeMirrorPath}/theme/{$options['theme']}.css'>";
-        }
 
         $this->json = new JsonProcessor();
 
-        $content = Str::replace($content, '#HEAD#', $head);
-        $content = Str::replace($content, '#OPTIONS#', $this->json->format($options));
+        $content = Str::replace($content, '#MODE#', $mode);
+        $content = Str::replace($content, '#THEME#', $options['theme']);
 
         $this->webView = new UXWebView();
         $this->webEngine = $this->webView->engine;
@@ -246,8 +212,10 @@ CONTENT;
 
         $this->webEngine->on('alert', function (UXWebEvent $e) {
             if ($e->data == "~editor:loaded~") {
-                $this->loaded = true;
-                $this->webEngine->addSimpleBridge('PHP', [$this, 'editorBridgeHandler']);
+                UXApplication::runLater(function () {
+                    $this->loaded = true;
+                    $this->webEngine->addSimpleBridge('PHP', [$this, 'editorBridgeHandler']);
+                });
             } else {
                 UXDialog::show($e->data);
             }

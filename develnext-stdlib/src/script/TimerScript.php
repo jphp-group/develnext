@@ -27,6 +27,11 @@ class TimerScript extends AbstractScript
     /**
      * @var bool
      */
+    public $autoStart = true;
+
+    /**
+     * @var bool
+     */
     protected $stopped = false;
 
     /**
@@ -40,7 +45,9 @@ class TimerScript extends AbstractScript
      */
     protected function applyImpl($target)
     {
-        $this->start();
+        if ($this->autoStart) {
+            $this->start();
+        }
     }
 
     public function start()
@@ -74,6 +81,11 @@ class TimerScript extends AbstractScript
     public function isStopped()
     {
         return $this->stopped;
+    }
+
+    public function isRunning()
+    {
+        return !$this->stopped && ($this->th && $this->th->isAlive());
     }
 
     protected function doInterval()
