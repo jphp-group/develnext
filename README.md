@@ -29,22 +29,22 @@ Under MPL 2.0 (https://www.mozilla.org/MPL/2.0/)
 
 *Required*
 
-    Disclose Source
-    License and copyright notice
+- Disclose Source
+- License and copyright notice
 
 *Permitted*
 
-    Commercial Use
-    Distribution
-    Modification
-    Patent Grant
-    Private Use
-    Sublicensing
+- Commercial Use
+- Distribution
+- Modification
+- Patent Grant
+- Private Use
+- Sublicensing
 
 *Forbidden*
 
-    Hold Liable
-    Use Trademark
+- Hold Liable
+- Use Trademark
 
 
 
