@@ -23,6 +23,31 @@ cd /path/to/repo
 
 You can find the builded distrubutive in `develnext/build/install/develnext`.
 
+### License
+
+Under MPL 2.0 (https://www.mozilla.org/MPL/2.0/)
+
+*Required*
+
+    Disclose Source
+    License and copyright notice
+
+*Permitted*
+
+    Commercial Use
+    Distribution
+    Modification
+    Patent Grant
+    Private Use
+    Sublicensing
+
+*Forbidden*
+
+    Hold Liable
+    Use Trademark
+
+
+
 ### Как получить дистрибутив DevelNext?
 
 Установите JDK (Java), склонируйте репозиторий и используйте следующие консольные команды:
@@ -34,3 +59,26 @@ cd /path/to/repo
 ```
 
 Найти собранный дистрибутив можно будет в папке `develnext/build/install/develnext`.
+
+### Лицензия
+
+Under MPL 2.0 (https://www.mozilla.org/MPL/2.0/)
+
+*Обязательно*
+
+  - Не закрывать исходники
+  - Прикладывать тексты лицензии
+   
+*Разрешено*
+
+  - Комерческое использование
+  - Распространение
+  - Модификация
+  - Патентные гарантия
+  - Приватное использование
+  - Саб-лицензирование
+   
+*Зарещено*
+  
+  - Нести ответственность
+  - Использование торговой марки продукта (названия и логотипов)
