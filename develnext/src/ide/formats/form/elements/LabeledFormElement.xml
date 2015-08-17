@@ -17,5 +17,18 @@
         </property>
 
         <property code="alignment" name="Выравнивание" editor="position" />
+
+        <property code="graphic" name="Иконка" editor="image" virtual="1" />
+        <property code="graphicTextGap" name="Отступ иконки" editor="float" />
+        <property code="contentDisplay" name="Отображение иконки" editor="enum" defaultValue="LEFT">
+            <variants>
+                <variant value="TOP">Сверху</variant>
+                <variant value="BOTTOM">Снизу</variant>
+                <variant value="LEFT">Слева</variant>
+                <variant value="RIGHT">Справа</variant>
+                <variant value="GRAPHIC_ONLY">Без текста</variant>
+                <variant value="TEXT_ONLY">Только текст</variant>
+            </variants>
+        </property>
     </properties>
 </element>

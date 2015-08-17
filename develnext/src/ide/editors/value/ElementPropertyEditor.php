@@ -6,6 +6,8 @@ use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\framework\DataUtils;
 use php\gui\UXNode;
 use php\gui\UXTableCell;
+use php\lang\IllegalArgumentException;
+use php\lang\JavaException;
 use php\xml\DomElement;
 
 /**
@@ -182,26 +184,44 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     {
         $value = $this->getNormalizedValue($value);
 
-        if (!$this->setter) {
-            $this->designProperties->target->{$this->code} = $value;
-        } else {
-            $setter = $this->setter;
-            $setter($this, $value);
-        }
+        try {
+            if (!$this->setter) {
+                $this->designProperties->target->{$this->code} = $value;
+            } else {
+                $setter = $this->setter;
+                $setter($this, $value);
+            }
 
-        if ($updateUi) {
-            $this->updateUi($value);
+            if ($updateUi) {
+                $this->updateUi($value);
+            }
+        } catch (IllegalArgumentException $e) {
+            ;
+        } catch (JavaException $e) {
+            if (!$e->isIllegalArgumentException()) {
+                throw $e;
+            }
         }
     }
 
     public function getValue()
     {
-        if (!$this->getter) {
-            $value = $this->designProperties->target->{$this->code};
-            return $value;
-        } else {
-            $getter = $this->getter;
-            return $getter($this);
+        try {
+            if (!$this->getter) {
+                $value = $this->designProperties->target->{$this->code};
+                return $value;
+            } else {
+                $getter = $this->getter;
+
+                return $getter($this);
+
+            }
+        } catch (IllegalArgumentException $e) {
+            ;
+        } catch (JavaException $e) {
+            if (!$e->isIllegalArgumentException()) {
+                throw $e;
+            }
         }
     }
 

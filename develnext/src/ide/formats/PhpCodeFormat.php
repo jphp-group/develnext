@@ -19,13 +19,13 @@ class PhpCodeFormat extends AbstractFormat
     public function createEditor($file)
     {
         return new CodeEditor($file, 'php', [
-            'lineNumbers'         => true,
-            'continueComments'    => true,
-            'styleActiveLine'     => true,
-            'selectionPointer'    => true,
+            'enableBasicAutocompletion' => true,
+            'enableSnippets' => true,
+            'enableLiveAutocompletion' => true,
+            'showPrintMargin' => false,
+            'fontSize' => 14,
 
-            'theme'               => 'ambiance',
-            'mode'                => 'application/x-httpd-php',
+            'theme' => 'ambiance',
         ]);
     }
 

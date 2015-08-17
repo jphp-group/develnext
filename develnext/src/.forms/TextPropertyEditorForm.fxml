@@ -6,8 +6,8 @@
 <?import javafx.scene.web.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-
 <?import org.develnext.jphp.ext.javafx.classes.data.*?>
+
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="247.0" prefWidth="428.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TextArea id="textArea" layoutX="14.0" layoutY="14.0" prefHeight="239.0" prefWidth="442.0" promptText="Введите текст" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
@@ -19,6 +19,11 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
+      <Button id="copyButton" layoutX="20.0" layoutY="207.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="117.0" styleClass="icon-copy" text="Скопировать" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
    </children>
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

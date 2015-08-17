@@ -194,4 +194,11 @@ class UXDesigner
     public function update()
     {
     }
+
+    /**
+     * ...
+     */
+    public function requestFocus()
+    {
+    }
 }

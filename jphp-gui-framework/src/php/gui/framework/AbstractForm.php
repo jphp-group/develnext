@@ -6,6 +6,7 @@ use php\gui\event\UXEvent;
 use php\gui\UXApplication;
 use php\gui\UXData;
 use php\gui\UXForm;
+use php\gui\UXImage;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
@@ -132,13 +133,25 @@ abstract class AbstractForm extends UXForm
         // only for non primary forms.
         if ($this->_app->getMainForm() && $this->_config->has('form.modality')) {
             try {
-                $this->modality = $this->_config->get('form.modality');
-            } catch (Exception $e) {
-                if ($this->_config->get('form.modality')) {
-                    $this->modality = 'APPLICATION_MODAL';
-                } else {
-                    $this->modality = 'NONE';
+                $value = $this->_config->get('form.modality');
+
+                if ($value == '1') {
+                    $value = 'APPLICATION_MODAL';
+                } elseif ($value == '0') {
+                    $value = 'NONE';
                 }
+
+                $this->modality = $value;
+            } catch (Exception $e) {
+                ;
+            }
+        }
+
+        if ($this->_config->has('form.icon')) {
+            try {
+                $this->icons->add(new UXImage("res://" . $this->_config->get('form.icon')));
+            } catch (Exception $e) {
+                ;
             }
         }
 

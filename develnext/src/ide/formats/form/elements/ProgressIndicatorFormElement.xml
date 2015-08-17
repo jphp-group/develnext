@@ -1,5 +1,5 @@
 <element extends="NodeFormElement" >
     <properties>
-        <property code="progress" name="Прогресс" editor="float" />
+        <property code="progress" name="Прогресс (%)" editor="integer" />
     </properties>
 </element>

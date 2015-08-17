@@ -112,6 +112,11 @@ public class UXDesigner extends BaseObject {
         }
     }
 
+    @Signature
+    public void requestFocus() {
+        area.requestFocus();
+    }
+
     @Getter
     public Node getPickedNode() {
         return picked;
@@ -633,6 +638,11 @@ public class UXDesigner extends BaseObject {
                     }
                 }
 
+
+                if (e.getButton() == MouseButton.PRIMARY) {
+                    e.consume();
+                }
+
                 tmpLock = true;
 
                 Platform.runLater(new Runnable() {
@@ -921,6 +931,11 @@ public class UXDesigner extends BaseObject {
 
                     if (node instanceof Region) {
                         ((Region) node).setPrefSize(resizeW, resizeH);
+                    }
+
+                    if (node instanceof ImageView) {
+                        ((ImageView) node).setFitWidth(resizeW);
+                        ((ImageView) node).setFitHeight(resizeH);
                     }
 
                     if (onChanged != null) {

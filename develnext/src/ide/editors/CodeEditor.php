@@ -6,12 +6,14 @@ use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\utils\UiUtils;
 use php\format\JsonProcessor;
+use php\gui\event\UXKeyEvent;
 use php\gui\event\UXWebErrorEvent;
 use php\gui\event\UXWebEvent;
 use php\gui\framework\Timer;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\UXApplication;
+use php\gui\UXClipboard;
 use php\gui\UXDialog;
 use php\gui\UXNode;
 use php\gui\UXWebEngine;
@@ -23,6 +25,7 @@ use php\io\Stream;
 use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\lib\Char;
+use php\lib\Items;
 use php\lib\Mirror;
 use php\lib\Str;
 use php\net\URLConnection;
@@ -96,11 +99,6 @@ class CodeEditor extends AbstractEditor
         $acePath = $ace->toExternalForm();
         $acePath = Str::replace($acePath, '/ace.js', '');
 
-        $url = new ResourceStream('/.data/vendor/codemirror/codemirror.css');
-
-        $codeMirrorPath = $url->toExternalForm();
-        $codeMirrorPath = Str::replace($codeMirrorPath, '/codemirror.css', '');
-
         $url = new ResourceStream('/.data/vendor/jquery/jquery-1.11.1.js');
         $jqueryPath = $url->toExternalForm();
 
@@ -108,10 +106,12 @@ class CodeEditor extends AbstractEditor
 <!doctype html>
 <html>
     <head>
-        <link rel="stylesheet" href="$codeMirrorPath/codemirror.css">
         <script src="$jqueryPath"></script>
         <script src="$acePath/ace.js"></script>
-
+        <script src="$acePath/ext-language_tools.js"></script>
+        <script src="$acePath/ext-spellcheck.js"></script>
+        <script src="$acePath/ext-searchbox.js"></script>
+        <script src="$acePath/ext-split.js"></script>
         <style>
           html { height: 100%; }
           body { height: 100%; padding: 0; margin: 0; }
@@ -125,44 +125,38 @@ class CodeEditor extends AbstractEditor
             }
         </style>
     </head>
-<body>
-    <pre id="editor"></pre>
+<body><div id="editor"></div><div id="statusBar"></div>
     <script type="text/javascript">
         CODE_EDITOR = ace.edit("editor");
+
+        var lang = ace.require("ace/ext/language_tools");
+
+        CODE_EDITOR.setOptions(#OPTIONS#);
+
         CODE_EDITOR.setTheme("ace/theme/#THEME#");
         CODE_EDITOR.getSession().setMode("ace/mode/#MODE#");
 
-        document.getElementById('editor').style.fontSize='14px';
-
-        /*CODE_EDITOR = CodeMirror.fromTextArea(document.getElementById("editor"), #OPTIONS#);
-        CODE_EDITOR.setSize("100%", "100%");
-
         function bindEvents() {
-            CODE_EDITOR.on('beforeChange', function (cm, change) {
-                var result = trigger('beforeChange', change);
-
-                if (result && result["cancel"]) {
-                    change.cancel();
-                }
+            CODE_EDITOR.on('change', function (e) { trigger('change', e) });
+            CODE_EDITOR.on('copy', function (e) { trigger('copy', {text: e}) });
+            CODE_EDITOR.on('paste', function (e) {
+                var result = trigger('paste', e);
+                e.text = result.text;
             });
 
-            CODE_EDITOR.on('change', function (cm, change) {
-                 change.value = getValue();
-                 trigger('change', change)
-            });
-            CODE_EDITOR.on('cursorActivity', function (cm) { trigger('cursorActivity') });
-            CODE_EDITOR.on('keyHandled', function (cm, name, e) { trigger('keyHandled', {name: name, event: event}) });
-            CODE_EDITOR.on('gutterClick', function (cm, line, gutter) { trigger('keyHandled', {line: line, gutter: gutter}) });
+            CODE_EDITOR.on('cut', function (e) { trigger('cut', {text: e}) });
         }
 
         function unbindEvents() {
-            CODE_EDITOR.off('beforeChange');
             CODE_EDITOR.off('change');
-            CODE_EDITOR.off('cursorActivity');
-            CODE_EDITOR.off('keyHandled');
-            CODE_EDITOR.off('gutterClick');
+            CODE_EDITOR.off('copy');
+            CODE_EDITOR.off('cut');
+            CODE_EDITOR.off('paste');
         }
-        */
+
+        function executeCommand(cm) {
+            CODE_EDITOR.execCommand(cm);
+        }
 
         function trigger(event, args) {
             if (typeof PHP !== "undefined") {
@@ -175,9 +169,9 @@ class CodeEditor extends AbstractEditor
         }
 
         function setValue(value) {
-            //unbindEvents();
+            unbindEvents();
             CODE_EDITOR.setValue(value, -1);
-            //bindEvents();
+            bindEvents();
         }
 
         function getValue() {
@@ -191,8 +185,24 @@ class CodeEditor extends AbstractEditor
 
         $(window).load(function(){
             CODE_EDITOR.clearSelection();
+            bindEvents();
             alert("~editor:loaded~");
         });
+
+        var completer = {
+          getCompletions: function (editor, session, pos, prefix, callback) {
+            if (prefix.length === 0) {
+                callback(null, []);
+                return;
+            }
+
+            var result = CODE_EDITOR.trigger('autocomplete', {prefix: prefix, pos: pos}) || [];
+            callback(null, []);
+            return;
+          }
+        }
+
+        //lang.addCompleter(completer);
     </script>
 </body>
 </html>
@@ -202,6 +212,7 @@ CONTENT;
 
         $content = Str::replace($content, '#MODE#', $mode);
         $content = Str::replace($content, '#THEME#', $options['theme']);
+        $content = Str::replace($content, '#OPTIONS#', Json::encode($options));
 
         $this->webView = new UXWebView();
         $this->webEngine = $this->webView->engine;
@@ -209,6 +220,15 @@ CONTENT;
         $this->webEngine->loadContent($content);
 
         $this->loaded = false;
+
+        $this->webView->on('keyDown', function (UXKeyEvent $e) {
+            if (($e->controlDown && $e->codeName == 'V')
+                || ($e->shiftDown && $e->codeName == 'Insert')) {
+                UXApplication::runLater(function () {
+                    $this->executeCommand('paste');
+                });
+            }
+        });
 
         $this->webEngine->on('alert', function (UXWebEvent $e) {
             if ($e->data == "~editor:loaded~") {
@@ -243,8 +263,10 @@ CONTENT;
             }
         });
 
-        $this->on('beforeChange', [$this, 'doBeforeChange']);
         $this->on('change', [$this, 'doChange']);
+        $this->on('copy', [$this, 'doCopy']);
+        $this->on('cut', [$this, 'doCopy']);
+        $this->on('paste', [$this, 'doPaste']);
     }
 
     /**
@@ -256,7 +278,7 @@ CONTENT;
     {
         if ($any instanceof AbstractCommand) {
             $any->setTarget($this);
-            $this->commands[Mirror::typeOf($any, true)] = $any;
+            $this->commands[] = $any;
         } else {
             throw new IllegalArgumentException();
         }
@@ -284,25 +306,27 @@ CONTENT;
     {
         $i = ++$this->eventUpdates;
 
-        $this->value = $change['value'];
-
         Timer::run(1000, function () use ($i) {
+            $this->value = $this->webEngine->callFunction('getValue', []);
+
             if ($i == $this->eventUpdates) {
                 $this->trigger('update', []);
             }
         });
     }
 
-    protected function doBeforeChange($change)
+    protected function doCopy($e)
     {
-        if ($this->editableArea) {
-            $line = $change['from']['line'];
-            // TODO: сделать плавающий endLine
-
-            if ($line >= $this->editableArea['endLine'] || $line < $this->editableArea['beginLine']) {
-                return ['cancel' => true];
-            }
+        if (is_array($e['text'])) {
+            return;
         }
+
+        UXClipboard::setText($e['text']);
+    }
+
+    protected function doPaste($e)
+    {
+        return ['text' => UXClipboard::getText()];
     }
 
     protected function waitState(callable $handler)
@@ -323,6 +347,18 @@ CONTENT;
         }
 
         $this->doOnSucceed[] = $handler;
+    }
+
+    public function executeCommand($command)
+    {
+        $this->webView->requestFocus();
+
+        UXApplication::runLater(function () use ($command) {
+            $this->waitState(function () use ($command) {
+                $this->webEngine->callFunction('executeCommand', [$command]);
+                $this->value = $this->webEngine->callFunction('getValue', []);
+            });
+        });
     }
 
     public function setEditableArea($beginLine, $endLine)
@@ -443,5 +479,41 @@ CONTENT;
         $this->webView->topAnchor = 30;
 
         return $ui;
+    }
+
+    public function registerDefaultCommands()
+    {
+        $this->register(AbstractCommand::make('Отменить (Ctrl + Z)', 'icons/undo16.png', function () {
+            $this->executeCommand('undo');
+        }));
+
+        $this->register(AbstractCommand::make('Вернуть (Ctrl + Shift + Z)', 'icons/redo16.png', function () {
+            $this->executeCommand('redo');
+        }));
+
+        $this->register(AbstractCommand::makeSeparator());
+
+        $this->register(AbstractCommand::make('Вырезать (Ctrl + X)', 'icons/cut16.png', function () {
+            $this->executeCommand('cut');
+        }));
+
+        $this->register(AbstractCommand::make('Копировать (Ctrl + C)', 'icons/copy16.png', function () {
+            $this->executeCommand('copy');
+        }));
+
+        $this->register(AbstractCommand::make('Вставить (Ctrl + V)', 'icons/paste16.png', function () {
+            $this->executeCommand('paste');
+        }));
+
+        $this->register(AbstractCommand::makeSeparator());
+
+        $this->register(AbstractCommand::makeWithText('Найти', 'icons/search16.png', function () {
+            $this->executeCommand('find');
+        }));
+
+        $this->register(AbstractCommand::makeWithText('Заменить', 'icons/replace16.png', function () {
+            $this->executeCommand('replace');
+            $this->save();
+        }));
     }
 }

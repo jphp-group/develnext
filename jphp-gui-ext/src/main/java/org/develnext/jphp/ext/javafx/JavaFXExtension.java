@@ -20,6 +20,7 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.web.*;
 import javafx.stage.*;
+import netscape.javascript.JSException;
 import org.develnext.jphp.ext.javafx.bind.CursorMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.InsetsMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.KeyCombinationMemoryOperation;
@@ -156,6 +157,8 @@ public class JavaFXExtension extends Extension {
 
         registerClass(scope, UXDialog.class);
         registerClass(scope, UXClipboard.class);
+
+        registerJavaException(scope, WrapJSException.class, JSException.class);
 
         registerEvents();
     }

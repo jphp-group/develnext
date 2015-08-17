@@ -22,7 +22,7 @@ use php\gui\UXTextField;
  * Class ButtonFormElement
  * @package ide\formats\form
  */
-class CheckboxFormElement extends AbstractFormElement
+class CheckboxFormElement extends LabeledFormElement
 {
     public function getName()
     {

@@ -67,6 +67,9 @@ class FormEditor extends AbstractModuleEditor
 
     protected $designerCodeEditor;
 
+    /** @var  UXHBox */
+    protected $modulesPane;
+
     /** @var UXSplitPane */
     protected $viewerAndEvents;
 
@@ -170,10 +173,17 @@ class FormEditor extends AbstractModuleEditor
         $this->configFile = $confFile;
 
         $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
-        $this->codeEditor->register(AbstractCommand::makeWithText('Скрыть', 'icons/exit16.png', function () {
+        $this->codeEditor->register(AbstractCommand::make('Скрыть', 'icons/close16.png', function () {
             $this->codeEditor->save();
             $this->switchToDesigner(true);
         }));
+        $this->codeEditor->register(AbstractCommand::make('Поменять расположение', 'icons/layoutHorizontal16.png', function () {
+            $this->viewerAndEvents->orientation = $this->viewerAndEvents->orientation == 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL';
+        }));
+
+        $this->codeEditor->register(AbstractCommand::makeSeparator());
+
+        $this->codeEditor->registerDefaultCommands();
 
         $this->codeEditor->on('update', function () {
             $node = $this->designer->pickedNode;
@@ -318,10 +328,14 @@ class FormEditor extends AbstractModuleEditor
     public function open()
     {
         parent::open();
-        $this->designer->unselectAll();
+        //$this->designer->unselectAll();
 
         $this->eventManager->load();
-        $this->updateProperties($this);
+        $this->updateProperties($this->designer->pickedNode ?: $this);
+
+        UXApplication::runLater(function () {
+            $this->designer->requestFocus();
+        });
     }
 
     public function selectForm()
@@ -377,6 +391,12 @@ class FormEditor extends AbstractModuleEditor
 
         $this->tabs = $tabs;
 
+        if (Ide::get()->getUserConfigValue(__CLASS__ . '.sourceEditor', false)) {
+            UXApplication::runLater(function () {
+                $this->switchToSmallSource();
+            });
+        }
+
         return $this->tabs;
     }
 
@@ -422,11 +442,16 @@ class FormEditor extends AbstractModuleEditor
 
         $class = __CLASS__;
 
-        $panel->watch('height', function () use ($class) {
+        $func = function () use ($class) {
             if ($this->viewerAndEvents->items->count() > 1) {
                 Ide::get()->setUserConfigValue("$class.dividerPositions", Str::join($this->viewerAndEvents->dividerPositions, ','));
             }
-        });
+        };
+
+        $panel->watch('width', $func);
+        $panel->watch('height', $func);
+
+        Ide::get()->setUserConfigValue("$class.sourceEditor", true);
     }
 
     public function switchToDesigner($hideSource = false)
@@ -434,6 +459,9 @@ class FormEditor extends AbstractModuleEditor
         $this->tabs->selectTab($this->designerTab);
 
         if ($hideSource && $this->viewerAndEvents->items->count() > 1) {
+            $class = __CLASS__;
+
+            Ide::get()->setUserConfigValue("$class.sourceEditor", false);
             $this->codeTab->content = $this->viewerAndEvents->items[1];
             unset($this->viewerAndEvents->items[1]);
         }
@@ -447,6 +475,7 @@ class FormEditor extends AbstractModuleEditor
     protected function makeDesigner($fullArea = false)
     {
         $area = new UXAnchorPane();
+        $this->layout->classes->add('form-editor');
 
         $viewer = new UXScrollPane($area);
 
@@ -463,7 +492,7 @@ class FormEditor extends AbstractModuleEditor
 
             UXAnchorPane::setAnchor($this->layout, 0);
         } else {
-            $this->layout->style = '-fx-border-width: 1px; -fx-border-style: dashed; -fx-border-color: silver;';
+            $this->layout->style = '-fx-border-width: 1px; -fx-border-style: none; -fx-border-color: silver;';
             $this->layout->position = [10, 10];
             $area->add($this->layout);
         }
@@ -481,6 +510,12 @@ class FormEditor extends AbstractModuleEditor
             }
 
             if (!$node->classes->has('ignore')) {
+                $element = $this->format->getFormElement($node);
+
+                if ($element) {
+                    $element->registerNode($node);
+                }
+
                 $this->designer->registerNode($node);
             }
         }
@@ -496,8 +531,21 @@ class FormEditor extends AbstractModuleEditor
 
         $this->designerCodeEditor = $designerCodeEditor;
 
+        $class = __CLASS__;
+
         $this->viewerAndEvents = new UXSplitPane([$viewer, $this->designerCodeEditor]);
-        $this->viewerAndEvents->orientation = 'VERTICAL';
+
+        try {
+            $this->viewerAndEvents->orientation = Ide::get()->getUserConfigValue("$class.orientation", 'VERTICAL');
+        } catch (\Exception $e) {
+            $this->viewerAndEvents->orientation = 'VERTICAL';
+        }
+
+        $this->viewerAndEvents->watch('orientation', function () use ($class) {
+            UXApplication::runLater(function () use ($class) {
+                Ide::get()->setUserConfigValue("$class.orientation", $this->viewerAndEvents->orientation);
+            });
+        });
 
         $this->viewerAndEvents->items->remove($designerCodeEditor);
 
@@ -559,6 +607,13 @@ class FormEditor extends AbstractModuleEditor
             $node->position = $position;
 
             $this->layout->add($node);
+
+            $element = $this->format->getFormElement($node);
+
+            if ($element) {
+                $element->registerNode($node);
+            }
+
             $this->designer->registerNode($node);
 
             if (!$e->controlDown) {
@@ -574,6 +629,8 @@ class FormEditor extends AbstractModuleEditor
                     $node->{$key} = $property['value'];
                 }
             }
+
+            $this->designer->requestFocus();
         } else {
             $this->updateProperties($this);
         }
@@ -599,6 +656,8 @@ class FormEditor extends AbstractModuleEditor
     protected function _onNodeClick(UXMouseEvent $e)
     {
         $selected = $this->elementTypePane->getSelected();
+
+        $this->layout->requestFocus();
 
         if ($selected) {
             $this->designer->unselectAll();

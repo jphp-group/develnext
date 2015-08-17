@@ -1,6 +1,7 @@
 <?php
 namespace ide\formats\form;
 
+use php\gui\UXNode;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 

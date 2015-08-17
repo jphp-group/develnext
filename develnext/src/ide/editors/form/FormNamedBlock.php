@@ -56,6 +56,15 @@ class FormNamedBlock extends UXAnchorPane
         $this->watch('height', function () use ($label) {
             $label->y = $this->height + 7;
         });
+
+        $mouseUp = function () {
+            UXApplication::runLater(function () {
+                $this->parent->requestFocus();
+            });
+        };
+
+        $label->on('click', $mouseUp);
+        $this->on('click', $mouseUp);
     }
 
     /**
@@ -112,6 +121,11 @@ class FormNamedBlock extends UXAnchorPane
             $icon->style = 'cursor: hand;';
             $icon->mouseTransparent = true;
             $icon->position = [8, 8];
+
+
+            $icon->on('mouseUp', function () {
+                $this->parent->requestFocus();
+            });
             $this->add($icon);
         }
     }

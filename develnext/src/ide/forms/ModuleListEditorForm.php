@@ -94,6 +94,10 @@ class ModuleListEditorForm extends AbstractForm
         $command = new CreateScriptModuleProjectCommand();
         $name = $command->onExecute();
 
+        if (!$name) {
+            return;
+        }
+
         $modules = [];
 
         foreach ($this->checkboxes as $module => $checkbox) {

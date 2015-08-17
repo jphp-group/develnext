@@ -9,6 +9,10 @@
 
 .icon-plus { -fx-graphic: url("/.data/img/icons/plus16.png"); }
 
+.icon-copy { -fx-graphic: url("/.data/img/icons/copy16.png"); }
+.icon-settings { -fx-graphic: url("/.data/img/icons/settings16.png"); }
+.icon-blocks { -fx-graphic: url("/.data/img/icons/blocks16.png"); }
+
 .icon-refresh { -fx-graphic: url("/.data/img/icons/refresh16.png"); }
 .icon-refresh32 { -fx-graphic: url("/.data/img/icons/refresh32.png"); }
 
@@ -43,4 +47,12 @@
 
 .list-cell:even { /* <=== changed to even */
     -fx-background-color: white;
+}
+
+/** ############### */
+
+.form-editor .image-view {
+    -fx-border-width: 1px;
+    -fx-border-color: gray;
+    -fx-border-style: dashed;
 }

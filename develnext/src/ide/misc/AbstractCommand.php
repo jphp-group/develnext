@@ -4,6 +4,7 @@ namespace ide\misc;
 use ide\Ide;
 use php\gui\UXButton;
 use php\gui\UXMenuItem;
+use php\gui\UXSeparator;
 
 /**
  * Class AbstractCommand
@@ -94,6 +95,11 @@ abstract class AbstractCommand
         $this->target = $target;
     }
 
+    public static function makeSeparator()
+    {
+        return new SeparatorCommand();
+    }
+
     /**
      * @param $name
      * @param $icon
@@ -112,6 +118,26 @@ abstract class AbstractCommand
         $command->setTextVisible(true);
 
         return $command;
+    }
+}
+
+class SeparatorCommand extends AbstractCommand
+{
+    public function getName()
+    {
+        return '';
+    }
+
+    public function onExecute()
+    {
+    }
+
+    public function makeUiForHead()
+    {
+        $separator = new UXSeparator();
+        $separator->orientation = 'VERTICAL';
+        $separator->paddingLeft = 2;
+        return $separator;
     }
 }
 

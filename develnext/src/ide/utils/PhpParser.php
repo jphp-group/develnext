@@ -1,5 +1,6 @@
 <?php
 namespace ide\utils;
+
 use phpx\parser\SourceTokenizer;
 use php\io\MemoryStream;
 use php\io\Stream;

@@ -1,9 +1,11 @@
 <?php
 namespace ide\formats\form\tags;
 
+use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXNode;
+use php\xml\DomDocument;
 use php\xml\DomElement;
 
 class NodeFormElementTag extends AbstractFormElementTag
@@ -37,5 +39,9 @@ class NodeFormElementTag extends AbstractFormElementTag
 
         $element->setAttribute('prefWidth', $node->size[0]);
         $element->setAttribute('prefHeight', $node->size[1]);
+    }
+
+    public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
+    {
     }
 }

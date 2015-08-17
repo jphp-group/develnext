@@ -10,6 +10,17 @@
         <property code="id" name="ID" editor="id" tooltip="Уникальный индетификатор элемента в рамках формы" />
         <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />
 
+        <property code="cursor" name="Курсор" editor="enum" tooltip="Тип курсора при наведении на объект" virtual="1" defaultValue="DEFAULT">
+            <variants>
+                <variant value="DEFAULT">[DEFAULT] По-умолчанию</variant>
+                <variant value="HAND">[HAND] Указательный палец</variant>
+                <variant value="TEXT">[TEXT] Редактирование</variant>
+                <variant value="WAIT">[WAIT] Ожидание</variant>
+                <variant value="MOVE">[MOVE] Перемещение</variant>
+                <variant value="NONE">[NONE] Отсутствует</variant>
+            </variants>
+        </property>
+
         <property code="visible" name="Видимость" editor="boolean" virtual="1" tooltip="Видимость элемента на форме в момент старта" />
         <property code="enabled" name="Доступность" editor="boolean" virtual="1" tooltip="Доступность элемента на форме в момент старта" />
 

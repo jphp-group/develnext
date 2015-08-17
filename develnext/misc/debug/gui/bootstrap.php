@@ -43,7 +43,7 @@ if (!$mainForm->alwaysOnTop) {
 
 $mainForm->requestFocus();
 
-/*set_exception_handler(function (BaseException $e) {
+set_exception_handler(function (BaseException $e) {
     static $showed = false;
 
     if ($showed) {
@@ -56,7 +56,7 @@ $mainForm->requestFocus();
     $dialog->title = 'Ошибка';
     $dialog->headerText = 'Произошла ошибка в вашей программе';
     $dialog->contentText = $e->getMessage();
-    $dialog->setButtonTypes(['Остановить', 'Игнорировать']);
+    $dialog->setButtonTypes(['Выход из программы', 'Продолжить']);
 
     $pane = new UXAnchorPane();
     $pane->maxWidth = 100000;
@@ -70,12 +70,10 @@ $mainForm->requestFocus();
     $dialog->expanded = true;
 
     switch ($dialog->showAndWait()) {
-        case 'Остановить':
+        case 'Выход из программы':
             Application::get()->shutdown();
             break;
     }
 
     $showed = false;
-});          */
-
-restore_exception_handler();
+});

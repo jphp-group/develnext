@@ -7,6 +7,7 @@ use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
 use php\gui\designer\UXDesigner;
 use php\gui\framework\DataUtils;
+use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXPane;
 use php\gui\UXData;
 use php\gui\UXDialog;
@@ -49,6 +50,7 @@ class GuiFormDumper extends AbstractFormDumper
         $this->designer = $editor->getDesigner();
 
         $loader = new UXLoader();
+        /** @var UXAnchorPane $layout */
         $layout = $loader->load($editor->getFile());
 
         if ($layout instanceof UXPane) {
@@ -99,6 +101,9 @@ class GuiFormDumper extends AbstractFormDumper
         $document->insertBefore($import, $document->getDocumentElement());
 
         $import = $document->createProcessingInstruction('import', 'javafx.scene.text.*');
+        $document->insertBefore($import, $document->getDocumentElement());
+
+        $import = $document->createProcessingInstruction('import', 'javafx.scene.image.*');
         $document->insertBefore($import, $document->getDocumentElement());
 
         $import = $document->createProcessingInstruction('import', 'java.lang.*');

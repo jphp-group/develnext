@@ -138,4 +138,11 @@ abstract class AbstractFormElement
 
         return $size;
     }
+
+    /**
+     * @param $node
+     */
+    public function registerNode(UXNode $node)
+    {
+    }
 }

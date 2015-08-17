@@ -109,6 +109,11 @@ abstract class UXNode
     public $mouseTransparent = false;
 
     /**
+     * @var string|UXImage
+     */
+    public $cursor = 'DEFAULT';
+
+    /**
      * @var double|null
      */
     public $leftAnchor, $rightAnchor, $topAnchor, $bottomAnchor = null;

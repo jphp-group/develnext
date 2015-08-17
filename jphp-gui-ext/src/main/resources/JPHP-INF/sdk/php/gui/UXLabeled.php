@@ -45,6 +45,11 @@ abstract class UXLabeled extends UXControl
     public $graphic;
 
     /**
+     * @var double
+     */
+    public $graphicTextGap = 4;
+
+    /**
      * @var UXColor
      */
     public $textColor;
@@ -53,4 +58,9 @@ abstract class UXLabeled extends UXControl
      * @var string
      */
     public $ellipsisString = '...';
+
+    /**
+     * @var string LEFT, TOP, RIGHT, BOTTOM, TEXT_ONLY, GRAPHIC_ONLY
+     */
+    public $contentDisplay = 'LEFT';
 }

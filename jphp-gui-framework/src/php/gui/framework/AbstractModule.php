@@ -21,6 +21,21 @@ abstract class AbstractModule extends AbstractScript
     public $applyToApplication = false;
 
     /**
+     * @var string
+     */
+    public $author = '';
+
+    /**
+     * @var string
+     */
+    public $version = '1.0';
+
+    /**
+     * @var string
+     */
+    public $description = '';
+
+    /**
      * @var ScriptManager
      */
     protected $scriptManager;
@@ -30,6 +45,8 @@ abstract class AbstractModule extends AbstractScript
      */
     public function __construct()
     {
+        $this->_enabledGetters = $this->_enabledSetters = false;
+
         $this->scriptManager = new ScriptManager();
 
         $path = Str::replace(get_class($this), '\\', '/');

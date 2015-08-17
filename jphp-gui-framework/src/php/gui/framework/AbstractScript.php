@@ -15,6 +15,9 @@ use ReflectionClass;
  */
 abstract class AbstractScript
 {
+    protected $_enabledSetters = true;
+    protected $_enabledGetters = true;
+
     /**
      * @var mixed
      */
@@ -71,17 +74,35 @@ abstract class AbstractScript
         unset($this->handlers[$event]);
     }
 
+    public function __set($name, $value)
+    {
+        if ($this->_enabledSetters && method_exists($this, "set$name")) {
+            $this->{"set$name"}($value);
+            return;
+        }
+
+        throw new \Exception("Unable to set the '$name' property");
+    }
+
     public function __get($name)
     {
+        if ($this->_enabledGetters && method_exists($this, "get$name")) {
+            return $this->{"get$name"}();
+        }
+
         if ($this->_context) {
             return $this->_context->{$name};
         }
 
-        return parent::_get($name);
+        throw new \Exception("Unable to get the '$name' property");
     }
 
     public function __isset($name)
     {
+        if ($this->_enabledGetters && method_exists($this, "get$name")) {
+            return true;
+        }
+
         if ($this->_context) {
             return $this->_context->{$name} !== null;
         }

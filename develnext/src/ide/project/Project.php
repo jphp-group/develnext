@@ -1,6 +1,7 @@
 <?php
 namespace ide\project;
 use Exception;
+use Files;
 use ide\formats\AbstractFileTemplate;
 use ide\forms\MainForm;
 use ide\Ide;
@@ -511,5 +512,30 @@ class Project
     {
         $this->save();
         $this->tree->clear(true);
+    }
+
+    /**
+     * @param $fileName
+     * @param $directory
+     * @return ProjectFile
+     */
+    public function copyFile($fileName, $directory)
+    {
+        $file = File::of($fileName);
+        $name = $file->getName();
+
+        $directory = $this->getFile($directory);
+
+        $x = 2;
+
+        while (Files::exists($directory . '/' . $name)) {
+            $name = FileUtils::stripExtension($file->getName()) . ($x++) . '.' . FileUtils::getExtension($file->getName());
+        }
+
+        $newFile = "$directory/$name";
+
+        FileUtils::copyFile($fileName, $newFile);
+
+        return $this->getAbsoluteFile($newFile);
     }
 }

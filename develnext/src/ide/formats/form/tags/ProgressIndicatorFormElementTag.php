@@ -22,6 +22,6 @@ class ProgressIndicatorFormElementTag extends AbstractFormElementTag
     public function writeAttributes($node, DomElement $element)
     {
         /** @var UXProgressIndicator $node */
-        $element->setAttribute('progress', $node->progress);
+        $element->setAttribute('progress', $node->progressK);
     }
 }

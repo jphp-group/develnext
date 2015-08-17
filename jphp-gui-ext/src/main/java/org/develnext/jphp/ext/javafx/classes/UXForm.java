@@ -1,7 +1,9 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.*;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
@@ -31,6 +33,8 @@ public class UXForm extends UXWindow {
 
         @Property boolean alwaysOnTop();
         @Property boolean maximized();
+
+        @Property ObservableList<Image> icons();
 
         void show();
         void showAndWait();

@@ -2,6 +2,7 @@
 namespace ide\utils;
 
 use php\io\File;
+use php\io\FileStream;
 use php\io\Stream;
 use php\lang\System;
 use php\lib\Str;
@@ -100,6 +101,17 @@ class FileUtils
         return $path;
     }
 
+    public static function getExtension($name)
+    {
+        $pos = Str::lastPos($name, '.');
+
+        if ($pos > -1) {
+            return Str::sub($name, $pos + 1);
+        }
+
+        return null;
+    }
+
     public static function stripExtension($name)
     {
         $pos = Str::lastPos($name, '.');
@@ -137,17 +149,18 @@ class FileUtils
 
             $parent = File::of($dest)->getParentFile();
 
-            if (!$parent->isDirectory()) {
+            if ($parent && !$parent->isDirectory()) {
                 $parent->mkdirs();
             }
 
-            $out = Stream::of($dest, 'w+');
-
+            $out = new FileStream($dest, 'w+');
             $out->write($in->readFully());
         } finally {
             if ($out) $out->close();
             if ($in) $in->close();
         }
+
+        return -1;
     }
 
     public static function deleteDirectory($directory)

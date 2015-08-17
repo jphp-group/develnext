@@ -24,7 +24,7 @@ class IdPropertyEditor extends TextPropertyEditor
         $this->textField->style = '-fx-background-color: silver; -fx-border-width: 0; -fx-border-radius: 0;
                                     -fx-font-style: italic; -fx-font-weight: bold;';
 
-        $this->editorForm->layout->size = [250, 125];
+        $this->editorForm->layout->size = [350, 125];
         $this->textField->on('click', function (UXMouseEvent $e) {
             if ($e->clickCount >= 2) {
                 $this->showDialog($e->screenX, $e->screenY);

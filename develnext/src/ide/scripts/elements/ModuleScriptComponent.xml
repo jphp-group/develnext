@@ -1,10 +1,17 @@
 <element>
     <init>
         <property code="applyToApplication" value="0" />
+        <property code="version" value="1.0" />
     </init>
 
     <properties group="general" title="Модуль">
         <property code="disabled" name="Отключить" editor="boolean" tooltip="При отключении модуль не будет выполнять все свои скрипты" />
+    </properties>
+
+    <properties group="info" title="Информация">
+        <property code="version" name="Версия" editor="simpleText" tooltip="Версия модуля (например 1.2.3 или 5.3)" />
+        <property code="author" name="Автор" editor="text" tooltip="Автор модуля (название компании, имя человека и т.д.)" />
+        <property code="description" name="Описание" editor="text" tooltip="Подробное описание модуля" />
     </properties>
 
     <eventTypes>

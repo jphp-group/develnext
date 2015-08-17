@@ -50,6 +50,11 @@ class UXForm extends UXWindow
     public $style;
 
     /**
+     * @var UXList of UXImage
+     */
+    public $icons;
+
+    /**
      * @param UXForm $form (optional)
      */
     public function __construct(UXForm $form)

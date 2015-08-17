@@ -1,6 +1,5 @@
-JAVA_VERSION="1.8.0_45"
+JAVA_VERSION="1.8.0_60"
 OS_NAME="Windows"
 OS_VERSION="5.1"
 OS_ARCH="i586"
-SOURCE=" .:d195213dc77e corba:681b5c54c9a8 deploy:8ceddb02649f hotspot:13990387b643 hotspot/make/closed:05aa2680eb9f hotspot/src/closed:91caea42673b hotspot/test/closed:60b47b8c1721 install:4318d1f7b3a5 jaxp:1c4cdf942059 jaxws:1a0139074296 jdk:d177c684b874 jdk/make/closed:137c6a750834 jdk/src/closed:f47229507b9a jdk/test/closed:42d53147784b langtools:3c7d5e1ec7e5 nashorn:7a2d26de1826 pubs:b60ba41c22d2 sponsors:9a5a318d7ca6"
-BUILD_TYPE="commercial"
+SOURCE=" .:be2ddf520d26 corba:c665dd5d32b0 deploy:97eb2c05a649 hotspot:6b4ea38c01bd hotspot/make/closed:6702e05eace7 hotspot/src/closed:5ea117e2609a hotspot/test/closed:0bcfbde73dee install:5b6af090f24e jaxp:7a74fd4791e8 jaxws:0497fdafbc8d jdk:c8cfbe57bcd5 jdk/make/closed:a1a9de316092 jdk/src/closed:72a1f9556281 jdk/test/closed:680149dfb9a2 langtools:8d152d1e4594 nashorn:371f3f83f773 pubs:14a3e626de33 sponsors:66eaa9ae0efd"

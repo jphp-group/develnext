@@ -1,7 +1,10 @@
 <element extends="NodeFormElement">
     <properties>
+        <property code="image" name="Изображение" editor="image" virtual="1" />
+        <property code="hoverImage" name="Изображение наведения" editor="image" virtual="1" />
+        <property code="clickImage" name="Изображение нажатия" editor="image" virtual="1" />
+
         <property code="smooth" name="Сглаживание" editor="boolean" />
         <property code="preserveRatio" name="Пропорциональность" editor="boolean" />
-        <property code="alignment" name="Выравнивание" editor="position" />
     </properties>
 </element>

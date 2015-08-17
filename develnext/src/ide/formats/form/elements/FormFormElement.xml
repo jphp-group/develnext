@@ -20,6 +20,7 @@
             </variants>
         </property>
         <property code="form.modality" name="Модальность" editor="boolean" formConfig="1" defaultValue="0" />
+        <property code="form.icon" name="Иконка" editor="image" formConfig="1" defaultValue="" />
     </properties>
     <properties group="extra" title="Дополнительно">
         <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />

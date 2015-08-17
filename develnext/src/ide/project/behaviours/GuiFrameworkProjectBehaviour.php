@@ -269,6 +269,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         if (!$sources->exists()) {
             $this->createModule($rel);
+        } else if (!Str::trim(Stream::getContents($sources))) {
+            $sources->delete();
+            $this->createModule($rel);
         }
     }
 

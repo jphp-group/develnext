@@ -19,7 +19,7 @@ public class UXPopupWindow<T extends PopupWindow> extends UXWindow<PopupWindow> 
         @Property boolean autoHide();
         @Property boolean hideOnEscape();
 
-        void show(Window owner);
+        void show(@Nullable Window owner);
         void show(@Nullable Window owner, double screenX, double screenY);
 
         void hide();

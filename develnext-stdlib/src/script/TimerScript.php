@@ -50,8 +50,12 @@ class TimerScript extends AbstractScript
         }
     }
 
-    public function start()
+    public function start($force = false)
     {
+        if (!$force && $this->isRunning()) {
+            return;
+        }
+
         $this->stopped = false;
 
         $this->th = (new Thread(function() {
@@ -90,10 +94,42 @@ class TimerScript extends AbstractScript
 
     protected function doInterval()
     {
+        if ($this->stopped) {
+            return;
+        }
+
         $this->trigger('action', $this);
 
-        if ($this->repeatable) {
-            $this->start();
+        if ($this->stopped) {
+            return;
         }
+
+        if ($this->repeatable) {
+            $this->start(true);
+        }
+    }
+
+    public function setEnabled($value)
+    {
+        if ($value) {
+            $this->start();
+        } else {
+            $this->stop();
+        }
+    }
+
+    public function getEnabled()
+    {
+        return !$this->isStopped();
+    }
+
+    public function setEnable($value)
+    {
+        $this->setEnabled($value);
+    }
+
+    public function getEnable()
+    {
+        return $this->getEnabled();
     }
 }

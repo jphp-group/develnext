@@ -30,5 +30,9 @@ class UXNodeWrapper
         if ($data->has('visible')) {
             $this->node->visible = $data->get('visible');
         }
+
+        if ($data->has('cursor')) {
+            $this->node->cursor = $data->get('cursor');
+        }
     }
 }

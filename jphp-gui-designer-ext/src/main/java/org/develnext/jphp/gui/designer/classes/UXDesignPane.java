@@ -45,7 +45,9 @@ public class UXDesignPane extends UXAnchorPane {
         getWrappedObject().setOnMouseExited(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                //getWrappedObject().getScene().setCursor(Cursor.DEFAULT);
+                if (!resizing) {
+                    getWrappedObject().getScene().setCursor(Cursor.DEFAULT);
+                }
             }
         });
 
@@ -57,11 +59,17 @@ public class UXDesignPane extends UXAnchorPane {
 
                 Scene scene = getWrappedObject().getScene();
 
-                if (isHResize(x, y) && isVResize(x, y)) {
+                boolean blockWidth = getWrappedObject().getMaxWidth() == getWrappedObject().getPrefWidth() &&
+                        getWrappedObject().getMinWidth() == getWrappedObject().getPrefWidth();
+
+                boolean blockHeight = getWrappedObject().getMaxHeight() == getWrappedObject().getPrefHeight() &&
+                        getWrappedObject().getMinHeight() == getWrappedObject().getPrefHeight();
+
+                if ((!blockWidth && isHResize(x, y)) && (!blockHeight && isVResize(x, y))) {
                     scene.setCursor(Cursor.SE_RESIZE);
-                } else if (isHResize(x, y)) {
+                } else if (!blockWidth && isHResize(x, y)) {
                     scene.setCursor(Cursor.H_RESIZE);
-                } else if (isVResize(x, y)) {
+                } else if (!blockHeight && isVResize(x, y)) {
                     scene.setCursor(Cursor.V_RESIZE);
                 } else {
                     scene.setCursor(Cursor.DEFAULT);

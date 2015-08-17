@@ -29,6 +29,8 @@ class LabeledFormElementTag extends AbstractFormElementTag
         $element->setAttribute('wrapText', $node->wrapText ? 'true' : 'false');
         $element->setAttribute('underline', $node->underline ? 'true' : 'false');
         $element->setAttribute('ellipsisString', $node->ellipsisString);
+        $element->setAttribute('graphicTextGap', $node->graphicTextGap);
+        $element->setAttribute('contentDisplay', $node->contentDisplay);
 
         $textColor = $node->textColor;
 

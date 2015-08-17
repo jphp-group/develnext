@@ -66,11 +66,12 @@ class ProjectFile extends File
     }
 
     /**
+     * @param string $suffix
      * @return string
      */
-    public function getRelativePath()
+    public function getRelativePath($suffix = '')
     {
-        $rootDir = $this->project->getRootDir();
+        $rootDir = $this->project->getRootDir() . ($suffix ? "/$suffix" : '');
 
         return FileUtils::relativePath($rootDir, parent::getPath());
     }

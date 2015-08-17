@@ -27,7 +27,7 @@ class TextFieldFormElement extends AbstractFormElement
 
     public function getIdPattern()
     {
-        return "textField%s";
+        return "edit%s";
     }
 
     /**

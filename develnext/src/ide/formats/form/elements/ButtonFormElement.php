@@ -21,7 +21,7 @@ use php\gui\UXTextField;
  * Class ButtonFormElement
  * @package ide\formats\form
  */
-class ButtonFormElement extends AbstractFormElement
+class ButtonFormElement extends LabeledFormElement
 {
     public function getName()
     {

@@ -12,7 +12,7 @@ use php\gui\designer\UXDesignProperties;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 
-class LabelFormElement extends AbstractFormElement
+class LabelFormElement extends LabeledFormElement
 {
     /**
      * @return string

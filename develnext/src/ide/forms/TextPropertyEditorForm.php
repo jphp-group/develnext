@@ -2,9 +2,14 @@
 namespace ide\forms;
 
 use ide\forms\mixins\DialogFormMixin;
+use ide\Ide;
+use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\framework\Timer;
 use php\gui\UXButton;
+use php\gui\UXClipboard;
 use php\gui\UXTextArea;
+use php\gui\UXTooltip;
 
 /**
  * Class TextPropertyEditorForm
@@ -19,6 +24,23 @@ class TextPropertyEditorForm extends AbstractForm
     use DialogFormMixin;
 
     /**
+     * @event copyButton.action
+     */
+    public function actionCopy(UXEvent $e)
+    {
+        UXClipboard::setText($this->textArea->text);
+        $this->hide();
+
+        $toast = new UXTooltip();
+        $toast->text = "Свойство '$this->title' успешно скопировано";
+        $toast->show(Ide::get()->getMainForm(), $e->target->screenX, $e->target->screenY - 100);
+
+        Timer::run(2000, function () use ($toast) {
+            $toast->hide();
+        });
+    }
+
+    /**
      * @event show
      */
     public function actionOpen()
@@ -28,7 +50,7 @@ class TextPropertyEditorForm extends AbstractForm
     }
 
     /**
-     * @event applyButton.click
+     * @event applyButton.action
      */
     public function actionApply()
     {
@@ -37,7 +59,7 @@ class TextPropertyEditorForm extends AbstractForm
     }
 
     /**
-     * @event cancelButton.click
+     * @event cancelButton.action
      */
     public function actionCancel()
     {

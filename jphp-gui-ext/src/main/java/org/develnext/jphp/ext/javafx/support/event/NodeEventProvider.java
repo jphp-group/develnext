@@ -79,6 +79,42 @@ public class NodeEventProvider extends EventProvider<Node> {
             }
         });
 
+        setHandler("mouseDrag", new Handler() {
+            @Override
+            public void set(Node target, EventHandler eventHandler) {
+                target.setOnMouseDragged(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Node target) {
+                return target.getOnMouseDragged();
+            }
+        });
+
+        setHandler("mouseDragOver", new Handler() {
+            @Override
+            public void set(Node target, EventHandler eventHandler) {
+                target.setOnMouseDragOver(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Node target) {
+                return target.getOnMouseDragOver();
+            }
+        });
+
+        setHandler("mouseDragRelease", new Handler() {
+            @Override
+            public void set(Node target, EventHandler eventHandler) {
+                target.setOnMouseDragReleased(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Node target) {
+                return target.getOnMouseDragReleased();
+            }
+        });
+
         // Scroll Events
 
         setHandler("scroll", new Handler() {

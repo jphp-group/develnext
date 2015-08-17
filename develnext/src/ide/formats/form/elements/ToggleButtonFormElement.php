@@ -22,7 +22,7 @@ use php\gui\UXToggleButton;
  * Class ToggleButtonFormElement
  * @package ide\formats\form
  */
-class ToggleButtonFormElement extends AbstractFormElement
+class ToggleButtonFormElement extends LabeledFormElement
 {
     public function getName()
     {

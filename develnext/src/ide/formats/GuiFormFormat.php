@@ -39,6 +39,7 @@ use ide\formats\form\tags\ComboBoxBaseFormElementTag;
 use ide\formats\form\tags\ComboBoxFormElementTag;
 use ide\formats\form\tags\DataFormElementTag;
 use ide\formats\form\tags\HyperlinkFormElementTag;
+use ide\formats\form\tags\ImageViewFormElementTag;
 use ide\formats\form\tags\LabeledFormElementTag;
 use ide\formats\form\tags\LabelFormElementTag;
 use ide\formats\form\tags\ListViewFormElementTag;
@@ -73,7 +74,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new CheckboxFormElement());
         $this->register(new ComboBoxFormElement());
         $this->register(new ListViewFormElement());
-        //$this->register(new ImageViewFormElement());
+        $this->register(new ImageViewFormElement());
         $this->register(new ProgressBarFormElement());
         $this->register(new SliderFormElement());
         $this->register(new ProgressIndicatorFormElement());
@@ -105,6 +106,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new SeparatorFormElementTag());
         $this->register(new ColorPickerFormElementTag());
         $this->register(new SliderFormElementTag());
+        $this->register(new ImageViewFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());

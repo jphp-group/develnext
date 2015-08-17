@@ -14,6 +14,7 @@ use ide\editors\value\EnumPropertyEditor;
 use ide\editors\value\FloatPropertyEditor;
 use ide\editors\value\FontPropertyEditor;
 use ide\editors\value\IdPropertyEditor;
+use ide\editors\value\ImagePropertyEditor;
 use ide\editors\value\IntegerPropertyEditor;
 use ide\editors\value\ModuleListPropertyEditor;
 use ide\editors\value\PositionPropertyEditor;
@@ -41,6 +42,7 @@ use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use php\gui\framework\Application;
+use php\gui\JSException;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;
 use php\gui\UXImage;
@@ -129,14 +131,19 @@ class Ide extends Application
                 set_exception_handler(function (\BaseException $e) {
                     static $showError;
 
+                    if ($e instanceof JSException) {
+                        echo $e->getTraceAsString();
+                        return;
+                    }
+
                     if (!$showError) {
                         $showError = true;
 
                         $dialog = new UXAlert('ERROR');
                         $dialog->title = 'Ошибка';
-                        $dialog->headerText = 'Произошла ошибка в вашей программе';
+                        $dialog->headerText = 'Произошла ошибка в DevelNext, сообщите об этом авторам';
                         $dialog->contentText = $e->getMessage();
-                        $dialog->setButtonTypes(['Выход из программы', 'Продолжить']);
+                        $dialog->setButtonTypes(['Выход из DevelNext', 'Продолжить']);
 
                         $pane = new UXAnchorPane();
                         $pane->maxWidth = 100000;
@@ -150,7 +157,7 @@ class Ide extends Application
                         $dialog->expanded = true;
 
                         switch ($dialog->showAndWait()) {
-                            case 'Выход из программы':
+                            case 'Выход из DevelNext':
                                 Ide::get()->shutdown();
                                 break;
                         }
@@ -650,6 +657,7 @@ class Ide extends Application
         ElementPropertyEditor::register(new StringListPropertyEditor());
         ElementPropertyEditor::register(new ModuleListPropertyEditor());
         ElementPropertyEditor::register(new IdPropertyEditor());
+        ElementPropertyEditor::register(new ImagePropertyEditor());
 
         $this->registerFormat(new WelcomeFormat());
         $this->registerFormat(new PhpCodeFormat());

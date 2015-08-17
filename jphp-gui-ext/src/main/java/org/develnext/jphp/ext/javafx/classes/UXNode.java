@@ -8,9 +8,7 @@ import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
-import javafx.scene.DepthTest;
-import javafx.scene.Node;
-import javafx.scene.Parent;
+import javafx.scene.*;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -25,6 +23,7 @@ import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.memory.ArrayMemory;
 import php.runtime.memory.DoubleMemory;
+import php.runtime.memory.ObjectMemory;
 import php.runtime.memory.StringMemory;
 import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
@@ -265,6 +264,30 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     @Setter
     public void setBottomAnchor(Memory v) {
         AnchorPane.setBottomAnchor(getWrappedObject(), v.isNull() ? null : v.toDouble());
+    }
+
+    @Getter
+    public Memory getCursor(Environment env) {
+        Cursor cursor = getWrappedObject().getCursor();
+
+        if (cursor instanceof ImageCursor) {
+            return ObjectMemory.valueOf(new UXImage(env, ((ImageCursor) cursor).getImage()));
+        }
+
+        return cursor == null ? Memory.NULL : StringMemory.valueOf(cursor.toString());
+    }
+
+    @Setter
+    public void setCursor(Memory value) {
+        try {
+            if (value.instanceOf(UXImage.class)) {
+                getWrappedObject().setCursor(new ImageCursor(value.toObject(UXImage.class).getWrappedObject()));
+            } else {
+                getWrappedObject().setCursor((Cursor) Cursor.class.getField(value.toString()).get(null));
+            }
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            throw new IllegalArgumentException("Invalid cursor - " + value);
+        }
     }
 
     @Getter

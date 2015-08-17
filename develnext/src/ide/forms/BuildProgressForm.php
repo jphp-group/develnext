@@ -179,7 +179,7 @@ class BuildProgressForm extends AbstractForm
     public function doCloseAfterDoneCheckboxClick(UXMouseEvent $e)
     {
         if ($e->target) {
-            Ide::get()->setUserConfigValue('builder.closerAfterDone', $e->target->selected ? "1" : "0");
+            Ide::get()->setUserConfigValue('builder.closeAfterDone', $e->target->selected ? "1" : "0");
         }
     }
 

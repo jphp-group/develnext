@@ -22,7 +22,7 @@ use php\gui\UXTextField;
  * Class HyperlinkFormElement
  * @package ide\formats\form
  */
-class HyperlinkFormElement extends AbstractFormElement
+class HyperlinkFormElement extends LabeledFormElement
 {
     public function getName()
     {

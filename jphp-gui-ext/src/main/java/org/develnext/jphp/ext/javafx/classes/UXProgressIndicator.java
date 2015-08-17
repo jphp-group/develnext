@@ -2,16 +2,14 @@ package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.scene.control.ProgressIndicator;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
-import php.runtime.annotation.Reflection.Name;
-import php.runtime.annotation.Reflection.Property;
-import php.runtime.annotation.Reflection.Signature;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "UXProgressIndicator")
 public class UXProgressIndicator extends UXControl {
     interface WrappedInterface {
-        @Property double progress();
+        @Property("progressK") double progress();
         @Property boolean indeterminate();
     }
 
@@ -36,5 +34,16 @@ public class UXProgressIndicator extends UXControl {
     @Signature
     public void __construct(double progress) {
         __wrappedObject = new ProgressIndicator(progress);
+    }
+
+    @Getter("progress")
+    public int getProgressPercent() {
+        int round = (int) (Math.round(getWrappedObject().getProgress() * 100));
+        return round > 100 ? 100 : round;
+    }
+
+    @Setter("progress")
+    public void setProgressPercent(int value) {
+        getWrappedObject().setProgress(value / 100.0);
     }
 }

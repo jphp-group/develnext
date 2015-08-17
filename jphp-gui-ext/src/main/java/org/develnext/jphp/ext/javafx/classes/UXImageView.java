@@ -31,4 +31,29 @@ public class UXImageView extends UXNode<ImageView> {
     public void __construct() {
         __wrappedObject = new ImageView();
     }
+
+    @Override
+    @Signature
+    public void setWidth(double value) {
+        super.setWidth(value);
+        getWrappedObject().setFitWidth(value);
+    }
+
+    @Override
+    @Signature
+    public void setHeight(double value) {
+        super.setHeight(value);
+        getWrappedObject().setFitHeight(value);
+    }
+
+    @Override
+    @Signature
+    public void setSize(double[] values) {
+        super.setSize(values);
+
+        if (values.length >= 2) {
+            getWrappedObject().setFitWidth(values[0]);
+            getWrappedObject().setFitHeight(values[1]);
+        }
+    }
 }

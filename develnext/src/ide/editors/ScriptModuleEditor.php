@@ -155,14 +155,6 @@ class ScriptModuleEditor extends FormEditor
         $this->layout->size = [800, 600];
         $this->layout->css('background-color', 'white');
 
-        $label = new UXLabel($this->getTitle());
-        $label->classes->add('ignore');
-        $label->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-border-style: dashed; -fx-background-color: #e6e6e6; -fx-border-radius: 3px;';
-        $label->position = [5, 8];
-        $label->leftAnchor = $label->rightAnchor = 5;
-        $label->padding = [5, 10];
-        $this->layout->add($label);
-
         $files = File::of($this->file)->findFiles();
 
         foreach ($files as $file) {
@@ -302,6 +294,7 @@ class ScriptModuleEditor extends FormEditor
             }
 
             $this->manager->add($container);
+            $this->designer->requestFocus();
         } else {
             $this->updateProperties($this);
         }
