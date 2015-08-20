@@ -5,6 +5,9 @@ use ide\formats\FormFormat;
 use ide\Ide;
 use php\gui\UXDialog;
 
+$app = new Ide();
+$app->launch();
+
 function dump($arg)
 {
     ob_start();
@@ -17,5 +20,11 @@ function dump($arg)
     UXDialog::show($str);
 }
 
-$app = new Ide();
-$app->launch();
+/**
+ * @param $name
+ * @return \php\gui\UXImageView
+ */
+function ico($name)
+{
+    return Ide::get()->getImage("icons/$name.png");
+}

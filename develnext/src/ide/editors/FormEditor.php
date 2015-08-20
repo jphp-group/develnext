@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors;
 
+use ide\editors\action\ActionEditor;
 use ide\editors\form\FormElementTypePane;
 use ide\editors\menu\ContextMenu;
 use ide\formats\AbstractFormFormat;
@@ -125,6 +126,11 @@ class FormEditor extends AbstractModuleEditor
     protected $codeEditor;
 
     /**
+     * @var ActionEditor
+     */
+    protected $actionEditor;
+
+    /**
      * @var string
      */
     protected $tabOpened = null;
@@ -171,6 +177,9 @@ class FormEditor extends AbstractModuleEditor
 
         $this->codeFile = $phpFile;
         $this->configFile = $confFile;
+
+        $this->actionEditor = new ActionEditor($phpFile . '.xml');
+        $this->actionEditor->makeUi();
 
         $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
         $this->codeEditor->register(AbstractCommand::make('Скрыть', 'icons/close16.png', function () {
@@ -433,7 +442,6 @@ class FormEditor extends AbstractModuleEditor
         $content = $this->codeTab->content;
         UXAnchorPane::setAnchor($content, 0);
 
-        $this->viewerAndEvents->items->add($panel);
         $panel->add($content);
 
         if ($dividerPositions) {
@@ -447,9 +455,30 @@ class FormEditor extends AbstractModuleEditor
                 Ide::get()->setUserConfigValue("$class.dividerPositions", Str::join($this->viewerAndEvents->dividerPositions, ','));
             }
         };
+        $tabs = new UXTabPane();
+        $tabs->side = 'LEFT';
 
-        $panel->watch('width', $func);
-        $panel->watch('height', $func);
+        $codeTab = new UXTab();
+        $codeTab->text = 'PHP Код';
+        $codeTab->content = $panel;
+        $codeTab->closable = false;
+        $codeTab->graphic = ico('script16');
+        $codeTab->style = '-fx-cursor: hand';
+
+        $constructorTab = new UXTab();
+        $constructorTab->text = 'Конструктор';
+        $constructorTab->closable = false;
+        $constructorTab->graphic = ico('wizard16');
+        $constructorTab->style = '-fx-cursor: hand';
+        $constructorTab->content = $this->actionEditor->getPane();
+        UXAnchorPane::setAnchor($constructorTab->content, 0);
+
+        $tabs->tabs->addAll([$constructorTab, $codeTab]);
+
+        $this->viewerAndEvents->items->add($tabs);
+
+        $tabs->watch('width', $func);
+        $tabs->watch('height', $func);
 
         Ide::get()->setUserConfigValue("$class.sourceEditor", true);
     }

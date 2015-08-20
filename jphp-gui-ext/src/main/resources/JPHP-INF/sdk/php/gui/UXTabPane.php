@@ -30,7 +30,7 @@ class UXTabPane extends UXControl
     /**
      * @var string
      */
-    public $side;
+    public $side = 'TOP';
 
     /**
      * @param UXTab $tab

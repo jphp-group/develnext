@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.web.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="488.0" prefWidth="668.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ScrollPane layoutX="14.0" layoutY="52.0" prefHeight="419.0" prefViewportHeight="416.1458435058594" prefViewportWidth="470.0" prefWidth="479.0" style="-fx-border-style: dashed; -fx-border-color: gray;">
+         <content>
+            <ImageView id="image" fitHeight="415.0" fitWidth="475.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-width: 1px; -fx-border-color: gray; -fx-border-style: dashed;" AnchorPane.bottomAnchor="19.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="184.0" AnchorPane.topAnchor="14.0">
+               <viewport>
+                  <Rectangle2D />
+               </viewport>
+            </ImageView>
+         </content>
+      </ScrollPane>
+      <VBox layoutX="506.0" layoutY="14.0" prefHeight="337.0" prefWidth="147.0" spacing="8.0" AnchorPane.bottomAnchor="103.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+         <children>
+            <Button id="loadButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" prefWidth="147.0" styleClass="icon-open" text="Загрузить" />
+            <Button id="clearButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" prefWidth="147.0" text="Очистить" />
+         </children>
+      </VBox>
+      <VBox layoutX="507.0" layoutY="403.0" prefHeight="68.0" prefWidth="147.0" spacing="5.0">
+         <children>
+            <Button id="cancelButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" prefWidth="147.0" text="Отмена" />
+            <Button id="applyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" prefWidth="147.0" styleClass="icon-ok" text="Применить">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+         </children>
+      </VBox>
+      <TextField id="pathField" layoutX="14.0" layoutY="14.0" prefHeight="25.0" prefWidth="479.0" promptText="относительный путь к файлу jpg, png или gif" />
+   </children>
+</AnchorPane>
