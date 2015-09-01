@@ -3,6 +3,7 @@ namespace ide\editors\value;
 use php\gui\UXChoiceBox;
 use php\lib\Items;
 use php\gui\layout\UXHBox;
+use php\lib\Str;
 use php\lib\String;
 use php\xml\DomElement;
 
@@ -56,7 +57,7 @@ class EnumPropertyEditor extends ElementPropertyEditor
 
     public function getNormalizedValue($value)
     {
-        if (String::isNumber($value)) {
+        if (Str::isNumber($value)) {
             if ($key = $this->variantKeys[$value]) {
                 return $key;
             }

@@ -21,7 +21,8 @@ abstract class AbstractFormDumper
      * @param UXNode $node
      * @param DomDocument $document
      *
+     * @param bool $ignoreUnregistered
      * @return DomElement
      */
-    abstract public function createElementTag(UXNode $node, DomDocument $document);
+    abstract public function createElementTag(UXNode $node, DomDocument $document, $ignoreUnregistered = true);
 }

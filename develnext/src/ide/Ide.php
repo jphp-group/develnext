@@ -1,6 +1,7 @@
 <?php
 namespace ide;
 
+use ide\account\AccountManager;
 use ide\commands\CloseProjectCommand;
 use ide\commands\ExitCommand;
 use ide\commands\NewProjectCommand;
@@ -17,6 +18,7 @@ use ide\editors\value\IdPropertyEditor;
 use ide\editors\value\ImagePropertyEditor;
 use ide\editors\value\IntegerPropertyEditor;
 use ide\editors\value\ModuleListPropertyEditor;
+use ide\editors\value\PercentPropertyEditor;
 use ide\editors\value\PositionPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\StringListPropertyEditor;
@@ -45,6 +47,7 @@ use php\gui\framework\Application;
 use php\gui\JSException;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;
+use php\gui\UXApplication;
 use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXMenu;
@@ -52,11 +55,13 @@ use php\gui\UXMenuItem;
 use php\gui\UXTextArea;
 use php\io\File;
 use php\io\IOException;
+use php\io\ResourceStream;
 use php\io\Stream;
 use php\lang\System;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Configuration;
+use php\util\Scanner;
 
 
 /**
@@ -104,6 +109,11 @@ class Ide extends Application
      * @var Project
      */
     protected $openedProject = null;
+
+    /**
+     * @var AccountManager
+     */
+    protected $accountManager = null;
 
     /**
      * @var string
@@ -167,15 +177,22 @@ class Ide extends Application
                     }
                 });
 
+                if ($this->isDevelopment()) {
+                    restore_exception_handler();
+                }
+
                 $this->registerAll();
 
                 $this->splash = $splash = new SplashForm();
                 $splash->show();
+
             },
             function () {
                 foreach ($this->afterShow as $handle) {
                     $handle();
                 }
+
+                $this->accountManager = new AccountManager();
             }
         );
     }
@@ -644,6 +661,14 @@ class Ide extends Application
         return null;
     }
 
+    /**
+     * @return AccountManager
+     */
+    public function getAccountManager()
+    {
+        return $this->accountManager;
+    }
+
     public function registerAll()
     {
         ElementPropertyEditor::register(new SimpleTextPropertyEditor());
@@ -659,6 +684,7 @@ class Ide extends Application
         ElementPropertyEditor::register(new ModuleListPropertyEditor());
         ElementPropertyEditor::register(new IdPropertyEditor());
         ElementPropertyEditor::register(new ImagePropertyEditor());
+        ElementPropertyEditor::register(new PercentPropertyEditor());
 
         $this->registerFormat(new WelcomeFormat());
         $this->registerFormat(new PhpCodeFormat());
@@ -739,6 +765,37 @@ class Ide extends Application
         } catch (\Exception $e) {
             System::halt(0);
         }
+    }
+
+    /**
+     * @param $resourceName
+     * @return array
+     */
+    public function getInternalList($resourceName)
+    {
+        static $cache;
+
+        if ($result = $cache[$resourceName]) {
+            return $result;
+        }
+
+        $resources = ResourceStream::getResources($resourceName);
+
+        $result = [];
+
+        foreach ($resources as $resource) {
+            $scanner = new Scanner($resource, 'UTF-8');
+
+            while ($scanner->hasNextLine()) {
+                $line = Str::trim($scanner->nextLine());
+
+                if ($line) {
+                    $result[] = $line;
+                }
+            }
+        }
+
+        return $cache[$resourceName] = $result;
     }
 
     /**

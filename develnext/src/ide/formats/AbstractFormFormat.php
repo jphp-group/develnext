@@ -9,6 +9,7 @@ use php\lang\Environment;
 use php\lang\IllegalArgumentException;
 use php\lang\Thread;
 use php\lang\ThreadPool;
+use php\lib\Str;
 use php\lib\String;
 
 /**
@@ -34,7 +35,7 @@ abstract class AbstractFormFormat extends AbstractFormat
 
     public function isValid($file)
     {
-        if (String::endsWith($file, '.fxml')) {
+        if (Str::endsWith($file, '.fxml')) {
             return true;
         }
 

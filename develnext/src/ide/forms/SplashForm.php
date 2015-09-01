@@ -1,6 +1,7 @@
 <?php
 namespace ide\forms;
 
+use ide\Ide;
 use php\gui\framework\AbstractForm;
 use php\gui\UXApplication;
 use php\gui\UXImageView;
@@ -33,5 +34,7 @@ class SplashForm extends AbstractForm
     public function hide()
     {
         parent::hide();
+
+        Ide::get()->getAccountManager()->authorize();
     }
 }

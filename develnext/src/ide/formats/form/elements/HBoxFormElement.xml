@@ -1,0 +1,5 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="spacing" name="Отступы" editor="float" />
+    </properties>
+</element>

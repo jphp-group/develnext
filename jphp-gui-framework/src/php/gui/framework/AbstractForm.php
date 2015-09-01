@@ -3,6 +3,8 @@ namespace php\gui\framework;
 
 use Exception;
 use php\gui\event\UXEvent;
+use php\gui\event\UXKeyEvent;
+use php\gui\framework\event\AbstractEventAdapter;
 use php\gui\UXApplication;
 use php\gui\UXData;
 use php\gui\UXForm;
@@ -106,18 +108,18 @@ abstract class AbstractForm extends UXForm
         $class = get_class($this);
 
         if ($this->_app->getNamespace()) {
-            $class = String::replace($class, $this->_app->getNamespace(), '');
+            $class = Str::replace($class, $this->_app->getNamespace(), '');
 
-            if (String::startsWith($class, '\\')) {
-                $class = String::sub($class, 1);
+            if (Str::startsWith($class, '\\')) {
+                $class = Str::sub($class, 1);
             }
 
-            if (String::startsWith($class, 'forms\\')) {
-                $class = String::sub($class, 6);
+            if (Str::startsWith($class, 'forms\\')) {
+                $class = Str::sub($class, 6);
             }
         }
 
-        return String::replace($class, '\\', '/');
+        return Str::replace($class, '\\', '/');
     }
 
     protected function applyConfig()
@@ -249,10 +251,10 @@ abstract class AbstractForm extends UXForm
             $scanner = new Scanner($comment);
 
             while ($scanner->hasNextLine()) {
-                $line = String::trim($scanner->nextLine());
+                $line = Str::trim($scanner->nextLine());
 
-                if (String::startsWith($line, '@event ')) {
-                    $event = String::trim(String::sub($line, 7));
+                if (Str::startsWith($line, '@event ')) {
+                    $event = Str::trim(Str::sub($line, 7));
 
                     if (isset($events[$event])) {
                         throw new IllegalStateException(
@@ -285,7 +287,33 @@ abstract class AbstractForm extends UXForm
             throw new Exception("Unable to bind '$event'");
         }
 
-        $node->on($eventName, $handler, $group);
+        $eventName = Str::split($eventName, '-', 2);
+
+        if ($eventName[1]) {
+            $class = "php\\gui\\framework\\event\\" . Str::upperFirst(Str::lower($eventName[0])) . "EventAdapter";
+
+            static $adapters;
+
+            if ($adapters[$class]) {
+                $adapter = $adapters[$class];
+            } elseif (class_exists($class)) {
+                /** @var AbstractEventAdapter $adapter */
+                $adapter = new $class();
+                $adapters[$class] = $adapter;
+            } else {
+                throw new Exception("Unable to bind '$event'");
+            }
+
+            $handler = $adapter->adapt($node, $handler, $eventName[1]);
+
+            if (!$handler) {
+                throw new Exception("Unable to bind '$event'");
+            }
+
+            $node->on($eventName[0], $handler, $event);
+        } else {
+            $node->on($eventName[0], $handler, $group);
+        }
     }
 
     public function __get($name)

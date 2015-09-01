@@ -1,6 +1,8 @@
 <?php
 namespace ide\utils;
 
+use php\lib\Str;
+use phpx\parser\SourceToken;
 use phpx\parser\SourceTokenizer;
 use php\io\MemoryStream;
 use php\io\Stream;
@@ -28,6 +30,14 @@ class PhpParser
     public function getContent()
     {
         return $this->content;
+    }
+
+    /**
+     * @param string $content
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
     }
 
     /**
@@ -107,6 +117,104 @@ class PhpParser
         }
 
         $this->content = $content;
+    }
+
+    /**
+     * @param $class
+     * @param SourceTokenizer|null $tokenizer
+     * @return array|null
+     */
+    public function findClass($class, SourceTokenizer $tokenizer = null)
+    {
+        $tokenizer = $this->getTokenizer($tokenizer);
+
+        /** @var SourceToken $prev */
+        $prev = null;
+
+        while ($next = $tokenizer->next()) {
+            switch ($next->type) {
+                case 'ClassStmt':
+                    if ($prev && $prev->type == 'StaticAccessExprToken') {
+                        $prev = null;
+                        continue;
+                    }
+
+                    $next = $tokenizer->next();
+
+                    if ($next->type == 'Name' && (!$class || Str::equalsIgnoreCase($class, $next->word))) {
+
+                        while ($next = $tokenizer->next()) {
+                            if ($next->word == '{') {
+                                return ['line' => $next->line, 'pos' => $next->position];
+                            }
+                        }
+                    }
+
+                    break;
+            }
+
+            $prev = $next;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $class string if not set means any class
+     * @param $methodName
+     * @param SourceTokenizer|null $tokenizer
+     * @return array|null
+     */
+    public function findMethod($class, $methodName, SourceTokenizer $tokenizer = null)
+    {
+        $tokenizer = $this->getTokenizer($tokenizer);
+
+        /** @var SourceToken $prev */
+        $prev = null;
+
+        $classFound = false;
+
+        while ($next = $tokenizer->next()) {
+            switch ($next->type) {
+                case 'ClassStmt':
+                    if ($prev && $prev->type == 'StaticAccessExprToken') {
+                        $prev = null;
+                        continue;
+                    }
+
+                    $next = $tokenizer->next();
+
+                    if ($next->type == 'Name' && (!$class || Str::equalsIgnoreCase($class, $next->word))) {
+                        $classFound = true;
+                        continue;
+                    }
+
+                    break;
+
+                case 'FunctionStmt':
+                    if (!$classFound) continue;
+
+                    $next = $tokenizer->next();
+
+                    if ($next->type == 'Name' && Str::equalsIgnoreCase($methodName, $next->word)) {
+                        $next = $tokenizer->next();
+
+                        if ($next && $next->word == '(') {
+                            while ($next = $tokenizer->next()) {
+                                if ($next->word == '{') {
+                                    return ['line' => $next->line, 'pos' => $next->position];
+                                }
+                            }
+                        }
+                    }
+
+                    break;
+            }
+
+            $prev = $next;
+        }
+
+        return null;
     }
 
     /**
@@ -192,5 +300,23 @@ class PhpParser
         $memory->seek(0);
 
         return new SourceTokenizer($memory, '', 'UTF-8');
+    }
+
+    /**
+     * @param string $className
+     * @param string $methodName
+     * @param string $code
+     * @return bool
+     */
+    public function appendToMethod($className, $methodName, $code)
+    {
+        $pos = $this->findMethod($className, $methodName);
+
+        if ($pos) {
+            $this->insertAfterLine($pos['line'], $code);
+            return true;
+        }
+
+        return false;
     }
 }

@@ -9,6 +9,10 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.*;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TitledPane;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -129,6 +133,10 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         double layoutX = getWrappedObject().getLayoutX();
 
         Point2D pt = getWrappedObject().localToScreen(layoutX, 0);
+        if (pt == null) {
+            return 0;
+        }
+
         return pt.getX();
     }
 
@@ -143,6 +151,10 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         double layoutY = getWrappedObject().getLayoutY();
 
         Point2D pt = getWrappedObject().localToScreen(0, layoutY);
+        if (pt == null) {
+            return 0;
+        }
+
         return pt.getY();
     }
 
@@ -297,6 +309,17 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Signature
+    public double[] screenToLocal(double x, double y) {
+        Point2D pt = getWrappedObject().screenToLocal(x, y);
+
+        if (pt == null) {
+            return null;
+        }
+
+        return new double[] {pt.getX(), pt.getY()};
+    }
+
+    @Signature
     public void show() {
         getWrappedObject().setVisible(true);
     }
@@ -314,7 +337,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     @Signature
     @SuppressWarnings("unchecked")
     public Memory lookup(Environment env, TraceInfo trace, String selector) throws Throwable {
-        Node result = getWrappedObject().lookup(selector);
+        Node result = __globalLookup(getWrappedObject(), selector);
 
         if (result == null) {
             return null;
@@ -450,5 +473,45 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     @Override
     public int getPointer() {
         return getWrappedObject().hashCode();
+    }
+
+    public static Node __globalLookup(Node parent, String select) {
+        Node node = parent.lookup(select);
+
+        if (node != null) {
+            return node;
+        }
+
+        if (node instanceof Parent) {
+            ObservableList<Node> nodes = ((Parent) parent).getChildrenUnmodifiable();
+
+            for (Node nd : nodes) {
+                if (nd instanceof TitledPane && ((TitledPane) nd).getContent() instanceof Parent) {
+                    node = __globalLookup(((TitledPane) nd).getContent(), select);
+
+                    if (node != null) {
+                        return node;
+                    }
+                } else if (nd instanceof ScrollPane && ((ScrollPane) nd).getContent() instanceof Parent) {
+                    node = __globalLookup(((ScrollPane) nd).getContent(), select);
+
+                    if (node != null) {
+                        return node;
+                    }
+                } else if (nd instanceof TabPane) {
+                    for (Tab tab : ((TabPane) nd).getTabs()) {
+                        if (tab.getContent() instanceof Parent) {
+                            node = __globalLookup(tab.getContent(), select);
+
+                            if (node != null) {
+                                return node;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

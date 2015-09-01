@@ -12,6 +12,8 @@
 .icon-copy { -fx-graphic: url("/.data/img/icons/copy16.png"); }
 .icon-settings { -fx-graphic: url("/.data/img/icons/settings16.png"); }
 .icon-blocks { -fx-graphic: url("/.data/img/icons/blocks16.png"); }
+.icon-vk { -fx-graphic: url("/.data/img/icons/vk16.png"); }
+.icon-login { -fx-graphic: url("/.data/img/icons/login16.png"); }
 
 .icon-refresh { -fx-graphic: url("/.data/img/icons/refresh16.png"); }
 .icon-refresh32 { -fx-graphic: url("/.data/img/icons/refresh32.png"); }

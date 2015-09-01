@@ -1,6 +1,8 @@
 <?php
 namespace ide\editors;
 
+use Files;
+use ide\editors\menu\ContextMenu;
 use ide\misc\AbstractCommand;
 use ide\utils\FileUtils;
 use ide\utils\Json;
@@ -83,6 +85,11 @@ class CodeEditor extends AbstractEditor
      * @var AbstractCommand[]
      */
     protected $commands = [];
+
+    /**
+     * @var ContextMenu
+     */
+    protected $contextMenu;
 
     public function getIcon()
     {
@@ -267,6 +274,7 @@ CONTENT;
         $this->on('copy', [$this, 'doCopy']);
         $this->on('cut', [$this, 'doCopy']);
         $this->on('paste', [$this, 'doPaste']);
+        $this->on('context', [$this, 'doContextMenu']);
     }
 
     /**
@@ -327,6 +335,13 @@ CONTENT;
     protected function doPaste($e)
     {
         return ['text' => UXClipboard::getText()];
+    }
+
+    protected function doContextMenu($e)
+    {
+        dump('111');
+        $this->contextMenu = new ContextMenu($this, $this->commands);
+        $this->contextMenu->getRoot()->showByNode($this->webView);
     }
 
     protected function waitState(callable $handler)
@@ -433,8 +448,16 @@ CONTENT;
 
     public function load()
     {
+        $sourceFile = "$this->file.source";
+
+        if (Files::exists($sourceFile)) {
+            $file = $sourceFile;
+        } else {
+            $file = $this->file;
+        }
+
         try {
-            $content = FileUtils::get($this->file);
+            $content = FileUtils::get($file);
         } catch (IOException $e) {
             $content = '';
         }
@@ -445,7 +468,12 @@ CONTENT;
     public function save()
     {
         $value = $this->getValue();
-        FileUtils::put($this->file, $value);
+
+        if (!Files::exists($this->file)) {
+            FileUtils::put($this->file, $value);
+        }
+
+        FileUtils::put("$this->file.source", $value);
     }
 
     /**

@@ -101,7 +101,7 @@ class FormEventManager
     {
         $binds = $this->findBinds($id);
 
-        $parser = new PhpParser(FileUtils::get($this->file));
+        $parser = new PhpParser($this->loadContent());
 
         $offset = 0;
 
@@ -110,9 +110,23 @@ class FormEventManager
             $offset += $bind['endLine'] - $bind['eventLine'] + 1;
         }
 
-        FileUtils::put($this->file, $parser->getContent());
+        $this->save($parser->getContent());
 
         return !!$binds;
+    }
+
+    public function loadContent()
+    {
+        if (\Files::exists("$this->file.source")) {
+            return FileUtils::get("$this->file.source");
+        }
+
+        return FileUtils::get($this->file);
+    }
+
+    public function save($content)
+    {
+        FileUtils::put("$this->file.source", $content);
     }
 
     /**
@@ -126,10 +140,10 @@ class FormEventManager
         $bind = $this->findBind($id, $event);
 
         if ($bind) {
-            $parser = new PhpParser(FileUtils::get($this->file));
+            $parser = new PhpParser($this->loadContent());
             $parser->removeLines($bind['eventLine'], $bind['endLine']);
 
-            FileUtils::put($this->file, $parser->getContent());
+            $this->save($parser->getContent());
             return $bind;
         }
 
@@ -142,7 +156,7 @@ class FormEventManager
      */
     public function renameBind($oldId, $newId)
     {
-        $parser = new PhpParser(FileUtils::get($this->file));
+        $parser = new PhpParser($this->loadContent());
 
         $parser->processLines(0, 999999, function ($line) use ($oldId, $newId) {
             $tmp = Str::trim($line);
@@ -163,7 +177,7 @@ class FormEventManager
             return $line;
         });
 
-        FileUtils::put($this->file, $parser->getContent());
+        $this->save($parser->getContent());
     }
 
     /**
@@ -175,7 +189,7 @@ class FormEventManager
     {
         $source = "";
 
-        $methodName = "do" . Str::upperFirst($id) . Str::upperFirst($event);
+        $methodName = "do" . Str::upperFirst($id) . Str::upperFirst(Str::replace(Str::replace($event, '-', ''), '+', ''));
 
         $line = $this->classBeginLine;
 
@@ -183,7 +197,7 @@ class FormEventManager
             $line = $info['endLine'];
         }
 
-        $scanner = new Scanner(FileUtils::get($this->file), 'UTF-8');
+        $scanner = new Scanner($this->loadContent(), 'UTF-8');
 
         $i = 0;
 
@@ -227,7 +241,7 @@ class FormEventManager
             $source = $parser->getContent();
         }
 
-        FileUtils::put($this->file, $source);
+        $this->save($source);
     }
 
     /**
@@ -247,8 +261,14 @@ class FormEventManager
         $this->eventBinds = [];
         $this->classBeginLine = -1;
 
+        $file = $this->file;
+
+        if (\Files::exists("$file.source")) {
+            $file = "$file.source";
+        }
+
         try {
-            $tokenizer = new SourceTokenizer($this->file, $this->file, 'UTF-8');
+            $tokenizer = new SourceTokenizer($file, $this->file, 'UTF-8');
 
             if ($this->nextTo($tokenizer, 'ClassStmt')) {
                 $name = $tokenizer->next();

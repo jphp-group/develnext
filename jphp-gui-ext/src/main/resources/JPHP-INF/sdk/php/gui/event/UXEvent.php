@@ -1,6 +1,7 @@
 <?php
 namespace php\gui\event;
 use php\gui\UXNode;
+use php\gui\UXWindow;
 
 /**
  * Class Event
@@ -8,6 +9,11 @@ use php\gui\UXNode;
  */
 abstract class UXEvent
 {
+    /**
+     * @var UXNode|UXWindow
+     */
+    public $sender;
+
     /**
      * @var object|UXNode
      */

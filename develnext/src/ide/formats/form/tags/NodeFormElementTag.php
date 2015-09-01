@@ -39,6 +39,14 @@ class NodeFormElementTag extends AbstractFormElementTag
 
         $element->setAttribute('prefWidth', $node->size[0]);
         $element->setAttribute('prefHeight', $node->size[1]);
+
+        if ($node->opacity < 1) {
+            $element->setAttribute('opacity', $node->opacity);
+        }
+
+        if ($node->rotate > 0) {
+            $element->setAttribute('rotate', $node->rotate);
+        }
     }
 
     public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)

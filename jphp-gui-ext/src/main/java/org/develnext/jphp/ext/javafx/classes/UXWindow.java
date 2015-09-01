@@ -229,7 +229,7 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
 
     @Signature
     public Memory __get(Environment env, String name) throws NoSuchFieldException, IllegalAccessException {
-        Node node = getWrappedObject().getScene().lookup("#" + name);
+        Node node = UXNode.__globalLookup(getLayout(), "#" + name);
 
         if (node instanceof MenuButton && node.getClass().getName().endsWith("MenuBarButton")) {
             Field field = node.getClass().getDeclaredField("menu");

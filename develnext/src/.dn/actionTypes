@@ -1,0 +1,6 @@
+ide\action\types\AppShutdownActionType
+
+ide\action\types\ElementSetTextActionType
+ide\action\types\ElementSetXActionType
+ide\action\types\ElementSetYActionType
+ide\action\types\ElementDestroyActionType

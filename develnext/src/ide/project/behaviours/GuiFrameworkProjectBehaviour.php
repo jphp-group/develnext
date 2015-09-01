@@ -1,6 +1,7 @@
 <?php
 namespace ide\project\behaviours;
 
+use ide\action\ActionManager;
 use ide\build\OneJarBuildType;
 use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
@@ -52,6 +53,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     protected $scriptComponentManager;
 
     /**
+     * @var ActionManager
+     */
+    protected $actionManager;
+
+    /**
      * ...
      */
     public function inject()
@@ -75,6 +81,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
 
         $this->scriptComponentManager = new ScriptComponentManager();
+        $this->actionManager = new ActionManager();
     }
 
     public function getMainForm()
@@ -119,6 +126,17 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->synchronizeDependencies();
         $this->updateScriptManager();
+
+        if ($log) {
+            $log(':dn-compile-actions');
+        }
+
+        $this->actionManager->compile($this->project->getFile('src/'), function ($filename) use ($log) {
+            $name = $this->project->getAbsoluteFile($filename)->getRelativePath();
+            if ($log) {
+                $log(':compile "' . $name . '"');
+            }
+        });
 
         $modules = $this->scriptComponentManager->getModules();
         $values = [];

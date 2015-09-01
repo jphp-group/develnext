@@ -62,6 +62,21 @@ abstract class AbstractFormElement
      */
     abstract public function createElement();
 
+    public function addToLayout($layout, $node, $screenX, $screenY)
+    {
+        // nop.
+    }
+
+    public function getLayoutChildren($layout)
+    {
+        return [];
+    }
+
+    public function isLayout()
+    {
+        return false;
+    }
+
     /**
      * @param $node
      *

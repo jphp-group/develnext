@@ -44,4 +44,10 @@ public class UXEvent extends BaseWrapper<Event> {
         Object target = getWrappedObject().getTarget();
         return Memory.wrap(env, target);
     }
+
+    @Getter
+    protected Memory getSender(Environment env) throws Throwable {
+        Object target = getWrappedObject().getSource();
+        return Memory.wrap(env, target);
+    }
 }

@@ -10,6 +10,7 @@ use php\gui\framework\Timer;
 use php\gui\UXClipboard;
 use php\gui\UXDialog;
 use php\gui\UXLoader;
+use php\gui\UXNode;
 use php\io\MemoryStream;
 use php\io\Stream;
 use php\xml\DomNode;
@@ -54,6 +55,22 @@ class PasteMenuCommand extends AbstractMenuCommand
 
                 $nodes = $document->findAll('/copies/node/*');
 
+                $addLayout = function (UXNode $uiNode) use ($editor, &$addLayout) {
+                    $type = $editor->getFormat()->getFormElement($uiNode);
+
+                    if ($type) {
+                        $uiNode->id = $editor->generateNodeId($type);
+
+                        if ($type->isLayout()) {
+                            foreach ($type->getLayoutChildren($uiNode) as $sub) {
+                                $editor->getDesigner()->registerNode($sub);
+
+                                $addLayout($sub);
+                            }
+                        }
+                    }
+                };
+
                 /** @var DomNode $element */
                 foreach ($nodes as $element) {
                     $uiNode = $loader->load($this->makeXmlForLoader($element, $imports));
@@ -67,6 +84,8 @@ class PasteMenuCommand extends AbstractMenuCommand
                     Timer::run(100, function () use ($editor, $uiNode) {
                         $editor->getDesigner()->selectNode($uiNode);
                     });
+
+                    $addLayout($uiNode);
                 }
 
                 $editor->getDesigner()->update();

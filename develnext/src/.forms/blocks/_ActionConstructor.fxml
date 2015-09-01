@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TabPane prefHeight="71.0" prefWidth="849.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TabPane layoutY="38.0" prefHeight="515.0" prefWidth="130.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="38.0">
         <tabs>
           <Tab text="Объекты">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="24.0" prefWidth="849.0" />
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="515.0" prefWidth="122.0" />
             </content>
           </Tab>
         </tabs>
       </TabPane>
-      <Separator layoutY="67.0" prefHeight="9.0" prefWidth="849.0" />
-      <ListView layoutY="71.0" prefHeight="484.0" prefWidth="849.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0" />
+      <ListView id="list" layoutX="133.0" layoutY="35.0" prefHeight="518.0" prefWidth="716.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="133.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0" />
+      <Separator layoutY="28.0" prefHeight="17.0" prefWidth="151.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="28.0" />
    </children>
 </AnchorPane>

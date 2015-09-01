@@ -4,6 +4,7 @@ namespace ide\editors\value;
 use ide\forms\FontPropertyEditorForm;
 use php\gui\event\UXMouseEvent;
 use php\gui\text\UXFont;
+use php\lib\Str;
 use php\lib\String;
 
 class FontPropertyEditor extends TextPropertyEditor
@@ -31,8 +32,8 @@ class FontPropertyEditor extends TextPropertyEditor
     public function getNormalizedValue($value)
     {
         if (!($value instanceof UXFont)) {
-            list($name, $size) = String::split($value, ', ');
-            $value = UXFont::of(String::trim($name), String::trim($size));
+            list($name, $size) = Str::split($value, ', ');
+            $value = UXFont::of(Str::trim($name), Str::trim($size));
         }
 
         return $value;

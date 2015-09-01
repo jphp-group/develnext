@@ -119,6 +119,7 @@ project(':develnext') {
         compile "org.develnext:jphp-json-ext:$jphpVersion"
         compile "org.develnext:jphp-jsoup-ext:$jphpVersion"
         compile "org.develnext:jphp-sql-ext:$jphpVersion"
+        compile "org.develnext:jphp-debugger:$jphpVersion"
     }
 }
 

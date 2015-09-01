@@ -82,6 +82,16 @@ abstract class UXNode
     public $enabled = true;
 
     /**
+     * @var double
+     */
+    public $opacity = 1;
+
+    /**
+     * @var double 0..360
+     */
+    public $rotate = 0;
+
+    /**
      * @readonly
      * @var bool
      */
@@ -122,6 +132,15 @@ abstract class UXNode
      * UXNode constructor.
      */
     public function __construct()
+    {
+    }
+
+    /**
+     * @param $x
+     * @param $y
+     * @return array [x, y]
+     */
+    public function screenToLocal($x, $y)
     {
     }
 

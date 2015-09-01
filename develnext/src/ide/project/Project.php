@@ -324,7 +324,7 @@ class Project
 
         $selected = $this->config->getSelectedFile();
 
-        if ($selected) {
+        if ($selected && File::of($selected)->exists()) {
             FileSystem::open($selected, true);
         }
     }

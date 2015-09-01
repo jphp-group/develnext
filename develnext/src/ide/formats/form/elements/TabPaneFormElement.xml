@@ -1,0 +1,19 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="side" name="Сторона" editor="enum">
+            <variants>
+                <variant value="TOP">Верхняя</variant>
+                <variant value="BOTTOM">Нижняя</variant>
+                <variant value="LEFT">Левая</variant>
+                <variant value="RIGHT">Правая</variant>
+            </variants>
+        </property>
+        <property code="tabClosingPolicy" name="Закрытие табов" editor="enum">
+            <variants>
+                <variant value="SELECTED_TAB">Для активного</variant>
+                <variant value="ALL_TABS">Для всех</variant>
+                <variant value="UNAVAILABLE">Отключить</variant>
+            </variants>
+        </property>
+    </properties>
+</element>

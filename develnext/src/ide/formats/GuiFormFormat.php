@@ -19,6 +19,7 @@ use ide\formats\form\elements\CircleFormElement;
 use ide\formats\form\elements\ColorPickerFormElement;
 use ide\formats\form\elements\ComboBoxFormElement;
 use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\HBoxFormElement;
 use ide\formats\form\elements\HyperlinkFormElement;
 use ide\formats\form\elements\ImageViewFormElement;
 use ide\formats\form\elements\LabelFormElement;
@@ -28,8 +29,10 @@ use ide\formats\form\elements\ProgressBarFormElement;
 use ide\formats\form\elements\ProgressIndicatorFormElement;
 use ide\formats\form\elements\SeparatorFormElement;
 use ide\formats\form\elements\SliderFormElement;
+use ide\formats\form\elements\TabPaneFormElement;
 use ide\formats\form\elements\TextAreaFormElement;
 use ide\formats\form\elements\TextFieldFormElement;
+use ide\formats\form\elements\TitledPaneFormElement;
 use ide\formats\form\elements\ToggleButtonFormElement;
 use ide\formats\form\tags\AnchorPaneFormElementTag;
 use ide\formats\form\tags\ButtonFormElementTag;
@@ -49,9 +52,11 @@ use ide\formats\form\tags\ProgressBarFormElementTag;
 use ide\formats\form\tags\ProgressIndicatorFormElementTag;
 use ide\formats\form\tags\SeparatorFormElementTag;
 use ide\formats\form\tags\SliderFormElementTag;
+use ide\formats\form\tags\TabPaneFormElementTag;
 use ide\formats\form\tags\TextAreaFormElementTag;
 use ide\formats\form\tags\TextFieldFormElementTag;
 use ide\formats\form\tags\TextInputControlFormElementTag;
+use ide\formats\form\tags\TitledPaneFormElementTag;
 use ide\formats\form\tags\ToggleButtonFormElementTag;
 use ide\utils\FileUtils;
 use php\gui\UXNode;
@@ -81,6 +86,10 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new ColorPickerFormElement());
         $this->register(new SeparatorFormElement());
 
+        $this->register(new TitledPaneFormElement());
+        $this->register(new TabPaneFormElement());
+        $this->register(new HBoxFormElement());
+
         //$this->register(new CircleFormElement());
 
         // Element tags.
@@ -107,6 +116,9 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new ColorPickerFormElementTag());
         $this->register(new SliderFormElementTag());
         $this->register(new ImageViewFormElementTag());
+
+        $this->register(new TitledPaneFormElementTag());
+        $this->register(new TabPaneFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());

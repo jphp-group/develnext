@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="364.0" prefWidth="601.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button id="loginButton" graphicTextGap="7.0" layoutX="470.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="104.0" styleClass="icon-login" text="Войти">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+      <Button id="loginVkButton" graphicTextGap="7.0" layoutX="295.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="161.0" styleClass="icon-vk" text="Войти через VK" />
+      <ImageView id="icon" fitHeight="112.0" fitWidth="104.0" layoutX="23.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+      </ImageView>
+      <Label layoutX="153.0" layoutY="74.0" prefHeight="21.0" prefWidth="414.0" text="Для разработчиков на DevelNext" textFill="#979797">
+         <font>
+            <Font name="Tahoma" size="17.0" />
+         </font>
+      </Label>
+      <Label layoutX="153.0" layoutY="39.0" prefHeight="35.0" prefWidth="414.0" text="Социальная сеть" textFill="#486aa8">
+         <font>
+            <Font name="Tahoma" size="28.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="38.0" layoutY="148.0" prefHeight="27.0" prefWidth="128.0" text="Email:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField id="emailField" layoutX="177.0" layoutY="142.0" prefHeight="39.0" prefWidth="397.0" promptText="name@example.com">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextField>
+      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="38.0" layoutY="209.0" prefHeight="27.0" prefWidth="128.0" text="Пароль:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <PasswordField id="passwordField" layoutX="177.0" layoutY="203.0" prefHeight="39.0" prefWidth="397.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </PasswordField>
+      <Hyperlink id="registerLink" layoutX="31.0" layoutY="311.0" text="Регистрация" />
+      <Hyperlink id="forgetPasswordLink" layoutX="476.0" layoutY="249.0" text="Забыли пароль?" />
+   </children>
+</AnchorPane>

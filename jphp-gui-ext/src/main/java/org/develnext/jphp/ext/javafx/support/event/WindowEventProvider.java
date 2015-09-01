@@ -102,6 +102,18 @@ public class WindowEventProvider extends EventProvider<Window> {
                 return target.getScene().getOnKeyReleased();
             }
         });
+
+        setHandler("scroll", new Handler() {
+            @Override
+            public void set(Window target, EventHandler eventHandler) {
+                target.getScene().setOnScroll(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Window target) {
+                return target.getScene().getOnScroll();
+            }
+        });
     }
 
     @Override

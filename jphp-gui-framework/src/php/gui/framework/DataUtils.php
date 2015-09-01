@@ -5,7 +5,10 @@ use php\gui\layout\UXPane;
 use php\gui\UXData;
 use php\gui\UXNode;
 use php\gui\UXParent;
+use php\gui\UXTabPane;
+use php\gui\UXTitledPane;
 use php\lang\IllegalArgumentException;
+use php\lib\Str;
 use php\lib\String;
 
 /**
@@ -24,12 +27,24 @@ class DataUtils
     {
         foreach ($layout->childrenUnmodifiable as $node) {
             if ($node instanceof UXData) {
-                $nd = static::getNode($layout, $node);
+                $nd = self::getNode($layout, $node);
                 if ($nd) {
                     $callback($node, $nd);
                 }
+            } else if ($node instanceof UXTitledPane) {
+                if ($node->content instanceof UXParent) {
+                    self::scan($node->content, $callback);
+                }
+            } else if ($node instanceof UXTabPane) {
+                if ($node->tabs->count) {
+                    foreach ($node->tabs as $tab) {
+                        if ($tab->content instanceof UXParent) {
+                            self::scan($tab->content, $callback);
+                        }
+                    }
+                }
             } else if ($node instanceof UXParent) {
-                static::scan($node, $callback);
+                self::scan($node, $callback);
             }
         }
     }
@@ -45,6 +60,10 @@ class DataUtils
 
                 if (!$nd) {
                     $parent->children->remove($node);
+                }
+            } else if ($node instanceof UXTitledPane) {
+                if ($node->content instanceof UXParent) {
+                    static::cleanup($node->content);
                 }
             } else if ($node instanceof UXParent) {
                 static::cleanup($node);
@@ -97,8 +116,8 @@ class DataUtils
     {
         $id = $data->id;
 
-        if (String::startsWith($id, 'data-')) {
-            return $layout->lookup('#' . String::sub($id, 5));
+        if (Str::startsWith($id, 'data-')) {
+            return $layout->lookup('#' . Str::sub($id, 5));
         }
 
         return null;

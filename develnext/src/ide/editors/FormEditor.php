@@ -1,12 +1,13 @@
 <?php
 namespace ide\editors;
 
-use ide\editors\action\ActionEditor;
+use ide\action\ActionEditor;
 use ide\editors\form\FormElementTypePane;
 use ide\editors\menu\ContextMenu;
 use ide\formats\AbstractFormFormat;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElement;
+use ide\formats\form\event\AbstractEventKind;
 use ide\formats\form\FormEventManager;
 use ide\formats\FormFormat;
 use ide\formats\PhpCodeFormat;
@@ -15,6 +16,7 @@ use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\project\ProjectFile;
+use ide\utils\FileUtils;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
@@ -39,8 +41,10 @@ use php\gui\UXList;
 use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\gui\UXLoader;
+use php\gui\UXMenu;
 use php\gui\UXMenuItem;
 use php\gui\UXNode;
+use php\gui\UXParent;
 use php\gui\UXPopupWindow;
 use php\gui\UXSplitPane;
 use php\gui\UXTab;
@@ -178,7 +182,7 @@ class FormEditor extends AbstractModuleEditor
         $this->codeFile = $phpFile;
         $this->configFile = $confFile;
 
-        $this->actionEditor = new ActionEditor($phpFile . '.xml');
+        $this->actionEditor = new ActionEditor($phpFile . '.axml');
         $this->actionEditor->makeUi();
 
         $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
@@ -258,6 +262,8 @@ class FormEditor extends AbstractModuleEditor
         $this->eventManager->load();
         $this->formDumper->load($this);
 
+        $this->actionEditor->load();
+
         if (File::of($this->codeFile)->exists()) {
             $this->codeEditor->load();
         }
@@ -303,6 +309,14 @@ class FormEditor extends AbstractModuleEditor
     {
         $designer = $this->designer;
 
+        $element = $this->format->getFormElement($node);
+
+        if ($element && $element->isLayout()) {
+            foreach ($element->getLayoutChildren($node) as $sub) {
+                $this->deleteNode($sub);
+            }
+        }
+
         $designer->unselectNode($node);
         $designer->unregisterNode($node);
 
@@ -321,6 +335,8 @@ class FormEditor extends AbstractModuleEditor
         if (File::of($this->codeFile)->exists()) {
             $this->codeEditor->save();
         }
+
+        $this->actionEditor->save();
 
         Stream::tryAccess($this->configFile, function (Stream $stream) {
             $this->config->save($stream);
@@ -455,25 +471,35 @@ class FormEditor extends AbstractModuleEditor
                 Ide::get()->setUserConfigValue("$class.dividerPositions", Str::join($this->viewerAndEvents->dividerPositions, ','));
             }
         };
-        $tabs = new UXTabPane();
-        $tabs->side = 'LEFT';
 
-        $codeTab = new UXTab();
-        $codeTab->text = 'PHP Код';
-        $codeTab->content = $panel;
-        $codeTab->closable = false;
-        $codeTab->graphic = ico('script16');
-        $codeTab->style = '-fx-cursor: hand';
+        if ($content instanceof UXTabPane) {
+            $tabs = $content;
+        } else {
+            $tabs = new UXTabPane();
+            $tabs->side = 'LEFT';
 
-        $constructorTab = new UXTab();
-        $constructorTab->text = 'Конструктор';
-        $constructorTab->closable = false;
-        $constructorTab->graphic = ico('wizard16');
-        $constructorTab->style = '-fx-cursor: hand';
-        $constructorTab->content = $this->actionEditor->getPane();
-        UXAnchorPane::setAnchor($constructorTab->content, 0);
+            $codeTab = new UXTab();
+            $codeTab->text = 'PHP Код';
+            $codeTab->content = $panel;
+            $codeTab->closable = false;
+            $codeTab->graphic = ico('script16');
+            $codeTab->style = '-fx-cursor: hand';
 
-        $tabs->tabs->addAll([$constructorTab, $codeTab]);
+            $constructorTab = new UXTab();
+            $constructorTab->text = 'Конструктор (в разработке)';
+            $constructorTab->closable = false;
+            $constructorTab->graphic = ico('wizard16');
+            $constructorTab->style = '-fx-cursor: hand';
+
+            $panel = new UXAnchorPane();
+            $panel->visible = false;
+            $panel->add($this->actionEditor->getPane());
+            UXAnchorPane::setAnchor($this->actionEditor->getPane(), 0);
+
+            $constructorTab->content = $panel;
+
+            $tabs->tabs->addAll([$codeTab, $constructorTab]);
+        }
 
         $this->viewerAndEvents->items->add($tabs);
 
@@ -529,25 +555,38 @@ class FormEditor extends AbstractModuleEditor
         $this->designer = new UXDesigner($this->layout);
         $this->designer->onAreaMouseDown(function ($e) { $this->_onAreaMouseDown($e); } );
         $this->designer->onNodeClick([$this, '_onNodeClick']);
-        $this->designer->onNodePick([$this, '_onNodePick']);
+        $this->designer->onNodePick(function () {
+            $this->_onNodePick();
+        });
+
         $this->designer->onChanged([$this, '_onChanged']);
 
-        /** @var UXNode $node */
-        foreach ($this->layout->children as $node) {
-            if ($node instanceof UXData) {
-                continue;
-            }
-
-            if (!$node->classes->has('ignore')) {
-                $element = $this->format->getFormElement($node);
-
-                if ($element) {
-                    $element->registerNode($node);
+        $registerChildren = function ($children) use (&$registerChildren) {
+            /** @var UXNode $node */
+            foreach ($children as $node) {
+                if ($node instanceof UXData) {
+                    continue;
                 }
 
-                $this->designer->registerNode($node);
+                if (!$node->classes->has('ignore')) {
+                    $element = $this->format->getFormElement($node);
+
+                    if ($element) {
+                        $element->registerNode($node);
+                    }
+
+                    if ($element->isLayout()) {
+                        $registerChildren($element->getLayoutChildren($node));
+                    }
+
+                    $this->designer->registerNode($node);
+                }
             }
-        }
+        };
+
+        $registerChildren($this->layout->children);
+
+
 
         if (!$fullArea) {
             $area->add($designPane);
@@ -578,7 +617,11 @@ class FormEditor extends AbstractModuleEditor
 
         $this->viewerAndEvents->items->remove($designerCodeEditor);
 
-        $split = new UXSplitPane([$this->viewerAndEvents, $this->elementTypePane->getContent()]);
+        $scrollPane = new UXScrollPane($this->elementTypePane->getContent());
+        $scrollPane->fitToWidth = true;
+        $scrollPane->maxWidth = $scrollPane->content->maxWidth;
+
+        $split = new UXSplitPane([$this->viewerAndEvents, $scrollPane]);
 
         $this->makeContextMenu();
 
@@ -591,6 +634,79 @@ class FormEditor extends AbstractModuleEditor
         $this->designer->contextMenu = $this->contextMenu->getRoot();
     }
 
+    public function generateNodeId(AbstractFormElement $element)
+    {
+        $n = 3;
+
+        $id = Str::format($element->getIdPattern(), "");
+
+        if ($this->layout->lookup("#$id")) {
+            $id = Str::format($element->getIdPattern(), "Alt");
+
+            if ($this->layout->lookup("#$id")) {
+                do {
+                    $id = Str::format($element->getIdPattern(), $n);
+                    $n++;
+                } while ($this->layout->lookup("#$id"));
+            }
+        }
+
+        return $id;
+    }
+
+    protected function createElement(AbstractFormElement $element, $screenX, $screenY, $parent = null)
+    {
+        $node = $element->createElement();
+
+        if (!$node->id) {
+            $node->id = $this->generateNodeId($element);
+        }
+
+        $size = $element->getDefaultSize();
+        $position = [$screenX, $screenY];
+
+        $snapSize = $this->designer->snapSize;
+
+        if ($this->designer->snapEnabled) {
+            $size[0] = floor($size[0] / $snapSize) * $snapSize;
+            $size[1] = floor($size[1] / $snapSize) * $snapSize;
+
+            $position[0] = floor($position[0] / $snapSize) * $snapSize;
+            $position[1] = floor($position[1] / $snapSize) * $snapSize;
+        }
+
+        $node->size = $size;
+
+        if ($parent) {
+            $parentElement = $this->format->getFormElement($parent);
+            $parentElement->addToLayout($parent, $node, $screenX, $screenY);
+        } else {
+            $position = $this->layout->screenToLocal($screenX, $screenY);
+            $node->position = $position;
+            $this->layout->add($node);
+        }
+
+        $element = $this->format->getFormElement($node);
+
+        if ($element) {
+            $element->registerNode($node);
+        }
+
+        $this->designer->registerNode($node);
+
+        $data = DataUtils::get($node);
+
+        foreach ($element->getInitProperties() as $key => $property) {
+            if ($property['virtual']) {
+                $data->set($key, $property['value']);
+            } else if ($key !== 'width' && $key !== 'height') {
+                $node->{$key} = $property['value'];
+            }
+        }
+
+        return $node;
+    }
+
     protected function _onAreaMouseDown(UXMouseEvent $e)
     {
         $selected = $this->elementTypePane->getSelected();
@@ -598,68 +714,18 @@ class FormEditor extends AbstractModuleEditor
         $this->save();
 
         if ($selected) {
-            $node = $selected->createElement();
-
-            if (!$node->id) {
-                $n = 3;
-
-                $id = Str::format($selected->getIdPattern(), "");
-
-                if ($this->layout->lookup("#$id")) {
-                    $id = Str::format($selected->getIdPattern(), "Alt");
-
-                    if ($this->layout->lookup("#$id")) {
-                        do {
-                            $id = Str::format($selected->getIdPattern(), $n);
-                            $n++;
-                        } while ($this->layout->lookup("#$id"));
-                    }
-                }
-
-                $node->id = $id;
-            }
-
-            $size = $selected->getDefaultSize();
-            $position = [$e->x, $e->y];
-
-            $snapSize = $this->designer->snapSize;
-
-            if ($this->designer->snapEnabled) {
-                $size[0] = floor($size[0] / $snapSize) * $snapSize;
-                $size[1] = floor($size[1] / $snapSize) * $snapSize;
-
-                $position[0] = floor($position[0] / $snapSize) * $snapSize;
-                $position[1] = floor($position[1] / $snapSize) * $snapSize;
-            }
-
-            $node->size = $size;
-            $node->position = $position;
-
-            $this->layout->add($node);
-
-            $element = $this->format->getFormElement($node);
-
-            if ($element) {
-                $element->registerNode($node);
-            }
-
-            $this->designer->registerNode($node);
+            $node = $this->createElement($selected, $e->screenX, $e->screenY);
 
             if (!$e->controlDown) {
                 $this->elementTypePane->clearSelected();
             }
 
-            $data = DataUtils::get($node);
-
-            foreach ($selected->getInitProperties() as $key => $property) {
-                if ($property['virtual']) {
-                    $data->set($key, $property['value']);
-                } else if ($key !== 'width' && $key !== 'height') {
-                    $node->{$key} = $property['value'];
-                }
-            }
-
             $this->designer->requestFocus();
+
+            UXApplication::runLater(function () use ($node) {
+                $this->designer->unselectAll();
+                $this->designer->selectNode($node);
+            });
         } else {
             $this->updateProperties($this);
         }
@@ -689,7 +755,24 @@ class FormEditor extends AbstractModuleEditor
         $this->layout->requestFocus();
 
         if ($selected) {
-            $this->designer->unselectAll();
+            $element = $this->format->getFormElement($e->sender);
+
+            if ($element && $element->isLayout()) {
+                $node = $this->createElement($selected, $e->screenX, $e->screenY, $e->sender);
+
+                if (!$e->controlDown) {
+                    $this->elementTypePane->clearSelected();
+                }
+
+                $this->designer->requestFocus();
+
+                UXApplication::runLater(function () use ($node) {
+                    $this->designer->unselectAll();
+                    $this->designer->selectNode($node);
+                });
+            }
+
+            //$this->designer->unselectAll();
             $this->elementTypePane->clearSelected();
             return true;
         }
@@ -732,7 +815,7 @@ class FormEditor extends AbstractModuleEditor
                 $selected = Items::first($list->selectedItems);
 
                 if ($selected) {
-                    $selected = $selected['type']['code'];
+                    $selected = $selected['eventCode'];
                 }
             }
         }
@@ -844,6 +927,8 @@ class FormEditor extends AbstractModuleEditor
         $bind = $this->eventManager->findBind($this->getNodeId($node), $eventType);
 
         if ($bind) {
+            $this->actionEditor->show(FileUtils::stripExtension(File::of($this->file)->getName()), $bind['methodName']);
+
             $this->switchToSmallSource();
             //$this->codeEditor->setEditableArea($bind['beginLine'], $bind['endLine']);
             Timer::run(100, function () use ($bind) {
@@ -870,26 +955,90 @@ class FormEditor extends AbstractModuleEditor
 
         $addButton->on('action', function (UXEvent $event) use ($node, $eventTypes) {
             $menu = new UXContextMenu();
+            $prevKind = null;
 
             foreach ($eventTypes as $type) {
                 $menuItem = new UXMenuItem($type['name'], Ide::get()->getImage($type['icon']));
-                $menuItem->on('action', function () use ($node, $type) {
-                    $this->switchToSmallSource();
-                    $this->eventManager->addBind($this->getNodeId($node), $type['code'], $type['kind']);
 
-                    Timer::run(100, function () use ($node, $type) {
-                        $this->codeEditor->load();
-                        $this->updateEventTypes($node, $type['code']);
+                /** @var AbstractEventKind $kind */
+                $kind = $type['kind'];
 
-                        $this->jumpToEventSource($node, $type['code']);
+                $variants = $kind->getParamVariants();
+
+                if (!$variants) {
+                    $menuItem->on('action', function () use ($node, $type) {
+                        $this->switchToSmallSource();
+                        $this->eventManager->addBind($this->getNodeId($node), $type['code'], $type['kind']);
+
+                        Timer::run(100, function () use ($node, $type) {
+                            $this->codeEditor->load();
+                            $this->updateEventTypes($node, $type['code']);
+
+                            $this->jumpToEventSource($node, $type['code']);
+                        });
                     });
-                });
 
-                if ($this->eventManager->findBind($this->getNodeId($node), $type['code'])) {
-                    $menuItem->disable = true;
+                    if ($this->eventManager->findBind($this->getNodeId($node), $type['code'])) {
+                        $menuItem->disable = true;
+                    }
+                } else {
+                    $menuItem = new UXMenu($menuItem->text, $menuItem->graphic);
+                }
+
+                if ($prevKind && $prevKind != $type['kind']) {
+                    $menu->items->add(UXMenuItem::createSeparator());
                 }
 
                 $menu->items->add($menuItem);
+
+                if ($variants) {
+                    $appendVariants = function ($variants, UXMenu $menuItem) use ($node, $type, &$appendVariants) {
+                        foreach ($variants as $name => $param) {
+                            if ($param === '-') {
+                                $menuItem->items->add(UXMenuItem::createSeparator());
+                                continue;
+                            }
+
+                            if (is_array($param)) {
+                                $subItem = new UXMenu($name);
+                                $menuItem->items->add($subItem);
+
+                                $appendVariants($param, $subItem);
+                                continue;
+                            }
+
+                            $code = $type['code'];
+
+                            if ($param) {
+                                $code .= "-$param";
+                            }
+
+                            $item = new UXMenuItem($name);
+                            $item->on('action', function () use ($node, $type, $code) {
+                                $this->switchToSmallSource();
+
+                                $this->eventManager->addBind($this->getNodeId($node), $code, $type['kind']);
+
+                                Timer::run(100, function () use ($node, $type, $code) {
+                                    $this->codeEditor->load();
+                                    $this->updateEventTypes($node, $code);
+
+                                    $this->jumpToEventSource($node, $code);
+                                });
+                            });
+
+                            if ($this->eventManager->findBind($this->getNodeId($node), $code)) {
+                                $item->disable = true;
+                            }
+
+                            $menuItem->items->add($item);
+                        }
+                    };
+
+                    $appendVariants($variants, $menuItem);
+                }
+
+                $prevKind = $type['kind'];
             }
 
             /** @var UXButton $target */
@@ -935,8 +1084,7 @@ class FormEditor extends AbstractModuleEditor
             $selected = Items::first($list->selectedItems);
 
             if ($selected) {
-                if ($bind = $this->eventManager->removeBind($this->getNodeId($node), $selected['type']['code'])) {
-
+                if ($bind = $this->eventManager->removeBind($this->getNodeId($node), $selected['eventCode'])) {
                     Timer::run(100, function () use ($bind) {
                         $this->codeEditor->load();
                         $this->codeEditor->jumpToLine($bind['eventLine'] - 1);
@@ -955,7 +1103,7 @@ class FormEditor extends AbstractModuleEditor
             }
 
             if ($selected) {
-                $this->jumpToEventSource($node, $selected['type']['code']);
+                $this->jumpToEventSource($node, $selected['eventCode']);
             }
         });
 
@@ -964,7 +1112,7 @@ class FormEditor extends AbstractModuleEditor
                 $selected = Items::first($list->selectedItems);
 
                 if ($selected) {
-                    $this->jumpToEventSource($node, $selected['type']['code']);
+                    $this->jumpToEventSource($node, $selected['eventCode']);
                 }
             }
         });
@@ -974,14 +1122,24 @@ class FormEditor extends AbstractModuleEditor
                 /** @var array $eventType */
                 $eventType = $item['type'];
                 $methodName = $item['info']['methodName'];
+                $param = $item['paramName'];
 
                 $cell->text = null;
 
                 $nameLabel = new UXLabel($eventType['name']);
+
                 $nameLabel->css('font-weight', 'bold');
 
                 $methodNameLabel = new UXLabel($methodName);
                 $methodNameLabel->textColor = UXColor::of('gray');
+
+                if ($param) {
+                    $paramLabel = new UXLabel("($param)");
+                    $paramLabel->textColor = UXColor::of('blue');
+                    $paramLabel->paddingRight = 3;
+
+                    $methodNameLabel = new UXHBox([$paramLabel, $methodNameLabel]);
+                }
 
                 $namesBox = new UXVBox([$nameLabel, $methodNameLabel]);
 
@@ -1005,17 +1163,22 @@ class FormEditor extends AbstractModuleEditor
             $binds = $this->eventManager->findBinds($this->getNodeId($node));
 
             foreach ($binds as $code => $info) {
+                list($code, $param) = Str::split($code, '-');
+
                 if ($eventType = $eventTypes[$code]) {
                     $list->items->add([
                         'type' => $eventType,
-                        'info' => $info
+                        'info' => $info,
+                        'param' => $param,
+                        'paramName' => $eventType['kind']->findParamName($param),
+                        'eventCode' => $param ? "$eventType[code]-$param" : $eventType['code'],
                     ]);
                 }
             }
 
             if ($selected) {
                 foreach ($list->items as $i => $item) {
-                    if ($item['type']['code'] == $selected) {
+                    if ($item['eventCode'] == $selected) {
                         $list->selectedIndexes = [$i];
                         break;
                     }
