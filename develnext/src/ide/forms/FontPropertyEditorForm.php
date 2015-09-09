@@ -55,21 +55,21 @@ class FontPropertyEditorForm extends AbstractForm
 
         if ($font instanceof UXFont) {
             $this->fontCombobox->value = $font->family;
-            $this->fontSizeCombobox->value = (int) $font->size;
+            $this->fontSizeCombobox->text = (int) $font->size;
         }
     }
 
     /**
-     * @event applyButton.click
+     * @event applyButton.action
      */
     public function actionApply()
     {
-        $this->setResult(UXFont::of($this->fontCombobox->value, $this->fontSizeCombobox->value));
+        $this->setResult(UXFont::of($this->fontCombobox->value, $this->fontSizeCombobox->text));
         $this->hide();
     }
 
     /**
-     * @event cancelButton.click
+     * @event cancelButton.action
      */
     public function actionCancel()
     {

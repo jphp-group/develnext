@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="629.0" prefWidth="849.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Pane layoutX="706.0" layoutY="14.0" prefHeight="558.0" prefWidth="131.0" style="-fx-border-color: silver;">
+         <children>
+            <TabPane prefHeight="556.0" prefWidth="131.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="57.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+              <tabs>
+                <Tab text="Объекты">
+                     <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="515.0" prefWidth="101.0" />
+                     </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+         </children>
+      </Pane>
+      <ListView id="list" layoutX="14.0" layoutY="14.0" prefHeight="558.0" prefWidth="691.0" AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="144.0" AnchorPane.topAnchor="14.0" />
+      <HBox layoutX="14.0" layoutY="525.0" prefHeight="34.0" prefWidth="691.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="144.0">
+         <children>
+            <Button id="saveButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" prefWidth="138.0" styleClass="icon-ok" text="Сохранить">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Button>
+            <Button id="cancelButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" prefWidth="138.0" text="Отменить" />
+         </children>
+      </HBox>
+      <Label id="hintLabel" layoutX="48.0" layoutY="41.0" text="Перетащите сюда иконки с правой панели ..." textFill="#ababab">
+         <font>
+            <Font name="System Italic" size="22.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

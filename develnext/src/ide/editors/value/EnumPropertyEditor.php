@@ -76,6 +76,8 @@ class EnumPropertyEditor extends ElementPropertyEditor
      */
     public function updateUi($value)
     {
+        parent::updateUi($value);
+
         $i = 0;
         $this->choiceBox->selectedIndex = -1;
 

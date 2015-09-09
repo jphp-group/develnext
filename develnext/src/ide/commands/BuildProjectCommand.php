@@ -34,6 +34,8 @@ class BuildProjectCommand extends AbstractCommand
 
     public function onExecute()
     {
+        throw new \RuntimeException();
+
         $dialog = new BuildProjectForm();
         $dialog->setBuildTypes($this->buildTypes);
         $dialog->showAndWait();

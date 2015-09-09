@@ -37,4 +37,9 @@ class UXComboBoxBase extends UXControl
      * @var mixed
      */
     public $value;
+
+    /**
+     * @var string
+     */
+    public $text;
 }

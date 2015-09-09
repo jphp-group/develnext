@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="343.0" prefWidth="601.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button id="okButton" graphicTextGap="7.0" layoutX="426.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="148.0" styleClass="icon-ok" text="Подтвердить" AnchorPane.bottomAnchor="22.0" AnchorPane.rightAnchor="27.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
+      <ImageView id="icon" fitHeight="112.0" fitWidth="104.0" layoutX="23.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+      </ImageView>
+      <Label layoutX="153.0" layoutY="74.0" prefHeight="21.0" prefWidth="414.0" text="Подтвердите свой email для успешной регистрации" textFill="#979797">
+         <font>
+            <Font name="Tahoma" size="17.0" />
+         </font>
+      </Label>
+      <Label layoutX="153.0" layoutY="39.0" prefHeight="35.0" prefWidth="414.0" text="Регистрация" textFill="#486aa8">
+         <font>
+            <Font name="Tahoma" size="28.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="23.0" layoutY="148.0" prefHeight="27.0" prefWidth="169.0" text="Email:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField id="emailField" layoutX="205.0" layoutY="142.0" prefHeight="39.0" prefWidth="369.0" promptText="name@example.com">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextField>
+      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="23.0" layoutY="213.0" prefHeight="27.0" prefWidth="169.0" text="Проверочный код:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="24.0" layoutY="284.0" prefHeight="35.0" prefWidth="281.0" text="* Проверочный код ищите в письме после первого этапа регистрации" wrapText="true" />
+      <TextField id="keyField" layoutX="205.0" layoutY="207.0" prefHeight="39.0" prefWidth="369.0" promptText="символный код">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextField>
+   </children>
+</AnchorPane>

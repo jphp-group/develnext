@@ -2,8 +2,11 @@
 namespace ide\editors\value;
 
 use ide\editors\FormEditor;
+use ide\systems\FileSystem;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\framework\DataUtils;
+use php\gui\framework\Timer;
+use php\gui\UXApplication;
 use php\gui\UXNode;
 use php\gui\UXTableCell;
 use php\lang\IllegalArgumentException;
@@ -68,7 +71,16 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     /**
      * @param $value
      */
-    abstract public function updateUi($value);
+    public function updateUi($value)
+    {
+        Timer::run(100, function () {
+            $editor = FileSystem::getSelectedEditor();
+
+            if ($editor instanceof FormEditor) {
+                $editor->getDesigner()->update();
+            }
+    });
+    }
 
     /**
      * @param DomElement $element

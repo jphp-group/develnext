@@ -5,7 +5,9 @@ use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
+use php\gui\UXApplication;
 use php\gui\UXButton;
+use php\gui\UXCheckbox;
 use php\gui\UXControl;
 use php\gui\UXForm;
 use php\gui\UXImageView;
@@ -16,6 +18,8 @@ use php\gui\UXNode;
  * @property UXHBox $buttonBox
  * @property UXLabel $messageLabel
  * @property UXImageView $icon
+ *
+ * @property UXCheckbox $flag
  *
  * Class MessageBoxForm
  * @package ide\forms
@@ -40,6 +44,21 @@ class MessageBoxForm extends AbstractForm
 
         $this->text = $text;
         $this->buttons = $buttons;
+    }
+
+    public function isChecked()
+    {
+        return $this->flag->selected;
+    }
+
+    public function showDialogWithFlag()
+    {
+        UXApplication::runLater(function() {
+            $this->flag->visible = true;
+            $this->height += 42;
+        });
+
+        return $this->showDialog();
     }
 
     /**

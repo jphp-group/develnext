@@ -1,0 +1,2 @@
+ide\commands\account\AccountLoginCommand
+ide\commands\account\AccountRegisterCommand

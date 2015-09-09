@@ -88,7 +88,6 @@ class GuiFormFormat extends AbstractFormFormat
 
         $this->register(new TitledPaneFormElement());
         $this->register(new TabPaneFormElement());
-        $this->register(new HBoxFormElement());
 
         //$this->register(new CircleFormElement());
 
@@ -118,7 +117,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new ImageViewFormElementTag());
 
         $this->register(new TitledPaneFormElementTag());
-        $this->register(new TabPaneFormElementTag());
+        //$this->register(new TabPaneFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());

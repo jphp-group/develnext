@@ -11,6 +11,7 @@ use ide\formats\form\event\AbstractEventKind;
 use ide\formats\form\FormEventManager;
 use ide\formats\FormFormat;
 use ide\formats\PhpCodeFormat;
+use ide\forms\ActionConstructorForm;
 use ide\forms\MainForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
@@ -36,6 +37,7 @@ use php\gui\UXButton;
 use php\gui\UXContextMenu;
 use php\gui\UXData;
 use php\gui\UXDialog;
+use php\gui\UXHyperlink;
 use php\gui\UXLabel;
 use php\gui\UXList;
 use php\gui\UXListCell;
@@ -145,6 +147,16 @@ class FormEditor extends AbstractModuleEditor
     protected $eventManager;
 
     /**
+     * @var null
+     */
+    protected $selectedClass = null;
+
+    /**
+     * @var null
+     */
+    protected $selectedMethod = null;
+
+    /**
      * @var UXDesignProperties[]
      */
     protected static $typeProperties = [];
@@ -197,6 +209,7 @@ class FormEditor extends AbstractModuleEditor
         $this->codeEditor->register(AbstractCommand::makeSeparator());
 
         $this->codeEditor->registerDefaultCommands();
+        $this->codeEditor->register(new SetDefaultCommand($this, 'php'));
 
         $this->codeEditor->on('update', function () {
             $node = $this->designer->pickedNode;
@@ -416,7 +429,7 @@ class FormEditor extends AbstractModuleEditor
 
         $this->tabs = $tabs;
 
-        if (Ide::get()->getUserConfigValue(__CLASS__ . '.sourceEditor', false)) {
+        if (Ide::get()->getUserConfigValue(__CLASS__ . '.sourceEditorEx', false)) {
             UXApplication::runLater(function () {
                 $this->switchToSmallSource();
             });
@@ -486,10 +499,24 @@ class FormEditor extends AbstractModuleEditor
             $codeTab->style = '-fx-cursor: hand';
 
             $constructorTab = new UXTab();
-            $constructorTab->text = 'Конструктор (в разработке)';
+            $constructorTab->text = 'Конструктор';
             $constructorTab->closable = false;
             $constructorTab->graphic = ico('wizard16');
             $constructorTab->style = '-fx-cursor: hand';
+
+            $constructorTab->on('change', function () use ($tabs, $codeTab) {
+                UXApplication::runLater(function() use ($tabs, $codeTab) {
+                    $tabs->selectedTab = $codeTab;
+                });
+
+                if (!$this->selectedClass || !$this->selectedMethod) {
+                    UXDialog::show('Выберите событие или добавьте новое перед запуском конструктора событий');
+                    return;
+                }
+
+                $actionConstructor = new ActionConstructorForm();
+                $actionConstructor->showAndWait($this->actionEditor, $this->selectedClass, $this->selectedMethod);
+            });
 
             $panel = new UXAnchorPane();
             $panel->visible = false;
@@ -498,7 +525,7 @@ class FormEditor extends AbstractModuleEditor
 
             $constructorTab->content = $panel;
 
-            $tabs->tabs->addAll([$codeTab, $constructorTab]);
+            $tabs->tabs->addAll([$codeTab]);
         }
 
         $this->viewerAndEvents->items->add($tabs);
@@ -506,7 +533,7 @@ class FormEditor extends AbstractModuleEditor
         $tabs->watch('width', $func);
         $tabs->watch('height', $func);
 
-        Ide::get()->setUserConfigValue("$class.sourceEditor", true);
+        Ide::get()->setUserConfigValue("$class.sourceEditorEx", true);
     }
 
     public function switchToDesigner($hideSource = false)
@@ -516,7 +543,7 @@ class FormEditor extends AbstractModuleEditor
         if ($hideSource && $this->viewerAndEvents->items->count() > 1) {
             $class = __CLASS__;
 
-            Ide::get()->setUserConfigValue("$class.sourceEditor", false);
+            Ide::get()->setUserConfigValue("$class.sourceEditorEx", false);
             $this->codeTab->content = $this->viewerAndEvents->items[1];
             unset($this->viewerAndEvents->items[1]);
         }
@@ -881,6 +908,9 @@ class FormEditor extends AbstractModuleEditor
                 $propTab->content->children->add($groupPane);
             }
 
+            $propTab->content = new UXScrollPane($propTab->content);
+            $propTab->content->fitToWidth = true;
+
             $tabs->tabs->add($propTab);
         }
 
@@ -927,8 +957,6 @@ class FormEditor extends AbstractModuleEditor
         $bind = $this->eventManager->findBind($this->getNodeId($node), $eventType);
 
         if ($bind) {
-            $this->actionEditor->show(FileUtils::stripExtension(File::of($this->file)->getName()), $bind['methodName']);
-
             $this->switchToSmallSource();
             //$this->codeEditor->setEditableArea($bind['beginLine'], $bind['endLine']);
             Timer::run(100, function () use ($bind) {
@@ -940,6 +968,117 @@ class FormEditor extends AbstractModuleEditor
     public function getNodeId($node)
     {
         return $node->id;
+    }
+
+    public function setDefaultEventEditor($editor)
+    {
+        Ide::get()->setUserConfigValue(__CLASS__ . '.editorOnDoubleClick', $editor);
+    }
+
+    public function getDefaultEventEditor($request = true)
+    {
+        $editorType = Ide::get()->getUserConfigValue(__CLASS__ . '.editorOnDoubleClick');
+
+        if ($request && !$editorType) {
+            $buttons = ['constructor' => 'Конструктор', 'php' => 'PHP редактор'];
+
+            $dialog = new MessageBoxForm('Какой использовать редактор для редактирования событий?', $buttons);
+
+            Ide::get()->getMainForm()->toast('Используйте "Конструктор" если вы новичок!');
+
+            if ($dialog->showDialogWithFlag()) {
+                $editorType = $dialog->getResult();
+
+                if ($dialog->isChecked()) {
+                    Ide::get()->setUserConfigValue(__CLASS__ . '.editorOnDoubleClick', $editorType);
+                }
+            }
+        }
+
+        return $editorType;
+    }
+
+    public function openEventSource($node, $eventCode, $editorType = null)
+    {
+        if (!$editorType) {
+            $editorType = $this->getDefaultEventEditor();
+        }
+
+        $element = $this->format->getFormElement($node);
+        $eventTypes = $element->getEventTypes();
+        $eventType = null;
+
+        $code = $eventCode;
+
+        list($eventCode, $eventParam) = Str::split($eventCode, '-', 2);
+
+        foreach ($eventTypes as $el) {
+            if (Str::equalsIgnoreCase($el['code'], $eventCode)) {
+                $eventType = $el;
+            }
+        }
+
+        switch ($editorType) {
+            case 'php':
+                $this->jumpToEventSource($node, $code);
+                break;
+            case 'constructor':
+                $bind = $this->eventManager->findBind($this->getNodeId($node), $code);
+
+                if ($bind) {
+                    $selectedClass = FileUtils::stripExtension(File::of($this->file)->getName());
+                    $selectedMethod = $bind['methodName'];
+
+                    $actionConstructor = new ActionConstructorForm();
+
+                    if ($eventType) {
+                        $nodeId = $this->getNodeId($node);
+
+                        $actionConstructor->title = 'Событие - ' . $eventType['name'];
+
+                        if ($eventParam) {
+                            $actionConstructor->title .= ' (' . $eventType['kind']->findParamName($eventParam) . ')';
+                        }
+
+                        if ($nodeId) {
+                            $actionConstructor->title .= ' - id = "' . $nodeId . '"';
+                        }
+                    } else {
+                        $actionConstructor->title = "Метод - $selectedMethod()";
+                    }
+
+                    $actionConstructor->showAndWait($this->actionEditor, $selectedClass, $selectedMethod);
+                } else {
+
+                }
+
+                break;
+        }
+    }
+
+    protected function makeEventContextMenu(UXListView $list, $node)
+    {
+        $menu = new ContextMenu();
+
+        $menu->addCommand(AbstractCommand::makeWithText('Открыть в конструкторе', 'icons/wizard16.png', function () use ($list, $node) {
+            $selected = Items::first($list->selectedItems);
+
+            if ($selected) {
+                $this->openEventSource($node, $selected['eventCode'], 'constructor ');
+            }
+        }));
+
+        $menu->addSeparator();
+
+        $menu->addCommand(AbstractCommand::makeWithText('Открыть в php-редакторе', 'icons/phpFile16.png', function () use ($list, $node) {
+            $selected = Items::first($list->selectedItems);
+
+            if ($selected) {
+                $this->openEventSource($node, $selected['eventCode'], 'php');
+            }
+        }));
+
+        return $menu;
     }
 
     protected function makeEventTypePane($node, AbstractFormElement $element, $selected = null)
@@ -974,7 +1113,7 @@ class FormEditor extends AbstractModuleEditor
                             $this->codeEditor->load();
                             $this->updateEventTypes($node, $type['code']);
 
-                            $this->jumpToEventSource($node, $type['code']);
+                            $this->openEventSource($node, $type['code']);
                         });
                     });
 
@@ -1023,7 +1162,7 @@ class FormEditor extends AbstractModuleEditor
                                     $this->codeEditor->load();
                                     $this->updateEventTypes($node, $code);
 
-                                    $this->jumpToEventSource($node, $code);
+                                    $this->openEventSource($node, $code);
                                 });
                             });
 
@@ -1103,7 +1242,7 @@ class FormEditor extends AbstractModuleEditor
             }
 
             if ($selected) {
-                $this->jumpToEventSource($node, $selected['eventCode']);
+                $this->openEventSource($node, $selected['eventCode']);
             }
         });
 
@@ -1112,12 +1251,15 @@ class FormEditor extends AbstractModuleEditor
                 $selected = Items::first($list->selectedItems);
 
                 if ($selected) {
-                    $this->jumpToEventSource($node, $selected['eventCode']);
+                    $this->openEventSource($node, $selected['eventCode']);
                 }
             }
         });
 
-        $list->setCellFactory(function (UXListCell $cell, $item, $empty) {
+
+        $eventContextMenu = $this->makeEventContextMenu($list, $node);
+
+        $list->setCellFactory(function (UXListCell $cell, $item, $empty) use ($list, $deleteButton, $eventContextMenu) {
             if ($item) {
                 /** @var array $eventType */
                 $eventType = $item['type'];
@@ -1126,22 +1268,44 @@ class FormEditor extends AbstractModuleEditor
 
                 $cell->text = null;
 
-                $nameLabel = new UXLabel($eventType['name']);
+                $constructorLink = new UXHyperlink('Изменить');
+                $constructorLink->style = '-fx-text-fill: gray';
+                $constructorLink->on('action', function ($event) use ($list, $item, $deleteButton, $constructorLink, $eventContextMenu) {
+                    foreach ($list->items as $i => $el) {
+                        if ($el === $item) {
+                            UXApplication::runLater(function () use ($list, $i) {
+                                $list->selectedIndex = $i;
+                                $list->focusedIndex = $i;
+                            });
+                            break;
+                        }
+                    }
 
-                $nameLabel->css('font-weight', 'bold');
+                    $eventContextMenu->getRoot()->showByNode($constructorLink, - 120, $constructorLink->height);
+                });
+
+                $name = new UXLabel($eventType['name']);
+                $name->css('font-weight', 'bold');
+
+                $nameLabel = new UXHBox([$name]);
+                $nameLabel->spacing = 4;
+
 
                 $methodNameLabel = new UXLabel($methodName);
                 $methodNameLabel->textColor = UXColor::of('gray');
 
                 if ($param) {
                     $paramLabel = new UXLabel("($param)");
-                    $paramLabel->textColor = UXColor::of('blue');
+                    $paramLabel->style = '-fx-font-style: italic';
+                    $paramLabel->textColor = UXColor::of('#2f6eb2');
                     $paramLabel->paddingRight = 3;
 
-                    $methodNameLabel = new UXHBox([$paramLabel, $methodNameLabel]);
+                    $line = new UXHBox([$paramLabel, $constructorLink]);
+                } else {
+                    $line = new UXHBox([$constructorLink]);
                 }
 
-                $namesBox = new UXVBox([$nameLabel, $methodNameLabel]);
+                $namesBox = new UXVBox([$nameLabel, $line]);
 
                 $icon = Ide::get()->getImage($eventType['icon']);
 

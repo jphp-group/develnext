@@ -2,6 +2,7 @@
 namespace ide;
 
 use ide\account\AccountManager;
+use ide\account\ServiceManager;
 use ide\commands\CloseProjectCommand;
 use ide\commands\ExitCommand;
 use ide\commands\NewProjectCommand;
@@ -116,6 +117,11 @@ class Ide extends Application
     protected $accountManager = null;
 
     /**
+     * @var ServiceManager
+     */
+    protected $serviceManager = null;
+
+    /**
      * @var string
      */
     protected $mode = 'prod';
@@ -131,6 +137,7 @@ class Ide extends Application
         if (isset($env['DEVELNEXT_MODE'])) {
             $this->mode = $env['DEVELNEXT_MODE'];
         }
+
     }
 
     public function launch()
@@ -150,27 +157,31 @@ class Ide extends Application
                     if (!$showError) {
                         $showError = true;
 
-                        $dialog = new UXAlert('ERROR');
-                        $dialog->title = 'Ошибка';
-                        $dialog->headerText = 'Произошла ошибка в DevelNext, сообщите об этом авторам';
-                        $dialog->contentText = $e->getMessage();
-                        $dialog->setButtonTypes(['Выход из DevelNext', 'Продолжить']);
+                        if (Ide::accountManager()->isAuthorized()) {
+                            Ide::service()->ide()->sendErrorAsync($e, null);
+                        } else {
+                            $dialog = new UXAlert('ERROR');
+                            $dialog->title = 'Ошибка';
+                            $dialog->headerText = 'Произошла ошибка в DevelNext, сообщите об этом авторам';
+                            $dialog->contentText = $e->getMessage();
+                            $dialog->setButtonTypes(['Выход из DevelNext', 'Продолжить']);
 
-                        $pane = new UXAnchorPane();
-                        $pane->maxWidth = 100000;
+                            $pane = new UXAnchorPane();
+                            $pane->maxWidth = 100000;
 
-                        $content = new UXTextArea("Ошибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
-                        $content->padding = 10;
-                        UXAnchorPane::setAnchor($content, 0);
+                            $content = new UXTextArea("Ошибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
+                            $content->padding = 10;
+                            UXAnchorPane::setAnchor($content, 0);
 
-                        $pane->add($content);
-                        $dialog->expandableContent = $pane;
-                        $dialog->expanded = true;
+                            $pane->add($content);
+                            $dialog->expandableContent = $pane;
+                            $dialog->expanded = true;
 
-                        switch ($dialog->showAndWait()) {
-                            case 'Выход из DevelNext':
-                                Ide::get()->shutdown();
-                                break;
+                            switch ($dialog->showAndWait()) {
+                                case 'Выход из DevelNext':
+                                    Ide::get()->shutdown();
+                                    break;
+                            }
                         }
 
                         $showError = false;
@@ -192,6 +203,7 @@ class Ide extends Application
                     $handle();
                 }
 
+                $this->serviceManager = new ServiceManager();
                 $this->accountManager = new AccountManager();
             }
         );
@@ -445,6 +457,48 @@ class Ide extends Application
         }
     }
 
+    public function unregisterCommand($commandClass, $ignoreAlways = true)
+    {
+        /** @var MainForm $mainForm */
+        $mainForm = $this->getMainForm();
+
+        $data = $this->commands[$commandClass];
+
+        if (!$data) {
+            return;
+        }
+
+        /** @var AbstractCommand $command */
+        $command = $data['command'];
+
+        if (!$ignoreAlways && $command->isAlways()) {
+            return;
+        }
+
+        if ($data['headUi']) {
+            if (is_array($data['headUi'])) {
+                foreach ($data['headUi'] as $ui) {
+                    $mainForm->getHeadPane()->remove($ui);
+                }
+            } else {
+                $mainForm->getHeadPane()->remove($data['headUi']);
+            }
+        }
+
+        if ($data['menuItem']) {
+            /** @var UXMenu $menu */
+            $menu = $mainForm->{'menu' . Str::upperFirst($command->getCategory())};
+
+            if ($menu instanceof UXMenu) {
+                foreach ($data['menuItem'] as $el) {
+                    $menu->items->remove($el);
+                }
+            }
+        }
+
+        unset($this->commands[$commandClass]);
+    }
+
     public function unregisterCommands()
     {
         /** @var MainForm $mainForm */
@@ -455,33 +509,7 @@ class Ide extends Application
         }
 
         foreach ($this->commands as $code => $data) {
-            /** @var AbstractCommand $command */
-            $command = $data['command'];
-
-            if ($command->isAlways()) {
-                continue;
-            }
-
-            if ($data['headUi']) {
-                if (is_array($data['headUi'])) {
-                    foreach ($data['headUi'] as $ui) {
-                        $mainForm->getHeadPane()->remove($ui);
-                    }
-                } else {
-                    $mainForm->getHeadPane()->remove($data['headUi']);
-                }
-            }
-
-            if ($data['menuItem']) {
-                /** @var UXMenu $menu */
-                $menu = $mainForm->{'menu' . Str::upperFirst($command->getCategory())};
-
-                if ($menu instanceof UXMenu) {
-                    $menu->items->remove($data['menuItem']);
-                }
-            }
-
-            unset($this->commands[$code]);
+            $this->unregisterCommand($code, false);
         }
     }
 
@@ -506,6 +534,8 @@ class Ide extends Application
      */
     public function registerCommand(AbstractCommand $command)
     {
+        $this->unregisterCommand(get_class($command));
+
         $data = [
             'command' => $command,
         ];
@@ -532,7 +562,7 @@ class Ide extends Application
         if ($menuItem) {
             $data['menuItem'] = $menuItem;
 
-            $this->afterShow(function () use ($menuItem, $command) {
+            $this->afterShow(function () use ($menuItem, $command, &$data) {
                 /** @var MainForm $mainForm */
                 $mainForm = $this->getMainForm();
 
@@ -540,6 +570,8 @@ class Ide extends Application
                 $menu = $mainForm->{'menu' . Str::upperFirst($command->getCategory())};
 
                 if ($menu instanceof UXMenu) {
+                    $items = [];
+
                     if ($command->withBeforeSeparator()) {
                         /** @var UXMenuItem $last */
                         $last = $menu->items->last();
@@ -547,16 +579,24 @@ class Ide extends Application
                         if ($last && $last->isSeparator()) {
                             // do nothing...
                         } else {
-                            $menu->items->add(UXMenuItem::createSeparator());
+                            $items[] = UXMenuItem::createSeparator();
                         }
                     }
 
-                    $menu->items->add($menuItem);
+                    $items[] = $menuItem;
 
                     if ($command->withAfterSeparator()) {
-                        $menu->items->add(UXMenuItem::createSeparator());
+                        $items[] = UXMenuItem::createSeparator();
                     }
+
+                    foreach ($items as $el) {
+                        $menu->items->add($el);
+                    }
+
+                    $data['menuItem'] = $items;
                 }
+
+
             });
         }
 
@@ -694,11 +734,14 @@ class Ide extends Application
 
         $this->registerProjectTemplate(new DefaultGuiProjectTemplate());
 
-        $this->registerCommand(new NewProjectCommand());
-        $this->registerCommand(new OpenProjectCommand());
-        $this->registerCommand(new SaveProjectCommand());
-        $this->registerCommand(new CloseProjectCommand());
-        $this->registerCommand(new ExitCommand());
+        $mainCommands = $this->getInternalList('.dn/mainCommands');
+
+        foreach ($mainCommands as $commandClass) {
+            /** @var AbstractCommand $command */
+            $command = new $commandClass();
+
+            $this->registerCommand($command);
+        }
 
         $ideConfig = $this->getUserConfig('ide');
 
@@ -735,6 +778,22 @@ class Ide extends Application
         return parent::get();
     }
 
+    /**
+     * @return AccountManager
+     */
+    public static function accountManager()
+    {
+        return Ide::get()->getAccountManager();
+    }
+
+    /**
+     * @return ServiceManager
+     */
+    public static function service()
+    {
+        return Ide::get()->serviceManager;
+    }
+
     public function shutdown()
     {
         $project = $this->getOpenedProject();
@@ -759,6 +818,12 @@ class Ide extends Application
                 if ($stream) $stream->close();
             }
         }
+
+        if ($this->accountManager->isAuthorized()) {
+            Ide::service()->ide()->shutdownAsync(null);
+        }
+
+        Ide::service()->shutdown();
 
         try {
             parent::shutdown();

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="344.0" prefWidth="682.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="26.0" layoutY="24.0" text="Сейчас вас перенаправит на страницу входа через vk.com ...">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Label>
+      <Hyperlink id="urlLink" layoutX="47.0" layoutY="70.0" prefHeight="23.0" prefWidth="613.0" text="Hyperlink" />
+      <Label alignment="CENTER" layoutX="101.0" layoutY="145.0" prefHeight="41.0" prefWidth="481.0" text="Если переход не происходит автоматически в течении нескольких секунд, скопируйте ссылку и откройте ее в своем браузере" textAlignment="CENTER" textFill="#545252" wrapText="true">
+         <font>
+            <Font name="System Italic" size="12.0" />
+         </font>
+      </Label>
+      <Button id="copyButton" layoutX="47.0" layoutY="99.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="216.0" styleClass="icon-copy" text="Копировать в буффер обмена" />
+      <Separator layoutX="27.0" layoutY="200.0" prefHeight="10.0" prefWidth="623.0" />
+      <Label layoutX="47.0" layoutY="238.0" text="Введите код подтверждения полученный после входа:" textFill="#0d0d0d" />
+      <TextField id="confirmField" layoutX="47.0" layoutY="261.0" prefHeight="39.0" prefWidth="419.0" promptText="код подтверждения">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextField>
+      <Button id="loginVkButton" graphicTextGap="7.0" layoutX="481.0" layoutY="261.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="156.0" styleClass="icon-ok" text="Подтвердить">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
+      <Label id="timerLabel" alignment="CENTER_RIGHT" layoutX="501.0" layoutY="49.0" prefHeight="17.0" prefWidth="116.0" text="через 0 сек" textAlignment="CENTER" />
+      <ProgressIndicator layoutX="629.0" layoutY="46.0" prefHeight="23.0" prefWidth="21.0" />
+   </children>
+</AnchorPane>

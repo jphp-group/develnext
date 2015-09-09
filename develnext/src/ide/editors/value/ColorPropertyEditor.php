@@ -89,6 +89,8 @@ class ColorPropertyEditor extends ElementPropertyEditor
      */
     public function updateUi($value)
     {
+        parent::updateUi($value);
+
         $this->colorPicker->value = $value;
     }
 

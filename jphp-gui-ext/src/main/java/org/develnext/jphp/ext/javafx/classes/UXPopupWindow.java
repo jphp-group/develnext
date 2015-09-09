@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.PopupControl;
 import javafx.stage.PopupWindow;
@@ -46,11 +47,13 @@ public class UXPopupWindow<T extends PopupWindow> extends UXWindow<PopupWindow> 
 
     @Signature
     public void showByNode(Node node) {
-        getWrappedObject().show(node, 0, 0);
+        showByNode(node, 0, 0);
     }
 
     @Signature
     public void showByNode(Node node, int offsetX, int offsetY) {
-        getWrappedObject().show(node, offsetX, offsetY);
+        Point2D screen = node.localToScreen(node.getLayoutX(), node.getLayoutY());
+
+        getWrappedObject().show(node, screen.getX() + offsetX, screen.getY() + offsetY);
     }
 }

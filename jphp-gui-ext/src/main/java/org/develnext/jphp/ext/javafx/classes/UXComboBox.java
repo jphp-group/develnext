@@ -69,6 +69,25 @@ public class UXComboBox extends UXComboBoxBase {
         getWrappedObject().getSelectionModel().select(value);
     }
 
+    @Getter
+    public String getText() {
+        if (getWrappedObject().getEditor() == null) {
+            Object value = getWrappedObject().getValue();
+            return value == null ? null : value.toString();
+        }
+
+        return getWrappedObject().getEditor().getText();
+    }
+
+    @Setter
+    public void setText(String value) {
+        if (getWrappedObject().getEditor() == null) {
+            throw new IllegalStateException("Property 'text' is read only");
+        }
+
+        getWrappedObject().getEditor().setText(value);
+    }
+
     @Signature
     public void onCellRender(final Environment env, @Nullable final Invoker handler) {
         getWrappedObject().setCellFactory(new Callback<ListView, ListCell>() {

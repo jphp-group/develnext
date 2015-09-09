@@ -15,6 +15,7 @@ use php\gui\framework\Timer;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\UXApplication;
+use php\gui\UXCheckbox;
 use php\gui\UXClipboard;
 use php\gui\UXDialog;
 use php\gui\UXNode;
@@ -339,7 +340,6 @@ CONTENT;
 
     protected function doContextMenu($e)
     {
-        dump('111');
         $this->contextMenu = new ContextMenu($this, $this->commands);
         $this->contextMenu->getRoot()->showByNode($this->webView);
     }
@@ -543,5 +543,61 @@ CONTENT;
             $this->executeCommand('replace');
             $this->save();
         }));
+    }
+}
+
+class SetDefaultCommand extends AbstractCommand
+{
+    /**
+     * @var FormEditor
+     */
+    protected $formEditor;
+
+    protected $editor;
+
+    /**
+     * SetDefaultCommand constructor.
+     * @param FormEditor $formEditor
+     * @param $editor
+     */
+    public function __construct(FormEditor $formEditor, $editor)
+    {
+        $this->formEditor = $formEditor;
+        $this->editor = $editor;
+    }
+
+    public function getName()
+    {
+        return 'Использовать по-умолчанию';
+    }
+
+    public function makeUiForHead()
+    {
+        $ui = new UXCheckbox($this->getName());
+        $ui->padding = 3;
+
+        $ui->selected = $this->formEditor->getDefaultEventEditor(false) == "php";
+
+        UXApplication::runLater(function () use ($ui) {
+            $ui->watch('selected', function (UXNode $self, $property, $oldValue, $newValue) {
+                if ($newValue) {
+                    $this->formEditor->setDefaultEventEditor($this->editor);
+                } else {
+                    $this->formEditor->setDefaultEventEditor($this->editor == 'php' ? 'constructor' : 'php');
+                }
+            });
+        });
+
+        return $ui;
+    }
+
+    public function withBeforeSeparator()
+    {
+        return true;
+    }
+
+    public function onExecute()
+    {
+        ;
     }
 }

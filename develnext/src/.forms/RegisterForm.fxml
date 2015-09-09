@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="436.0" prefWidth="601.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button id="nextButton" graphicTextGap="7.0" layoutX="470.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="104.0" styleClass="icon-ok" text="Даллее" AnchorPane.bottomAnchor="22.0" AnchorPane.rightAnchor="27.0">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Button>
+      <ImageView id="icon" fitHeight="112.0" fitWidth="104.0" layoutX="23.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true" smooth="false" />
+      <Label layoutX="153.0" layoutY="39.0" prefHeight="35.0" prefWidth="414.0" text="Регистрация" textFill="#486aa8">
+         <font>
+            <Font name="Tahoma" size="28.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="38.0" layoutY="148.0" prefHeight="27.0" prefWidth="128.0" text="Email *:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField id="emailField" layoutX="177.0" layoutY="142.0" prefHeight="39.0" prefWidth="397.0" promptText="name@example.com">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextField>
+      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="38.0" layoutY="209.0" prefHeight="27.0" prefWidth="128.0" text="Пароль *:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <PasswordField id="passwordField" layoutX="177.0" layoutY="203.0" prefHeight="39.0" prefWidth="397.0" promptText="минимум 5 символов">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </PasswordField>
+      <Label layoutX="153.0" layoutY="74.0" prefHeight="21.0" prefWidth="414.0" text="Для разработчиков на DevelNext" textFill="#979797">
+         <font>
+            <Font name="Tahoma" size="17.0" />
+         </font>
+      </Label>
+      <Label layoutX="38.0" layoutY="314.0" text="* Необходимо будет подтвердить ваш email" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="38.0" />
+      <Button id="cancelButton" graphicTextGap="7.0" layoutX="354.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="104.0" text="Отмена" AnchorPane.bottomAnchor="22.0" AnchorPane.rightAnchor="143.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
+      <Label layoutX="316.0" layoutY="257.0" prefHeight="27.0" prefWidth="257.0" text="Проверочный код *:">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Pane layoutX="174.0" layoutY="259.0">
+         <children>
+            <ProgressIndicator layoutX="41.0" layoutY="8.0" prefHeight="35.0" prefWidth="40.0" />
+            <ImageView id="captcha" fitHeight="50.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </Pane>
+      <Hyperlink id="refreshCaptcha" layoutX="174.0" layoutY="312.0" prefHeight="23.0" prefWidth="113.0" text="Обновить" />
+      <TextField id="captchaField" layoutX="316.0" layoutY="293.0" prefHeight="39.0" prefWidth="257.0" promptText="код с картинки">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextField>
+      <Hyperlink id="confirmLink" layoutX="91.0" layoutY="364.0" prefHeight="23.0" prefWidth="190.0" text="У меня есть код подтверждения" />
+   </children>
+</AnchorPane>

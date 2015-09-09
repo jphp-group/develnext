@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="412.0" prefWidth="692.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="50.0" layoutY="42.0" text="Выберите режим работы DevelNext ...">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Separator layoutX="317.0" layoutY="125.0" orientation="VERTICAL" prefHeight="229.0" prefWidth="23.0" />
+      <Label layoutX="35.0" layoutY="125.0" prefHeight="21.0" prefWidth="286.0" text="Все просто">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label layoutX="344.0" layoutY="125.0" prefHeight="21.0" prefWidth="314.0" text="Для продвинутых">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Label>
+      <Label alignment="TOP_LEFT" layoutX="39.0" layoutY="152.0" prefHeight="178.0" prefWidth="278.0" text="- Для начинающих&#10;- Для любителей&#10;- Для тех, кто не знаком с программированием&#10;- Для тех, кто не знает PHP" textFill="#686868" />
+      <Label alignment="TOP_LEFT" layoutX="352.0" layoutY="152.0" prefHeight="178.0" prefWidth="278.0" text="- Для знающих програмирование&#10;- Для знающих язык PHP&#10;- Для программистов&#10;- Для тех, кто уже давно работает с DevelStudio" textFill="#686868" />
+      <Button layoutX="89.0" layoutY="265.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="169.0" styleClass="icon-green-document" text="Выбрать" textFill="#298011">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+      <Button layoutX="407.0" layoutY="265.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="169.0" styleClass="icon-red-document" text="Выбрать" textFill="#a80505">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

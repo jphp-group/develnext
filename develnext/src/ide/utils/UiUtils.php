@@ -1,8 +1,11 @@
 <?php
 namespace ide\utils;
+use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use ide\misc\AbstractCommand;
+use php\gui\layout\UXPane;
 use php\gui\layout\UXVBox;
+use php\gui\UXProgressIndicator;
 
 /**
  * Class UiUtils

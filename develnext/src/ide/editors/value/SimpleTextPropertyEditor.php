@@ -55,6 +55,8 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
      */
     public function updateUi($value)
     {
+        parent::updateUi($value);
+
         $this->textField->text = $value;
     }
 

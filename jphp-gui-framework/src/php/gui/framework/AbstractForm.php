@@ -5,16 +5,21 @@ use Exception;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyEvent;
 use php\gui\framework\event\AbstractEventAdapter;
+use php\gui\layout\UXAnchorPane;
 use php\gui\UXApplication;
 use php\gui\UXData;
 use php\gui\UXForm;
 use php\gui\UXImage;
+use php\gui\UXLabel;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
+use php\gui\UXProgressIndicator;
+use php\gui\UXTooltip;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
+use php\lang\Thread;
 use php\lib\Items;
 use php\lib\Str;
 use php\lib\String;
@@ -155,6 +160,10 @@ abstract class AbstractForm extends UXForm
             } catch (Exception $e) {
                 ;
             }
+        } else {
+            if ($icon = $this->_app->getConfig()->get('app.icon')) {
+                $this->icons->add(new UXImage("res://" . $icon));
+            }
         }
 
         foreach ([
@@ -230,6 +239,100 @@ abstract class AbstractForm extends UXForm
                 });
             }
         });
+    }
+
+    public function toast($message, $timeout = 0)
+    {
+        UXApplication::runLater(function () use ($message, $timeout) {
+            $tooltip = new UXTooltip();
+            $tooltip->text = $message;
+
+            if ($timeout <= 0) {
+                $length = Str::length($message);
+                $timeout = $length * 100;
+
+                if ($timeout < 1500) {
+                    $timeout = 1500;
+                }
+            }
+
+            $width = $tooltip->font->calculateTextWidth($message);
+            $height = $tooltip->font->lineHeight;
+            $tooltip->layout->style = '-fx-cursor: hand;';
+
+            $tooltip->on('click', function ($e) {
+                $e->sender->hide();
+            });
+
+            $tooltip->show($this, $this->x + $this->width / 2 - $width / 2, $this->y + $this->height / 2 - $height / 2);
+
+            (new Thread(function () use ($timeout, $tooltip) {
+                Thread::sleep($timeout);
+
+                try {
+                    UXApplication::runLater(function () use ($tooltip) {
+                        $tooltip->hide();
+                    });
+                } catch (IllegalStateException $e) {
+                    // ..
+                }
+            }))->start();
+        });
+    }
+
+    public function showPreloader($text = '', $timeout = 0)
+    {
+        $pane = $this->layout;
+
+        $preloader = new UXAnchorPane();
+        $preloader->size = $pane->size;
+
+        $preloader->position = [0, 0];
+        $preloader->opacity = 0.6;
+
+        $indicator = new UXProgressIndicator();
+        $indicator->progress = -1;
+        $indicator->size = [48, 48];
+
+        $indicator->x = $pane->width / 2 - $indicator->width / 2;
+        $indicator->y = $pane->height / 2 - $indicator->height / 2;
+
+        $preloader->add($indicator);
+
+        if ($text) {
+            $label = new UXLabel($text);
+            $label->text = $text;
+            $label->y = $indicator->y + $indicator->height + 5;
+            $label->x = $pane->width / 2 - $label->font->calculateTextWidth($text) / 2;
+
+            $preloader->add($label);
+        }
+
+        $preloader->id = 'x-preloader';
+        $preloader->style = '-fx-background-color: white';
+
+        $pane->add($preloader);
+
+        $preloader->toFront();
+
+        if ($timeout) {
+            (new Thread(function () use ($timeout) {
+                Thread::sleep($timeout);
+
+                UXApplication::runLater(function () {
+                    $this->hidePreloader();
+                });
+            }))->start();
+        }
+    }
+
+    public function hidePreloader()
+    {
+        $preloader = $this->layout->lookup('#x-preloader');
+
+        if ($preloader) {
+            $preloader->free();
+        }
     }
 
     /**

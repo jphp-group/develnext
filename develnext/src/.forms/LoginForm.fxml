@@ -12,10 +12,13 @@
    <children>
       <Button id="loginButton" graphicTextGap="7.0" layoutX="470.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="104.0" styleClass="icon-login" text="Войти">
          <font>
-            <Font name="System Bold" size="12.0" />
+            <Font name="System Bold" size="15.0" />
          </font>
       </Button>
-      <Button id="loginVkButton" graphicTextGap="7.0" layoutX="295.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="161.0" styleClass="icon-vk" text="Войти через VK" />
+      <Button id="loginVkButton" graphicTextGap="7.0" layoutX="295.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="161.0" styleClass="icon-vk" text="Войти через VK">
+         <font>
+            <Font size="15.0" />
+         </font></Button>
       <ImageView id="icon" fitHeight="112.0" fitWidth="104.0" layoutX="23.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true" smooth="false">
       </ImageView>
       <Label layoutX="153.0" layoutY="74.0" prefHeight="21.0" prefWidth="414.0" text="Для разработчиков на DevelNext" textFill="#979797">
@@ -43,12 +46,15 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <PasswordField id="passwordField" layoutX="177.0" layoutY="203.0" prefHeight="39.0" prefWidth="397.0">
+      <PasswordField id="passwordField" layoutX="177.0" layoutY="203.0" prefHeight="39.0" prefWidth="397.0" promptText="минимум 5 символов">
          <font>
             <Font size="18.0" />
          </font>
       </PasswordField>
-      <Hyperlink id="registerLink" layoutX="31.0" layoutY="311.0" text="Регистрация" />
+      <Hyperlink id="registerLink" layoutX="31.0" layoutY="311.0" text="Регистрация">
+         <font>
+            <Font size="15.0" />
+         </font></Hyperlink>
       <Hyperlink id="forgetPasswordLink" layoutX="476.0" layoutY="249.0" text="Забыли пароль?" />
    </children>
 </AnchorPane>

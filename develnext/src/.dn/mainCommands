@@ -1,0 +1,5 @@
+ide\commands\NewProjectCommand
+ide\commands\OpenProjectCommand
+ide\commands\SaveProjectCommand
+ide\commands\CloseProjectCommand
+ide\commands\ExitCommand

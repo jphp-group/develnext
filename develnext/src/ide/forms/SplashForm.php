@@ -36,5 +36,9 @@ class SplashForm extends AbstractForm
         parent::hide();
 
         Ide::get()->getAccountManager()->authorize();
+
+        if (Ide::accountManager()->isAuthorized()) {
+            Ide::service()->ide()->startAsync(null);
+        }
     }
 }

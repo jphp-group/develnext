@@ -1,6 +1,7 @@
 <?php
 namespace ide\action;
 
+use ide\utils\FileUtils;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXCell;
 use php\gui\UXListView;
@@ -73,12 +74,15 @@ class ActionEditor extends AbstractEditor
 
         try {
             if (File::of($this->file)->exists()) {
-                $this->document = $xml->parse($this->file);
+                $this->document = $xml->parse(FileUtils::get($this->file));
             } else {
                 $this->document = $xml->createDocument();
             }
         } catch (\Exception $e) {
+            echo "-> $this->file\n";
             $this->document = $xml->createDocument();
+            echo $e->getMessage();
+            echo $e->getTraceAsString();
         }
 
         $this->recoverDocument();
@@ -121,6 +125,7 @@ class ActionEditor extends AbstractEditor
     }
 
     /**
+     * @deprecated
      * @return UXNode
      */
     public function makeUi()
@@ -133,37 +138,5 @@ class ActionEditor extends AbstractEditor
         $list->setCellFactory([$this, 'listCellFactory']);
 
         return $this->pane;
-    }
-
-    public function show($className, $methodName)
-    {
-        $actions = $this->findMethod($className, $methodName);
-
-        /** @var UXListView $list */
-        $list = $this->pane->lookup('#list');
-
-        $list->items->clear();
-        $list->items->addAll($actions);
-    }
-
-    protected function listCellFactory(UXCell $cell, Action $action = null, $empty)
-    {
-        if ($action) {
-            $titleName = new UXLabel($action->getTitle());
-            $titleName->style = '-fx-font-weight: bold;';
-
-            $titleDescription = new UXLabel($action->getDescription());
-            $titleDescription->style = '-fx-text-fill: gray;';
-
-            $title = new UXVBox([$titleName, $titleDescription]);
-            $title->spacing = 0;
-
-            $line = new UXHBox([Ide::get()->getImage($action->getIcon()), $title]);
-            $line->spacing = 7;
-            $line->padding = 5;
-
-            $cell->text = null;
-            $cell->graphic = $line;
-        }
     }
 }

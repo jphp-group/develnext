@@ -57,6 +57,7 @@ class BooleanPropertyEditor extends ElementPropertyEditor
      */
     public function updateUi($value, $updateCheckbox = true)
     {
+        parent::updateUi($value);
         $this->label->text = $value ? 'Да' : 'Нет';
 
         if ($updateCheckbox) {

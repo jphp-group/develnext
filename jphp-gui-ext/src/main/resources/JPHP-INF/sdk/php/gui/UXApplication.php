@@ -17,6 +17,13 @@ class UXApplication
     }
 
     /**
+     * @return string
+     */
+    public static function getMacAddress()
+    {
+    }
+
+    /**
      * @param string|Stream $value css file
      */
     public static function setTheme($value)
