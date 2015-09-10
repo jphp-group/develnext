@@ -6,7 +6,7 @@
 
 **Dependencies**
 
-- jphp 0.7.2 (not published yet!)
+- jphp 0.7.2 (not published yet, you can build it from the jphp sources!)
 - java 1.8+ (jre)
 - gradle 2.4+
 - launch4j 3.8
@@ -59,6 +59,9 @@ cd /path/to/repo
 ```
 
 Найти собранный дистрибутив можно будет в папке `develnext/build/install/develnext`.
+
+Если проект не собирается, значит на текущем этапе в develnext используется еще неопубликованная версия jphp,
+поэтому ее нужно собрать вручную с нужной ветки (см. версию), выполнив команду `gradlew install` в папке исходников jphp.
 
 ### Лицензия
 
