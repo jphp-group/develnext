@@ -16,7 +16,9 @@ use ide\forms\MainForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
+use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\ProjectFile;
+use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
@@ -54,6 +56,7 @@ use php\gui\UXTabPane;
 use php\gui\UXTooltip;
 use php\io\File;
 use php\io\Stream;
+use php\lang\IllegalStateException;
 use php\lib\Items;
 use php\lib\Str;
 use php\lib\String;
@@ -157,9 +160,16 @@ class FormEditor extends AbstractModuleEditor
     protected $selectedMethod = null;
 
     /**
+     * @var ScriptModuleEditor[]
+     */
+    protected $modules = [];
+
+    /**
      * @var UXDesignProperties[]
      */
     protected static $typeProperties = [];
+
+    protected $opened;
 
     public function __construct($file, AbstractFormDumper $dumper)
     {
@@ -195,7 +205,6 @@ class FormEditor extends AbstractModuleEditor
         $this->configFile = $confFile;
 
         $this->actionEditor = new ActionEditor($phpFile . '.axml');
-        $this->actionEditor->makeUi();
 
         $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
         $this->codeEditor->register(AbstractCommand::make('Скрыть', 'icons/close16.png', function () {
@@ -212,10 +221,12 @@ class FormEditor extends AbstractModuleEditor
         $this->codeEditor->register(new SetDefaultCommand($this, 'php'));
 
         $this->codeEditor->on('update', function () {
-            $node = $this->designer->pickedNode;
-            $this->codeEditor->save();
+            if ($this->opened) {
+                $node = $this->designer->pickedNode;
+                $this->codeEditor->save();
 
-            $this->updateEventTypes($node ? $node : $this);
+                $this->updateEventTypes($node ? $node : $this);
+            }
         });
     }
 
@@ -336,9 +347,16 @@ class FormEditor extends AbstractModuleEditor
         DataUtils::remove($node);
         $node->parent->remove($node);
 
+        $binds = $this->eventManager->findBinds($this->getNodeId($node));
+
+        foreach ($binds as $bind) {
+            $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
+        }
+
         if ($this->eventManager->removeBinds($this->getNodeId($node))) {
             $this->codeEditor->load();
         }
+
     }
 
     public function save()
@@ -360,16 +378,21 @@ class FormEditor extends AbstractModuleEditor
     {
         parent::close();
 
+        $this->opened = false;
+
         $this->updateProperties(null);
     }
 
     public function open()
     {
         parent::open();
+
+        $this->opened = true;
         //$this->designer->unselectAll();
 
         $this->eventManager->load();
         $this->updateProperties($this->designer->pickedNode ?: $this);
+        $this->updateEventTypes($this->designer->pickedNode ?: $this);
 
         UXApplication::runLater(function () {
             $this->designer->requestFocus();
@@ -518,12 +541,8 @@ class FormEditor extends AbstractModuleEditor
                 $actionConstructor->showAndWait($this->actionEditor, $this->selectedClass, $this->selectedMethod);
             });
 
-            $panel = new UXAnchorPane();
-            $panel->visible = false;
-            $panel->add($this->actionEditor->getPane());
-            UXAnchorPane::setAnchor($this->actionEditor->getPane(), 0);
 
-            $constructorTab->content = $panel;
+            $constructorTab->content = null;
 
             $tabs->tabs->addAll([$codeTab]);
         }
@@ -534,6 +553,46 @@ class FormEditor extends AbstractModuleEditor
         $tabs->watch('height', $func);
 
         Ide::get()->setUserConfigValue("$class.sourceEditorEx", true);
+    }
+
+    public function getModules()
+    {
+        $modules = $this->config->get('modules');
+
+        $modules = Str::split($modules, '|');
+
+        $result = [];
+
+        foreach ($modules as &$module) {
+            $module = Str::trim($module);
+            $result[$module] = $module;
+        }
+
+        return $result;
+    }
+
+    public function getModuleEditors()
+    {
+        $modules = $this->getModules();
+
+        foreach ($this->modules as $name => $value) {
+            if (!$modules[$name]) {
+                unset($this->modules[$name]);
+            }
+        }
+
+        foreach ($modules as $module) {
+            $module = Str::trim($module);
+
+            if ($this->modules[$module]) {
+                $this->modules[$module]->load();
+            } else {
+                $this->modules[$module] = FileSystem::fetchEditor(Ide::get()->getOpenedProject()->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY . "/$module"));
+                $this->modules[$module]->makeUi();
+            }
+        }
+
+        return $this->modules;
     }
 
     public function switchToDesigner($hideSource = false)
@@ -1047,6 +1106,7 @@ class FormEditor extends AbstractModuleEditor
                         $actionConstructor->title = "Метод - $selectedMethod()";
                     }
 
+                    $actionConstructor->setContextEditor($this);
                     $actionConstructor->showAndWait($this->actionEditor, $selectedClass, $selectedMethod);
                 } else {
 
@@ -1064,7 +1124,7 @@ class FormEditor extends AbstractModuleEditor
             $selected = Items::first($list->selectedItems);
 
             if ($selected) {
-                $this->openEventSource($node, $selected['eventCode'], 'constructor ');
+                $this->openEventSource($node, $selected['eventCode'], 'constructor');
             }
         }));
 
@@ -1106,7 +1166,10 @@ class FormEditor extends AbstractModuleEditor
 
                 if (!$variants) {
                     $menuItem->on('action', function () use ($node, $type) {
-                        $this->switchToSmallSource();
+                        if ($this->getDefaultEventEditor(false) == 'php') {
+                            $this->switchToSmallSource();
+                        }
+
                         $this->eventManager->addBind($this->getNodeId($node), $type['code'], $type['kind']);
 
                         Timer::run(100, function () use ($node, $type) {
@@ -1224,6 +1287,8 @@ class FormEditor extends AbstractModuleEditor
 
             if ($selected) {
                 if ($bind = $this->eventManager->removeBind($this->getNodeId($node), $selected['eventCode'])) {
+                    $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
+
                     Timer::run(100, function () use ($bind) {
                         $this->codeEditor->load();
                         $this->codeEditor->jumpToLine($bind['eventLine'] - 1);

@@ -13,6 +13,8 @@ class Action
      **/
     protected $type;
 
+    protected $__level = 0;
+
     /**
      * @param AbstractActionType $type
      */
@@ -67,5 +69,21 @@ class Action
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @param int $_level
+     */
+    public function setLevel($_level)
+    {
+        $this->__level = $_level;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLevel()
+    {
+        return $this->__level;
     }
 }

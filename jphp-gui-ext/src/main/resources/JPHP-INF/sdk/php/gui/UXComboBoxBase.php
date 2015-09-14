@@ -42,4 +42,8 @@ class UXComboBoxBase extends UXControl
      * @var string
      */
     public $text;
+
+    public function showPopup()
+    {
+    }
 }

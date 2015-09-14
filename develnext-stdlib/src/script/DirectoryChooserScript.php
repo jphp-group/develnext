@@ -3,6 +3,7 @@ namespace script;
 
 use php\gui\framework\AbstractScript;
 use php\gui\framework\Application;
+use php\gui\framework\behaviour\TextableBehaviour;
 use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXColorChooser;
@@ -21,7 +22,7 @@ use script\support\ScriptHelpers;
  * Class DirectoryChooserScript
  * @package script
  */
-class DirectoryChooserScript extends AbstractScript
+class DirectoryChooserScript extends AbstractScript implements TextableBehaviour
 {
     use ScriptHelpers;
 
@@ -59,11 +60,11 @@ class DirectoryChooserScript extends AbstractScript
 
             $this->_adaptValue($this->inputNode, $this->file);
 
-            $this->trigger('action', $this);
+            $this->trigger('action');
         } else {
             $this->file = null;
 
-            $this->trigger('cancel', $this);
+            $this->trigger('cancel');
         }
     }
 
@@ -76,5 +77,10 @@ class DirectoryChooserScript extends AbstractScript
         $this->_bindAction($this->actionNode, function () {
             $this->execute();
         });
+    }
+
+    function getObjectText()
+    {
+        return (string) $this->file;
     }
 }

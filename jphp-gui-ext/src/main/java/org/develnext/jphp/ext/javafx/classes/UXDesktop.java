@@ -1,7 +1,7 @@
-package org.develnext.jphp.gui.designer.classes;
+package org.develnext.jphp.ext.javafx.classes;
 
-import org.develnext.jphp.gui.designer.GuiDesignerExtension;
-import php.runtime.annotation.Reflection.Namespace;
+import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-@Namespace(GuiDesignerExtension.NS)
+@Reflection.Name(JavaFXExtension.NS + "UXDesktop")
 public class UXDesktop extends BaseWrapper<Desktop> {
     public UXDesktop(Environment env, Desktop wrappedObject) {
         super(env, wrappedObject);

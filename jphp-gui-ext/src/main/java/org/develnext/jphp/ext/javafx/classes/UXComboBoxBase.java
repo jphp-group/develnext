@@ -20,7 +20,6 @@ public class UXComboBoxBase extends UXControl {
         void disarm();
 
         void hide();
-        void show();
     }
 
     public UXComboBoxBase(Environment env, ComboBoxBase wrappedObject) {
@@ -29,6 +28,11 @@ public class UXComboBoxBase extends UXControl {
 
     public UXComboBoxBase(Environment env, ClassEntity clazz) {
         super(env, clazz);
+    }
+
+    @Signature
+    public void showPopup() {
+        getWrappedObject().show();
     }
 
     @Override

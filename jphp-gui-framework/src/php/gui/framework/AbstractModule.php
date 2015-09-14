@@ -139,7 +139,7 @@ abstract class AbstractModule extends AbstractScript
             }
         }
 
-        $this->trigger('action', $this, $target);
+        $this->trigger('action', ['target' => $target]);
     }
 
     public function getScript($name)
@@ -163,5 +163,14 @@ abstract class AbstractModule extends AbstractScript
     public function __isset($name)
     {
         return isset($this->scriptManager->{$name}) || parent::__isset($name);
+    }
+
+    public function __call($name, array $args)
+    {
+        if (method_exists($this->_context, $name)) {
+            return $this->_context->{$name}(...$args);
+        }
+
+        throw new \EngineException("Unable to call " . get_class($this) . "::" . $name . "() method");
     }
 }

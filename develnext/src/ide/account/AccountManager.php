@@ -66,9 +66,11 @@ class AccountManager
         if ($this->isAuthorized()) {
             Ide::service()->account()->getAsync(function (ServiceResponse $response) {
                 if ($response->isSuccess()) {
-                    $this->accountData = $response->data();
+                    if (!$this->accountData) {
+                        Ide::get()->getMainForm()->toast("Добро пожаловать, вы вошли через {$response->data()['email']}");
+                    }
 
-                    Ide::get()->getMainForm()->toast("Добро пожаловать, вы вошли через {$this->accountData['email']}");
+                    $this->accountData = $response->data();
 
                     $this->updateIdeUi();
                 }

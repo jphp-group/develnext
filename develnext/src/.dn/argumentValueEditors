@@ -1,0 +1,7 @@
+ide\editors\argument\MixedArgumentEditor
+ide\editors\argument\StringArgumentEditor
+ide\editors\argument\IntegerArgumentEditor
+ide\editors\argument\ObjectArgumentEditor
+ide\editors\argument\FlagArgumentEditor
+ide\editors\argument\ExprArgumentEditor
+ide\editors\argument\FormArgumentEditor

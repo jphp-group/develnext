@@ -9,6 +9,7 @@ use ide\commands\BuildProjectCommand;
 use ide\commands\CreateFormProjectCommand;
 use ide\commands\CreateScriptModuleProjectCommand;
 use ide\commands\ExecuteProjectCommand;
+use ide\editors\FormEditor;
 use ide\formats\ScriptFormat;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
 use ide\formats\templates\GuiBootstrapFileTemplate;
@@ -363,6 +364,47 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         return $file;
+    }
+
+    /**
+     * @return FormEditor[]
+     */
+    public function getFormEditors()
+    {
+        $formDir = $this->project->getFile(self::FORMS_DIRECTORY);
+
+        $editors = [];
+
+        FileUtils::scan($formDir, function ($filename) use (&$editors) {
+            if (FileUtils::getExtension($filename) == "fxml") {
+                $editor = FileSystem::fetchEditor($filename);
+
+                $editors[] = $editor;
+            }
+        });
+
+        return $editors;
+    }
+
+    /**
+     * @param $moduleName
+     * @return FormEditor[]
+     */
+    public function getFormEditorsOfModule($moduleName)
+    {
+        $formEditors = $this->getFormEditors();
+
+        $result = [];
+
+        foreach ($formEditors as $formEditor) {
+            $modules = $formEditor->getModules();
+
+            if ($modules[$moduleName]) {
+                $result[FileUtils::hashName($formEditor->getFile())] = $formEditor;
+            }
+        }
+
+        return $result;
     }
 
     public function createForm($name)

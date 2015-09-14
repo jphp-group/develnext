@@ -71,11 +71,36 @@ abstract class AbstractForm extends UXForm
     }
 
     /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function form($name)
+    {
+        return $this->_app->getForm($name);
+    }
+
+    /**
      * @return Configuration
      */
     public function getConfig()
     {
         return $this->_config;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        $namespace = app()->getNamespace();
+
+        if ($namespace) {
+            return Str::replace(get_class($this), "$namespace\\forms\\", "");
+        } else {
+            $name = Str::split(get_class($this), "\\");
+
+            return $name[sizeof($name) - 1];
+        }
     }
 
     public function show()
@@ -85,6 +110,11 @@ abstract class AbstractForm extends UXForm
         if ($this->_config && $this->_config->get('maximized')) {
             $this->maximized = true;
         }
+    }
+
+    public function free()
+    {
+        $this->hide();
     }
 
     protected function init()
@@ -282,9 +312,12 @@ abstract class AbstractForm extends UXForm
 
     public function showPreloader($text = '', $timeout = 0)
     {
+        $this->hidePreloader();
+
         $pane = $this->layout;
 
         $preloader = new UXAnchorPane();
+        UXAnchorPane::setAnchor($preloader, 0);
         $preloader->size = $pane->size;
 
         $preloader->position = [0, 0];
@@ -294,19 +327,31 @@ abstract class AbstractForm extends UXForm
         $indicator->progress = -1;
         $indicator->size = [48, 48];
 
-        $indicator->x = $pane->width / 2 - $indicator->width / 2;
-        $indicator->y = $pane->height / 2 - $indicator->height / 2;
-
-        $preloader->add($indicator);
+        $label = null;
 
         if ($text) {
             $label = new UXLabel($text);
             $label->text = $text;
-            $label->y = $indicator->y + $indicator->height + 5;
-            $label->x = $pane->width / 2 - $label->font->calculateTextWidth($text) / 2;
-
             $preloader->add($label);
         }
+
+        $preloader->watch('width', function () use ($pane, $indicator, $label, $text) {
+            $indicator->x = $pane->width / 2 - $indicator->width / 2;
+
+            if ($label) {
+                $label->x = $pane->width / 2 - $label->font->calculateTextWidth($text) / 2;
+            }
+        });
+
+        $preloader->watch('height', function () use ($pane, $indicator, $label) {
+            $indicator->y = $pane->height / 2 - $indicator->height / 2;
+
+            if ($label) {
+                $label->y = $indicator->y + $indicator->height + 5;
+            }
+        });
+
+        $preloader->add($indicator);
 
         $preloader->id = 'x-preloader';
         $preloader->style = '-fx-background-color: white';

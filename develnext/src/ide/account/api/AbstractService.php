@@ -111,7 +111,7 @@ abstract class AbstractService
                 return $response;
             } catch (ProcessorException $e) {
                 throw new ServiceInvalidResponseException($e->getMessage(), 0, $e);
-            } catch (IOException $e) {
+            } catch (Exception $e) {
                 return new ServiceResponse([
                     'status' => 'error',
                     'message' => 'ConnectionFailed'
@@ -152,12 +152,12 @@ abstract class AbstractService
 
     protected function makeUrl($url)
     {
-        return ("http://develnext.org/a/" . $url);
+        return ("http://develnext.ru/a/" . $url);
     }
 
     protected function buildConnection($url)
     {
-        $connection = URLConnection::create("http://develnext.org/a/" . $url);
+        $connection = URLConnection::create($this->makeUrl($url));
 
         $connection->doInput = true;
         $connection->doOutput = true;

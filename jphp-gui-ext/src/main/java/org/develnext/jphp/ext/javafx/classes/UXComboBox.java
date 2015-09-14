@@ -99,7 +99,12 @@ public class UXComboBox extends UXComboBoxBase {
                         super.updateItem(item, empty);
 
                         if (handler != null) {
-                            handler.callAny(UXComboBox.this, new UXListCell(env, this), item, empty);
+                            if (empty) {
+                                setText(null);
+                                setGraphic(null);
+                            } else {
+                                handler.callAny(new UXListCell(env, this), item, empty);
+                            }
                         }
                     }
                 };

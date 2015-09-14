@@ -5,7 +5,7 @@ use ide\account\api\AccountService;
 use ide\account\api\ServiceResponse;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
-use php\gui\designer\UXDesktop;
+use php\gui\UXDesktop;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\Timer;
 use php\gui\UXButton;

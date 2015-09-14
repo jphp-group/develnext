@@ -37,6 +37,8 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
         @Property boolean focused();
         @Property("visible") boolean showing();
 
+        @Property @Nullable Object userData();
+
         void hide();
         void sizeToScene();
 

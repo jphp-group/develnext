@@ -90,4 +90,16 @@ class UXListView extends UXControl
     public function setCellFactory(callable $handler)
     {
     }
+
+    /**
+     * @param callable|null $handler (UXListCell $cell, $item, $empty)
+     * @param callable|null $dragDoneHandler (int $dragIndex, int $insertIndex)
+     */
+    public function setDraggableCellFactory(callable $handler, callable $dragDoneHandler)
+    {
+    }
+
+    public function update()
+    {
+    }
 }

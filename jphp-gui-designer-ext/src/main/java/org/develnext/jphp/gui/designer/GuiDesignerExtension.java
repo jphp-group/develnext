@@ -1,6 +1,7 @@
 package org.develnext.jphp.gui.designer;
 
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.classes.UXDesktop;
 import org.develnext.jphp.gui.designer.classes.*;
 import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
@@ -22,7 +23,6 @@ public class GuiDesignerExtension extends Extension {
         registerClass(scope, UXDesignPane.class);
         registerClass(scope, UXDesignProperties.class);
         registerClass(scope, UXDesignPropertyEditor.class);
-        registerWrapperClass(scope, Desktop.class, UXDesktop.class);
 
         registerClass(scope, FileSystemWatcher.WrapWatchKey.class);
         registerClass(scope, FileSystemWatcher.class);

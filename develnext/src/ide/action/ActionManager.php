@@ -82,6 +82,14 @@ class ActionManager
         return $action;
     }
 
+    /**
+     * @return AbstractActionType[]
+     */
+    public function getActionTypes()
+    {
+        return $this->actionTypes;
+    }
+
     public function registerType(AbstractActionType $type)
     {
         $this->actionTypes[Str::lower($type->getTagName())] = $type;

@@ -9,6 +9,11 @@ use php\xml\DomElement;
 use php\xml\XmlProcessor;
 use ReflectionClass;
 
+class ScriptEvent extends \stdClass
+{
+    public $sender;
+}
+
 /**
  * Class AbstractScript
  * @package php\gui\framework
@@ -24,6 +29,11 @@ abstract class AbstractScript
     protected $_context;
 
     /**
+     * @var mixed
+     */
+    protected $form;
+
+    /**
      * @var string
      */
     public $id = null;
@@ -37,6 +47,15 @@ abstract class AbstractScript
      * @var callable[]
      */
     protected $handlers = [];
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function form($name)
+    {
+        return app()->getForm($name);
+    }
 
     public function apply($target)
     {
@@ -59,8 +78,20 @@ abstract class AbstractScript
      */
     public function trigger($eventType, ...$args)
     {
+        if ($this->disabled) {
+            return;
+        }
+
+        $e = new ScriptEvent();
+        $e->sender = $this;
+        $e->sender->form = $this->_context instanceof UXForm ? $this->_context : null;
+
+        foreach ($args as $name => $code) {
+            $e->{$name} = $code;
+        }
+
         foreach ((array) $this->handlers[$eventType] as $handler) {
-            $handler(...$args);
+            $handler($e);
         }
     }
 
@@ -108,5 +139,10 @@ abstract class AbstractScript
         }
 
         return false;
+    }
+
+    public function free()
+    {
+        $this->disabled = true;
     }
 }

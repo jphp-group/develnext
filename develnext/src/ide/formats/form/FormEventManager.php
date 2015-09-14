@@ -331,6 +331,7 @@ class FormEventManager
                 }
 
                 $this->eventBinds[$eventBind] = [
+                    'className'      => $this->className,
                     'methodName'     => $methodName,
                     'methodLine'     => $function->line,
                     'eventLine'      => $comment->line,

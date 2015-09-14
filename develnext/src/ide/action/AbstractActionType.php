@@ -2,15 +2,40 @@
 namespace ide\action;
 
 use php\jsoup\Document;
+use php\xml\DomDocument;
 use php\xml\DomElement;
 
 abstract class AbstractActionType
 {
     abstract function getTagName();
 
-    abstract function getTitle(Action $action);
-    abstract function getDescription(Action $action);
-    abstract function getIcon(Action $action);
+    abstract function getTitle(Action $action = null);
+    abstract function getDescription(Action $action = null);
+    abstract function getIcon(Action $action = null);
+
+    function getGroup() {
+        return 'Другое';
+    }
+
+    function getSubGroup()
+    {
+        return null;
+    }
+
+    function isAppendSingleLevel()
+    {
+        return false;
+    }
+
+    function isAppendMultipleLevel()
+    {
+        return false;
+    }
+
+    function isCloseLevel()
+    {
+        return false;
+    }
 
     /**
      * @return array classes for use section
@@ -46,7 +71,7 @@ abstract class AbstractActionType
     /**
      * @param Action $action
      * @param DomElement $element
-     * @param Document $document
+     * @param DomDocument $document
      */
-    abstract function serialize(Action $action, DomElement $element, Document $document);
+    abstract function serialize(Action $action, DomElement $element, DomDocument $document);
 }

@@ -105,16 +105,17 @@ abstract class AbstractCommand
      * @param $icon
      * @param callable $onExecute
      *
+     * @param null $accelerator
      * @return SimpleSingleCommand
      */
-    public static function make($name, $icon, callable $onExecute)
+    public static function make($name, $icon, callable $onExecute, $accelerator = null)
     {
-        return new SimpleSingleCommand($name, $icon, $onExecute);
+        return new SimpleSingleCommand($name, $icon, $onExecute, $accelerator);
     }
 
-    public static function makeWithText($name, $icon, callable $onExecute)
+    public static function makeWithText($name, $icon, callable $onExecute, $accelerator = null)
     {
-        $command = new SimpleSingleCommand($name, $icon, $onExecute);
+        $command = new SimpleSingleCommand($name, $icon, $onExecute, $accelerator);
         $command->setTextVisible(true);
 
         return $command;
@@ -150,18 +151,22 @@ class SimpleSingleCommand extends AbstractCommand
      */
     protected $textVisible = false;
 
+    protected $accelerator = null;
+
     /**
      * ClosureCommand constructor.
      *
      * @param $name
      * @param $icon
-     * @param $onExecute
+     * @param callable $onExecute
+     * @param null $accelerator
      */
-    public function __construct($name, $icon, callable $onExecute)
+    public function __construct($name, $icon, callable $onExecute, $accelerator = null)
     {
         $this->name = $name;
         $this->icon = $icon;
         $this->onExecute = $onExecute;
+        $this->accelerator = $accelerator;
     }
 
     public function getName()
@@ -183,6 +188,11 @@ class SimpleSingleCommand extends AbstractCommand
         }
 
         return $button;
+    }
+
+    public function getAccelerator()
+    {
+        return $this->accelerator;
     }
 
     public function onExecute()

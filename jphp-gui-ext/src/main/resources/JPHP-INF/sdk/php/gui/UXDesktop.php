@@ -1,9 +1,9 @@
 <?php
-namespace php\gui\designer;
+namespace php\gui;
 
 /**
  * Class UXDesktop
- * @package php\gui\designer
+ * @package php\gui
  */
 class UXDesktop
 {

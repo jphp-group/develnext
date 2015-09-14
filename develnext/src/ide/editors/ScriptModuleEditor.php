@@ -137,6 +137,7 @@ class ScriptModuleEditor extends FormEditor
     public function load()
     {
         $this->eventManager->load();
+        $this->actionEditor->load();
 
         if (File::of($this->codeFile)->exists()) {
             $this->codeEditor->load();
@@ -234,11 +235,56 @@ class ScriptModuleEditor extends FormEditor
 
         $node->parent->remove($node);
 
+        if ($container && $container->id) {
+            $binds = $this->eventManager->findBinds($container->id);
+
+            foreach ($binds as $bind) {
+                $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
+            }
+        }
+
         if ($container && $container->id && $this->eventManager->removeBinds($container->id)) {
             $this->codeEditor->load();
         }
 
         File::of($container->getConfigPath())->delete();
+    }
+
+    public function getModules()
+    {
+        return [];
+    }
+
+    public function getModuleName()
+    {
+        return FileUtils::stripExtension(File::of($this->file)->getName());
+    }
+
+    protected $forms = [];
+
+    /**
+     * @return FormEditor[]
+     * @throws \Exception
+     */
+    public function getFormEditors()
+    {
+        $project = Ide::get()->getOpenedProject();
+
+        if (!$project) {
+            return [];
+        }
+
+        /** @var GuiFrameworkProjectBehaviour $gui */
+        $gui = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
+
+        $forms = $gui->getFormEditorsOfModule($this->getModuleName());
+
+        foreach ($forms as $name => $form) {
+            $form->load();
+            $form->makeUi();
+        }
+
+        return $forms;
     }
 
     protected function _onAreaMouseDown(UXMouseEvent $e)

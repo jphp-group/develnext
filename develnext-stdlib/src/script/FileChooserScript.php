@@ -2,6 +2,7 @@
 namespace script;
 
 use php\gui\framework\AbstractScript;
+use php\gui\framework\behaviour\TextableBehaviour;
 use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXDialog;
@@ -18,7 +19,7 @@ use script\support\ScriptHelpers;
  * Class TimerScript
  * @package script
  */
-class FileChooserScript extends AbstractScript
+class FileChooserScript extends AbstractScript implements TextableBehaviour
 {
     use ScriptHelpers;
 
@@ -76,12 +77,12 @@ class FileChooserScript extends AbstractScript
 
             $this->_adaptValue($this->inputNode, $this->files);
 
-            $this->trigger('action', $this);
+            $this->trigger('action');
         } else {
             $this->file = null;
             $this->files = [];
 
-            $this->trigger('cancel', $this);
+            $this->trigger('cancel');
         }
     }
 
@@ -94,5 +95,10 @@ class FileChooserScript extends AbstractScript
         $this->_bindAction($this->actionNode, function () {
             $this->execute();
         });
+    }
+
+    function getObjectText()
+    {
+        return (string) $this->file;
     }
 }

@@ -30,6 +30,11 @@ abstract class UXNode
     public $scene;
 
     /**
+     * @var UXForm
+     */
+    public $form;
+
+    /**
      * @var double
      */
     public $x;

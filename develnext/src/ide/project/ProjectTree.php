@@ -7,7 +7,7 @@ use ide\Ide;
 use ide\misc\SimpleSingleCommand;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
-use php\gui\designer\UXDesktop;
+use php\gui\UXDesktop;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXApplication;
 use php\gui\UXTreeItem;

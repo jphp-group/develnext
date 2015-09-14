@@ -1,0 +1,15 @@
+ide\editors\value\SimpleTextPropertyEditor
+ide\editors\value\TextPropertyEditor
+ide\editors\value\IntegerPropertyEditor
+ide\editors\value\FloatPropertyEditor
+ide\editors\value\ColorPropertyEditor
+ide\editors\value\FontPropertyEditor
+ide\editors\value\EnumPropertyEditor
+ide\editors\value\PositionPropertyEditor
+ide\editors\value\BooleanPropertyEditor
+ide\editors\value\StringListPropertyEditor
+ide\editors\value\ModuleListPropertyEditor
+ide\editors\value\IdPropertyEditor
+ide\editors\value\ImagePropertyEditor
+ide\editors\value\PercentPropertyEditor
+ide\editors\value\ObjectPropertyEditor

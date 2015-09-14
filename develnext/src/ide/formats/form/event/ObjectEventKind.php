@@ -2,6 +2,7 @@
 namespace ide\formats\form\event;
 
 use php\gui\event\UXEvent;
+use php\gui\framework\ScriptEvent;
 
 /**
  * Class ObjectEventKind
@@ -15,7 +16,7 @@ class ObjectEventKind extends AbstractEventKind
     public function getArguments()
     {
         return [
-            ['script']
+            [ScriptEvent::class, 'event']
         ];
     }
 }

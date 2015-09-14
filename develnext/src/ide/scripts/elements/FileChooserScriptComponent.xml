@@ -10,8 +10,8 @@
     </properties>
 
     <properties group="binding" title="Взаимодействие">
-        <property code="inputNode" name="[Вывод]" editor="text" tooltip="ID компонентов, в которые будет выведен результат" />
-        <property code="actionNode" name="[Действие]" editor="text" tooltip="ID компонентов, при взаимодействии с которыми, будет открываться диалог" />
+        <property code="inputNode" name="[Вывод]" editor="object" tooltip="ID компонентов, в которые будет выведен результат" />
+        <property code="actionNode" name="[Действие]" editor="object" tooltip="ID компонентов, при взаимодействии с которыми, будет открываться диалог" />
     </properties>
 
     <eventTypes>

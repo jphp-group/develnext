@@ -157,9 +157,9 @@ class Ide extends Application
                     if (!$showError) {
                         $showError = true;
 
-                        if (Ide::accountManager()->isAuthorized()) {
+                        /*if (Ide::accountManager()->isAuthorized()) {
                             Ide::service()->ide()->sendErrorAsync($e, null);
-                        } else {
+                        } else {    */
                             $dialog = new UXAlert('ERROR');
                             $dialog->title = 'Ошибка';
                             $dialog->headerText = 'Произошла ошибка в DevelNext, сообщите об этом авторам';
@@ -182,7 +182,7 @@ class Ide extends Application
                                     Ide::get()->shutdown();
                                     break;
                             }
-                        }
+                        /*}  */
 
                         $showError = false;
                     }
@@ -711,31 +711,24 @@ class Ide extends Application
 
     public function registerAll()
     {
-        ElementPropertyEditor::register(new SimpleTextPropertyEditor());
-        ElementPropertyEditor::register(new TextPropertyEditor());
-        ElementPropertyEditor::register(new IntegerPropertyEditor());
-        ElementPropertyEditor::register(new FloatPropertyEditor());
-        ElementPropertyEditor::register(new ColorPropertyEditor());
-        ElementPropertyEditor::register(new FontPropertyEditor());
-        ElementPropertyEditor::register(new EnumPropertyEditor([]));
-        ElementPropertyEditor::register(new PositionPropertyEditor());
-        ElementPropertyEditor::register(new BooleanPropertyEditor());
-        ElementPropertyEditor::register(new StringListPropertyEditor());
-        ElementPropertyEditor::register(new ModuleListPropertyEditor());
-        ElementPropertyEditor::register(new IdPropertyEditor());
-        ElementPropertyEditor::register(new ImagePropertyEditor());
-        ElementPropertyEditor::register(new PercentPropertyEditor());
+        $valueEditors = $this->getInternalList('.dn/propertyValueEditors');
+        foreach ($valueEditors as $valueEditor) {
+            $valueEditor = new $valueEditor();
 
-        $this->registerFormat(new WelcomeFormat());
-        $this->registerFormat(new PhpCodeFormat());
-        $this->registerFormat(new GuiFormFormat());
-        $this->registerFormat(new ScriptFormat());
-        $this->registerFormat(new ScriptModuleFormat());
+            ElementPropertyEditor::register($valueEditor);
+        }
 
-        $this->registerProjectTemplate(new DefaultGuiProjectTemplate());
+        $formats = $this->getInternalList('.dn/formats');
+        foreach ($formats as $format) {
+            $this->registerFormat(new $format());
+        }
+
+        $projectTemplates = $this->getInternalList('.dn/projectTemplates');
+        foreach ($projectTemplates as $projectTemplate) {
+            $this->registerProjectTemplate(new $projectTemplate());
+        }
 
         $mainCommands = $this->getInternalList('.dn/mainCommands');
-
         foreach ($mainCommands as $commandClass) {
             /** @var AbstractCommand $command */
             $command = new $commandClass();

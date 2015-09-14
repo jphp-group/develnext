@@ -16,6 +16,8 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.StyleManager;
@@ -373,6 +375,21 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         }
 
         return new UXScene(env, getWrappedObject().getScene());
+    }
+
+    @Getter(hiddenInDebugInfo = true)
+    protected UXForm getForm(Environment env) {
+        if (getWrappedObject().getScene() == null) {
+            return null;
+        }
+
+        Window window = getWrappedObject().getScene().getWindow();
+
+        if (window instanceof Stage) {
+            return new UXForm(env, (Stage) window);
+        }
+
+        return null;
     }
 
     @Signature

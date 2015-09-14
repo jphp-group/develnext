@@ -11,8 +11,25 @@ class ElementDestroyActionType extends AbstractSimpleActionType
     function attributes()
     {
         return [
-            'object' => 'element',
+            'object' => 'object',
         ];
+    }
+
+    function attributeLabels()
+    {
+        return [
+            'object' => 'Объект'
+        ];
+    }
+
+    function getSubGroup()
+    {
+        return self::SUB_GROUP_COMPONENT;
+    }
+
+    function getGroup()
+    {
+        return self::GROUP_UI;
     }
 
     function getTagName()
@@ -20,19 +37,23 @@ class ElementDestroyActionType extends AbstractSimpleActionType
         return 'elementDestroy';
     }
 
-    function getTitle(Action $action)
+    function getTitle(Action $action = null)
     {
-        return 'Уничтожить элемент';
+        return 'Уничтожить объект';
     }
 
-    function getDescription(Action $action)
+    function getDescription(Action $action = null)
     {
-        return Str::format("Уничтожить (удалить) элемент %s", $action->get('object'));
+        if ($action == null) {
+            return "Уничтожить (удалить) объект формы / модуля";
+        }
+
+        return Str::format("Уничтожить (удалить) объект %s", $action->get('object'));
     }
 
-    function getIcon(Action $action)
+    function getIcon(Action $action = null)
     {
-
+        return 'icons/trash16.gif';
     }
 
     /**
@@ -43,6 +64,6 @@ class ElementDestroyActionType extends AbstractSimpleActionType
     {
         $object = $action->get('object');
 
-        return "unset({$object})";
+        return "{$object}->free()";
     }
 }

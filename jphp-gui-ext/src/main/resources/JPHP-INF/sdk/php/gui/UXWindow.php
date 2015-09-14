@@ -50,6 +50,11 @@ abstract class UXWindow
      */
     public $cursor;
 
+    /**
+     * @var mixed
+     */
+    public $userData = null;
+
     public function requestFocus()
     {
     }

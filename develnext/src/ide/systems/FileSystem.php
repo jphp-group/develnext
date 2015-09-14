@@ -103,7 +103,17 @@ class FileSystem
     static function getSelectedEditor()
     {
         /** @var UXTabPane $fileTabPane */
-        $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+        $mainForm = Ide::get()->getMainForm();
+
+        if (!$mainForm) {
+            return null;
+        }
+
+        $fileTabPane = $mainForm->{'fileTabPane'};
+
+        if (!$fileTabPane) {
+            return null;
+        }
 
         $tab = $fileTabPane->selectedTab;
 
@@ -112,6 +122,18 @@ class FileSystem
         }
 
         return null;
+    }
+
+    static function fetchEditor($path)
+    {
+        $editor = Ide::get()->createEditor($path);
+
+        if (!$editor) {
+            return null;
+        }
+
+        $editor->load();
+        return $editor;
     }
 
     /**
@@ -128,13 +150,7 @@ class FileSystem
         $info   = (array) static::$openedFiles[$hash];
 
         if (!$editor) {
-            $editor = Ide::get()->createEditor($path);
-
-            if (!$editor) {
-                return null;
-            }
-
-            $editor->load();
+            $editor = self::fetchEditor($path);
 
             $info['file'] = $path;
             $info['mtime'] = File::of($path)->lastModified();

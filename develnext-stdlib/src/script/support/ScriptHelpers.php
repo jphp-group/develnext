@@ -42,7 +42,8 @@ trait ScriptHelpers
         $result = [];
 
         foreach ($input as $string) {
-            $out = new NodeHelper($this->_context, $string);
+
+            $out = new NodeHelper($this->_context, $string == '_context' ? null : $string);
 
             if ($out->isValid()) {
                 $result[] = $out;

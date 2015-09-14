@@ -10,6 +10,14 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -20,6 +28,7 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.web.*;
 import javafx.stage.*;
+import javafx.stage.Window;
 import netscape.javascript.JSException;
 import org.develnext.jphp.ext.javafx.bind.CursorMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.InsetsMemoryOperation;
@@ -38,6 +47,7 @@ import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
 import php.runtime.memory.support.MemoryOperation;
 
+import java.awt.*;
 import java.awt.event.InputEvent;
 
 public class JavaFXExtension extends Extension {
@@ -86,6 +96,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, StackPane.class, UXStackPane.class);
         registerWrapperClass(scope, VBox.class, UXVBox.class);
         registerWrapperClass(scope, HBox.class, UXHBox.class);
+        registerWrapperClass(scope, FlowPane.class, UXFlowPane.class);
 
         registerWrapperClass(scope, Labeled.class, UXLabeled.class);
         registerWrapperClass(scope, ButtonBase.class, UXButtonBase.class);
@@ -155,6 +166,8 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, FXMLLoader.class, UXLoader.class);
         registerWrapperClass(scope, Data.class, UXData.class);
         registerWrapperClass(scope, Alert.class, UXAlert.class);
+
+        registerWrapperClass(scope, Desktop.class, UXDesktop.class);
 
         registerClass(scope, UXDialog.class);
         registerClass(scope, UXClipboard.class);

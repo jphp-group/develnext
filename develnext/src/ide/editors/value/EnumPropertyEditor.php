@@ -31,7 +31,7 @@ class EnumPropertyEditor extends ElementPropertyEditor
     /**
      * @param $variants
      */
-    public function __construct(array $variants)
+    public function __construct(array $variants = [])
     {
         $this->variants = $variants;
         $this->variantKeys = Items::keys($variants);

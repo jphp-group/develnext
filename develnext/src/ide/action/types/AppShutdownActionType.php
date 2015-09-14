@@ -16,19 +16,24 @@ class AppShutdownActionType extends AbstractSimpleActionType
         return 'applicationShutdown';
     }
 
-    function getTitle(Action $action)
+    function getGroup()
+    {
+        return self::GROUP_APP;
+    }
+
+    function getTitle(Action $action = null)
     {
         return 'Выход из программы';
     }
 
-    function getDescription(Action $action)
+    function getDescription(Action $action = null)
     {
         return 'Полностью закрыть все окна программы и выйти из неё';
     }
 
-    function getIcon(Action $action)
+    function getIcon(Action $action = null)
     {
-        return null;
+        return 'icons/shutdown16.png';
     }
 
     function imports()

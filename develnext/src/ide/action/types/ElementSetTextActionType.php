@@ -11,10 +11,29 @@ class ElementSetTextActionType extends AbstractSimpleActionType
     function attributes()
     {
         return [
-            'object' => 'element',
+            'object' => 'object',
             'value' => 'string',
-            'relative' => 'boolean'
+            'relative' => 'flag'
         ];
+    }
+
+    function attributeLabels()
+    {
+        return [
+            'object' => 'Объект',
+            'value'  => 'Текст',
+            'relative' => 'Прибавить к существующему тексту'
+        ];
+    }
+
+    function getGroup()
+    {
+        return self::GROUP_UI;
+    }
+
+    function getSubGroup()
+    {
+        return self::SUB_GROUP_COMPONENT;
     }
 
     function getTagName()
@@ -22,13 +41,17 @@ class ElementSetTextActionType extends AbstractSimpleActionType
         return 'elementSetText';
     }
 
-    function getTitle(Action $action)
+    function getTitle(Action $action = null)
     {
-        return 'Изменить текст элемента';
+        return 'Изменить текст объекта';
     }
 
-    function getDescription(Action $action)
+    function getDescription(Action $action = null)
     {
+        if ($action == null) {
+            return "Добавить или задать текст объекта формы";
+        }
+
         $text = $action->get('value');
 
         if ($text >= 40) {
@@ -36,16 +59,16 @@ class ElementSetTextActionType extends AbstractSimpleActionType
         }
 
         if ($action->relative) {
-            return Str::format("Добавить элементу %s текст %s", $action->get('object'), $text);
+            return Str::format("Добавить объекту %s текст %s", $action->get('object'), $text);
         } else {
-            return Str::format("Задать текст элемента %s на %s", $action->get('object'), $text);
+            return Str::format("Поменять текст объекта %s на %s", $action->get('object'), $text);
         }
 
     }
 
-    function getIcon(Action $action)
+    function getIcon(Action $action = null)
     {
-
+        return 'icons/textEdit16.png';
     }
 
     function imports()

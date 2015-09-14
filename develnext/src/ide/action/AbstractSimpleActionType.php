@@ -1,18 +1,39 @@
 <?php
 namespace ide\action;
 
+use ide\forms\ActionArgumentsDialog;
 use php\jsoup\Document;
 use php\lib\Str;
+use php\xml\DomDocument;
 use php\xml\DomElement;
 
 abstract class AbstractSimpleActionType extends AbstractActionType
 {
+    const GROUP_OTHER = 'Другок';
+    const GROUP_APP = 'Система';
+    const GROUP_UI = 'Интерфейс';
+    const GROUP_CONDITIONS = 'Условия';
+
+    const SUB_GROUP_WINDOW = 'Форма';
+    const SUB_GROUP_COMPONENT = 'Объект';
+    const SUB_GROUP_COMMON = 'Главное';
+
     /**
      * @return array
      */
     function attributes()
     {
         return [];
+    }
+
+    function attributeLabels()
+    {
+        return [];
+    }
+
+    function getSubGroup()
+    {
+        return self::SUB_GROUP_COMMON;
     }
 
     function fetchFieldValue(Action $action, $field, $value)
@@ -31,11 +52,33 @@ abstract class AbstractSimpleActionType extends AbstractActionType
 
                 return $value;
 
-            case 'property':
-                return "\$this->$value";
+            case 'object':
+                if ($value == '~sender') {
+                    $result = "\$event->sender";
+                } else {
+                    $result = $value ? "\$this->$value" : "\$this";
+                }
+
+                $t = $this->attributes()[$field];
+
+                if ($t == "string" || $t == "integer") {
+                    $result = "uiText($result)";
+                }
+
+                return $result;
+
+            case 'form':
+                if ($value == '~sender') {
+                    return "\$event->sender->form";
+                }
+
+                return "'$value'";
 
             case 'string':
                 return "'$value'";
+
+            case 'magicString':
+                return '"' . $value . '"';
 
             case 'integer':
                 return ((int) $value) . '';
@@ -69,9 +112,9 @@ abstract class AbstractSimpleActionType extends AbstractActionType
     /**
      * @param Action $action
      * @param DomElement $element
-     * @param Document $document
+     * @param DomDocument $document
      */
-    function serialize(Action $action, DomElement $element, Document $document)
+    function serialize(Action $action, DomElement $element, DomDocument $document)
     {
         foreach ($this->attributes() as $name => $info) {
             $element->setAttribute("{$name}-type", $action->{"$name-type"});
@@ -90,5 +133,33 @@ abstract class AbstractSimpleActionType extends AbstractActionType
             $action->{$name} = $element->getAttribute($name);
             $action->{"$name-type"} = $element->getAttribute("$name-type");
         }
+    }
+
+    /**
+     * @param Action $action
+     * @param $userData
+     * @return bool
+     */
+    function showDialog(Action $action, $userData = null)
+    {
+        if (!$this->attributes()) {
+            return true;
+        }
+
+        $dialog = new ActionArgumentsDialog();
+        $dialog->userData = $userData;
+        $dialog->setAction($action);
+
+        if ($dialog->showDialog()) {
+            $result = $dialog->getResult();
+
+            foreach ($result as $name => $value) {
+                $action->{$name} = $value;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

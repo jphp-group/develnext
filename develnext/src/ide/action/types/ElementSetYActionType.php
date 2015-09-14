@@ -11,10 +11,29 @@ class ElementSetYActionType extends AbstractSimpleActionType
     function attributes()
     {
         return [
-            'object' => 'element',
+            'object' => 'object',
             'value'  => 'integer',
-            'relative' => 'boolean'
+            'relative' => 'flag'
         ];
+    }
+
+    function attributeLabels()
+    {
+        return [
+            'object' => 'Объект',
+            'value' => 'Позиция Y',
+            'relative' => 'Относительно'
+        ];
+    }
+
+    function getGroup()
+    {
+        return self::GROUP_UI;
+    }
+
+    function getSubGroup()
+    {
+        return self::SUB_GROUP_COMPONENT;
     }
 
     function getTagName()
@@ -22,26 +41,30 @@ class ElementSetYActionType extends AbstractSimpleActionType
         return 'elementSetY';
     }
 
-    function getTitle(Action $action)
+    function getTitle(Action $action = null)
     {
         return 'Позиция Y';
     }
 
-    function getDescription(Action $action)
+    function getDescription(Action $action = null)
     {
+        if ($action == null) {
+            return "Изменить позицию Y объекта формы";
+        }
+
         $value = $action->get('value');
 
         if ($action->relative) {
-            return Str::format("Добавить к позиции Y элемента %s значение +%s", $action->get('object'), $value);
+            return Str::format("Добавить к позиции Y объекта %s значение %s", $action->get('object'), $value);
         } else {
-            return Str::format("Задать позицию Y элемента %s на %s", $action->get('object'), $value);
+            return Str::format("Задать позицию Y объекта %s на %s", $action->get('object'), $value);
         }
 
     }
 
-    function getIcon(Action $action)
+    function getIcon(Action $action = null)
     {
-
+        return 'icons/top16.png';
     }
 
     function imports()

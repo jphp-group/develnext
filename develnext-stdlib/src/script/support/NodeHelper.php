@@ -5,6 +5,7 @@ namespace script\support;
 use php\gui\UXButtonBase;
 use php\gui\UXChoiceBox;
 use php\gui\UXComboBox;
+use php\gui\UXForm;
 use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXLabeled;
@@ -15,6 +16,7 @@ use php\gui\UXNode;
 use php\gui\UXTextArea;
 use php\gui\UXTextField;
 use php\gui\UXTextInputControl;
+use php\gui\UXWindow;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Flow;
@@ -54,7 +56,7 @@ class NodeHelper {
                 }
             }
         } else {
-            $out = $context->{$input};
+            $out = $input ? $context->{$input} : $context;
         }
 
         $this->root = $out;
@@ -84,6 +86,8 @@ class NodeHelper {
 
         if ($node instanceof UXLabeled || $node instanceof UXTextField) {
             $node->text = is_array($value) ? Items::first($value) : $value;
+        } else if ($node instanceof UXForm) {
+            $node->title = is_array($value) ? Items::first($value) : $value;
         } elseif ($node instanceof UXTextArea) {
             if (!$this->options['+']) {
                 $node->text = '';

@@ -57,6 +57,8 @@ class Application
             $configPath = 'res://.system/application.conf';
         }
 
+        include_once "res://php/gui/framework/functions.php";
+
         try {
             $this->loadConfig($configPath);
         } catch (IOException $e) {
@@ -96,6 +98,103 @@ class Application
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * @param $name
+     * @param UXForm $origin
+     * @return AbstractForm
+     */
+    public function getForm($name, UXForm $origin = null)
+    {
+        static $forms = [];
+
+        if ($this->mainForm && $name == $this->mainForm) {
+            return $this->mainForm;
+        }
+
+        if ($form = $forms[$name]) {
+            return $form;
+        }
+
+        return $forms[$name] = $this->getNewForm($name, $origin);
+    }
+
+    /**
+     * @param $name
+     * @param UXForm $origin
+     * @return AbstractForm
+     */
+    public function getNewForm($name, UXForm $origin = null)
+    {
+        $class = $name;
+
+        if ($this->getNamespace()) {
+            $class = $this->getNamespace() . "\\forms\\$name";
+        }
+
+        $form = new $class($origin);
+
+        return $form;
+    }
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function showForm($name)
+    {
+        if ($name instanceof UXForm) {
+            $this->getForm($name);
+        }
+
+        $form = $this->getForm($name);
+        $form->show();
+        return $form;
+    }
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function showFormAndWait($name)
+    {
+        $form = $this->getForm($name);
+        $form->showAndWait();
+        return $form;
+    }
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function showNewForm($name)
+    {
+        $form = $this->getNewForm($name);
+        $form->show();
+        return $form;
+    }
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function showNewFormAndWait($name)
+    {
+        $form = $this->getNewForm($name);
+        $form->show();
+        return $form;
+    }
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function hideForm($name)
+    {
+        $form = $this->getForm($name);
+        $form->hide();
+        return $form;
     }
 
     /**

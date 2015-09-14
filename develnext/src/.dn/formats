@@ -1,0 +1,5 @@
+ide\formats\WelcomeFormat
+ide\formats\PhpCodeFormat
+ide\formats\GuiFormFormat
+ide\formats\ScriptFormat
+ide\formats\ScriptModuleFormat

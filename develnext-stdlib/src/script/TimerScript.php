@@ -62,7 +62,7 @@ class TimerScript extends AbstractScript
             try {
                 Thread::sleep($this->interval);
 
-                if (!$this->stopped) {
+                if (!$this->stopped && !$this->disabled) {
                     UXApplication::runLater([$this, 'doInterval']);
                 }
             } catch (InterruptedException $e) {
@@ -94,13 +94,13 @@ class TimerScript extends AbstractScript
 
     protected function doInterval()
     {
-        if ($this->stopped) {
+        if ($this->stopped || $this->disabled) {
             return;
         }
 
-        $this->trigger('action', $this);
+        $this->trigger('action');
 
-        if ($this->stopped) {
+        if ($this->stopped || $this->disabled) {
             return;
         }
 

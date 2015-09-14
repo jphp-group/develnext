@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="221.0" prefWidth="606.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox layoutX="14.0" layoutY="256.0" prefHeight="32.0" prefWidth="582.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
+         <children>
+            <Button id="okButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="124.0" styleClass="icon-ok" text="Применить">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Button>
+            <Button id="cancelButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="102.0" text="Отмена" />
+         </children>
+      </HBox>
+      <VBox id="box" layoutX="14.0" layoutY="70.0" prefHeight="73.0" prefWidth="578.0" AnchorPane.bottomAnchor="78.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="70.0" />
+      <ImageView id="icon" fitHeight="16.0" fitWidth="16.0" layoutX="22.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true" />
+      <Label id="titleLabel" layoutX="49.0" layoutY="14.0" prefHeight="17.0" prefWidth="537.0" text="Title" AnchorPane.leftAnchor="49.0" AnchorPane.rightAnchor="20.0">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label id="descriptionLabel" layoutX="49.0" layoutY="30.0" prefHeight="17.0" prefWidth="537.0" text="Description" textFill="#909090" AnchorPane.leftAnchor="49.0" AnchorPane.rightAnchor="20.0" />
+      <Separator layoutX="25.0" layoutY="56.0" prefHeight="2.0" prefWidth="559.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+      <Separator layoutX="14.0" layoutY="159.0" prefHeight="3.0" prefWidth="578.0" AnchorPane.bottomAnchor="59.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+   </children>
+</AnchorPane>
