@@ -32,6 +32,11 @@ public class UXImageView extends UXNode<ImageView> {
         __wrappedObject = new ImageView();
     }
 
+    @Signature
+    public void __construct(Image image) {
+        __wrappedObject = new ImageView(image);
+    }
+
     @Override
     @Signature
     public void setWidth(double value) {

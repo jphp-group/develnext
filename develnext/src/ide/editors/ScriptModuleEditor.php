@@ -255,6 +255,14 @@ class ScriptModuleEditor extends FormEditor
         return [];
     }
 
+    /**
+     * @return ScriptComponentManager
+     */
+    public function getManager()
+    {
+        return $this->manager;
+    }
+
     public function getModuleName()
     {
         return FileUtils::stripExtension(File::of($this->file)->getName());

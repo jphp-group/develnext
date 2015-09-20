@@ -89,6 +89,25 @@ public class UXComboBox extends UXComboBoxBase {
     }
 
     @Signature
+    public void onButtonRender(final Environment env, @Nullable final Invoker handler) {
+        getWrappedObject().setButtonCell(new ListCell() {
+            @Override
+            protected void updateItem(Object item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (handler != null) {
+                    if (empty) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        handler.callAny(new UXListCell(env, this), item);
+                    }
+                }
+            }
+        });
+    }
+
+    @Signature
     public void onCellRender(final Environment env, @Nullable final Invoker handler) {
         getWrappedObject().setCellFactory(new Callback<ListView, ListCell>() {
             @Override

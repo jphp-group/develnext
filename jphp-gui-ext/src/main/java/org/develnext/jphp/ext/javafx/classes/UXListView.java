@@ -242,6 +242,7 @@ public class UXListView extends UXControl<ListView> {
                 @Override
                 public void handle(DragEvent event) {
                     if (DragListCell.this.getItem() == null) {
+                        dragDone.callAny(event, DragListCell.this.getListView(), -1);
                         return;
                     }
 
@@ -250,27 +251,27 @@ public class UXListView extends UXControl<ListView> {
 
                     if (db.hasString()) {
                         ObservableList items = DragListCell.this.getListView().getItems();
-                        int draggedIdx = Integer.parseInt(db.getString());
                         int thisIdx = items.indexOf(DragListCell.this.getItem());
 
-                        Object dragged = DragListCell.this.getListView().getItems().get(draggedIdx);
-
-                        if (thisIdx < draggedIdx) {
-                            items.add(thisIdx, dragged);
-                            items.remove(++draggedIdx);
+                        if (dragDone != null) {
+                            dragDone.callAny(event, DragListCell.this.getListView(), thisIdx);
                         } else {
-                            items.add(thisIdx + 1, dragged);
-                            items.remove(draggedIdx);
-                        }
+                            int draggedIdx = Integer.parseInt(db.getString());
+                            Object dragged = DragListCell.this.getListView().getItems().get(draggedIdx);
 
-                        List itemscopy = new ArrayList<>(DragListCell.this.getListView().getItems());
-                        DragListCell.this.getListView().getItems().setAll(itemscopy);
+                            if (thisIdx < draggedIdx) {
+                                items.add(thisIdx, dragged);
+                                items.remove(++draggedIdx);
+                            } else {
+                                items.add(thisIdx + 1, dragged);
+                                items.remove(draggedIdx);
+                            }
+
+                            List itemscopy = new ArrayList<>(DragListCell.this.getListView().getItems());
+                            DragListCell.this.getListView().getItems().setAll(itemscopy);
+                        }
 
                         success = true;
-
-                        if (dragDone != null) {
-                            dragDone.callAny(draggedIdx, thisIdx);
-                        }
                     }
 
                     event.setDropCompleted(success);

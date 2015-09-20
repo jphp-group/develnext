@@ -35,9 +35,16 @@ class UXComboBox extends UXComboBoxBase
     public function __construct($items) {}
 
     /**
-     * @param callable|null $handler (UXComboBox $self, UXListCell $cell, mixed $value, bool $empty)
+     * @param callable|null $handler (UXListCell $cell, mixed $value, bool $empty)
      */
     public function onCellRender(callable $handler)
+    {
+    }
+
+    /**
+     * @param callable|null $handler (UXListCell $cell, mixed $value)
+     */
+    public function onButtonRender(callable $handler)
     {
     }
 }

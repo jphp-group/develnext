@@ -5,3 +5,5 @@ ide\editors\argument\ObjectArgumentEditor
 ide\editors\argument\FlagArgumentEditor
 ide\editors\argument\ExprArgumentEditor
 ide\editors\argument\FormArgumentEditor
+ide\editors\argument\NameArgumentEditor
+ide\editors\argument\FloatArgumentEditor

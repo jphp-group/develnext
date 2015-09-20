@@ -4,6 +4,7 @@ namespace ide\action\types;
 use action\Element;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
+use ide\action\ActionScript;
 use php\lib\Str;
 
 class ElementSetYActionType extends AbstractSimpleActionType
@@ -23,6 +24,13 @@ class ElementSetYActionType extends AbstractSimpleActionType
             'object' => 'Объект',
             'value' => 'Позиция Y',
             'relative' => 'Относительно'
+        ];
+    }
+
+    function attributeSettings()
+    {
+        return [
+            'object' => ['def' => '~sender'],
         ];
     }
 
@@ -76,9 +84,10 @@ class ElementSetYActionType extends AbstractSimpleActionType
 
     /**
      * @param Action $action
+     * @param ActionScript $actionScript
      * @return string
      */
-    function convertToCode(Action $action)
+    function convertToCode(Action $action, ActionScript $actionScript)
     {
         $object = $action->get('object');
         $value = $action->get('value');

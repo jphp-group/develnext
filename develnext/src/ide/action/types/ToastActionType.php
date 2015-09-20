@@ -4,6 +4,7 @@ namespace ide\action\types;
 use action\Element;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
+use ide\action\ActionScript;
 use php\gui\UXDialog;
 use php\lib\Str;
 
@@ -61,9 +62,10 @@ class ToastActionType extends AbstractSimpleActionType
 
     /**
      * @param Action $action
+     * @param ActionScript $actionScript
      * @return string
      */
-    function convertToCode(Action $action)
+    function convertToCode(Action $action, ActionScript $actionScript)
     {
         $value = $action->get('value');
 

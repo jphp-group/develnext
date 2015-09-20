@@ -1,6 +1,9 @@
 package org.develnext.jphp.ext.javafx;
 
 import com.sun.javafx.scene.control.skin.CustomColorDialog;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
+import javafx.animation.PathTransition;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,7 +26,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.shape.*;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.web.*;
@@ -31,15 +35,18 @@ import javafx.stage.*;
 import javafx.stage.Window;
 import netscape.javascript.JSException;
 import org.develnext.jphp.ext.javafx.bind.CursorMemoryOperation;
+import org.develnext.jphp.ext.javafx.bind.DurationMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.InsetsMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.KeyCombinationMemoryOperation;
 import org.develnext.jphp.ext.javafx.classes.*;
+import org.develnext.jphp.ext.javafx.classes.animation.UXAnimation;
+import org.develnext.jphp.ext.javafx.classes.animation.UXFadeAnimation;
+import org.develnext.jphp.ext.javafx.classes.animation.UXPathAnimation;
 import org.develnext.jphp.ext.javafx.classes.data.Data;
 import org.develnext.jphp.ext.javafx.classes.event.*;
 import org.develnext.jphp.ext.javafx.classes.layout.*;
 import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
-import org.develnext.jphp.ext.javafx.classes.shape.UXCircle;
-import org.develnext.jphp.ext.javafx.classes.shape.UXShape;
+import org.develnext.jphp.ext.javafx.classes.shape.*;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.event.*;
@@ -68,6 +75,7 @@ public class JavaFXExtension extends Extension {
         registerMemoryOperation(KeyCombinationMemoryOperation.class);
         registerMemoryOperation(CursorMemoryOperation.class);
         registerMemoryOperation(InsetsMemoryOperation.class);
+        registerMemoryOperation(DurationMemoryOperation.class);
 
         registerWrapperClass(scope, ObservableList.class, UXList.class);
         registerWrapperClass(scope, Application.class, UXApplication.class);
@@ -143,8 +151,13 @@ public class JavaFXExtension extends Extension {
         MemoryOperation.registerWrapper(TableColumn.class, UXTableColumn.class);
         MemoryOperation.registerWrapper(IndexedCell.class, UXCell.class);
 
+        registerWrapperClass(scope, Dragboard.class, UXDragboard.class);
+
         registerWrapperClass(scope, Shape.class, UXShape.class);
         registerWrapperClass(scope, Circle.class, UXCircle.class);
+        registerWrapperClass(scope, Ellipse.class, UXEllipse.class);
+        registerWrapperClass(scope, javafx.scene.shape.Polygon.class, UXPolygon.class);
+        registerWrapperClass(scope, Rectangle.class, UXRectangle.class);
 
         MemoryOperation.registerWrapper(InputEvent.class, UXEvent.class);
         MemoryOperation.registerWrapper(ActionEvent.class, UXEvent.class);
@@ -174,7 +187,14 @@ public class JavaFXExtension extends Extension {
 
         registerJavaException(scope, WrapJSException.class, JSException.class);
 
+        registerAnimationPackage(scope);
         registerEvents();
+    }
+
+    protected void registerAnimationPackage(CompileScope scope) {
+        registerWrapperClass(scope, Animation.class, UXAnimation.class);
+        registerWrapperClass(scope, FadeTransition.class, UXFadeAnimation.class);
+        registerWrapperClass(scope, PathTransition.class, UXPathAnimation.class);
     }
 
     protected void registerEvents() {
@@ -189,6 +209,8 @@ public class JavaFXExtension extends Extension {
         registerEventProvider(new WebEngineEventProvider());
         registerEventProvider(new TreeViewEventProvider());
         registerEventProvider(new TabEventProvider());
+
+        registerEventProvider(new AnimationEventProvider());
     }
 
     protected void registerEventProvider(EventProvider eventProvider) {

@@ -8,6 +8,11 @@ namespace php\gui\shape;
 class UXCircle extends UXShape
 {
     /**
+     * @var double
+     */
+    public $radius;
+
+    /**
      * @param double $radius (optional)
      */
     public function __construct($radius)

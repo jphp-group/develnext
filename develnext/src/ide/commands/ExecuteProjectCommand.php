@@ -95,7 +95,7 @@ class ExecuteProjectCommand extends AbstractCommand
         $project = $ide->getOpenedProject();
 
         $this->process = new Process(
-            [$ide->getGradleProgram(), 'run', $ide->isDevelopment() ? '--no-daemon' : '--no-daemon'],
+            [$ide->getGradleProgram(), 'run', '--daemon'],
             $project->getRootDir(),
             $ide->makeEnvironment()
         );

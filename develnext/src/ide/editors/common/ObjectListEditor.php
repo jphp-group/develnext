@@ -8,11 +8,15 @@ use ide\editors\ScriptModuleEditor;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\scripts\AbstractScriptComponent;
+use ide\scripts\ScriptComponentContainer;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use php\gui\layout\UXHBox;
 use php\gui\paint\UXColor;
+use php\gui\UXApplication;
 use php\gui\UXComboBox;
+use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXNode;
@@ -48,6 +52,8 @@ class ObjectListEditor
      * @var bool
      */
     protected $enableAllForms;
+
+    protected $cacheItems = null;
 
     /**
      * ObjectListEditor constructor.
@@ -95,15 +101,13 @@ class ObjectListEditor
     {
         $this->filters[] = $filter;
 
-        $this->makeUi();
-        $this->updateUi();
-
         return $this;
     }
 
     protected function makeUi()
     {
         $this->comboBox = new UXComboBox();
+        $this->comboBox->visibleRowCount = 30;
 
         $this->comboBox->on('action', function () {
             if ($this->onChange) {
@@ -112,7 +116,7 @@ class ObjectListEditor
             }
         }, 'ext');
 
-        $this->comboBox->onCellRender(function (UXListCell $cell, ObjectListEditorItem $item) {
+        $render = function (UXListCell $cell, ObjectListEditorItem $item) {
             $cell->graphic = null;
             $cell->text = null;
 
@@ -120,6 +124,21 @@ class ObjectListEditor
             $label->graphic = $item->graphic;
 
             $label->paddingLeft = $item->level * 10;
+
+            $hintLabel = new UXLabel($item->hint ? ": $item->hint" : "");
+            $hintLabel->textColor = UXColor::of('gray');
+
+            $cell->graphic = new UXHBox([$label, $hintLabel]);
+        };
+
+        $this->comboBox->onCellRender($render);
+        $this->comboBox->onButtonRender(function (UXListCell $cell, ObjectListEditorItem $item) {
+            $cell->graphic = null;
+            $cell->text = null;
+
+            $label = new UXLabel($item->prefix ? $item->prefix . '.' . $item->text : $item->text);
+            $label->graphic = $item->graphic ? new UXImageView($item->graphic->image) : null;
+            $label->textColor = UXColor::of('black');
 
             $hintLabel = new UXLabel($item->hint ? ": $item->hint" : "");
             $hintLabel->textColor = UXColor::of('gray');
@@ -177,12 +196,26 @@ class ObjectListEditor
 
         $this->comboBox->items->clear();
 
+        $cacheKey = __CLASS__ . "_cache_" . $this->senderCode . '_' . (int)$this->enableAllForms;
+
+        $cacheItems = ($editor ? $editor->cacheData[$cacheKey] : null);
+
+        if ($cacheItems) {
+            /** @var ObjectListEditorItem $item */
+            foreach ($this->cacheItems as $item) {
+                $this->comboBox->items->add($item->duplicate());
+            }
+
+            return;
+        }
+
         $undef = new ObjectListEditorItem();
         $undef->text = '...';
         $this->comboBox->items->add($undef);
 
         if ($this->senderCode) {
             $this->comboBox->items->add(new ObjectListEditorItem('Текущий объект', null, $this->senderCode));
+            $this->comboBox->items->add(new ObjectListEditorItem('Текущая форма', null, $this->senderCode . "Form"));
         }
 
         if ($editor instanceof FormEditor) {
@@ -226,7 +259,7 @@ class ObjectListEditor
                     $this->comboBox->items->add(new ObjectListEditorItem('[Модули]', null, ''));
 
                     foreach ($moduleEditors as $module => $moduleEditor) {
-                        $nodes = $moduleEditor->getDesigner()->getNodes();
+                        $nodes = $moduleEditor->getManager()->getComponents();
 
                         if ($nodes) {
                             $this->comboBox->items->add(new ObjectListEditorItem(
@@ -237,14 +270,14 @@ class ObjectListEditor
                             ));
 
                             foreach ($nodes as $node) {
-                                /** @var AbstractFormElement $element */
-                                $element = $moduleEditor->getFormat()->getFormElement($node);
+                                /** @var ScriptComponentContainer $node */
 
                                 $item = new ObjectListEditorItem(
-                                    $moduleEditor->getNodeId($node), Ide::get()->getImage($element->getIcon()), null, 2
+                                    $node->id, Ide::get()->getImage($node->getType()->getIcon()), null, 2
                                 );
 
-                                $item->hint = $element->getName();
+                                $item->prefix = $module;
+                                $item->hint = $node->getType()->getName();
                                 $this->comboBox->items->add($item);
                             }
                         }
@@ -280,50 +313,63 @@ class ObjectListEditor
 
                     $formEditors = $gui->getFormEditors();
 
-                    $this->comboBox->items->add(new ObjectListEditorItem('[Другие формы]', null, ''));
+                    if (sizeof($formEditors) > 1) {
+                        $this->comboBox->items->add(new ObjectListEditorItem('[Другие формы]', null, ''));
 
-                    foreach ($formEditors as $formEditor) {
-                        if (FileUtils::hashName($formEditor->getFile()) == FileUtils::hashName($editor->getFile())) {
-                            continue;
+                        foreach ($formEditors as $key => $formEditor) {
+                            if (FileUtils::hashName($formEditor->getFile()) == FileUtils::hashName($editor->getFile())) {
+                                continue;
+                            }
+
+                            $prefix = "form('{$formEditor->getTitle()}')";
+
+                            $this->comboBox->items->add(new ObjectListEditorItem(
+                                $formEditor->getTitle(),
+                                Ide::get()->getImage($formEditor->getIcon()),
+                                $prefix,
+                                1
+                            ));
+
+                            $this->appendFormEditor($formEditor, 2, $prefix);
                         }
-
-                        $formEditor->load();
-                        $formEditor->makeUi();
-
-                        $prefix = "form('{$formEditor->getTitle()}')";
-
-                        $this->comboBox->items->add(new ObjectListEditorItem(
-                            $formEditor->getTitle(),
-                            Ide::get()->getImage($formEditor->getIcon()),
-                            $prefix,
-                            1
-                        ));
-
-                        $this->appendFormEditor($formEditor, 2, $prefix);
                     }
                 }
             }
+
+            $this->cacheItems = $this->comboBox->items;
+
+            if ($this->editor) {
+                $this->editor->cacheData[$cacheKey] = $this->cacheItems;
+            }
+
+            UXApplication::runLater(function () {
+                $this->cacheItems = null;
+            });
         }
     }
 
     protected function appendFormEditor(FormEditor $formEditor, $level = 0, $prefix = '')
     {
-        $nodes = $formEditor->getDesigner()->getNodes();
+        $list = $formEditor->getObjectList();
 
-        if ($nodes) {
-            foreach ($nodes as $node) {
-                /** @var AbstractFormElement $element */
-                $element = $formEditor->getFormat()->getFormElement($node);
+        if ($list) {
+            foreach ($list as $item) {
+                $new = $item->duplicate();
+                $new->value = $prefix ? "{$prefix}->$item->text" : $item->text;
+                $new->level = $level;
+                $new->prefix = $formEditor->getTitle();
 
-                $id = $formEditor->getNodeId($node);
-
-                $item = new ObjectListEditorItem(
-                    $id, Ide::get()->getImage($element->getIcon()), $prefix ? "{$prefix}->$id" : $id, $level
-                );
-
-                $item->hint = $element->getName();
-                $this->comboBox->items->add($item);
+                $this->comboBox->items->add($new);
             }
+        }
+    }
+
+    public function clearCache()
+    {
+        $this->cacheItems = null;
+
+        if ($this->editor) {
+            $this->editor->cacheData[__CLASS__ . "_cache"] = null;
         }
     }
 }

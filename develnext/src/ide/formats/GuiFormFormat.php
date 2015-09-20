@@ -18,8 +18,10 @@ use ide\formats\form\elements\CheckboxFormElement;
 use ide\formats\form\elements\CircleFormElement;
 use ide\formats\form\elements\ColorPickerFormElement;
 use ide\formats\form\elements\ComboBoxFormElement;
+use ide\formats\form\elements\EllipseFormElement;
 use ide\formats\form\elements\FormFormElement;
 use ide\formats\form\elements\HBoxFormElement;
+use ide\formats\form\elements\HexahedronFormElement;
 use ide\formats\form\elements\HyperlinkFormElement;
 use ide\formats\form\elements\ImageViewFormElement;
 use ide\formats\form\elements\LabelFormElement;
@@ -27,6 +29,8 @@ use ide\formats\form\elements\ListViewFormElement;
 use ide\formats\form\elements\PasswordFieldFormElement;
 use ide\formats\form\elements\ProgressBarFormElement;
 use ide\formats\form\elements\ProgressIndicatorFormElement;
+use ide\formats\form\elements\RectangleFormElement;
+use ide\formats\form\elements\RhombusFormElement;
 use ide\formats\form\elements\SeparatorFormElement;
 use ide\formats\form\elements\SliderFormElement;
 use ide\formats\form\elements\TabPaneFormElement;
@@ -37,10 +41,12 @@ use ide\formats\form\elements\ToggleButtonFormElement;
 use ide\formats\form\tags\AnchorPaneFormElementTag;
 use ide\formats\form\tags\ButtonFormElementTag;
 use ide\formats\form\tags\CheckboxFormElementTag;
+use ide\formats\form\tags\CircleFormElementTag;
 use ide\formats\form\tags\ColorPickerFormElementTag;
 use ide\formats\form\tags\ComboBoxBaseFormElementTag;
 use ide\formats\form\tags\ComboBoxFormElementTag;
 use ide\formats\form\tags\DataFormElementTag;
+use ide\formats\form\tags\EllipseFormElementTag;
 use ide\formats\form\tags\HyperlinkFormElementTag;
 use ide\formats\form\tags\ImageViewFormElementTag;
 use ide\formats\form\tags\LabeledFormElementTag;
@@ -48,9 +54,12 @@ use ide\formats\form\tags\LabelFormElementTag;
 use ide\formats\form\tags\ListViewFormElementTag;
 use ide\formats\form\tags\NodeFormElementTag;
 use ide\formats\form\tags\PasswordFieldFormElementTag;
+use ide\formats\form\tags\PolygonFormElementTag;
 use ide\formats\form\tags\ProgressBarFormElementTag;
 use ide\formats\form\tags\ProgressIndicatorFormElementTag;
+use ide\formats\form\tags\RectangleFormElementTag;
 use ide\formats\form\tags\SeparatorFormElementTag;
+use ide\formats\form\tags\ShapeFormElementTag;
 use ide\formats\form\tags\SliderFormElementTag;
 use ide\formats\form\tags\TabPaneFormElementTag;
 use ide\formats\form\tags\TextAreaFormElementTag;
@@ -87,9 +96,13 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new SeparatorFormElement());
 
         $this->register(new TitledPaneFormElement());
-        $this->register(new TabPaneFormElement());
+        //$this->register(new TabPaneFormElement());
 
-        //$this->register(new CircleFormElement());
+        $this->register(new RectangleFormElement());
+        $this->register(new CircleFormElement());
+        $this->register(new EllipseFormElement());
+        $this->register(new RhombusFormElement());
+        $this->register(new HexahedronFormElement());
 
         // Element tags.
         $this->register(new NodeFormElementTag());
@@ -118,6 +131,12 @@ class GuiFormFormat extends AbstractFormFormat
 
         $this->register(new TitledPaneFormElementTag());
         //$this->register(new TabPaneFormElementTag());
+
+        $this->register(new ShapeFormElementTag());
+        $this->register(new RectangleFormElementTag());
+        $this->register(new EllipseFormElementTag());
+        $this->register(new CircleFormElementTag());
+        $this->register(new PolygonFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());

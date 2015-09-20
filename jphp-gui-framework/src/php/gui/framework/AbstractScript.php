@@ -3,6 +3,7 @@ namespace php\gui\framework;
 
 use php\gui\UXForm;
 use php\io\Stream;
+use php\lang\IllegalArgumentException;
 use php\util\Scanner;
 use php\xml\DomDocument;
 use php\xml\DomElement;
@@ -11,7 +12,25 @@ use ReflectionClass;
 
 class ScriptEvent extends \stdClass
 {
+    /**
+     * @var AbstractScript
+     **/
     public $sender;
+
+    /**
+     * @var int
+     */
+    public $usage = 0;
+
+    public function done()
+    {
+        $this->usage -= 1;
+    }
+
+    public function isDone()
+    {
+        return $this->usage <= 0;
+    }
 }
 
 /**
@@ -67,6 +86,31 @@ abstract class AbstractScript
     }
 
     /**
+     * @param $args
+     * @return
+     * @throws IllegalArgumentException
+     * @internal param string $name
+     * @internal param mixed $value (optional)
+     */
+    public function data(...$args)
+    {
+        static $data = [];
+
+        $sizeof = sizeof($args);
+
+        if ($sizeof == 1) {
+            return $data[$args[0]];
+        } elseif ($sizeof >= 2) {
+            $old = $data[$args[0]];
+
+            $data[$args[0]] = $args[1];
+            return $old;
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    /**
      * @param $target
      * @return mixed
      */
@@ -75,11 +119,12 @@ abstract class AbstractScript
     /**
      * @param string $eventType
      * @param ...$args
+     * @return ScriptEvent
      */
     public function trigger($eventType, ...$args)
     {
         if ($this->disabled) {
-            return;
+            return null;
         }
 
         $e = new ScriptEvent();
@@ -93,6 +138,8 @@ abstract class AbstractScript
         foreach ((array) $this->handlers[$eventType] as $handler) {
             $handler($e);
         }
+
+        return $e;
     }
 
     public function on($event, callable $handler, $group = 'general')

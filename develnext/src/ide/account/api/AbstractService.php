@@ -74,51 +74,51 @@ abstract class AbstractService
      */
     public function execute($methodName, $json)
     {
-        $connection = $this->buildConnection($methodName);
         try {
+            $connection = $this->buildConnection($methodName);
             $connection->requestMethod = 'POST';
 
-            $connection->getOutputStream()->write(Json::encode($json));
-
-            $data = $connection->getInputStream()->readFully();
-
-            if (Ide::get()->isDevelopment()) {
-                static $lock;
-
-                if (!$lock) $lock = new SharedValue();
-
-                $lock->synchronize(function () use ($methodName, $json, $data) {
-                    echo "POST /$methodName [" . Json::encode($json) . "]\n";
-                    echo "\t-> [" . $data . "]\n\n";
-                });
-            }
-
-            if ($connection->responseCode != 200) {
-                if ($connection->responseCode >= 500) {
-                    throw new ServiceNotAvailableException($connection->responseCode, $data);
-                } else {
-                    throw new ServiceException($connection->responseCode, $data);
-                }
-            }
-
             try {
-                $response = new ServiceResponse(Json::decode($data));
+                $connection->getOutputStream()->write(Json::encode($json));
 
-                if ($response->isFail() && $response->message() == "InvalidAuthorization") {
-                    Ide::accountManager()->setAccessToken(null);
+                $data = $connection->getInputStream()->readFully();
+
+                if (Ide::get()->isDevelopment()) {
+                    static $lock;
+
+                    if (!$lock) $lock = new SharedValue();
+
+                    $lock->synchronize(function () use ($methodName, $json, $data) {
+                        echo "POST /$methodName [" . Json::encode($json) . "]\n";
+                        echo "\t-> [" . $data . "]\n\n";
+                    });
                 }
 
-                return $response;
+                if ($connection->responseCode != 200) {
+                    if ($connection->responseCode >= 500) {
+                        throw new ServiceNotAvailableException($connection->responseCode, $data);
+                    } else {
+                        throw new ServiceException($connection->responseCode, $data);
+                    }
+                }
+
+                    $response = new ServiceResponse(Json::decode($data));
+
+                    if ($response->isFail() && $response->message() == "InvalidAuthorization") {
+                        Ide::accountManager()->setAccessToken(null);
+                    }
+
+                    return $response;
             } catch (ProcessorException $e) {
                 throw new ServiceInvalidResponseException($e->getMessage(), 0, $e);
-            } catch (Exception $e) {
+            } catch (IOException $e) {
                 return new ServiceResponse([
                     'status' => 'error',
                     'message' => 'ConnectionFailed'
                 ]);
             }
         } finally {
-            $connection->disconnect();
+            if ($connection) $connection->disconnect();
         }
     }
 

@@ -51,7 +51,13 @@ public class UXColor extends BaseWrapper<Color> {
         int g = (int)Math.round(getWrappedObject().getGreen() * 255.0);
         int b = (int)Math.round(getWrappedObject().getBlue() * 255.0);
 
-        return String.format("#%02x%02x%02x" , r, g, b);
+        int a = (int) Math.round(getWrappedObject().getOpacity() * 255.0);
+
+        if (a == 255) {
+            return String.format("#%02x%02x%02x", r, g, b);
+        } else {
+            return String.format("#%02x%02x%02x%02x", r, g, b, a);
+        }
     }
 
     @Signature

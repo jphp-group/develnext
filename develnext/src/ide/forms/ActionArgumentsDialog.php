@@ -35,9 +35,13 @@ class ActionArgumentsDialog extends AbstractForm
      */
     protected $argumentEditors = [];
 
-    public function setAction(Action $action)
+    public function setAction(Action $action, $isNew = false)
     {
         $this->box->children->clear();
+
+        if ($isNew) {
+            $action->fillDefaults();
+        }
 
         /** @var AbstractSimpleActionType $type */
         $type = $action->getType();
@@ -98,7 +102,7 @@ class ActionArgumentsDialog extends AbstractForm
 
         $layout = new UXVBox($labelUi ? [$labelUi, $ui] : [$ui]);
         $layout->spacing = 5;
-        $layout->padding = $labelUi ? 3 : 10;
+        $layout->padding = $labelUi ? 3 : 13;
 
         $layout->paddingLeft = $layout->paddingRight = 10;
         $layout->fillWidth = true;

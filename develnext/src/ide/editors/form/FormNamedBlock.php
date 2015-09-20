@@ -2,6 +2,7 @@
 namespace ide\editors\form;
 
 use ide\Ide;
+use php\gui\event\UXEvent;
 use php\gui\framework\Timer;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXApplication;
@@ -40,6 +41,7 @@ class FormNamedBlock extends UXAnchorPane
         $label->id = 'title';
         $label->padding = [2, 5];
         $label->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-background-color: white; -fx-border-style: dashed; cursor: hand;';
+        $label->mouseTransparent = true;
 
         $this->add($label);
 
@@ -121,7 +123,6 @@ class FormNamedBlock extends UXAnchorPane
             $icon->style = 'cursor: hand;';
             $icon->mouseTransparent = true;
             $icon->position = [8, 8];
-
 
             $icon->on('mouseUp', function () {
                 $this->parent->requestFocus();

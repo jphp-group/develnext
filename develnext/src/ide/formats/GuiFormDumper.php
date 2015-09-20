@@ -5,6 +5,7 @@ use Exception;
 use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
+use ide\Ide;
 use php\gui\designer\UXDesigner;
 use php\gui\framework\DataUtils;
 use php\gui\layout\UXAnchorPane;
@@ -51,10 +52,18 @@ class GuiFormDumper extends AbstractFormDumper
 
         $loader = new UXLoader();
         /** @var UXAnchorPane $layout */
-        $layout = $loader->load($editor->getFile());
+        try {
+            $layout = $loader->load($editor->getFile());
 
-        if ($layout instanceof UXPane) {
-            $editor->setLayout($layout);
+            if ($layout instanceof UXPane) {
+                $editor->setLayout($layout);
+            }
+        } catch (IOException $e) {
+            Ide::get()->getMainForm()->toast('Ошибка загрузки формы: ' . $e->getMessage());
+            $layout1 = new UXAnchorPane();
+            $layout1->size = [500, 500];
+
+            $editor->setLayout($layout1);
         }
     }
 
@@ -104,6 +113,9 @@ class GuiFormDumper extends AbstractFormDumper
         $document->insertBefore($import, $document->getDocumentElement());
 
         $import = $document->createProcessingInstruction('import', 'javafx.scene.image.*');
+        $document->insertBefore($import, $document->getDocumentElement());
+
+        $import = $document->createProcessingInstruction('import', 'javafx.scene.shape.*');
         $document->insertBefore($import, $document->getDocumentElement());
 
         $import = $document->createProcessingInstruction('import', 'java.lang.*');

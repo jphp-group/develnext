@@ -1,6 +1,8 @@
 <?php
 namespace ide\action;
 
+use php\gui\layout\UXVBox;
+use php\gui\UXNode;
 use php\jsoup\Document;
 use php\xml\DomDocument;
 use php\xml\DomElement;
@@ -37,6 +39,16 @@ abstract class AbstractActionType
         return false;
     }
 
+    function isYield(Action $action)
+    {
+        return false;
+    }
+
+    function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode)
+    {
+        return new UXVBox($descriptionNode ? [$titleNode, $descriptionNode] : [$titleNode]);
+    }
+
     /**
      * @return array classes for use section
      **/
@@ -58,9 +70,10 @@ abstract class AbstractActionType
 
     /**
      * @param Action $action
+     * @param ActionScript $actionScript
      * @return string
      */
-    abstract function convertToCode(Action $action);
+    abstract function convertToCode(Action $action, ActionScript $actionScript);
 
     /**
      * @param Action $action

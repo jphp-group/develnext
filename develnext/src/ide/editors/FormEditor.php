@@ -2,6 +2,7 @@
 namespace ide\editors;
 
 use ide\action\ActionEditor;
+use ide\editors\common\ObjectListEditorItem;
 use ide\editors\form\FormElementTypePane;
 use ide\editors\menu\ContextMenu;
 use ide\formats\AbstractFormFormat;
@@ -40,6 +41,8 @@ use php\gui\UXContextMenu;
 use php\gui\UXData;
 use php\gui\UXDialog;
 use php\gui\UXHyperlink;
+use php\gui\UXImage;
+use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXList;
 use php\gui\UXListCell;
@@ -205,6 +208,7 @@ class FormEditor extends AbstractModuleEditor
         $this->configFile = $confFile;
 
         $this->actionEditor = new ActionEditor($phpFile . '.axml');
+        $this->actionEditor->setFormEditor($this);
 
         $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
         $this->codeEditor->register(AbstractCommand::make('Скрыть', 'icons/close16.png', function () {
@@ -329,6 +333,34 @@ class FormEditor extends AbstractModuleEditor
         return '';
     }
 
+    /**
+     * @param bool $cached
+     * @return ObjectListEditorItem[]
+     */
+    public function getObjectList($cached = true)
+    {
+        if (!$cached || !$this->layout) {
+            $this->formDumper->load($this);
+        }
+
+        $nodes = $this->findNodesToRegister($this->layout->children);
+
+        $result = [];
+
+        foreach ($nodes as $node) {
+            $element = $this->format->getFormElement($node);
+
+            $result[] = $item = new ObjectListEditorItem(
+                $this->getNodeId($node), $element ? Ide::get()->getImage($element->getIcon()) : null
+            );
+
+            $item->hint = $element->getName();
+            $item->element = $element;
+        }
+
+        return $result;
+    }
+
     public function deleteNode($node)
     {
         $designer = $this->designer;
@@ -356,7 +388,6 @@ class FormEditor extends AbstractModuleEditor
         if ($this->eventManager->removeBinds($this->getNodeId($node))) {
             $this->codeEditor->load();
         }
-
     }
 
     public function save()
@@ -380,7 +411,9 @@ class FormEditor extends AbstractModuleEditor
 
         $this->opened = false;
 
-        $this->updateProperties(null);
+        if (FileSystem::getOpened() === $this) {
+            $this->updateProperties(null);
+        }
     }
 
     public function open()
@@ -402,6 +435,7 @@ class FormEditor extends AbstractModuleEditor
     public function selectForm()
     {
         $this->designer->unselectAll();
+
         $this->updateProperties($this);
     }
 
@@ -613,6 +647,41 @@ class FormEditor extends AbstractModuleEditor
         return $this->codeEditor->makeUi();
     }
 
+    protected function findNodesToRegister($nodes)
+    {
+        $result = [];
+
+        $registerChildren = function ($children, &$result) use (&$registerChildren) {
+            /** @var UXNode $node */
+            foreach ($children as $node) {
+                if (!$node) {
+                    continue;
+                }
+
+                if ($node instanceof UXData) {
+                    continue;
+                }
+
+                if (!$node->classes->has('ignore')) {
+                    $element = $this->format->getFormElement($node);
+
+                    if ($element) {
+                        $element->registerNode($node);
+                    }
+
+                    if ($element && $element->isLayout()) {
+                        $registerChildren($element->getLayoutChildren($node), $result);
+                    }
+
+                    $result[] = $node;
+                }
+            }
+        };
+
+        $registerChildren($nodes, $result);
+        return $result;
+    }
+
     protected function makeDesigner($fullArea = false)
     {
         $area = new UXAnchorPane();
@@ -647,32 +716,9 @@ class FormEditor extends AbstractModuleEditor
 
         $this->designer->onChanged([$this, '_onChanged']);
 
-        $registerChildren = function ($children) use (&$registerChildren) {
-            /** @var UXNode $node */
-            foreach ($children as $node) {
-                if ($node instanceof UXData) {
-                    continue;
-                }
-
-                if (!$node->classes->has('ignore')) {
-                    $element = $this->format->getFormElement($node);
-
-                    if ($element) {
-                        $element->registerNode($node);
-                    }
-
-                    if ($element->isLayout()) {
-                        $registerChildren($element->getLayoutChildren($node));
-                    }
-
-                    $this->designer->registerNode($node);
-                }
-            }
-        };
-
-        $registerChildren($this->layout->children);
-
-
+        foreach ($this->findNodesToRegister($this->layout->children) as $node) {
+            $this->designer->registerNode($node);
+        }
 
         if (!$fullArea) {
             $area->add($designPane);
@@ -817,6 +863,24 @@ class FormEditor extends AbstractModuleEditor
         }
     }
 
+    public function addUseImports(array $imports)
+    {
+        $this->eventManager->addUseImports($imports);
+
+        Timer::run(100, function () {
+            $this->codeEditor->load();
+        });
+    }
+
+    public function insertCodeToMethod($class, $method, $code)
+    {
+        $this->eventManager->insertCodeToMethod($class, $method, $code);
+
+        Timer::run(100, function () {
+            $this->codeEditor->load();
+        });
+    }
+
     protected function _onChanged()
     {
         $this->save();
@@ -913,6 +977,7 @@ class FormEditor extends AbstractModuleEditor
 
     protected function updateProperties($node)
     {
+
         $this->eventManager->load();
         $element = $this->format->getFormElement($node);
 
@@ -1011,6 +1076,19 @@ class FormEditor extends AbstractModuleEditor
         }
     }
 
+    public function jumpToClassMethod($class, $method)
+    {
+        $coord = $this->eventManager->findMethod($class, $method);
+
+        if ($coord) {
+            $this->switchToSmallSource();
+
+            Timer::run(100, function () use ($coord) {
+                $this->codeEditor->jumpToLine($coord['line'], $coord['pos']);
+            });
+        }
+    }
+
     public function jumpToEventSource($node, $eventType)
     {
         $bind = $this->eventManager->findBind($this->getNodeId($node), $eventType);
@@ -1043,7 +1121,9 @@ class FormEditor extends AbstractModuleEditor
 
             $dialog = new MessageBoxForm('Какой использовать редактор для редактирования событий?', $buttons);
 
-            Ide::get()->getMainForm()->toast('Используйте "Конструктор" если вы новичок!');
+            UXApplication::runLater(function () use ($dialog) {
+                $dialog->toast('Используйте "Конструктор" если вы новичок!');
+            });
 
             if ($dialog->showDialogWithFlag()) {
                 $editorType = $dialog->getResult();
@@ -1217,7 +1297,9 @@ class FormEditor extends AbstractModuleEditor
 
                             $item = new UXMenuItem($name);
                             $item->on('action', function () use ($node, $type, $code) {
-                                $this->switchToSmallSource();
+                                if ($this->getDefaultEventEditor(false) == 'php') {
+                                    $this->switchToSmallSource();
+                                }
 
                                 $this->eventManager->addBind($this->getNodeId($node), $code, $type['kind']);
 

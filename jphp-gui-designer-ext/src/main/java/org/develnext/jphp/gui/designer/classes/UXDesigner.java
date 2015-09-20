@@ -15,10 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -28,9 +25,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.develnext.jphp.ext.javafx.classes.shape.UXPolygon;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -105,7 +106,9 @@ public class UXDesigner extends BaseObject {
 
     @Signature
     public void update() {
-        dots.toBack();
+        if (dots != null) {
+            dots.toBack();
+        }
 
         for (Selection selection : selections.values()) {
             selection.update();
@@ -371,13 +374,88 @@ public class UXDesigner extends BaseObject {
         onChanged = invoker;
     }
 
+    protected double getCenterX(Node node) {
+        if (node instanceof Circle) {
+            return ((Circle) node).getRadius();
+        }
+
+        if (node instanceof Ellipse) {
+            return ((Ellipse) node).getRadiusX();
+        }
+
+        if (node instanceof Polygon) {
+            return UXPolygon.getWidth((Polygon) node) / 2;
+        }
+
+        return 0.0;
+    }
+
+    protected double getCenterY(Node node) {
+        if (node instanceof Circle) {
+            return ((Circle) node).getRadius();
+        }
+
+        if (node instanceof Ellipse) {
+            return ((Ellipse) node).getRadiusY();
+        }
+
+        if (node instanceof Polygon) {
+            return UXPolygon.getHeight((Polygon) node) / 2;
+        }
+
+        return 0.0;
+    }
+
+    protected void resizeNode(Node node, double width, double height) {
+        if (node instanceof Region) {
+            ((Region) node).setPrefSize(width, height);
+            return;
+        }
+
+        if (node instanceof ImageView) {
+            ((ImageView) node).setFitWidth(width);
+            ((ImageView) node).setFitHeight(height);
+            return;
+        }
+
+        if (node instanceof Rectangle) {
+            ((Rectangle) node).setWidth(width);
+            ((Rectangle) node).setHeight(height);
+            return;
+        }
+
+        if (node instanceof Circle) {
+            double radius = (width < height ? width : height) / 2;
+            ((Circle) node).setRadius(radius);
+            return;
+        }
+
+        if (node instanceof Ellipse) {
+            ((Ellipse) node).setRadiusX(width / 2);
+            ((Ellipse) node).setRadiusY(height / 2);
+            return;
+        }
+
+        if (node instanceof Polygon) {
+            UXPolygon.setWidth((Polygon) node, width);
+            UXPolygon.setHeight((Polygon) node, height);
+            return;
+        }
+
+        node.resize(width, height);
+    }
+
+    protected void relocateNode(Node node, double x, double y) {
+        node.relocate(x + getCenterX(node), y + getCenterY(node));
+    }
+
     @Signature
     public List<Node> getNodesInArea(double x, double y, double w, double h) {
         List<Node> result = new ArrayList<>();
 
         for (Node node : nodes.keySet()) {
-            double nx = node.getLayoutX();
-            double ny = node.getLayoutY();
+            double nx = node.getLayoutX() - getCenterX(node);
+            double ny = node.getLayoutY() - getCenterY(node);
             double nw = node.getBoundsInLocal().getWidth();
             double nh = node.getBoundsInLocal().getHeight();
 
@@ -601,7 +679,7 @@ public class UXDesigner extends BaseObject {
 
                 for (Selection selection : selections.values()) {
                     selection.dragImageView.setMouseTransparent(true);
-                    selection.dragImageView.relocate(selection.node.getLayoutX(), selection.node.getLayoutY());
+                    selection.drag(selection.node.getLayoutX(), selection.node.getLayoutY(), false);
                 }
 
                 if (e.getButton() == MouseButton.SECONDARY) {
@@ -610,8 +688,8 @@ public class UXDesigner extends BaseObject {
                     }
                 }
 
-                if (!(node instanceof Pane)) {
-                    //e.consume();
+                if (!(node instanceof TitledPane) && !(node instanceof TabPane) && !(node instanceof ScrollPane)) {
+                    e.consume();
                 }
 
                 picked = node;
@@ -628,7 +706,8 @@ public class UXDesigner extends BaseObject {
                         selection.node.setMouseTransparent(false);
                         selection.node.setCursor(Cursor.DEFAULT);
 
-                        selection.node.relocate(selection.dragImageView.getLayoutX(), selection.dragImageView.getLayoutY());
+                        selection.drag(selection.dragImageView.getLayoutX(), selection.dragImageView.getLayoutY(), false);
+                        relocateNode(selection.node, selection.dragImageView.getLayoutX(), selection.dragImageView.getLayoutY());
 
                         selection.update();
 
@@ -823,8 +902,8 @@ public class UXDesigner extends BaseObject {
         public void update(double x, double y, Bounds bounds) {
             Point2D local = area.screenToLocal(x, y);
 
-            x = local.getX();
-            y = local.getY();
+            x = local.getX() - getCenterX(this.node);
+            y = local.getY() - getCenterY(this.node);
 
             int ptW = (int) ltPoint.getWidth();
             int ptH = (int) ltPoint.getHeight();
@@ -963,16 +1042,12 @@ public class UXDesigner extends BaseObject {
                     border.setVisible(false);
                     resizePoint = null;
 
-                    node.relocate(resizeX, resizeY);
+                    final double centerX = getCenterX(node);
+                    final double centerY = getCenterY(node);
 
-                    if (node instanceof Region) {
-                        ((Region) node).setPrefSize(resizeW, resizeH);
-                    }
+                    resizeNode(node, resizeW, resizeH);
+                    node.relocate(resizeX - centerX, resizeY - centerY);
 
-                    if (node instanceof ImageView) {
-                        ((ImageView) node).setFitWidth(resizeW);
-                        ((ImageView) node).setFitHeight(resizeH);
-                    }
 
                     if (onChanged != null) {
                         onChanged.callAny();
@@ -1115,12 +1190,18 @@ public class UXDesigner extends BaseObject {
         }
 
         public void drag(double x, double y) {
-            dragImageView.relocate(x, y);
+            drag(x, y, false);
+        }
 
-            sizeText.setVisible(dragged && helpersEnabled);
+        public void drag(double x, double y, boolean updateUi) {
+            dragImageView.relocate(x - getCenterX(node), y - getCenterY(node));
 
-            if (dragged) {
-                sizeText.setText("X: " + (int) x + ", Y: " + (int) y);
+            if (updateUi) {
+                sizeText.setVisible(dragged && helpersEnabled);
+
+                if (dragged) {
+                    sizeText.setText("X: " + (int) x + ", Y: " + (int) y);
+                }
             }
         }
     }

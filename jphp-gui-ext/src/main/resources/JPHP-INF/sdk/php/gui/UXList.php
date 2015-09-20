@@ -55,6 +55,13 @@ class UXList implements Iterator, Countable, ArrayAccess
     }
 
     /**
+     * @param $index
+     */
+    public function removeByIndex($index)
+    {
+    }
+
+    /**
      * ...
      */
     public function clear()

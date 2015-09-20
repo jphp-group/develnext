@@ -1,14 +1,18 @@
 package org.develnext.jphp.ext.javafx.classes.event;
 
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
+
+import java.util.List;
 
 @Name(JavaFXExtension.NS + "event\\UXDragEvent")
 public class UXDragEvent extends UXEvent {
@@ -25,6 +29,8 @@ public class UXDragEvent extends UXEvent {
 
         @Property boolean accepted();
         @Property boolean dropCompleted();
+
+        @Property Dragboard dragboard();
     }
 
 
@@ -49,5 +55,10 @@ public class UXDragEvent extends UXEvent {
     @Getter
     protected Memory getGestureTarget(Environment env) {
         return Memory.wrap(env, getWrappedObject().getGestureTarget());
+    }
+
+    @Reflection.Signature
+    public void acceptTransferModes(List<TransferMode> modes) {
+        getWrappedObject().acceptTransferModes(modes.toArray(new TransferMode[0]));
     }
 }

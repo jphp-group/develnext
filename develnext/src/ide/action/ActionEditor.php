@@ -1,6 +1,7 @@
 <?php
 namespace ide\action;
 
+use ide\editors\FormEditor;
 use ide\utils\FileUtils;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXCell;
@@ -45,6 +46,11 @@ class ActionEditor extends AbstractEditor
      * @var DomDocument[]
      */
     protected $snapshots = [];
+
+    /**
+     * @var FormEditor
+     */
+    protected $formEditor;
 
     /**
      * ActionEditor constructor.
@@ -101,6 +107,22 @@ class ActionEditor extends AbstractEditor
         }
     }
 
+    /**
+     * @return FormEditor
+     */
+    public function getFormEditor()
+    {
+        return $this->formEditor;
+    }
+
+    /**
+     * @param FormEditor $formEditor
+     */
+    public function setFormEditor($formEditor)
+    {
+        $this->formEditor = $formEditor;
+    }
+
     public function load()
     {
         $xml = new XmlProcessor();
@@ -151,13 +173,7 @@ class ActionEditor extends AbstractEditor
     {
         if ($this->document) {
             $xml = new XmlProcessor();
-            $stream = new FileStream($this->file, 'w+');
-
-            try {
-                $xml->formatTo($this->document, $stream);
-            } finally {
-                $stream->close();
-            }
+            FileUtils::put($this->file, $xml->format($this->document));
         }
     }
 
@@ -248,17 +264,25 @@ class ActionEditor extends AbstractEditor
         $this->save();
     }
 
-    public function removeAction($class, $method, $index)
+    public function removeActions($class, $method, ...$indexes)
     {
         $domMethod = $this->fetchMethodDom($class, $method);
 
-        $index++;
+        $domActions = [];
+        foreach ($indexes as $index) {
+            $index++;
 
-        $domAction = $domMethod->find("(./*)[$index]");
+            $domAction = $domMethod->find("(./*)[$index]");
 
-        if ($domAction) {
-            $domMethod->removeChild($domAction);
-            $this->save();
+            if ($domAction) {
+                $domActions[] = $domAction;
+            }
         }
+
+        foreach ($domActions as $domAction) {
+            $domMethod->removeChild($domAction);
+        }
+
+        $this->save();
     }
 }

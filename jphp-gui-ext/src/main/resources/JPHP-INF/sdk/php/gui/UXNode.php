@@ -47,6 +47,21 @@ abstract class UXNode
     /**
      * @var double
      */
+    public $translateX;
+
+    /**
+     * @var double
+     */
+    public $translateY;
+
+    /**
+     * @var double
+     */
+    public $translateZ;
+
+    /**
+     * @var double
+     */
     public $screenX;
 
     /**
@@ -141,6 +156,15 @@ abstract class UXNode
     }
 
     /**
+     * Getter and Setter for object data
+     * @param string $name
+     * @param mixed $value (optional)
+     */
+    public function data($name, $value)
+    {
+    }
+
+    /**
      * @param $x
      * @param $y
      * @return array [x, y]
@@ -153,6 +177,13 @@ abstract class UXNode
      * ...
      */
     public function autosize()
+    {
+    }
+
+    /**
+     * @return UXImage
+     */
+    public function snapshot()
     {
     }
 
@@ -221,6 +252,21 @@ abstract class UXNode
     }
 
     public function free()
+    {
+    }
+
+    /**
+     * Start drag and drop
+     */
+    public function startFullDrag()
+    {
+    }
+
+    /**
+     * @param array $modes variants MOVE, COPY, LINK
+     * @return UXDragboard
+     */
+    public function startDrag(array $modes)
     {
     }
 

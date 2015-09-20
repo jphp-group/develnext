@@ -6,15 +6,15 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="853.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <AnchorPane layoutX="707.0" layoutY="14.0" style="-fx-border-color: silver;" AnchorPane.bottomAnchor="57.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="14.0">
+      <AnchorPane layoutX="707.0" layoutY="14.0" prefHeight="629.0" prefWidth="169.0" style="-fx-border-color: silver;" AnchorPane.bottomAnchor="57.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="14.0">
          <children>
             <TabPane id="actionTypePane" prefHeight="556.0" prefWidth="127.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
-      <ListView id="list" fixedCellSize="45.0" layoutX="14.0" layoutY="14.0" prefHeight="558.0" prefWidth="689.0" AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="145.0" AnchorPane.topAnchor="14.0" />
-      <HBox layoutX="14.0" layoutY="525.0" prefHeight="34.0" prefWidth="691.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="144.0">
+      <ListView id="list" fixedCellSize="40.0" layoutX="14.0" layoutY="14.0" prefHeight="558.0" prefWidth="689.0" AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="185.0" AnchorPane.topAnchor="14.0" />
+      <HBox layoutX="14.0" layoutY="525.0" prefHeight="34.0" prefWidth="700.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="185.0">
          <children>
             <Button id="saveButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" prefWidth="138.0" styleClass="icon-ok" text="Сохранить">
                <font>
@@ -29,5 +29,6 @@
             <Font name="System Italic" size="22.0" />
          </font>
       </Label>
+      <Button id="convertButton" layoutX="718.0" layoutY="652.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="34.0" prefWidth="167.0" text="Конвертировать в PHP" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
    </children>
 </AnchorPane>

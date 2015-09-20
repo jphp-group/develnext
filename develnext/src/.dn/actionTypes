@@ -9,6 +9,7 @@ ide\action\types\HidePreloaderActionType
 
 ide\action\types\ElementSetTextActionType
 ide\action\types\ElementDestroyActionType
+ide\action\types\ElementLoadContentActionType
 ide\action\types\ElementShowActionType
 ide\action\types\ElementHideActionType
 ide\action\types\ElementToggleActionType
@@ -17,6 +18,11 @@ ide\action\types\ElementSetXActionType
 ide\action\types\ElementSetYActionType
 ide\action\types\ElementSetWidthActionType
 ide\action\types\ElementSetHeightActionType
+ide\action\types\FadeOutActionType
+ide\action\types\FadeInActionType
+ide\action\types\FadeToActionType
+ide\action\types\DisplaceActionType
+ide\action\types\MoveToActionType
 
 ide\action\types\OpenActionType
 ide\action\types\BrowseActionType
@@ -31,3 +37,12 @@ ide\action\types\IfExprActionType
 ide\action\types\ElseActionType
 ide\action\types\OpenBlockActionType
 ide\action\types\CloseBlockActionType
+
+ide\action\types\SleepActionType
+ide\action\types\SetVarActionType
+ide\action\types\AppendVarActionType
+ide\action\types\PhpLineActionType
+ide\action\types\ElementSetDataActionType
+ide\action\types\ElementAppendDataActionType
+ide\action\types\CommentActionType
+ide\action\types\NewLineActionType

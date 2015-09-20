@@ -11,6 +11,11 @@ use php\gui\UXNode;
 abstract class UXShape extends UXNode
 {
     /**
+     * @var bool
+     */
+    public $smooth = true;
+
+    /**
      * @var UXColor
      */
     public $fillColor;
@@ -19,4 +24,14 @@ abstract class UXShape extends UXNode
      * @var UXColor
      */
     public $strokeColor;
+
+    /**
+     * @var double
+     */
+    public $strokeWidth = 1;
+
+    /**
+     * @var string INSIDE, OUTSIDE, CENTERED
+     */
+    public $strokeType = 'OUTSIDE';
 }

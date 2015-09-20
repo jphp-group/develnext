@@ -90,6 +90,26 @@ class PhpParser
     }
 
     /**
+     * @param string $class
+     * @param string $method
+     * @param string $code
+     * @return bool
+     */
+    public function insertToMethod($class, $method, $code)
+    {
+        $coord = $this->findMethod($class, $method);
+
+        if ($coord) {
+            $line = $coord['line'];
+
+            $this->insertAfterLine($line, $code);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param int $lineNumber
      * @param $text
      */
@@ -233,8 +253,12 @@ class PhpParser
             switch ($next->type) {
                 case 'NamespaceStmt':
                 case 'NamespaceUseStmt':
-                    $line = $next->line;
-                    $pos = $next->position;
+                    if ($next = $tokenizer->next()) {
+                        if ($next->word !== '(') {
+                            $line = $next->line;
+                            $pos = $next->position;
+                        }
+                    }
 
                     break;
             }

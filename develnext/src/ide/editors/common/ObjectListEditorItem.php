@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\common;
 
+use ide\formats\form\AbstractFormElement;
 use php\gui\UXImageView;
 
 class ObjectListEditorItem extends \stdClass
@@ -29,6 +30,16 @@ class ObjectListEditorItem extends \stdClass
      * @var string
      */
     public $hint;
+
+    /**
+     * @var string
+     */
+    public $prefix = null;
+
+    /**
+     * @var AbstractFormElement
+     */
+    public $element;
     
     /**
      * ListItem constructor.
@@ -48,5 +59,21 @@ class ObjectListEditorItem extends \stdClass
     function __toString()
     {
         return (string)($this->text);
+    }
+
+    public function duplicate()
+    {
+        $graphic = $this->graphic ? new UXImageView() : null;
+
+        if ($graphic) {
+            $graphic->image = $this->graphic->image;
+        }
+
+        $item = new ObjectListEditorItem($this->text, $graphic, $this->value, $this->level);
+        $item->hint = $this->hint;
+        $item->prefix = $this->prefix;
+        $item->element = $this->element;
+
+        return $item;
     }
 }

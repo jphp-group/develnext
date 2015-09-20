@@ -142,6 +142,16 @@ abstract class AbstractModule extends AbstractScript
         $this->trigger('action', ['target' => $target]);
     }
 
+    public function getContextForm()
+    {
+        return $this->_context instanceof AbstractForm ? $this->_context : null;
+    }
+
+    public function getContextFormName()
+    {
+        return $this->_context instanceof AbstractForm ? $this->_context->getName() : null;
+    }
+
     public function getScript($name)
     {
         if (isset($this->scriptManager->{$name})) {

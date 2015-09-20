@@ -3,12 +3,10 @@ package org.develnext.jphp.ext.javafx.classes.shape;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
+import javafx.scene.shape.StrokeType;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.classes.UXNode;
-import php.runtime.annotation.Reflection.Name;
-import php.runtime.annotation.Reflection.Nullable;
-import php.runtime.annotation.Reflection.Property;
-import php.runtime.annotation.Reflection.Signature;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
@@ -16,6 +14,8 @@ import php.runtime.reflection.ClassEntity;
 public abstract class UXShape<T extends Shape> extends UXNode<Shape> {
     interface WrappedInterface {
         @Property boolean smooth();
+        @Property double strokeWidth();
+        @Property StrokeType strokeType();
     }
 
     public UXShape(Environment env, T wrappedObject) {
@@ -27,16 +27,16 @@ public abstract class UXShape<T extends Shape> extends UXNode<Shape> {
     }
 
     @Override
-    public Shape getWrappedObject() {
+    public T getWrappedObject() {
         return (T) super.getWrappedObject();
     }
 
-    @Signature
+    @Setter
     public void setFillColor(@Nullable Color color) {
         getWrappedObject().setFill(color);
     }
 
-    @Signature
+    @Getter
     public Color getFillColor() {
         Paint fill = getWrappedObject().getFill();
 
@@ -47,12 +47,12 @@ public abstract class UXShape<T extends Shape> extends UXNode<Shape> {
         return null;
     }
 
-    @Signature
+    @Setter
     public void setStrokeColor(@Nullable Color color) {
         getWrappedObject().setStroke(color);
     }
 
-    @Signature
+    @Getter
     public Color getStrokeColor() {
         Paint fill = getWrappedObject().getStroke();
 

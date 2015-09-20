@@ -84,6 +84,13 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         return getWrappedObject().remove((T) Memory.unwrap(env, object));
     }
 
+
+    @Signature
+    @SuppressWarnings("unchecked")
+    public boolean removeByIndex(Environment env, int index) {
+        return getWrappedObject().remove(index) != null;
+    }
+
     @Signature
     public void clear() {
         getWrappedObject().clear();

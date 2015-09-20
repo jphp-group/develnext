@@ -379,7 +379,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             if (FileUtils::getExtension($filename) == "fxml") {
                 $editor = FileSystem::fetchEditor($filename);
 
-                $editors[] = $editor;
+                $editors[FileUtils::hashName($filename)] = $editor;
             }
         });
 

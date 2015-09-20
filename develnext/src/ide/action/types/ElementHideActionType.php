@@ -4,6 +4,7 @@ namespace ide\action\types;
 use action\Element;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
+use ide\action\ActionScript;
 use php\lib\Str;
 
 class ElementHideActionType extends AbstractSimpleActionType
@@ -19,6 +20,13 @@ class ElementHideActionType extends AbstractSimpleActionType
     {
         return [
             'object' => 'Объект'
+        ];
+    }
+
+    function attributeSettings()
+    {
+        return [
+            'object' => ['def' => '~sender'],
         ];
     }
 
@@ -54,9 +62,10 @@ class ElementHideActionType extends AbstractSimpleActionType
 
     /**
      * @param Action $action
+     * @param ActionScript $actionScript
      * @return string
      */
-    function convertToCode(Action $action)
+    function convertToCode(Action $action, ActionScript $actionScript)
     {
         $object = $action->get('object');
 

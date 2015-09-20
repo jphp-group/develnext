@@ -18,6 +18,9 @@ abstract class AbstractEditor
      */
     protected $format;
 
+
+    public $cacheData = [];
+
     /**
      * AbstractEditor constructor.
      * @param string $file

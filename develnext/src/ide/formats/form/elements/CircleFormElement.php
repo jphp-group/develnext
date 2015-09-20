@@ -2,6 +2,7 @@
 namespace ide\formats\form\elements;
 
 use ide\formats\form\AbstractFormElement;
+use php\gui\paint\UXColor;
 use php\gui\shape\UXCircle;
 use php\gui\UXNode;
 use php\gui\UXProgressBar;
@@ -37,8 +38,10 @@ class CircleFormElement extends AbstractFormElement
     public function createElement()
     {
         $element = new UXCircle(50);
-        $element->fillColor = 'white';
-        $element->strokeColor = 'black';
+        $element->fillColor = UXColor::of('#cce6ff');
+        $element->strokeColor = UXColor::of('#334db3');
+        $element->strokeType = 'INSIDE';
+        $element->strokeWidth = 2;
 
         return $element;
     }

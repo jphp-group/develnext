@@ -5,6 +5,7 @@ use ide\account\api\AccountService;
 use ide\account\api\ServiceResponse;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
+use php\gui\framework\ScriptEvent;
 use php\gui\UXDesktop;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\Timer;
@@ -45,11 +46,11 @@ class LoginVkRedirectForm extends AbstractForm
 
         $this->timerLabel->text = "Через $i сек";
 
-        $timer->on('action', function (TimerScript $timer) use (&$i) {
+        $timer->on('action', function (ScriptEvent $e) use (&$i) {
             $this->timerLabel->text = "Через " . (--$i) . " сек";
 
             if ($i <= 0) {
-               $timer->stop();
+               $e->sender->stop();
             }
         });
 

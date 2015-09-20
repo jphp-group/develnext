@@ -5,25 +5,37 @@ use ide\action\AbstractActionType;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionEditor;
+use ide\action\ActionScript;
 use ide\editors\FormEditor;
 use ide\editors\menu\ContextMenu;
 use ide\Ide;
 use ide\misc\AbstractCommand;
+use ide\utils\PhpParser;
+use php\format\ProcessorException;
+use php\gui\event\UXDragEvent;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\framework\Timer;
 use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
+use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXButton;
+use php\gui\UXClipboard;
 use php\gui\UXContextMenu;
+use php\gui\UXDialog;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
+use php\lang\IllegalStateException;
 use php\lib\Items;
+use php\lib\Str;
+use php\util\Flow;
+use php\xml\XmlProcessor;
 
 /**
  * Class ActionConstructorForm
@@ -56,7 +68,13 @@ class ActionConstructorForm extends AbstractForm
     {
         parent::init();
 
-        $this->list->setDraggableCellFactory([$this, 'listCellFactory'], [$this, 'listDragDone']);
+        $this->list->multipleSelection = true;
+
+        $this->list->on('dragOver', [$this, 'listDragOver']);
+        $this->list->on('dragDone', [$this, 'listDragDone']);
+        $this->list->on('dragDrop', [$this, 'listDragDrop']);
+
+        $this->list->setDraggableCellFactory([$this, 'listCellFactory'], [$this, 'listCellDragDone']);
         $this->hintLabel->mouseTransparent = true;
 
         $contextMenu = new ContextMenu();
@@ -67,6 +85,19 @@ class ActionConstructorForm extends AbstractForm
 
         $contextMenu->addSeparator();
 
+        $contextMenu->addCommand(AbstractCommand::make('Вставить', 'icons/paste16.png', function () {
+            $this->actionPaste();
+        }, 'Ctrl+V'));
+
+        $contextMenu->addCommand(AbstractCommand::make('Вырезать', 'icons/cut16.png', function () {
+            $this->actionCopy();
+            $this->actionDelete();
+        }, 'Ctrl+X'));
+
+        $contextMenu->addCommand(AbstractCommand::make('Копировать', 'icons/copy16.png', function () {
+            $this->actionCopy();
+        }, 'Ctrl+C'));
+
         $contextMenu->addCommand(AbstractCommand::make('Удалить', 'icons/delete16.png', function () {
             $this->actionDelete();
         }, 'Delete'));
@@ -74,35 +105,133 @@ class ActionConstructorForm extends AbstractForm
         $this->list->contextMenu = $contextMenu->getRoot();
     }
 
-    protected function listDragDone($dragIndex, $replaceIndex)
+    protected function listDragOver(UXDragEvent $e)
     {
+        $e->acceptTransferModes(['MOVE']);
+        $e->consume();
+    }
+
+    protected function listDragDone(UXDragEvent $e)
+    {
+        $e->consume();
+    }
+
+    protected function listDragDrop(UXDragEvent $e)
+    {
+        if ($this->list->items->count > 0) {
+            return;
+        }
+
+        $dragboard = $e->dragboard;
+
+        $value = $dragboard->string;
+
+        if (class_exists($value)) {
+            $actionType = new $value();
+
+            if ($actionType instanceof AbstractSimpleActionType) {
+                $dragboard->dragView = null;
+
+                /** @var ActionConstructorForm $self */
+                $self = $e->sender->scene->window->userData->self;
+
+                UXApplication::runLater(function () use ($self, $actionType) {
+                    $self->addAction($actionType);
+                });
+
+                $e->dropCompleted = true;
+                $e->consume();
+            }
+        }
+    }
+
+    protected function listCellDragDone(UXDragEvent $e, UXListView $list, $index)
+    {
+        $dragboard = $e->dragboard;
+
+        $value = $dragboard->string;
+
+        if (class_exists($value)) {
+            $actionType = new $value();
+            $dragboard->dragView = null;
+
+            if ($actionType instanceof AbstractSimpleActionType) {
+                /** @var ActionConstructorForm $self */
+                $self = $list->scene->window->userData->self;
+
+                UXApplication::runLater(function () use ($self, $actionType, $index) {
+                    $self->addAction($actionType, $index);
+
+                });
+            } else {
+                return false;
+            }
+        } elseif (Str::isNumber($value) && $value < $list->items->count && $value >= 0) {
+            $indexes = $list->selectedIndexes;
+
+            $dragged = [];
+
+            foreach ($indexes as $i) {
+                $dragged[] = $list->items[$i];
+            }
+
+            if ($index < (int) ($value)) {
+                foreach ($dragged as $el) {
+                    $list->items->remove($el);
+                }
+
+                foreach ($dragged as $el) {
+                    $list->items->insert($index++, $el);
+                }
+
+                $index--;
+            } else {
+                $index++;
+
+                foreach ($dragged as $el) {
+                    $index--;
+                    $list->items->remove($el);
+                }
+
+                foreach ($dragged as $el) {
+                    $list->items->insert($index++, $el);
+                }
+
+                $index--;
+            }
+
+            UXApplication::runLater(function () use ($index) {
+                $this->list->selectedIndex = $index;
+            });
+        }
+
         $this->editor->updateMethod($this->class, $this->method, Items::toArray($this->list->items));
 
         $this->updateList();
 
         $this->editor->calculateLevels(Items::toArray($this->list->items));
         $this->list->update();
-
-        if ($replaceIndex < $this->list->items->count) {
-            $this->list->selectedIndex = $replaceIndex;
-        }
     }
 
     protected function listCellFactory(UXListCell $cell, Action $action = null, $empty)
     {
         if ($action) {
             $titleName = new UXLabel($action->getTitle());
-            $titleName->style = '-fx-font-weight: bold;';
+            $titleName->style = '-fx-font-weight: bold; -fx-text-fill: #383838;';
 
             if ($action->getDescription()) {
                 $titleDescription = new UXLabel($action->getDescription());
                 $titleDescription->style = '-fx-text-fill: gray;';
+                $titleDescription->padding = 0;
             } else {
                 $titleDescription = null;
             }
 
-            $title = new UXVBox($titleDescription ? [$titleName, $titleDescription] : [$titleName]);
-            $title->spacing = 0;
+            $title = $action->getType()->makeUi($action, $titleName, $titleDescription);
+
+            if ($title instanceof UXVBox || $title instanceof UXHBox) {
+                $title->spacing = 0;
+            }
 
             $image = Ide::get()->getImage($action->getIcon());
 
@@ -117,6 +246,10 @@ class ActionConstructorForm extends AbstractForm
             $line->alignment = 'CENTER_LEFT';
 
             $line->paddingLeft = 20 * $action->getLevel() + 5;
+
+            if ($action->getType()->isCloseLevel() || $action->getType()->isAppendMultipleLevel()) {
+                $line->paddingLeft -= 5;
+            }
 
             $cell->text = null;
             $cell->graphic = $line;
@@ -240,7 +373,7 @@ class ActionConstructorForm extends AbstractForm
         if (!$subGroups[$actionType->getGroup()][$subGroup]) {
             if ($subGroup) {
                 $label = new UXLabel($subGroup);
-                $label->minWidth = 34 * 2;
+                $label->minWidth = 34 * 3;
 
                 if ($subGroups[$actionType->getGroup()]) {
                     $label->paddingTop = 5;
@@ -265,6 +398,18 @@ class ActionConstructorForm extends AbstractForm
 
         $btn->on('action', [$this, 'actionTypeClick']);
 
+        $btn->on('dragDetect', function (UXMouseEvent $e) {
+            $dragboard = $e->sender->startDrag(['MOVE']);
+            $dragboard->dragView = $e->sender->snapshot();
+
+            $dragboard->dragViewOffsetX = $dragboard->dragView->width / 2;
+            $dragboard->dragViewOffsetY = $dragboard->dragView->height / 2;
+
+            $dragboard->string = get_class($e->sender->userData);
+
+            $e->consume();
+        });
+
         $tab->content->add($btn);
     }
 
@@ -276,24 +421,33 @@ class ActionConstructorForm extends AbstractForm
     {
         /** @var ActionConstructorForm $self */
         $self = $e ? $e->sender->scene->window->userData->self : $this;
-        $index = $self->list->selectedIndex;
+        $indexes = $self->list->selectedIndexes;
 
-        if ($index > -1) {
-            $action = $self->list->items[$index];
+        if ($indexes) {
+            $index = -1;
 
-            $self->editor->removeAction($self->class, $self->method, $index);
-            $this->list->items->remove($action);
+            $self->editor->removeActions($self->class, $self->method, $indexes);
+            $actions = [];
+
+            foreach ($indexes as $index) {
+                $actions[] = $self->list->items[$index];
+            }
+
+            foreach ($actions as $action) {
+                $this->list->items->remove($action);
+            }
+
+            $this->editor->updateMethod($self->class, $self->method, Items::toArray($this->list->items));
+
+            $this->list->update();
+
+            $this->updateList();
 
             $this->list->selectedIndex = $index++;
 
             if ($index >= $this->list->items->count) {
                 $this->list->selectedIndex = $this->list->items->count - 1;
             }
-
-            $this->editor->updateMethod($self->class, $self->method, Items::toArray($this->list->items));
-            $this->list->update();
-
-            $this->updateList();
         }
     }
 
@@ -326,27 +480,25 @@ class ActionConstructorForm extends AbstractForm
         }
     }
 
-    protected function actionTypeClick(UXEvent $e)
+    public function addAction(AbstractSimpleActionType $actionType, $index = -1)
     {
-        /** @var $actionType AbstractSimpleActionType */
-        $actionType = $e->sender->userData;
-
-        /** @var ActionConstructorForm $self */
-        $self = $e->sender->scene->window->userData->self;
-        $self->updateList();
+        $self = $this;
 
         $action = new Action($actionType);
 
-        if ($actionType->showDialog($action, $self->contextEditor)) {
+        if ($actionType->showDialog($action, $self->contextEditor, true)) {
             $editor = $self->editor;
             $editor->addAction($action, $self->class, $self->method);
 
-            $self->list->items->add($action);
+            if ($index == -1 || $index > $self->list->items->count) {
+                $self->list->items->add($action);
+                $index = $self->list->items->count - 1;
+            } else {
+                $this->list->items->insert($index, $action);
+            }
 
             $editor->calculateLevels(Items::toArray($self->list->items));
             $self->list->update();
-
-            $index = $self->list->items->count - 1;
 
             $self->list->selectedIndex = $index;
             $self->list->focusedIndex = $index;
@@ -356,6 +508,27 @@ class ActionConstructorForm extends AbstractForm
             $self->updateList();
         }
     }
+
+    protected function actionTypeClick(UXEvent $e)
+    {
+        /** @var $actionType AbstractSimpleActionType */
+        $actionType = $e->sender->userData;
+
+        /** @var ActionConstructorForm $self */
+        $self = $e->sender->scene->window->userData->self;
+
+        $self->addAction($actionType);
+    }
+
+    public function hide()
+    {
+        parent::hide();
+
+        if ($this->editor) {
+            $this->editor->cacheData = [];
+        }
+    }
+
 
     /**
      * @event saveButton.action
@@ -380,5 +553,132 @@ class ActionConstructorForm extends AbstractForm
         static::$tabSelectedIndex = $this->actionTypePane->selectedIndex;
 
         $this->hide();
+    }
+
+    /**
+     * @event convertButton.action
+     */
+    public function actionConvert()
+    {
+        if ($this->list->items->count == 0) {
+            UXDialog::show('Нет действий для конвертирования в php код');
+            return;
+        }
+
+        $buttons = ['Конвертировать, удалив действия', 'Конвертировать, сохранив действия', 'Отмена'];
+
+        $dialog = new MessageBoxForm('Каким образом сконвертировать действия в php код?', $buttons);
+
+        if ($dialog->showDialog()) {
+            switch ($dialog->getResultIndex()) {
+                case 0:
+                    $this->editor->removeMethod($this->class, $this->method);
+                    // ! do not break !
+
+                case 1:
+                    $script = new ActionScript();
+
+                    $imports = $script->getImports(Items::toArray($this->list->items));
+
+                    $code = $script->compileActions(
+                        $this->class,
+                        $this->method,
+                        Items::toArray($this->list->items),
+                        'Сгенерированный код',
+                        '------------------'
+                    );
+
+                    $formEditor = $this->editor->getFormEditor();
+
+                    if (!$formEditor) {
+                        throw new IllegalStateException();
+                    }
+
+                    // TODO FIX!
+                    if ($formEditor->getDefaultEventEditor(false) == 'php') {
+                        $formEditor->switchToSmallSource();
+                    }
+
+                    $formEditor->addUseImports($imports);
+                    $formEditor->insertCodeToMethod($this->class, $this->method, $code);
+
+                    $this->actionSave();
+                    $this->hide();
+
+                    Timer::run(500, function () use ($formEditor) {
+                        $formEditor->jumpToClassMethod($this->class, $this->method);
+                    });
+
+                    break;
+            }
+        }
+    }
+
+    public function actionPaste()
+    {
+        $xmlProcessor = (new XmlProcessor());
+
+        try {
+            $xml = $xmlProcessor->parse(UXClipboard::getText());
+
+            $actions = [];
+            foreach ($xml->findAll("/actionCopies/*") as $domAction) {
+                if ($action = $this->editor->getManager()->buildAction($domAction)) {
+                    $actions[] = $action;
+                }
+            }
+
+            if ($this->list->selectedIndexes) {
+                $index = $this->list->selectedIndex;
+                $selectedIndexes = Flow::ofRange($index, $index + sizeof($actions))->toArray();
+
+                foreach (Items::reverse($actions) as $action) {
+                    $this->list->items->insert($index, $action);
+                }
+            } else {
+                $selectedIndexes = Flow::ofRange($this->list->items->count, $this->list->items->count + sizeof($actions))->toArray();
+                $this->list->items->addAll($actions);
+            }
+
+            $this->updateList();
+            $this->list->update();
+
+            $this->editor->updateMethod($this->class, $this->method, Items::toArray($this->list->items));
+
+            $this->list->selectedIndex = $selectedIndexes;
+        } catch (ProcessorException $e) {
+            ;
+        }
+    }
+
+    public function actionCopy()
+    {
+        $indexes = $this->list->selectedIndexes;
+
+        if ($indexes) {
+            $xmlProcessor = (new XmlProcessor());
+
+            $document = $xmlProcessor->createDocument();
+
+            $document->appendChild($root = $document->createElement('actionCopies'));
+
+
+            foreach ($indexes as $index) {
+                /** @var Action $action */
+                $action = $this->list->items[$index];
+
+                $element = $document->createElement($action->getType()->getTagName(), [
+                    'ideName' => Ide::get()->getName(),
+                    'ideVersion' => Ide::get()->getVersion(),
+                    'ideNamespace' => Ide::get()->getNamespace(),
+                ]);
+
+                $action->getType()->serialize($action, $element, $document);
+
+                $root->appendChild($element);
+            }
+
+            UXClipboard::setText($xmlProcessor->format($document));
+        }
     }
 }

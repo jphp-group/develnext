@@ -117,6 +117,16 @@ abstract class AbstractForm extends UXForm
         $this->hide();
     }
 
+    public function getContextForm()
+    {
+        return $this;
+    }
+
+    public function getContextFormName()
+    {
+        return $this->getName();
+    }
+
     protected function init()
     {
         // nop.

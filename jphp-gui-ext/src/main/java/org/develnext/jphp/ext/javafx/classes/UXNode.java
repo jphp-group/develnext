@@ -14,13 +14,18 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TitledPane;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.StyleManager;
+import org.develnext.jphp.ext.javafx.support.UserData;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -36,6 +41,7 @@ import php.runtime.reflection.ClassEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 
 @Abstract
@@ -79,7 +85,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
         @Property("classes") ObservableList<String> styleClass();
 
-        @Property(hiddenInDebugInfo = true) @Nullable Object userData();
+        //@Property(hiddenInDebugInfo = true) @Nullable Object userData();
 
         void autosize();
         boolean contains(double localX, double localY);
@@ -127,6 +133,32 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
                     .newInstance(getEnvironment(), getWrappedObject());
         } else {
             return this;
+        }
+    }
+
+    @Getter
+    public Memory getUserData(Environment env) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData == null) {
+            return null;
+        }
+
+        if (userData instanceof UserData) {
+            return ((UserData) userData).getValue();
+        }
+
+        return Memory.wrap(env, userData);
+    }
+
+    @Setter
+    public void setUserData(Environment env, @Nullable Object value) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData instanceof UserData) {
+            ((UserData) userData).setValue(Memory.wrap(env, value));
+        } else {
+            getWrappedObject().setUserData(value);
         }
     }
 
@@ -311,6 +343,28 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Signature
+    public Memory data(String name) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData instanceof UserData) {
+            return ((UserData) userData).get(name);
+        }
+
+        return Memory.NULL;
+    }
+
+    @Signature
+    public Memory data(Environment env, String name, Memory value) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (!(userData instanceof UserData)) {
+            getWrappedObject().setUserData(userData = new UserData(Memory.wrap(env, userData)));
+        }
+
+        return ((UserData) userData).set(name, value);
+    }
+
+    @Signature
     public double[] screenToLocal(double x, double y) {
         Point2D pt = getWrappedObject().screenToLocal(x, y);
 
@@ -390,6 +444,23 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         }
 
         return null;
+    }
+
+    @Signature
+    public UXImage snapshot(Environment env) {
+        SnapshotParameters snapParams = new SnapshotParameters();
+        snapParams.setFill(Color.TRANSPARENT);
+
+        WritableImage snapshot = getWrappedObject().snapshot(snapParams, null);
+
+        return snapshot == null ? null : new UXImage(env, snapshot);
+    }
+
+    @Signature
+    public UXDragboard startDrag(Environment env, List<TransferMode> modes) {
+        Dragboard dragboard = getWrappedObject().startDragAndDrop(modes.toArray(new TransferMode[0]));
+
+        return dragboard == null ? null : new UXDragboard(env, dragboard);
     }
 
     @Signature

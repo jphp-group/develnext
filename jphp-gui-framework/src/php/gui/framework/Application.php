@@ -109,10 +109,6 @@ class Application
     {
         static $forms = [];
 
-        if ($this->mainForm && $name == $this->mainForm) {
-            return $this->mainForm;
-        }
-
         if ($form = $forms[$name]) {
             return $form;
         }
@@ -207,9 +203,9 @@ class Application
 
     public function setMainFormClass($class)
     {
-        if ($this->getNamespace()) {
+        /*if ($this->getNamespace()) {    TODO Remove It
             $class = $this->getNamespace() . '\\forms\\' . $class;
-        }
+        }  */
 
         $this->mainFormClass = $class;
     }
@@ -277,9 +273,9 @@ class Application
         $mainFormClass = $this->mainFormClass;
         $showMainForm  = $this->config->getBoolean('app.showMainForm');
 
-        if (!class_exists($mainFormClass)) {
+        /*if (!class_exists($mainFormClass)) {    TODO Remove it
             throw new Exception("Unable to start the application without the main form class or the class '$mainFormClass' not found");
-        }
+        }*/
 
         UXApplication::launch(function(UXForm $mainForm) use ($mainFormClass, $showMainForm, $handler, $after) {
             static::$instance = $this;
@@ -312,9 +308,9 @@ class Application
                 $handler();
             }
 
-            $this->mainForm = new $mainFormClass($mainForm);
+            $this->mainForm = $this->getForm($mainFormClass, $mainForm);
 
-            if ($showMainForm) {
+            if ($showMainForm && $this->mainForm) {
                 $this->mainForm->show();
             }
 

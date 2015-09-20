@@ -152,6 +152,10 @@ class FileSystem
         if (!$editor) {
             $editor = self::fetchEditor($path);
 
+            if (!$editor) {
+                return null;
+            }
+
             $info['file'] = $path;
             $info['mtime'] = File::of($path)->lastModified();
         }

@@ -1,6 +1,7 @@
 <?php
 namespace php\gui\event;
 
+use php\gui\UXDragboard;
 use php\gui\UXNode;
 
 /**
@@ -77,4 +78,13 @@ class UXDragEvent extends UXEvent
      * @var mixed|UXNode
      */
     public $gestureTarget;
+
+    /**
+     * @var UXDragboard
+     */
+    public $dragboard;
+
+    public function acceptTransferModes(array $modes)
+    {
+    }
 }

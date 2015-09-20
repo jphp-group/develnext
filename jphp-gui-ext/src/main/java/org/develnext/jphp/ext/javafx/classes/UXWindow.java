@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
+import org.develnext.jphp.ext.javafx.support.UserData;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -36,8 +37,6 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
 
         @Property boolean focused();
         @Property("visible") boolean showing();
-
-        @Property @Nullable Object userData();
 
         void hide();
         void sizeToScene();
@@ -68,6 +67,32 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     @Signature
     public void __construct(Stage stage) {
         __wrappedObject = stage;
+    }
+
+    @Getter
+    public Memory getUserData(Environment env) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData == null) {
+            return null;
+        }
+
+        if (userData instanceof UserData) {
+            return ((UserData) userData).getValue();
+        }
+
+        return Memory.wrap(env, userData);
+    }
+
+    @Setter
+    public void setUserData(Environment env, @Nullable Object value) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData instanceof UserData) {
+            ((UserData) userData).setValue(Memory.wrap(env, value));
+        } else {
+            getWrappedObject().setUserData(value);
+        }
     }
 
     @Getter

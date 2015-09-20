@@ -1,0 +1,6 @@
+<element extends="ShapeFormElement">
+    <properties>
+        <property code="arcWidth" name="Закругление W" editor="float" />
+        <property code="arcHeight" name="Закругление H" editor="float" />
+    </properties>
+</element>

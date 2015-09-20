@@ -13,10 +13,13 @@ abstract class AbstractSimpleActionType extends AbstractActionType
     const GROUP_APP = 'Система';
     const GROUP_UI = 'Интерфейс';
     const GROUP_CONDITIONS = 'Условия';
+    const GROUP_SCRIPT = 'Скрипт';
 
     const SUB_GROUP_WINDOW = 'Форма';
     const SUB_GROUP_COMPONENT = 'Объект';
     const SUB_GROUP_COMMON = 'Главное';
+    const SUB_GROUP_DECOR = 'Декорация';
+    const SUB_GROUP_ANIMATION = 'Анимация';
 
     /**
      * @return array
@@ -27,6 +30,11 @@ abstract class AbstractSimpleActionType extends AbstractActionType
     }
 
     function attributeLabels()
+    {
+        return [];
+    }
+
+    function  attributeSettings()
     {
         return [];
     }
@@ -55,6 +63,8 @@ abstract class AbstractSimpleActionType extends AbstractActionType
             case 'object':
                 if ($value == '~sender') {
                     $result = "\$event->sender";
+                } else if ($value == '~senderForm') {
+                    $result = "\$this->getContextForm()";
                 } else {
                     $result = $value ? "\$this->$value" : "\$this";
                 }
@@ -69,7 +79,7 @@ abstract class AbstractSimpleActionType extends AbstractActionType
 
             case 'form':
                 if ($value == '~sender') {
-                    return "\$event->sender->form";
+                    return "\$this->getContextFormName()";
                 }
 
                 return "'$value'";
@@ -138,9 +148,10 @@ abstract class AbstractSimpleActionType extends AbstractActionType
     /**
      * @param Action $action
      * @param $userData
+     * @param bool $asNew
      * @return bool
      */
-    function showDialog(Action $action, $userData = null)
+    function showDialog(Action $action, $userData = null, $asNew = false)
     {
         if (!$this->attributes()) {
             return true;
@@ -148,7 +159,7 @@ abstract class AbstractSimpleActionType extends AbstractActionType
 
         $dialog = new ActionArgumentsDialog();
         $dialog->userData = $userData;
-        $dialog->setAction($action);
+        $dialog->setAction($action, $asNew);
 
         if ($dialog->showDialog()) {
             $result = $dialog->getResult();

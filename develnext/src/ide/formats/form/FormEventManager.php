@@ -78,6 +78,17 @@ class FormEventManager
     }
 
     /**
+     * @param $class
+     * @param $method
+     * @return array|null
+     */
+    public function findMethod($class, $method)
+    {
+        $parser = new PhpParser($this->loadContent());
+        return $parser->findMethod($class, $method);
+    }
+
+    /**
      * @param string $id
      * @param $event
      *
@@ -178,6 +189,25 @@ class FormEventManager
         });
 
         $this->save($parser->getContent());
+    }
+
+    public function insertCodeToMethod($class, $method, $code)
+    {
+        $parser = new PhpParser($this->loadContent());
+
+        if ($parser->insertToMethod($class, $method, $code)) {
+            $this->save($parser->getContent());
+        }
+    }
+
+    public function addUseImports(array $imports)
+    {
+        if ($imports) {
+            $parser = new PhpParser($this->loadContent());
+            $parser->addUseImports($imports);
+
+            $this->save($parser->getContent());
+        }
     }
 
     /**

@@ -115,6 +115,80 @@ public class NodeEventProvider extends EventProvider<Node> {
             }
         });
 
+        // Drag Events
+
+        setHandler("dragDetect", new Handler() {
+            @Override
+            public void set(Node target, EventHandler eventHandler) {
+                target.setOnDragDetected(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Node target) {
+                return target.getOnDragDetected();
+            }
+        });
+
+        setHandler("dragOver", new Handler() {
+            @Override
+            public void set(Node target, EventHandler eventHandler) {
+                target.setOnDragOver(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Node target) {
+                return target.getOnDragOver();
+            }
+        });
+
+        setHandler("dragDone", new Handler() {
+            @Override
+            public void set(Node target, EventHandler eventHandler) {
+                target.setOnDragDone(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Node target) {
+                return target.getOnDragDone();
+            }
+        });
+
+        setHandler("dragEnter", new Handler() {
+            @Override
+            public void set(Node target, EventHandler eventHandler) {
+                target.setOnDragEntered(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Node target) {
+                return target.getOnDragEntered();
+            }
+        });
+
+        setHandler("dragExit", new Handler() {
+            @Override
+            public void set(Node target, EventHandler eventHandler) {
+                target.setOnDragExited(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Node target) {
+                return target.getOnDragExited();
+            }
+        });
+
+        setHandler("dragDrop", new Handler() {
+            @Override
+            public void set(Node target, EventHandler eventHandler) {
+                target.setOnDragDropped(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Node target) {
+                return target.getOnDragDropped();
+            }
+        });
+
         // Scroll Events
 
         setHandler("scroll", new Handler() {

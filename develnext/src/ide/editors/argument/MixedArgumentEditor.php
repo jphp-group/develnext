@@ -63,6 +63,9 @@ class MixedArgumentEditor extends AbstractArgumentEditor
     public function makeUi($label = null)
     {
         $this->formListEditor = new FormListEditor();
+        $this->formListEditor->enableSender();
+        $this->formListEditor->build();
+
         $this->formListEditor->getUi()->maxWidth = 9999;
         $this->formListEditor->onChange(function ($value) {
             $this->input->text = $value;

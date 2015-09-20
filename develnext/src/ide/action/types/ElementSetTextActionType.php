@@ -4,6 +4,7 @@ namespace ide\action\types;
 use action\Element;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
+use ide\action\ActionScript;
 use php\lib\Str;
 
 class ElementSetTextActionType extends AbstractSimpleActionType
@@ -23,6 +24,13 @@ class ElementSetTextActionType extends AbstractSimpleActionType
             'object' => 'Объект',
             'value'  => 'Текст',
             'relative' => 'Прибавить к существующему тексту'
+        ];
+    }
+
+    function  attributeSettings()
+    {
+        return [
+            'object' => ['def' => '~sender'],
         ];
     }
 
@@ -81,9 +89,10 @@ class ElementSetTextActionType extends AbstractSimpleActionType
 
     /**
      * @param Action $action
+     * @param ActionScript $actionScript
      * @return string
      */
-    function convertToCode(Action $action)
+    function convertToCode(Action $action, ActionScript $actionScript)
     {
         $object = $action->get('object');
         $value = $action->get('value');

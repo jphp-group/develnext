@@ -34,6 +34,9 @@ class MessageBoxForm extends AbstractForm
     /** @var array */
     protected $buttons = [];
 
+    /** @var int */
+    protected $indexResult = -1;
+
     /**
      * @param string $text
      * @param array $buttons
@@ -62,10 +65,19 @@ class MessageBoxForm extends AbstractForm
     }
 
     /**
+     * @return int
+     */
+    public function getResultIndex()
+    {
+        return $this->indexResult;
+    }
+
+    /**
      * @event show
      */
     public function doOpen()
     {
+        $this->indexResult = -1;
         $this->icon->image = Ide::get()->getImage('icons/question32.png')->image;
 
         $this->iconified = false;
@@ -83,14 +95,15 @@ class MessageBoxForm extends AbstractForm
             $ui->minWidth = 100;
             $ui->maxHeight = 10000;
 
+            $ui->on('action', function() use ($value, $i) {
+                $this->setResult($value);
+                $this->indexResult = $i;
+                $this->hide();
+            });
+
             if ($i++ == 0) {
                 $ui->style = '-fx-font-weight: bold';
             }
-
-            $ui->on('action', function() use ($value) {
-                $this->setResult($value);
-                $this->hide();
-            });
 
             $this->buttonBox->add($ui);
         }

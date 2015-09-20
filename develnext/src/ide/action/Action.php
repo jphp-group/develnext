@@ -23,12 +23,18 @@ class Action
         $this->type = $type;
     }
 
-    /**
-     * @return string
-     **/
-    public function convertToCode()
+    public function fillDefaults()
     {
-        return $this->type->convertToCode($this);
+        $type = $this->getType();
+
+        if ($type instanceof AbstractSimpleActionType) {
+            foreach ($type->attributeSettings() as $code => $settings) {
+                if ($settings['def']) {
+                    $this->{$code} = $settings['def'];
+                    $this->{"$code-type"} = $type->attributes()[$code];
+                }
+            }
+        }
     }
 
     public function imports()

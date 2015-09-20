@@ -40,7 +40,7 @@ class FontPropertyEditorForm extends AbstractForm
             $this->fontSizeCombobox->items->add($size);
         }
 
-        $this->fontCombobox->onCellRender(function ($self, UXListCell $cell, $value) {
+        $this->fontCombobox->onCellRender(function (UXListCell $cell, $value) {
             $cell->font = UXFont::of($value, $cell->font->size);
             $cell->text = $value;
         });
