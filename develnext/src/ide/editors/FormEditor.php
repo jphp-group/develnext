@@ -691,7 +691,7 @@ class FormEditor extends AbstractModuleEditor
 
         $viewer->on('click', function ($e) {
             $this->designer->unselectAll();
-            $this->_onAreaMouseDown($e);
+            $this->_onAreaMouseUp($e);
         });
 
         if (!$fullArea) {
@@ -708,7 +708,7 @@ class FormEditor extends AbstractModuleEditor
         }
 
         $this->designer = new UXDesigner($this->layout);
-        $this->designer->onAreaMouseDown(function ($e) { $this->_onAreaMouseDown($e); } );
+        $this->designer->onAreaMouseUp(function ($e) { $this->_onAreaMouseUp($e); } );
         $this->designer->onNodeClick([$this, '_onNodeClick']);
         $this->designer->onNodePick(function () {
             $this->_onNodePick();
@@ -795,6 +795,14 @@ class FormEditor extends AbstractModuleEditor
         }
 
         $size = $element->getDefaultSize();
+
+        $selectionRectangle = $this->designer->getSelectionRectangle();
+
+        if ($parent == null && $selectionRectangle->width >= 8 && $selectionRectangle->height >= 8) {
+            $size = $selectionRectangle->size;
+            $selectionRectangle->size = [1, 1];
+        }
+
         $position = [$screenX, $screenY];
 
         $snapSize = $this->designer->snapSize;
@@ -839,14 +847,16 @@ class FormEditor extends AbstractModuleEditor
         return $node;
     }
 
-    protected function _onAreaMouseDown(UXMouseEvent $e)
+    protected function _onAreaMouseUp(UXMouseEvent $e)
     {
         $selected = $this->elementTypePane->getSelected();
 
         $this->save();
 
         if ($selected) {
-            $node = $this->createElement($selected, $e->screenX, $e->screenY);
+            $selectionRectangle = $this->designer->getSelectionRectangle();
+
+            $node = $this->createElement($selected, $selectionRectangle->x, $selectionRectangle->y);
 
             if (!$e->controlDown) {
                 $this->elementTypePane->clearSelected();
@@ -907,8 +917,8 @@ class FormEditor extends AbstractModuleEditor
         if ($selected) {
             $element = $this->format->getFormElement($e->sender);
 
-            if ($element && $element->isLayout()) {
-                $node = $this->createElement($selected, $e->screenX, $e->screenY, $e->sender);
+            if ($element) {
+                $node = $this->createElement($selected, $e->screenX, $e->screenY, $element->isLayout() ? $e->sender : null);
 
                 if (!$e->controlDown) {
                     $this->elementTypePane->clearSelected();

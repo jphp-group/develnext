@@ -112,6 +112,30 @@ abstract class AbstractForm extends UXForm
         }
     }
 
+    public function loadForm($form, $saveSize = false, $savePosition = false)
+    {
+        $form = $this->_app->getForm($form);
+
+        if ($form) {
+            if ($saveSize) {
+                UXApplication::runLater(function () use ($form) {
+                    $form->size = $this->size;
+                    $form->centerOnScreen();
+                });
+            }
+
+            if ($savePosition) {
+                UXApplication::runLater(function () use ($form) {
+                    $form->x = $this->x;
+                    $form->y = $this->y;
+                });
+            }
+
+            $form->show();
+            $this->free();
+        }
+    }
+
     public function free()
     {
         $this->hide();

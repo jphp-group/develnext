@@ -14,7 +14,7 @@ class ColorPickerFormElement extends AbstractFormElement
 {
     public function getName()
     {
-        return 'Выбор цвета';
+        return 'Поле для цвета';
     }
 
     public function getIcon()

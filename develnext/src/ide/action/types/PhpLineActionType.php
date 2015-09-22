@@ -44,7 +44,7 @@ class PhpLineActionType extends AbstractSimpleActionType
             return "Строчка кода на php";
         }
 
-        return Str::format("%", $action->get('expr'));
+        return Str::format("%s", $action->get('expr'));
     }
 
     function getIcon(Action $action = null)

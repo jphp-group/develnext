@@ -11,7 +11,7 @@ abstract class AbstractSimpleActionType extends AbstractActionType
 {
     const GROUP_OTHER = 'Другок';
     const GROUP_APP = 'Система';
-    const GROUP_UI = 'Интерфейс';
+    const GROUP_CONTROL = 'Управление';
     const GROUP_CONDITIONS = 'Условия';
     const GROUP_SCRIPT = 'Скрипт';
 

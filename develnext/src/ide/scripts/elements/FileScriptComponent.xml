@@ -1,0 +1,17 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="watch" value="1" />
+        <property code="path" value="example.txt" />
+    </init>
+
+    <properties group="general" title="Главное">
+        <property code="path" name="Имя файла" editor="text" tooltip="Имя или путь к файлу" />
+        <property code="watch" name="Следить" editor="boolean" tooltip="Следить за файлом" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="create" name="Создание файла" kind="ObjectEvent" />
+        <eventType code="update" name="Обновление файла" kind="ObjectEvent" />
+        <eventType code="delete" name="Удаление файла" kind="ObjectEvent" />
+    </eventTypes>
+</element>

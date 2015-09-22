@@ -102,7 +102,7 @@ class ActionArgumentsDialog extends AbstractForm
 
         $layout = new UXVBox($labelUi ? [$labelUi, $ui] : [$ui]);
         $layout->spacing = 5;
-        $layout->padding = $labelUi ? 3 : 13;
+        $layout->padding = $labelUi ? 3 : 10;
 
         $layout->paddingLeft = $layout->paddingRight = 10;
         $layout->fillWidth = true;

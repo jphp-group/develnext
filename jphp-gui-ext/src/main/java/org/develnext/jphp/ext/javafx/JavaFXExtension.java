@@ -142,6 +142,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, FileChooser.class, UXFileChooser.class);
         registerWrapperClass(scope, DirectoryChooser.class, UXDirectoryChooser.class);
         registerWrapperClass(scope, Slider.class, UXSlider.class);
+        registerWrapperClass(scope, DatePicker.class, UXDatePicker.class);
 
         registerWrapperClass(scope, Cell.class, UXCell.class);
         registerWrapperClass(scope, TableView.class, UXTableView.class);

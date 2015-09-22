@@ -1,0 +1,5 @@
+<element extends="ComboBoxBaseFormElement">
+    <properties>
+        <property code="showWeekNumbers" name="Номера недель" editor="boolean" />
+    </properties>
+</element>

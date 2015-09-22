@@ -7,7 +7,7 @@ use ide\action\Action;
 use ide\action\ActionScript;
 use php\lib\Str;
 
-class ElementHideActionType extends AbstractSimpleActionType
+class ElementEnabledOffActionType extends AbstractSimpleActionType
 {
     function attributes()
     {
@@ -42,22 +42,22 @@ class ElementHideActionType extends AbstractSimpleActionType
 
     function getTagName()
     {
-        return 'elementHide';
+        return 'elementEnabledOff';
     }
 
     function getTitle(Action $action = null)
     {
-        return 'Скрыть';
+        return 'Сделать недоступным';
     }
 
     function getDescription(Action $action = null)
     {
-        return Str::format("Скрыть объект %s", $action ? $action->get('object') : '');
+        return Str::format("Сделать объект %s недоступным", $action ? $action->get('object') : '');
     }
 
     function getIcon(Action $action = null)
     {
-        return 'icons/eyeMinus16.png';
+        return 'icons/enabledOff16.png';
     }
 
     /**
@@ -69,6 +69,6 @@ class ElementHideActionType extends AbstractSimpleActionType
     {
         $object = $action->get('object');
 
-        return "{$object}->hide()";
+        return "{$object}->enabled = false";
     }
 }

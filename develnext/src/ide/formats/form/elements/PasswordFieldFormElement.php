@@ -18,7 +18,7 @@ class PasswordFieldFormElement extends AbstractFormElement
      */
     public function getName()
     {
-        return 'Поле пароля';
+        return 'Поле для пароля';
     }
 
     public function getIcon()

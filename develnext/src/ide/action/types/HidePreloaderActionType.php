@@ -24,7 +24,7 @@ class HidePreloaderActionType extends AbstractSimpleActionType
 
     function getGroup()
     {
-        return self::GROUP_UI;
+        return self::GROUP_CONTROL;
     }
 
     function getSubGroup()

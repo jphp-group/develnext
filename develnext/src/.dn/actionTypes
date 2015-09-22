@@ -1,3 +1,4 @@
+ide\action\types\LoadFormActionType
 ide\action\types\ShowFormActionType
 ide\action\types\ShowFormAndWaitActionType
 ide\action\types\ShowNewFormActionType
@@ -13,6 +14,9 @@ ide\action\types\ElementLoadContentActionType
 ide\action\types\ElementShowActionType
 ide\action\types\ElementHideActionType
 ide\action\types\ElementToggleActionType
+ide\action\types\ElementEnabledOnActionType
+ide\action\types\ElementEnabledOffActionType
+ide\action\types\ElementEnabledSwitchActionType
 ide\action\types\ElementFocusActionType
 ide\action\types\ElementSetXActionType
 ide\action\types\ElementSetYActionType

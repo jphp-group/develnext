@@ -1,6 +1,7 @@
 <?php
 namespace action;
 
+use behaviour\SetTextBehaviour;
 use behaviour\StreamLoadableBehaviour;
 use php\gui\UXApplication;
 use php\gui\UXComboBox;
@@ -25,6 +26,11 @@ class Element
 {
     static function setText($object, $value)
     {
+        if ($object instanceof SetTextBehaviour) {
+            $object->setTextBehaviour($value);
+            return true;
+        }
+
         if ($object instanceof UXLabeled || $object instanceof UXTextInputControl) {
             $object->text = $value;
             return true;
@@ -45,6 +51,11 @@ class Element
 
     static function appendText($object, $value)
     {
+        if ($object instanceof SetTextBehaviour) {
+            $object->appendTextBehaviour($value);
+            return true;
+        }
+
         if ($object instanceof UXLabeled || $object instanceof UXTextInputControl) {
             $object->text .= $value;
             return true;

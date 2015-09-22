@@ -295,7 +295,7 @@ class ScriptModuleEditor extends FormEditor
         return $forms;
     }
 
-    protected function _onAreaMouseDown(UXMouseEvent $e)
+    protected function _onAreaMouseUp(UXMouseEvent $e)
     {
         $selected = $this->elementTypePane->getSelected();
 

@@ -9,7 +9,7 @@ import php.runtime.reflection.ClassEntity;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXComboBoxBase")
-public class UXComboBoxBase extends UXControl {
+public class UXComboBoxBase<T extends ComboBoxBase> extends UXControl<ComboBoxBase> {
     interface WrappedInterface {
         @Property boolean armed();
         @Property boolean editable();
@@ -22,7 +22,7 @@ public class UXComboBoxBase extends UXControl {
         void hide();
     }
 
-    public UXComboBoxBase(Environment env, ComboBoxBase wrappedObject) {
+    public UXComboBoxBase(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -37,8 +37,8 @@ public class UXComboBoxBase extends UXControl {
 
     @Override
     @SuppressWarnings("unchecked")
-    public ComboBoxBase getWrappedObject() {
-        return (ComboBoxBase) super.getWrappedObject();
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 
     @Getter

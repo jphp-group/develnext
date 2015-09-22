@@ -18,6 +18,7 @@ use ide\formats\form\elements\CheckboxFormElement;
 use ide\formats\form\elements\CircleFormElement;
 use ide\formats\form\elements\ColorPickerFormElement;
 use ide\formats\form\elements\ComboBoxFormElement;
+use ide\formats\form\elements\DatePickerFormElement;
 use ide\formats\form\elements\EllipseFormElement;
 use ide\formats\form\elements\FormFormElement;
 use ide\formats\form\elements\HBoxFormElement;
@@ -46,6 +47,7 @@ use ide\formats\form\tags\ColorPickerFormElementTag;
 use ide\formats\form\tags\ComboBoxBaseFormElementTag;
 use ide\formats\form\tags\ComboBoxFormElementTag;
 use ide\formats\form\tags\DataFormElementTag;
+use ide\formats\form\tags\DatePickerFormElementTag;
 use ide\formats\form\tags\EllipseFormElementTag;
 use ide\formats\form\tags\HyperlinkFormElementTag;
 use ide\formats\form\tags\ImageViewFormElementTag;
@@ -84,6 +86,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new HyperlinkFormElement());
         $this->register(new TextFieldFormElement());
         $this->register(new PasswordFieldFormElement());
+        $this->register(new DatePickerFormElement());
         $this->register(new TextAreaFormElement());
         $this->register(new CheckboxFormElement());
         $this->register(new ComboBoxFormElement());
@@ -91,8 +94,8 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new ImageViewFormElement());
         $this->register(new ProgressBarFormElement());
         $this->register(new SliderFormElement());
-        $this->register(new ProgressIndicatorFormElement());
         $this->register(new ColorPickerFormElement());
+        $this->register(new ProgressIndicatorFormElement());
         $this->register(new SeparatorFormElement());
 
         $this->register(new TitledPaneFormElement());
@@ -128,6 +131,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new ColorPickerFormElementTag());
         $this->register(new SliderFormElementTag());
         $this->register(new ImageViewFormElementTag());
+        $this->register(new DatePickerFormElementTag());
 
         $this->register(new TitledPaneFormElementTag());
         //$this->register(new TabPaneFormElementTag());
