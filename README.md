@@ -18,7 +18,7 @@ Install JDK, close repo and use the following console commands:
 ```
 cd /path/to/repo
 
-./gradlew distIde -Drelease=true
+./gradlew distIde
 ```
 
 You can find the builded distrubutive in `develnext/build/install/develnext`.
@@ -55,7 +55,7 @@ Under MPL 2.0 (https://www.mozilla.org/MPL/2.0/)
 ```
 cd /path/to/repo
 
-./gradlew distIde -Drelease=true
+./gradlew distIde
 ```
 
 Найти собранный дистрибутив можно будет в папке `develnext/build/install/develnext`.
