@@ -21,11 +21,11 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Label layoutX="22.0" layoutY="443.0" prefHeight="24.0" prefWidth="559.0" text="Папка проектов:" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="33.0" />
+      <Label layoutX="22.0" layoutY="443.0" prefHeight="24.0" prefWidth="559.0" text="Папка избранных проектов:" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="33.0" />
       <TextField id="pathField" disable="true" editable="false" layoutX="54.0" layoutY="467.0" prefHeight="25.0" prefWidth="533.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="27.0" />
       <ListView id="projectList" layoutX="32.0" layoutY="137.0" prefHeight="292.0" prefWidth="550.0" AnchorPane.bottomAnchor="84.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="137.0" />
-      <Label layoutX="32.0" layoutY="113.0" prefHeight="24.0" prefWidth="550.0" text="Проекты:" />
-      <Label layoutX="122.0" layoutY="79.0" prefHeight="24.0" prefWidth="459.0" text="Выбрать файл проекта и открыть" AnchorPane.leftAnchor="122.0" AnchorPane.rightAnchor="33.0" />
-      <Button id="openButton" layoutX="33.0" layoutY="78.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Обзор ..." />
+      <Label layoutX="32.0" layoutY="113.0" prefHeight="24.0" prefWidth="550.0" text="Избранные проекты:" />
+      <Label layoutX="171.0" layoutY="79.0" prefHeight="24.0" prefWidth="410.0" text="Выбрать файл или архив с проектоми и открыть" textFill="#6f6f6f" AnchorPane.leftAnchor="171.0" AnchorPane.rightAnchor="33.0" />
+      <Button id="openButton" layoutX="33.0" layoutY="78.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="128.0" text="Открыть другой ..." />
    </children>
 </AnchorPane>

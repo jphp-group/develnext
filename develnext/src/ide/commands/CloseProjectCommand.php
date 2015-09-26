@@ -2,6 +2,7 @@
 namespace ide\commands;
 
 use ide\misc\AbstractCommand;
+use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 
 /**
@@ -18,6 +19,7 @@ class CloseProjectCommand extends AbstractCommand
     public function onExecute()
     {
         ProjectSystem::close();
+        FileSystem::open('~welcome');
     }
 
     public function withBeforeSeparator()

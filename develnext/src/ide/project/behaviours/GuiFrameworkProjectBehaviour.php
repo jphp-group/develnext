@@ -10,6 +10,7 @@ use ide\commands\CreateFormProjectCommand;
 use ide\commands\CreateScriptModuleProjectCommand;
 use ide\commands\ExecuteProjectCommand;
 use ide\editors\FormEditor;
+use ide\editors\ScriptModuleEditor;
 use ide\formats\ScriptFormat;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
 use ide\formats\templates\GuiBootstrapFileTemplate;
@@ -18,7 +19,9 @@ use ide\formats\templates\PhpClassFileTemplate;
 use ide\Ide;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\Project;
+use ide\project\ProjectExporter;
 use ide\project\ProjectFile;
+use ide\project\ProjectIndexer;
 use ide\project\ProjectTree;
 use ide\project\ProjectTreeItem;
 use ide\scripts\elements\TimerScriptComponent;
@@ -68,6 +71,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('updateTree', [$this, 'doUpdateTree']);
         $this->project->on('compile', [$this, 'doCompile']);
+        $this->project->on('export', [$this, 'doExport']);
+        $this->project->on('reindex', [$this, 'doReindex']);
 
         WatcherSystem::addListener([$this, 'doWatchFile']);
 
@@ -94,6 +99,23 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     {
         $mainForm = $this->createForm($this->mainForm);
         FileSystem::open($mainForm);
+    }
+
+    public function doReindex(ProjectIndexer $indexer)
+    {
+        foreach ($this->getFormEditors() as $editor) {
+            $editor->reindex();
+        }
+
+        foreach ($this->getModuleEditors() as $editor) {
+            $editor->reindex();
+        }
+    }
+
+    public function doExport(ProjectExporter $exporter)
+    {
+        $exporter->addDirectory($this->project->getFile('src/'));
+        $exporter->removeFile($this->project->getFile('src/.debug'));
     }
 
     public function doCompile($environment, callable $log = null) {
@@ -210,7 +232,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree->addIgnoreRule('^src\\/\\.scripts\\/.*\\.json');
 
         $projectTreeItem = $tree->getOrCreateItem(
-            'scripts', 'Модули (скрипты)', 'icons/brickFolder16.png', $this->project->getFile(self::SCRIPTS_DIRECTORY)
+            'scripts', 'Модули', 'icons/brickFolder16.png', $this->project->getFile(self::SCRIPTS_DIRECTORY)
         );
         $projectTreeItem->setExpanded(true);
         $projectTreeItem->setDisableDelete(true);
@@ -364,6 +386,20 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         return $file;
+    }
+
+    /**
+     * @return ScriptModuleEditor[]
+     */
+    public function getModuleEditors()
+    {
+        $editors = [];
+        foreach ($this->getScriptModules() as $file) {
+            $editor = FileSystem::fetchEditor($this->project->getFile(self::SCRIPTS_DIRECTORY . '/' . $file));
+            $editors[FileUtils::hashName($file)] = $editor;
+        }
+
+        return $editors;
     }
 
     /**

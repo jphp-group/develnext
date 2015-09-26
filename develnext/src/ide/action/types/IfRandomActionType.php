@@ -25,6 +25,14 @@ class IfRandomActionType extends AbstractSimpleActionType
         ];
     }
 
+    function  attributeSettings()
+    {
+        return [
+            'max' => ['def' => 2]
+        ];
+    }
+
+
     function isAppendSingleLevel()
     {
         return true;
@@ -33,6 +41,11 @@ class IfRandomActionType extends AbstractSimpleActionType
     function getGroup()
     {
         return self::GROUP_CONDITIONS;
+    }
+
+    function getSubGroup()
+    {
+        return self::SUB_GROUP_ADDITIONAL;
     }
 
     function getTagName()

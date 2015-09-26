@@ -245,7 +245,7 @@ class ProjectConfig
 
         foreach ($files as $file) {
             $domFile = $this->document->createElement('file');
-            $domFile->setAttribute('src', $file);
+            $domFile->setAttribute('src', $file instanceof ProjectFile ? $file->getRelativePath() : $file);
 
             if (FileUtils::hashName($selectedFile) == FileUtils::hashName($file)) {
                 $domFile->setAttribute('selected', '1');

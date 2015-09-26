@@ -313,19 +313,25 @@ class FormElementConfig
                     }
 
                     if ($editor) {
+                        $realCode = $property->getAttribute('realCode');
+
                         if ($property->getAttribute('virtual')) {
-                            $editor->setAsDataProperty();
+                            $editor->setAsDataProperty($realCode);
                         }
 
                         if ($property->getAttribute('css')) {
-                            $editor->setAsCssProperty();
+                            $editor->setAsCssProperty($realCode);
                         }
 
                         if ($property->getAttribute('formConfig')) {
-                            $editor->setAsFormConfigProperty($property->getAttribute('defaultValue'));
+                            $editor->setAsFormConfigProperty($property->getAttribute('defaultValue'), $realCode);
                         }
 
-                        $tooltip = "[ ->$code ]";
+                        if ($realCode) {
+                            $tooltip = "[ ->$realCode ]";
+                        } else {
+                            $tooltip = "[ ->$code ]";
+                        }
 
                         if ($property->getAttribute('tooltip')) {
                             $tooltip .= " {$property->getAttribute('tooltip')}";

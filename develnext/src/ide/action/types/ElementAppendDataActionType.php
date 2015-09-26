@@ -28,7 +28,7 @@ class ElementAppendDataActionType extends AbstractSimpleActionType
         ];
     }
 
-    function  attributeSettings()
+    function attributeSettings()
     {
         return [
             'object' => ['def' => '~sender']
@@ -38,6 +38,11 @@ class ElementAppendDataActionType extends AbstractSimpleActionType
     function getGroup()
     {
         return self::GROUP_SCRIPT;
+    }
+
+    function getSubGroup()
+    {
+        return self::SUB_GROUP_DATA;
     }
 
     function getTagName()
@@ -63,7 +68,7 @@ class ElementAppendDataActionType extends AbstractSimpleActionType
 
     function getIcon(Action $action = null)
     {
-        return "icons/databaseAdd16.png";
+        return "icons/databaseGo16.png";
     }
 
     /**

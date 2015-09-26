@@ -5,6 +5,7 @@ use Dialog;
 use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\forms\FontPropertyEditorForm;
+use ide\forms\TextPropertyEditorForm;
 use ide\systems\FileSystem;
 use php\gui\event\UXMouseEvent;
 use php\gui\text\UXFont;
@@ -24,7 +25,6 @@ class IdPropertyEditor extends TextPropertyEditor
         $this->textField->style = '-fx-background-color: silver; -fx-border-width: 0; -fx-border-radius: 0;
                                     -fx-font-style: italic; -fx-font-weight: bold;';
 
-        $this->editorForm->layout->size = [350, 125];
         $this->textField->on('click', function (UXMouseEvent $e) {
             if ($e->clickCount >= 2) {
                 $this->showDialog($e->screenX, $e->screenY);
@@ -37,6 +37,12 @@ class IdPropertyEditor extends TextPropertyEditor
     public function getCode()
     {
         return 'id';
+    }
+
+    public function showDialog($x = null, $y = null)
+    {
+        $this->editorForm->layout->size = [350, 125];
+        parent::showDialog($x, $y);
     }
 
     public function applyValue($value, $updateUi = true)

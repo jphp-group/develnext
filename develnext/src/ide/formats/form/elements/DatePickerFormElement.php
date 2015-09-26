@@ -11,7 +11,9 @@ use ide\editors\value\TextPropertyEditor;
 use ide\formats\form\AbstractFormElement;
 use php\gui\designer\UXDesignProperties;
 use php\gui\designer\UXDesignPropertyEditor;
+use php\gui\framework\DataUtils;
 use php\gui\layout\UXHBox;
+use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXComboBox;
 use php\gui\UXDatePicker;
@@ -48,12 +50,35 @@ class DatePickerFormElement extends AbstractFormElement
     public function createElement()
     {
         $button = new UXDatePicker();
+        $button->format = 'dd.MM.yyyy';
+
+        $button->value = '01.01.2000';
+
         return $button;
     }
 
+    public function registerNode(UXNode $node)
+    {
+        /** @var UXDatePicker $node */
+        $data = DataUtils::get($node);
+        $format = $data->get('format');
+        $value = $data->get('value');
+
+        UXApplication::runLater(function () use ($format, $value, $node) {
+            if ($format) {
+                $node->format = $format;
+            }
+
+            if ($value) {
+                $node->value = $value;
+            }
+        });
+    }
+
+
     public function getDefaultSize()
     {
-        return [150, 20];
+        return [150, 35];
     }
 
     public function isOrigin($any)

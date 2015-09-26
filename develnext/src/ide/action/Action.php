@@ -31,7 +31,12 @@ class Action
             foreach ($type->attributeSettings() as $code => $settings) {
                 if ($settings['def']) {
                     $this->{$code} = $settings['def'];
-                    $this->{"$code-type"} = $type->attributes()[$code];
+
+                    if ($settings['defType']) {
+                        $this->{"$code-type"} = $settings['defType'];
+                    } else {
+                        $this->{"$code-type"} = $type->attributes()[$code];
+                    }
                 }
             }
         }

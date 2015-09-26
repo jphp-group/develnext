@@ -9,6 +9,7 @@ use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\scripts\AbstractScriptComponent;
+use ide\scripts\elements\MacroScriptComponent;
 use ide\scripts\ScriptComponentContainer;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
@@ -55,20 +56,29 @@ class ObjectListEditor
 
     protected $cacheItems = null;
 
+    protected $disableForms;
+
     /**
      * ObjectListEditor constructor.
      * @param AbstractEditor $editor
+     * @param array $filters
      */
-    public function __construct(AbstractEditor $editor = null)
+    public function __construct(AbstractEditor $editor = null, array $filters = [])
     {
         $this->editor = $editor;
-
-        $this->build();
+        $this->filters = $filters;
     }
 
     public function disableDependencies()
     {
         $this->disableDependencies = true;
+
+        return $this;
+    }
+
+    public function disableForms()
+    {
+        $this->disableForms = true;
 
         return $this;
     }
@@ -190,66 +200,69 @@ class ObjectListEditor
         return $this->comboBox;
     }
 
+    public function isFiltered(ObjectListEditorItem $item)
+    {
+        if ($this->filters) {
+            foreach ($this->filters as $filter) {
+                if ($filter($item)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function addItem(ObjectListEditorItem $item)
+    {
+        if ($this->isFiltered($item)) {
+            $this->comboBox->items->add($item);
+        }
+    }
+
     public function updateUi()
     {
         $editor = $this->editor ?: FileSystem::getSelectedEditor();
 
         $this->comboBox->items->clear();
 
-        $cacheKey = __CLASS__ . "_cache_" . $this->senderCode . '_' . (int)$this->enableAllForms;
-
-        $cacheItems = ($editor ? $editor->cacheData[$cacheKey] : null);
-
-        if ($cacheItems) {
-            /** @var ObjectListEditorItem $item */
-            foreach ($this->cacheItems as $item) {
-                $this->comboBox->items->add($item->duplicate());
-            }
-
-            return;
-        }
-
         $undef = new ObjectListEditorItem();
         $undef->text = '...';
         $this->comboBox->items->add($undef);
 
         if ($this->senderCode) {
-            $this->comboBox->items->add(new ObjectListEditorItem('Текущий объект', null, $this->senderCode));
-            $this->comboBox->items->add(new ObjectListEditorItem('Текущая форма', null, $this->senderCode . "Form"));
+            $this->addItem(new ObjectListEditorItem('Текущий объект', null, $this->senderCode));
+
+            if (!$this->disableForms) {
+                $this->addItem(new ObjectListEditorItem('Текущая форма', null, $this->senderCode . "Form"));
+            }
         }
 
         if ($editor instanceof FormEditor) {
-            $this->comboBox->items->add(new ObjectListEditorItem(
-                $editor->getTitle(),
-                Ide::get()->getImage($editor->getIcon()),
-                ''
-            ));
+            if (!$this->disableForms) {
+                $this->addItem(new ObjectListEditorItem(
+                    $editor->getTitle(),
+                    Ide::get()->getImage($editor->getIcon()),
+                    ''
+                ));
 
-            $nodes = $editor->getDesigner()->getNodes();
+                $nodes = $editor->getDesigner()->getNodes();
 
-            foreach ($nodes as $node) {
-                /** @var AbstractFormElement $element */
-                $element = $editor->getFormat()->getFormElement($node);
+                foreach ($nodes as $node) {
+                    /** @var AbstractFormElement $element */
+                    $element = $editor->getFormat()->getFormElement($node);
 
-                $ignore = false;
+                    $item = new ObjectListEditorItem(
+                        $editor->getNodeId($node), Ide::get()->getImage($element->getIcon()), null, 1
+                    );
 
-                foreach ($this->filters as $filter) {
-                    if ($filter($element, $element->getTarget($node)) === false) {
-                        $ignore = true;
-                        break;
-                    }
+                    $item->hint = $element->getName();
+                    $item->element = $element;
+
+                    $this->addItem($item);
                 }
-
-                if ($ignore) {
-                    continue;
-                }
-
-                $item = new ObjectListEditorItem(
-                    $editor->getNodeId($node), Ide::get()->getImage($element->getIcon()), null, 1
-                );
-
-                $item->hint = $element->getName();
-                $this->comboBox->items->add($item);
             }
 
             if (!$this->disableDependencies) {
@@ -269,22 +282,12 @@ class ObjectListEditor
                                 1
                             ));
 
-                            foreach ($nodes as $node) {
-                                /** @var ScriptComponentContainer $node */
-
-                                $item = new ObjectListEditorItem(
-                                    $node->id, Ide::get()->getImage($node->getType()->getIcon()), null, 2
-                                );
-
-                                $item->prefix = $module;
-                                $item->hint = $node->getType()->getName();
-                                $this->comboBox->items->add($item);
-                            }
+                            $this->appendFormEditor($moduleEditor, 2);
                         }
                     }
                 }
 
-                if ($editor instanceof ScriptModuleEditor) {
+                if ($editor instanceof ScriptModuleEditor && !$this->disableForms) {
                     $formEditors = $editor->getFormEditors();
 
                     if ($formEditors) {
@@ -335,16 +338,6 @@ class ObjectListEditor
                     }
                 }
             }
-
-            $this->cacheItems = $this->comboBox->items;
-
-            if ($this->editor) {
-                $this->editor->cacheData[$cacheKey] = $this->cacheItems;
-            }
-
-            UXApplication::runLater(function () {
-                $this->cacheItems = null;
-            });
         }
     }
 
@@ -359,7 +352,7 @@ class ObjectListEditor
                 $new->level = $level;
                 $new->prefix = $formEditor->getTitle();
 
-                $this->comboBox->items->add($new);
+                $this->addItem($new);
             }
         }
     }

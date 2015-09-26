@@ -10,6 +10,8 @@ use ide\systems\FileSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileHelper;
 use ide\utils\FileUtils;
+use php\compress\ArchiveInputStream;
+use php\compress\ArchiveOutputStream;
 use php\io\File;
 use php\io\FileStream;
 use php\io\Stream;
@@ -79,6 +81,11 @@ class Project
     protected $template;
 
     /**
+     * @var ProjectIndexer
+     */
+    protected $indexer;
+
+    /**
      * Project constructor.
      *
      * @param string $rootDir
@@ -94,6 +101,7 @@ class Project
         $mainForm = Ide::get()->getMainForm();
 
         $this->tree = new ProjectTree($this, $mainForm->getProjectTree());
+        $this->indexer = new ProjectIndexer($this);
     }
 
     /**
@@ -112,6 +120,11 @@ class Project
         }
 
         return new Project($file->getParent(), $name);
+    }
+
+    public function getProjectFile()
+    {
+        return $this->getFile($this->name . ".dnproject");
     }
 
     /**
@@ -291,6 +304,14 @@ class Project
     }
 
     /**
+     * @return ProjectIndexer
+     */
+    public function getIndexer()
+    {
+        return $this->indexer;
+    }
+
+    /**
      * @return ProjectTree
      */
     public function getTree()
@@ -318,16 +339,57 @@ class Project
         $this->tree->update();
 
         foreach ($this->config->getOpenedFiles() as $file) {
+            if ($this->getFile($file)->exists()) {
+                $file = $this->getFile($file);
+            } else {
+                $file = $this->getAbsoluteFile($file);
+            }
+
             if (File::of($file)->exists()) {
-                FileSystem::open($this->getAbsoluteFile($file), false);
+                FileSystem::open($file, false);
             }
         }
 
         $selected = $this->config->getSelectedFile();
 
+        if ($this->getFile($selected)->exists()) {
+            $selected = $this->getFile($selected);
+        }
+
         if ($selected && File::of($selected)->exists()) {
             FileSystem::open($selected, true);
         }
+
+        //if (!$this->indexer->isValid()) { todo implement it
+            $this->reindex();
+        //  }
+    }
+
+    /**
+     * Переиндексировать весь проект.
+     */
+    public function reindex()
+    {
+        $this->indexer->clear();
+
+        $this->trigger(__FUNCTION__, $this->indexer);
+
+        $this->indexer->save();
+    }
+
+    /**
+     * @param $file
+     */
+    public function export($file)
+    {
+        $exporter = new ProjectExporter($this, $file);
+        $exporter->addFile($this->getProjectFile());
+        $exporter->addDirectory($this->getIdeDir());
+        $exporter->removeFile($this->indexer->getIndexFile());
+
+        $this->trigger(__FUNCTION__, $exporter);
+
+        $exporter->save();
     }
 
     /**
@@ -359,7 +421,7 @@ class Project
 
         FileSystem::saveAll();
 
-        $files = Flow::of(FileSystem::getOpened())->map(function ($e) { return $e['file']; })->toArray();
+        $files = Flow::of(FileSystem::getOpened())->map(function ($e) { return $this->getAbsoluteFile($e['file']); })->toArray();
 
         $this->config->setOpenedFiles($files, FileSystem::getSelected());
         $this->config->setProjectFiles($this->filesData);

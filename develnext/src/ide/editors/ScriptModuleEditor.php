@@ -12,6 +12,7 @@ use ide\forms\MainForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\project\ProjectIndexer;
 use ide\scripts\AbstractScriptComponent;
 use ide\scripts\ScriptComponentContainer;
 use ide\scripts\ScriptComponentManager;
@@ -75,6 +76,27 @@ class ScriptModuleEditor extends FormEditor
         return $this->properties[$name];
     }
 
+    protected function reindexImpl(ProjectIndexer $indexer)
+    {
+        $result = [];
+
+        $indexer->remove($this->file, '_objects');
+
+        $index = [];
+
+        foreach ($this->manager->getComponents() as $component) {
+            $index[$component->id] = [
+                'id' => $component->id,
+                'type' => get_class($component->getType()),
+            ];
+        }
+
+        $indexer->set($this->file, '_objects', $index);
+
+        return $result;
+    }
+
+
     public function save()
     {
         foreach ($this->manager->getComponents() as $el) {
@@ -132,6 +154,7 @@ class ScriptModuleEditor extends FormEditor
         });
 
         $this->layout->add($node);
+        $this->reindex();
     }
 
     public function load()
@@ -193,6 +216,7 @@ class ScriptModuleEditor extends FormEditor
             $container->getIdeNode()->setTitle($newId);
 
             $this->codeEditor->load();
+            $this->reindex();
         } else {
             return 'invalid';
         }
@@ -248,6 +272,7 @@ class ScriptModuleEditor extends FormEditor
         }
 
         File::of($container->getConfigPath())->delete();
+        $this->reindex();
     }
 
     public function getModules()
@@ -286,11 +311,6 @@ class ScriptModuleEditor extends FormEditor
         $gui = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
 
         $forms = $gui->getFormEditorsOfModule($this->getModuleName());
-
-        foreach ($forms as $name => $form) {
-            $form->load();
-            $form->makeUi();
-        }
 
         return $forms;
     }

@@ -33,19 +33,25 @@ ide\action\types\BrowseActionType
 ide\action\types\ExecActionType
 ide\action\types\AppShutdownActionType
 
-ide\action\types\IfRandomActionType
-ide\action\types\IfConfirmActionType
-ide\action\types\IfFileExistsActionType
-ide\action\types\IfDirExistsActionType
+
 ide\action\types\IfExprActionType
 ide\action\types\ElseActionType
 ide\action\types\OpenBlockActionType
 ide\action\types\CloseBlockActionType
+ide\action\types\IfRandomActionType
+ide\action\types\IfConfirmActionType
+ide\action\types\IfTextActionType
+ide\action\types\IfFileExistsActionType
+ide\action\types\IfDirExistsActionType
 
+ide\action\types\CallScriptActionType
+ide\action\types\PhpLineActionType
 ide\action\types\SleepActionType
+ide\action\types\ExitActionType
 ide\action\types\SetVarActionType
 ide\action\types\AppendVarActionType
-ide\action\types\PhpLineActionType
+ide\action\types\SetPropertyActionType
+ide\action\types\AppendPropertyActionType
 ide\action\types\ElementSetDataActionType
 ide\action\types\ElementAppendDataActionType
 ide\action\types\CommentActionType

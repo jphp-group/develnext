@@ -1,6 +1,7 @@
 <?php
 namespace php\gui\layout;
 
+use php\gui\paint\UXColor;
 use php\gui\UXParent;
 
 /**
@@ -38,4 +39,9 @@ class UXRegion extends UXParent
      * @var double
      */
     public $paddingLeft = 0, $paddingTop = 0, $paddingRight = 0, $paddingBottom = 0;
+
+    /**
+     * @var UXColor
+     */
+    public $backgroundColor = null;
 }

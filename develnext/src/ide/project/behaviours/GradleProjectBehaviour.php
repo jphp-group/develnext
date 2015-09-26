@@ -3,6 +3,7 @@ namespace ide\project\behaviours;
 
 use ide\misc\GradleBuildConfig;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\ProjectExporter;
 
 /**
  * Class GradleProjectBehaviour
@@ -23,6 +24,12 @@ class GradleProjectBehaviour extends AbstractProjectBehaviour
         $this->config = new GradleBuildConfig($this->project->getRootDir() . "/build.gradle");
 
         $this->project->on('save', [$this, 'doSave']);
+        $this->project->on('export', [$this, 'doExport']);
+    }
+
+    public function doExport(ProjectExporter $exporter)
+    {
+        $exporter->addFile($this->project->getFile("build.xml"));
     }
 
     public function doSave()

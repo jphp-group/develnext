@@ -161,7 +161,7 @@ class ActionConstructorForm extends AbstractForm
 
                 UXApplication::runLater(function () use ($self, $actionType, $index) {
                     $self->addAction($actionType, $index);
-
+                    $this->editor->updateMethod($this->class, $this->method, Items::toArray($this->list->items));
                 });
             } else {
                 return false;

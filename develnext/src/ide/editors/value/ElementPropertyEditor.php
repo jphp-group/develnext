@@ -124,13 +124,17 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
         $this->updateUi($this->getNormalizedValue($this->getValue()));
     }
 
-    public function setAsFormConfigProperty($defaultValue)
+    public function setAsFormConfigProperty($defaultValue, $realCode = null)
     {
-        $this->setter = function (ElementPropertyEditor $editor, $value) {
+        $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode) {
             $target = $this->designProperties->target;
 
             if ($target->userData instanceof FormEditor) {
-                $target->userData->getConfig()->set($editor->code, $value);
+                $target->userData->getConfig()->set($editor->code, "$value");
+
+                if ($realCode) {
+                    $target->{$realCode} = $value;
+                }
             }
         };
 
@@ -146,16 +150,21 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     }
 
     /**
+     * @param null $realCode
      * @return $this
      */
-    public function setAsDataProperty()
+    public function setAsDataProperty($realCode = null)
     {
-        $this->setter = function (ElementPropertyEditor $editor, $value) {
+        $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode) {
             $target = $this->designProperties->target;
 
             if ($target->id) {
                 $data = DataUtils::get($target);
                 $data->set($editor->code, $value);
+
+                if ($realCode) {
+                    $target->{$realCode} = $value;
+                }
             }
         };
 
@@ -175,13 +184,18 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     }
 
     /**
+     * @param null $realCode
      * @return $this
      */
-    public function setAsCssProperty()
+    public function setAsCssProperty($realCode = null)
     {
-        $this->setter = function (ElementPropertyEditor $editor, $value) {
+        $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode) {
             $target = $this->designProperties->target;
             $target->css($editor->code, $editor->getCssNormalizedValue($value));
+
+            if ($realCode) {
+                $target->{$realCode} = $value;
+            }
         };
 
         $this->getter = function (ElementPropertyEditor $editor) {
@@ -226,7 +240,6 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
                 $getter = $this->getter;
 
                 return $getter($this);
-
             }
         } catch (IllegalArgumentException $e) {
             ;

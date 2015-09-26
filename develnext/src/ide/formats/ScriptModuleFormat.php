@@ -13,6 +13,7 @@ use ide\scripts\AbstractScriptComponent;
 use ide\scripts\elements\DirectoryChooserScriptComponent;
 use ide\scripts\elements\FileChooserScriptComponent;
 use ide\scripts\elements\FileScriptComponent;
+use ide\scripts\elements\MacroScriptComponent;
 use ide\scripts\elements\ModuleScriptComponent;
 use ide\scripts\elements\TimerScriptComponent;
 use ide\scripts\ScriptComponentContainer;
@@ -31,6 +32,7 @@ class ScriptModuleFormat extends AbstractFormFormat
     public function __construct()
     {
         $this->register(new ModuleScriptComponent());
+        $this->register(new MacroScriptComponent());
         $this->register(new TimerScriptComponent());
         $this->register(new FileScriptComponent());
         $this->register(new FileChooserScriptComponent());

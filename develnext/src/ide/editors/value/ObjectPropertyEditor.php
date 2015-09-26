@@ -33,6 +33,7 @@ class ObjectPropertyEditor extends ElementPropertyEditor
     public function makeUi()
     {
         $this->objectListEditor = new ObjectListEditor();
+        $this->objectListEditor->build();
 
         $ui = $this->objectListEditor->getUi();
         $ui->padding = 3;

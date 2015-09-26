@@ -7,3 +7,4 @@ ide\editors\argument\ExprArgumentEditor
 ide\editors\argument\FormArgumentEditor
 ide\editors\argument\NameArgumentEditor
 ide\editors\argument\FloatArgumentEditor
+ide\editors\argument\TextMethodsArgumentEditor

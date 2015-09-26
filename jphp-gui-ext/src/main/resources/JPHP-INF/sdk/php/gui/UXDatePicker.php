@@ -14,6 +14,11 @@ class UXDatePicker extends UXComboBoxBase
     public $editor;
 
     /**
+     * @var string
+     */
+    public $format = 'yyyy-MM-dd';
+
+    /**
      * @var bool
      */
     public $showWeekNumbers;

@@ -31,6 +31,23 @@ class MixedArgumentEditor extends AbstractArgumentEditor
     /** @var ObjectListEditor */
     protected $formListEditor;
 
+    /**
+     * @return ObjectListEditor
+     */
+    public function getObjectListEditor()
+    {
+        return $this->objectListEditor;
+    }
+
+    /**
+     * @return ObjectListEditor
+     */
+    public function getFormListEditor()
+    {
+        return $this->formListEditor;
+    }
+
+
     public function getCode()
     {
         return "mixed";
@@ -73,15 +90,19 @@ class MixedArgumentEditor extends AbstractArgumentEditor
 
         $this->objectListEditor = new ObjectListEditor();
 
+        if ($filter = $this->options['objectFilter']) {
+            $this->objectListEditor->addFilter($filter);
+        }
+
         if ($this->userData instanceof FormEditor) {
             $this->objectListEditor->enableSender();
 
             if (!($this->userData instanceof ScriptModuleEditor)) {
                 $this->objectListEditor->enableAllForms();
             }
-
-            $this->objectListEditor->build();
         }
+
+        $this->objectListEditor->build();
 
         $this->objectListEditor->getUi()->maxWidth = 9999;
         $this->objectListEditor->onChange(function ($value) {

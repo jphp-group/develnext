@@ -41,7 +41,7 @@ class TextFieldFormElement extends AbstractFormElement
 
     public function getDefaultSize()
     {
-        return [150, 20];
+        return [150, 35];
     }
 
     public function isOrigin($any)

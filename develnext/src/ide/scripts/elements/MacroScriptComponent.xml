@@ -1,0 +1,12 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+
+    <properties group="general" title="Главное">
+        <property code="runOnApply" name="Автозапуск" editor="boolean" tooltip="Запускать скрипт при подключении модуля к форме" />
+        <property code="runOnce" name="Одноразовый" editor="boolean" tooltip="Скрипт выполнится только один раз" />
+        <property code="description" name="Описание" editor="text" tooltip="Описание, комментарий к скрипту" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="action" name="Выполнение" kind="ObjectEvent" icon="icons/ok16.png" />
+    </eventTypes>
+</element>

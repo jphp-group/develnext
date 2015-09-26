@@ -19,6 +19,7 @@ use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\ProjectFile;
+use ide\project\ProjectIndexer;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use php\gui\designer\UXDesigner;
@@ -299,94 +300,9 @@ class FormEditor extends AbstractModuleEditor
         if (File::of($this->configFile)->exists()) {
             $this->config->load($this->configFile);
         }
-    }
 
-    public function checkNodeId($newId)
-    {
-        return (Regex::match('^[A-Za-z\\_]{1}[A-Za-z0-9\\_]{1,60}$', $newId));
-    }
-
-    public function changeNodeId($node, $newId)
-    {
-        if (!$this->checkNodeId($newId)) {
-            return 'invalid';
-        }
-
-        if ($node->id == $newId) {
-            return '';
-        }
-
-        if ($this->layout->lookup("#$newId")) {
-            return 'busy';
-        }
-
-        $data = DataUtils::get($node, $this->layout, false);
-
-        if ($data) {
-            $data->id = "data-$newId";
-        }
-
-        $this->eventManager->renameBind($node->id, $newId);
-        $this->codeEditor->load();
-
-        $node->id = $newId;
-        return '';
-    }
-
-    /**
-     * @param bool $cached
-     * @return ObjectListEditorItem[]
-     */
-    public function getObjectList($cached = true)
-    {
-        if (!$cached || !$this->layout) {
-            $this->formDumper->load($this);
-        }
-
-        $nodes = $this->findNodesToRegister($this->layout->children);
-
-        $result = [];
-
-        foreach ($nodes as $node) {
-            $element = $this->format->getFormElement($node);
-
-            $result[] = $item = new ObjectListEditorItem(
-                $this->getNodeId($node), $element ? Ide::get()->getImage($element->getIcon()) : null
-            );
-
-            $item->hint = $element->getName();
-            $item->element = $element;
-        }
-
-        return $result;
-    }
-
-    public function deleteNode($node)
-    {
-        $designer = $this->designer;
-
-        $element = $this->format->getFormElement($node);
-
-        if ($element && $element->isLayout()) {
-            foreach ($element->getLayoutChildren($node) as $sub) {
-                $this->deleteNode($sub);
-            }
-        }
-
-        $designer->unselectNode($node);
-        $designer->unregisterNode($node);
-
-        DataUtils::remove($node);
-        $node->parent->remove($node);
-
-        $binds = $this->eventManager->findBinds($this->getNodeId($node));
-
-        foreach ($binds as $bind) {
-            $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
-        }
-
-        if ($this->eventManager->removeBinds($this->getNodeId($node))) {
-            $this->codeEditor->load();
+        if ($this->config->get('form.backgroundColor')) {
+            $this->layout->backgroundColor = UXColor::of($this->config->get('form.backgroundColor'));
         }
     }
 
@@ -424,12 +340,136 @@ class FormEditor extends AbstractModuleEditor
         //$this->designer->unselectAll();
 
         $this->eventManager->load();
-        $this->updateProperties($this->designer->pickedNode ?: $this);
-        $this->updateEventTypes($this->designer->pickedNode ?: $this);
 
         UXApplication::runLater(function () {
-            $this->designer->requestFocus();
+            $this->updateProperties($this->designer->pickedNode ?: $this);
+            $this->updateEventTypes($this->designer->pickedNode ?: $this);
+
+            UXApplication::runLater(function () {
+                $this->designer->requestFocus();
+            });
         });
+    }
+
+    protected function reindexImpl(ProjectIndexer $indexer)
+    {
+        if (!$this->layout) {
+            $this->formDumper->load($this);
+        }
+
+        $nodes = $this->findNodesToRegister($this->layout->children);
+
+        $result = [];
+
+        $indexer->remove($this->file, '_objects');
+
+        $index = [];
+
+        foreach ($nodes as $node) {
+            $element = $this->format->getFormElement($node);
+
+            $index[$this->getNodeId($node)] = [
+                'id' => $this->getNodeId($node),
+                'type' => get_class($element),
+            ];
+        }
+
+        $indexer->set($this->file, '_objects', $index);
+
+        return $result;
+    }
+
+
+    public function checkNodeId($newId)
+    {
+        return (Regex::match('^[A-Za-z\\_]{1}[A-Za-z0-9\\_]{1,60}$', $newId));
+    }
+
+    public function changeNodeId($node, $newId)
+    {
+        if (!$this->checkNodeId($newId)) {
+            return 'invalid';
+        }
+
+        if ($node->id == $newId) {
+            return '';
+        }
+
+        if ($this->layout->lookup("#$newId")) {
+            return 'busy';
+        }
+
+        $data = DataUtils::get($node, $this->layout, false);
+
+        if ($data) {
+            $data->id = "data-$newId";
+        }
+
+        $this->eventManager->renameBind($node->id, $newId);
+        $this->codeEditor->load();
+        $this->reindex();
+
+        $node->id = $newId;
+        return '';
+    }
+
+    /**
+     * @return ObjectListEditorItem[]
+     */
+    public function getObjectList()
+    {
+        $project = Ide::get()->getOpenedProject();
+        $result = [];
+
+        if ($project) {
+
+            $index = $project->getIndexer()->get($this->file, '_objects');
+
+            foreach ((array)$index as $it) {
+                /** @var AbstractFormElement $element */
+                $element = class_exists($it['type']) ? new $it['type']() : null;
+
+                $result[] = $item = new ObjectListEditorItem(
+                    $it['id'], $element ? Ide::get()->getImage($element->getIcon()) : null
+                );
+
+                $item->hint = $element ? $element->getName() : '';
+                $item->element = $element;
+            }
+        }
+
+        return $result;
+    }
+
+    public function deleteNode($node)
+    {
+        $designer = $this->designer;
+
+        $element = $this->format->getFormElement($node);
+
+        if ($element && $element->isLayout()) {
+            foreach ($element->getLayoutChildren($node) as $sub) {
+                $this->deleteNode($sub);
+            }
+        }
+
+        $designer->unselectNode($node);
+        $designer->unregisterNode($node);
+
+        DataUtils::remove($node);
+        $node->parent->remove($node);
+
+        $binds = $this->eventManager->findBinds($this->getNodeId($node));
+
+        foreach ($binds as $bind) {
+            $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
+        }
+
+        if ($this->eventManager->removeBinds($this->getNodeId($node))) {
+            $this->codeEditor->load();
+        }
+
+        $this->reindex();
     }
 
     public function selectForm()
@@ -665,7 +705,7 @@ class FormEditor extends AbstractModuleEditor
                 if (!$node->classes->has('ignore')) {
                     $element = $this->format->getFormElement($node);
 
-                    if ($element) {
+                    if ($element && $node->id) {
                         $element->registerNode($node);
                     }
 
@@ -844,6 +884,7 @@ class FormEditor extends AbstractModuleEditor
             }
         }
 
+        $this->reindex();
         return $node;
     }
 

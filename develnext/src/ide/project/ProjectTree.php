@@ -10,6 +10,7 @@ use ide\utils\FileUtils;
 use php\gui\UXDesktop;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXApplication;
+use php\gui\UXDialog;
 use php\gui\UXTreeItem;
 use php\gui\UXTreeView;
 use php\io\File;
@@ -231,12 +232,19 @@ class ProjectTree
 
                         if ($file instanceof ProjectFile) {
                             $file->delete();
+                            $done = !Files::exists($file);
                         } else {
                             if (Files::isDir($file)) {
                                 FileUtils::deleteDirectory($file);
+                                $done = !Files::isDir($file);
                             } else {
                                 File::of($file)->delete();
+                                $done = !Files::isFile($file);
                             }
+                        }
+
+                        if (!$done) {
+                            UXDialog::show('Ошибка удаления, что-то пошло не так', 'ERROR');
                         }
                     }));
                 }
@@ -259,6 +267,8 @@ class ProjectTree
      */
     public function updateDirectory($code, $path, $saveSelected = true)
     {
+        if (UXApplication::isShutdown()) return;
+
         $selected = $this->tree->selectedItems;
         $focused = $this->tree->focusedItem;
 

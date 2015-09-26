@@ -29,6 +29,7 @@ import java.net.UnknownHostException;
 @Name(JavaFXExtension.NS + "UXApplication")
 public class UXApplication extends BaseWrapper<Application> {
     private static Invoker onStart;
+    private static boolean shutdown = false;
 
     public UXApplication(Environment env, Application wrappedObject) {
         super(env, wrappedObject);
@@ -46,6 +47,11 @@ public class UXApplication extends BaseWrapper<Application> {
 
         String pid = jvmName.substring(0, index);
         return pid;
+    }
+
+    @Signature
+    public static boolean isShutdown() {
+        return shutdown;
     }
 
     @Signature
@@ -110,6 +116,7 @@ public class UXApplication extends BaseWrapper<Application> {
 
     @Signature
     public static void shutdown() {
+        shutdown = true;
         Platform.exit();
     }
 

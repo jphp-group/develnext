@@ -24,6 +24,21 @@ abstract class AbstractArgumentEditor
      */
     protected $userData;
 
+    /**
+     * @var array
+     */
+    protected $options = [];
+
+    /**
+     * AbstractArgumentEditor constructor.
+     * @param array $options
+     */
+    public function __construct(array $options = [])
+    {
+        $this->options = $options;
+    }
+
+
     public function setValue($value, $type)
     {
         $this->value = $value;
@@ -94,16 +109,17 @@ abstract class AbstractArgumentEditor
 
     /**
      * @param $type
+     * @param array $options
      * @return AbstractArgumentEditor
      * @throws \Exception
      */
-    public static function make($type)
+    public static function make($type, array $options = [])
     {
         $editor = self::get($type);
 
         $class = get_class($editor);
 
-        return new $class();
+        return new $class($options);
     }
 
     abstract public function requestUiFocus();

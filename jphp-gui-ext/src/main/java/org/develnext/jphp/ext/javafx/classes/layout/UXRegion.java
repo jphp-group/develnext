@@ -1,7 +1,12 @@
 package org.develnext.jphp.ext.javafx.classes.layout;
 
 import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.classes.UXParent;
 import php.runtime.annotation.Reflection.*;
@@ -117,5 +122,29 @@ public class UXRegion<T extends Region> extends UXParent<Region> {
         if (args.length >= 2) {
             getWrappedObject().setMaxSize(args[0], args[1]);
         }
+    }
+
+
+    @Setter
+    public void setBackgroundColor(@Nullable Color color) {
+        if (color == null) {
+            getWrappedObject().setBackground(null);
+        } else {
+            getWrappedObject().setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
+        }
+    }
+
+    @Getter
+    public Color getBackgroundColor() {
+        Background background = getWrappedObject().getBackground();
+
+        if (background != null && background.getFills().size() > 0) {
+            Paint fill = background.getFills().get(0).getFill();
+            if (fill instanceof Color) {
+                return (Color) fill;
+            }
+        }
+
+        return null;
     }
 }

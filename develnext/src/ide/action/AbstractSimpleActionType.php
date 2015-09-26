@@ -20,6 +20,8 @@ abstract class AbstractSimpleActionType extends AbstractActionType
     const SUB_GROUP_COMMON = 'Главное';
     const SUB_GROUP_DECOR = 'Декорация';
     const SUB_GROUP_ANIMATION = 'Анимация';
+    const SUB_GROUP_DATA = 'Данные';
+    const SUB_GROUP_ADDITIONAL = 'Другое';
 
     /**
      * @return array

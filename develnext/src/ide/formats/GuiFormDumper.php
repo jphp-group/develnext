@@ -53,11 +53,13 @@ class GuiFormDumper extends AbstractFormDumper
         $loader = new UXLoader();
         /** @var UXAnchorPane $layout */
         try {
-            $layout = $loader->load($editor->getFile());
+            Stream::tryAccess($editor->getFile(), function ($stream) use ($loader, $editor) {
+                $layout = $loader->load($stream);
 
-            if ($layout instanceof UXPane) {
-                $editor->setLayout($layout);
-            }
+                if ($layout instanceof UXPane) {
+                    $editor->setLayout($layout);
+                }
+            });
         } catch (IOException $e) {
             Ide::get()->getMainForm()->toast('Ошибка загрузки формы: ' . $e->getMessage());
             $layout1 = new UXAnchorPane();

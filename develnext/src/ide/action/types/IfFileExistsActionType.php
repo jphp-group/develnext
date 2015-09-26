@@ -36,6 +36,11 @@ class IfFileExistsActionType extends AbstractSimpleActionType
         return self::GROUP_CONDITIONS;
     }
 
+    function getSubGroup()
+    {
+        return self::SUB_GROUP_ADDITIONAL;
+    }
+
     function getTagName()
     {
         return 'ifFileExists';

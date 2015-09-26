@@ -4,8 +4,11 @@ use ide\forms\MainForm;
 use ide\Ide;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
+use ide\project\ProjectImporter;
 use ide\utils\FileUtils;
 use php\gui\framework\Timer;
+use php\gui\UXApplication;
+use php\gui\UXDialog;
 use php\io\File;
 
 /**
@@ -19,6 +22,23 @@ class ProjectSystem
         WatcherSystem::clear();
         WatcherSystem::clearListeners();
         Ide::get()->unregisterCommands();
+    }
+
+    static function import($file, $projectDir = null)
+    {
+        if (!$projectDir) {
+            $projectDir = FileUtils::stripExtension($file);
+        }
+
+        Ide::get()->getMainForm()->showPreloader('Распаковка архива ...');
+
+        $importer = new ProjectImporter($file);
+
+        $importer->extract($projectDir);
+
+        ProjectSystem::open($projectDir . "/" . File::of($projectDir)->getName() . ".dnproject");
+
+        Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива \n -> $file");
     }
 
     /**
@@ -47,6 +67,8 @@ class ProjectSystem
      */
     static function open($fileName)
     {
+        Ide::get()->getMainForm()->showPreloader('Открытие проекта ...');
+
         static::clear();
         static::close();
 
@@ -58,6 +80,8 @@ class ProjectSystem
         $project->load();
         $project->recover();
         $project->open();
+
+        Ide::get()->getMainForm()->hidePreloader();
     }
 
     /**
@@ -88,9 +112,9 @@ class ProjectSystem
         static::clear();
 
         foreach (FileSystem::getOpened() as $hash => $info) {
-            if ($project && $project->isContainsFile($info['file'])) {
+            //if ($project && $project->isContainsFile($info['file'])) {
                 FileSystem::close($info['file']);
-            }
+            //}
         }
 
         Ide::get()->setOpenedProject(null);

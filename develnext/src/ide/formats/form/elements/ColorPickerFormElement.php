@@ -43,7 +43,7 @@ class ColorPickerFormElement extends AbstractFormElement
 
     public function getDefaultSize()
     {
-        return [150, 32];
+        return [150, 35];
     }
 
     public function isOrigin($any)

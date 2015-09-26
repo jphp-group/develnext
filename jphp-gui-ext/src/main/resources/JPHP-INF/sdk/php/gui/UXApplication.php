@@ -38,6 +38,13 @@ class UXApplication
     }
 
     /**
+     * @return bool
+     */
+    public static function isShutdown()
+    {
+    }
+
+    /**
      * @param callable $onStart (UXStage $stage)
      */
     public static function launch(callable $onStart)

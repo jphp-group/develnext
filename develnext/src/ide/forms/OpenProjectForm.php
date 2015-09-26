@@ -50,9 +50,9 @@ class OpenProjectForm extends AbstractForm
         if (!self::$fileChooser) {
             self::$fileChooser = new UXFileChooser();
             self::$fileChooser->extensionFilters = [
-                ['description' => 'DevelNext Projects', 'extensions' => ['*.dnproject']]
+                ['description' => 'DevelNext проекты и архивы', 'extensions' => ['*.dnproject', '*.zip']]
             ];
-            self::$fileChooser->initialDirectory = Ide::get()->getUserConfigValue('projectDirectory');
+            //self::$fileChooser->initialDirectory = Ide::get()->getUserConfigValue('projectDirectory');
         }
 
         $this->icon->image = Ide::get()->getImage('icons/open32.png')->image;
@@ -139,7 +139,12 @@ class OpenProjectForm extends AbstractForm
     {
         if ($file = self::$fileChooser->execute()) {
             $this->hide();
-            ProjectSystem::open($file);
+
+            if (Str::endsWith($file, ".zip")) {
+                ProjectSystem::import($file);
+            } else {
+                ProjectSystem::open($file);
+            }
         }
     }
 

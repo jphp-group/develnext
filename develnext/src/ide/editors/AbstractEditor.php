@@ -1,8 +1,12 @@
 <?php
 namespace ide\editors;
 use ide\formats\AbstractFormat;
+use ide\Ide;
+use ide\project\Project;
+use ide\project\ProjectIndexer;
 use php\gui\layout\UXPane;
 use php\gui\UXNode;
+use php\lang\Thread;
 
 /**
  * Class AbstractEditor
@@ -54,17 +58,32 @@ abstract class AbstractEditor
         return $this->format;
     }
 
+    protected function reindexImpl(ProjectIndexer $indexer)
+    {
+        // nop.
+    }
+
+    public function reindex()
+    {
+        $project = Ide::get()->getOpenedProject();
+
+        if ($project) {
+            $this->reindexImpl($project->getIndexer());
+        }
+    }
+
     abstract public function load();
     abstract public function save();
 
     public function close()
     {
         $this->save();
+        $this->reindex();
     }
 
     public function open()
     {
-        // nop.
+        $this->reindex();
     }
 
     public function getTitle()

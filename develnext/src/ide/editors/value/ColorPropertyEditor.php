@@ -91,6 +91,10 @@ class ColorPropertyEditor extends ElementPropertyEditor
     {
         parent::updateUi($value);
 
+        if ($value && !($value instanceof UXColor)) {
+            $value = UXColor::of($value);
+        }
+
         $this->colorPicker->value = $value;
     }
 

@@ -2,11 +2,13 @@ package org.develnext.jphp.ext.javafx.classes.paint;
 
 import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
+import php.runtime.memory.StringMemory;
 import php.runtime.reflection.ClassEntity;
 
 @Reflection.Name(JavaFXExtension.NS + "paint\\UXColor")
@@ -43,6 +45,11 @@ public class UXColor extends BaseWrapper<Color> {
     @Signature
     public void __construct(double red, double blue, double green, double opacity) {
         __wrappedObject = new Color(red, blue, green, opacity);
+    }
+
+    @Signature
+    public Memory __toString(Environment env, Memory... args) {
+        return StringMemory.valueOf(getWebValue());
     }
 
     @Signature

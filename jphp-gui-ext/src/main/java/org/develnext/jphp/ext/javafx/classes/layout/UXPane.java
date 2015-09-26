@@ -48,5 +48,4 @@ public class UXPane<T extends Pane> extends UXRegion<T> {
     public boolean remove(Node node) {
         return getChildren().remove(node);
     }
-
 }

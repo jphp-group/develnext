@@ -60,7 +60,9 @@ class ActionArgumentsDialog extends AbstractForm
                 $label = $name;
             }
 
-            $editor = $this->addArgument($name, $label, $value);
+            $settings = $type->attributeSettings()[$name];
+
+            $editor = $this->addArgument($name, $label, $value, $settings);
 
             if ($i == 0) {
                 $editor->requestUiFocus();
@@ -85,9 +87,14 @@ class ActionArgumentsDialog extends AbstractForm
         });
     }
 
-    public function addArgument($name, $label, $type)
+    public function addArgument($name, $label, $type, array $settings = null)
     {
-        $editor = AbstractArgumentEditor::make($type);
+        if (is_callable($settings['editor'])) {
+            $editor = $settings['editor']($name, $label, $type, $settings);
+        } else {
+            $editor = AbstractArgumentEditor::make($type, (array)$settings['editor']);
+        }
+
         $editor->setUserData($this->userData);
 
         $this->argumentEditors[$name] = $editor;

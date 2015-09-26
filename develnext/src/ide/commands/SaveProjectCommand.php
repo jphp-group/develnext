@@ -33,7 +33,7 @@ class SaveProjectCommand extends AbstractCommand
 
     public function makeUiForHead()
     {
-        return [$this->makeGlyphButton(), new UXSeparator('VERTICAL')];
+        return [$this->makeGlyphButton()];
     }
 
     public function onExecute()
@@ -42,6 +42,8 @@ class SaveProjectCommand extends AbstractCommand
 
         if ($project) {
             $project->save();
+
+            Ide::get()->getMainForm()->toast('Проект успешно сохранен');
         }
     }
 }

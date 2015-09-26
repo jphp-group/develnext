@@ -1,5 +1,6 @@
 ide\commands\NewProjectCommand
 ide\commands\OpenProjectCommand
 ide\commands\SaveProjectCommand
+ide\commands\ExportProjectCommand
 ide\commands\CloseProjectCommand
 ide\commands\ExitCommand

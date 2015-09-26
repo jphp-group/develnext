@@ -11,26 +11,58 @@ use script\TimerScript;
 
 class Animation
 {
-    static function fadeTo(UXNode $object, $duration, $value, callable $callback = null)
+    static function fadeTo($object, $duration, $value, callable $callback = null)
     {
-        $anim = new UXFadeAnimation($duration, $object);
-        $anim->fromValue = $object->opacity;
-        $anim->toValue = $value;
+        if ($object instanceof UXNode) {
+            $anim = new UXFadeAnimation($duration, $object);
+            $anim->fromValue = $object->opacity;
+            $anim->toValue = $value;
 
-        if ($callback) {
-            $anim->on('finish', $callback);
+            if ($callback) {
+                $anim->on('finish', $callback);
+            }
+
+            $anim->play();
+            return $anim;
+        } else {
+            $diff = $value - $object->opacity;
+
+            $steps = $duration / 25;
+
+            $step = $diff / $steps;
+
+            $timer = new TimerScript();
+            $timer->interval = 25;
+            $timer->repeatable = true;
+
+            $timer->on('action', function (ScriptEvent $e) use ($object, $step, $value, $callback, &$steps) {
+                $opacity = $object->opacity + $step;
+
+                $object->opacity = $opacity < 0 ? 0 : $opacity;
+
+                $steps--;
+
+                if ($steps <= 0) {
+                    $e->sender->free();
+                    $object->opacity = (double) $value;
+
+                    if ($callback) {
+                        $callback();
+                    }
+                }
+            });
+            $timer->start();
+
+            return $timer;
         }
-
-        $anim->play();
-        return $anim;
     }
 
-    static function fadeIn(UXNode $object, $duration, callable $callback = null)
+    static function fadeIn($object, $duration, callable $callback = null)
     {
         return self::fadeTo($object, $duration, 1.0, $callback);
     }
 
-    static function fadeOut(UXNode $object, $duration, callable $callback = null)
+    static function fadeOut($object, $duration, callable $callback = null)
     {
         return self::fadeTo($object, $duration, 0.0, $callback);
     }
