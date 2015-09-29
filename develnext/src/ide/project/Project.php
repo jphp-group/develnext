@@ -14,10 +14,12 @@ use php\compress\ArchiveInputStream;
 use php\compress\ArchiveOutputStream;
 use php\io\File;
 use php\io\FileStream;
+use php\io\IOException;
 use php\io\Stream;
 use php\lib\Items;
 use php\lib\Str;
 use php\time\Time;
+use php\util\Configuration;
 use php\util\Flow;
 
 /**
@@ -239,6 +241,32 @@ class Project
     }
 
     /**
+     * @param $name
+     * @return Configuration
+     */
+    public function getIdeConfig($name)
+    {
+        $configuration = new Configuration();
+
+        try {
+            $configuration->load($this->getIdeDir() . "/$name");
+        } catch (IOException $e) {
+            ;
+        }
+
+        return $configuration;
+    }
+
+    /**
+     * @param $name
+     * @param Configuration $configuration
+     */
+    public function setIdeConfig($name, Configuration $configuration)
+    {
+        $configuration->save($this->getIdeDir() . "/$name");
+    }
+
+    /**
      * @return File
      */
     public function getIdeDir()
@@ -378,18 +406,26 @@ class Project
     }
 
     /**
+     * @return ProjectExporter
+     * @throws \php\lang\IllegalArgumentException
+     */
+    public function makeExporter()
+    {
+        $exporter = new ProjectExporter($this);
+        $exporter->addFile($this->getProjectFile());
+        $exporter->removeFile($this->indexer->getIndexFile());
+
+        $this->trigger('export', $exporter);
+
+        return $exporter;
+    }
+
+    /**
      * @param $file
      */
     public function export($file)
     {
-        $exporter = new ProjectExporter($this, $file);
-        $exporter->addFile($this->getProjectFile());
-        $exporter->addDirectory($this->getIdeDir());
-        $exporter->removeFile($this->indexer->getIndexFile());
-
-        $this->trigger(__FUNCTION__, $exporter);
-
-        $exporter->save();
+        $this->makeExporter()->save($file);
     }
 
     /**

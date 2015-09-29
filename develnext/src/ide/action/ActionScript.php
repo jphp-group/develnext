@@ -113,7 +113,7 @@ class ActionScript
         $this->localVariables[$name] = $name;
     }
 
-    public function compileActions($class, $method, array $actions, $comment = '', $endComment = '')
+    public function compileActions($class, $method, array $actions, $comment = '', $endComment = '', $prefix = "\t\t")
     {
         ActionScript::calculateLevels($actions);
 
@@ -124,18 +124,19 @@ class ActionScript
         $yields = new SharedStack();
 
         if ($comment) {
-            $code .= "\t\t// $comment\n";
+            $code .= "$prefix// $comment\n";
         }
 
         /** @var Action $action */
-        foreach ($actions as $action)  {
+        foreach ($actions as $i => $action)  {
             $type = $action->getType();
+            $nextType = $actions[$i + 1] ? $actions[$i + 1]->getType() : null;
 
             if ($type->isAppendSingleLevel()) {
                 $code .= "\n";
             }
 
-            $code .= "\t\t";
+            $code .= $prefix;
 
             $level = $action->getLevel();
             $yieldCount = $yields->count();
@@ -153,7 +154,7 @@ class ActionScript
                     while ($yields->peek() > $level) {
                         $yields->pop();
 
-                        $code .= "\t\t";
+                        $code .= $prefix;
                         $code .= Str::repeat("\t", $level + $yields->count());
                         $code .= "\n});";
                     }
@@ -173,9 +174,11 @@ class ActionScript
             }
 
             if ($type->isAppendMultipleLevel() || $type->isAppendSingleLevel() || $type->isCloseLevel() || $isYield) {
-                $code .= "\n";
-
                 if ($type->isCloseLevel()) {
+                    if ($nextType && !$nextType->isAppendSingleLevel() && !$nextType->isAppendMultipleLevel()) {
+                        $code .= "\n\n";
+                    }
+                } else {
                     $code .= "\n";
                 }
             } else {
@@ -191,14 +194,14 @@ class ActionScript
             while ($yields->count()) {
                 $yields->pop();
 
-                $code .= "\t\t";
+                $code .= $prefix;
                 $code .= Str::repeat("\t", $yields->count());
                 $code .= "});\n";
             }
         }
 
         if ($endComment) {
-            $code .= "\t\t// $endComment\n";
+            $code .= "$prefix// $endComment\n";
         }
 
         return $code;

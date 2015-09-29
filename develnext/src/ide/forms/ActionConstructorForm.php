@@ -6,6 +6,8 @@ use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionEditor;
 use ide\action\ActionScript;
+use ide\editors\CodeEditor;
+use ide\editors\common\CodeTextArea;
 use ide\editors\FormEditor;
 use ide\editors\menu\ContextMenu;
 use ide\Ide;
@@ -17,6 +19,7 @@ use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\Timer;
+use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
@@ -42,7 +45,9 @@ use php\xml\XmlProcessor;
  * @package ide\forms
  *
  * @property UXListView $list
- * @property UXTabPane $actionTypePane;
+ * @property UXTabPane $actionTypePane
+ * @property UXAnchorPane $generatedCodeContent
+ * @property UXTabPane $tabs
  */
 class ActionConstructorForm extends AbstractForm
 {
@@ -67,6 +72,49 @@ class ActionConstructorForm extends AbstractForm
     protected function init()
     {
         parent::init();
+
+        $codeView = new CodeTextArea('php', [
+            'fontSize' => 13,
+            'theme' => 'ambiance'
+        ]);
+
+        UXAnchorPane::setAnchor($codeView, 0);
+        $this->generatedCodeContent->add($codeView);
+
+        $this->tabs->tabs[1]->on('change', function () use ($codeView) {
+            UXApplication::runLater(function () use ($codeView) {
+
+                $script = new ActionScript();
+
+                $imports = $script->getImports(Items::toArray($this->list->items));
+
+                $code = "<?php \n";
+
+                if ($imports) {
+                    $code .= "// Импортируем имена классов ...\n";
+                }
+
+                foreach ($imports as $import) {
+                    $code .= "use $import[0];\n";
+                }
+
+                if ($imports) {
+                    $code .= "\n// Исходный код события \n";
+                }
+
+                $code .= $script->compileActions(
+                    $this->class,
+                    $this->method,
+                    Items::toArray($this->list->items),
+                    "",
+                    '',
+                    ''
+                );
+
+                $codeView->setValue($code);
+            });
+        });
+
 
         $this->list->multipleSelection = true;
 

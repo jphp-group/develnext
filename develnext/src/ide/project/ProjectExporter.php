@@ -15,11 +15,6 @@ use php\lib\Str;
 class ProjectExporter
 {
     /**
-     * @var string
-     */
-    protected $file;
-
-    /**
      * @var string[] name -> file
      */
     protected $files = [];
@@ -32,11 +27,9 @@ class ProjectExporter
     /**
      * ProjectExporter constructor.
      * @param Project $project
-     * @param $file
      */
-    public function __construct(Project $project, $file)
+    public function __construct(Project $project)
     {
-        $this->file = $file;
         $this->project = $project;
     }
 
@@ -65,6 +58,14 @@ class ProjectExporter
     }
 
     /**
+     * @return string[]
+     */
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    /**
      * @param $directory
      * @throws IllegalArgumentException
      */
@@ -84,11 +85,11 @@ class ProjectExporter
     }
 
     /**
-     * @throws IOException
+     * @param $zipFile
      */
-    public function save()
+    public function save($zipFile)
     {
-        $out = new ArchiveOutputStream('zip', $this->file);
+        $out = new ArchiveOutputStream('zip', $zipFile);
 
         foreach ($this->files as $name => $file) {
             $file = File::of($file);

@@ -130,7 +130,7 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             $target = $this->designProperties->target;
 
             if ($target->userData instanceof FormEditor) {
-                $target->userData->getConfig()->set($editor->code, "$value");
+                $target->userData->getConfig()->set($editor->code, $this->getNormalizedValue($value));
 
                 if ($realCode) {
                     $target->{$realCode} = $value;
@@ -142,7 +142,9 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             $target = $this->designProperties->target;
 
             if ($target->userData instanceof FormEditor) {
-                return $target->userData->getConfig()->get($editor->code, $defaultValue);
+                $value = $target->userData->getConfig()->get($editor->code, $defaultValue);
+
+                return $value;
             }
 
             return '';

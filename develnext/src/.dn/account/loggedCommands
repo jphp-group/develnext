@@ -1,2 +1,3 @@
 ide\commands\account\AccountInfoCommand
 ide\commands\account\AccountLogoutCommand
+ide\commands\account\AccountProjectSyncCommand

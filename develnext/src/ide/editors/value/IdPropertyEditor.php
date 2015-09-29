@@ -41,7 +41,7 @@ class IdPropertyEditor extends TextPropertyEditor
 
     public function showDialog($x = null, $y = null)
     {
-        $this->editorForm->layout->size = [350, 125];
+        $this->getEditorForm()->layout->size = [350, 125];
         parent::showDialog($x, $y);
     }
 

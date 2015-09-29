@@ -30,4 +30,8 @@ class SourceTokenizer
     public function fetchAll()
     {
     }
+
+    public function close()
+    {
+    }
 }

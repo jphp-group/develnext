@@ -6,6 +6,7 @@ use php\gui\event\UXEvent;
 use php\gui\event\UXKeyEvent;
 use php\gui\framework\event\AbstractEventAdapter;
 use php\gui\layout\UXAnchorPane;
+use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXData;
 use php\gui\UXForm;
@@ -18,6 +19,7 @@ use php\gui\UXProgressIndicator;
 use php\gui\UXTooltip;
 use php\io\IOException;
 use php\io\Stream;
+use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\lang\Thread;
 use php\lib\Items;
@@ -236,6 +238,14 @@ abstract class AbstractForm extends UXForm
                  ] as $key) {
             if ($this->_config->has("form.$key")) {
                 $this->{$key} = $this->_config->get("form.$key");
+            }
+        }
+
+        if ($this->_config->get('form.backgroundColor')) {
+            try {
+                $this->layout->backgroundColor = UXColor::of($this->_config->get('form.backgroundColor'));
+            } catch (Exception $e) {
+                ;
             }
         }
 

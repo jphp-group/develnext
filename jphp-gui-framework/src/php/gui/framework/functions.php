@@ -5,6 +5,7 @@ use php\gui\framework\behaviour\TextableBehaviour;
 use php\gui\UXAlert;
 use php\gui\UXApplication;
 use php\gui\UXComboBox;
+use php\gui\UXComboBoxBase;
 use php\gui\UXDesktop;
 use php\gui\UXDialog;
 use php\gui\UXLabel;
@@ -65,7 +66,7 @@ function uiText($object)
         return $object->text;
     }
 
-    if ($object instanceof UXComboBox) {
+    if ($object instanceof UXComboBoxBase) {
         return $object->value;
     }
 

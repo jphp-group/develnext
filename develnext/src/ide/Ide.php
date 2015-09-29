@@ -1,6 +1,7 @@
 <?php
 namespace ide;
 
+use Files;
 use ide\account\AccountManager;
 use ide\account\ServiceManager;
 use ide\commands\CloseProjectCommand;
@@ -415,6 +416,27 @@ class Ide extends Application
         }
 
         return File::of("$ideHome/$path");
+    }
+
+    /**
+     * @param string $suffix
+     * @return File
+     */
+    public function createTempFile($suffix = '')
+    {
+        $tempDir = $this->getFile('tmp');
+
+        if (!Files::isDir($tempDir)) {
+            if (Files::exists($tempDir)) {
+                Files::delete($tempDir);
+            }
+        }
+
+        $tempDir->mkdirs();
+
+        $file = File::createTemp(Str::random(5), Str::random(10) . $suffix, $tempDir);
+        $file->deleteOnExit();
+        return $file;
     }
 
     /**

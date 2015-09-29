@@ -319,8 +319,11 @@ class FormEventManager
                     }
                 }
             }
+
         } catch (IOException $e) {
 
+        } finally {
+            if ($tokenizer) $tokenizer->close();
         }
     }
 

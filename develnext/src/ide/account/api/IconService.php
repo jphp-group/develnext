@@ -1,7 +1,6 @@
 <?php
-namespace ide\account;
+namespace ide\account\api;
 
-use ide\account\api\AbstractService;
 
 /**
  * Class IconService

@@ -1,2 +1,3 @@
 ide\commands\account\AccountLoginCommand
 ide\commands\account\AccountRegisterCommand
+ide\commands\account\AccountProjectSyncCommand

@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="748.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <AnchorPane layoutX="707.0" layoutY="14.0" prefHeight="629.0" prefWidth="169.0" style="-fx-border-color: silver;" AnchorPane.bottomAnchor="57.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="14.0">
-         <children>
-            <TabPane id="actionTypePane" prefHeight="556.0" prefWidth="127.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-         </children>
-      </AnchorPane>
-      <ListView id="list" fixedCellSize="40.0" layoutX="14.0" layoutY="14.0" prefHeight="558.0" prefWidth="689.0" AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="185.0" AnchorPane.topAnchor="14.0" />
       <HBox layoutX="14.0" layoutY="525.0" prefHeight="34.0" prefWidth="700.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="185.0">
          <children>
             <Button id="saveButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" prefWidth="138.0" styleClass="icon-ok" text="Сохранить">
@@ -24,11 +19,37 @@
             <Button id="cancelButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" prefWidth="138.0" text="Отменить" />
          </children>
       </HBox>
-      <Label id="hintLabel" layoutX="48.0" layoutY="41.0" text="Перетащите сюда иконки с правой панели ..." textFill="#ababab">
-         <font>
-            <Font name="System Italic" size="22.0" />
-         </font>
-      </Label>
       <Button id="convertButton" layoutX="718.0" layoutY="652.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="34.0" prefWidth="167.0" text="Конвертировать в PHP" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+      <TabPane id="tabs" layoutX="14.0" layoutY="14.0" prefHeight="675.0" prefWidth="872.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="59.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+        <tabs>
+          <Tab text="Конструктор">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="654.0" prefWidth="872.0">
+                     <children>
+                        <ListView id="list" fixedCellSize="40.0" layoutX="-1.0" prefHeight="646.0" prefWidth="688.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="172.0" AnchorPane.topAnchor="0.0" />
+                        <Label id="hintLabel" layoutX="26.0" layoutY="21.0" text="Перетащите сюда иконки с правой панели ..." textFill="#ababab">
+                           <font>
+                              <Font name="System Italic" size="22.0" />
+                           </font>
+                        </Label>
+                        <AnchorPane prefHeight="646.0" prefWidth="169.0" style="-fx-border-color: silver;" AnchorPane.bottomAnchor="3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <TabPane id="actionTypePane" prefHeight="556.0" prefWidth="127.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab id="generatedCodeTab" text="Сгенерированный код">
+            <content>
+              <AnchorPane id="generatedCodeContent" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+          </Tab>
+        </tabs>
+         <cursor>
+            <Cursor fx:constant="DEFAULT" />
+         </cursor>
+      </TabPane>
    </children>
 </AnchorPane>

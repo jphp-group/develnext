@@ -10,6 +10,8 @@ use php\gui\framework\Timer;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\io\File;
+use php\lib\Items;
+use php\lib\Str;
 
 /**
  * Class ProjectSystem
@@ -26,17 +28,30 @@ class ProjectSystem
 
     static function import($file, $projectDir = null)
     {
+        Ide::get()->getMainForm()->showPreloader('Распаковка архива ...');
+
+        ProjectSystem::close();
+
         if (!$projectDir) {
             $projectDir = FileUtils::stripExtension($file);
         }
 
-        Ide::get()->getMainForm()->showPreloader('Распаковка архива ...');
+        FileUtils::deleteDirectory($projectDir);
 
         $importer = new ProjectImporter($file);
 
         $importer->extract($projectDir);
 
-        ProjectSystem::open($projectDir . "/" . File::of($projectDir)->getName() . ".dnproject");
+        $files = File::of($projectDir)->findFiles(function (File $dir, $name) {
+            return (Str::endsWith($name, '.dnproject'));
+        });
+
+        if (!$files) {
+            UXDialog::show('В архиве не обнаружен файл проекта', 'ERROR');
+            return;
+        }
+
+        ProjectSystem::open($projectDir . "/" . Items::first($files)->getName());
 
         Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива \n -> $file");
     }
@@ -108,6 +123,12 @@ class ProjectSystem
         if ($project) {
             $project->close();
         }
+
+        /** @var MainForm $mainForm */
+        $mainForm = Ide::get()->getMainForm();
+        $pane = $mainForm->getPropertiesPane();
+
+        $pane->children->clear();
 
         static::clear();
 

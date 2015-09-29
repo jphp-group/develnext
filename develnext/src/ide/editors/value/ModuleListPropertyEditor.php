@@ -45,7 +45,6 @@ class ModuleListPropertyEditor extends TextPropertyEditor
         return parent::getNormalizedValue($value);
     }
 
-
     public function updateUi($value)
     {
         if (is_array($value)) {

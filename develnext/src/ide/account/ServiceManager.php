@@ -3,6 +3,7 @@ namespace ide\account;
 
 use ide\account\api\AbstractService;
 use ide\account\api\AccountService;
+use ide\account\api\ProjectService;
 
 /**
  * Class ServiceManager
@@ -21,12 +22,18 @@ class ServiceManager
     protected $ideService;
 
     /**
+     * @var ProjectService
+     */
+    protected $projectService;
+
+    /**
      * ServiceManager constructor.
      */
     public function __construct()
     {
         $this->accountService = new AccountService();
         $this->ideService = new IdeService();
+        $this->projectService = new ProjectService();
     }
 
     /**
@@ -43,6 +50,11 @@ class ServiceManager
     public function ide()
     {
         return $this->ideService;
+    }
+
+    public function project()
+    {
+        return $this->projectService;
     }
 
     public function shutdown()

@@ -6,10 +6,13 @@ use ide\Ide;
 use ide\utils\Json;
 use php\format\ProcessorException;
 use php\gui\UXApplication;
+use php\io\File;
 use php\io\IOException;
+use php\io\Stream;
 use php\lang\ThreadPool;
 use php\lib\Items;
 use php\lib\Str;
+use php\net\SocketException;
 use php\net\URLConnection;
 use php\util\SharedValue;
 
@@ -46,6 +49,8 @@ abstract class AbstractService
     const CONNECTION_TIMEOUT = 10000;
     const READ_TIMEOUT = 60000;
 
+    const CRLF = "\r\n";
+
     /**
      * @var ThreadPool
      */
@@ -62,6 +67,85 @@ abstract class AbstractService
     public function __destruct()
     {
         $this->pool->shutdown();
+    }
+
+    public function upload($methodName, $files)
+    {
+        try {
+            $connection = $this->buildConnection($methodName);
+            $connection->requestMethod = 'POST';
+            $connection->doOutput = true;
+
+            try {
+                $boundary = Str::random(90);
+
+                $connection->setRequestProperty('Content-Type', "multipart/form-data; boundary=$boundary");
+
+                $out = $connection->getOutputStream();
+
+                $i = 0;
+
+                foreach ($files as $name => $file) {
+                    $fileName = File::of($file)->getName();
+
+                    $out->write("--$boundary");
+                    $out->write(self::CRLF);
+
+                    $out->write("Content-Disposition: form-data; name=\"$name\"; filename=\"$fileName\"");
+                    $out->write(self::CRLF);
+
+                    $out->write("Content-Type: " . URLConnection::guessContentTypeFromName($fileName));
+                    $out->write(self::CRLF);
+
+                    $out->write("Content-Transfer-Encoding: binary");
+                    $out->write(self::CRLF);
+                    $out->write(self::CRLF);
+                    $out->write(Stream::getContents($file));
+                    $out->write(self::CRLF);
+                }
+
+                $out->write("--$boundary--");
+                $out->write(self::CRLF);
+
+                $data = $connection->getInputStream()->readFully();
+
+                if (Ide::get()->isDevelopment()) {
+                    static $lock;
+
+                    if (!$lock) $lock = new SharedValue();
+
+                    $lock->synchronize(function () use ($methodName, $files, $data) {
+                        echo "POST files /$methodName [" . Json::encode($files) . "]\n";
+                        echo "\t-> [" . $data . "]\n\n";
+                    });
+                }
+
+                if ($connection->responseCode != 200) {
+                    if ($connection->responseCode >= 500) {
+                        throw new ServiceNotAvailableException($connection->responseCode, $data);
+                    } else {
+                        throw new ServiceException($connection->responseCode, $data);
+                    }
+                }
+
+                $response = new ServiceResponse(Json::decode($data));
+
+                if ($response->isFail() && $response->message() == "InvalidAuthorization") {
+                    Ide::accountManager()->setAccessToken(null);
+                }
+
+                return $response;
+            } catch (ProcessorException $e) {
+                throw new ServiceInvalidResponseException($e->getMessage(), 0, $e);
+            } catch (IOException $e) {
+                return new ServiceResponse([
+                    'status' => 'error',
+                    'message' => 'ConnectionFailed: ' . $e->getMessage() . ' line ' . $e->getLine()
+                ]);
+            }
+        } finally {
+            if ($connection) $connection->disconnect();
+        }
     }
 
     /**
@@ -102,13 +186,18 @@ abstract class AbstractService
                     }
                 }
 
-                    $response = new ServiceResponse(Json::decode($data));
+                $response = new ServiceResponse(Json::decode($data));
 
-                    if ($response->isFail() && $response->message() == "InvalidAuthorization") {
-                        Ide::accountManager()->setAccessToken(null);
-                    }
+                if ($response->isFail() && $response->message() == "InvalidAuthorization") {
+                    Ide::accountManager()->setAccessToken(null);
+                }
 
-                    return $response;
+                return $response;
+            } catch (SocketException $e) {
+                return new ServiceResponse([
+                    'status' => 'error',
+                    'message' => 'ConnectionRefused'
+                ]);
             } catch (ProcessorException $e) {
                 throw new ServiceInvalidResponseException($e->getMessage(), 0, $e);
             } catch (IOException $e) {
@@ -152,7 +241,8 @@ abstract class AbstractService
 
     protected function makeUrl($url)
     {
-        return ("http://develnext.ru/a/" . $url);
+        return ("http://localhost:8080/a/" . $url);
+        //return ("http://develnext.ru/a/" . $url);
     }
 
     protected function buildConnection($url)

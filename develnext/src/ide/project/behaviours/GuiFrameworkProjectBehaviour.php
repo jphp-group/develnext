@@ -1,6 +1,7 @@
 <?php
 namespace ide\project\behaviours;
 
+use Files;
 use ide\action\ActionManager;
 use ide\build\OneJarBuildType;
 use ide\build\SetupWindowsApplicationBuildType;
@@ -115,7 +116,15 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function doExport(ProjectExporter $exporter)
     {
         $exporter->addDirectory($this->project->getFile('src/'));
+
         $exporter->removeFile($this->project->getFile('src/.debug'));
+
+        // remove .php files if .source exists
+        FileUtils::scan($this->project->getFile('src'), function ($filename) use ($exporter) {
+            if (Str::endsWith($filename, '.php') && Files::exists($filename . '.source')) {
+                $exporter->removeFile($filename);
+            }
+        });
     }
 
     public function doCompile($environment, callable $log = null) {

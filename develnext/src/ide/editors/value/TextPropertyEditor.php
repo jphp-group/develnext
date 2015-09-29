@@ -23,6 +23,15 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
      */
     protected $dialogButton;
 
+    protected function getEditorForm()
+    {
+        if (!$this->editorForm) {
+            $this->editorForm = new TextPropertyEditorForm();
+        }
+
+        return $this->editorForm;
+    }
+
     public function makeUi()
     {
         parent::makeUi();
@@ -35,10 +44,6 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
         $this->dialogButton->width = 20;
 
         $this->dialogButton->on('click', function (UXMouseEvent $e) {
-            if (!$this->editorForm) {
-                $this->editorForm = new TextPropertyEditorForm();
-            }
-
             $this->showDialog($e->screenX, $e->screenY);
         });
 
@@ -52,7 +57,7 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
 
     public function showDialog($x = null, $y = null)
     {
-        $dialog = $this->editorForm;
+        $dialog = $this->getEditorForm();
 
         if ($dialog->visible) {
             $dialog->hide();

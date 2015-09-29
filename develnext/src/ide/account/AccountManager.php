@@ -63,7 +63,6 @@ class AccountManager
      */
     public function updateAccount()
     {
-        return; // TODO
         if ($this->isAuthorized()) {
             Ide::service()->account()->getAsync(function (ServiceResponse $response) {
                 if ($response->isSuccess()) {
@@ -84,7 +83,6 @@ class AccountManager
 
     public function updateIdeUi()
     {
-        return; // FIXME
         $logged = Ide::get()->getInternalList('.dn/account/loggedCommands');
         $unlogged = Ide::get()->getInternalList('.dn/account/unloggedCommands');
 
@@ -152,10 +150,10 @@ class AccountManager
                 }  */
             }
 
-            // $this->loginForm->show();
-           // Ide::service()->ide()->startAsync(null);  TODO
+             $this->loginForm->showAndWait();
         }
 
+        Ide::service()->ide()->startAsync(null);
         $this->updateAccount();
     }
 }

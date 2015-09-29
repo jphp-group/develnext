@@ -22,6 +22,7 @@ import java.util.List;
 @Namespace(ParserExtension.NS)
 public class SourceTokenizer extends BaseObject {
     protected Tokenizer tokenizer;
+    private InputStream stream;
 
     public SourceTokenizer(Environment env, Tokenizer tokenizer) {
         super(env);
@@ -34,7 +35,7 @@ public class SourceTokenizer extends BaseObject {
 
     @Signature
     public void __construct(Environment env, Memory path, String moduleName, String charset) throws IOException {
-        InputStream stream = Stream.getInputStream(env, path);
+        stream = Stream.getInputStream(env, path);
 
         Context context = new Context(stream, moduleName, Charset.forName(charset));
 
@@ -66,5 +67,14 @@ public class SourceTokenizer extends BaseObject {
         }
 
         return result;
+    }
+
+    @Signature
+    public void close(Environment env) {
+        try {
+            stream.close();
+        } catch (IOException e) {
+            ;
+        }
     }
 }

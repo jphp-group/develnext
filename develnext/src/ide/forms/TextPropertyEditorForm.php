@@ -23,6 +23,17 @@ class TextPropertyEditorForm extends AbstractForm
 {
     use DialogFormMixin;
 
+    protected function init()
+    {
+        parent::init();
+
+        $this->watch('focused', function ($self, $prop, $old, $new) {
+            if (!$new) {
+                $this->hide();
+            }
+        });
+    }
+
     /**
      * @event copyButton.action
      */
