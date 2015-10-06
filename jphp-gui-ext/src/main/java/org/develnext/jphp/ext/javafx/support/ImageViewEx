@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.support;
 
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -186,6 +187,27 @@ public class ImageViewEx extends Canvas {
     public void setBackground(Paint background) {
         this.background = background;
         update();
+    }
+
+    @Override
+    public double prefWidth(double height) {
+        return getWidth();
+    }
+
+    @Override
+    public double prefHeight(double width) {
+        return getHeight();
+    }
+
+    @Override
+     public boolean isResizable() {
+        return !autoSize;
+    }
+
+    @Override
+    public void resize(double v, double v1) {
+        setWidth(v);
+        setHeight(v1);
     }
 
     protected void update() {
