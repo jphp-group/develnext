@@ -1,3 +1,7 @@
+.root {
+
+}
+
 /* icons .. */
 .icon-exit { -fx-graphic: url("/.data/img/icons/exit16.png"); }
 .icon-exit32 { -fx-graphic: url("/.data/img/icons/exit32.png"); }
@@ -33,4 +37,13 @@
 .list-view .list-cell:filled:selected:focused, .list-view .list-cell:filled:selected {
     -fx-background-color: silver;
     -fx-cursor: hand;
+}
+
+.small-checkbox {
+    -fx-label-padding: 0.0em 0.0em 0.0em 0.0em;
+}
+
+.small-checkbox .mark {
+    -fx-padding: 0.26em;
+    -fx-background-radius: 0, 0, 0, 0;
 }

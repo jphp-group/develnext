@@ -2,6 +2,7 @@
 namespace ide\forms;
 
 use ide\Ide;
+use ide\Logger;
 use ide\project\templates\DefaultGuiProjectTemplate;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
@@ -31,10 +32,20 @@ use php\gui\UXTreeView;
  */
 class MainForm extends AbstractForm
 {
+    protected function init()
+    {
+        parent::init();
+    }
+
     public function show()
     {
         parent::show();
+        Logger::info("Show main form ...");
+
         $this->maximized = true;
+
+        $this->projectTabs->tabs[0]->graphic = ico('settings16');
+        $this->projectTabs->tabs[1]->graphic = ico('tree16');
     }
 
     /**
@@ -47,6 +58,8 @@ class MainForm extends AbstractForm
      */
     public function doClose(UXEvent $e)
     {
+        Logger::info("Close main form ...");
+
         $project = Ide::get()->getOpenedProject();
 
         if ($project) {
@@ -61,11 +74,14 @@ class MainForm extends AbstractForm
                 $result = $dialog->getResult();
 
                 if ($result == 'yes') {
+                    Logger::info("Remember the last project = yes!");
+
                     Ide::get()->setUserConfigValue('lastProject', $project->getFile($project->getName() . '.dnproject'));
                 } elseif ($result == 'abort') {
                     $e->consume();
                     return;
                 } else {
+                    Logger::info("Cancel closing main form.");
                     Ide::get()->setUserConfigValue('lastProject', null);
                 }
             }

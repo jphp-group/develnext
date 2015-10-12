@@ -24,4 +24,11 @@ class UXDesignPane extends UXAnchorPane
      * @var bool
      */
     public $editing;
+
+    /**
+     * @param callable|null $handle
+     */
+    public function onResize(callable $handle)
+    {
+    }
 }

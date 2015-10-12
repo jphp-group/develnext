@@ -2,6 +2,7 @@
 namespace ide\forms;
 
 use ide\Ide;
+use ide\Logger;
 use php\gui\UXDesktop;
 use php\gui\framework\AbstractForm;
 use php\gui\UXButton;
@@ -89,6 +90,8 @@ class BuildSuccessForm extends AbstractForm
      */
     public function doShow()
     {
+        Logger::info("Show build success: buildPath = {$this->buildPath}");
+
         $this->runButton->visible = !!$this->onRun;
         $this->openButton->visible = !!$this->onOpenDirectory;
 

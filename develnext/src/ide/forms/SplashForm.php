@@ -2,6 +2,7 @@
 namespace ide\forms;
 
 use ide\Ide;
+use ide\Logger;
 use php\gui\framework\AbstractForm;
 use php\gui\UXApplication;
 use php\gui\UXImageView;
@@ -17,11 +18,13 @@ class SplashForm extends AbstractForm
 {
     protected function init()
     {
+        Logger::info("Init form ...");
+
         $this->centerOnScreen();
 
         $this->version->text = $this->_app->getVersion();
 
-        Timer::run(4000, function() {
+        Timer::run(7000, function() {
             if ($this->_app->getMainForm()->visible) {
                 $this->hide();
             }

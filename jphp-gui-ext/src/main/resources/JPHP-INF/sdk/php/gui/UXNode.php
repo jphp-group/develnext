@@ -2,6 +2,7 @@
 namespace php\gui;
 
 use php\gui\event\UXEvent;
+use php\lang\IllegalArgumentException;
 
 /**
  * Class UXNode
@@ -159,6 +160,7 @@ abstract class UXNode
      * Getter and Setter for object data
      * @param string $name
      * @param mixed $value (optional)
+     * @return mixed
      */
     public function data($name, $value)
     {
@@ -305,10 +307,21 @@ abstract class UXNode
     }
 
     /**
+     * Use observer() ..
+     * @deprecated
      * @param string $property
      * @param callable $listener (UXNode $self, $property, $oldValue, $newValue)
      */
     public function watch($property, callable $listener)
+    {
+    }
+
+    /**
+     * @param string $property
+     * @return UXValue
+     * @throws IllegalArgumentException
+     */
+    public function observer($property)
     {
     }
 }

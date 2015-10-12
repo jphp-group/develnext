@@ -33,7 +33,7 @@ public class UXRectangle extends UXShape<Rectangle> {
     protected void setSize(double[] size) {
         if (size.length >= 2) {
             getWrappedObject().setWidth(size[0]);
-            getWrappedObject().setHeight(size[0]);
+            getWrappedObject().setHeight(size[1]);
         }
     }
 

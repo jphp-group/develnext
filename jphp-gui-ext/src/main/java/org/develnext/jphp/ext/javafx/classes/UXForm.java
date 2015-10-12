@@ -5,6 +5,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.*;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection.*;
@@ -117,5 +118,19 @@ public class UXForm extends UXWindow {
         getWrappedObject().setY(bounds.getMinY());
         getWrappedObject().setWidth(bounds.getWidth());
         getWrappedObject().setHeight(bounds.getHeight());
+    }
+
+    @Setter
+    public void setTransparent(boolean value) {
+        if (value) {
+            getWrappedObject().getScene().setFill(null);
+        } else {
+            getWrappedObject().getScene().setFill(Color.WHITE);
+        }
+    }
+
+    @Getter
+    public boolean getTransparent() {
+        return getWrappedObject().getScene().getFill() == null;
     }
 }

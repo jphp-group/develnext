@@ -3,6 +3,7 @@ namespace ide\formats;
 
 use ide\editors\AbstractEditor;
 use ide\editors\CodeEditor;
+use php\gui\designer\UXSyntaxAutoCompletion;
 use php\lib\Str;
 
 /**
@@ -18,15 +19,15 @@ class PhpCodeFormat extends AbstractFormat
      */
     public function createEditor($file)
     {
-        return new CodeEditor($file, 'php', [
-            'enableBasicAutocompletion' => true,
-            'enableSnippets' => true,
-            'enableLiveAutocompletion' => true,
-            'showPrintMargin' => false,
-            'fontSize' => 14,
+        $editor = new CodeEditor($file, 'php');
 
-            'theme' => 'ambiance',
-        ]);
+        $completion = new UXSyntaxAutoCompletion();
+        $completion->addVariableCompletion('$this', 'object');
+        $completion->addVariableCompletion('$event', 'mixed');
+
+        //$editor->installAutoCompletion($completion);
+
+        return $editor;
     }
 
     /**

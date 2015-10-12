@@ -1,0 +1,5 @@
+<behaviour extends="AnimationBehaviourSpec">
+    <properties>
+        <property name="Анимировать" code="animated" editor="boolean" tooltip="Плавное появление и исчезание объекта" />
+    </properties>
+</behaviour>

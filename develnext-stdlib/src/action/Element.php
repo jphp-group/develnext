@@ -8,11 +8,13 @@ use php\gui\UXComboBox;
 use php\gui\UXComboBoxBase;
 use php\gui\UXForm;
 use php\gui\UXImage;
+use php\gui\UXImageArea;
 use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXLabeled;
 use php\gui\UXListView;
 use php\gui\UXTextInputControl;
+use php\gui\UXWebView;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\Thread;
@@ -31,7 +33,7 @@ class Element
             return true;
         }
 
-        if ($object instanceof UXLabeled || $object instanceof UXTextInputControl) {
+        if ($object instanceof UXLabeled || $object instanceof UXTextInputControl || $object instanceof UXImageArea) {
             $object->text = $value;
             return true;
         } elseif ($object instanceof UXComboBoxBase) {
@@ -43,6 +45,9 @@ class Element
             return true;
         } elseif ($object instanceof UXForm) {
             $object->title = $value;
+            return true;
+        } elseif ($object instanceof UXWebView) {
+            $object->engine->loadContent($value, "text/html");
             return true;
         }
 
@@ -56,7 +61,7 @@ class Element
             return true;
         }
 
-        if ($object instanceof UXLabeled || $object instanceof UXTextInputControl) {
+        if ($object instanceof UXLabeled || $object instanceof UXTextInputControl || $object instanceof UXImageArea) {
             $object->text .= $value;
             return true;
         } else if ($object instanceof UXListView || $object instanceof UXComboBoxBase) {
@@ -64,6 +69,9 @@ class Element
             return true;
         } else if ($object instanceof UXForm) {
             $object->title .= $value;
+            return true;
+        } else if ($object instanceof UXWebView) {
+            $object->engine->loadContent($value, "text/html");
             return true;
         }
 
@@ -80,6 +88,11 @@ class Element
 
         if ($object instanceof UXImageView) {
             $object->image = new UXImage(Stream::of($path));
+            return true;
+        }
+
+        if ($object instanceof UXWebView) {
+            $object->engine->load($path);
             return true;
         }
 
@@ -106,6 +119,18 @@ class Element
                     $object->applyContentToObject($content);
 
                     if ($callback) $callback();
+                });
+            } else if ($object instanceof UXWebView) {
+                UXApplication::runLater(function () use ($object, $path, $callback) {
+                    $object->engine->load($path);
+
+                    $object->engine->watchState(function () use ($object, $callback) {
+                        if ($object->engine->state == 'SUCCEEDED') {
+                            if ($callback) {
+                                UXApplication::runLater($callback);
+                            }
+                        }
+                    });
                 });
             } else if ($object instanceof UXImageView) {
                 $image = new UXImage(Stream::of($path));

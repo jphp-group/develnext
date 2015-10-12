@@ -2,6 +2,7 @@
 namespace ide\systems;
 use ide\forms\MainForm;
 use ide\Ide;
+use ide\Logger;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\project\ProjectImporter;
@@ -12,6 +13,7 @@ use php\gui\UXDialog;
 use php\io\File;
 use php\lib\Items;
 use php\lib\Str;
+use script\TimerScript;
 
 /**
  * Class ProjectSystem
@@ -28,6 +30,8 @@ class ProjectSystem
 
     static function import($file, $projectDir = null)
     {
+        Logger::info("Start import project: file = $file, projectDir = $projectDir");
+
         Ide::get()->getMainForm()->showPreloader('Распаковка архива ...');
 
         ProjectSystem::close();
@@ -51,9 +55,13 @@ class ProjectSystem
             return;
         }
 
-        ProjectSystem::open($projectDir . "/" . Items::first($files)->getName());
+        TimerScript::executeAfter(1000, function () use ($projectDir, $files, $file) {
+            ProjectSystem::open($projectDir . "/" . Items::first($files)->getName());
 
-        Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива \n -> $file");
+            Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива \n -> $file");
+
+            Logger::info("Finish importing project.");
+        });
     }
 
     /**
@@ -82,6 +90,8 @@ class ProjectSystem
      */
     static function open($fileName)
     {
+        Logger::info("Start opening project: $fileName");
+
         Ide::get()->getMainForm()->showPreloader('Открытие проекта ...');
 
         static::clear();
@@ -97,6 +107,8 @@ class ProjectSystem
         $project->open();
 
         Ide::get()->getMainForm()->hidePreloader();
+
+        Logger::info("Finish opening project.");
     }
 
     /**

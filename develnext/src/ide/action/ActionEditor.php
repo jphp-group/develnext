@@ -285,4 +285,16 @@ class ActionEditor extends AbstractEditor
 
         $this->save();
     }
+
+    public function renameMethod($className, $methodName, $newMethodName)
+    {
+        /** @var DomElement $domMethod */
+        $domMethod = $this->document->find("/root/class[@name='$className']/method[@name='$methodName']");
+
+        if ($domMethod) {
+            $domMethod->setAttribute('name', $newMethodName);
+
+            $this->save();
+        }
+    }
 }

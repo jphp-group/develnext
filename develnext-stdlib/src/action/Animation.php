@@ -38,6 +38,10 @@ class Animation
             $timer->on('action', function (ScriptEvent $e) use ($object, $step, $value, $callback, &$steps) {
                 $opacity = $object->opacity + $step;
 
+                if ($opacity > 1) {
+                    $opacity = 1;
+                }
+
                 $object->opacity = $opacity < 0 ? 0 : $opacity;
 
                 $steps--;

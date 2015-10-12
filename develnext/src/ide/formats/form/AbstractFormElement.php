@@ -156,8 +156,10 @@ abstract class AbstractFormElement
 
     /**
      * @param $node
+     * @return mixed
      */
     public function registerNode(UXNode $node)
     {
+        return null;
     }
 }

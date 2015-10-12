@@ -16,6 +16,12 @@ abstract class UXWebEngine
     public $document;
 
     /**
+     * @readonly
+     * @var UXWebHistory
+     */
+    public $history;
+
+    /**
      * @var bool
      */
     public $javaScriptEnabled;
@@ -58,6 +64,16 @@ abstract class UXWebEngine
      * ...
      */
     public function reload() {}
+
+    /**
+     * See reload().
+     */
+    public function refresh() {}
+
+    /**
+     * Break a loading.
+     */
+    public function cancel() {}
 
     /**
      * @param string $script

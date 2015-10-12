@@ -17,6 +17,7 @@ class IfTextActionType extends AbstractSimpleActionType
             'object' => 'string',
             'method' => 'textMethods',
             'string' => 'string',
+            'not' => 'flag',
         ];
     }
 
@@ -25,7 +26,8 @@ class IfTextActionType extends AbstractSimpleActionType
         return [
             'object' => 'Текст',
             'method' => 'Метод сравнения',
-            'string' => 'Значение'
+            'string' => 'Значение',
+            'not' => 'Отрицание (все наоборот)'
         ];
     }
 
@@ -104,28 +106,36 @@ class IfTextActionType extends AbstractSimpleActionType
         $object = $action->get('object');
         $string = $action->get('string');
 
+        $not = $action->not ? '!' : '';
+
+        dump($this->method);
+
         switch ($this->method) {
             case 'regex':
-                return "if (Regex::match($string, $object))";
+                return "if ({$not}Regex::match($string, $object))";
 
             case 'regexIgnoreCase':
-                return "if (Regex::match($string, $object, Regex::CASE_INSENSITIVE))";
+                return "if ({$not}Regex::match($string, $object, Regex::CASE_INSENSITIVE))";
 
             case 'startsWith':
-                return "if (Str::startsWith($object, $string))";
+                return "if ({$not}Str::startsWith($object, $string))";
 
             case 'endsWith':
-                return "if (Str::endsWith($object, $string))";
+                return "if ({$not}Str::endsWith($object, $string))";
 
             case 'contains':
-                return "if (Str::contains($object, $string))";
+                return "if ({$not}Str::contains($object, $string))";
 
             case 'equalsIgnoreCase':
-                return "if (Str::equalsIgnoreCase($object, $string))";
+                return "if ({$not}Str::equalsIgnoreCase($object, $string))";
 
             case 'equals':
             default:
-                return "if ($object == $string)";
+                if ($action->not) {
+                    return "if ($object != $string)";
+                } else {
+                    return "if ($object == $string)";
+                }
         }
     }
 }

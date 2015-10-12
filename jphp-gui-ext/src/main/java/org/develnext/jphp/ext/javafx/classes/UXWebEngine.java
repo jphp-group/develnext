@@ -1,13 +1,16 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.Event;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebHistory;
 import netscape.javascript.JSObject;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
+import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.w3c.dom.Document;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
@@ -23,6 +26,7 @@ import php.runtime.reflection.ClassEntity;
 public class UXWebEngine extends BaseWrapper<WebEngine> {
     interface WrappedInterface {
         @Property Document document();
+        @Property WebHistory history();
         @Property boolean javaScriptEnabled();
         @Property String location();
         @Property String title();
@@ -47,6 +51,16 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
     @Signature
     public Memory executeScript(Environment env, String script) {
         return Memory.wrap(env, getWrappedObject().executeScript(script));
+    }
+
+    @Signature
+    public void refresh() {
+        getWrappedObject().reload();
+    }
+
+    @Signature
+    public boolean cancel() {
+        return getWrappedObject().getLoadWorker().cancel();
     }
 
     @Signature
@@ -78,6 +92,11 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
         window.setMember(name, new Bridge(handler));
     }
 
+    @Signature
+    public ObservableValue observer(String property) {
+        return JavaFxUtils.findObservable(this, property);
+    }
+
     @Getter
     public Worker.State getState() {
         return getWrappedObject().getLoadWorker().getState();
@@ -87,12 +106,17 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
     public void watchState(final Environment env, final Invoker invoker) {
         getWrappedObject().getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
             @Override
-            public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
-                try {
-                    invoker.callAny(UXWebEngine.this, oldValue, newValue);
-                } catch (Throwable e) {
-                    env.wrapThrow(e);
-                }
+            public void changed(ObservableValue<? extends Worker.State> observable, final Worker.State oldValue, final Worker.State newValue) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            invoker.callAny(UXWebEngine.this, oldValue, newValue);
+                        } catch (Throwable e) {
+                            env.wrapThrow(e);
+                        }
+                    }
+                });
             }
         });
     }

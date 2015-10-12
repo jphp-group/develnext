@@ -1,0 +1,5 @@
+<behaviour extends="AnimationBehaviourSpec">
+    <properties>
+        <property name="Макс. смещение" code="maxOffset" editor="integer" tooltip="Максимальное смещение" />
+    </properties>
+</behaviour>

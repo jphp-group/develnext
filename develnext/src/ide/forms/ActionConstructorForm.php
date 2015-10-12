@@ -73,13 +73,20 @@ class ActionConstructorForm extends AbstractForm
     {
         parent::init();
 
-        $codeView = new CodeTextArea('php', [
-            'fontSize' => 13,
-            'theme' => 'ambiance'
-        ]);
+        $codeView = new CodeTextArea('php');
+        $codeView->editable = false;
 
         UXAnchorPane::setAnchor($codeView, 0);
+        $codeView->bottomAnchor = 3;
+        $codeView->topAnchor = 26;
+
+        $label = new UXLabel('Сгенерированный код, только для чтения:');
+        $label->padding = 3;
+
+        $this->generatedCodeContent->add($label);
         $this->generatedCodeContent->add($codeView);
+
+
 
         $this->tabs->tabs[1]->on('change', function () use ($codeView) {
             UXApplication::runLater(function () use ($codeView) {

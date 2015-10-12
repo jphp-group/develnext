@@ -40,6 +40,23 @@ class TimerScript extends AbstractScript
     protected $th;
 
     /**
+     * TimerScript constructor.
+     * @param int $interval
+     * @param bool $repeatable
+     * @param callable $action
+     */
+    public function __construct($interval = 1000, $repeatable = false, callable $action = null)
+    {
+        $this->interval = $interval;
+        $this->repeatable = $repeatable;
+
+        if ($action) {
+            $this->on('action', $action);
+        }
+    }
+
+
+    /**
      * @param $target
      * @return mixed
      */
@@ -131,5 +148,21 @@ class TimerScript extends AbstractScript
     public function getEnable()
     {
         return $this->getEnabled();
+    }
+
+    /**
+     * @param int $delay millis
+     * @param callable $callback
+     * @return TimerScript
+     */
+    static function executeAfter($delay, callable $callback)
+    {
+        $timer = new TimerScript();
+        $timer->repeatable = false;
+        $timer->interval = $delay;
+        $timer->on('action', $callback);
+        $timer->start();
+
+        return $timer;
     }
 }

@@ -7,6 +7,7 @@ use php\gui\event\UXMouseEvent;
 use php\gui\event\UXWindowEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\paint\UXColor;
+use php\gui\text\UXFont;
 use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXCheckbox;
@@ -58,9 +59,11 @@ class BuildProgressForm extends AbstractForm
     protected function init()
     {
         $this->threadPool = ThreadPool::createFixed(3);
-        $this->icon->image = Ide::get()->getImage('icons/refresh32.png')->image;
+        $this->icon->image = ico('wait32')->image;
 
         $this->consoleList->setCellFactory(function (UXListCell $cell, $item, $empty) {
+            $cell->font = UXFont::of('Courier New', 12);
+
             if (is_array($item)) {
                 $cell->text = $item[0];
                 $cell->textColor = UXColor::of($item[1]);

@@ -1,0 +1,6 @@
+<behaviour extends="AnimationBehaviourSpec">
+    <properties>
+        <property name="Анимировать" code="animated" editor="boolean" />
+        <property name="Скорость анимации" code="animationSpeed" editor="integer" tooltip="Скорость перемещения объекта" />
+    </properties>
+</behaviour>

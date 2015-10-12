@@ -8,6 +8,7 @@ use php\format\ProcessorException;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
+use php\lang\IllegalStateException;
 use php\lib\Str;
 use php\xml\DomElement;
 use php\xml\XmlProcessor;
@@ -109,6 +110,21 @@ class ScriptComponentManager
     }
 
     /**
+     * @param $id
+     * @return ScriptComponentContainer|null
+     */
+    public function findById($id)
+    {
+        foreach ($this->components as $component) {
+            if ($component->id == $id) {
+                return $component;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param ScriptComponentContainer $container
      */
     public function remove(ScriptComponentContainer $container)
@@ -186,6 +202,8 @@ class ScriptComponentManager
 
             return true;
         }
+
+        //throw new IllegalStateException("Unable to rename {$container->getConfigPath()} to $newConfigPath");
 
         return false;
     }

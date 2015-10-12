@@ -1,12 +1,10 @@
 package org.develnext.jphp.gui.designer;
 
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
-import org.develnext.jphp.ext.javafx.classes.UXDesktop;
 import org.develnext.jphp.gui.designer.classes.*;
+import org.fife.ui.autocomplete.AutoCompletion;
 import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
-
-import java.awt.*;
 
 public class GuiDesignerExtension extends Extension {
     public static final String NS = JavaFXExtension.NS + "designer";
@@ -23,6 +21,8 @@ public class GuiDesignerExtension extends Extension {
         registerClass(scope, UXDesignPane.class);
         registerClass(scope, UXDesignProperties.class);
         registerClass(scope, UXDesignPropertyEditor.class);
+        registerWrapperClass(scope, AutoCompletion.class, UXSyntaxAutoCompletion.class);
+        registerWrapperClass(scope, SyntaxTextArea.class, UXSyntaxTextArea.class);
 
         registerClass(scope, FileSystemWatcher.WrapWatchKey.class);
         registerClass(scope, FileSystemWatcher.class);

@@ -1,6 +1,6 @@
 <element>
     <properties group="bindings" title="Функционал">
-        <property code="modules" name="Модули (скрипты)" editor="moduleList" tooltip="Подключенные модули к форме" formConfig="1" />
+        <property code="modules" name="Модули" editor="moduleList" tooltip="Подключенные модули к форме" formConfig="1" />
     </properties>
 
     <properties group="general" title="Главное">

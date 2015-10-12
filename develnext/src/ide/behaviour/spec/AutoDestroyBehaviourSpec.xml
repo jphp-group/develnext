@@ -1,0 +1,5 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property name="Задержка" code="delay" editor="integer" tooltip="Через сколько млсек объект будет уничтожен" />
+    </properties>
+</behaviour>

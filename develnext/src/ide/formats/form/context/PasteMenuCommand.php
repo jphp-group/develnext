@@ -6,6 +6,7 @@ use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use php\format\ProcessorException;
+use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\Timer;
 use php\gui\UXClipboard;
 use php\gui\UXDialog;
@@ -13,6 +14,7 @@ use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\io\MemoryStream;
 use php\io\Stream;
+use php\xml\DomElement;
 use php\xml\DomNode;
 use php\xml\DomNodeList;
 use php\xml\XmlProcessor;
@@ -41,7 +43,6 @@ class PasteMenuCommand extends AbstractMenuCommand
         if (UXClipboard::hasText()) {
             $text = UXClipboard::getText();
 
-            $loader = new UXLoader();
             $processor = new XmlProcessor();
 
             $editor->getDesigner()->unselectAll();
@@ -54,6 +55,9 @@ class PasteMenuCommand extends AbstractMenuCommand
                 $count = (int) $rootElement->getAttribute('count');
 
                 $nodes = $document->findAll('/copies/node/*');
+
+                /** @var DomElement $behaviours */
+                $behaviours = $document->find('/copies/behaviours');
 
                 $addLayout = function (UXNode $uiNode) use ($editor, &$addLayout) {
                     $type = $editor->getFormat()->getFormElement($uiNode);
@@ -71,9 +75,11 @@ class PasteMenuCommand extends AbstractMenuCommand
                     }
                 };
 
-                /** @var DomNode $element */
+                /** @var DomElement $element */
                 foreach ($nodes as $element) {
+                    $loader = new UXLoader();
                     $uiNode = $loader->load($this->makeXmlForLoader($element, $imports));
+                    $targetId = $editor->getNodeId($uiNode);
 
                     $uiNode->x += $editor->getDesigner()->snapSize * ($count + 1);
                     $uiNode->y += $editor->getDesigner()->snapSize * ($count + 1);
@@ -86,6 +92,10 @@ class PasteMenuCommand extends AbstractMenuCommand
                     });
 
                     $addLayout($uiNode);
+
+                    if ($behaviours) {
+                        BehaviourLoader::loadOne($targetId, $behaviours, $editor->getBehaviourManager(), $editor->getNodeId($uiNode));
+                    }
                 }
 
                 $editor->getDesigner()->update();

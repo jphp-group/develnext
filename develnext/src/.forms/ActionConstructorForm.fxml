@@ -26,15 +26,18 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="654.0" prefWidth="872.0">
                      <children>
-                        <ListView id="list" fixedCellSize="40.0" layoutX="-1.0" prefHeight="646.0" prefWidth="688.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="172.0" AnchorPane.topAnchor="0.0" />
+                        <ListView id="list" fixedCellSize="40.0" layoutX="-1.0" prefHeight="643.0" prefWidth="700.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="178.0" AnchorPane.topAnchor="0.0" />
                         <Label id="hintLabel" layoutX="26.0" layoutY="21.0" text="Перетащите сюда иконки с правой панели ..." textFill="#ababab">
                            <font>
                               <Font name="System Italic" size="22.0" />
                            </font>
                         </Label>
-                        <AnchorPane prefHeight="646.0" prefWidth="169.0" style="-fx-border-color: silver;" AnchorPane.bottomAnchor="3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane prefHeight="646.0" prefWidth="176.0" style="-fx-border-color: silver;" AnchorPane.bottomAnchor="3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <TabPane id="actionTypePane" prefHeight="556.0" prefWidth="127.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <TabPane id="actionTypePane" prefHeight="556.0" prefWidth="127.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets></TabPane>
                            </children>
                         </AnchorPane>
                      </children>

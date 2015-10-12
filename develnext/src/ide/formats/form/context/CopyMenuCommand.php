@@ -41,6 +41,15 @@ class CopyMenuCommand extends AbstractMenuCommand
 
             $rootElement = $document->createElement('copies');
 
+            $targetIds = [];
+
+            foreach ($nodes as $node) {
+                $targetIds[] = $editor->getNodeId($node);
+            }
+
+            $behaviourElement = $editor->getBehaviourManager()->dump($document, $targetIds);
+            $rootElement->appendChild($behaviourElement);
+
             if ($disableCount) {
                 $rootElement->setAttribute('count', -1);
             } else {

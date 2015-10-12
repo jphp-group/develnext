@@ -27,11 +27,9 @@
         <property code="opacity" name="Непрозрачность %" editor="percent" tooltip="Уровень непрозрачности от 0 до 100%, например, 50% - объект прозрачен на половину" />
         <property code="rotate" name="Угол поворота" editor="float" tooltip="Уровень поворота в градусах от 0 до 360" />
 
-        <property code="x" name="Позиция X" editor="integer" />
-        <property code="y" name="Позиция Y" editor="integer" />
-
-        <property code="width" name="Ширина" editor="integer" />
-        <property code="height" name="Высота" editor="integer" />
+        <property code="position" name="Позиция (X, Y)" editor="doubleArray" tooltip="Позиция по X (горизонтали) и по Y (вертикали)" />
+        <property code="size" name="Размеры (W, H)" editor="doubleArray" tooltip="Размеры, ширина (width) + высота (height)" />
+        <property code="anchorFlags" name="Растягивание" editor="anchor" tooltip="Автоматическое растягивание объекта, к левой части, к правой, к верху, к низу" />
     </properties>
 
     <eventTypes>

@@ -34,4 +34,12 @@ class SourceTokenizer
     public function close()
     {
     }
+
+    /**
+     * @param $string
+     * @return SourceToken[]
+     */
+    public static function parseAll($string)
+    {
+    }
 }

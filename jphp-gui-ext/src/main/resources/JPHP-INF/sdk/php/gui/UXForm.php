@@ -55,6 +55,11 @@ class UXForm extends UXWindow
     public $icons;
 
     /**
+     * @var bool
+     */
+    public $transparent = false;
+
+    /**
      * @param UXForm $form (optional)
      */
     public function __construct(UXForm $form)

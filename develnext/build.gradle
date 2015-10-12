@@ -15,6 +15,11 @@ sourceSets {
 }
 
 mainClassName = 'php.runtime.launcher.Launcher'
+jar.archiveName = 'DevelNext.jar'
+
+manifest {
+    attributes 'Main-Class': 'php.runtime.launcher.Launcher'
+}
 
 task distIdeZip(type: Zip, dependsOn: ['clean', 'distIde']) {
     def ver = new Date(System.currentTimeMillis()).format("yyyyMMddhh");

@@ -5,9 +5,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.MenuButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -95,6 +97,28 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
         }
     }
 
+    @Signature
+    public Memory data(String name) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData instanceof UserData) {
+            return ((UserData) userData).get(name);
+        }
+
+        return Memory.NULL;
+    }
+
+    @Signature
+    public Memory data(Environment env, String name, Memory value) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (!(userData instanceof UserData)) {
+            getWrappedObject().setUserData(userData = new UserData(Memory.wrap(env, userData)));
+        }
+
+        return ((UserData) userData).set(name, value);
+    }
+
     @Getter
     protected Cursor getCursor() {
         return getWrappedObject().getScene().getCursor();
@@ -170,6 +194,31 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     @Signature
     public void addStylesheet(String path) {
         getWrappedObject().getScene().getStylesheets().add(path);
+    }
+
+    @Signature
+    public void addEventFilter(final Environment env, String event, final Invoker invoker) {
+        EventHandler<MouseEvent> mouseHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                try {
+                    invoker.callAny(event);
+                } catch (Throwable throwable) {
+                    env.wrapThrow(throwable);
+                }
+            }
+        };
+
+        switch (event) {
+            case "mouseMove":
+                getWrappedObject().getScene().addEventFilter(MouseEvent.MOUSE_MOVED, mouseHandler);
+                break;
+            case "mouseDrag":
+                getWrappedObject().getScene().addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseHandler);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     @Signature

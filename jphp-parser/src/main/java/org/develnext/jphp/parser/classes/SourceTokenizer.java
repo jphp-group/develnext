@@ -77,4 +77,22 @@ public class SourceTokenizer extends BaseObject {
             ;
         }
     }
+
+    @Signature
+    public static List<SourceToken> parseAll(Environment env, String text) {
+        Tokenizer tokenizer = new Tokenizer(text, new Context(text));
+
+        Token token;
+        List<SourceToken> result = new ArrayList<>();
+
+        try {
+            while ((token = tokenizer.nextToken()) != null) {
+                result.add(new SourceToken(env, token));
+            }
+        } catch (ParseException e){
+            return null;
+        }
+
+        return result;
+    }
 }

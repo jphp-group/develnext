@@ -5,7 +5,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="632.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="688.0" prefWidth="988.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <MenuBar id="mainMenu" prefHeight="25.0" prefWidth="900.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
@@ -13,7 +13,7 @@
             <Menu id="menuAccount" mnemonicParsing="false" text="Аккаунт" />
             <Menu id="menuRun" mnemonicParsing="false" text="Запуск" />
             <Menu id="menuHelp" mnemonicParsing="false" text="Помощь" />
-            <Menu id="menuCreate" disable="true" mnemonicParsing="false" text="Создать" style="-fx-text-fill: transparent; -fx-pref-width: 0; -fx-font-size: 0; -fx-text-overrun: '';" />
+            <Menu id="menuCreate" disable="true" mnemonicParsing="false" style="-fx-text-fill: transparent; -fx-pref-width: 0; -fx-font-size: 0; -fx-text-overrun: '';" text="Создать" />
         </menus>
          <opaqueInsets>
             <Insets />
@@ -21,34 +21,38 @@
       </MenuBar>
       <AnchorPane layoutY="58.0" prefHeight="574.0" prefWidth="900.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="58.0">
          <children>
-            <SplitPane dividerPositions="0.26169265033407574" prefHeight="557.0" prefWidth="900.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <SplitPane dividerPositions="0.24239350912778904" prefHeight="557.0" prefWidth="900.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
                      <children>
-                        <TabPane id="projectTabs" layoutY="-3.0" prefHeight="557.0" prefWidth="232.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <TabPane id="projectTabs" layoutY="-3.0" prefHeight="557.0" prefWidth="232.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <tabs>
-                              <Tab closable="false" text="Проект">
+                              <Tab text="Редактор">
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <SplitPane dividerPositions="0.3" layoutX="22.0" layoutY="72.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <content>
+                                                <AnchorPane id="properties" prefHeight="200.0" prefWidth="200.0">
+                                                   <padding>
+                                                      <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                                                   </padding>
+                                                </AnchorPane>
+                                             </content>
+                                          </ScrollPane>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
+                              <Tab closable="false" styleClass="icon-open" text="Проект">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <SplitPane layoutX="22.0" layoutY="72.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <items>
                                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                                    <children>
                                                       <TreeView id="projectTree" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                                   </children>
-                                                </AnchorPane>
-                                                <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                                                   <children>
-                                                      <ScrollPane fitToHeight="true" fitToWidth="true" layoutY="14.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                         <content>
-                                                            <AnchorPane id="properties" prefHeight="200.0" prefWidth="200.0">
-                                                               <padding>
-                                                                  <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                                                               </padding>
-                                                            </AnchorPane>
-                                                         </content>
-                                                      </ScrollPane>
                                                    </children>
                                                 </AnchorPane>
                                             </items>
@@ -57,7 +61,6 @@
                                     </AnchorPane>
                                 </content>
                               </Tab>
-                              <Tab closable="false" text="Аккаунт" />
                           </tabs>
                         </TabPane>
                      </children>

@@ -1,0 +1,12 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property name="Формат" code="format" editor="enum" tooltip="Формат текущего времени и даты для отображения">
+            <variants>
+                <variant value="HH:mm">Часы, Минуты</variant>
+                <variant value="HH:mm:ss">Часы, Минуты, Секунды</variant>
+                <variant value="HH:mm dd.MM.YYYY">Часы, Минуты + Дата</variant>
+                <variant value="HH:mm:ss dd.MM.YYYY">Часы, Минуты, Секунды + Дата</variant>
+            </variants>
+        </property>
+    </properties>
+</behaviour>

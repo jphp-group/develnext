@@ -2,6 +2,7 @@
 namespace ide\formats\form;
 
 use ide\formats\form\event\AbstractEventKind;
+use ide\Logger;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
 use php\io\File;
@@ -164,12 +165,24 @@ class FormEventManager
     /**
      * @param string $oldId
      * @param string $newId
+     * @return array
      */
     public function renameBind($oldId, $newId)
     {
         $parser = new PhpParser($this->loadContent());
 
-        $parser->processLines(0, 999999, function ($line) use ($oldId, $newId) {
+        $binds = $this->findBinds($oldId);
+
+        $i = 0;
+
+        $result = [];
+        $methodLines = [];
+
+        foreach ($binds as $bind) {
+            $methodLines[$bind['methodLine']] = $bind;
+        }
+
+        $parser->processLines(0, 999999, function ($line) use ($oldId, $newId, $methodLines, &$result, &$i) {
             $tmp = Str::trim($line);
             $tmp = Regex::of('[ ]+?')->with($tmp)->replace(' ');
 
@@ -177,18 +190,29 @@ class FormEventManager
                 $k = Str::pos($line, '@event ');
 
                 $line = Str::sub($line, 0, $k) . "@event $newId" . Str::sub($line, $k + Str::length("@event $oldId"));
-            } elseif (Str::startsWith($tmp, "function do" . Str::upperFirst($oldId))) {
+            } elseif ($methodLines[$i] && Str::startsWith($tmp, "function do" . Str::upperFirst($oldId))) {
                 $k = Str::pos($line, "function do");
 
-                $line = Str::sub($line, 0, $k)
-                    . "function do" . Str::upperFirst($newId)
+                $methodEnd = Str::upperFirst($newId)
                     . Str::sub($line, $k + Str::length("function do $oldId") - 1);
+                $methodName = Str::upperFirst($newId) . Str::sub($line, $k + Str::length("function do $oldId") - 1, Str::pos($tmp, '(') + 1);
+
+                $line = Str::sub($line, 0, $k)
+                    . "function do" . $methodEnd;
+
+                $item = $methodLines[$i];
+                $item['newMethodName'] = "do$methodName";
+
+                $result[] = $item;
             }
 
+            $i++;
             return $line;
         });
 
         $this->save($parser->getContent());
+        $this->load();
+        return $result;
     }
 
     public function insertCodeToMethod($class, $method, $code)
@@ -218,6 +242,8 @@ class FormEventManager
     public function addBind($id, $event, AbstractEventKind $kind)
     {
         $source = "";
+
+        Logger::info("Start adding event bind: id = $id, event = $event, kind = " . get_class($kind));
 
         $methodName = "do" . Str::upperFirst($id) . Str::upperFirst(Str::replace(Str::replace($event, '-', ''), '+', ''));
 
@@ -272,6 +298,8 @@ class FormEventManager
         }
 
         $this->save($source);
+
+        Logger::info("Finish adding bind: id = $id, event = $event.");
     }
 
     /**

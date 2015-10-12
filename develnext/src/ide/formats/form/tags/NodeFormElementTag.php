@@ -47,6 +47,22 @@ class NodeFormElementTag extends AbstractFormElementTag
         if ($node->rotate > 0) {
             $element->setAttribute('rotate', $node->rotate);
         }
+
+        if ($node->leftAnchor !== null) {
+            $element->setAttribute('AnchorPane.leftAnchor', $node->leftAnchor);
+        }
+
+        if ($node->rightAnchor !== null) {
+            $element->setAttribute('AnchorPane.rightAnchor', $node->rightAnchor);
+        }
+
+        if ($node->topAnchor !== null) {
+            $element->setAttribute('AnchorPane.topAnchor', $node->topAnchor);
+        }
+
+        if ($node->bottomAnchor !== null) {
+            $element->setAttribute('AnchorPane.bottomAnchor', $node->bottomAnchor);
+        }
     }
 
     public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)

@@ -28,4 +28,12 @@ abstract class UXEvent
      * ...
      */
     public function consume() {}
+
+    /**
+     * @param $sender
+     * @return UXEvent
+     */
+    public static function makeMock($sender)
+    {
+    }
 }

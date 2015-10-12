@@ -35,18 +35,38 @@ public class UXCircle extends UXShape<Circle> {
     @Override
     @Signature
     protected void setWidth(double v) {
-        getWrappedObject().setRadius(v);
+        getWrappedObject().setRadius(v / 2);
     }
 
     @Override
     protected void setHeight(double v) {
-        getWrappedObject().setRadius(v);
+        getWrappedObject().setRadius(v / 2);
+    }
+
+    @Override
+    public void setX(double v) {
+        super.setX(v + getWrappedObject().getRadius());
+    }
+
+    @Override
+    public void setY(double v) {
+        super.setY(v + getWrappedObject().getRadius());
+    }
+
+    @Override
+    public double getX() {
+        return super.getX() - getWrappedObject().getRadius();
+    }
+
+    @Override
+    public double getY() {
+        return super.getY() - getWrappedObject().getRadius();
     }
 
     @Override
     protected void setSize(double[] size) {
         if (size.length > 0) {
-            getWrappedObject().setRadius(size[0]);
+            getWrappedObject().setRadius(size[0] / 2);
         }
     }
 }

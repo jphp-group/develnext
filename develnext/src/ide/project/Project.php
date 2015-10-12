@@ -5,6 +5,7 @@ use Files;
 use ide\formats\AbstractFileTemplate;
 use ide\forms\MainForm;
 use ide\Ide;
+use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\systems\FileSystem;
 use ide\systems\WatcherSystem;
@@ -145,6 +146,8 @@ class Project
     public function makeDirectory($path)
     {
         $directory = "$this->rootDir/$path";
+
+        Logger::info("Make directory in project: $directory");
 
         return File::of($directory)->mkdirs();
     }
@@ -360,6 +363,8 @@ class Project
      */
     public function open()
     {
+        Logger::info("Opening project ...");
+
         $this->tree->clear();
 
         $this->trigger(__FUNCTION__);
@@ -425,6 +430,8 @@ class Project
      */
     public function export($file)
     {
+        Logger::info("Project export to: $file");
+
         $this->makeExporter()->save($file);
     }
 
@@ -433,6 +440,8 @@ class Project
      */
     public function load()
     {
+        Logger::info("Project loading ...");
+
         $dir = $this->getIdeDir();
 
         if (!$dir->isDirectory()) {
@@ -453,6 +462,8 @@ class Project
      */
     public function save()
     {
+        Logger::info("Start project saving ...");
+
         $this->trigger(__FUNCTION__);
 
         FileSystem::saveAll();
@@ -466,6 +477,8 @@ class Project
         $this->config->setProject($this);
 
         $this->config->save();
+
+        Logger::info("Project is saved.");
     }
 
     /**
@@ -483,6 +496,8 @@ class Project
     public function compile($environment, callable $log = null)
     {
         $this->save();
+
+        Logger::info("Compile project: env = $environment");
 
         $this->trigger(__FUNCTION__, $environment, $log);
     }
@@ -609,6 +624,8 @@ class Project
 
     public function close()
     {
+        Logger::info("Close project ...");
+
         $this->save();
         $this->tree->clear(true);
     }

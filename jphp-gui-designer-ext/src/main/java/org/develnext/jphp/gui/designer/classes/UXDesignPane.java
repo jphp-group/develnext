@@ -9,11 +9,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import org.develnext.jphp.ext.javafx.classes.layout.UXAnchorPane;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
-import php.runtime.annotation.Reflection.Getter;
-import php.runtime.annotation.Reflection.Namespace;
-import php.runtime.annotation.Reflection.NotWrapper;
-import php.runtime.annotation.Reflection.Setter;
+import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
+import php.runtime.invoke.Invoker;
 import php.runtime.reflection.ClassEntity;
 
 @NotWrapper
@@ -27,6 +26,8 @@ public class UXDesignPane extends UXAnchorPane {
     protected double startWidth;
     protected double startHeight;
     protected Point2D startDragPoint = null;
+
+    protected Invoker onResize = null;
 
     public UXDesignPane(Environment env, AnchorPane wrappedObject) {
         super(env, wrappedObject);
@@ -123,6 +124,10 @@ public class UXDesignPane extends UXAnchorPane {
 
                     resizing = true;
 
+                    if (onResize != null) {
+                        onResize.callAny();
+                    }
+
                     event.consume();
                 }
             }
@@ -173,6 +178,11 @@ public class UXDesignPane extends UXAnchorPane {
     public void setBorderColor(String borderColor) {
         this.borderColor = borderColor;
         updateStyle();
+    }
+
+    @Signature
+    public void onResize(@Reflection.Nullable Invoker onResize) {
+        this.onResize = onResize;
     }
 
     protected void updateStyle() {

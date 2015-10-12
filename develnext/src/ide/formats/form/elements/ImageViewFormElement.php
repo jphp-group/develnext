@@ -7,6 +7,7 @@ use ide\project\Project;
 use php\gui\framework\DataUtils;
 use php\gui\UXApplication;
 use php\gui\UXImage;
+use php\gui\UXImageArea;
 use php\gui\UXImageView;
 use php\gui\UXListView;
 use php\gui\UXNode;
@@ -38,29 +39,52 @@ class ImageViewFormElement extends AbstractFormElement
      */
     public function createElement()
     {
-        $image = new UXImageView();
-        $image->preserveRatio = false;
+        $image = new UXImageArea();
+        $image->proportional = false;
+        $image->stretch = true;
 
         return $image;
     }
 
     public function getDefaultSize()
     {
-        return [150, 100];
+        return [200, 150];
     }
 
     public function registerNode(UXNode $node)
     {
-        /** @var UXImageView $node */
+        /** @var UXImageArea $node */
+        if ($node instanceof UXImageView) {
+            $new = new UXImageArea();
+            $new->id = $node->id;
+            $new->proportional = $node->preserveRatio;
+
+            $new->size = $node->size;
+            $new->position = $node->position;
+            $new->style = $node->style;
+            $new->rotate = $node->rotate;
+            $new->opacity = $node->opacity;
+
+            $node->parent->children->add($new);
+
+            $node->free();
+
+            $node = $new;
+        }
+
         $data = DataUtils::get($node);
         $image = $data->get('image');
 
         UXApplication::runLater(function () use ($image, $node) {
             if ($image) {
-                $file = Ide::get()->getOpenedProject()->getFile("src/$image");
+                $project = Ide::get()->getOpenedProject();
 
-                if ($file->exists()) {
-                    $node->image = new UXImage($file);
+                if ($project) {
+                    $file = $project->getFile("src/$image");
+
+                    if ($file->exists()) {
+                        $node->image = new UXImage($file);
+                    }
                 }
             }
 
@@ -72,6 +96,7 @@ class ImageViewFormElement extends AbstractFormElement
 
     public function isOrigin($any)
     {
-        return $any instanceof UXImageView;
+        return $any instanceof UXImageArea
+            || $any instanceof UXImageView;
     }
 }

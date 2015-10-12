@@ -3,6 +3,7 @@ namespace ide\forms;
 
 use ide\build\AbstractBuildType;
 use ide\Ide;
+use ide\Logger;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
@@ -87,6 +88,8 @@ class BuildProjectForm extends AbstractForm
      */
     public function doShow()
     {
+        Logger::info("Show build project dialog");
+
         $this->list->items->addAll($this->buildTypes);
         $this->list->selectedIndexes = [0];
     }

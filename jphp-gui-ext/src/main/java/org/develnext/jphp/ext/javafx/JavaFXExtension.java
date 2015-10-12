@@ -5,6 +5,7 @@ import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.PathTransition;
 import javafx.application.Application;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -49,6 +50,7 @@ import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
 import org.develnext.jphp.ext.javafx.classes.shape.*;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
+import org.develnext.jphp.ext.javafx.support.ImageViewEx;
 import org.develnext.jphp.ext.javafx.support.event.*;
 import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
@@ -77,6 +79,9 @@ public class JavaFXExtension extends Extension {
         registerMemoryOperation(InsetsMemoryOperation.class);
         registerMemoryOperation(DurationMemoryOperation.class);
 
+        registerClass(scope, UXGeometry.class);
+
+        registerWrapperClass(scope, ObservableValue.class, UXValue.class);
         registerWrapperClass(scope, ObservableList.class, UXList.class);
         registerWrapperClass(scope, Application.class, UXApplication.class);
 
@@ -113,6 +118,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, ToggleButton.class, UXToggleButton.class);
         registerWrapperClass(scope, CheckBox.class, UXCheckbox.class);
         registerWrapperClass(scope, ImageView.class, UXImageView.class);
+        registerWrapperClass(scope, ImageViewEx.class, UXImageArea.class);
         registerWrapperClass(scope, MenuBar.class, UXMenuBar.class);
         registerWrapperClass(scope, TextInputControl.class, UXTextInputControl.class);
         registerWrapperClass(scope, TextArea.class, UXTextArea.class);
@@ -128,6 +134,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, ProgressIndicator.class, UXProgressIndicator.class);
         registerWrapperClass(scope, ProgressBar.class, UXProgressBar.class);
         registerWrapperClass(scope, HTMLEditor.class, UXHtmlEditor.class);
+        registerWrapperClass(scope, WebHistory.class, UXWebHistory.class);
         registerWrapperClass(scope, WebEngine.class, UXWebEngine.class);
         registerWrapperClass(scope, WebView.class, UXWebView.class);
         registerWrapperClass(scope, Tab.class, UXTab.class);

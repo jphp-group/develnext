@@ -1,0 +1,6 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property name="Интервал" code="duration" editor="integer" />
+        <property name="Задержка" code="delay" editor="integer" />
+    </properties>
+</behaviour>

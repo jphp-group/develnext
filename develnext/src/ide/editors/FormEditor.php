@@ -2,7 +2,9 @@
 namespace ide\editors;
 
 use ide\action\ActionEditor;
+use ide\behaviour\IdeBehaviourManager;
 use ide\editors\common\ObjectListEditorItem;
+use ide\editors\form\FormBehaviourPane;
 use ide\editors\form\FormElementTypePane;
 use ide\editors\menu\ContextMenu;
 use ide\formats\AbstractFormFormat;
@@ -16,6 +18,7 @@ use ide\forms\ActionConstructorForm;
 use ide\forms\MainForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
+use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\ProjectFile;
@@ -41,6 +44,7 @@ use php\gui\UXButton;
 use php\gui\UXContextMenu;
 use php\gui\UXData;
 use php\gui\UXDialog;
+use php\gui\UXForm;
 use php\gui\UXHyperlink;
 use php\gui\UXImage;
 use php\gui\UXImageView;
@@ -58,6 +62,7 @@ use php\gui\UXSplitPane;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXTooltip;
+use php\gui\UXWebView;
 use php\io\File;
 use php\io\Stream;
 use php\lang\IllegalStateException;
@@ -124,6 +129,11 @@ class FormEditor extends AbstractModuleEditor
     protected $elementTypePane;
 
     /**
+     * @var FormBehaviourPane
+     */
+    protected $behaviourPane;
+
+    /**
      * @var ContextMenu
      */
     protected $contextMenu;
@@ -144,6 +154,11 @@ class FormEditor extends AbstractModuleEditor
     protected $actionEditor;
 
     /**
+     * @var IdeBehaviourManager
+     */
+    protected $behaviourManager;
+
+    /**
      * @var string
      */
     protected $tabOpened = null;
@@ -152,16 +167,6 @@ class FormEditor extends AbstractModuleEditor
      * @var FormEventManager
      */
     protected $eventManager;
-
-    /**
-     * @var null
-     */
-    protected $selectedClass = null;
-
-    /**
-     * @var null
-     */
-    protected $selectedMethod = null;
 
     /**
      * @var ScriptModuleEditor[]
@@ -174,6 +179,11 @@ class FormEditor extends AbstractModuleEditor
     protected static $typeProperties = [];
 
     protected $opened;
+
+    /**
+     * @var UXNode
+     */
+    protected $codeEditorUi;
 
     public function __construct($file, AbstractFormDumper $dumper)
     {
@@ -208,9 +218,18 @@ class FormEditor extends AbstractModuleEditor
         $this->codeFile = $phpFile;
         $this->configFile = $confFile;
 
+        $this->initCodeEditor($phpFile);
+
         $this->actionEditor = new ActionEditor($phpFile . '.axml');
         $this->actionEditor->setFormEditor($this);
 
+        $this->behaviourManager = new IdeBehaviourManager(FileUtils::stripExtension($phpFile) . '.behaviour', function ($targetId) {
+            return $this->getFormat()->getFormElement($targetId ? $this->layout->lookup("#$targetId") : $this);
+        });
+    }
+
+    protected function initCodeEditor($phpFile)
+    {
         $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
         $this->codeEditor->register(AbstractCommand::make('Скрыть', 'icons/close16.png', function () {
             $this->codeEditor->save();
@@ -284,6 +303,24 @@ class FormEditor extends AbstractModuleEditor
     }
 
     /**
+     * @return IdeBehaviourManager
+     */
+    public function getBehaviourManager()
+    {
+        return $this->behaviourManager;
+    }
+
+    protected function loadOthers()
+    {
+        $this->actionEditor->load();
+        $this->behaviourManager->load();
+
+        if (File::of($this->codeFile)->exists()) {
+            $this->codeEditor->load();
+        }
+    }
+
+    /**
      * @return UXNode
      */
     public function load()
@@ -291,11 +328,7 @@ class FormEditor extends AbstractModuleEditor
         $this->eventManager->load();
         $this->formDumper->load($this);
 
-        $this->actionEditor->load();
-
-        if (File::of($this->codeFile)->exists()) {
-            $this->codeEditor->load();
-        }
+        $this->loadOthers();
 
         if (File::of($this->configFile)->exists()) {
             $this->config->load($this->configFile);
@@ -306,15 +339,21 @@ class FormEditor extends AbstractModuleEditor
         }
     }
 
-    public function save()
+    protected function saveOthers()
     {
-        $this->formDumper->save($this);
-
         if (File::of($this->codeFile)->exists()) {
             $this->codeEditor->save();
         }
 
         $this->actionEditor->save();
+        $this->behaviourManager->save();
+    }
+
+    public function save()
+    {
+        $this->formDumper->save($this);
+
+        $this->saveOthers();
 
         Stream::tryAccess($this->configFile, function (Stream $stream) {
             $this->config->save($stream);
@@ -405,7 +444,14 @@ class FormEditor extends AbstractModuleEditor
             $data->id = "data-$newId";
         }
 
-        $this->eventManager->renameBind($node->id, $newId);
+        $this->behaviourManager->changeTargetId($node->id, $newId);
+
+        $binds = $this->eventManager->renameBind($node->id, $newId);
+
+        foreach ($binds as $bind) {
+            $this->actionEditor->renameMethod($bind['className'], $bind['methodName'], $bind['newMethodName']);
+        }
+
         $this->codeEditor->load();
         $this->reindex();
 
@@ -459,15 +505,20 @@ class FormEditor extends AbstractModuleEditor
         DataUtils::remove($node);
         $node->parent->remove($node);
 
-        $binds = $this->eventManager->findBinds($this->getNodeId($node));
+        $nodeId = $this->getNodeId($node);
+
+        $binds = $this->eventManager->findBinds($nodeId);
 
         foreach ($binds as $bind) {
             $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
         }
 
-        if ($this->eventManager->removeBinds($this->getNodeId($node))) {
+        if ($this->eventManager->removeBinds($nodeId)) {
             $this->codeEditor->load();
         }
+
+        $this->behaviourManager->removeBehaviours($nodeId);
+        $this->behaviourManager->save();
 
         $this->reindex();
     }
@@ -485,7 +536,7 @@ class FormEditor extends AbstractModuleEditor
             throw new \Exception("Cannot open unloaded form");
         }
 
-        $codeEditor = $this->makeCodeEditor();
+        $this->codeEditorUi = $codeEditor = $this->makeCodeEditor();
         $designer = $this->makeDesigner();
 
         $tabs = new UXTabPane();
@@ -494,7 +545,6 @@ class FormEditor extends AbstractModuleEditor
 
         $codeTab = new UXTab();
         $codeTab->text = 'Исходный код';
-        $codeTab->content = $codeEditor;
         $codeTab->style = '-fx-cursor: hand;';
         $codeTab->graphic = Ide::get()->getImage($this->codeEditor->getIcon());
         $codeTab->tooltip = UXTooltip::of($this->codeFile);
@@ -544,6 +594,8 @@ class FormEditor extends AbstractModuleEditor
     {
         static $dividerPositions;
 
+        Logger::info("Start switch to small source editor...");
+
         $data = Ide::get()->getUserConfigValue(__CLASS__ . ".dividerPositions");
 
         if ($data) {
@@ -561,11 +613,13 @@ class FormEditor extends AbstractModuleEditor
 
             $item = $this->viewerAndEvents->items[$count - 1];
             $this->viewerAndEvents->items->remove($item);
+
+            Logger::info(".. reset small code editor");
         }
 
         $panel = new UXAnchorPane();
 
-        $content = $this->codeTab->content;
+        $content = $this->codeEditorUi;
         UXAnchorPane::setAnchor($content, 0);
 
         $panel->add($content);
@@ -582,51 +636,14 @@ class FormEditor extends AbstractModuleEditor
             }
         };
 
-        if ($content instanceof UXTabPane) {
-            $tabs = $content;
-        } else {
-            $tabs = new UXTabPane();
-            $tabs->side = 'LEFT';
+        $this->viewerAndEvents->items->add($panel);
 
-            $codeTab = new UXTab();
-            $codeTab->text = 'PHP Код';
-            $codeTab->content = $panel;
-            $codeTab->closable = false;
-            $codeTab->graphic = ico('script16');
-            $codeTab->style = '-fx-cursor: hand';
-
-            $constructorTab = new UXTab();
-            $constructorTab->text = 'Конструктор';
-            $constructorTab->closable = false;
-            $constructorTab->graphic = ico('wizard16');
-            $constructorTab->style = '-fx-cursor: hand';
-
-            $constructorTab->on('change', function () use ($tabs, $codeTab) {
-                UXApplication::runLater(function() use ($tabs, $codeTab) {
-                    $tabs->selectedTab = $codeTab;
-                });
-
-                if (!$this->selectedClass || !$this->selectedMethod) {
-                    UXDialog::show('Выберите событие или добавьте новое перед запуском конструктора событий');
-                    return;
-                }
-
-                $actionConstructor = new ActionConstructorForm();
-                $actionConstructor->showAndWait($this->actionEditor, $this->selectedClass, $this->selectedMethod);
-            });
-
-
-            $constructorTab->content = null;
-
-            $tabs->tabs->addAll([$codeTab]);
-        }
-
-        $this->viewerAndEvents->items->add($tabs);
-
-        $tabs->watch('width', $func);
-        $tabs->watch('height', $func);
+        $panel->watch('width', $func);
+        $panel->watch('height', $func);
 
         Ide::get()->setUserConfigValue("$class.sourceEditorEx", true);
+
+        Logger::info("Finish switching of small source editor");
     }
 
     public function getModules()
@@ -706,7 +723,9 @@ class FormEditor extends AbstractModuleEditor
                     $element = $this->format->getFormElement($node);
 
                     if ($element && $node->id) {
-                        $element->registerNode($node);
+                        if ($new = $element->registerNode($node)) {
+                            $node = $new;
+                        }
                     }
 
                     if ($element && $element->isLayout()) {
@@ -738,6 +757,10 @@ class FormEditor extends AbstractModuleEditor
             $designPane = new UXDesignPane();
             $designPane->size = $this->layout->size;
             $designPane->position = [10, 10];
+            $designPane->onResize(function () {
+                $this->designer->update();
+            });
+
             $designPane->add($this->layout);
 
             UXAnchorPane::setAnchor($this->layout, 0);
@@ -765,6 +788,7 @@ class FormEditor extends AbstractModuleEditor
         }
 
         $this->elementTypePane = new FormElementTypePane($this->format->getFormElements());
+        $this->behaviourPane = new FormBehaviourPane($this->behaviourManager);
 
         $designerCodeEditor = new UXAnchorPane();
         $designerCodeEditor->hide();
@@ -826,8 +850,27 @@ class FormEditor extends AbstractModuleEditor
         return $id;
     }
 
-    protected function createElement(AbstractFormElement $element, $screenX, $screenY, $parent = null)
+    protected function createElement(AbstractFormElement $element, $screenX, $screenY, $parent = null,
+                                     $checkDuplicates = false)
     {
+        static $prevElement;
+
+        Logger::info("Create element: element = " . get_class($element) . ", screenX = $screenX, screenY = $screenY, parent = $parent");
+
+        /*if ($checkDuplicates) {
+            if ($prevElement == $element) {
+                Ide::get()->getMainForm()->toast('Зажмите CTRL, чтобы добавить сразу несколько одинаковых компонентов "' . $element->getName() . '"');
+            }
+
+            $prevElement = $element;
+
+            Timer::run(5000, function () use (&$prevElement) {
+                $prevElement = null;
+            });
+        } else {
+            $prevElement = null;
+        } */
+
         $node = $element->createElement();
 
         if (!$node->id) {
@@ -869,8 +912,13 @@ class FormEditor extends AbstractModuleEditor
         $element = $this->format->getFormElement($node);
 
         if ($element) {
-            $element->registerNode($node);
+            $new = $element->registerNode($node);
+
+            if ($new) {
+                $node = $new;
+            }
         }
+
 
         $this->designer->registerNode($node);
 
@@ -897,7 +945,7 @@ class FormEditor extends AbstractModuleEditor
         if ($selected) {
             $selectionRectangle = $this->designer->getSelectionRectangle();
 
-            $node = $this->createElement($selected, $selectionRectangle->x, $selectionRectangle->y);
+            $node = $this->createElement($selected, $selectionRectangle->x, $selectionRectangle->y, null, !$e->controlDown);
 
             if (!$e->controlDown) {
                 $this->elementTypePane->clearSelected();
@@ -959,7 +1007,7 @@ class FormEditor extends AbstractModuleEditor
             $element = $this->format->getFormElement($e->sender);
 
             if ($element) {
-                $node = $this->createElement($selected, $e->screenX, $e->screenY, $element->isLayout() ? $e->sender : null);
+                $node = $this->createElement($selected, $e->screenX, $e->screenY, $element->isLayout() ? $e->sender : null, !$e->controlDown);
 
                 if (!$e->controlDown) {
                     $this->elementTypePane->clearSelected();
@@ -1028,9 +1076,10 @@ class FormEditor extends AbstractModuleEditor
 
     protected function updateProperties($node)
     {
-
         $this->eventManager->load();
         $element = $this->format->getFormElement($node);
+
+        Logger::info("Update properties: element = " . get_class($element));
 
         /** @var MainForm $mainForm */
         $mainForm = Ide::get()->getMainForm();
@@ -1099,6 +1148,18 @@ class FormEditor extends AbstractModuleEditor
             $tabs->tabs->add($eventTab);
         }
 
+        $behaviourTab = new UXTab();
+        $behaviourTab->text = 'Поведения';
+        $behaviourTab->closable = false;
+
+        $nodeId = $node === $this ? '' : $this->getNodeId($node);
+
+        $behaviourTab->content = $this->behaviourPane->makeUi($nodeId);
+        $size = sizeof($this->behaviourManager->getBehaviours($nodeId));
+        $behaviourTab->text .= " ($size)";
+
+        $tabs->tabs->add($behaviourTab);
+
         if ($tabs->tabs && $node) {
             $pane->add($tabs);
 
@@ -1121,6 +1182,7 @@ class FormEditor extends AbstractModuleEditor
             $hint->style = '-fx-font-style: italic;';
             $hint->maxSize = [10000, 10000];
             $hint->padding = 20;
+            $hint->paddingTop = 40;
             $hint->alignment = 'BASELINE_CENTER';
 
             $pane->children->add($hint);
@@ -1130,6 +1192,8 @@ class FormEditor extends AbstractModuleEditor
     public function jumpToClassMethod($class, $method)
     {
         $coord = $this->eventManager->findMethod($class, $method);
+
+        Logger::info("Jump to class method $class::$method()");
 
         if ($coord) {
             $this->switchToSmallSource();
@@ -1144,9 +1208,11 @@ class FormEditor extends AbstractModuleEditor
     {
         $bind = $this->eventManager->findBind($this->getNodeId($node), $eventType);
 
+        Logger::info("Jump to event source node = {$this->getNodeId($node)}, eventType = $eventType");
+
         if ($bind) {
             $this->switchToSmallSource();
-            //$this->codeEditor->setEditableArea($bind['beginLine'], $bind['endLine']);
+
             Timer::run(100, function () use ($bind) {
                 $this->codeEditor->jumpToLine($bind['beginLine'], $bind['beginPosition']);
             });
@@ -1190,8 +1256,11 @@ class FormEditor extends AbstractModuleEditor
 
     public function openEventSource($node, $eventCode, $editorType = null)
     {
+        Logger::info("Start opening even source: eventCode = $eventCode, editorType = $editorType");
+
         if (!$editorType) {
             $editorType = $this->getDefaultEventEditor();
+            Logger::info("... default event editor = $editorType");
         }
 
         $element = $this->format->getFormElement($node);
@@ -1208,6 +1277,7 @@ class FormEditor extends AbstractModuleEditor
             }
         }
 
+
         switch ($editorType) {
             case 'php':
                 $this->jumpToEventSource($node, $code);
@@ -1216,7 +1286,7 @@ class FormEditor extends AbstractModuleEditor
                 $bind = $this->eventManager->findBind($this->getNodeId($node), $code);
 
                 if ($bind) {
-                    $selectedClass = FileUtils::stripExtension(File::of($this->file)->getName());
+                    $selectedClass = $bind['className'];
                     $selectedMethod = $bind['methodName'];
 
                     $actionConstructor = new ActionConstructorForm();

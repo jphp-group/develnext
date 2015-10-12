@@ -9,8 +9,8 @@ ide\action\types\ShowPreloaderActionType
 ide\action\types\HidePreloaderActionType
 
 ide\action\types\ElementSetTextActionType
-ide\action\types\ElementDestroyActionType
 ide\action\types\ElementLoadContentActionType
+ide\action\types\ElementDestroyActionType
 ide\action\types\ElementShowActionType
 ide\action\types\ElementHideActionType
 ide\action\types\ElementToggleActionType
@@ -56,3 +56,6 @@ ide\action\types\ElementSetDataActionType
 ide\action\types\ElementAppendDataActionType
 ide\action\types\CommentActionType
 ide\action\types\NewLineActionType
+
+ide\action\types\BehaviourEnableActionType
+ide\action\types\BehaviourDisableActionType

@@ -1,14 +1,21 @@
 <?php
 namespace php\gui\framework;
 
+use action\Animation;
 use Exception;
+use php\gui\AbstractFormWrapper;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyEvent;
+use php\gui\framework\behaviour\custom\AbstractBehaviour;
+use php\gui\framework\behaviour\custom\BehaviourLoader;
+use php\gui\framework\behaviour\custom\BehaviourManager;
+use php\gui\framework\behaviour\custom\FormBehaviourManager;
 use php\gui\framework\event\AbstractEventAdapter;
 use php\gui\layout\UXAnchorPane;
 use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXData;
+use php\gui\UXDialog;
 use php\gui\UXForm;
 use php\gui\UXImage;
 use php\gui\UXLabel;
@@ -17,6 +24,7 @@ use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
 use php\gui\UXProgressIndicator;
 use php\gui\UXTooltip;
+use php\gui\UXWindow;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
@@ -48,12 +56,19 @@ abstract class AbstractForm extends UXForm
     protected $_modules = [];
 
     /**
+     * @var BehaviourManager
+     */
+    protected $behaviourManager;
+
+    /**
      * @param UXForm $origin
      * @throws Exception
      */
     public function __construct(UXForm $origin = null)
     {
         parent::__construct($origin);
+
+        $name = Str::replace(get_class($this), '\\', '/');
 
         $this->_app = Application::get();
         $this->loadConfig(null, false);
@@ -70,6 +85,14 @@ abstract class AbstractForm extends UXForm
         if (Stream::exists('res://.theme/style.css')) {
             $this->addStylesheet('/.theme/style.css');
         }
+
+        $this->behaviourManager = $behaviourManager = new FormBehaviourManager($this);
+        BehaviourLoader::load("res://$name.behaviour", $behaviourManager);
+    }
+
+    public function behaviour($target, $class)
+    {
+        return $this->behaviourManager->getBehaviour($target, $class);
     }
 
     /**
@@ -109,8 +132,9 @@ abstract class AbstractForm extends UXForm
     {
         parent::show();
 
-        if ($this->_config && $this->_config->get('maximized')) {
+        if ($this->_config && $this->_config->get('form.maximized')) {
             $this->maximized = true;
+            $this->maximize();
         }
     }
 
@@ -249,6 +273,12 @@ abstract class AbstractForm extends UXForm
             }
         }
 
+        if ($this->style == 'TRANSPARENT') {
+            $this->transparent = true;
+            $this->style = 'TRANSPARENT';
+            $this->layout->backgroundColor = null;
+        }
+
         $modules = $this->_config->getArray('modules', []);
 
         foreach ($modules as $type) {
@@ -299,20 +329,41 @@ abstract class AbstractForm extends UXForm
             if ($this->layout) {
                 DataUtils::scan($this->layout, function (UXData $data, UXNode $node = null) {
                     if ($node) {
-                        $class = get_class($node) . 'Wrapper';
-
-                        if (class_exists($class)) {
-                            $wrapper = new $class($node);
-                        } else {
-                            $wrapper = new UXNodeWrapper($node);
-                        }
-
-                        $wrapper->applyData($data);
+                        $this->getNodeWrapper($node)->applyData($data);
                         $data->free();
                     }
                 });
             }
         });
+    }
+
+    /**
+     * @param UXWindow|UXNode $node
+     * @return UXNodeWrapper
+     */
+    public function getNodeWrapper($node)
+    {
+        $wrapper = $node->data('~wrapper');
+
+        if ($wrapper) {
+            return $wrapper;
+        }
+
+        if ($node instanceof AbstractForm) {
+            $wrapper = new AbstractFormWrapper($this);
+        } else {
+            $class = get_class($node) . 'Wrapper';
+
+            if (class_exists($class)) {
+                $wrapper = new $class($node);
+            } else {
+                $wrapper = new UXNodeWrapper($node);
+            }
+        }
+
+        $node->data('~wrapper', $wrapper);
+
+        return $wrapper;
     }
 
     public function toast($message, $timeout = 0)
@@ -338,14 +389,19 @@ abstract class AbstractForm extends UXForm
                 $e->sender->hide();
             });
 
+            $tooltip->opacity = 0;
             $tooltip->show($this, $this->x + $this->width / 2 - $width / 2, $this->y + $this->height / 2 - $height / 2);
+
+            Animation::fadeIn($tooltip, 300);
 
             (new Thread(function () use ($timeout, $tooltip) {
                 Thread::sleep($timeout);
 
                 try {
                     UXApplication::runLater(function () use ($tooltip) {
-                        $tooltip->hide();
+                        Animation::fadeOut($tooltip, 300, function () use ($tooltip) {
+                            $tooltip->hide();
+                        });
                     });
                 } catch (IllegalStateException $e) {
                     // ..
@@ -481,6 +537,7 @@ abstract class AbstractForm extends UXForm
 
         $eventName = Str::split($eventName, '-', 2);
 
+
         if ($eventName[1]) {
             $class = "php\\gui\\framework\\event\\" . Str::upperFirst(Str::lower($eventName[0])) . "EventAdapter";
 
@@ -493,6 +550,10 @@ abstract class AbstractForm extends UXForm
                 $adapter = new $class();
                 $adapters[$class] = $adapter;
             } else {
+                $adapter = null;
+            }
+
+            if ($adapter == null) {
                 throw new Exception("Unable to bind '$event'");
             }
 
@@ -502,10 +563,11 @@ abstract class AbstractForm extends UXForm
                 throw new Exception("Unable to bind '$event'");
             }
 
-            $node->on($eventName[0], $handler, $event);
-        } else {
-            $node->on($eventName[0], $handler, $group);
+            $group = $event;
         }
+
+        $wrapper = $this->getNodeWrapper($node);
+        $wrapper->bind($eventName[0], $handler, $group);
     }
 
     public function __get($name)

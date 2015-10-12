@@ -7,6 +7,7 @@ use ide\Ide;
 use php\gui\event\UXMouseEvent;
 use php\gui\text\UXFont;
 use php\gui\UXImage;
+use php\gui\UXImageArea;
 use php\gui\UXImageView;
 use php\lib\String;
 
@@ -26,14 +27,6 @@ class ImagePropertyEditor extends TextPropertyEditor
 
             if ($dialog->showDialog()) {
                 $this->applyValue($dialog->getResult());
-
-                if ($this->designProperties->target instanceof UXImageView) {
-                    $img = $this->designProperties->target->{$this->code};
-
-                    if ($img instanceof UXImage) {
-                        $this->designProperties->target->size = [$img->width, $img->height];
-                    }
-                }
             }
         });
 
@@ -50,7 +43,7 @@ class ImagePropertyEditor extends TextPropertyEditor
             $file = $project->getFile("src/$value");
 
             if ($file->exists()) {
-                if (!($this->designProperties->target instanceof UXImageView)) {
+                if (!($this->designProperties->target instanceof UXImageArea)) {
                     $icon = new UXImageView();
                     $icon->image = new UXImage($file);
                     $this->designProperties->target->{$this->code} = $icon;
@@ -62,7 +55,7 @@ class ImagePropertyEditor extends TextPropertyEditor
             }
         }
 
-        if ($this->designProperties->target instanceof UXImageView) {
+        if ($this->designProperties->target instanceof UXImageArea && $this->code == 'image') {
             $this->designProperties->target->{$this->code} = Ide::get()->getImage('dummyImage.png')->image;
         } else {
             $this->designProperties->target->{$this->code} = null;

@@ -92,6 +92,7 @@ configure([
 project(':jphp-gui-ext') {
     dependencies {
         compile "org.develnext:jphp-runtime:$jphpVersion"
+        compile "org.develnext:jphp-xml-ext:$jphpVersion"
     }
 }
 
@@ -118,6 +119,7 @@ project(':develnext') {
         compile "org.develnext:jphp-xml-ext:$jphpVersion"
         compile "org.develnext:jphp-json-ext:$jphpVersion"
         compile "org.develnext:jphp-jsoup-ext:$jphpVersion"
+        compile "org.develnext:jphp-zend-ext:$jphpVersion"
         compile "org.develnext:jphp-sql-ext:$jphpVersion"
         compile "org.develnext:jphp-compress-ext:$jphpVersion"
         compile "org.develnext:jphp-debugger:$jphpVersion"

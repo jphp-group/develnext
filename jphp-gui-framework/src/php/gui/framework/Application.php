@@ -296,7 +296,7 @@ class Application
                 $dialog->setButtonTypes(['Stop', 'Ignore']);
 
                 switch ($dialog->showAndWait()) {
-                    case 'Ignore':
+                    case 'Stop':
                         Application::get()->shutdown();
                         break;
                 }

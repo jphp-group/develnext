@@ -21,7 +21,7 @@ class IfConfirmActionType extends AbstractSimpleActionType
     {
         return [
             'message' => 'Текст вопроса',
-            'not' => 'Отрицание (наоборт, если не откажется)'
+            'not' => 'Отрицание (наоборот, если откажется)'
         ];
     }
 

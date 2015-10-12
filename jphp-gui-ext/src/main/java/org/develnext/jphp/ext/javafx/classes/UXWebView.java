@@ -45,7 +45,8 @@ public class UXWebView extends UXParent {
     @Override
     protected void setSize(double[] size) {
         if (size.length >= 2) {
-            getWrappedObject().setPrefSize(size[0], size[1]);
+            setWidth(size[0]);
+            setHeight(size[1]);
         }
     }
 

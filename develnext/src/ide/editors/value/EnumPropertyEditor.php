@@ -55,6 +55,14 @@ class EnumPropertyEditor extends ElementPropertyEditor
         return new UXHBox([$this->choiceBox]);
     }
 
+    public function setTooltip($tooltip)
+    {
+        parent::setTooltip($tooltip);
+
+        $this->choiceBox->tooltipText = $tooltip;
+    }
+
+
     public function getNormalizedValue($value)
     {
         if (Str::isNumber($value)) {

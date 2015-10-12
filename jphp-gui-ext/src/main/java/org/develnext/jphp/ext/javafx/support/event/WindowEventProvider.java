@@ -103,6 +103,18 @@ public class WindowEventProvider extends EventProvider<Window> {
             }
         });
 
+        setHandler("globalMouseMove", new Handler() {
+            @Override
+            public void set(Window target, EventHandler eventHandler) {
+                target.getScene().setOnMouseMoved(eventHandler);
+            }
+
+            @Override
+            public EventHandler get(Window target) {
+                return target.getScene().getOnMouseMoved();
+            }
+        });
+
         setHandler("scroll", new Handler() {
             @Override
             public void set(Window target, EventHandler eventHandler) {

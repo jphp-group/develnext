@@ -29,6 +29,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.develnext.jphp.ext.javafx.classes.shape.UXPolygon;
@@ -58,6 +59,7 @@ public class UXDesigner extends BaseObject {
     private Canvas dots;
 
     private Stage selectionRectangle = null;
+    private Point2D selectionRectanglePoint = null;
 
     private Node picked = null;
     private Map<Node, Item> nodes = new LinkedHashMap<>();
@@ -268,6 +270,9 @@ public class UXDesigner extends BaseObject {
                 if (selectionEnabled) {
                     selectionRectangle.setX(event.getScreenX());
                     selectionRectangle.setY(event.getScreenY());
+
+                    selectionRectanglePoint = new Point2D(event.getScreenX(), event.getScreenY());
+
                     selectionRectangle.setWidth(1);
                     selectionRectangle.setHeight(1);
                 }
@@ -287,13 +292,26 @@ public class UXDesigner extends BaseObject {
                     return;
                 }
 
-                if (selectionEnabled) {
-                    double width = event.getScreenX() - selectionRectangle.getX();
-                    selectionRectangle.setWidth(width);
-                    double height = event.getScreenY() - selectionRectangle.getY();
-                    selectionRectangle.setHeight(height);
+                if (selectionEnabled && selectionRectanglePoint != null) {
+                    double width = event.getScreenX() - selectionRectanglePoint.getX();
+                    double height = event.getScreenY() - selectionRectanglePoint.getY();
 
-                    if (width > 2 && height > 2) {
+                    selectionRectangle.setWidth(Math.abs(width));
+                    selectionRectangle.setHeight(Math.abs(height));
+
+                    if (width < 0) {
+                        selectionRectangle.setX(selectionRectanglePoint.getX() + width);
+                    } else {
+                        selectionRectangle.setX(selectionRectanglePoint.getX());
+                    }
+
+                    if (height < 0) {
+                        selectionRectangle.setY(selectionRectanglePoint.getY() + height);
+                    } else {
+                        selectionRectangle.setY(selectionRectanglePoint.getY());
+                    }
+
+                    if (Math.abs(width) > 2 && Math.abs(height) > 2) {
                         selectionRectangle.show();
                     }
                 }
@@ -324,6 +342,7 @@ public class UXDesigner extends BaseObject {
                 }
 
                 selectionRectangle.hide();
+                selectionRectanglePoint = null;
 
                 if (!event.isShiftDown()) {
                     unselectAll();
@@ -442,11 +461,37 @@ public class UXDesigner extends BaseObject {
             return;
         }
 
+        if (node instanceof WebView) {
+            ((WebView) node).setPrefSize(width, height);
+            return;
+        }
+
         node.resize(width, height);
     }
 
     protected void relocateNode(Node node, double x, double y) {
-        node.relocate(x + getCenterX(node), y + getCenterY(node));
+        if (AnchorPane.getLeftAnchor(node) != null) {
+            AnchorPane.setLeftAnchor(node, x);
+        }
+
+        if (AnchorPane.getTopAnchor(node) != null) {
+            AnchorPane.setTopAnchor(node, y);
+        }
+
+        if (AnchorPane.getRightAnchor(node) != null) {
+            double offset = x - node.getLayoutX();
+            AnchorPane.setRightAnchor(node, AnchorPane.getRightAnchor(node) - offset);
+        }
+
+        if (AnchorPane.getBottomAnchor(node) != null) {
+            double offset = y - node.getLayoutY();
+            AnchorPane.setBottomAnchor(node, AnchorPane.getBottomAnchor(node) - offset);
+        }
+
+        x = x + getCenterX(node);
+        y = y + getCenterY(node);
+
+        node.relocate(x, y);
     }
 
     @Signature
@@ -602,7 +647,7 @@ public class UXDesigner extends BaseObject {
                     snapParams.setFill(Color.TRANSPARENT);
 
                     selection.dragImageView.setImage(selection.node.snapshot(snapParams, null));
-                    selection.dragImageView.setStyle("-fx-opacity: 0.7");
+                    selection.dragImageView.setStyle("-fx-opacity: 0.7; -fx-border-width: 1px; -fx-border-color: gray; -fx-border-style: dashed");
 
                     selection.parent.getChildren().add(selection.dragImageView);
 
@@ -1044,6 +1089,34 @@ public class UXDesigner extends BaseObject {
 
                     final double centerX = getCenterX(node);
                     final double centerY = getCenterY(node);
+
+                    Bounds bounds = node.getBoundsInLocal();
+
+                    if (resizeW != bounds.getWidth()) {
+                        if (resizeX == nodeX) {
+                            if (AnchorPane.getRightAnchor(node) != null) {
+                                double offset = resizeW - bounds.getWidth();
+                                AnchorPane.setRightAnchor(node, AnchorPane.getRightAnchor(node) - offset);
+                            }
+                        } else {
+                            if (AnchorPane.getLeftAnchor(node) != null) {
+                                AnchorPane.setLeftAnchor(node, (double) resizeX);
+                            }
+                        }
+                    }
+
+                    if (resizeH != bounds.getHeight()) {
+                        if (resizeY == nodeY) {
+                            if (AnchorPane.getBottomAnchor(node) != null) {
+                                double offset = resizeH - bounds.getHeight();
+                                AnchorPane.setBottomAnchor(node, AnchorPane.getBottomAnchor(node) - offset);
+                            }
+                        } else {
+                            if (AnchorPane.getTopAnchor(node) != null) {
+                                AnchorPane.setTopAnchor(node, (double) resizeY);
+                            }
+                        }
+                    }
 
                     resizeNode(node, resizeW, resizeH);
                     node.relocate(resizeX - centerX, resizeY - centerY);

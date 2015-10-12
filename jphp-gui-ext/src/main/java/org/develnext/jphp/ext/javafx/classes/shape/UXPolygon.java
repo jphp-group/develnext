@@ -155,9 +155,29 @@ public class UXPolygon extends UXShape<Polygon> {
     }
 
     @Override
+    public void setX(double v) {
+        super.setX(v + getWidth() / 2);
+    }
+
+    @Override
+    public void setY(double v) {
+        super.setY(v + getHeight() / 2);
+    }
+
+    @Override
+    public double getX() {
+        return super.getX() - getWidth() / 2;
+    }
+
+    @Override
+    public double getY() {
+        return super.getY() - getHeight() / 2;
+    }
+    @Override
     protected void setSize(double[] size) {
         if (size.length > 1) {
-
+            setWidth(size[0]);
+            setHeight(size[1]);
         }
     }
 }

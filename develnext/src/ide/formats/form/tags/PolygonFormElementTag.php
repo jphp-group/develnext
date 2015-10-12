@@ -37,6 +37,8 @@ class PolygonFormElementTag extends AbstractFormElementTag
     {
         /** @var UXPolygon $node */
         $domPoints = $document->createElement('points');
+        $domPoints->setAttribute('xmlns:fx', "http://javafx.com/fxml");
+
         $element->appendChild($domPoints);
 
         foreach ($node->points as $point) {

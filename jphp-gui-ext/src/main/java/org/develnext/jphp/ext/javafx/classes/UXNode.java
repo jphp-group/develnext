@@ -24,6 +24,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
+import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.StyleManager;
 import org.develnext.jphp.ext.javafx.support.UserData;
 import php.runtime.Memory;
@@ -32,10 +33,7 @@ import php.runtime.env.Environment;
 import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
-import php.runtime.memory.ArrayMemory;
-import php.runtime.memory.DoubleMemory;
-import php.runtime.memory.ObjectMemory;
-import php.runtime.memory.StringMemory;
+import php.runtime.memory.*;
 import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
 
@@ -54,8 +52,6 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         @Property(hiddenInDebugInfo = true) Orientation contentBias();
         @Property(hiddenInDebugInfo = true) DepthTest depthTest();
         @Property String id();
-        @Property("x") double layoutX();
-        @Property("y") double layoutY();
         @Property(hiddenInDebugInfo = true) double opacity();
 
         @Property double rotate();
@@ -134,6 +130,26 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         } else {
             return this;
         }
+    }
+
+    @Getter
+    public double getX() {
+        return getWrappedObject().getLayoutX();
+    }
+
+    @Setter
+    public void setX(double v) {
+        getWrappedObject().setLayoutX(v);
+    }
+
+    @Getter
+    public double getY() {
+        return getWrappedObject().getLayoutY();
+    }
+
+    @Setter
+    public void setY(double v) {
+        getWrappedObject().setLayoutY(v);
     }
 
     @Getter
@@ -229,14 +245,14 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
     @Getter(hiddenInDebugInfo = true)
     protected double[] getPosition() {
-        return new double[] { getWrappedObject().getLayoutX(), getWrappedObject().getLayoutY() };
+        return new double[] { getX(), getY() };
     }
 
     @Setter
     protected void setPosition(double[] value) {
         if (value.length >= 2) {
-            getWrappedObject().setLayoutX(value[0]);
-            getWrappedObject().setLayoutY(value[1]);
+            setX(value[0]);
+            setY(value[1]);
         }
     }
 
@@ -249,8 +265,8 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     @Setter
     protected void setSize(double[] size) {
         if (size.length >= 2) {
-            getWrappedObject().prefWidth(size[0]);
-            getWrappedObject().prefHeight(size[1]);
+            setWidth(size[0]);
+            setHeight(size[1]);
         }
     }
 
@@ -261,7 +277,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
     @Setter
     protected void setWidth(double v) {
-        getWrappedObject().prefWidth(v);
+        getWrappedObject().resize(v, getHeight());
     }
 
     @Getter
@@ -271,7 +287,101 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
     @Setter
     protected void setHeight(double v) {
-        getWrappedObject().prefHeight(v);
+        getWrappedObject().resize(getWidth(), v);
+    }
+
+    @Getter
+    public Memory getAnchors() {
+        ArrayMemory r = new ArrayMemory();
+
+        r.refOfIndex("left").assign(getLeftAnchor());
+        r.refOfIndex("top").assign(getTopAnchor());
+        r.refOfIndex("right").assign(getRightAnchor());
+        r.refOfIndex("bottom").assign(getBottomAnchor());
+
+        return r.toConstant();
+    }
+
+    @Getter
+    public Memory getAnchorFlags() {
+        ArrayMemory r = new ArrayMemory();
+
+        r.refOfIndex("left").assign(getLeftAnchor().isNotNull());
+        r.refOfIndex("top").assign(getTopAnchor().isNotNull());
+        r.refOfIndex("right").assign(getRightAnchor().isNotNull());
+        r.refOfIndex("bottom").assign(getBottomAnchor().isNotNull());
+
+        return r.toConstant();
+    }
+
+    @Setter
+    public void setAnchorFlags(ArrayMemory value) {
+        if (value.containsKey("left")) {
+            boolean left = value.valueOfIndex("left").toBoolean();
+
+            if (left) {
+                setLeftAnchor(DoubleMemory.valueOf(getWrappedObject().getLayoutX()));
+            } else {
+                setLeftAnchor(Memory.NULL);
+            }
+        }
+
+        if (value.containsKey("top")) {
+            boolean top = value.valueOfIndex("top").toBoolean();
+
+            if (top) {
+                setTopAnchor(DoubleMemory.valueOf(getWrappedObject().getLayoutY()));
+            } else {
+                setTopAnchor(Memory.NULL);
+            }
+        }
+
+        if (value.containsKey("right")) {
+            boolean right = value.valueOfIndex("right").toBoolean();
+
+            if (right) {
+                Parent parent = getWrappedObject().getParent();
+
+                if (parent != null) {
+                    setRightAnchor(DoubleMemory.valueOf(parent.getBoundsInLocal().getWidth() - (getX() + getWidth())));
+                }
+            } else {
+                setRightAnchor(Memory.NULL);
+            }
+        }
+
+        if (value.containsKey("bottom")) {
+            boolean bottom = value.valueOfIndex("bottom").toBoolean();
+
+            if (bottom) {
+                Parent parent = getWrappedObject().getParent();
+
+                if (parent != null) {
+                    setBottomAnchor(DoubleMemory.valueOf(parent.getBoundsInLocal().getHeight() - (getY() + getHeight())));
+                }
+            } else {
+                setBottomAnchor(Memory.NULL);
+            }
+        }
+    }
+
+    @Setter
+    public void setAnchors(ArrayMemory value) {
+        if (value.containsKey("left")) {
+            setLeftAnchor(value.valueOfIndex("left"));
+        }
+
+        if (value.containsKey("top")) {
+            setTopAnchor(value.valueOfIndex("top"));
+        }
+
+        if (value.containsKey("right")) {
+            setRightAnchor(value.valueOfIndex("right"));
+        }
+
+        if (value.containsKey("bottom")) {
+            setBottomAnchor(value.valueOfIndex("bottom"));
+        }
     }
 
     @Setter
@@ -493,6 +603,11 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Signature
+    public ObservableValue observer(String property) {
+        return JavaFxUtils.findObservable(this.getWrappedObject(), property);
+    }
+
+    @Signature
     public void watch(final String property, final Invoker invoker) throws InvocationTargetException, IllegalAccessException {
         String name = property + "Property";
 
@@ -570,7 +685,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
             return node;
         }
 
-        if (node instanceof Parent) {
+        if (parent instanceof Parent) {
             ObservableList<Node> nodes = ((Parent) parent).getChildrenUnmodifiable();
 
             for (Node nd : nodes) {

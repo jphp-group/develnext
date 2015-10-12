@@ -1,5 +1,8 @@
 <?php
 namespace php\gui\framework;
+use php\gui\framework\behaviour\custom\BehaviourLoader;
+use php\gui\framework\behaviour\custom\BehaviourManager;
+use php\gui\framework\behaviour\custom\ModuleBehaviourManager;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\lang\IllegalStateException;
@@ -15,6 +18,11 @@ use ReflectionMethod;
  */
 abstract class AbstractModule extends AbstractScript
 {
+    /**
+     * @var ModuleBehaviourManager
+     */
+    protected $behaviourManager;
+
     /**
      * @var bool
      */
@@ -49,7 +57,7 @@ abstract class AbstractModule extends AbstractScript
 
         $this->scriptManager = new ScriptManager();
 
-        $path = Str::replace(get_class($this), '\\', '/');
+        $path = $name = Str::replace(get_class($this), '\\', '/');
 
         $reflection = new ReflectionClass($this);
         $this->id = $reflection->getShortName();
@@ -67,7 +75,15 @@ abstract class AbstractModule extends AbstractScript
 
         $this->loadBinds($this);
 
+        $this->behaviourManager = new ModuleBehaviourManager($this);
+        BehaviourLoader::load("res://$name.behaviour", $this->behaviourManager);
+
         $this->trigger('load');
+    }
+
+    public function behaviour($target, $class)
+    {
+        return $this->behaviourManager->getBehaviour($target, $class);
     }
 
     /**

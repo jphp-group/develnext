@@ -1,0 +1,10 @@
+ide\behaviour\spec\DraggingFormBehaviourSpec
+ide\behaviour\spec\EscapeShutdownBehaviourSpec
+
+ide\behaviour\spec\CursorBindBehaviourSpec
+ide\behaviour\spec\WatchMakerBehaviourSpec
+ide\behaviour\spec\AutoDestroyBehaviourSpec
+
+ide\behaviour\spec\BlinkAnimationBehaviourSpec
+ide\behaviour\spec\ChatterAnimationBehaviourSpec
+ide\behaviour\spec\RandomMovementAnimationBehaviourSpec

@@ -42,6 +42,7 @@ class CallScriptActionType extends AbstractSimpleActionType
                 'editor' => function ($name, $label) {
                     $editor = new ObjectArgumentEditor([
                         'objectFilter' => function (ObjectListEditorItem $item) {
+
                             return $item->element instanceof MacroScriptComponent;
                         }
                     ]);

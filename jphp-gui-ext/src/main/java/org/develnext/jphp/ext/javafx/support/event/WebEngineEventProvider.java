@@ -54,7 +54,7 @@ public class WebEngineEventProvider extends EventProvider<WebEngine> {
             }
         });
 
-        setHandler("statusChanged", new Handler() {
+        setHandler("visibilityChanged", new Handler() {
             @Override
             public void set(WebEngine target, EventHandler eventHandler) {
                 target.setOnVisibilityChanged(eventHandler);

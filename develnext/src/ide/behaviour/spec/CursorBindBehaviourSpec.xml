@@ -1,0 +1,8 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property name="Скрыть оригинал" code="hideOrigin" editor="boolean" tooltip="Скрыть оригинальный курсор OS" />
+        <property name="Центрировать" code="centered" editor="boolean" tooltip="Курсор относительно центра объекта" />
+        <property name="Смещение X" code="offsetX" editor="integer" tooltip="Смещение относительно координаты курсора X" />
+        <property name="Смещение Y" code="offsetY" editor="integer" tooltip="Смещение относительно координаты курсора Y" />
+    </properties>
+</behaviour>

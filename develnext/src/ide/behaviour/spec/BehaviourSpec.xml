@@ -1,0 +1,5 @@
+<behaviour>
+    <properties>
+        <property name="Включено" code="enabled" editor="boolean" />
+    </properties>
+</behaviour>

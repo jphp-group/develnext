@@ -88,6 +88,16 @@ abstract class UXWindow
     }
 
     /**
+     * Getter and Setter for object data
+     * @param string $name
+     * @param mixed $value (optional)
+     * @return mixed
+     */
+    public function data($name, $value)
+    {
+    }
+
+    /**
      * @param string $event
      * @param callable $handler
      * @param string $group
@@ -109,6 +119,14 @@ abstract class UXWindow
      * @param UXEvent $e (optional)
      */
     public function trigger($event, UXEvent $e)
+    {
+    }
+
+    /**
+     * @param string $event
+     * @param callable $filter
+     */
+    public function addEventFilter($event, callable $filter)
     {
     }
 

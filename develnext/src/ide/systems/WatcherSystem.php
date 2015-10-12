@@ -2,6 +2,7 @@
 namespace ide\systems;
 
 use ide\Ide;
+use ide\Logger;
 use ide\project\ProjectFile;
 use ide\utils\FileUtils;
 use php\gui\designer\FileSystemWatcher;
@@ -85,6 +86,8 @@ class WatcherSystem
 
     static function addPathRecursive($path)
     {
+        Logger::info("Add recursive path $path");
+
         static::addPath($path, true);
 
         foreach (File::of($path)->findFiles() as $file) {
@@ -96,6 +99,8 @@ class WatcherSystem
 
     static function addPath($path, $appendCreatedPath = false)
     {
+        Logger::info("Add path $path");
+
         try {
             $watcher = new FileSystemWatcher($path);
         } catch (IOException $e) {
@@ -156,8 +161,12 @@ class WatcherSystem
 
     static function shutdown()
     {
+        Logger::info("Start shutdown ...");
+
         foreach (static::$watchers as $watcher) {
             $watcher->close();
         }
+
+        Logger::info("Finish shutdown.");
     }
 }

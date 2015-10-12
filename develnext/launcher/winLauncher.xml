@@ -2,7 +2,6 @@
 <launch4jConfig>
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
-  <jar></jar>
   <outfile>DevelNext.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
@@ -26,19 +25,19 @@
     <maxVersion></maxVersion>
     <jdkPreference>jreOnly</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <initialHeapSize>50</initialHeapSize>
+    <initialHeapSize>128</initialHeapSize>
     <maxHeapSize>1024</maxHeapSize>
     <opt>-Dfile.encoding=UTF8</opt>
   </jre>
   <versionInfo>
-    <fileVersion>0.1.0.0</fileVersion>
+    <fileVersion>1.0.0.0</fileVersion>
     <txtFileVersion>-</txtFileVersion>
     <fileDescription>RAD Studio for PHP</fileDescription>
-    <copyright>2014, OpenSource</copyright>
-    <productVersion>0.1.0.0</productVersion>
+    <copyright>2015, OpenSource</copyright>
+    <productVersion>1.0.0.0</productVersion>
     <txtProductVersion>-</txtProductVersion>
     <productName>DevelNext</productName>
-    <companyName></companyName>
+    <companyName>Dim-S Software</companyName>
     <internalName>DevelNext</internalName>
     <originalFilename>DevelNext.exe</originalFilename>
   </versionInfo>

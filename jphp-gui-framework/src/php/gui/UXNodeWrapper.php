@@ -31,8 +31,18 @@ class UXNodeWrapper
             $this->node->visible = $data->get('visible');
         }
 
-        if ($data->has('cursor')) {
+        if ($data->has('cursor') && $data->get('cursor') !== 'DEFAULT') {
             $this->node->cursor = $data->get('cursor');
         }
+    }
+
+    /**
+     * @param $event
+     * @param callable $handler
+     * @param $group
+     */
+    public function bind($event, callable $handler, $group)
+    {
+        $this->node->on($event, $handler, $group);
     }
 }

@@ -19,6 +19,7 @@ import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
+import java.awt.*;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -118,6 +119,12 @@ public class UXApplication extends BaseWrapper<Application> {
     public static void shutdown() {
         shutdown = true;
         Platform.exit();
+
+        Window[] windows = Window.getWindows();
+
+        for (Window window : windows) {
+            window.dispose();
+        }
     }
 
     @Signature

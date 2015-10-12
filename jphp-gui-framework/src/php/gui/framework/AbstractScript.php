@@ -86,11 +86,9 @@ abstract class AbstractScript
     }
 
     /**
-     * @param $args
+     * @param ...$args
      * @return
      * @throws IllegalArgumentException
-     * @internal param string $name
-     * @internal param mixed $value (optional)
      */
     public function data(...$args)
     {

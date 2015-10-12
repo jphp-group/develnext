@@ -75,8 +75,17 @@ public class UXFont extends BaseWrapper<Font> {
         return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().getFontMetrics(getWrappedObject()).getLineHeight();
     }
 
+    public static float getLineHeight(Font font) {
+        return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().getFontMetrics(font).getLineHeight();
+    }
+
     @Signature
     public float calculateTextWidth(String text) {
         return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().computeStringWidth(text, getWrappedObject());
+    }
+
+
+    public static float calculateTextWidth(String text, Font font) {
+        return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().computeStringWidth(text, font);
     }
 }

@@ -6,6 +6,7 @@ use ide\systems\FileSystem;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\framework\DataUtils;
 use php\gui\framework\Timer;
+use php\gui\text\UXFont;
 use php\gui\UXApplication;
 use php\gui\UXNode;
 use php\gui\UXTableCell;
@@ -183,6 +184,22 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
         };
 
         return $this;
+    }
+
+    /**
+     * @param callable $getter
+     */
+    public function setGetter(callable $getter)
+    {
+        $this->getter = $getter;
+    }
+
+    /**
+     * @param callable $setter
+     */
+    public function setSetter(callable $setter)
+    {
+        $this->setter = $setter;
     }
 
     /**

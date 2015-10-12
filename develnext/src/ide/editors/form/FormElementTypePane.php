@@ -124,14 +124,14 @@ class FormElementTypePane
     {
         if ($this->selectable) {
             $vbox = new UXVBox();
-            $vbox->spacing = 2;
-            $vbox->padding = 5;
+            $vbox->spacing = 1;
+            $vbox->padding = 2;
 
             $button = new UXToggleButton('Курсор');
 
             $button->toggleGroup = $this->toggleGroup;
             $button->graphic = Ide::get()->getImage('icons/cursor16.png');
-            $button->height = 23;
+            $button->height = 20;
             $button->maxWidth = 10000;
             $button->style = '-fx-cursor: hand; -fx-font-weight: bold;';
             $button->alignment = 'BASELINE_LEFT';
@@ -148,8 +148,8 @@ class FormElementTypePane
     protected function createGroupUi($group, $elements)
     {
         $vbox = new UXVBox();
-        $vbox->spacing = 2;
-        $vbox->padding = 5;
+        $vbox->spacing = 1;
+        $vbox->padding = 2;
 
         /** @var AbstractFormElement $element */
         foreach ($elements as $element) {
@@ -159,7 +159,7 @@ class FormElementTypePane
                 $button->toggleGroup = $this->toggleGroup;
             }
 
-            $button->height = 23;
+            $button->height = 18;
             $button->maxWidth = 10000;
             $button->alignment = 'BASELINE_LEFT';
 

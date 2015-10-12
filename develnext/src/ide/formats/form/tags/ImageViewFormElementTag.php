@@ -1,33 +1,75 @@
 <?php
 namespace ide\formats\form\tags;
 
+use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
 use php\gui\UXButton;
+use php\gui\UXImageArea;
 use php\gui\UXImageView;
+use php\xml\DomDocument;
 use php\xml\DomElement;
 
 class ImageViewFormElementTag extends AbstractFormElementTag
 {
-    
+
     public function getTagName()
     {
-        return 'ImageView';
+        return 'ImageViewEx';
     }
 
     public function getElementClass()
     {
-        return UXImageView::class;
+        return UXImageArea::class;
     }
 
     public function writeAttributes($node, DomElement $element)
     {
-        /** @var UXImageView $node */
-        $element->setAttribute('fitWidth', $node->fitWidth);
-        $element->setAttribute('fitHeight', $node->fitHeight);
-        $element->setAttribute('smooth', $node->smooth ? 'true' : 'false');
-        $element->setAttribute('preserveRatio', $node->preserveRatio ? 'true' : 'false');
+        /** @var UXImageArea $node */
+        $element->setAttribute('autoSize', $node->autoSize ? 'true' : 'false');
+        $element->setAttribute('proportional', $node->proportional ? 'true' : 'false');
+        $element->setAttribute('stretch', $node->stretch ? 'true' : 'false');
+        $element->setAttribute('centered', $node->centered ? 'true' : 'false');
+        $element->setAttribute('mosaic', $node->mosaic ? 'true' : 'false');
+        $element->setAttribute('mosaicGap', $node->mosaicGap);
 
         $element->removeAttribute('prefWidth');
         $element->removeAttribute('prefHeight');
+
+        $element->setAttribute('width', $node->width);
+        $element->setAttribute('height', $node->height);
+
+        if ($node->text) {
+            $element->setAttribute('text', $node->text);
+        }
+
+        $textColor = $node->textColor;
+        if ($textColor) {
+            $element->setAttribute('textFill', $textColor->getWebValue());
+        }
+
+        $backgroundColor = $node->backgroundColor;
+
+        if ($backgroundColor) {
+            $element->setAttribute('background', $backgroundColor->getWebValue());
+        }
+    }
+
+
+    public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
+    {
+        /** @var UXImageArea $node */
+        $font = $node->font;
+
+        if ($font && ($font->family !== 'System' || $font->size != 12)) {
+            $domFontProperty = $document->createElement('font');
+
+            $domFont = $document->createElement('Font');
+            $domFont->setAttribute('name', $font->name);
+            $domFont->setAttribute('size', $font->size);
+
+            $domFontProperty->appendChild($domFont);
+
+            $element->appendChild($domFontProperty);
+        }
     }
 }

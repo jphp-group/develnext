@@ -46,10 +46,12 @@ use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use php\gui\framework\Application;
+use php\gui\framework\Timer;
 use php\gui\JSException;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;
 use php\gui\UXApplication;
+use php\gui\UXDialog;
 use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXMenu;
@@ -138,13 +140,15 @@ class Ide extends Application
         if (isset($env['DEVELNEXT_MODE'])) {
             $this->mode = $env['DEVELNEXT_MODE'];
         }
-
     }
 
     public function launch()
     {
         parent::launch(
             function () {
+                Logger::reset();
+                Logger::info("Start IDE ...");
+
                 restore_exception_handler();
 
                 set_exception_handler(function (\BaseException $e) {
@@ -156,6 +160,8 @@ class Ide extends Application
                     }
 
                     if (!$showError) {
+                        Logger::exception("Unknown exception", $e);
+
                         $showError = true;
 
                         /*if (Ide::accountManager()->isAuthorized()) {
@@ -193,11 +199,12 @@ class Ide extends Application
                     restore_exception_handler();
                 }
 
-                $this->registerAll();
-
                 $this->splash = $splash = new SplashForm();
                 $splash->show();
 
+                UXApplication::runLater(function () {
+                    $this->registerAll();
+                });
             },
             function () {
                 foreach ($this->afterShow as $handle) {
@@ -540,6 +547,8 @@ class Ide extends Application
      */
     public function executeCommand($commandClass)
     {
+        Logger::info("Execute command - $commandClass");
+
         $command = $this->commands[$commandClass];
 
         if ($command) {
@@ -811,6 +820,8 @@ class Ide extends Application
 
     public function shutdown()
     {
+        Logger::info("Start IDE shutdown ...");
+
         $project = $this->getOpenedProject();
 
         $this->mainForm->hide();
@@ -825,6 +836,7 @@ class Ide extends Application
 
         foreach ($this->configurations as $name => $config) {
             try {
+                Logger::info("Save IDE config ($name.conf)");
                 $stream = Stream::of($this->getFile("$name.conf"), 'w+');
                 $config->save($stream);
             } catch (IOException $e) {
@@ -840,6 +852,7 @@ class Ide extends Application
 
         Ide::service()->shutdown();
 
+        Logger::info("Finish IDE shutdown");
         try {
             parent::shutdown();
         } catch (\Exception $e) {

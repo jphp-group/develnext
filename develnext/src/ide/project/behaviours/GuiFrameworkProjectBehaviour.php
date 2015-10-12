@@ -18,6 +18,7 @@ use ide\formats\templates\GuiBootstrapFileTemplate;
 use ide\formats\templates\GuiFormFileTemplate;
 use ide\formats\templates\PhpClassFileTemplate;
 use ide\Ide;
+use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\Project;
 use ide\project\ProjectExporter;
@@ -98,8 +99,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doCreate()
     {
+        $mainModule = $this->createModule('MainModule');
+        FileSystem::open($mainModule);
+
         $mainForm = $this->createForm($this->mainForm);
         FileSystem::open($mainForm);
+
     }
 
     public function doReindex(ProjectIndexer $indexer)
@@ -120,11 +125,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $exporter->removeFile($this->project->getFile('src/.debug'));
 
         // remove .php files if .source exists
-        FileUtils::scan($this->project->getFile('src'), function ($filename) use ($exporter) {
+        /*FileUtils::scan($this->project->getFile('src'), function ($filename) use ($exporter) {
             if (Str::endsWith($filename, '.php') && Files::exists($filename . '.source')) {
                 $exporter->removeFile($filename);
             }
-        });
+        });*/
     }
 
     public function doCompile($environment, callable $log = null) {
@@ -142,6 +147,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $buildConfig->setDependency('jphp-core');
         $buildConfig->setDependency('gson');
         $buildConfig->setDependency('jphp-json-ext');
+        $buildConfig->setDependency('jphp-xml-ext');
         $buildConfig->setDependency('jphp-gui-ext');
         $buildConfig->setDependency('jphp-gui-framework');
         $buildConfig->setDependency('develnext-stdlib');
@@ -317,10 +323,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $file->addLink($sources);
         }
 
-        if (!$sources->exists()) {
-            $this->createModule($rel);
-        } else if (!Str::trim(Stream::getContents($sources))) {
-            $sources->delete();
+        if (!$sources->exists() && !Files::exists("$sources.source")) {
             $this->createModule($rel);
         }
     }
@@ -343,7 +346,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $form->addLink($sources);
         }
 
-        if (!$sources->exists()) {
+        if (!$sources->exists() && !Files::exists("$sources.source")) {
+            Logger::warn("Source file of the '$rel' form not found - $sources, will be create ...");
             $this->createForm($rel);
         }
 
@@ -454,6 +458,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function createForm($name)
     {
+        Logger::info("Creating form '$name' ...");
+
         $form = $this->project->createFile("src/.forms/$name.fxml", new GuiFormFileTemplate());
 
         $template = new PhpClassFileTemplate($name, 'AbstractForm');
@@ -482,6 +488,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $conf->setHiddenInTree(true);
+
+        Logger::info("Finish creating form '$name'");
 
         return $form;
     }
@@ -519,6 +527,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function synchronizeDependencies()
     {
+        Logger::info("synchronizeDependencies ...");
+
         /** @var GradleProjectBehaviour $gradleBehavior */
         $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
 
@@ -540,6 +550,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function synchronizeDebugFiles()
     {
+        Logger::info("synchronizeDebugFiles ...");
+
         $debugDir = Ide::get()->getOwnFile('debug/gui');
 
         if (!$debugDir->isDirectory() && Ide::get()->isDevelopment()) {

@@ -61,7 +61,7 @@ class HexahedronFormElement extends AbstractFormElement
 
     public function getDefaultSize()
     {
-        return [100, 50];
+        return [100, 150];
     }
 
     public function isOrigin($any)

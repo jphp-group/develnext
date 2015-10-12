@@ -39,6 +39,7 @@ use ide\formats\form\elements\TextAreaFormElement;
 use ide\formats\form\elements\TextFieldFormElement;
 use ide\formats\form\elements\TitledPaneFormElement;
 use ide\formats\form\elements\ToggleButtonFormElement;
+use ide\formats\form\elements\WebViewFormElement;
 use ide\formats\form\tags\AnchorPaneFormElementTag;
 use ide\formats\form\tags\ButtonFormElementTag;
 use ide\formats\form\tags\CheckboxFormElementTag;
@@ -69,6 +70,7 @@ use ide\formats\form\tags\TextFieldFormElementTag;
 use ide\formats\form\tags\TextInputControlFormElementTag;
 use ide\formats\form\tags\TitledPaneFormElementTag;
 use ide\formats\form\tags\ToggleButtonFormElementTag;
+use ide\formats\form\tags\WebViewFormElementTag;
 use ide\utils\FileUtils;
 use php\gui\UXNode;
 
@@ -97,6 +99,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new ColorPickerFormElement());
         $this->register(new ProgressIndicatorFormElement());
         $this->register(new SeparatorFormElement());
+        $this->register(new WebViewFormElement());
 
         $this->register(new TitledPaneFormElement());
         //$this->register(new TabPaneFormElement());
@@ -132,6 +135,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new SliderFormElementTag());
         $this->register(new ImageViewFormElementTag());
         $this->register(new DatePickerFormElementTag());
+        $this->register(new WebViewFormElementTag());
 
         $this->register(new TitledPaneFormElementTag());
         //$this->register(new TabPaneFormElementTag());

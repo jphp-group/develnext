@@ -83,6 +83,8 @@ class AccountManager
 
     public function updateIdeUi()
     {
+        return;
+
         $logged = Ide::get()->getInternalList('.dn/account/loggedCommands');
         $unlogged = Ide::get()->getInternalList('.dn/account/unloggedCommands');
 
@@ -150,10 +152,10 @@ class AccountManager
                 }  */
             }
 
-             $this->loginForm->showAndWait();
+             //$this->loginForm->showAndWait();
         }
 
-        Ide::service()->ide()->startAsync(null);
-        $this->updateAccount();
+        //Ide::service()->ide()->startAsync(null);
+        //$this->updateAccount();
     }
 }

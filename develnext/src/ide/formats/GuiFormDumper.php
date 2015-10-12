@@ -63,6 +63,9 @@ class GuiFormDumper extends AbstractFormDumper
         } catch (IOException $e) {
             Ide::get()->getMainForm()->toast('Ошибка загрузки формы: ' . $e->getMessage());
             $layout1 = new UXAnchorPane();
+            $layout1->maxWidth = 99999999;
+            $layout1->maxHeight = 99999999;
+
             $layout1->size = [500, 500];
 
             $editor->setLayout($layout1);
@@ -120,10 +123,16 @@ class GuiFormDumper extends AbstractFormDumper
         $import = $document->createProcessingInstruction('import', 'javafx.scene.shape.*');
         $document->insertBefore($import, $document->getDocumentElement());
 
+        $import = $document->createProcessingInstruction('import', 'javafx.scene.web.*');
+        $document->insertBefore($import, $document->getDocumentElement());
+
         $import = $document->createProcessingInstruction('import', 'java.lang.*');
         $document->insertBefore($import, $document->getDocumentElement());
 
         $import = $document->createProcessingInstruction('import', 'org.develnext.jphp.ext.javafx.classes.data.*');
+        $document->insertBefore($import, $document->getDocumentElement());
+
+        $import = $document->createProcessingInstruction('import', 'org.develnext.jphp.ext.javafx.support.*');
         $document->insertBefore($import, $document->getDocumentElement());
     }
 

@@ -2,6 +2,7 @@
 namespace ide\editors;
 
 use Files;
+use ide\behaviour\IdeBehaviourManager;
 use ide\editors\form\FormElementTypePane;
 use ide\editors\form\FormNamedBlock;
 use ide\editors\menu\ContextMenu;
@@ -64,6 +65,16 @@ class ScriptModuleEditor extends FormEditor
         $this->properties = [];
 
         parent::__construct($file, new GuiFormDumper([]));
+
+        $this->behaviourManager->setTargetGetter(function ($nodeId) {
+            $container = $this->manager->findById($nodeId);
+
+            if ($container) {
+                return $container->getType();
+            }
+
+            return null;
+        });
     }
 
     public function __set($name, $value)
@@ -103,9 +114,7 @@ class ScriptModuleEditor extends FormEditor
             $this->manager->saveContainer($el);
         }
 
-        if (File::of($this->codeFile)->exists()) {
-            $this->codeEditor->save();
-        }
+        $this->saveOthers();
 
         /** @var ScriptComponentContainer[] $containers */
         $containers = Items::sort($this->manager->getComponents(), function (ScriptComponentContainer $a, ScriptComponentContainer $b) {
@@ -159,12 +168,7 @@ class ScriptModuleEditor extends FormEditor
 
     public function load()
     {
-        $this->eventManager->load();
-        $this->actionEditor->load();
-
-        if (File::of($this->codeFile)->exists()) {
-            $this->codeEditor->load();
-        }
+        $this->loadOthers();
 
         $indexFile = FileUtils::stripExtension($this->codeFile) . ".json";
 
@@ -212,8 +216,14 @@ class ScriptModuleEditor extends FormEditor
         $oldId = $container->id;
 
         if ($this->manager->renameId($container, $newId)) {
-            $this->eventManager->renameBind($oldId, $newId);
+            $this->behaviourManager->changeTargetId($oldId, $newId);
+            $binds = $this->eventManager->renameBind($oldId, $newId);
+
             $container->getIdeNode()->setTitle($newId);
+
+            foreach ($binds as $bind) {
+                $this->actionEditor->renameMethod($bind['className'], $bind['methodName'], $bind['newMethodName']);
+            }
 
             $this->codeEditor->load();
             $this->reindex();
@@ -271,6 +281,11 @@ class ScriptModuleEditor extends FormEditor
             $this->codeEditor->load();
         }
 
+        if ($container && $container->id) {
+            $this->behaviourManager->removeBehaviours($container->id);
+            $this->behaviourManager->save();
+        }
+
         File::of($container->getConfigPath())->delete();
         $this->reindex();
     }
@@ -326,6 +341,8 @@ class ScriptModuleEditor extends FormEditor
             $node = $selected->createElement();
 
             $container = new ScriptComponentContainer($selected, $this->makeId($selected->getIdPattern()));
+            $container->setIdeNode($node);
+
             $container->setConfigPath("{$this->file}/{$container->id}.json");
             $node->setTitle($container->id);
 
@@ -369,6 +386,9 @@ class ScriptModuleEditor extends FormEditor
 
             $this->manager->add($container);
             $this->designer->requestFocus();
+
+            $this->reindex();
+            $this->save();
         } else {
             $this->updateProperties($this);
         }

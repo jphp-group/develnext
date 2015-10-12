@@ -2,6 +2,7 @@
 namespace ide\editors;
 use ide\formats\AbstractFormat;
 use ide\Ide;
+use ide\Logger;
 use ide\project\Project;
 use ide\project\ProjectIndexer;
 use php\gui\layout\UXPane;
@@ -83,6 +84,7 @@ abstract class AbstractEditor
 
     public function open()
     {
+        Logger::info("Open editor for: $this->file");
         $this->reindex();
     }
 

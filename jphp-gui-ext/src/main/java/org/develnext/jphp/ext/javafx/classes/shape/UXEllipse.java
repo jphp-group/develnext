@@ -41,19 +41,40 @@ public class UXEllipse extends UXShape<Ellipse> {
     @Override
     @Signature
     protected void setWidth(double v) {
-        getWrappedObject().setRadiusX(v);
+        getWrappedObject().setRadiusX(v / 2);
     }
 
     @Override
     protected void setHeight(double v) {
-        getWrappedObject().setRadiusY(v);
+        getWrappedObject().setRadiusY(v / 2);
+    }
+
+
+    @Override
+    public void setX(double v) {
+        super.setX(v + getWrappedObject().getRadiusX());
+    }
+
+    @Override
+    public void setY(double v) {
+        super.setY(v + getWrappedObject().getRadiusY());
+    }
+
+    @Override
+    public double getX() {
+        return super.getX() - getWrappedObject().getRadiusX();
+    }
+
+    @Override
+    public double getY() {
+        return super.getY() - getWrappedObject().getRadiusY();
     }
 
     @Override
     protected void setSize(double[] size) {
         if (size.length > 1) {
-            getWrappedObject().setRadiusX(size[0]);
-            getWrappedObject().setRadiusY(size[1]);
+            getWrappedObject().setRadiusX(size[0] / 2);
+            getWrappedObject().setRadiusY(size[1] / 2);
         }
     }
 }
