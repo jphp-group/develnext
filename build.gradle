@@ -42,6 +42,7 @@ allprojects {
 
 configure([
         project(':jphp-gui-ext'),
+        project(':jphp-game-ext'),
         project(':jphp-gui-designer-ext'),
         project(':jphp-gui-framework')
 ]) {
@@ -93,6 +94,13 @@ project(':jphp-gui-ext') {
     dependencies {
         compile "org.develnext:jphp-runtime:$jphpVersion"
         compile "org.develnext:jphp-xml-ext:$jphpVersion"
+    }
+}
+
+project(':jphp-game-ext') {
+    dependencies {
+        compile "org.develnext:jphp-runtime:$jphpVersion"
+        compile "org.jbox2d:jbox2d:2.2.1.1"
     }
 }
 
