@@ -99,8 +99,10 @@ project(':jphp-gui-ext') {
 
 project(':jphp-game-ext') {
     dependencies {
+        compile 'org.jbox2d:jbox2d-library:2.2.1.1'
+
+        compile project(':jphp-gui-ext')
         compile "org.develnext:jphp-runtime:$jphpVersion"
-        compile "org.jbox2d:jbox2d:2.2.1.1"
     }
 }
 
@@ -121,6 +123,7 @@ project(':develnext') {
     dependencies {
         compile project(':jphp-gui-designer-ext')
         compile project(':jphp-gui-framework')
+        compile project(':jphp-game-ext')
         compile project(':jphp-parser')
         compile project(':develnext-stdlib')
 

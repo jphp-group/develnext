@@ -5,6 +5,7 @@ use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\Ide;
+use php\gui\framework\DataUtils;
 use php\gui\UXClipboard;
 use php\xml\XmlProcessor;
 
@@ -68,6 +69,8 @@ class CopyMenuCommand extends AbstractMenuCommand
                 if ($nodeElement != null) {
                     $wrapElement = $document->createElement('node');
                     $wrapElement->appendChild($nodeElement);
+
+                    $wrapElement->setAttributes(DataUtils::get($node)->toArray());
 
                     $rootElement->appendChild($wrapElement);
                 }

@@ -3,11 +3,13 @@ namespace ide\systems;
 
 use ide\editors\AbstractEditor;
 use ide\editors\menu\ContextMenu;
+use ide\forms\MainForm;
 use ide\Ide;
 use ide\utils\FileUtils;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\Timer;
+use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXContextMenu;
 use php\gui\UXDialog;
@@ -38,6 +40,11 @@ class FileSystem
      * @var array
      */
     static protected $openedFiles = [];
+
+    /**
+     * @var AbstractEditor
+     */
+    static protected $previousEditor = null;
 
     /**
      * @param $path
@@ -164,24 +171,58 @@ class FileSystem
             $tab = new UXTab();
             $tab->text = $editor->getTitle();
             $tab->tooltip = $editor->getTooltip();
-            $tab->style = '-fx-cursor: hand;';
+            $tab->style = '-fx-cursor: hand; ' . $editor->getTabStyle();
             $tab->graphic = Ide::get()->getImage($editor->getIcon());
             $tab->content = $editor->makeUi();
             $tab->userData = $editor;
+
+            $tab->closable = $editor->isCloseable();
+
+            /** @var MainForm $mainForm */
+            $mainForm = Ide::get()->getMainForm();
+
+            $leftPaneUi = $editor->makeLeftPaneUi();
+            $editor->setLeftPaneUi($leftPaneUi);
+
+            $mainForm->clearLeftPane();
+
+            if ($leftPaneUi) {
+                $mainForm->setLeftPane($leftPaneUi);
+            }
 
             $tab->on('closeRequest', function (UXEvent $e) use ($path, $editor) {
                 static::close($path, false);
             });
 
-            $tab->on('change', function () {
-                Timer::run(100, function () {
+            $tab->on('change', function (UXEvent $e) use ($mainForm) {
+                Timer::run(100, function () use ($mainForm) {
                     /** @var UXTabPane $fileTabPane */
                     $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
 
                     $tab = $fileTabPane->selectedTab;
 
+                    if (static::$previousEditor) {
+                        static::$previousEditor->hide();
+                    }
+
                     if ($tab->userData instanceof AbstractEditor) {
+                        $mainForm->clearLeftPane();
+
+                        if ($tab->userData->getLeftPaneUi()) {
+                            $mainForm->setLeftPane($tab->userData->getLeftPaneUi());
+                        }
+
                         $tab->userData->open();
+
+                        static::$previousEditor = $tab->userData;
+                    } else {
+                        $previousEditor = null;
+                    }
+
+                    $project = Ide::project();
+
+                    if ($project) {
+                        $project->update();
                     }
                 });
             });

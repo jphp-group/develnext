@@ -4,31 +4,9 @@ use php\gui\framework\Application;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;
 use php\gui\UXApplication;
-use php\gui\UXDialog;
 use php\gui\UXTextArea;
 use php\io\Stream;
 use php\lang\System;
-
-if (!function_exists('pre')) {
-    function pre($var) {
-        UXDialog::show(print_r($var, true));
-    }
-}
-
-if (!function_exists('dump')) {
-    function dump($var) {
-        ob_start();
-        var_dump($var);
-        $text = ob_get_contents();
-        ob_end_clean();
-
-        UXDialog::show($text);
-    }
-}
-
-if (!function_exists('alert')) {
-    function alert($message) { UXDialog::show($message); }
-}
 
 Stream::putContents("application.pid", UXApplication::getPid());
 

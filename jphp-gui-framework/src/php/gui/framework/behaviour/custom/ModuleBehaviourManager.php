@@ -3,6 +3,8 @@ namespace php\gui\framework\behaviour\custom;
 
 use php\gui\framework\AbstractModule;
 use php\gui\framework\AbstractScript;
+use php\gui\UXNode;
+use php\gui\UXWindow;
 
 class ModuleBehaviourManager extends BehaviourManager
 {
@@ -30,28 +32,5 @@ class ModuleBehaviourManager extends BehaviourManager
 
         $script->data('~behaviour~' . get_class($behaviour), $behaviour);
         $behaviour->apply($script);
-    }
-
-    /**
-     * @param $target
-     * @param $type
-     * @return AbstractBehaviour
-     */
-    public function getBehaviour($target, $type)
-    {
-        if ($target instanceof AbstractScript) {
-            $data = $target->data('~behaviour~' . $type);
-
-            if ($data == null) {
-                /** @var AbstractBehaviour $data */
-                $data = new $type();
-                $data->disable();
-                $this->apply($target->id, $data);
-            }
-
-            return $data;
-        }
-
-        return $target;
     }
 }

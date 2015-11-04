@@ -227,6 +227,10 @@ class ScriptModuleEditor extends FormEditor
 
             $this->codeEditor->load();
             $this->reindex();
+
+            $this->leftPaneUi->updateEventList($newId);
+            $this->leftPaneUi->updateBehaviours($newId);
+            $this->leftPaneUi->refreshObjectTreeList($newId);
         } else {
             return 'invalid';
         }
@@ -287,6 +291,8 @@ class ScriptModuleEditor extends FormEditor
         }
 
         File::of($container->getConfigPath())->delete();
+        $this->leftPaneUi->refreshObjectTreeList();
+
         $this->reindex();
     }
 
@@ -388,6 +394,7 @@ class ScriptModuleEditor extends FormEditor
             $this->designer->requestFocus();
 
             $this->reindex();
+            $this->leftPaneUi->refreshObjectTreeList($this->getNodeId($node));
             $this->save();
         } else {
             $this->updateProperties($this);

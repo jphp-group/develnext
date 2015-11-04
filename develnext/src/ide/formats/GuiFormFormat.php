@@ -1,6 +1,7 @@
 <?php
 namespace ide\formats;
 
+use Files;
 use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\formats\form\context\CopyMenuCommand;
@@ -21,6 +22,8 @@ use ide\formats\form\elements\ComboBoxFormElement;
 use ide\formats\form\elements\DatePickerFormElement;
 use ide\formats\form\elements\EllipseFormElement;
 use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\GameObjectFormElement;
+use ide\formats\form\elements\GamePaneFormElement;
 use ide\formats\form\elements\HBoxFormElement;
 use ide\formats\form\elements\HexahedronFormElement;
 use ide\formats\form\elements\HyperlinkFormElement;
@@ -34,6 +37,7 @@ use ide\formats\form\elements\RectangleFormElement;
 use ide\formats\form\elements\RhombusFormElement;
 use ide\formats\form\elements\SeparatorFormElement;
 use ide\formats\form\elements\SliderFormElement;
+use ide\formats\form\elements\SpriteViewFormElement;
 use ide\formats\form\elements\TabPaneFormElement;
 use ide\formats\form\elements\TextAreaFormElement;
 use ide\formats\form\elements\TextFieldFormElement;
@@ -64,6 +68,7 @@ use ide\formats\form\tags\RectangleFormElementTag;
 use ide\formats\form\tags\SeparatorFormElementTag;
 use ide\formats\form\tags\ShapeFormElementTag;
 use ide\formats\form\tags\SliderFormElementTag;
+use ide\formats\form\tags\SpriteViewFormElementTag;
 use ide\formats\form\tags\TabPaneFormElementTag;
 use ide\formats\form\tags\TextAreaFormElementTag;
 use ide\formats\form\tags\TextFieldFormElementTag;
@@ -73,6 +78,7 @@ use ide\formats\form\tags\ToggleButtonFormElementTag;
 use ide\formats\form\tags\WebViewFormElementTag;
 use ide\utils\FileUtils;
 use php\gui\UXNode;
+use php\io\File;
 
 class GuiFormFormat extends AbstractFormFormat
 {
@@ -81,6 +87,10 @@ class GuiFormFormat extends AbstractFormFormat
         $this->requireFormat(new PhpCodeFormat());
 
         // Element types.
+        $this->register(new SpriteViewFormElement());
+        //$this->register(new GamePaneFormElement());
+        //$this->register(new GameObjectFormElement());
+
         $this->register(new FormFormElement());
         $this->register(new ButtonFormElement());
         $this->register(new ToggleButtonFormElement());
@@ -145,6 +155,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new EllipseFormElementTag());
         $this->register(new CircleFormElementTag());
         $this->register(new PolygonFormElementTag());
+        $this->register(new SpriteViewFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());
@@ -189,6 +200,25 @@ class GuiFormFormat extends AbstractFormFormat
             $node->x += $size;
         }));
     }
+
+    public function delete($path)
+    {
+        parent::delete($path);
+
+        $name = FileUtils::stripExtension(File::of($path)->getName());
+
+        $parent = File::of($path)->getParent();
+
+        $path = $parent . '/../app/forms/';
+
+        Files::delete("$parent/$name.conf");
+
+        Files::delete("$path/$name.php");
+        Files::delete("$path/$name.php.source");
+        Files::delete("$path/$name.php.axml");
+        Files::delete("$path/$name.behaviour");
+    }
+
 
     /**
      * @param $file

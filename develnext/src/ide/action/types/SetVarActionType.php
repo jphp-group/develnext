@@ -41,13 +41,13 @@ class SetVarActionType extends AbstractSimpleActionType
 
     function getTitle(Action $action = null)
     {
-        return "Задать переменную";
+        return "Задать глобальную переменную";
     }
 
     function getDescription(Action $action = null)
     {
         if (!$action) {
-            return "Задать значение переменной";
+            return "Задать значение глобальной переменной";
         }
 
         $name = $action->get('name');
@@ -75,10 +75,10 @@ class SetVarActionType extends AbstractSimpleActionType
 
         $actionScript->addLocalVariable($name);
 
-        if ($name[0] != '$') {
-            $name = "\${$name}";
+        if ($name[0] == '$') {
+            $name = Str::sub($name, 1);
         }
 
-        return "$name = {$action->get('value')}";
+        return "\$GLOBALS['{$name}'] = {$action->get('value')}";
     }
 }

@@ -32,27 +32,4 @@ class FormBehaviourManager extends BehaviourManager
         $target->data('~behaviour~' . get_class($behaviour), $behaviour);
         $behaviour->apply($target);
     }
-
-    /**
-     * @param $target
-     * @param $type
-     * @return AbstractBehaviour
-     */
-    public function getBehaviour($target, $type)
-    {
-        if ($target instanceof UXNode) {
-            $data = $target->data('~behaviour~' . $type);
-
-            if ($data == null) {
-                /** @var AbstractBehaviour $data */
-                $data = new $type();
-                $data->disable();
-                $this->apply($target->id, $data);
-            }
-
-            return $data;
-        }
-
-        return null;
-    }
 }

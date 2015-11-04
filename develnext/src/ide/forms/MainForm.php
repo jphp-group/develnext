@@ -1,6 +1,7 @@
 <?php
 namespace ide\forms;
 
+use ide\editors\form\IdeTabPane;
 use ide\Ide;
 use ide\Logger;
 use ide\project\templates\DefaultGuiProjectTemplate;
@@ -18,6 +19,7 @@ use php\gui\UXButton;
 use php\gui\UXForm;
 use php\gui\UXImage;
 use php\gui\UXImageView;
+use php\gui\UXNode;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXTextArea;
@@ -37,6 +39,25 @@ class MainForm extends AbstractForm
         parent::init();
     }
 
+    /**
+     * @param IdeTabPane|UXNode $pane
+     */
+    public function setLeftPane($pane)
+    {
+        $this->clearLeftPane();
+
+        if ($pane instanceof IdeTabPane) {
+            $this->properties->children->add($pane->makeUi());
+        } else {
+            $this->properties->children->add($pane);
+        }
+    }
+
+    public function clearLeftPane()
+    {
+        $this->properties->children->clear();
+    }
+
     public function show()
     {
         parent::show();
@@ -45,7 +66,7 @@ class MainForm extends AbstractForm
         $this->maximized = true;
 
         $this->projectTabs->tabs[0]->graphic = ico('settings16');
-        $this->projectTabs->tabs[1]->graphic = ico('tree16');
+        //$this->projectTabs->tabs[1]->graphic = ico('tree16');
     }
 
     /**
@@ -99,6 +120,7 @@ class MainForm extends AbstractForm
     }
 
     /**
+     * @deprecated
      * @return UXVBox
      */
     public function getPropertiesPane()

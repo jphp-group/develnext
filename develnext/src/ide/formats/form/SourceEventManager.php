@@ -19,7 +19,7 @@ use phpx\parser\SourceTokenizer;
  * Class FormEventManager
  * @package ide\formats\form
  */
-class FormEventManager
+class SourceEventManager
 {
     /**
      * @var string
@@ -123,6 +123,7 @@ class FormEventManager
         }
 
         $this->save($parser->getContent());
+        $this->load();
 
         return !!$binds;
     }

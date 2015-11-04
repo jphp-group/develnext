@@ -1,22 +1,24 @@
 package org.develnext.jphp.ext.game.support;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Sprite extends Canvas {
+public class Sprite {
     public static class Animation {
+        protected String name;
         protected int[] indexes;
         protected int speed = -1;
 
         public int currentIndex;
 
-        public Animation(int... indexes) {
+        public Animation(String name, int... indexes) {
+            this.name = name;
             this.indexes = indexes;
         }
 
@@ -45,6 +47,10 @@ public class Sprite extends Canvas {
         public void setSpeed(int speed) {
             this.speed = speed;
         }
+
+        public String getName() {
+            return name;
+        }
     }
 
     public final Map<String, Animation> animations = new HashMap<>();
@@ -65,22 +71,44 @@ public class Sprite extends Canvas {
 
     private boolean freeze = false;
 
+    private Sprite prototype;
+
     public Sprite() {
-        super();
+    }
 
-        widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                setImage(getImage());
-            }
-        });
+    /**
+     * Создать клон из спрайта-прототипа, клон будет себя вести немного по другому, брать изображение и кадры из оригинала.
+     * @param sprite
+     */
+    public Sprite(Sprite sprite) {
+        this();
 
-        heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                setImage(getImage());
-            }
-        });
+        if (sprite == null) {
+            return;
+        }
+
+        if (sprite.prototype != null) {
+            sprite = sprite.prototype;
+        }
+
+        image = sprite.image;
+        frameWidth = sprite.frameWidth;
+        frameHeight = sprite.frameHeight;
+
+        speed = sprite.speed;
+        cycledAnimation = sprite.cycledAnimation;
+
+        rows = -1;
+        cols = -1;
+        maxIndex = -1;
+
+        currentAnimation = sprite.currentAnimation;
+
+        prototype = sprite;
+    }
+
+    public int getMaxIndex() {
+        return maxIndex;
     }
 
     public void freeze() {
@@ -96,26 +124,70 @@ public class Sprite extends Canvas {
     }
 
     public double getFrameWidth() {
-        return frameWidth;
+        return prototype != null ? prototype.frameWidth : frameWidth;
+    }
+
+    public double getFrameHeight() {
+        return prototype != null ? prototype.frameHeight : frameHeight;
+    }
+
+    public void setFrameWidth(double frameWidth) {
+        if (prototype != null) {
+            prototype.frameWidth = frameWidth;
+        } else {
+            this.frameWidth = frameWidth;
+        }
+    }
+
+    public void setFrameHeight(double frameHeight) {
+        if (prototype != null) {
+            prototype.frameHeight = frameHeight;
+            prototype.setImage(getImage());
+        } else {
+            this.frameHeight = frameHeight;
+            setImage(getImage());
+        }
+    }
+
+    public void setFrameSize(double[] size) {
+        if (size != null && size.length >= 2) {
+            setFrameSize(size[0], size[1]);
+        }
     }
 
     public void setFrameSize(double width, double height) {
-        this.frameWidth = width;
-        this.frameHeight = height;
-
-        setWidth(frameWidth);
-        setHeight(frameHeight);
+        if (prototype != null) {
+            prototype.setFrameSize(width, height);
+            prototype.setImage(getImage());
+        } else {
+            this.frameWidth = width;
+            this.frameHeight = height;
+            setImage(getImage());
+        }
     }
 
     public double[] getFrameSize() {
+        if (prototype != null) {
+            return prototype.getFrameSize();
+        }
+
         return new double[] { frameWidth, frameHeight };
     }
 
     public Image getImage() {
+        if (prototype != null) {
+            return prototype.image;
+        }
+
         return image;
     }
 
     public void setImage(Image image) {
+        if (prototype != null) {
+            prototype.setImage(image);
+            return;
+        }
+
         this.image = image;
 
         if (image != null) {
@@ -124,10 +196,9 @@ public class Sprite extends Canvas {
 
             if (frameWidth == null || frameHeight == null) {
                 maxIndex = 1;
-                frameWidth = width;
-                frameHeight = height;
                 cols = 1;
                 rows = 1;
+                setFrameSize(width, height);
             } else {
                 cols = (int) Math.floor(width / frameWidth);
                 rows = (int) Math.floor(height / frameHeight);
@@ -140,20 +211,35 @@ public class Sprite extends Canvas {
     }
 
     public void setAnimation(String name, int... indexes) {
+        if (prototype != null) {
+            prototype.setAnimation(name, indexes);
+            return;
+        }
+
         synchronized (animations) {
-            animations.put(name, new Animation(indexes));
+            animations.put(name, new Animation(name, indexes));
         }
     }
 
     public void setAnimation(String name, int from, int length) {
+        if (prototype != null) {
+            prototype.setAnimation(name, from, length);
+            return;
+        }
+
         synchronized (animations) {
-            Animation value = new Animation();
+            Animation value = new Animation(name);
             value.setRange(from, from + length + 1);
             animations.put(name, value);
         }
     }
 
     synchronized public void setAnimationSpeed(String name, int speed) {
+        if (prototype != null) {
+            prototype.setAnimationSpeed(name, speed);
+            return;
+        }
+
         synchronized (animations) {
             if (!animations.containsKey(name)) {
                 setAnimation(name);
@@ -161,16 +247,6 @@ public class Sprite extends Canvas {
 
             animations.get(name).setSpeed(speed);
         }
-    }
-
-    public void drawNext() {
-        currentIndex++;
-
-        if (currentIndex > maxIndex) {
-            currentIndex = 0;
-        }
-
-        draw(currentIndex);
     }
 
     public boolean isCycledAnimation() {
@@ -181,8 +257,22 @@ public class Sprite extends Canvas {
         this.cycledAnimation = cycledAnimation;
     }
 
+    public String getCurrentAnimation() {
+        return currentAnimation == null ? null : currentAnimation.getName();
+    }
+
     public void setCurrentAnimation(String name) {
-        this.currentAnimation = animations.get(name);
+        this.currentAnimation = prototype != null ? prototype.animations.get(name) : animations.get(name);
+
+        if (this.currentAnimation != null) {
+            if (this.currentAnimation.getSpeed() != -1) {
+                setSpeed(this.currentAnimation.getSpeed());
+            }
+        }
+
+        if (name != null && !name.isEmpty() && currentAnimation == null) {
+            throw new IllegalArgumentException("Animation '" + name + "' not found");
+        }
     }
 
     public int getSpeed() {
@@ -193,7 +283,19 @@ public class Sprite extends Canvas {
         this.speed = speed;
     }
 
-    public void drawByTime(long now) {
+    public void drawNext(Canvas canvas) {
+        currentIndex++;
+
+        if (currentIndex > maxIndex) {
+            currentIndex = 0;
+        }
+
+        draw(canvas, currentIndex);
+    }
+
+    public void drawByTime(Canvas canvas, long now) {
+        int maxIndex = prototype == null ? this.maxIndex : prototype.maxIndex;
+
         if (freeze || maxIndex < 1) {
             return;
         }
@@ -201,15 +303,17 @@ public class Sprite extends Canvas {
         int drawIndex = -1;
 
         if (currentAnimation != null) {
-            int speed = currentAnimation.getSpeed() > -1 ? currentAnimation.getSpeed() : this.speed;
-
             if (speed <= 0) {
-                drawIndex = currentAnimation.currentIndex;
+                drawIndex = currentAnimation.indexes[currentIndex];
             } else {
-                int newIndex = (int) Math.floor((now - currentAnimation.currentIndex) / (1000000000 / speed)); //Determine how many frames we need to advance to maintain frame rate independence
+                int newIndex = (int) Math.floor((now - currentIndex) / (1000000000 / speed)); //Determine how many frames we need to advance to maintain frame rate independence
 
-                newIndex = newIndex % currentAnimation.getMax();
+                newIndex = newIndex % (currentAnimation.getMax() + 1);
                 drawIndex = currentAnimation.indexes[newIndex];
+            }
+
+            if (cycledAnimation) {
+                draw(canvas, drawIndex);
             }
         } else {
             if (speed <= 0) {
@@ -217,28 +321,42 @@ public class Sprite extends Canvas {
             } else {
                 int newIndex = (int) Math.floor((now - currentIndex) / (1000000000 / speed)); //Determine how many frames we need to advance to maintain frame rate independence
 
-                drawIndex = newIndex % maxIndex;
+                drawIndex = newIndex % (maxIndex + 1);
             }
-        }
 
-        if (cycledAnimation || (currentIndex == -1 || currentIndex < drawIndex)) {
-            draw(drawIndex);
+            if (cycledAnimation || (currentIndex == -1 || currentIndex < drawIndex)) {
+                draw(canvas, drawIndex);
+            }
         }
     }
 
-    public void draw(int index) {
+    public void draw(Canvas node, int index) {
         if (freeze) {
             return;
         }
 
+        /*if (currentIndex == index) {
+            return;
+        } */
+
         currentIndex = index;
-        GraphicsContext gc = getGraphicsContext2D();
+        GraphicsContext gc = node.getGraphicsContext2D();
 
-        gc.clearRect(0, 0, getWidth(), getHeight());
+        gc.setFill(Color.TRANSPARENT);
+        gc.clearRect(0, 0, node.getWidth(), node.getHeight());
 
-        if (this.image == null || this.frameHeight < 0.1 || this.frameWidth < 0.1 || index > maxIndex || index < 0) {
+        double frameWidth = this.getFrameWidth();
+        double frameHeight = this.getFrameHeight();
+
+        int maxIndex = prototype != null ? prototype.maxIndex : this.maxIndex;
+
+        Image image = prototype != null ? prototype.image : this.image;
+
+        if (image == null || frameHeight < 0.1 || frameWidth < 0.1 || index > maxIndex || index < 0) {
             return;
         }
+
+        int cols = prototype != null ? prototype.cols : this.cols;
 
         //
         int row = (int) Math.ceil(index / cols);
@@ -248,5 +366,27 @@ public class Sprite extends Canvas {
         double y = row * frameHeight;
 
         gc.drawImage(image, x, y, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight);
+    }
+
+    public Image getFrameImage(int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("index must be greater or equal to zero");
+        }
+
+        if (index > maxIndex) {
+            throw new IllegalArgumentException("index must be smaller or equal to " + maxIndex);
+        }
+
+        double w = frameWidth == null ? 0 : frameWidth;
+        double h = frameHeight == null ? 0 : frameHeight;
+
+        Canvas canvas = new Canvas(w, h);
+
+        draw(canvas, index);
+
+        SnapshotParameters parameters = new SnapshotParameters();
+        parameters.setFill(Color.TRANSPARENT);
+
+        return canvas.snapshot(parameters, null);
     }
 }

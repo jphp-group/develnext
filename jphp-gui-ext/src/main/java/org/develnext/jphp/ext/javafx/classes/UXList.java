@@ -17,6 +17,9 @@ import php.runtime.memory.LongMemory;
 import php.runtime.memory.ObjectMemory;
 import php.runtime.reflection.ClassEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Reflection.Abstract
 @Reflection.Name(JavaFXExtension.NS + "UXList")
 public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterator, Countable, ArrayAccess {
@@ -41,6 +44,12 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         }
 
         return r.toConstant();
+    }
+
+    @Signature
+    @SuppressWarnings("unchecked")
+    public int indexOf(Environment env, Memory object) {
+        return getWrappedObject().indexOf((T) Memory.unwrap(env, object));
     }
 
     @Signature
@@ -75,6 +84,21 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     public void addAll(Environment env, ForeachIterator iterator) throws Throwable {
         while (iterator.next()) {
             env.invokeMethod(this, "add", iterator.getValue());
+        }
+    }
+
+    @Signature
+    public void insertAll(Environment env, int index, ForeachIterator iterator) throws Throwable {
+        List<T> list = new ArrayList<>();
+
+        while (iterator.next()) {
+            list.add((T) Memory.unwrap(env, iterator.getValue()));
+        }
+
+        if (index >= 0) {
+            getWrappedObject().addAll(index, list);
+        } else {
+            throw new IllegalArgumentException("index must be greater or equal to 0");
         }
     }
 

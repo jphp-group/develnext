@@ -23,5 +23,4 @@ final public class JavaFxUtils {
             throw new IllegalArgumentException("Unable to find the '" + property + "' property for watching");
         }
     }
-
 }

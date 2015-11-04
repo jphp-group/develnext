@@ -21,6 +21,15 @@ public class UXSyntaxTextArea extends UXNode<SyntaxTextArea> {
         void jumpToLine(int line, int pos);
         void showFindDialog();
         void showReplaceDialog();
+
+        void redo();
+        void undo();
+        void copy();
+        void cut();
+        void paste();
+
+        boolean canUndo();
+        boolean canRedo();
     }
     public UXSyntaxTextArea(Environment env, SyntaxTextArea wrappedObject) {
         super(env, wrappedObject);

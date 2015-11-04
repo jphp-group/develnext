@@ -102,6 +102,8 @@ class ProjectSystem
         $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
         Ide::get()->setOpenedProject($project);
 
+        FileSystem::open('~project');
+
         $project->load();
         $project->recover();
         $project->open();

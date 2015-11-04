@@ -3,6 +3,7 @@ namespace ide\formats\form;
 
 use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
+use ide\Logger;
 use php\io\File;
 use InvalidArgumentException;
 use php\lib\Items;
@@ -126,6 +127,8 @@ class FormElementConfig
         try {
             return self::$cache[$type] = new FormElementConfig($type);
         } catch (InvalidArgumentException $e) {
+            Logger::warn($e->getMessage());
+
             return null;
         }
     }

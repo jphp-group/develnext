@@ -33,18 +33,31 @@ class EnumPropertyEditor extends ElementPropertyEditor
      */
     public function __construct(array $variants = [])
     {
-        $this->variants = $variants;
-        $this->variantKeys = Items::keys($variants);
+        $this->setVariants($variants);
 
         parent::__construct();
     }
 
+    /**
+     * @param array $variants
+     */
+    public function setVariants($variants)
+    {
+        $this->variants = $variants;
+        $this->variantKeys = Items::keys($variants);
+
+        if ($this->choiceBox) {
+            $this->choiceBox->items->clear();
+            $this->choiceBox->items->addAll($this->variants);
+        }
+    }
 
     public function makeUi()
     {
         $this->choiceBox = new UXChoiceBox();
         $this->choiceBox->maxWidth = 300;
         $this->choiceBox->items->addAll($this->variants);
+        UXHBox::setHgrow($this->choiceBox, 'ALWAYS');
 
         $this->choiceBox->style = "-fx-background-insets: 0; -fx-background-radius: 0; -fx-background-color: -fx-control-inner-background;";
 
@@ -62,7 +75,6 @@ class EnumPropertyEditor extends ElementPropertyEditor
         $this->choiceBox->tooltipText = $tooltip;
     }
 
-
     public function getNormalizedValue($value)
     {
         if (Str::isNumber($value)) {
@@ -77,7 +89,6 @@ class EnumPropertyEditor extends ElementPropertyEditor
 
         return $value;
     }
-
 
     /**
      * @param $value

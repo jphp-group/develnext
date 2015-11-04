@@ -803,6 +803,14 @@ class Ide extends Application
     }
 
     /**
+     * @return Project
+     */
+    public static function project()
+    {
+        return self::get()->getOpenedProject();
+    }
+
+    /**
      * @return AccountManager
      */
     public static function accountManager()
@@ -816,6 +824,15 @@ class Ide extends Application
     public static function service()
     {
         return Ide::get()->serviceManager;
+    }
+
+    /**
+     * @param $text
+     * @param int $timeout
+     */
+    public static function toast($text, $timeout = 0)
+    {
+        Ide::get()->getMainForm()->toast($text, $timeout);
     }
 
     public function shutdown()

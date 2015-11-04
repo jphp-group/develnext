@@ -134,6 +134,12 @@ class GuiFormDumper extends AbstractFormDumper
 
         $import = $document->createProcessingInstruction('import', 'org.develnext.jphp.ext.javafx.support.*');
         $document->insertBefore($import, $document->getDocumentElement());
+
+        $import = $document->createProcessingInstruction('import', 'org.develnext.jphp.ext.javafx.support.control.*');
+        $document->insertBefore($import, $document->getDocumentElement());
+
+        $import = $document->createProcessingInstruction('import', 'org.develnext.jphp.ext.game.support.*');
+        $document->insertBefore($import, $document->getDocumentElement());
     }
 
     public function createElementTag(UXNode $node, DomDocument $document, $ignoreUnregistered = true)

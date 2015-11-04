@@ -71,6 +71,10 @@ class ActionScript
         $singleLevel = 0;
 
         foreach ($actions as $action) {
+            if (!$action) {
+                continue;
+            }
+
             $action->setLevel($level);
 
             if ($action->getType()->isCloseLevel()) {
@@ -237,11 +241,13 @@ class ActionScript
             foreach ($domClass->findAll("/root/class[@name='$className']/method") as $domMethod) {
                 $methodName = $domMethod->getAttribute('name');
 
-                $code = '';
                 $actions = [];
 
                 foreach ($domMethod->findAll('*') as $domAction) {
                     $action = $this->manager->buildAction($domAction);
+                    $action->setContextClass($className);
+                    $action->setContextMethod($methodName);
+
                     $actions[] = $action;
 
                     $imports = $imports->append($action->imports());

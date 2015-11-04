@@ -21,7 +21,7 @@ class IfExprActionType extends AbstractSimpleActionType
     {
         return [
             'expr' => 'Условие',
-            'not' => 'Отрицание (наоборт, если не выполнится)'
+            'not' => 'Отрицание (наоборот, если не выполнится)'
         ];
     }
 

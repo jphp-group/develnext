@@ -43,13 +43,13 @@ class AppendVarActionType extends AbstractSimpleActionType
 
     function getTitle(Action $action = null)
     {
-        return "Добавить к переменной";
+        return "Добавить к глобальной переменной";
     }
 
     function getDescription(Action $action = null)
     {
         if (!$action) {
-            return "Добавить к значению переменной";
+            return "Добавить к значению глобальной переменной";
         }
 
         $name = $action->get('name');
@@ -81,14 +81,14 @@ class AppendVarActionType extends AbstractSimpleActionType
 
         $actionScript->addLocalVariable($name);
 
-        if ($name[0] != '$') {
-            $name = "\${$name}";
+        if ($name[0] == '$') {
+            $name = Str::sub($name, 1);
         }
 
         if ($action->asString) {
-            return "$name .= {$action->get('value')}";
+            return "\$GLOBALS['$name'] .= {$action->get('value')}";
         } else {
-            return "$name += {$action->get('value')}";
+            return "\$GLOBALS['$name'] += {$action->get('value')}";
         }
     }
 }

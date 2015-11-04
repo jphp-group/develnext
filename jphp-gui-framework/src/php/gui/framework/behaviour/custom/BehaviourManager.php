@@ -19,5 +19,21 @@ abstract class BehaviourManager
      * @param $type
      * @return AbstractBehaviour
      */
-    abstract public function getBehaviour($target, $type);
+    public function getBehaviour($target, $type)
+    {
+        if (method_exists($target, 'data')) {
+            $data = $target->data('~behaviour~' . $type);
+
+            if ($data == null) {
+                /** @var AbstractBehaviour $data */
+                $data = new $type();
+                $data->disable();
+                $this->apply($target->id, $data);
+            }
+
+            return $data;
+        }
+
+        return null;
+    }
 }

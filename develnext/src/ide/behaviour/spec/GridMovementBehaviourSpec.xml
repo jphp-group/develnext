@@ -1,0 +1,17 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property name="Направление" code="direction" editor="enum">
+            <variants>
+                <variant value="ALL">Все</variant>
+                <variant value="LEFT_RIGHT">Лево + Право</variant>
+                <variant value="UP_DOWN">Верх + Низ</variant>
+            </variants>
+        </property>
+        <property name="WASD" code="wasd" editor="boolean" tooltip="Использовать клавишы букв WASD вместо стрелок" />
+        <property name="Сетка W" code="tileWidth" editor="integer" tooltip="Ширина сетки" />
+        <property name="Сетка H" code="tileHeight" editor="integer" tooltip="Высота сетки" />
+        <property name="Скорость анимации" code="speed" editor="integer" tooltip="Скорость анимации" />
+        <property name="Анимировать" code="animated" editor="boolean" tooltip="Анимировать изменение уровня прозрачности формы" />
+        <property name="Поворачивать" code="changeAngle" editor="boolean" tooltip="Менять угол поворота" />
+    </properties>
+</behaviour>

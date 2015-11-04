@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes.layout;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -50,5 +51,10 @@ public class UXHBox extends UXPane<HBox> {
     @Signature
     public static Priority getHgrow(Node node) {
         return HBox.getHgrow(node);
+    }
+
+    @Signature
+    public static void setMargin(Node node, Insets insets) {
+        HBox.setMargin(node, insets);
     }
 }

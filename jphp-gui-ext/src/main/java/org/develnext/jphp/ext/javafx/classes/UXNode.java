@@ -33,7 +33,10 @@ import php.runtime.env.Environment;
 import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
-import php.runtime.memory.*;
+import php.runtime.memory.ArrayMemory;
+import php.runtime.memory.DoubleMemory;
+import php.runtime.memory.ObjectMemory;
+import php.runtime.memory.StringMemory;
 import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
 

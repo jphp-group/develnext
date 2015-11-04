@@ -33,9 +33,9 @@ ide\action\types\BrowseActionType
 ide\action\types\ExecActionType
 ide\action\types\AppShutdownActionType
 
-
 ide\action\types\IfExprActionType
 ide\action\types\ElseActionType
+ide\action\types\IfElseExprActionType
 ide\action\types\OpenBlockActionType
 ide\action\types\CloseBlockActionType
 ide\action\types\IfRandomActionType
@@ -43,6 +43,19 @@ ide\action\types\IfConfirmActionType
 ide\action\types\IfTextActionType
 ide\action\types\IfFileExistsActionType
 ide\action\types\IfDirExistsActionType
+ide\action\types\IfIntersectActionType
+
+ide\action\types\BehaviourEnableActionType
+ide\action\types\BehaviourDisableActionType
+
+ide\action\types\GameChangeAnimationActionType
+ide\action\types\GameStopAnimationActionType
+ide\action\types\GameStartAnimationActionType
+ide\action\types\GameSetSpeedAnimationActionType
+ide\action\types\IfGameAnimationFreezeActionType
+ide\action\types\IfGameAnimationActionType
+ide\action\types\SetScoreActionType
+ide\action\types\IfScoreActionType
 
 ide\action\types\CallScriptActionType
 ide\action\types\PhpLineActionType
@@ -50,12 +63,10 @@ ide\action\types\SleepActionType
 ide\action\types\ExitActionType
 ide\action\types\SetVarActionType
 ide\action\types\AppendVarActionType
+ide\action\types\IfVarActionType
 ide\action\types\SetPropertyActionType
 ide\action\types\AppendPropertyActionType
 ide\action\types\ElementSetDataActionType
 ide\action\types\ElementAppendDataActionType
 ide\action\types\CommentActionType
 ide\action\types\NewLineActionType
-
-ide\action\types\BehaviourEnableActionType
-ide\action\types\BehaviourDisableActionType

@@ -8,11 +8,18 @@ use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
 use ide\commands\BuildProjectCommand;
 use ide\commands\CreateFormProjectCommand;
+use ide\commands\CreateGameObjectPrototypeProjectCommand;
+use ide\commands\CreateGameSceneProjectCommand;
+use ide\commands\CreateGameSpriteProjectCommand;
 use ide\commands\CreateScriptModuleProjectCommand;
 use ide\commands\ExecuteProjectCommand;
 use ide\editors\FormEditor;
 use ide\editors\ScriptModuleEditor;
+use ide\formats\form\FormProjectTreeNavigation;
+use ide\formats\module\ModuleProjectTreeNavigation;
 use ide\formats\ScriptFormat;
+use ide\formats\sprite\IdeSpriteManager;
+use ide\formats\sprite\SpriteProjectTreeNavigation;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
 use ide\formats\templates\GuiBootstrapFileTemplate;
 use ide\formats\templates\GuiFormFileTemplate;
@@ -48,7 +55,9 @@ use php\util\Regex;
 class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 {
     const FORMS_DIRECTORY = 'src/.forms';
+    const PROTOTYPES_DIRECTORY  = 'src/app/prototypes';
     const SCRIPTS_DIRECTORY = 'src/.scripts';
+    const GAME_DIRECTORY = 'src/.game';
 
     /** @var string */
     protected $mainForm = 'MainForm';
@@ -64,6 +73,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     protected $actionManager;
 
     /**
+     * @var IdeSpriteManager
+     */
+    protected $spriteManager;
+
+    /**
      * ...
      */
     public function inject()
@@ -75,6 +89,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('compile', [$this, 'doCompile']);
         $this->project->on('export', [$this, 'doExport']);
         $this->project->on('reindex', [$this, 'doReindex']);
+        $this->project->on('update', [$this, 'doUpdate']);
 
         WatcherSystem::addListener([$this, 'doWatchFile']);
 
@@ -87,14 +102,26 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         Ide::get()->registerCommand(new ExecuteProjectCommand());
         Ide::get()->registerCommand(new CreateFormProjectCommand());
         Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
+       // Ide::get()->registerCommand(new CreateGameSceneProjectCommand());
+      //  Ide::get()->registerCommand(new CreateGameObjectPrototypeProjectCommand());
+        Ide::get()->registerCommand(new CreateGameSpriteProjectCommand());
 
         $this->scriptComponentManager = new ScriptComponentManager();
         $this->actionManager = new ActionManager();
+        $this->spriteManager = new IdeSpriteManager($this->project);
     }
 
     public function getMainForm()
     {
         return $this->mainForm;
+    }
+
+    /**
+     * @return IdeSpriteManager
+     */
+    public function getSpriteManager()
+    {
+        return $this->spriteManager;
     }
 
     public function doCreate()
@@ -105,6 +132,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $mainForm = $this->createForm($this->mainForm);
         FileSystem::open($mainForm);
 
+    }
+
+    public function doUpdate()
+    {
+        $this->spriteManager->reloadAll();
     }
 
     public function doReindex(ProjectIndexer $indexer)
@@ -149,6 +181,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $buildConfig->setDependency('jphp-json-ext');
         $buildConfig->setDependency('jphp-xml-ext');
         $buildConfig->setDependency('jphp-gui-ext');
+        $buildConfig->setDependency('jphp-game-ext');
+        $buildConfig->setDependency('jphp-zend-ext');
         $buildConfig->setDependency('jphp-gui-framework');
         $buildConfig->setDependency('develnext-stdlib');
 
@@ -212,7 +246,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doWatchFile(ProjectFile $file, $event)
     {
-        if ($file) {
+        /*if ($file) {
             $path = $file->getRelativePath();
 
             switch ($event['kind']) {
@@ -227,14 +261,18 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
                     break;
             }
-        }
+        } */
     }
 
     public function doOpen()
     {
         $tree = $this->project->getTree();
 
-        $formsItem = $tree->getOrCreateItem('forms', 'Формы', 'icons/forms16.png', $this->project->getFile(self::FORMS_DIRECTORY));
+        $tree->register(new FormProjectTreeNavigation(self::FORMS_DIRECTORY));
+        $tree->register(new ModuleProjectTreeNavigation(self::SCRIPTS_DIRECTORY));
+        $tree->register(new SpriteProjectTreeNavigation(self::GAME_DIRECTORY . '/sprites'));
+
+        /*$formsItem = $tree->getOrCreateItem('forms', 'Формы', 'icons/folder16.png', $this->project->getFile(self::FORMS_DIRECTORY));
         $formsItem->setExpanded(true);
         $formsItem->setDisableDelete(true);
 
@@ -247,7 +285,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree->addIgnoreRule('^src\\/\\.scripts\\/.*\\.json');
 
         $projectTreeItem = $tree->getOrCreateItem(
-            'scripts', 'Модули', 'icons/brickFolder16.png', $this->project->getFile(self::SCRIPTS_DIRECTORY)
+            'scripts', 'Модули', 'icons/folder16.png', $this->project->getFile(self::SCRIPTS_DIRECTORY)
         );
         $projectTreeItem->setExpanded(true);
         $projectTreeItem->setDisableDelete(true);
@@ -255,7 +293,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $projectTreeItem->onUpdate(function () {
             $this->updateScriptsInTree();
         });
-        WatcherSystem::addPathRecursive($this->project->getFile(self::SCRIPTS_DIRECTORY));
+        WatcherSystem::addPathRecursive($this->project->getFile(self::SCRIPTS_DIRECTORY));  */
 
         /** @var GradleProjectBehaviour $gradleBehavior */
         $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
@@ -269,6 +307,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $buildConfig->setDefine('jar.archiveName', '"dn-compiled-module.jar"');
 
         $this->updateScriptManager();
+        $this->updateSpriteManager();
     }
 
     public function doUpdateTree(ProjectTree $tree, $path)
@@ -288,12 +327,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->defineFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
     }
 
-    public function updateFormsInTree()
+    /*public function updateFormsInTree()
     {
         $tree = $this->project->getTree();
 
         $tree->updateDirectory('forms', $this->project->getFile(self::FORMS_DIRECTORY));
-    }
+    } */
 
     public function updateScriptManager()
     {
@@ -301,12 +340,17 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->scriptComponentManager->updateByPath($this->project->getFile(self::SCRIPTS_DIRECTORY));
     }
 
-    public function updateScriptsInTree()
+    public function updateSpriteManager()
+    {
+        $this->spriteManager->reloadAll();
+    }
+
+    /*public function updateScriptsInTree()
     {
         $tree = $this->project->getTree();
 
         $tree->updateDirectory('scripts', $this->project->getFile(self::SCRIPTS_DIRECTORY));
-    }
+    } */
 
     public function recoveryModule($filename)
     {
@@ -373,6 +417,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         return $form;
     }
+
+    //public function create
 
     public function createModule($name)
     {
@@ -454,6 +500,33 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         return $result;
+    }
+
+    public function createSprite($name)
+    {
+        Logger::info("Creating game sprite '$name' ...");
+
+        $file = $this->spriteManager->createSprite($name);
+
+        Logger::info("Finish creating game sprite '$name'");
+
+        return $file;
+    }
+
+    public function createPrototype($name)
+    {
+        Logger::info("Creating prototype '$name' ...");
+
+        $template = new PhpClassFileTemplate($name, 'GameObject');
+        $template->setNamespace("app\\prototypes");
+        $template->setImports([
+            'game\\GameObject'
+        ]);
+
+        $prototype = $this->project->createFile(self::PROTOTYPES_DIRECTORY . "/$name.php", $template);
+
+        Logger::info("Finish creating prototype '$name'");
+        return $prototype;
     }
 
     public function createForm($name)

@@ -13,6 +13,7 @@ use ide\utils\FileHelper;
 use ide\utils\FileUtils;
 use php\compress\ArchiveInputStream;
 use php\compress\ArchiveOutputStream;
+use php\gui\UXTreeView;
 use php\io\File;
 use php\io\FileStream;
 use php\io\IOException;
@@ -103,7 +104,7 @@ class Project
         /** @var MainForm $mainForm */
         $mainForm = Ide::get()->getMainForm();
 
-        $this->tree = new ProjectTree($this, $mainForm->getProjectTree());
+        $this->tree = new ProjectTree($this, new UXTreeView());
         $this->indexer = new ProjectIndexer($this);
     }
 
@@ -355,7 +356,18 @@ class Project
      */
     public function create()
     {
+        FileSystem::open('~project');
         $this->trigger(__FUNCTION__);
+    }
+
+    /**
+     * Вызывать при смене табов.
+     */
+    public function update()
+    {
+        $this->trigger(__FUNCTION__);
+
+        $this->tree->update();
     }
 
     /**
@@ -628,6 +640,45 @@ class Project
 
         $this->save();
         $this->tree->clear(true);
+    }
+
+    /**
+     * @param string $fileName
+     * @return ProjectFile[]
+     */
+    public function findDuplicatedFiles($fileName)
+    {
+        $file = File::of($fileName);
+
+        $length = $file->length();
+        $crc  = $file->crc32();
+        $hash = $file->hash('SHA-256');
+
+        $duplicates = [];
+
+        FileUtils::scan($this->getFile('src/'), function ($filename) use ($crc, $length, $hash, &$duplicates) {
+            $file = File::of($filename);
+
+            if (!$file->isFile()) {
+                return;
+            }
+
+            if ($file->length() !== $length) {
+                return;
+            }
+
+            if ($file->crc32() !== $crc) {
+                return;
+            }
+
+            if ($file->hash('SHA-256') !== $hash) {
+                return;
+            }
+
+            $duplicates[] = $this->getAbsoluteFile($filename);
+        });
+
+        return $duplicates;
     }
 
     /**

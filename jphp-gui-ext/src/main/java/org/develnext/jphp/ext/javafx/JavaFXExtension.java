@@ -1,9 +1,7 @@
 package org.develnext.jphp.ext.javafx;
 
 import com.sun.javafx.scene.control.skin.CustomColorDialog;
-import javafx.animation.Animation;
-import javafx.animation.FadeTransition;
-import javafx.animation.PathTransition;
+import javafx.animation.*;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -13,6 +11,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.*;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -40,9 +40,7 @@ import org.develnext.jphp.ext.javafx.bind.DurationMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.InsetsMemoryOperation;
 import org.develnext.jphp.ext.javafx.bind.KeyCombinationMemoryOperation;
 import org.develnext.jphp.ext.javafx.classes.*;
-import org.develnext.jphp.ext.javafx.classes.animation.UXAnimation;
-import org.develnext.jphp.ext.javafx.classes.animation.UXFadeAnimation;
-import org.develnext.jphp.ext.javafx.classes.animation.UXPathAnimation;
+import org.develnext.jphp.ext.javafx.classes.animation.*;
 import org.develnext.jphp.ext.javafx.classes.data.Data;
 import org.develnext.jphp.ext.javafx.classes.event.*;
 import org.develnext.jphp.ext.javafx.classes.layout.*;
@@ -51,6 +49,7 @@ import org.develnext.jphp.ext.javafx.classes.shape.*;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.ImageViewEx;
+import org.develnext.jphp.ext.javafx.support.control.LabelEx;
 import org.develnext.jphp.ext.javafx.support.event.*;
 import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
@@ -88,6 +87,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Font.class, UXFont.class);
         registerWrapperClass(scope, Color.class, UXColor.class);
         registerWrapperClass(scope, Image.class, UXImage.class);
+        registerWrapperClass(scope, GraphicsContext.class, UXGraphicsContext.class);
 
         registerWrapperClass(scope, Window.class, UXWindow.class);
         registerWrapperClass(scope, Stage.class, UXForm.class);
@@ -125,6 +125,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, TextField.class, UXTextField.class);
         registerWrapperClass(scope, PasswordField.class, UXPasswordField.class);
         registerWrapperClass(scope, Label.class, UXLabel.class);
+        registerWrapperClass(scope, LabelEx.class, UXLabelEx.class);
         registerWrapperClass(scope, Hyperlink.class, UXHyperlink.class);
         registerWrapperClass(scope, ComboBoxBase.class, UXComboBoxBase.class);
         registerWrapperClass(scope, ComboBox.class, UXComboBox.class);
@@ -150,6 +151,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, DirectoryChooser.class, UXDirectoryChooser.class);
         registerWrapperClass(scope, Slider.class, UXSlider.class);
         registerWrapperClass(scope, DatePicker.class, UXDatePicker.class);
+        registerWrapperClass(scope, Canvas.class, UXCanvas.class);
 
         registerWrapperClass(scope, Cell.class, UXCell.class);
         registerWrapperClass(scope, TableView.class, UXTableView.class);
@@ -176,6 +178,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Event.class, UXEvent.class);
 
         registerWrapperClass(scope, MouseEvent.class, UXMouseEvent.class);
+        registerWrapperClass(scope, MouseDragEvent.class, UXMouseEvent.class);
         registerWrapperClass(scope, KeyEvent.class, UXKeyEvent.class);
         registerWrapperClass(scope, WindowEvent.class, UXWindowEvent.class);
         registerWrapperClass(scope, ContextMenuEvent.class, UXContextMenuEvent.class);
@@ -200,7 +203,9 @@ public class JavaFXExtension extends Extension {
     }
 
     protected void registerAnimationPackage(CompileScope scope) {
+        registerWrapperClass(scope, KeyFrame.class, UXKeyFrame.class);
         registerWrapperClass(scope, Animation.class, UXAnimation.class);
+        registerWrapperClass(scope, Timeline.class, UXTimeline.class);
         registerWrapperClass(scope, FadeTransition.class, UXFadeAnimation.class);
         registerWrapperClass(scope, PathTransition.class, UXPathAnimation.class);
     }

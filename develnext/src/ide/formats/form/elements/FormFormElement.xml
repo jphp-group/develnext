@@ -13,7 +13,7 @@
 
         <property code="form.style" name="Стиль" editor="enum" formConfig="1" defaultValue="DECORATED">
             <variants>
-                <variant value="DECORATED">Стаднарт</variant>
+                <variant value="DECORATED">Стандарт</variant>
                 <variant value="UNDECORATED">Без рамок</variant>
                 <variant value="TRANSPARENT">Прозрачный</variant>
                 <variant value="UTILITY">Утилита</variant>

@@ -10,12 +10,12 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "UXLabel")
-public class UXLabel extends UXLabeled {
+public class UXLabel<T extends Label> extends UXLabeled<Label> {
     interface WrappedInterface {
         @Property Node labelFor();
     }
 
-    public UXLabel(Environment env, Label wrappedObject) {
+    public UXLabel(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -32,13 +32,15 @@ public class UXLabel extends UXLabeled {
     public void __construct(String text) {
         __wrappedObject = new Label(text);
     }
+
     @Signature
     public void __construct(String text, Node graphic) {
         __wrappedObject = new Label(text, graphic);
     }
 
     @Override
-    public Label getWrappedObject() {
-        return (Label) super.getWrappedObject();
+    @SuppressWarnings("unchecked")
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 }

@@ -56,6 +56,11 @@ class UXDesigner
     public $pickedNode = null;
 
     /**
+     * @var bool
+     */
+    public $disabled = false;
+
+    /**
      * @param UXPane $area
      */
     public function __construct(UXPane $area)

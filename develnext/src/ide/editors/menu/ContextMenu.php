@@ -26,6 +26,11 @@ class ContextMenu
     protected $editor;
 
     /**
+     * @var callable
+     */
+    protected $filter;
+
+    /**
      * @var UXMenu[]
      */
     protected $groups = [];
@@ -42,6 +47,22 @@ class ContextMenu
         foreach ($commands as $command) {
             $this->add($command);
         }
+    }
+
+    /**
+     * @return callable
+     */
+    public function getFilter()
+    {
+        return $this->filter;
+    }
+
+    /**
+     * @param callable $filter
+     */
+    public function setFilter(callable $filter)
+    {
+        $this->filter = $filter;
     }
 
     public function clear()
@@ -78,7 +99,11 @@ class ContextMenu
         $menuItem->accelerator = $command->getAccelerator();
 
         $menuItem->on('action', function ($e) use ($command) {
-            $command->onExecute();
+            $filter = $this->filter;
+
+            if (!$filter || $filter($command)) {
+                $command->onExecute();
+            }
         });
 
         $this->root->items->add($menuItem);
@@ -94,7 +119,11 @@ class ContextMenu
         }
 
         $menuItem->on('action', function ($e) use ($command) {
-            $command->onExecute($e, $this->editor);
+            $filter = $this->filter;
+
+            if (!$filter || $filter($command)) {
+                $command->onExecute($e, $this->editor);
+            }
         });
 
         $menu = $this->root;

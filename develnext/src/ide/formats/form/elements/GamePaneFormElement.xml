@@ -1,0 +1,5 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="autoSize" name="Авторазмер" editor="boolean" tooltip="Подгонять размер игровой панели под размер сцены" />
+    </properties>
+</element>

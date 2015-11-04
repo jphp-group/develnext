@@ -155,6 +155,8 @@ public class UXDesignProperties extends BaseObject {
             setEditable(true);
             setFixedCellSize(20);
 
+            setFocusTraversable(false);
+
             setStyle("-fx-font-size: 11px; -fx-font-family: Tahoma;");
 
             prefHeightProperty().bind(fixedCellSizeProperty().multiply(Bindings.size(getItems())));

@@ -5,6 +5,7 @@ use Files;
 use ide\editors\menu\ContextMenu;
 use ide\Logger;
 use ide\misc\AbstractCommand;
+use ide\misc\EventHandlerBehaviour;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\utils\UiUtils;
@@ -45,10 +46,9 @@ use php\util\Scanner;
  */
 class CodeEditor extends AbstractEditor
 {
-    protected $mode;
+    use EventHandlerBehaviour;
 
-    /** @var array */
-    protected $handlers = [];
+    protected $mode;
 
     /**
      * @var bool
@@ -80,14 +80,14 @@ class CodeEditor extends AbstractEditor
         return $this->mode ? 'icons/' . $this->mode . 'File16.png' : null;
     }
 
-    public function __construct($file, $mode = null, $options = array())
+    public function __construct($file, $mode = 'php', $options = array())
     {
         parent::__construct($file);
 
         $this->mode = $mode;
 
         $this->textArea = new UXSyntaxTextArea();
-        $this->textArea->syntaxStyle = 'text/php';
+        $this->textArea->syntaxStyle = "text/$mode";
 
         $this->textArea->on('keyUp', function () {
             $this->doChange();
@@ -114,14 +114,14 @@ class CodeEditor extends AbstractEditor
         }
     }
 
-    private $eventUpdates = 0;
+    public $__eventUpdates = 0;
 
     protected function doChange()
     {
-        $i = ++$this->eventUpdates;
+        $i = ++$this->__eventUpdates;
 
         Timer::run(1000, function () use ($i) {
-            if ($i == $this->eventUpdates) {
+            if ($i == $this->__eventUpdates) {
                 $this->trigger('update', []);
             }
         });
@@ -140,33 +140,6 @@ class CodeEditor extends AbstractEditor
 
             default:
                 ;
-        }
-    }
-
-    public function trigger($event, array $args)
-    {
-        $result = null;
-
-        foreach ((array) $this->handlers[$event] as $handler) {
-            $result = $handler($args);
-
-            if ($result) {
-                return $result;
-            }
-        }
-    }
-
-    public function on($event, callable $handler, $group = 'general')
-    {
-        $this->handlers[$event][$group] = $handler;
-    }
-
-    public function off($event, $group = null)
-    {
-        if ($group === null) {
-            unset($this->handlers[$event]);
-        } else {
-            unset($this->handlers[$event][$group]);
         }
     }
 
@@ -289,6 +262,11 @@ class CodeEditor extends AbstractEditor
             $this->executeCommand('replace');
             $this->save();
         }));
+    }
+
+    public function requestFocus()
+    {
+        $this->textArea->requestFocus();
     }
 }
 

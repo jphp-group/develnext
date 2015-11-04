@@ -27,6 +27,8 @@ class CircleFormElementTag extends AbstractFormElementTag
         /** @var UXCircle $node */
         $element->setAttribute('radius', $node->radius);
 
+        $element->setAttribute('layoutX', $node->x + $node->radius);
+        $element->setAttribute('layoutY', $node->y + $node->radius);
 
         $element->removeAttribute('prefWidth');
         $element->removeAttribute('prefHeight');

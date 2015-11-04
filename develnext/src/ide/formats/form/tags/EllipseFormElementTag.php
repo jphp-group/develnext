@@ -29,6 +29,9 @@ class EllipseFormElementTag extends AbstractFormElementTag
         $element->setAttribute('radiusX', $node->radiusX);
         $element->setAttribute('radiusY', $node->radiusY);
 
+        $element->setAttribute('layoutX', $node->x + $node->radiusX);
+        $element->setAttribute('layoutY', $node->y + $node->radiusY);
+
         $element->removeAttribute('prefWidth');
         $element->removeAttribute('prefHeight');
     }

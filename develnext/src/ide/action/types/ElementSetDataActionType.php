@@ -8,6 +8,11 @@ use php\lib\Str;
 
 class ElementSetDataActionType extends AbstractSimpleActionType
 {
+    function isDeprecated()
+    {
+        return true;
+    }
+
     function attributes()
     {
         return [

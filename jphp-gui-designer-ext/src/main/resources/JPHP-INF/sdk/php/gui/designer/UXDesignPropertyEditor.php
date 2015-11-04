@@ -34,11 +34,10 @@ abstract class UXDesignPropertyEditor
     public $designProperties;
 
     /**
-     * @param UXDesignProperties $properties
      * @param UXTableCell $cell
      * @param bool $empty
-     *
      * @return mixed
+     * @internal param UXDesignProperties $properties
      */
     abstract public function update(UXTableCell $cell, $empty);
 }

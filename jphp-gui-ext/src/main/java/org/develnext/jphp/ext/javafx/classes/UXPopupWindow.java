@@ -54,6 +54,6 @@ public class UXPopupWindow<T extends PopupWindow> extends UXWindow<PopupWindow> 
     public void showByNode(Node node, int offsetX, int offsetY) {
         Point2D screen = node.localToScreen(node.getLayoutX(), node.getLayoutY());
 
-        getWrappedObject().show(node, screen.getX() + offsetX, screen.getY() + offsetY);
+        getWrappedObject().show(node.getScene().getWindow(), screen.getX() + offsetX, screen.getY() + offsetY);
     }
 }

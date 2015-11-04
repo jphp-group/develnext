@@ -23,9 +23,9 @@ class UXTabPane extends UXControl
     public $selectedIndex = -1;
 
     /**
-     * @var string
+     * @var string SELECTED_TAB, ALL_TABS, UNAVAILABLE
      */
-    public $tabClosingPolicy;
+    public $tabClosingPolicy = 'SELECTED_TAB';
 
     /**
      * @var string

@@ -38,7 +38,7 @@ class SplashForm extends AbstractForm
     {
         parent::hide();
 
-        Ide::get()->getAccountManager()->authorize();
+        //Ide::get()->getAccountManager()->authorize();
 
         // FIXME
         /*if (Ide::accountManager()->isAuthorized()) {

@@ -1,6 +1,8 @@
 package org.develnext.jphp.gui.designer;
 
 import javafx.embed.swing.SwingNode;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import org.fife.rsta.ui.search.FindDialog;
 import org.fife.rsta.ui.search.ReplaceDialog;
@@ -20,6 +22,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class SyntaxTextArea extends SwingNode implements SearchListener {
+    private final static String OS = System.getProperty("os.name").toLowerCase();
+
     protected final RSyntaxTextArea content;
     protected final RTextScrollPane scrollPane;
 
@@ -56,7 +60,9 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
             theme.apply(content);
         }
 
-        content.setFont(monoFont.deriveFont(14f));
+        if (OS.contains("win")){  // FIX, use font only for windows!
+            content.setFont(monoFont.deriveFont(14f));
+        }
 
         scrollPane = new RTextScrollPane(content);
         scrollPane.setLineNumbersEnabled(true);
@@ -64,6 +70,14 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
         scrollPane.setIconRowHeaderEnabled(true);
 
         setContent(scrollPane);
+
+        addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                SyntaxTextArea.this.requestFocus();
+                SyntaxTextArea.this.content.requestFocusInWindow();
+            }
+        });
     }
 
     public RSyntaxTextArea getSyntaxTextArea() {

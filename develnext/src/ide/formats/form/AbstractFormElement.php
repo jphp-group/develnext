@@ -4,6 +4,7 @@ namespace ide\formats\form;
 use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
+use ide\Logger;
 use php\gui\designer\UXDesignProperties;
 use php\gui\UXImage;
 use php\gui\UXNode;
@@ -102,6 +103,8 @@ abstract class AbstractFormElement
                     $properties->addProperty($property['group'], $property['code'], $property['name'], $editor);
                 }
             }
+        } else {
+            Logger::warn("Cannot apply properties, config is empty, element = " . get_class($this));
         }
     }
 
@@ -152,6 +155,11 @@ abstract class AbstractFormElement
         }
 
         return $size;
+    }
+
+    public function refreshNode(UXNode $node)
+    {
+        // nop.
     }
 
     /**

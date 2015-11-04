@@ -14,18 +14,35 @@ import php.runtime.reflection.ClassEntity;
 @Reflection.Name(JavaFXExtension.NS + "paint\\UXColor")
 public class UXColor extends BaseWrapper<Color> {
     interface WrappedInterface {
-        @Property double red();
-        @Property double blue();
-        @Property double green();
-        @Property double opacity();
-        @Property double brightness();
-        @Property double hue();
-        @Property double saturation();
+        @Property
+        double red();
+
+        @Property
+        double blue();
+
+        @Property
+        double green();
+
+        @Property
+        double opacity();
+
+        @Property
+        double brightness();
+
+        @Property
+        double hue();
+
+        @Property
+        double saturation();
 
         Color grayscale();
+
         Color invert();
+
         Color saturate();
+
         Color desaturate();
+
         Color interpolate(Color endValue, double t);
     }
 
@@ -53,10 +70,28 @@ public class UXColor extends BaseWrapper<Color> {
     }
 
     @Signature
+    public int getRGB() {
+        Color c = getWrappedObject();
+
+        int r = (int) Math.round(c.getRed() * 255.0);
+        int g = (int) Math.round(c.getGreen() * 255.0);
+        int b = (int) Math.round(c.getBlue() * 255.0);
+
+        int i = r;
+        i = i << 8;
+        i = i | g;
+        i = i << 8;
+        i = i | b;
+        i = i << 8;
+
+        return i;
+    }
+
+    @Signature
     public String getWebValue() {
-        int r = (int)Math.round(getWrappedObject().getRed() * 255.0);
-        int g = (int)Math.round(getWrappedObject().getGreen() * 255.0);
-        int b = (int)Math.round(getWrappedObject().getBlue() * 255.0);
+        int r = (int) Math.round(getWrappedObject().getRed() * 255.0);
+        int g = (int) Math.round(getWrappedObject().getGreen() * 255.0);
+        int b = (int) Math.round(getWrappedObject().getBlue() * 255.0);
 
         int a = (int) Math.round(getWrappedObject().getOpacity() * 255.0);
 

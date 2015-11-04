@@ -37,13 +37,6 @@ class AppShutdownActionType extends AbstractSimpleActionType
         return 'icons/shutdown16.png';
     }
 
-    function imports()
-    {
-        return [
-            Application::class
-        ];
-    }
-
     /**
      * @param Action $action
      * @param ActionScript $actionScript
@@ -51,6 +44,6 @@ class AppShutdownActionType extends AbstractSimpleActionType
      */
     function convertToCode(Action $action, ActionScript $actionScript)
     {
-        return 'Application::get()->shutdown()';
+        return 'app()->shutdown()';
     }
 }

@@ -22,4 +22,18 @@ abstract class UXParent extends UXNode
      * Requests a layout pass to be performed before the next scene is rendered.
      */
     public function requestLayout() {}
+
+    /**
+     * @param $filter (UXNode $node) : boolean
+     */
+    public function findNode(callable $filter)
+    {
+    }
+
+    /**
+     * @return UXNode|null
+     */
+    public function findFocusedNode()
+    {
+    }
 }

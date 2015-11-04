@@ -23,6 +23,7 @@ public class ImageViewEx extends Canvas implements Styleable {
 
     protected boolean autoSize;
     protected boolean stretch;
+    protected boolean smartStretch;
     protected boolean centered;
     protected boolean proportional;
 
@@ -273,19 +274,21 @@ public class ImageViewEx extends Canvas implements Styleable {
                 }
             } else {
                 if (isStretch()) {
-                    if (isProportional()) {
-                        double ratio = Math.min(getWidth() / w, getHeight() / h);
-                        w = (int) (w * ratio);
-                        h = (int) (h * ratio);
-                    } else {
-                        w = getWidth();
-                        h = getHeight();
+                    if (!smartStretch || (w > getWidth() || h > getHeight())) {
+                        if (isProportional()) {
+                            double ratio = Math.min(getWidth() / w, getHeight() / h);
+                            w = (int) (w * ratio);
+                            h = (int) (h * ratio);
+                        } else {
+                            w = getWidth();
+                            h = getHeight();
+                        }
                     }
                 }
 
                 if (isCentered()) {
-                    x = getWidth() / 2 - w / 2;
-                    y = getHeight() / 2 - h / 2;
+                    x = Math.round(getWidth() / 2 - w / 2);
+                    y = Math.round(getHeight() / 2 - h / 2);
                 }
 
                 g2.drawImage(image, x, y, w, h);
@@ -301,5 +304,14 @@ public class ImageViewEx extends Canvas implements Styleable {
 
             g2.fillText(text, getWidth() / 2 - fWidth / 2, getHeight() / 2 + fHeight / 4, getWidth());
         }
+    }
+
+    public boolean isSmartStretch() {
+        return smartStretch;
+    }
+
+    public void setSmartStretch(boolean smartStretch) {
+        this.smartStretch = smartStretch;
+        update();
     }
 }

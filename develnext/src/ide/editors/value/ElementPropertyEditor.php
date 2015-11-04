@@ -79,8 +79,15 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
 
             if ($editor instanceof FormEditor) {
                 $editor->getDesigner()->update();
+
+                if ($this->designProperties->target instanceof UXNode) {
+                    UXApplication::runLater(function () use ($editor) {
+                        $editor->refreshNode($this->designProperties->target);
+                        $editor->getDesigner()->update();
+                    });
+                }
             }
-    });
+        });
     }
 
     /**

@@ -16,6 +16,16 @@ class Action
     protected $__level = 0;
 
     /**
+     * @var string
+     */
+    protected $__contextClass = null;
+
+    /**
+     * @var string
+     */
+    protected $__contextMethod = null;
+
+    /**
      * @param AbstractActionType $type
      */
     public function __construct(AbstractActionType $type)
@@ -96,5 +106,37 @@ class Action
     public function getLevel()
     {
         return $this->__level;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContextClass()
+    {
+        return $this->__contextClass;
+    }
+
+    /**
+     * @param string $_contextClass
+     */
+    public function setContextClass($_contextClass)
+    {
+        $this->__contextClass = $_contextClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContextMethod()
+    {
+        return $this->__contextMethod;
+    }
+
+    /**
+     * @param string $_contextMethod
+     */
+    public function setContextMethod($_contextMethod)
+    {
+        $this->__contextMethod = $_contextMethod;
     }
 }

@@ -15,3 +15,4 @@ ide\editors\value\PercentPropertyEditor
 ide\editors\value\ObjectPropertyEditor
 ide\editors\value\DoubleArrayPropertyEditor
 ide\editors\value\AnchorPropertyEditor
+ide\editors\value\SpritePropertyEditor

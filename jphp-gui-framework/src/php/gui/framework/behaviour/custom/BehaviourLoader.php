@@ -4,6 +4,7 @@ namespace php\gui\framework\behaviour\custom;
 use php\format\ProcessorException;
 use php\io\IOException;
 use php\io\Stream;
+use php\xml\DomDocument;
 use php\xml\DomElement;
 use php\xml\XmlProcessor;
 
@@ -13,6 +14,8 @@ use php\xml\XmlProcessor;
  */
 class BehaviourLoader
 {
+    protected static $documents = [];
+
     public static function loadOne($targetId, DomElement $behaviours, BehaviourManager $manager, $newTargetId = null)
     {
         $targets = $behaviours->findAll("./target[@id='$targetId']");
@@ -37,33 +40,41 @@ class BehaviourLoader
         }
     }
 
-    public static function load($file, BehaviourManager $manager)
+    public static function loadFromDocument(DomDocument $document, BehaviourManager $manager)
     {
-        $xml = new XmlProcessor();
+        $targets = $document->findAll('/behaviours/target');
 
-        try {
-            $document = $xml->parse(Stream::getContents($file));
+        /** @var DomElement $domTarget */
+        foreach ($targets as $domTarget) {
+            $targetId = $domTarget->getAttribute('id');
 
-            $targets = $document->findAll('/behaviours/target');
+            /** @var DomElement $domBehaviour */
+            foreach ($domTarget->findAll('./behaviour') as $domBehaviour) {
+                $type = $domBehaviour->getAttribute('type');
 
-            /** @var DomElement $domTarget */
-            foreach ($targets as $domTarget) {
-                $targetId = $domTarget->getAttribute('id');
+                $attributes = $domBehaviour->getAttributes();
+                unset($attributes['type']);
 
-                /** @var DomElement $domBehaviour */
-                foreach ($domTarget->findAll('./behaviour') as $domBehaviour) {
-                    $type = $domBehaviour->getAttribute('type');
+                /** @var AbstractBehaviour $behaviour */
+                $behaviour = new $type();
+                $behaviour->setProperties($attributes);
 
-                    $attributes = $domBehaviour->getAttributes();
-                    unset($attributes['type']);
-
-                    /** @var AbstractBehaviour $behaviour */
-                    $behaviour = new $type();
-                    $behaviour->setProperties($attributes);
-
-                    $manager->apply($targetId, $behaviour);
-                }
+                $manager->apply($targetId, $behaviour);
             }
+        }
+    }
+
+    public static function load($file, BehaviourManager $manager, $cached = false)
+    {
+        try {
+            if (!$cached || !($document = static::$documents[$file])) {
+                $xml = new XmlProcessor();
+                $document = $xml->parse(Stream::getContents($file));
+
+                static::$documents[$file] = $document;
+            }
+
+            static::loadFromDocument($document, $manager);
         } catch (IOException $e) {
             ;
         }

@@ -5,8 +5,10 @@ use Files;
 use ide\editors\menu\ContextMenu;
 use ide\Ide;
 use ide\misc\SimpleSingleCommand;
+use ide\project\tree\AbstractProjectTreeNavigation;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
+use php\gui\framework\Timer;
 use php\gui\UXDesktop;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXApplication;
@@ -230,6 +232,15 @@ class ProjectTree
 
                         FileSystem::close($file);
 
+                        $format = Ide::get()->getFormat($file);
+
+                        if ($format) {
+                            $format->delete($file);
+                            Timer::run(1000, function () use ($format, $file) {
+                                $format->delete($file);
+                            });
+                        }
+
                         if ($file instanceof ProjectFile) {
                             $file->delete();
                             $done = !Files::exists($file);
@@ -245,6 +256,8 @@ class ProjectTree
 
                         if (!$done) {
                             UXDialog::show('Ошибка удаления, что-то пошло не так', 'ERROR');
+                        } else {
+                            $this->project->update();
                         }
                     }));
                 }
@@ -447,6 +460,28 @@ class ProjectTree
         }
     }
 
+    public function register(AbstractProjectTreeNavigation $navigation)
+    {
+        $navigation->setProject($this->project);
+
+        $item = $this->getOrCreateItem(
+            get_class($navigation), $navigation->getName(), Ide::get()->getImage($navigation->getIcon()), $this->project->getFile($navigation->getPath())
+        );
+
+        $item->setDisableDelete(true);
+        $item->setExpanded(true);
+
+        $item->onUpdate(function () use ($navigation, $item) {
+            $items = $navigation->getItems();
+
+            $item->clear();
+
+            foreach ($items as $one) {
+                $item->add($one);
+            }
+        });
+    }
+
     /**
      * @param string|ProjectFile $file
      *
@@ -469,5 +504,13 @@ class ProjectTree
         }
 
         return $item;
+    }
+
+    /**
+     * @return UXTreeView
+     */
+    public function getRoot()
+    {
+        return $this->tree;
     }
 }

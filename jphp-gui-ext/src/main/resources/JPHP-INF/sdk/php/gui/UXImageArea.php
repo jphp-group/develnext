@@ -7,7 +7,7 @@ use php\gui\text\UXFont;
  * Class UXImageArea
  * @package php\gui
  */
-class UXImageArea extends UXNode
+class UXImageArea extends UXCanvas
 {
     /**
      * @var bool
@@ -18,6 +18,11 @@ class UXImageArea extends UXNode
      * @var bool
      */
     public $stretch = false;
+
+    /**
+     * @var bool
+     */
+    public $smartStretch = false;
 
     /**
      * @var bool

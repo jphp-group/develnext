@@ -1,6 +1,8 @@
 <?php
 namespace php\gui\framework;
 
+use php\gui\animation\UXKeyFrame;
+use php\gui\animation\UXTimeline;
 use php\gui\UXApplication;
 use php\lang\IllegalStateException;
 use php\lang\ThreadPool;
@@ -15,15 +17,9 @@ class Timer
 {
     public static function run($delay, callable $handler)
     {
-        (new Thread(function() use ($delay, $handler) {
-            Thread::sleep($delay);
-            try {
-                UXApplication::runLater($handler);
-            } catch (IllegalStateException $e) {
-                if (!Str::contains($e->getMessage(), 'Platform.exit')) {
-                    throw $e;
-                }
-            }
-        }))->start();
+        $timeline = new UXTimeline([new UXKeyFrame($delay, function () use ($handler) {
+            UXApplication::runLater($handler);
+        })]);
+        $timeline->play();
     }
 }

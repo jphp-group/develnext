@@ -85,6 +85,13 @@ class UXColor
     public function interpolate(UXColor $color, $t) {}
 
     /**
+     * @return int
+     */
+    public function getRGB()
+    {
+    }
+
+    /**
      * @return string
      */
     public function getWebValue()

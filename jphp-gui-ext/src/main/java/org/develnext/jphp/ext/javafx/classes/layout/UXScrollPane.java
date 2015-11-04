@@ -11,7 +11,7 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Reflection.Name(JavaFXExtension.NS + "layout\\UXScrollPane")
-public class UXScrollPane extends UXControl<ScrollPane> {
+public class UXScrollPane<T extends ScrollPane> extends UXControl<ScrollPane> {
     interface WrappedInterface {
         @Property Node content();
 
@@ -19,7 +19,7 @@ public class UXScrollPane extends UXControl<ScrollPane> {
         @Property boolean fitToHeight();
     }
 
-    public UXScrollPane(Environment env, ScrollPane wrappedObject) {
+    public UXScrollPane(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -35,5 +35,10 @@ public class UXScrollPane extends UXControl<ScrollPane> {
     @Signature
     public void __construct(@Reflection.Nullable Node content) {
         __wrappedObject = new ScrollPane(content);
+    }
+
+    @Override
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 }

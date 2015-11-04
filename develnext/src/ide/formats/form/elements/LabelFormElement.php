@@ -10,6 +10,7 @@ use ide\editors\value\TextPropertyEditor;
 use ide\formats\form\AbstractFormElement;
 use php\gui\designer\UXDesignProperties;
 use php\gui\UXLabel;
+use php\gui\UXLabelEx;
 use php\gui\UXNode;
 
 class LabelFormElement extends LabeledFormElement
@@ -37,7 +38,7 @@ class LabelFormElement extends LabeledFormElement
      */
     public function createElement()
     {
-        $element = new UXLabel($this->getName());
+        $element = new UXLabelEx($this->getName());
         return $element;
     }
 
@@ -48,6 +49,34 @@ class LabelFormElement extends LabeledFormElement
 
     public function isOrigin($any)
     {
-        return $any instanceof UXLabel;
+        return $any instanceof UXLabel || $any instanceof UXLabelEx;
+    }
+
+    public function registerNode(UXNode $node)
+    {
+        /** @var UXLabel $node */
+        if (get_class($node) === UXLabel::class) {
+            $new = new UXLabelEx();
+            $new->id = $node->id;
+            $new->text = $node->text;
+            $new->textColor = $node->textColor;
+            $new->backgroundColor = $node->backgroundColor;
+            $new->anchors = $node->anchors;
+            $new->font = $node->font;
+            $new->alignment = $node->alignment;
+            $new->textAlignment = $node->textAlignment;
+
+            $new->size = $node->size;
+            $new->position = $node->position;
+            $new->style = $node->style;
+            $new->rotate = $node->rotate;
+            $new->opacity = $node->opacity;
+
+            $node->parent->children->add($new);
+
+            $node->free();
+
+            $node = $new;
+        }
     }
 }

@@ -46,7 +46,11 @@ namespace ide\formats\form\context {
             $nodes = Items::toList($designer->getNodes());
 
             if ($node = $nodes[sizeof($nodes) - 1]) {
-                $designer->selectNode($node);
+                if ($node) {
+                    $designer->selectNode($node);
+                } else {
+                    $editor->selectForm();
+                }
             } else {
                 $editor->selectForm();
             }

@@ -11,10 +11,11 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "UXImageArea")
-public class UXImageArea extends UXNode<ImageViewEx> {
+public class UXImageArea extends UXCanvas<ImageViewEx> {
     interface WrappedInterface {
         @Property boolean centered();
         @Property boolean stretch();
+        @Property boolean smartStretch();
         @Property boolean autoSize();
         @Property boolean proportional();
         @Property boolean mosaic();

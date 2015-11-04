@@ -126,35 +126,8 @@ class ObjectListEditor
             }
         }, 'ext');
 
-        $render = function (UXListCell $cell, ObjectListEditorItem $item) {
-            $cell->graphic = null;
-            $cell->text = null;
-
-            $label = new UXLabel($item->text);
-            $label->graphic = $item->graphic;
-
-            $label->paddingLeft = $item->level * 10;
-
-            $hintLabel = new UXLabel($item->hint ? ": $item->hint" : "");
-            $hintLabel->textColor = UXColor::of('gray');
-
-            $cell->graphic = new UXHBox([$label, $hintLabel]);
-        };
-
-        $this->comboBox->onCellRender($render);
-        $this->comboBox->onButtonRender(function (UXListCell $cell, ObjectListEditorItem $item) {
-            $cell->graphic = null;
-            $cell->text = null;
-
-            $label = new UXLabel($item->prefix ? $item->prefix . '.' . $item->text : $item->text);
-            $label->graphic = $item->graphic ? new UXImageView($item->graphic->image) : null;
-            $label->textColor = UXColor::of('black');
-
-            $hintLabel = new UXLabel($item->hint ? ": $item->hint" : "");
-            $hintLabel->textColor = UXColor::of('gray');
-
-            $cell->graphic = new UXHBox([$label, $hintLabel]);
-        });
+        $this->comboBox->onCellRender(new ObjectListEditorCellRender());
+        $this->comboBox->onButtonRender(new ObjectListEditorButtonRender());
     }
 
     public function setSelected($value)
@@ -306,35 +279,35 @@ class ObjectListEditor
                     }
                 }
             }
+        }
 
-            if ($this->enableAllForms) {
-                $project = Ide::get()->getOpenedProject();
+        if ($this->enableAllForms) {
+            $project = Ide::get()->getOpenedProject();
 
-                if ($project && $project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
-                    /** @var GuiFrameworkProjectBehaviour $gui */
-                    $gui = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
+            if ($project && $project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
+                /** @var GuiFrameworkProjectBehaviour $gui */
+                $gui = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
 
-                    $formEditors = $gui->getFormEditors();
+                $formEditors = $gui->getFormEditors();
 
-                    if (sizeof($formEditors) > 1) {
-                        $this->comboBox->items->add(new ObjectListEditorItem('[Другие формы]', null, ''));
+                if (!($editor instanceof FormEditor) || sizeof($formEditors) > 1) {
+                    $this->comboBox->items->add(new ObjectListEditorItem('[Другие формы]', null, ''));
 
-                        foreach ($formEditors as $key => $formEditor) {
-                            if (FileUtils::hashName($formEditor->getFile()) == FileUtils::hashName($editor->getFile())) {
-                                continue;
-                            }
-
-                            $prefix = "form('{$formEditor->getTitle()}')";
-
-                            $this->comboBox->items->add(new ObjectListEditorItem(
-                                $formEditor->getTitle(),
-                                Ide::get()->getImage($formEditor->getIcon()),
-                                $prefix,
-                                1
-                            ));
-
-                            $this->appendFormEditor($formEditor, 2, $prefix);
+                    foreach ($formEditors as $key => $formEditor) {
+                        if (FileUtils::hashName($formEditor->getFile()) == FileUtils::hashName($editor->getFile())) {
+                            continue;
                         }
+
+                        $prefix = "form('{$formEditor->getTitle()}')";
+
+                        $this->comboBox->items->add(new ObjectListEditorItem(
+                            $formEditor->getTitle(),
+                            Ide::get()->getImage($formEditor->getIcon()),
+                            $prefix,
+                            1
+                        ));
+
+                        $this->appendFormEditor($formEditor, 2, $prefix);
                     }
                 }
             }

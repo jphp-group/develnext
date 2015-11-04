@@ -161,7 +161,11 @@ class ActionEditor extends AbstractEditor
         $actions = [];
 
         foreach ($domActions as $domAction) {
-            $actions[] = $this->manager->buildAction($domAction);
+            $action = $this->manager->buildAction($domAction);
+
+            if ($action) {
+                $actions[] = $action;
+            }
         }
 
         $this->calculateLevels($actions);

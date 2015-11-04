@@ -1,0 +1,6 @@
+<element extends="NodeFormElement">
+    <properties group="general">
+        <property code="sprite" name="Спрайт" editor="sprite" virtual="1" />
+        <property code="animated" name="Анимирован" editor="boolean" tooltip="Проигрывать анимацию спрайта да или нет" virtual="1" />
+    </properties>
+</element>

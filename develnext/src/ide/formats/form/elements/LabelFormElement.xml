@@ -1,2 +1,5 @@
 <element extends="LabeledFormElement">
+    <properties>
+        <property code="autoSize" name="Авторазмер" editor="boolean" />
+    </properties>
 </element>

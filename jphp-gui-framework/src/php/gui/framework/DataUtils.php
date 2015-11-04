@@ -1,6 +1,7 @@
 <?php
 namespace php\gui\framework;
 
+use ide\Logger;
 use php\gui\layout\UXPane;
 use php\gui\UXData;
 use php\gui\UXNode;

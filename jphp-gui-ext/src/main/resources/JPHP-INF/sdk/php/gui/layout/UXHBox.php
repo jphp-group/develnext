@@ -48,4 +48,12 @@ class UXHBox extends UXPane
     static function getHgrow(UXNode $node)
     {
     }
+
+    /**
+     * @param UXNode $node
+     * @param double[]|double $margins
+     */
+    static public function setMargin(UXNode $node, $margins)
+    {
+    }
 }

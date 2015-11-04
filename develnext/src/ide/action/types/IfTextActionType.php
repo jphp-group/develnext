@@ -108,8 +108,6 @@ class IfTextActionType extends AbstractSimpleActionType
 
         $not = $action->not ? '!' : '';
 
-        dump($this->method);
-
         switch ($this->method) {
             case 'regex':
                 return "if ({$not}Regex::match($string, $object))";
@@ -128,6 +126,20 @@ class IfTextActionType extends AbstractSimpleActionType
 
             case 'equalsIgnoreCase':
                 return "if ({$not}Str::equalsIgnoreCase($object, $string))";
+
+            case 'smaller':
+                if ($not) {
+                    return "if ($object >= $string)";
+                } else {
+                    return "if ($object < $string)";
+                }
+
+            case 'greater':
+                if ($not) {
+                    return "if ($object <= $string)";
+                } else {
+                    return "if ($object > $string)";
+                }
 
             case 'equals':
             default:

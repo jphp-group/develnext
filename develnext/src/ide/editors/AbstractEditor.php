@@ -1,5 +1,6 @@
 <?php
 namespace ide\editors;
+use ide\editors\form\IdeTabPane;
 use ide\formats\AbstractFormat;
 use ide\Ide;
 use ide\Logger;
@@ -7,6 +8,7 @@ use ide\project\Project;
 use ide\project\ProjectIndexer;
 use php\gui\layout\UXPane;
 use php\gui\UXNode;
+use php\lang\IllegalStateException;
 use php\lang\Thread;
 
 /**
@@ -23,6 +25,11 @@ abstract class AbstractEditor
      */
     protected $format;
 
+    /**
+     * @var null|IdeTabPane
+     */
+    protected $leftPaneUi = null;
+
 
     public $cacheData = [];
 
@@ -33,6 +40,19 @@ abstract class AbstractEditor
     public function __construct($file)
     {
         $this->file = $file;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCloseable()
+    {
+        return true;
+    }
+
+    public function getTabStyle()
+    {
+        return '';
     }
 
     /**
@@ -88,6 +108,11 @@ abstract class AbstractEditor
         $this->reindex();
     }
 
+    public function refresh()
+    {
+        // nop
+    }
+
     public function getTitle()
     {
         return $this->format->getTitle($this->file);
@@ -107,4 +132,38 @@ abstract class AbstractEditor
      * @return UXNode
      */
     abstract public function makeUi();
+
+    /**
+     * Контент для левой панели главной формы Ide.
+     *
+     * @return IdeTabPane|UXNode
+     */
+    public function makeLeftPaneUi()
+    {
+        return null;
+    }
+
+    /**
+     * @return null
+     */
+    public function getLeftPaneUi()
+    {
+        return $this->leftPaneUi;
+    }
+
+    /**
+     * @param null $leftPaneUi
+     * @throws IllegalStateException
+     */
+    public function setLeftPaneUi($leftPaneUi)
+    {
+        if ($this->leftPaneUi) throw new IllegalStateException();
+
+        $this->leftPaneUi = $leftPaneUi;
+    }
+
+    public function hide()
+    {
+        ;
+    }
 }

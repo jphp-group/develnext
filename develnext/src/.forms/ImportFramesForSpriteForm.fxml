@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="567.0" prefWidth="743.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="14.0" layoutY="14.0" prefHeight="493.0" prefWidth="150.0" spacing="5.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
+         <children>
+            <VBox prefHeight="47.0" prefWidth="150.0" spacing="3.0">
+               <children>
+                  <Label text="Ширина кадра:" />
+                  <TextField id="widthField" text="32" />
+               </children>
+            </VBox>
+            <VBox prefHeight="47.0" prefWidth="150.0" spacing="3.0">
+               <children>
+                  <Label text="Высота кадра:" />
+                  <TextField id="heightField" text="32" />
+               </children>
+            </VBox>
+            <Separator prefHeight="35.0" prefWidth="140.0" />
+            <VBox prefHeight="47.0" prefWidth="150.0" spacing="3.0">
+               <children>
+                  <Label text="Кадров по X:" />
+                  <TextField id="colsField" text="1" />
+               </children>
+            </VBox>
+            <VBox prefHeight="47.0" prefWidth="150.0" spacing="3.0">
+               <children>
+                  <Label text="Кадров по Y" />
+                  <TextField id="rowsField" text="1" />
+               </children>
+            </VBox>
+            <Separator prefHeight="35.0" prefWidth="140.0" />
+            <VBox prefHeight="47.0" prefWidth="150.0" spacing="3.0">
+               <children>
+                  <Label text="Гориз. промежуток" />
+                  <TextField id="spaceXField" text="0" />
+               </children>
+            </VBox>
+            <VBox prefHeight="47.0" prefWidth="150.0" spacing="3.0">
+               <children>
+                  <Label text="Верт. промежуток:" />
+                  <TextField id="spaceYField" text="0" />
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
+      </VBox>
+      <ScrollPane layoutX="151.0" layoutY="14.0" prefHeight="493.0" prefWidth="560.0" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="169.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+         <content>
+            <Canvas id="canvas" height="390.0" width="433.0" />
+         </content>
+      </ScrollPane>
+      <HBox layoutX="14.0" layoutY="519.0" prefHeight="32.0" prefWidth="716.0" spacing="11.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
+         <children>
+            <Button id="importButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="144.0" styleClass="icon-ok" text="Импортировать" />
+            <Button id="cancelButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Отмена" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

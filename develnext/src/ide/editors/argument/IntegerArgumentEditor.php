@@ -10,6 +10,6 @@ class IntegerArgumentEditor extends MixedArgumentEditor
 
     protected function valueTypes()
     {
-        return ['integer', 'float', 'object', 'variable', 'expr'];
+        return ['integer', 'float', 'object', 'score', 'variable', 'expr'];
     }
 }

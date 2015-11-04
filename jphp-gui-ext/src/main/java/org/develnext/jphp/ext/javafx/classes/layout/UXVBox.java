@@ -1,7 +1,9 @@
 package org.develnext.jphp.ext.javafx.classes.layout;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
@@ -38,5 +40,20 @@ public class UXVBox extends UXPane<VBox> {
     @Signature
     public void __construct(List<Node> children) {
         __wrappedObject = new VBox(children.toArray(new Node[children.size()]));
+    }
+
+    @Signature
+    public static void setVgrow(Node node, @Reflection.Nullable Priority value) {
+        VBox.setVgrow(node, value);
+    }
+
+    @Signature
+    public static Priority getVgrow(Node node) {
+        return VBox.getVgrow(node);
+    }
+
+    @Signature
+    public static void setMargin(Node node, Insets insets) {
+        VBox.setMargin(node, insets);
     }
 }

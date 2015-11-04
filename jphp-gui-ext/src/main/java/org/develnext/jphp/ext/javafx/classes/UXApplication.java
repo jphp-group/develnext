@@ -52,7 +52,7 @@ public class UXApplication extends BaseWrapper<Application> {
 
     @Signature
     public static boolean isShutdown() {
-        return shutdown;
+        return !Platform.isFxApplicationThread();
     }
 
     @Signature
@@ -106,6 +106,10 @@ public class UXApplication extends BaseWrapper<Application> {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                if (!Platform.isFxApplicationThread()) {
+                    return;
+                }
+
                 try {
                     callback.callNoThrow();
                 } catch (Exception e) {

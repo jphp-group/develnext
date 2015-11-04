@@ -44,9 +44,28 @@ abstract class AbstractActionType
         return false;
     }
 
+    function isDeprecated()
+    {
+        return false;
+    }
+
     function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode)
     {
         return new UXVBox($descriptionNode ? [$titleNode, $descriptionNode] : [$titleNode]);
+    }
+
+    /**
+     * for example:
+     *
+     *  [
+     *      ['class' => 'game\GameObject']
+     *  ]
+     *
+     * @return array
+     */
+    function forContexts()
+    {
+        return [];
     }
 
     /**

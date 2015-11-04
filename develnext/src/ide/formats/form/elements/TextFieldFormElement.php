@@ -46,6 +46,6 @@ class TextFieldFormElement extends AbstractFormElement
 
     public function isOrigin($any)
     {
-        return $any instanceof UXTextField;
+        return get_class($any) == UXTextField::class;
     }
 }

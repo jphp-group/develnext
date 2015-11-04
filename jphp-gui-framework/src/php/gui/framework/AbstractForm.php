@@ -25,6 +25,7 @@ use php\gui\UXNodeWrapper;
 use php\gui\UXProgressIndicator;
 use php\gui\UXTooltip;
 use php\gui\UXWindow;
+use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;

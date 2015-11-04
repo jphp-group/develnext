@@ -28,9 +28,12 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
     {
         $this->textField = new UXTextField();
         $this->textField->padding = 2;
+        $this->textField->maxWidth = 9999;
+        UXHBox::setHgrow($this->textField, 'ALWAYS');
         $this->textField->style = "-fx-background-insets: 0; -fx-background-color: -fx-control-inner-background; -fx-background-radius: 0;";
 
         $this->textField->on('keyUp', function () {
+            $this->updateUi($this->textField->text, false);
             $this->applyValue($this->textField->text, false);
         });
 
@@ -52,12 +55,15 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
 
     /**
      * @param $value
+     * @param bool $setText
      */
-    public function updateUi($value)
+    public function updateUi($value, $setText = true)
     {
         parent::updateUi($value);
 
-        $this->textField->text = $value;
+        if ($setText) {
+            $this->textField->text = $value;
+        }
     }
 
     public function getCode()

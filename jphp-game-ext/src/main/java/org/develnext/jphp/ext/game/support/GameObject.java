@@ -1,164 +1,141 @@
 package org.develnext.jphp.ext.game.support;
 
-import com.almasb.fxgl.physics.PhysicsManager;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.shape.Circle;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.*;
 
-public class GameObject extends Parent {
+import java.util.ArrayList;
+import java.util.List;
+
+public class GameObject extends Canvas {
     private boolean collidable = false;
 
     /*package-private*/ FixtureDef fixtureDef = new FixtureDef();
     /*package-private*/ BodyDef bodyDef = new BodyDef();
 
     /*package-private*/ Body body;
-    /*package-private*/ org.jbox2d.dynamics.Fixture fixture;
+    /*package-private*/ Fixture fixture;
 
     private boolean raycastIgnored = false;
 
+    private List<Control> controls = new ArrayList<>();
+
     protected Sprite sprite;
+    protected GameScene gameScene;
+
+    protected EventHandler<Event> onUpdate;
+    protected EventHandler<Event> onCreate;
+    protected EventHandler<Event> onDestroy;
 
     public GameObject(Sprite sprite) {
-        this.sprite = sprite;
-        setGraphics(sprite);
+        setSprite(sprite);
     }
 
-    /**
-     * Do NOT call manually. It is called automatically
-     * by FXGL GameApplication
-     *
-     * @param now
-     */
-    public final void update(long now) {
+    public void setSprite(Sprite sprite) {
+        this.sprite = sprite == null ? null : new Sprite(sprite);
+
+        if (sprite == null) {
+            GraphicsContext gc = getGraphicsContext2D();
+            gc.clearRect(0, 0, getWidth(), getHeight());
+            setHeight(0);
+            setWidth(0);
+        } else {
+            setWidth(this.sprite.getFrameWidth());
+            setHeight(this.sprite.getFrameHeight());
+            this.sprite.drawNext(this);
+        }
+    }
+
+    public GameScene getGameScene() {
+        return gameScene;
+    }
+
+    public void setGameScene(GameScene gameScene) {
+        this.gameScene = gameScene;
+    }
+
+    public EventHandler<Event> getOnCreate() {
+        return onCreate;
+    }
+
+    public void setOnCreate(EventHandler<Event> onCreate) {
+        this.onCreate = onCreate;
+    }
+
+    public EventHandler<Event> getOnUpdate() {
+        return onUpdate;
+    }
+
+    public void setOnUpdate(EventHandler<Event> doUpdate) {
+        this.onUpdate = doUpdate;
+    }
+
+    public EventHandler<Event> getOnDestroy() {
+        return onDestroy;
+    }
+
+    public void setOnDestroy(EventHandler<Event> onDestroy) {
+        this.onDestroy = onDestroy;
+    }
+
+    public final void update(final long now) {
+        if (onUpdate != null) {
+            onUpdate.handle(new ActionEvent(this, this));
+        }
+
+        for (Control control : controls) {
+            control.onUpdate(GameObject.this, now);
+        }
+
         onUpdate(now);
     }
 
-    /**
-     * Can be overridden to provide subclass implementation.
-     */
     protected void onUpdate(long now) {
         if (sprite != null) {
-            sprite.drawByTime(now);
+            sprite.drawByTime(this, now);
         }
     }
 
-    private GameObject setGraphics(Node graphics) {
-        getChildren().clear();
-
-        if (graphics instanceof Circle) {
-            Circle c = (Circle) graphics;
-            c.setCenterX(c.getRadius());
-            c.setCenterY(c.getRadius());
-        }
-
-        getChildren().add(graphics);
-        return this;
-    }
-
-    /**
-     * Allow this entity to participate in collision detection
-     *
-     * @param b
-     */
     public final GameObject setCollidable(boolean b) {
         collidable = b;
         return this;
     }
 
-    // TODO: check various rotations and angles
-    /**
-     *
-     * @return width of the bounding box of this entity
-     */
-    public final double getWidth() {
-        return getLayoutBounds().getWidth();
-    }
-
-    /**
-     *
-     * @return height of the bounding box of this entity
-     */
-    public final double getHeight() {
-        return getLayoutBounds().getHeight();
-    }
-
-
-    /**
-     *
-     * @return center point of this entity
-     */
     public final Point2D getCenter() {
         return getPosition().add(getWidth() / 2, getHeight() / 2);
     }
 
-    /**
-     *
-     * @return entity position - translation from the parent's origin
-     */
     public final Point2D getPosition() {
         return new Point2D(getTranslateX(), getTranslateY());
     }
 
-    /**
-     * Set custom fixture definition to describe a generated
-     * fixture for this physics entity
-     *
-     * @param def
-     * @return this object
-     */
     public GameObject setFixtureDef(FixtureDef def) {
         fixtureDef = def;
         return this;
     }
 
-    /**
-     * Set custom body definition to describe a generated
-     * body for this physics entity
-     *
-     * @param def
-     * @return this entity
-     */
     public GameObject setBodyDef(BodyDef def) {
         bodyDef = def;
         return this;
     }
 
-    /**
-     * A convenience method to avoid setting body definition
-     * if only a change of body type is required
-     *
-     * @param type
-     * @return this entity
-     */
-    public GameObject setBodyType(BodyType type) {
+    public void setBodyType(BodyType type) {
         bodyDef.type = type;
-        return this;
     }
 
-    /**
-     * Set linear velocity for a physics entity
-     *
-     * Use this method to move a physics entity
-     * Please note that the vector x and y are in pixels
-     *
-     * @param vector x and y in pixels
-     * @return this entity
-     */
+    public BodyType getBodyType() {
+        return bodyDef.type;
+    }
+
     public GameObject setLinearVelocity(Point2D vector) {
         return setBodyLinearVelocity(GamePhysics.toVector(vector).mulLocal(60));
     }
 
-    /**
-     *
-     * @param vector x and y in pixels
-     * @return this
-     */
     public GameObject applyForce(Point2D vector) {
         return applyBodyForceToCenter(GamePhysics.toVector(vector).mulLocal(60));
     }
@@ -167,28 +144,10 @@ public class GameObject extends Parent {
         return applyForce(new Point2D(x, y));
     }
 
-    /**
-     * Set linear velocity for a physics entity
-     *
-     * Use this method to move a physics entity
-     * Please note that x and y are in pixels
-     *
-     * @param x and y in pixels
-     * @return this entity
-     */
     public GameObject setLinearVelocity(double x, double y) {
         return setLinearVelocity(new Point2D(x, y));
     }
 
-    /**
-     * Set linear velocity for a physics entity
-     *
-     * Similar to {@link #setLinearVelocity(Point2D)} but
-     * x and y of the argument are in meters
-     *
-     * @param vector x and y in meters
-     * @return
-     */
     public GameObject setBodyLinearVelocity(Vec2 vector) {
         if (body == null)
             throw new IllegalStateException("PhysicsEntity has not been added to the world yet! Call addEntities(entity) first");
@@ -205,31 +164,17 @@ public class GameObject extends Parent {
         return this;
     }
 
-    /**
-     *
-     * @return linear velocity in pxels
-     */
     public Point2D getLinearVelocity() {
         if (body == null)
             throw new IllegalStateException("PhysicsEntity has not been added to the world yet! Call addEntities(entity) first");
 
-        return PhysicsManager.toVector(body.getLinearVelocity().mul(1/60f));
+        return GamePhysics.toVector(body.getLinearVelocity().mul(1/60f));
     }
 
-    /**
-     * Set true to make raycast ignore this entity
-     *
-     * @param b
-     */
     public void setRaycastIgnored(boolean b) {
         raycastIgnored = b;
     }
 
-    /**
-     *
-     * @return true if raycast should ignore this entity,
-     *          false otherwise
-     */
     public boolean isRaycastIgnored() {
         return raycastIgnored;
     }
@@ -244,5 +189,29 @@ public class GameObject extends Parent {
 
     public void wakeup() {
         body.setActive(true);
+    }
+
+    @SuppressWarnings("unchecked")
+    public final <T extends Control> T getControl(Class<T> controlType) {
+        for (Control c : controls) {
+            if (controlType.isAssignableFrom(c.getClass())) {
+                return (T) c;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Add behavior to entity
+     */
+    public final void addControl(Control control) {
+        controls.add(control);
+    }
+
+    /**
+     * Remove behavior from entity
+     */
+    public final void removeControl(Control control) {
+        controls.remove(control);
     }
 }

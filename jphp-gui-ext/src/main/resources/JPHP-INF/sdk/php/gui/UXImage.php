@@ -1,6 +1,7 @@
 <?php
 namespace php\gui;
 
+use php\gui\paint\UXColor;
 use php\io\Stream;
 
 /**
@@ -30,6 +31,15 @@ class UXImage {
      * @param Stream|string $stream
      */
     public function __construct($stream) {}
+
+    /**
+     * @param $x
+     * @param $y
+     * @return UXColor
+     */
+    public function getPixelColor($x, $y)
+    {
+    }
 
     /**
      * ...

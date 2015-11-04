@@ -1,0 +1,5 @@
+<behaviour extends="AnimationBehaviourSpec">
+    <properties>
+        <property name="Против часовой" code="negative" editor="boolean" tooltip="Вращать против часовой стрелки" />
+    </properties>
+</behaviour>

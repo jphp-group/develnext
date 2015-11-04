@@ -55,7 +55,7 @@ class MixedArgumentEditor extends AbstractArgumentEditor
 
     protected function valueTypes()
     {
-        return ['string', 'magicString', 'integer', 'float', 'object', 'form', 'variable', 'expr'];
+        return ['string', 'magicString', 'integer', 'float', 'object', 'form', 'variable', 'expr', 'score'];
     }
 
     protected function valueTypeLabels()
@@ -69,7 +69,8 @@ class MixedArgumentEditor extends AbstractArgumentEditor
             'expr' => 'PHP код',
             'integer' => 'Число',
             'float' => 'Дробное число',
-            'boolean' => 'Логика'
+            'boolean' => 'Логика',
+            'score' => 'Счет',
         ];
     }
 
@@ -94,12 +95,10 @@ class MixedArgumentEditor extends AbstractArgumentEditor
             $this->objectListEditor->addFilter($filter);
         }
 
-        if ($this->userData instanceof FormEditor) {
-            $this->objectListEditor->enableSender();
+        $this->objectListEditor->enableSender();
 
-            if (!($this->userData instanceof ScriptModuleEditor)) {
-                $this->objectListEditor->enableAllForms();
-            }
+        if (!($this->userData instanceof ScriptModuleEditor)) {
+            $this->objectListEditor->enableAllForms();
         }
 
         $this->objectListEditor->build();

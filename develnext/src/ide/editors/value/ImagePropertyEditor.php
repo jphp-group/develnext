@@ -20,7 +20,8 @@ class ImagePropertyEditor extends TextPropertyEditor
         $this->textField->editable = false;
 
         $this->dialogButton->on('click', function (UXMouseEvent $e) {
-            $dialog = new ImagePropertyEditorForm();
+            /** @var ImagePropertyEditorForm $dialog */
+            $dialog = Ide::get()->getForm('ImagePropertyEditorForm');
             $dialog->title = $this->name;
 
             $dialog->setResult($this->getNormalizedValue($this->getValue()));

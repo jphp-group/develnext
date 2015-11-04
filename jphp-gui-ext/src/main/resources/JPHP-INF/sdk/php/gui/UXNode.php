@@ -150,6 +150,11 @@ abstract class UXNode
     public $leftAnchor, $rightAnchor, $topAnchor, $bottomAnchor = null;
 
     /**
+     * @var array
+     */
+    public $anchors = [];
+
+    /**
      * UXNode constructor.
      */
     public function __construct()

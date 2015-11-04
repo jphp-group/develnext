@@ -47,3 +47,50 @@
     -fx-padding: 0.26em;
     -fx-background-radius: 0, 0, 0, 0;
 }
+
+.dn-list-item {
+    -fx-border-color: silver;
+    -fx-cursor: hand;
+    -fx-background-color: white;
+}
+
+.dn-list-item:hover {
+    -fx-border-color: red;
+}
+
+.flow-list-view {
+    -fx-background-color: white;
+}
+
+.flow-list-view .list-cell {
+    -fx-cursor: hand;
+    -fx-border-width: 1px;
+    -fx-border-color: transparent;
+}
+
+.flow-list-view .list-cell.selected {
+    -fx-background-color: #dcdcdc;
+}
+
+.flow-list-view .list-cell.hovered {
+    -fx-border-color: gray;
+}
+
+.flow-list-view .list-cell.dragged {
+    -fx-border-color: red;
+    -fx-border-style: dotted;
+}
+
+.dn-list-hint {
+    -fx-text-fill: silver;
+    -fx-font-style: italic;
+    -fx-font-size: 1.6em;
+
+    -fx-padding: 20px;
+}
+
+.dn-title {
+    -fx-font-style: italic;
+    -fx-font-size: 1.6em;
+    -fx-padding: 20px;
+}

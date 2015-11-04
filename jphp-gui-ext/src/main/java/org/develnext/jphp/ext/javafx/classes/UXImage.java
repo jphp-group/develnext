@@ -1,11 +1,14 @@
 package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
+import php.runtime.ext.core.classes.stream.Stream;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
@@ -31,14 +34,23 @@ public class UXImage extends BaseWrapper<Image> {
     }
 
     @Signature
-    public void __construct(InputStream is) throws IOException {
+    public void __construct(Environment env, InputStream is) throws IOException {
         __wrappedObject = new Image(is);
+
+        Stream.closeStream(env, is);
+    }
+
+    @Signature
+    public Color getPixelColor(int x, int y) {
+        PixelReader pixelReader = getWrappedObject().getPixelReader();
+        return pixelReader == null ? null : pixelReader.getColor(x, y);
     }
 
     @Signature
     public static Image ofUrl(String url) {
         return new Image(url);
     }
+
     @Signature
     public static Image ofUrl(String url, boolean background) {
         return new Image(url, background);

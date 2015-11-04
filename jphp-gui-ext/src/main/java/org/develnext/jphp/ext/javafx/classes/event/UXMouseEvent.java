@@ -1,6 +1,7 @@
 package org.develnext.jphp.ext.javafx.classes.event;
 
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
@@ -37,6 +38,10 @@ public class UXMouseEvent extends UXEvent {
     }
 
     public UXMouseEvent(Environment env, MouseEvent wrappedObject) {
+        super(env, wrappedObject);
+    }
+
+    public UXMouseEvent(Environment env, MouseDragEvent wrappedObject) {
         super(env, wrappedObject);
     }
 

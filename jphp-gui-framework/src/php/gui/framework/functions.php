@@ -88,3 +88,28 @@ function uiConfirm($message)
 
     return $alert->showAndWait() == $buttons[0];
 }
+
+function pre($var)
+{
+    UXDialog::show(print_r($var, true));
+}
+
+function dump($var)
+{
+    ob_start();
+    var_dump($var);
+    $text = ob_get_contents();
+    ob_end_clean();
+
+    UXDialog::show($text);
+}
+
+function alert($message)
+{
+    UXDialog::show($message);
+}
+
+function message($message)
+{
+    UXDialog::show($message);
+}

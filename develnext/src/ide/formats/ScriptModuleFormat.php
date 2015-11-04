@@ -75,7 +75,7 @@ class ScriptModuleFormat extends AbstractFormFormat
         if ($project) {
             $path = $project->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY);
             return Str::startsWith(File::of($file)->getPath(), $path->getPath())
-                && Files::isDir($path)
+                && Files::isDir($file)
                 && File::of($file)->getPath() != $path->getPath();
         }
 

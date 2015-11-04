@@ -6,6 +6,7 @@ use ide\misc\AbstractCommand;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXVBox;
 use php\gui\UXProgressIndicator;
+use php\gui\UXSeparator;
 
 /**
  * Class UiUtils
@@ -26,10 +27,21 @@ class UiUtils
         $pane = $horizontal ? new UXHBox() : new UXVBox();
 
         /** @var AbstractCommand $command */
-        foreach ($commands as $command) {
-            $ui = $command->makeUiForHead();
+        foreach ($commands as $name => $command) {
+            if ($command == '-') {
+                $ui = new UXSeparator();
+                $ui->orientation = 'VERTICAL';
+                $ui->width = 5;
+                $ui->maxSize = [20, 20];
+            } else {
+                $ui = $command->makeUiForHead();
+            }
 
             if (!is_array($ui)) {
+                if ($name) {
+                    $ui->id = $name;
+                }
+
                 $ui = [$ui];
             }
 

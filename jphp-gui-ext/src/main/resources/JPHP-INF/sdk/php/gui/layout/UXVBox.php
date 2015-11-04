@@ -36,4 +36,28 @@ class UXVBox extends UXPane
     public function requestLayout()
     {
     }
+
+    /**
+     * @param UXNode $node
+     * @param string $value
+     */
+    static public function setVgrow(UXNode $node, $value)
+    {
+    }
+
+    /**
+     * @param UXNode $node
+     * @return string
+     */
+    static public function getVgrow(UXNode $node)
+    {
+    }
+
+    /**
+     * @param UXNode $node
+     * @param double[]|double $margins
+     */
+    static public function setMargin(UXNode $node, $margins)
+    {
+    }
 }

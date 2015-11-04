@@ -1,6 +1,7 @@
 <?php
 namespace ide\action;
 
+use action\Score;
 use ide\forms\ActionArgumentsDialog;
 use php\jsoup\Document;
 use php\lib\Str;
@@ -11,9 +12,10 @@ abstract class AbstractSimpleActionType extends AbstractActionType
 {
     const GROUP_OTHER = 'Другок';
     const GROUP_APP = 'Система';
+    const GROUP_GAME = 'Игра';
     const GROUP_CONTROL = 'Управление';
     const GROUP_CONDITIONS = 'Условия';
-    const GROUP_SCRIPT = 'Скрипт';
+    const GROUP_SCRIPT = 'Другое';
 
     const SUB_GROUP_WINDOW = 'Форма';
     const SUB_GROUP_COMPONENT = 'Объект';
@@ -101,6 +103,9 @@ abstract class AbstractSimpleActionType extends AbstractActionType
 
             case 'expr':
                 return $value;
+
+            case 'score':
+                return "\\" . Score::class . "::get('$value')";
 
             default:
                 $type = $this->attributes()[$field];

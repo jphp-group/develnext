@@ -3,10 +3,13 @@ namespace ide\formats\form\context;
 
 use Exception;
 use ide\editors\AbstractEditor;
+use ide\editors\form\IdeTabPane;
 use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
+use ide\formats\form\AbstractFormElement;
 use php\format\ProcessorException;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
+use php\gui\framework\DataUtils;
 use php\gui\framework\Timer;
 use php\gui\UXClipboard;
 use php\gui\UXDialog;
@@ -14,6 +17,7 @@ use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\io\MemoryStream;
 use php\io\Stream;
+use php\lib\Items;
 use php\xml\DomElement;
 use php\xml\DomNode;
 use php\xml\DomNodeList;
@@ -45,6 +49,10 @@ class PasteMenuCommand extends AbstractMenuCommand
 
             $processor = new XmlProcessor();
 
+            $selectedNode = Items::first($editor->getDesigner()->getSelectedNodes());
+            /** @var AbstractFormElement $selectedType */
+            $selectedType = $selectedNode ? $editor->getFormat()->getFormElement($selectedNode) : null;
+
             $editor->getDesigner()->unselectAll();
 
             try {
@@ -54,7 +62,7 @@ class PasteMenuCommand extends AbstractMenuCommand
                 $rootElement = $document->getDocumentElement();
                 $count = (int) $rootElement->getAttribute('count');
 
-                $nodes = $document->findAll('/copies/node/*');
+                $nodes = $document->findAll('/copies/node');
 
                 /** @var DomElement $behaviours */
                 $behaviours = $document->find('/copies/behaviours');
@@ -67,7 +75,7 @@ class PasteMenuCommand extends AbstractMenuCommand
 
                         if ($type->isLayout()) {
                             foreach ($type->getLayoutChildren($uiNode) as $sub) {
-                                $editor->getDesigner()->registerNode($sub);
+                                $editor->registerNode($sub);
 
                                 $addLayout($sub);
                             }
@@ -76,22 +84,47 @@ class PasteMenuCommand extends AbstractMenuCommand
                 };
 
                 /** @var DomElement $element */
-                foreach ($nodes as $element) {
+                foreach ($nodes as $one) {
+                    $element = $one->find("./*");
+
                     $loader = new UXLoader();
                     $uiNode = $loader->load($this->makeXmlForLoader($element, $imports));
+
+                    $type = $editor->getFormat()->getFormElement($uiNode);
+
+                    if (!$type) {
+                        continue;
+                    }
+
                     $targetId = $editor->getNodeId($uiNode);
 
-                    $uiNode->x += $editor->getDesigner()->snapSize * ($count + 1);
-                    $uiNode->y += $editor->getDesigner()->snapSize * ($count + 1);
+                    $offset = $editor->getDesigner()->snapSize * ($count + 1);
 
-                    $editor->getLayout()->add($uiNode);
-                    $editor->getDesigner()->registerNode($uiNode);
+                    $uiNode->x += $offset;
+                    $uiNode->y += $offset;
 
-                    Timer::run(100, function () use ($editor, $uiNode) {
+                    if ($selectedType && $selectedType->isLayout()) {
+                        $selectedType->addToLayout($selectedNode, $uiNode, $selectedNode->screenX + $offset, $selectedNode->screenY + $offset);
+                    } else {
+                        $editor->getLayout()->add($uiNode);
+                    }
+
+                    $editor->registerNode($uiNode);
+                    $addLayout($uiNode);
+
+                    // Paste virtual properties
+                    $data = DataUtils::get($uiNode);
+                    foreach ($one->getAttributes() as $name => $value) {
+                        if ($name == "id") continue;
+
+                        $data->set($name, $value);
+                    }
+
+                    $type->refreshNode($uiNode);
+
+                    Timer::run(100, function () use ($editor, $uiNode, $one, $data) {
                         $editor->getDesigner()->selectNode($uiNode);
                     });
-
-                    $addLayout($uiNode);
 
                     if ($behaviours) {
                         BehaviourLoader::loadOne($targetId, $behaviours, $editor->getBehaviourManager(), $editor->getNodeId($uiNode));
@@ -99,6 +132,12 @@ class PasteMenuCommand extends AbstractMenuCommand
                 }
 
                 $editor->getDesigner()->update();
+
+                $leftPaneUi = $editor->getLeftPaneUi();
+
+                if ($leftPaneUi instanceof IdeTabPane) {
+                    $leftPaneUi->refreshObjectTreeList();
+                }
 
                 if ($count >= 0) {
                     $rootElement->setAttribute('count', $count + 1);

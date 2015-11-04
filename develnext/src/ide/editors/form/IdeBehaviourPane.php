@@ -22,7 +22,7 @@ use php\util\Flow;
  * Class FormBehaviourPane
  * @package ide\editors\form
  */
-class FormBehaviourPane
+class IdeBehaviourPane
 {
     /**
      * @var IdeBehaviourManager

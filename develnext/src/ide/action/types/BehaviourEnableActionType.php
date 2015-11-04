@@ -64,7 +64,7 @@ class BehaviourEnableActionType extends AbstractSimpleActionType
 
     function getGroup()
     {
-        return self::GROUP_SCRIPT;
+        return self::GROUP_CONTROL;
     }
 
     function getSubGroup()

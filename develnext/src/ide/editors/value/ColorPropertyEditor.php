@@ -41,6 +41,8 @@ class ColorPropertyEditor extends ElementPropertyEditor
     {
         $this->colorPicker = new UXColorPicker();
         $this->colorPicker->padding = 0;
+        $this->colorPicker->maxWidth = 9999;
+        UXHBox::setHgrow($this->colorPicker, 'ALWAYS');
         $this->colorPicker->style = "-fx-background-insets: 0; -fx-background-radius: 0; -fx-font-size: 10px;";
 
         $this->colorPicker->on('action', function () {

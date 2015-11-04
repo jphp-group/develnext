@@ -19,6 +19,14 @@ class UXList implements Iterator, Countable, ArrayAccess
 
     /**
      * @param $object
+     * @return int -1 if not found
+     */
+    public function indexOf($object)
+    {
+    }
+
+    /**
+     * @param $object
      * @return bool
      */
     public function has($object)
@@ -44,6 +52,14 @@ class UXList implements Iterator, Countable, ArrayAccess
      * @param array $objects
      */
     public function addAll(array $objects)
+    {
+    }
+
+    /**
+     * @param int $index
+     * @param array $objects
+     */
+    public function insertAll($index, array $objects)
     {
     }
 

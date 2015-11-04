@@ -58,6 +58,7 @@ class ImageViewFormElement extends AbstractFormElement
             $new = new UXImageArea();
             $new->id = $node->id;
             $new->proportional = $node->preserveRatio;
+            $new->anchors = $node->anchors;
 
             $new->size = $node->size;
             $new->position = $node->position;

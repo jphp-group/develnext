@@ -66,6 +66,12 @@ abstract class AbstractCommand
 
         $button->on('action', function () {
             $this->onExecute();
+
+            $project = Ide::project();
+
+            if ($project) {
+                $project->update();
+            }
         });
 
         return $button;
@@ -77,7 +83,15 @@ abstract class AbstractCommand
         $item->graphic = Ide::get()->getImage($this->getIcon());
         $item->accelerator = $this->getAccelerator();
 
-        $item->on('action', [$this, 'onExecute']);
+        $item->on('action', function () {
+            $this->onExecute();
+
+            $project = Ide::project();
+
+            if ($project) {
+                $project->update();
+            }
+        });
 
         return $item;
     }

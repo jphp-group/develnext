@@ -6,6 +6,7 @@ use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionEditor;
 use ide\action\ActionScript;
+use ide\editors\AbstractEditor;
 use ide\editors\CodeEditor;
 use ide\editors\common\CodeTextArea;
 use ide\editors\FormEditor;
@@ -22,6 +23,7 @@ use php\gui\framework\Timer;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXHBox;
+use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
 use php\gui\paint\UXColor;
 use php\gui\UXApplication;
@@ -67,7 +69,28 @@ class ActionConstructorForm extends AbstractForm
     /** @var string */
     protected $method;
 
+    /**
+     * @var array
+     */
+    protected $context;
+
     protected static $tabSelectedIndex = -1;
+
+    /**
+     * @return array
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param array $context
+     */
+    public function setContext($context)
+    {
+        $this->context = $context;
+    }
 
     protected function init()
     {
@@ -85,8 +108,6 @@ class ActionConstructorForm extends AbstractForm
 
         $this->generatedCodeContent->add($label);
         $this->generatedCodeContent->add($codeView);
-
-
 
         $this->tabs->tabs[1]->on('change', function () use ($codeView) {
             UXApplication::runLater(function () use ($codeView) {
@@ -286,6 +307,11 @@ class ActionConstructorForm extends AbstractForm
 
             if ($title instanceof UXVBox || $title instanceof UXHBox) {
                 $title->spacing = 0;
+
+                if ($action->getType()->isDeprecated()) {
+                    $title->opacity = 0.6;
+                    $titleName->tooltipText = $titleDescription->tooltipText = 'Действие устарело, необходимо его заменить чем-то другим';
+                }
             }
 
             $image = Ide::get()->getImage($action->getIcon());
@@ -316,7 +342,7 @@ class ActionConstructorForm extends AbstractForm
        $this->hintLabel->visible = !$this->list->items->count;
     }
 
-    public function setContextEditor(FormEditor $editor = null)
+    public function setContextEditor(AbstractEditor $editor = null)
     {
         $this->contextEditor = $editor;
     }
@@ -366,6 +392,27 @@ class ActionConstructorForm extends AbstractForm
             $list = [];
 
             foreach ($actions as $action) {
+                if ($action->isDeprecated()) {
+                    continue;
+                }
+
+                $contexts = $action->forContexts();
+
+                if ($contexts) {
+                    $matches = false;
+
+                    foreach ($contexts as $one) {
+                        if ($one['class'] && $this->context['class'] == $one['class']) {
+                            $matches = true;
+                            break;
+                        }
+                    }
+
+                    if (!$matches) {
+                        continue;
+                    }
+                }
+
                 $group = $action->getGroup();
                 $subGroup = $action->getSubGroup();
 
@@ -389,7 +436,9 @@ class ActionConstructorForm extends AbstractForm
             $t = new UXTab();
             $t->text = $tab->text;
             $t->closable = false;
-            $t->content = $tab->content;
+            $t->content = new UXScrollPane($tab->content);
+            $t->content->fitToWidth = true;
+
             $t->graphic = $tab->graphic;
             $t->style = $tab->style;
 

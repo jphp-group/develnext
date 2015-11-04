@@ -41,11 +41,24 @@ abstract class AbstractFormat
         return $this->requireFormats;
     }
 
+    public function delete($path)
+    {
+        \Files::delete($path);
+    }
+
     /**
      * @param $file
      * @return AbstractEditor
      */
     abstract public function createEditor($file);
+
+    /**
+     * @return null TODO
+     */
+    public function createCreator()
+    {
+        return null;
+    }
 
     /**
      * @param $file

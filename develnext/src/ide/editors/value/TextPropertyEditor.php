@@ -36,7 +36,6 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
     {
         parent::makeUi();
 
-
         $this->dialogButton = new UXButton();
         $this->dialogButton->text = '...';
         $this->dialogButton->padding = [2, 4];

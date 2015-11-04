@@ -9,6 +9,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.MenuButton;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -209,12 +210,41 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
             }
         };
 
+        EventHandler<KeyEvent> keyHandler = new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                try {
+                    invoker.callAny(event);
+                } catch (Throwable throwable) {
+                    env.wrapThrow(throwable);
+                }
+            }
+        };
+
         switch (event) {
             case "mouseMove":
                 getWrappedObject().getScene().addEventFilter(MouseEvent.MOUSE_MOVED, mouseHandler);
                 break;
             case "mouseDrag":
                 getWrappedObject().getScene().addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseHandler);
+                break;
+            case "mouseDown":
+                getWrappedObject().getScene().addEventFilter(MouseEvent.MOUSE_PRESSED, mouseHandler);
+                break;
+            case "mouseUp":
+                getWrappedObject().getScene().addEventFilter(MouseEvent.MOUSE_RELEASED, mouseHandler);
+                break;
+            case "click":
+                getWrappedObject().getScene().addEventFilter(MouseEvent.MOUSE_CLICKED, mouseHandler);
+                break;
+            case "keyDown":
+                getWrappedObject().getScene().addEventFilter(KeyEvent.KEY_PRESSED, keyHandler);
+                break;
+            case "keyUp":
+                getWrappedObject().getScene().addEventFilter(KeyEvent.KEY_RELEASED, keyHandler);
+                break;
+            case "keyPress":
+                getWrappedObject().getScene().addEventFilter(KeyEvent.KEY_TYPED, keyHandler);
                 break;
             default:
                 throw new IllegalArgumentException();
