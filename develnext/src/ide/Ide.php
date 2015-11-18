@@ -37,7 +37,9 @@ use ide\formats\ScriptModuleFormat;
 use ide\formats\WelcomeFormat;
 use ide\forms\MainForm;
 use ide\forms\SplashForm;
+use ide\library\IdeLibrary;
 use ide\misc\AbstractCommand;
+use ide\misc\EventHandlerBehaviour;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\project\templates\DefaultGuiProjectTemplate;
@@ -75,6 +77,8 @@ use php\util\Scanner;
 class Ide extends Application
 {
     const JPHP_VERSION = '0.7.2';
+
+    use EventHandlerBehaviour;
 
     /** @var string */
     private $OS;
@@ -125,6 +129,11 @@ class Ide extends Application
     protected $serviceManager = null;
 
     /**
+     * @var IdeLibrary
+     */
+    protected $library;
+
+    /**
      * @var string
      */
     protected $mode = 'prod';
@@ -140,6 +149,8 @@ class Ide extends Application
         if (isset($env['DEVELNEXT_MODE'])) {
             $this->mode = $env['DEVELNEXT_MODE'];
         }
+
+        $this->library = new IdeLibrary($this);
     }
 
     public function launch()
@@ -176,7 +187,7 @@ class Ide extends Application
                             $pane = new UXAnchorPane();
                             $pane->maxWidth = 100000;
 
-                            $content = new UXTextArea("Ошибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
+                            $content = new UXTextArea("{$e->getMessage()}\n\nОшибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
                             $content->padding = 10;
                             UXAnchorPane::setAnchor($content, 0);
 
@@ -204,6 +215,7 @@ class Ide extends Application
 
                 UXApplication::runLater(function () {
                     $this->registerAll();
+                    $this->trigger('start', []);
                 });
             },
             function () {
@@ -230,6 +242,14 @@ class Ide extends Application
     public function isMac()
     {
         return Str::contains($this->OS, 'mac');
+    }
+
+    /**
+     * @return IdeLibrary
+     */
+    public function getLibrary()
+    {
+        return $this->library;
     }
 
     public function makeEnvironment()

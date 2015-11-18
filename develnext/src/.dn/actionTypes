@@ -60,6 +60,7 @@ ide\action\types\IfScoreActionType
 ide\action\types\CallScriptActionType
 ide\action\types\PhpLineActionType
 ide\action\types\SleepActionType
+ide\action\types\EventConsumeActionType
 ide\action\types\ExitActionType
 ide\action\types\SetVarActionType
 ide\action\types\AppendVarActionType

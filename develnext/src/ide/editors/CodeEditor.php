@@ -2,6 +2,8 @@
 namespace ide\editors;
 
 use Files;
+use ide\autocomplete\php\PhpAutoComplete;
+use ide\autocomplete\ui\AutoCompletePane;
 use ide\editors\menu\ContextMenu;
 use ide\Logger;
 use ide\misc\AbstractCommand;
@@ -21,9 +23,14 @@ use php\gui\layout\UXHBox;
 use php\gui\UXApplication;
 use php\gui\UXCheckbox;
 use php\gui\UXClipboard;
+use php\gui\UXContextMenu;
+use php\gui\UXDesktop;
 use php\gui\UXDialog;
 use php\gui\UXForm;
+use php\gui\UXListView;
+use php\gui\UXMenuItem;
 use php\gui\UXNode;
+use php\gui\UXPopupWindow;
 use php\gui\UXWebEngine;
 use php\gui\UXWebView;
 use php\io\File;
@@ -75,6 +82,11 @@ class CodeEditor extends AbstractEditor
      */
     protected $textArea;
 
+    /**
+     * @var AutoCompletePane
+     */
+    protected $autoComplete;
+
     public function getIcon()
     {
         return $this->mode ? 'icons/' . $this->mode . 'File16.png' : null;
@@ -89,7 +101,11 @@ class CodeEditor extends AbstractEditor
         $this->textArea = new UXSyntaxTextArea();
         $this->textArea->syntaxStyle = "text/$mode";
 
-        $this->textArea->on('keyUp', function () {
+        if ($mode == 'php') {
+            $this->autoComplete = new AutoCompletePane($this->textArea, new PhpAutoComplete());
+        }
+
+        $this->textArea->on('keyUp', function (UXKeyEvent $e) {
             $this->doChange();
         });
     }

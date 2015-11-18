@@ -142,7 +142,7 @@ class Element
                 });
             } else {
                 if (Element::setText($object, '')) {
-                    $content = Stream::getContents($object, $path);
+                    $content = Stream::getContents($path);
 
                     UXApplication::runLater(function () use ($content, $object, $callback) {
                         Element::setText($object, $content);

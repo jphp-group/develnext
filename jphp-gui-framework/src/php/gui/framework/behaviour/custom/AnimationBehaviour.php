@@ -21,6 +21,11 @@ abstract class AnimationBehaviour extends AbstractBehaviour
     public $duration = 1000;
 
     /**
+     * @var string
+     */
+    public $when = 'ALWAYS';
+
+    /**
      * Сколько раз повторить анимацию, -1 значит бесконечно раз
      * @var int
      **/
@@ -28,11 +33,26 @@ abstract class AnimationBehaviour extends AbstractBehaviour
 
     public function apply($target)
     {
-        if ($this->delay > 0) {
+        if ($this->delay > 0 && $this->when == 'ALWAYS') {
             TimerScript::executeAfter($this->delay, function () use ($target) {
                 $this->__apply($target);
             });
         } else {
+            $types = $this->getWhenEventTypes();
+
+            if ($types) {
+                $this->enabled = false;
+
+                $target->on($types[0], function () {
+                    $this->enable();
+                }, get_class($this));
+
+                $target->on($types[1], function () {
+                    $this->disable();
+                    $this->restore();
+                }, get_class($this));
+            }
+
             $this->__apply($target);
         }
     }
@@ -40,6 +60,18 @@ abstract class AnimationBehaviour extends AbstractBehaviour
     public function __apply($target)
     {
         parent::apply($target);
+    }
+
+    protected function getWhenEventTypes()
+    {
+        switch ($this->when) {
+            case 'HOVER':
+                return ['mouseEnter', 'mouseExit'];
+            case 'CLICK':
+                return ['mouseDown', 'mouseUp'];
+        }
+
+        return null;
     }
 
     /**
@@ -56,5 +88,10 @@ abstract class AnimationBehaviour extends AbstractBehaviour
         $repeats += 1;
 
         return true;
+    }
+
+    protected function restore()
+    {
+        ;
     }
 }

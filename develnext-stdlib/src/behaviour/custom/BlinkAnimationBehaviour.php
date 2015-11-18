@@ -9,7 +9,15 @@ use script\TimerScript;
 
 class BlinkAnimationBehaviour extends AnimationBehaviour
 {
+    /**
+     * @var bool
+     */
     public $animated = true;
+
+    /**
+     * @var float
+     */
+    public $minOpacity = 0.3;
 
     /**
      * @param mixed $target
@@ -26,8 +34,18 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
             $timer = new TimerScript($this->duration, true, function (ScriptEvent $e) use ($target) {
                 $e->sender->interval = $this->duration;
 
-                if ($this->enabled) {
-                    $target->toggle();
+                if ($this->enabled || !$target->visible) {
+                    if ($this->minOpacity <= 0.0000001) {
+                        $target->toggle();
+                    } else {
+                        $target->visible = true;
+
+                        if ($target->opacity > $this->minOpacity) {
+                            $target->opacity = $this->minOpacity;
+                        } else {
+                            $target->opacity = 1;
+                        }
+                    }
                 }
             });
 
@@ -37,25 +55,15 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
 
     protected function _fadeOutCallback()
     {
-        if (!$this->checkRepeatLimits()) {
-            return;
-        }
-
-        if ($this->enabled) {
-            Animation::fadeIn($this->_target, $this->duration, function () {
-                $this->_fadeInCallback();
-            });
-        } else {
-            TimerScript::executeAfter($this->duration, function () {
-                $this->_fadeInCallback();
-            });
-        }
+        Animation::fadeIn($this->_target, $this->duration, function () {
+            $this->_fadeInCallback();
+        });
     }
 
     protected function _fadeInCallback()
     {
         if ($this->enabled) {
-            Animation::fadeOut($this->_target, $this->duration, function () {
+            Animation::fadeTo($this->_target, $this->duration, $this->minOpacity, function () {
                 $this->_fadeOutCallback();
             });
         } else {

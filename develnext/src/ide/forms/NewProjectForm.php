@@ -1,13 +1,18 @@
 <?php
 namespace ide\forms;
 
+use ide\editors\menu\ContextMenu;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
+use ide\library\IdeLibraryResource;
+use ide\misc\AbstractCommand;
 use ide\project\AbstractProjectTemplate;
 use ide\systems\ProjectSystem;
+use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
+use php\gui\paint\UXColor;
 use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;
 use php\gui\UXFileChooser;
@@ -40,8 +45,28 @@ class NewProjectForm extends AbstractForm
     /** @var UXFileChooser */
     protected $directoryChooser;
 
+    /**
+     * @var ContextMenu
+     */
+    protected $contextMenu;
+
     public function init()
     {
+        $this->contextMenu = new ContextMenu();
+
+        $this->contextMenu->addCommand(AbstractCommand::make('Удалить', 'icons/delete16.png', function () {
+            $resource = Items::first($this->templateList->selectedItems);
+
+            if ($resource instanceof IdeLibraryResource) {
+                $msg = new MessageBoxForm("Вы уверены, что хотите удалить проект {$resource->getName()} из библиотеки?", ['Да, удалить', 'Нет']);
+
+                if ($msg->showDialog() && $msg->getResultIndex() == 0) {
+                    Ide::get()->getLibrary()->delete($resource);
+                    $this->doShow();
+                }
+            }
+        }));
+
         $this->directoryChooser = new UXDirectoryChooser();
 
         $this->icon->image = Ide::get()->getImage('icons/new32.png')->image;
@@ -50,23 +75,38 @@ class NewProjectForm extends AbstractForm
 
         $this->pathField->text = Ide::get()->getUserConfigValue('projectDirectory');
 
-        $this->templateList->setCellFactory(function (UXListCell $cell, AbstractProjectTemplate $template = null) {
+
+        $this->templateList->setCellFactory(function (UXListCell $cell, $template = null) {
             if ($template) {
-                $titleName = new UXLabel($template->getName());
-                $titleName->style = '-fx-font-weight: bold;';
+                if (is_string($template)) {
+                    $cell->text = $template . ":";
+                    $cell->textColor = UXColor::of('gray');
+                    $cell->padding = [5, 10];
+                    $cell->paddingTop = 10;
+                    $cell->style = '-fx-font-style: italic;';
+                    $cell->graphic = null;
+                } else {
+                    $titleName = new UXLabel($template->getName());
+                    $titleName->style = '-fx-font-weight: bold;';
 
-                $titleDescription = new UXLabel($template->getDescription());
-                $titleDescription->style = '-fx-text-fill: gray;';
+                    $titleDescription = new UXLabel($template->getDescription());
+                    $titleDescription->style = '-fx-text-fill: gray;';
 
-                $title = new UXVBox([$titleName, $titleDescription]);
-                $title->spacing = 0;
+                    if (!$titleDescription->text && $template instanceof IdeLibraryResource) {
+                        $titleDescription->text = 'Шаблонный проект без описания';
+                    }
 
-                $line = new UXHBox([Ide::get()->getImage($template->getIcon32()), $title]);
-                $line->spacing = 7;
-                $line->padding = 5;
+                    $title = new UXVBox([$titleName, $titleDescription]);
+                    $title->spacing = 0;
 
-                $cell->text = null;
-                $cell->graphic = $line;
+                    $line = new UXHBox([$template instanceof AbstractProjectTemplate ? Ide::get()->getImage($template->getIcon32()) : ico('programEx32'), $title]);
+                    $line->spacing = 7;
+                    $line->padding = 5;
+
+                    $cell->text = null;
+                    $cell->graphic = $line;
+                    $cell->style = '';
+                }
             }
         });
     }
@@ -85,6 +125,14 @@ class NewProjectForm extends AbstractForm
             $this->templateList->items->add($template);
         }
 
+        $libraryResources = Ide::get()->getLibrary()->getResources('projects');
+
+        if ($libraryResources) {
+            $this->templateList->items->add('Библиотека проектов');
+        }
+
+        $this->templateList->items->addAll($libraryResources);
+
         if ($templates) {
             $this->templateList->selectedIndexes = [0];
         }
@@ -92,9 +140,21 @@ class NewProjectForm extends AbstractForm
         $this->nameField->requestFocus();
     }
 
+    /**
+     * @event templateList.click-Right
+     * @param UXMouseEvent $e
+     */
+    public function doContextMenu(UXMouseEvent $e)
+    {
+        $resource = Items::first($this->templateList->selectedItems);
+
+        if ($resource instanceof IdeLibraryResource) {
+            $this->contextMenu->getRoot()->show($this, $e->screenX, $e->screenY);
+        }
+    }
 
     /**
-     * @event pathButton.click
+     * @event pathButton.action
      */
     public function doChoosePath()
     {
@@ -108,14 +168,15 @@ class NewProjectForm extends AbstractForm
     }
 
     /**
-     * @event createButton.click
+     * @event createButton.action
      */
     public function doCreate()
     {
-        $template = $this->templates[$this->templateList->selectedIndexes[0]];
+        $template = Items::first($this->templateList->selectedItems);
 
-        if (!$template) {
+        if (!$template || !is_object($template)) {
             UXDialog::show('Выберите шаблон для проекта');
+            return;
         }
 
         $path = File::of($this->pathField->text);
@@ -129,20 +190,29 @@ class NewProjectForm extends AbstractForm
 
         $name = $this->nameField->text;
 
-        $filename = File::of("$path/$name/$name.dnproject");
-
-        if ($filename->isFile()) {
-            UXDialog::show('Невозможно создать проект, т.к. проект уже существует.', 'ERROR');
+        if (!$name) {
+            UXDialog::show('Введите название для нового проекта', 'ERROR');
             return;
         }
 
-        if (!$filename->createNewFile(true)) {
-            UXDialog::show("Невозможно создать файл проекта по выбранному пути\n -> $filename", 'ERROR');
-            return;
-        }
+        if ($template instanceof IdeLibraryResource) {
+            ProjectSystem::import($template->getPath(), "$path/$name", $name);
+        } else {
+            $filename = File::of("$path/$name/$name.dnproject");
 
-        ProjectSystem::close();
-        ProjectSystem::create($template, $filename);
+            if ($filename->isFile()) {
+                UXDialog::show('Невозможно создать проект, т.к. проект уже существует.', 'ERROR');
+                return;
+            }
+
+            if (!$filename->createNewFile(true)) {
+                UXDialog::show("Невозможно создать файл проекта по выбранному пути\n -> $filename", 'ERROR');
+                return;
+            }
+
+            ProjectSystem::close();
+            ProjectSystem::create($template, $filename);
+        }
 
         $this->hide();
     }

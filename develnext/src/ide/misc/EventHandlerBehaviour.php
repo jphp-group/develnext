@@ -33,6 +33,11 @@ trait EventHandlerBehaviour
         return $result;
     }
 
+    public function isLockHandles()
+    {
+        return $this->handleLock;
+    }
+
     public function lockHandles()
     {
         $this->handleLock = true;

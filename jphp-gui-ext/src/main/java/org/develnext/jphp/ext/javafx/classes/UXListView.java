@@ -11,6 +11,7 @@ import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.support.control.ListViewEx;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -30,11 +31,14 @@ public class UXListView extends UXControl<ListView> {
         @Property ObservableList items();
         @Property int editingIndex();
 
-        void scrollTo(int index);
-        void edit(int index);
+        //void scrollTo(int index);
+        //void edit(int index);
     }
 
     public UXListView(Environment env, ListView wrappedObject) {
+        super(env, wrappedObject);
+    }
+    public UXListView(Environment env, ListViewEx wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -44,8 +48,12 @@ public class UXListView extends UXControl<ListView> {
 
     @Signature
     public void __construct() {
-        __wrappedObject = new ListView<>();
+        __wrappedObject = new ListViewEx<>();
+    }
 
+    @Signature
+    public void scrollTo(int index) {
+        getWrappedObject().scrollTo(index);
     }
 
     @Getter

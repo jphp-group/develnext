@@ -2,6 +2,8 @@ package org.develnext.jphp.gui.designer;
 
 import javafx.embed.swing.SwingNode;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import org.fife.rsta.ui.search.FindDialog;
@@ -18,6 +20,8 @@ import org.fife.ui.rtextarea.SearchResult;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -29,6 +33,10 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
 
     protected static java.awt.Font monoFont;
     protected static Theme theme;
+
+    protected EventHandler<javafx.scene.input.KeyEvent> onKeyDown;
+    protected EventHandler<javafx.scene.input.KeyEvent> onKeyUp;
+    protected EventHandler<javafx.scene.input.KeyEvent> onKeyPress;
 
     static {
         try {
@@ -44,6 +52,16 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
         }
     }
 
+    private static KeyCode getKeyCode(int k) {
+        for (KeyCode keyCode : KeyCode.values()) {
+            if (keyCode.impl_getCode() == k) {
+                return keyCode;
+            }
+        }
+
+        return KeyCode.UNDEFINED;
+    }
+
     public SyntaxTextArea() {
         super();
 
@@ -55,6 +73,53 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
         content.setCloseCurlyBraces(true);
         content.setClearWhitespaceLinesEnabled(true);
         content.setHighlightSecondaryLanguages(false);
+
+        content.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (onKeyPress != null) {
+                    javafx.scene.input.KeyEvent event = new javafx.scene.input.KeyEvent(
+                            SyntaxTextArea.this,
+                            SyntaxTextArea.this,
+                            javafx.scene.input.KeyEvent.KEY_TYPED, String.valueOf(e.getKeyChar()), e.paramString(), getKeyCode(e.getKeyCode()), e.isShiftDown(), e.isControlDown(), e.isAltDown(), e.isMetaDown());
+                    onKeyPress.handle(event);
+
+                    if (event.isConsumed()) {
+                        e.consume();
+                    }
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (onKeyDown != null) {
+                    javafx.scene.input.KeyEvent event = new javafx.scene.input.KeyEvent(
+                            SyntaxTextArea.this,
+                            SyntaxTextArea.this,
+                            javafx.scene.input.KeyEvent.KEY_PRESSED, String.valueOf(e.getKeyChar()), e.paramString(), getKeyCode(e.getKeyCode()), e.isShiftDown(), e.isControlDown(), e.isAltDown(), e.isMetaDown());
+                    onKeyDown.handle(event);
+
+                    if (event.isConsumed()) {
+                        e.consume();
+                    }
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (onKeyUp != null) {
+                    javafx.scene.input.KeyEvent event = new javafx.scene.input.KeyEvent(
+                            SyntaxTextArea.this,
+                            SyntaxTextArea.this,
+                            javafx.scene.input.KeyEvent.KEY_RELEASED, String.valueOf(e.getKeyChar()), e.paramString(), getKeyCode(e.getKeyCode()), e.isShiftDown(), e.isControlDown(), e.isAltDown(), e.isMetaDown());
+                    onKeyUp.handle(event);
+
+                    if (event.isConsumed()) {
+                        e.consume();
+                    }
+                }
+            }
+        });
 
         if (theme != null) {
             theme.apply(content);
@@ -78,6 +143,30 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
                 SyntaxTextArea.this.content.requestFocusInWindow();
             }
         });
+    }
+
+    public EventHandler<javafx.scene.input.KeyEvent> getOnKeyPress() {
+        return onKeyPress;
+    }
+
+    public void setOnKeyPress(EventHandler<javafx.scene.input.KeyEvent> onKeyPress) {
+        this.onKeyPress = onKeyPress;
+    }
+
+    public EventHandler<javafx.scene.input.KeyEvent> getOnKeyDown() {
+        return onKeyDown;
+    }
+
+    public void setOnKeyDown(EventHandler<javafx.scene.input.KeyEvent> onKeyDown) {
+        this.onKeyDown = onKeyDown;
+    }
+
+    public EventHandler<javafx.scene.input.KeyEvent> getOnKeyUp() {
+        return onKeyUp;
+    }
+
+    public void setOnKeyUp(EventHandler<javafx.scene.input.KeyEvent> onKeyUp) {
+        this.onKeyUp = onKeyUp;
     }
 
     public RSyntaxTextArea getSyntaxTextArea() {
@@ -215,5 +304,41 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
     @Override
     public String getSelectedText() {
         return content.getSelectedText();
+    }
+
+    public void setCaretPosition(int value) {
+        content.setCaretPosition(value);
+    }
+
+    public int getCaretPosition() {
+        return content.getCaretPosition();
+    }
+
+    public int getCaretLine() {
+        return content.getCaretLineNumber();
+    }
+
+    public int getCaretOffset() {
+        return content.getCaretOffsetFromLineStart();
+    }
+
+    public void insertToCaret(String text) {
+        content.insert(text, content.getCaretPosition());
+        content.setCaretPosition(content.getCaretPosition() + text.length());
+    }
+
+    public Point2D getCaretScreenPosition() {
+        try {
+            if (content.getCaret() == null) {
+                return null;
+            }
+
+            Rectangle rectangle = content.modelToView(content.getCaret().getDot());
+            Point2D p = new Point2D(rectangle.getX(), rectangle.getY());
+
+            return localToScreen(p);
+        } catch (BadLocationException e) {
+            return null;
+        }
     }
 }

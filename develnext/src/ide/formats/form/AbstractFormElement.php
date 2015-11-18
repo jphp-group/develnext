@@ -127,6 +127,14 @@ abstract class AbstractFormElement
     /**
      * @return array
      */
+    public function getProperties()
+    {
+        return $this->config ? $this->config->getProperties() : [];
+    }
+
+    /**
+     * @return array
+     */
     public function getInitProperties()
     {
         return $this->config ? $this->config->getInitProperties() : [];

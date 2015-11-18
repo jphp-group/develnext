@@ -571,6 +571,7 @@ class FormEditor extends AbstractModuleEditor
         $element = $this->format->getFormElement($node);
 
         if ($element && $element->isLayout()) {
+            Logger::debug('Delete children of layout - ' . get_class($node));
             foreach ($element->getLayoutChildren($node) as $sub) {
                 $this->deleteNode($sub);
             }
@@ -579,23 +580,30 @@ class FormEditor extends AbstractModuleEditor
         $designer->unselectNode($node);
         $designer->unregisterNode($node);
 
-        DataUtils::remove($node);
-        $node->parent->remove($node);
-
         $nodeId = $this->getNodeId($node);
 
-        $binds = $this->eventManager->findBinds($nodeId);
-
-        foreach ($binds as $bind) {
-            $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
+        if ($nodeId) {
+            DataUtils::remove($node);
         }
 
-        if ($this->eventManager->removeBinds($nodeId)) {
-            $this->codeEditor->load();
+        if ($node->parent) {
+            $node->parent->remove($node);
         }
 
-        $this->behaviourManager->removeBehaviours($nodeId);
-        $this->behaviourManager->save();
+        if ($nodeId) {
+            $binds = $this->eventManager->findBinds($nodeId);
+
+            foreach ($binds as $bind) {
+                $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
+            }
+
+            if ($this->eventManager->removeBinds($nodeId)) {
+                $this->codeEditor->load();
+            }
+
+            $this->behaviourManager->removeBehaviours($nodeId);
+            $this->behaviourManager->save();
+        }
 
         $this->leftPaneUi->refreshObjectTreeList();
         $this->reindex();
@@ -891,10 +899,9 @@ class FormEditor extends AbstractModuleEditor
 
         $viewer = new UXScrollPane($area);
 
-        /*$viewer->on('click', function ($e) {
-            $this->designer->unselectAll();
-            $this->_onAreaMouseUp($e);
-        }); */
+        $viewer->on('click', function ($e) {
+            $this->selectForm();
+        });
 
         if (!$fullArea) {
             $designPane = new UXDesignPane();

@@ -89,6 +89,10 @@ class ProjectExporter
      */
     public function save($zipFile)
     {
+        if ($parent = File::of($zipFile)->getParentFile()) {
+            $parent->mkdirs();
+        }
+
         $out = new ArchiveOutputStream('zip', $zipFile);
 
         foreach ($this->files as $name => $file) {

@@ -34,4 +34,9 @@ class RotateAnimationBehaviour extends AnimationBehaviour
 
         $timer->start();
     }
+
+    protected function restore()
+    {
+        $this->_target->rotate = 0;
+    }
 }

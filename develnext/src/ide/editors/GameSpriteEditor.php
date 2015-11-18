@@ -641,7 +641,6 @@ class GameSpriteEditor extends AbstractEditor
                             $color = $image->getPixelColor($i, $j);
 
                             if ($color->opacity < 0.999) {
-                                dump('!!!');
                                 $alphaExists = true;
                                 break 2;
                             }

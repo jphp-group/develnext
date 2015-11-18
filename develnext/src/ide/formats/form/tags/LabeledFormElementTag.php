@@ -44,7 +44,7 @@ class LabeledFormElementTag extends AbstractFormElementTag
         /** @var UXLabeled $node */
         $font = $node->font;
 
-        if ($font && ($font->family !== 'System' || $font->size != 12)) {
+        if ($font && ($font->family !== 'System' || $font->size != 12 || $font->style !== 'Regular')) {
             $domFontProperty = $document->createElement('font');
 
             $domFont = $document->createElement('Font');

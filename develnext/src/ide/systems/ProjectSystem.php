@@ -28,7 +28,7 @@ class ProjectSystem
         Ide::get()->unregisterCommands();
     }
 
-    static function import($file, $projectDir = null)
+    static function import($file, $projectDir = null, $newName = null)
     {
         Logger::info("Start import project: file = $file, projectDir = $projectDir");
 
@@ -53,6 +53,14 @@ class ProjectSystem
         if (!$files) {
             UXDialog::show('В архиве не обнаружен файл проекта', 'ERROR');
             return;
+        }
+
+        $file = File::of(Items::first($files));
+
+        if ($newName) {
+            $files = [File::of($file->getParent() . "/$newName.dnproject")];
+
+            $file->renameTo(Items::first($files));
         }
 
         TimerScript::executeAfter(1000, function () use ($projectDir, $files, $file) {

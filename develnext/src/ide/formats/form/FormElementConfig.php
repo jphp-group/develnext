@@ -186,7 +186,13 @@ class FormElementConfig
      */
     public function getPropertyGroups()
     {
-        return $this->allPropertyGroups;
+        return Items::sort($this->allPropertyGroups, function ($a, $b) {
+            if ($a['sort'] == $b['sort']) {
+                return 0;
+            }
+
+            return $a['sort'] > $b['sort'] ? 1 : -1;
+        }, true);
     }
 
     public function getEventTypes()
@@ -297,6 +303,7 @@ class FormElementConfig
                 $this->propertyGroups[$group] = [
                     'code'  => $group,
                     'title' => $groupProperties->getAttribute('title'),
+                    'sort'  => (int) $groupProperties->getAttribute('sort'),
                 ];
             }
 
@@ -354,7 +361,15 @@ class FormElementConfig
                     'code'          => $code,
                     'group'         => $group,
                     'name'          => $name,
+                    'editor'        => $property->getAttribute('editor'),
                     'editorFactory' => $editorFactory,
+
+                    'tooltip'       => $property->getAttribute('tooltip'),
+                    'realCode'      => $property->getAttribute('realCode'),
+
+                    'isCss'         => $property->getAttribute('css'),
+                    'isVirtual'     => $property->getAttribute('virtual'),
+                    'isFormConfig'  => $property->getAttribute('formConfig'),
                 ];
             }
         }

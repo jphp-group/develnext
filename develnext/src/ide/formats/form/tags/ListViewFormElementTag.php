@@ -13,7 +13,7 @@ class ListViewFormElementTag extends AbstractFormElementTag
 {
     public function getTagName()
     {
-        return 'ListView';
+        return 'ListViewEx';
     }
 
     public function getElementClass()

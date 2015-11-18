@@ -11,6 +11,7 @@ use php\gui\UXDialog;
 use php\gui\UXLabel;
 use php\gui\UXLabeled;
 use php\gui\UXListView;
+use php\gui\UXTab;
 use php\gui\UXTextInputControl;
 use php\lang\Process;
 use php\lang\Thread;
@@ -62,7 +63,7 @@ function uiText($object)
         return (string) $object->getObjectText();
     }
 
-    if ($object instanceof UXLabeled || $object instanceof UXTextInputControl) {
+    if ($object instanceof UXLabeled || $object instanceof UXTextInputControl || $object instanceof UXTab) {
         return $object->text;
     }
 

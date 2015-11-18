@@ -18,7 +18,15 @@ class Timer
     public static function run($delay, callable $handler)
     {
         $timeline = new UXTimeline([new UXKeyFrame($delay, function () use ($handler) {
-            UXApplication::runLater($handler);
+            try {
+                UXApplication::runLater($handler);
+            } catch (IllegalStateException $e) {
+                if ($e->getMessage() == "java.lang.IllegalStateException: Platform.exit has been called") {
+                    return;
+                }
+
+                throw $e;
+            }
         })]);
         $timeline->play();
     }

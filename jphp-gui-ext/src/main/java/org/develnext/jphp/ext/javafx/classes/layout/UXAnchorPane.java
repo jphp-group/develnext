@@ -9,12 +9,12 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "layout\\UXAnchorPane")
-public class UXAnchorPane extends UXPane<AnchorPane> {
+public class UXAnchorPane<T extends AnchorPane> extends UXPane<AnchorPane> {
     interface WrappedInterface {
 
     }
 
-    public UXAnchorPane(Environment env, AnchorPane wrappedObject) {
+    public UXAnchorPane(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 

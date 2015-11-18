@@ -25,7 +25,7 @@ class AnchorPaneFormElementTag extends AbstractFormElementTag
 
     public function isFinal()
     {
-        return true;
+        return false;
     }
 
     public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
@@ -82,5 +82,8 @@ class AnchorPaneFormElementTag extends AbstractFormElementTag
 
         $element->setAttribute('prefWidth', $node->size[0]);
         $element->setAttribute('prefHeight', $node->size[1]);
+
+        $element->removeAttribute('layoutX');
+        $element->removeAttribute('layoutY');
     }
 }

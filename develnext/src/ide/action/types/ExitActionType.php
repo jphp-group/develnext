@@ -25,7 +25,7 @@ class ExitActionType extends AbstractSimpleActionType
 
     function getDescription(Action $action = null)
     {
-        return 'Прервать выполнение действий и выйти из события';
+        return 'Прервать выполнение действий и выйти из текущего события';
     }
 
     function getIcon(Action $action = null)

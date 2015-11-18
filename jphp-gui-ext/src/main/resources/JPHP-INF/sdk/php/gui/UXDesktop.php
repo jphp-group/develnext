@@ -27,4 +27,11 @@ class UXDesktop
     public function edit($file)
     {
     }
+
+    /**
+     * @return array [x, y]
+     */
+    public function getCursorPosition()
+    {
+    }
 }

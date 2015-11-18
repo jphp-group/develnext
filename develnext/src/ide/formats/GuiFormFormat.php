@@ -14,6 +14,7 @@ use ide\formats\form\context\SelectAllMenuCommand;
 use ide\formats\form\context\ToBackMenuCommand;
 use ide\formats\form\context\ToFrontMenuCommand;
 use ide\formats\form\context\UpMenuCommand;
+use ide\formats\form\elements\AnchorPaneFormElement;
 use ide\formats\form\elements\ButtonFormElement;
 use ide\formats\form\elements\CheckboxFormElement;
 use ide\formats\form\elements\CircleFormElement;
@@ -21,6 +22,7 @@ use ide\formats\form\elements\ColorPickerFormElement;
 use ide\formats\form\elements\ComboBoxFormElement;
 use ide\formats\form\elements\DatePickerFormElement;
 use ide\formats\form\elements\EllipseFormElement;
+use ide\formats\form\elements\FlatButtonFormElement;
 use ide\formats\form\elements\FormFormElement;
 use ide\formats\form\elements\GameObjectFormElement;
 use ide\formats\form\elements\GamePaneFormElement;
@@ -30,6 +32,7 @@ use ide\formats\form\elements\HyperlinkFormElement;
 use ide\formats\form\elements\ImageViewFormElement;
 use ide\formats\form\elements\LabelFormElement;
 use ide\formats\form\elements\ListViewFormElement;
+use ide\formats\form\elements\PanelFormElement;
 use ide\formats\form\elements\PasswordFieldFormElement;
 use ide\formats\form\elements\ProgressBarFormElement;
 use ide\formats\form\elements\ProgressIndicatorFormElement;
@@ -54,12 +57,14 @@ use ide\formats\form\tags\ComboBoxFormElementTag;
 use ide\formats\form\tags\DataFormElementTag;
 use ide\formats\form\tags\DatePickerFormElementTag;
 use ide\formats\form\tags\EllipseFormElementTag;
+use ide\formats\form\tags\FlatButtonFormElementTag;
 use ide\formats\form\tags\HyperlinkFormElementTag;
 use ide\formats\form\tags\ImageViewFormElementTag;
 use ide\formats\form\tags\LabeledFormElementTag;
 use ide\formats\form\tags\LabelFormElementTag;
 use ide\formats\form\tags\ListViewFormElementTag;
 use ide\formats\form\tags\NodeFormElementTag;
+use ide\formats\form\tags\PanelFormElementTag;
 use ide\formats\form\tags\PasswordFieldFormElementTag;
 use ide\formats\form\tags\PolygonFormElementTag;
 use ide\formats\form\tags\ProgressBarFormElementTag;
@@ -91,8 +96,10 @@ class GuiFormFormat extends AbstractFormFormat
         //$this->register(new GamePaneFormElement());
         //$this->register(new GameObjectFormElement());
 
+        $this->register(new AnchorPaneFormElement());
         $this->register(new FormFormElement());
         $this->register(new ButtonFormElement());
+        $this->register(new FlatButtonFormElement());
         $this->register(new ToggleButtonFormElement());
         $this->register(new LabelFormElement());
         $this->register(new HyperlinkFormElement());
@@ -111,8 +118,9 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new SeparatorFormElement());
         $this->register(new WebViewFormElement());
 
+        $this->register(new PanelFormElement());
         $this->register(new TitledPaneFormElement());
-        //$this->register(new TabPaneFormElement());
+        $this->register(new TabPaneFormElement());
 
         $this->register(new RectangleFormElement());
         $this->register(new CircleFormElement());
@@ -126,6 +134,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new LabeledFormElementTag());
         $this->register(new AnchorPaneFormElementTag());
         $this->register(new ButtonFormElementTag());
+        $this->register(new FlatButtonFormElementTag());
         $this->register(new ToggleButtonFormElementTag());
         $this->register(new LabeledFormElementTag());
         $this->register(new LabelFormElementTag());
@@ -148,7 +157,8 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new WebViewFormElementTag());
 
         $this->register(new TitledPaneFormElementTag());
-        //$this->register(new TabPaneFormElementTag());
+        $this->register(new TabPaneFormElementTag());
+        $this->register(new PanelFormElementTag());
 
         $this->register(new ShapeFormElementTag());
         $this->register(new RectangleFormElementTag());

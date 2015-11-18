@@ -4,9 +4,8 @@ import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.gui.designer.classes.*;
 import org.fife.ui.autocomplete.AutoCompletion;
 import php.runtime.env.CompileScope;
-import php.runtime.ext.support.Extension;
 
-public class GuiDesignerExtension extends Extension {
+public class GuiDesignerExtension extends JavaFXExtension {
     public static final String NS = JavaFXExtension.NS + "designer";
 
     @Override
@@ -26,5 +25,7 @@ public class GuiDesignerExtension extends Extension {
 
         registerClass(scope, FileSystemWatcher.WrapWatchKey.class);
         registerClass(scope, FileSystemWatcher.class);
+
+        registerEventProvider(new UXSyntaxTextArea.EventProvider());
     }
 }

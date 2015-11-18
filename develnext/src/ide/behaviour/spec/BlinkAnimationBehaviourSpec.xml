@@ -1,5 +1,6 @@
 <behaviour extends="AnimationBehaviourSpec">
     <properties>
         <property name="Анимировать" code="animated" editor="boolean" tooltip="Плавное появление и исчезание объекта" />
+        <property name="Минимум прозрачности" code="minOpacity" editor="float" tooltip="Минимальный уровень прозрачности от 0 до 1" />
     </properties>
 </behaviour>

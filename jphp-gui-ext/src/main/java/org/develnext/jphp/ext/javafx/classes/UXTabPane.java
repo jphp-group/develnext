@@ -5,6 +5,7 @@ import javafx.geometry.Side;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.support.control.TabPaneEx;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
@@ -26,6 +27,9 @@ public class UXTabPane extends UXControl<TabPane> {
     public UXTabPane(Environment env, TabPane wrappedObject) {
         super(env, wrappedObject);
     }
+    public UXTabPane(Environment env, TabPaneEx wrappedObject) {
+        super(env, wrappedObject);
+    }
 
     public UXTabPane(Environment env, ClassEntity clazz) {
         super(env, clazz);
@@ -33,7 +37,7 @@ public class UXTabPane extends UXControl<TabPane> {
 
     @Signature
     public void __construct() {
-        __wrappedObject = new TabPane();
+        __wrappedObject = new TabPaneEx();
     }
 
     @Getter

@@ -39,7 +39,7 @@ set_exception_handler(function (BaseException $e) {
     $pane = new UXAnchorPane();
     $pane->maxWidth = 100000;
 
-    $content = new UXTextArea("Ошибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
+    $content = new UXTextArea("{$e->getMessage()}\n\nОшибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
     $content->padding = 10;
     UXAnchorPane::setAnchor($content, 0);
 

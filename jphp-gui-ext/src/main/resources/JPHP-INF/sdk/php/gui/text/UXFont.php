@@ -55,9 +55,11 @@ class UXFont
      * @param string $family
      * @param double $size
      *
+     * @param string $fontWeight THIN, BOLD, NORMAL, MEDIUM, EXTRA_BOLD, BLACK
+     * @param bool $italic
      * @return UXFont
      */
-    public static function of($family, $size)
+    public static function of($family, $size, $fontWeight = 'THIN', $italic = false)
     {
     }
 

@@ -50,6 +50,11 @@ class ObjectListEditor
     protected $senderCode;
 
     /**
+     * @var string
+     */
+    protected $targetCode;
+
+    /**
      * @var bool
      */
     protected $enableAllForms;
@@ -83,9 +88,10 @@ class ObjectListEditor
         return $this;
     }
 
-    public function enableSender($code = '~sender')
+    public function enableSender($code = '~sender', $target = '~target')
     {
         $this->senderCode = $code;
+        $this->targetCode = $target;
 
         return $this;
     }
@@ -206,7 +212,8 @@ class ObjectListEditor
         $this->comboBox->items->add($undef);
 
         if ($this->senderCode) {
-            $this->addItem(new ObjectListEditorItem('Текущий объект', null, $this->senderCode));
+            $this->addItem(new ObjectListEditorItem('Текущий объект (self)', null, $this->senderCode));
+            $this->addItem(new ObjectListEditorItem('Целевой объект (target)', null, $this->targetCode));
 
             if (!$this->disableForms) {
                 $this->addItem(new ObjectListEditorItem('Текущая форма', null, $this->senderCode . "Form"));

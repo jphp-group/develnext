@@ -7,6 +7,7 @@ use php\gui\text\UXFont;
 use php\gui\UXButton;
 use php\gui\UXComboBox;
 use php\gui\UXListCell;
+use php\gui\UXToggleButton;
 use php\util\Flow;
 
 /**
@@ -17,6 +18,11 @@ use php\util\Flow;
  * @property UXComboBox $fontSizeCombobox
  * @property UXComboBox $customFontCombobox
  * @property UXButton $addFontButton
+ *
+ * @property UXToggleButton $thinWeightButton
+ * @property UXToggleButton $italicBoldWeightButton
+ * @property UXToggleButton $italicButton
+ * @property UXToggleButton $boldWeightButton
  */
 class FontPropertyEditorForm extends AbstractForm
 {
@@ -56,6 +62,22 @@ class FontPropertyEditorForm extends AbstractForm
         if ($font instanceof UXFont) {
             $this->fontCombobox->value = $font->family;
             $this->fontSizeCombobox->text = (int) $font->size;
+
+            switch ($font->style) {
+                case 'Bold':
+                    $this->boldWeightButton->selected = true;
+                    break;
+                case 'Bold Italic':
+                    $this->italicBoldWeightButton->selected = true;
+                    break;
+                case 'Italic':
+                    $this->italicButton->selected = true;
+                    break;
+                case 'Regular':
+                default:
+                    $this->thinWeightButton->selected = true;
+                    break;
+            }
         }
     }
 
@@ -64,7 +86,16 @@ class FontPropertyEditorForm extends AbstractForm
      */
     public function actionApply()
     {
-        $this->setResult(UXFont::of($this->fontCombobox->value, $this->fontSizeCombobox->text));
+        $weight = 'THIN';
+
+        if ($this->boldWeightButton->selected || $this->italicBoldWeightButton->selected) {
+            $weight = 'BOLD';
+        }
+
+        $italic = ($this->italicButton->selected || $this->italicBoldWeightButton->selected);
+
+        $result = UXFont::of($this->fontCombobox->value, $this->fontSizeCombobox->text, $weight, $italic);
+        $this->setResult($result);
         $this->hide();
     }
 

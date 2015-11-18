@@ -1,5 +1,7 @@
 <?php
 namespace ide\autocomplete;
+use ide\Logger;
+use php\io\MemoryStream;
 use php\lib\Items;
 use php\lib\Str;
 use phpx\parser\SourceTokenizer;
@@ -13,39 +15,126 @@ class AutoComplete
     /**
      * @var AutoComplete
      */
-    public $context = null;
+    protected $context = null;
 
     /**
      * @var AutoCompleteTypeRule[]
      */
-    public $rules = [];
+    protected $rules = [];
 
     /**
      * @var AutoCompleteTypeLoader[]
      */
-    public $loader = [];
+    protected $loader = [];
 
     /**
-     * @param string $prefix
-     * @return null|string
+     * @var AutoCompleteRegion[]
      */
-    public function identifyType($prefix)
-    {
-        if ($this->context) {
-            $result = $this->context->identifyType($prefix);
+    protected $regions = [];
 
-            if ($result) {
-                return $result;
+    /**
+     * @var AutoCompleteRegion
+     */
+    protected $globalRegion = [];
+
+
+    /**
+     * @param $sourceCode
+     */
+    public function update($sourceCode)
+    {
+        $mem = new MemoryStream();
+        $mem->write($sourceCode);
+        $mem->seek(0);
+
+        $tokenizer = new SourceTokenizer($mem, '', 'UTF-8');
+
+        $this->regions = [];
+        $this->globalRegion = new AutoCompleteRegion(0, 0);
+
+        foreach ($this->rules as $rule) {
+            $rule->updateStart();
+        }
+
+        $prev = null;
+
+        while ($token = $tokenizer->next()) {
+            foreach ($this->rules as $rule) {
+                $rule->update($tokenizer, $token, $prev);
             }
+
+            $prev = $token;
         }
 
         foreach ($this->rules as $rule) {
-            if ($result = $rule->identifyType($prefix)) {
-                return $result;
+            $rule->updateDone();
+        }
+    }
+
+    /**
+     * @return AutoCompleteRegion
+     */
+    public function getGlobalRegion()
+    {
+        return $this->globalRegion;
+    }
+
+    public function findRegion($line, $pos) {
+        if ($line == 0 && $pos == 0) {
+            return $this->globalRegion;
+        }
+
+        foreach ($this->regions as $region) {
+            if ($region->isAcross($line, $pos)) {
+                return $region;
             }
         }
 
-        return null;
+        return $this->globalRegion;
+    }
+
+    public function setValueOfRegion($value, $category, $line = 0, $pos = 0)
+    {
+        if ($region = $this->findRegion($line, $pos)) {
+            $region->setValue($value, $category);
+        }
+    }
+
+    public function addRegion(AutoCompleteRegion $region)
+    {
+        $this->regions[] = $region;
+    }
+
+    /**
+     * @param string $prefix
+     * @return string[]
+     */
+    public function identifyType($prefix)
+    {
+        $results = [];
+        Logger::debug("Identify type by prefix: $prefix ...");
+
+        if ($prefix) {
+            if ($this->context) {
+                $result = $this->context->identifyType($prefix);
+
+                if ($result) {
+                    $results[] = $result;
+                }
+            }
+
+            foreach ($this->rules as $rule) {
+                Logger::debug("Use rule " . get_class($rule));
+
+                if ($result = $rule->identifyType($prefix)) {
+                    $results[] = $result;
+                }
+            }
+        }
+
+        Logger::debug("Identify type by prefix: $prefix = [" . Str::join($results, ', ') . ']');
+
+        return $results;
     }
 
     /**

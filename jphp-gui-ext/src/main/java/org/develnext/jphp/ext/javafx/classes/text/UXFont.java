@@ -1,6 +1,8 @@
 package org.develnext.jphp.ext.javafx.classes.text;
 
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
@@ -63,6 +65,16 @@ public class UXFont extends BaseWrapper<Font> {
     @Signature
     public static Font of(String family, int size) {
         return Font.font(family, size);
+    }
+
+    @Signature
+    public static Font of(String family, int size, FontWeight fontWeight) {
+        return Font.font(family, fontWeight, size);
+    }
+
+    @Signature
+    public static Font of(String family, int size, FontWeight fontWeight, boolean italic) {
+        return Font.font(family, fontWeight, italic ? FontPosture.ITALIC : FontPosture.REGULAR, size);
     }
 
     @Signature

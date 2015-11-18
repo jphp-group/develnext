@@ -70,6 +70,7 @@ class IdeObjectTreeList
             foreach ($this->ui->items as $i => $item) {
                 if ($item->value && $item->value == $targetId) {
                     $this->ui->selectedIndex = $i;
+                    $this->unlockHandles();
                     return;
                 }
             }

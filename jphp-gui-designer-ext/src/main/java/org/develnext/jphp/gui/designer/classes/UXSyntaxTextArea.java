@@ -1,5 +1,7 @@
 package org.develnext.jphp.gui.designer.classes;
 
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.classes.UXNode;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
@@ -16,11 +18,15 @@ public class UXSyntaxTextArea extends UXNode<SyntaxTextArea> {
         @Property String text();
         @Property String syntaxStyle();
         @Property Font font();
+        @Property int caretPosition();
+        @Property int caretOffset();
+        @Property int caretLine();
         @Property boolean editable();
 
         void jumpToLine(int line, int pos);
         void showFindDialog();
         void showReplaceDialog();
+        void insertToCaret(String text);
 
         void redo();
         void undo();
@@ -42,5 +48,61 @@ public class UXSyntaxTextArea extends UXNode<SyntaxTextArea> {
     @Signature
     public void __construct() {
         __wrappedObject = new SyntaxTextArea();
+    }
+
+    @Signature
+    public double[] getCaretScreenPosition() {
+        Point2D point2D = getWrappedObject().getCaretScreenPosition();
+
+        if (point2D == null) {
+            return null;
+        }
+
+        return new double[] { point2D.getX(), point2D.getY() };
+    }
+
+    public static class EventProvider extends org.develnext.jphp.ext.javafx.support.EventProvider<SyntaxTextArea> {
+        public EventProvider() {
+            setHandler("keyPress", new Handler() {
+                @Override
+                public void set(SyntaxTextArea target, EventHandler eventHandler) {
+                    target.setOnKeyPress(eventHandler);
+                }
+
+                @Override
+                public EventHandler get(SyntaxTextArea target) {
+                    return target.getOnKeyPress();
+                }
+            });
+
+            setHandler("keyDown", new Handler() {
+                @Override
+                public void set(SyntaxTextArea target, EventHandler eventHandler) {
+                    target.setOnKeyDown(eventHandler);
+                }
+
+                @Override
+                public EventHandler get(SyntaxTextArea target) {
+                    return target.getOnKeyDown();
+                }
+            });
+
+            setHandler("keyUp", new Handler() {
+                @Override
+                public void set(SyntaxTextArea target, EventHandler eventHandler) {
+                    target.setOnKeyUp(eventHandler);
+                }
+
+                @Override
+                public EventHandler get(SyntaxTextArea target) {
+                    return target.getOnKeyUp();
+                }
+            });
+        }
+
+        @Override
+        public Class<SyntaxTextArea> getTargetClass() {
+            return SyntaxTextArea.class;
+        }
     }
 }

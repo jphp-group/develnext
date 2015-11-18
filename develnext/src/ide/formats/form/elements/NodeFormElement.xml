@@ -4,9 +4,9 @@
         <property code="enabled" virtual="1" value="1" />
     </init>
 
-    <properties group="general" title="Главное" />
+    <properties group="general" title="Главное" sort="1000" />
 
-    <properties group="extra" title="Дополнительно">
+    <properties group="extra" title="Дополнительно" sort="2000" >
         <property code="id" name="ID" editor="id" tooltip="Уникальный индетификатор элемента в рамках формы" />
         <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />
 

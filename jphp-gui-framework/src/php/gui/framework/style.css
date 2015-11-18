@@ -39,6 +39,10 @@
     -fx-stroke: -fx-text-fill;
 }
 
+.flat-button {
+    -fx-cursor: hand;
+}
+
 .tooltip {
     -fx-font-size: 1em;
 }

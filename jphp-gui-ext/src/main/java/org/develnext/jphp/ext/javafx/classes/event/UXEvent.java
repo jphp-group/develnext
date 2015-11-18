@@ -33,6 +33,7 @@ public class UXEvent extends BaseWrapper<Event> {
     public UXEvent(Environment env, InputEvent wrappedObject) {
         super(env, wrappedObject);
     }
+
     public UXEvent(Environment env, InputMethodEvent wrappedObject) {
         super(env, wrappedObject);
     }

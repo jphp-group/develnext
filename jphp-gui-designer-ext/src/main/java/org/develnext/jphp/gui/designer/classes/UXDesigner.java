@@ -17,7 +17,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -778,7 +781,10 @@ public class UXDesigner extends BaseObject {
                     }
                 }
 
-                if (!(node instanceof TitledPane) && !(node instanceof TabPane) && !(node instanceof ScrollPane)) {
+                if (!(node instanceof TitledPane)
+                        && !(node instanceof TabPane)
+                        && !(node instanceof ScrollPane)
+                        && !(node instanceof AnchorPane)) {
                     e.consume();
                 }
 

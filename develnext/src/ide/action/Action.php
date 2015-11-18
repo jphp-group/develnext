@@ -72,6 +72,11 @@ class Action
         return $this->type->fetchFieldValue($this, $field, $this->{$field});
     }
 
+    public function getFieldType($field)
+    {
+        return $this->{"$field-type"};
+    }
+
     public function getDescription()
     {
         return $this->type->getDescription($this);

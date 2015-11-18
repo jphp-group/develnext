@@ -12,6 +12,8 @@
 .icon-run { -fx-graphic: url("/.data/img/icons/run16.png"); }
 
 .icon-plus { -fx-graphic: url("/.data/img/icons/plus16.png"); }
+.icon-delete { -fx-graphic: url("/.data/img/icons/delete16.png"); }
+.icon-clear { -fx-graphic: url("/.data/img/icons/clear16.png"); }
 
 .icon-copy { -fx-graphic: url("/.data/img/icons/copy16.png"); }
 .icon-settings { -fx-graphic: url("/.data/img/icons/settings16.png"); }

@@ -12,6 +12,8 @@ use script\TimerScript;
 
 class ChatterAnimationBehaviour extends AnimationBehaviour
 {
+    protected $xValue;
+    protected $yValue;
     /**
      * @var int
      */
@@ -33,8 +35,8 @@ class ChatterAnimationBehaviour extends AnimationBehaviour
         $timer->repeatable = true;
         $timer->interval = $this->duration;
 
-        $xValue = new SharedValue($target->x);
-        $yValue = new SharedValue($target->y);
+        $this->xValue = $xValue = new SharedValue($target->x);
+        $this->yValue = $yValue = new SharedValue($target->y);
         $sleep  = new SharedValue(false);
 
         $target->observer('layoutX')->addListener(function ($old, $new) use ($xValue, $sleep) {
@@ -53,11 +55,11 @@ class ChatterAnimationBehaviour extends AnimationBehaviour
             $e->sender->interval = $this->duration;
 
             if ($this->enabled) {
-                $offsetX = rand(-$this->maxOffset, $this->maxOffset);
-                $offsetY = rand(-$this->maxOffset, $this->maxOffset);
-
                 /** @var UXNode $target */
                 $target = $this->_target;
+
+                $offsetX = rand(-$this->maxOffset, $this->maxOffset);
+                $offsetY = rand(-$this->maxOffset, $this->maxOffset);
 
                 $sleep->set(true);
 
@@ -69,5 +71,14 @@ class ChatterAnimationBehaviour extends AnimationBehaviour
         });
 
         $timer->start();
+    }
+
+    protected function restore()
+    {
+        /** @var UXNode $target */
+        $target = $this->_target;
+
+        $target->x = $this->xValue->get();
+        $target->y = $this->yValue->get();
     }
 }

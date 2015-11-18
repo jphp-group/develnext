@@ -18,7 +18,7 @@ class TabPaneFormElementTag extends AbstractFormElementTag
 {
     public function getTagName()
     {
-        return 'TabPane';
+        return 'TabPaneEx';
     }
 
     public function getElementClass()

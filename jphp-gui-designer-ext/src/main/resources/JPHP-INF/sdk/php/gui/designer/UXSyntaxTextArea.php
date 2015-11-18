@@ -27,6 +27,23 @@ class UXSyntaxTextArea extends UXNode
     public $syntaxStyle;
 
     /**
+     * @var int
+     */
+    public $caretPosition;
+
+    /**
+     * @readonly
+     * @var int
+     */
+    public $caretOffset;
+
+    /**
+     * @readonly
+     * @var int
+     */
+    public $caretLine;
+
+    /**
      * @var UXFont
      */
     public $font;
@@ -36,6 +53,13 @@ class UXSyntaxTextArea extends UXNode
      * @param $pos
      */
     public function jumpToLine($line, $pos)
+    {
+    }
+
+    /**
+     * @param $text
+     */
+    public function insertToCaret($text)
     {
     }
 
@@ -64,6 +88,10 @@ class UXSyntaxTextArea extends UXNode
     }
 
     public function showReplaceDialog()
+    {
+    }
+
+    public function getCaretScreenPosition()
     {
     }
 }

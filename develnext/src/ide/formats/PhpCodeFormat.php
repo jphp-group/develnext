@@ -25,7 +25,7 @@ class PhpCodeFormat extends AbstractFormat
         $completion->addVariableCompletion('$this', 'object');
         $completion->addVariableCompletion('$event', 'mixed');
 
-        //$editor->installAutoCompletion($completion);
+      //  $editor->installAutoCompletion($completion);
 
         return $editor;
     }

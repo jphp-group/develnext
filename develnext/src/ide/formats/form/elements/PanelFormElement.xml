@@ -1,0 +1,16 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="backgroundColor" name="Цвет фона" editor="color" />
+        <property code="borderWidth" name="Размер окантовки" editor="float" />
+        <property code="borderColor" name="Цвет оконтовки" editor="color" />
+        <property code="borderStyle" name="Стиль оконтовки" editor="enum">
+            <variants>
+                <variant value="NONE">Без окантовки</variant>
+                <variant value="SOLID">Линия</variant>
+                <variant value="DOTTED">Точки</variant>
+                <variant value="DASHED">Прерывистая линия</variant>
+            </variants>
+        </property>
+        <property code="borderRadius" name="Радиус окантовки" editor="float" />
+    </properties>
+</element>

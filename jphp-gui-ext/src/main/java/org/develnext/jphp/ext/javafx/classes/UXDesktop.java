@@ -41,4 +41,11 @@ public class UXDesktop extends BaseWrapper<Desktop> {
     public void edit(File file) throws IOException {
         getWrappedObject().edit(file);
     }
+
+    @Signature
+    public double[] getCursorPosition() {
+        Point location = MouseInfo.getPointerInfo().getLocation();
+
+        return new double[] { location.getX(), location.getY() };
+    }
 }

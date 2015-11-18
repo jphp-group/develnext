@@ -68,7 +68,7 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour
         if ($this->multiple) {
             $file = $this->saveDialog ? $this->_dialog->showSaveDialog() : $this->_dialog->showOpenMultipleDialog();
         } else {
-            $file = $this->_dialog->showOpenDialog();
+            $file = $this->saveDialog ? $this->_dialog->showSaveDialog() : $this->_dialog->showOpenDialog();
         }
 
         if ($file !== null) {

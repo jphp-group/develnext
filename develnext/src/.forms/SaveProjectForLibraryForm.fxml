@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="316.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Separator layoutX="14.0" layoutY="46.0" prefHeight="32.0" prefWidth="573.0" />
+      <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
+      <Label layoutX="54.0" layoutY="14.0" prefHeight="22.0" prefWidth="533.0" text="Сохранение проекта в библиотеке">
+         <font>
+            <Font name="Tahoma Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label layoutX="14.0" layoutY="78.0" prefHeight="22.0" prefWidth="573.0" text="Название:" />
+      <TextField id="nameField" layoutX="14.0" layoutY="100.0" prefHeight="32.0" prefWidth="573.0" promptText="название может отличаться от оригинального" />
+      <Label layoutX="14.0" layoutY="139.0" prefHeight="22.0" prefWidth="573.0" text="Описание проекта:" />
+      <Button id="cancelButton" layoutX="135.0" layoutY="354.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="111.0" text="Отмена" AnchorPane.bottomAnchor="14.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button id="createButton" layoutX="14.0" layoutY="354.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="111.0" styleClass="icon-plus" text="Сохранить" AnchorPane.bottomAnchor="14.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Button>
+      <Separator layoutX="14.0" layoutY="316.0" prefHeight="32.0" prefWidth="573.0" AnchorPane.bottomAnchor="52.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="13.0" />
+      <TextArea id="descriptionField" layoutX="14.0" layoutY="164.0" prefHeight="61.0" prefWidth="573.0" promptText="придумайте описание вашему проекту" />
+      <Label layoutX="54.0" layoutY="29.0" prefHeight="22.0" prefWidth="533.0" text="После сохранения вы сможете использовать этот проект при создании новых" textFill="#686868" />
+   </children>
+</AnchorPane>

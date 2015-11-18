@@ -5,6 +5,7 @@ use action\Element;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionScript;
+use php\io\Stream;
 use php\lib\Items;
 use php\lib\Str;
 
@@ -75,13 +76,14 @@ class ElementLoadContentActionType extends AbstractSimpleActionType
 
     function isYield(Action $action)
     {
-        return !$action->sync;
+        return !$action->sync && $action->getFieldType('object') != 'variable';
     }
 
     function imports()
     {
         return [
-            Element::class
+            Element::class,
+            Stream::class,
         ];
     }
 
@@ -93,9 +95,22 @@ class ElementLoadContentActionType extends AbstractSimpleActionType
     function convertToCode(Action $action, ActionScript $actionScript)
     {
         if ($action->sync) {
-            return "Element::loadContent({$action->get('object')}, {$action->get('path')})";
+            switch ($action->getFieldType('object')) {
+                case 'variable':
+                    $actionScript->addLocalVariable($action->get('object'));
+                    return "{$action->get('object')} = Stream::getContents({$action->get('path')})";
+                default:
+                    return "Element::loadContent({$action->get('object')}, {$action->get('path')})";
+            }
         } else {
-            return "Element::loadContentAsync({$action->get('object')}, {$action->get('path')},";
+
+            switch ($action->getFieldType('object')) {
+                case 'variable':
+                    $actionScript->addLocalVariable($action->get('object'));
+                    return "{$action->get('object')} = Stream::getContents({$action->get('path')})";
+                default:
+                    return "Element::loadContentAsync({$action->get('object')}, {$action->get('path')},";
+            }
         }
     }
 }

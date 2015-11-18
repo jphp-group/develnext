@@ -11,6 +11,7 @@ use ide\editors\value\TextPropertyEditor;
 use ide\formats\form\AbstractFormElement;
 use php\gui\designer\UXDesignProperties;
 use php\gui\designer\UXDesignPropertyEditor;
+use php\gui\event\UXEvent;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\UXButton;
@@ -31,7 +32,7 @@ class TabPaneFormElement extends AbstractFormElement
 
     public function getName()
     {
-        return 'Панель вкладок';
+        return 'Панель табов';
     }
 
     public function getIcon()
@@ -41,7 +42,7 @@ class TabPaneFormElement extends AbstractFormElement
 
     public function getIdPattern()
     {
-        return "tabs%s";
+        return "tabPane%s";
     }
 
     public function isLayout()
@@ -66,6 +67,16 @@ class TabPaneFormElement extends AbstractFormElement
         $tab->content->add($node);
     }
 
+    public function registerNode(UXNode $node)
+    {
+        $node->on('closeRequest', function (UXEvent $e) {
+            $e->consume();
+        }, __CLASS__);
+
+        return parent::registerNode($node);
+    }
+
+
     public function getLayoutChildren($layout)
     {
         $result = [];
@@ -88,12 +99,14 @@ class TabPaneFormElement extends AbstractFormElement
     {
         $tabs = new UXTabPane();
 
-        $tab = new UXTab($this->getName());
+        $name = 'Tab';
+
+        $tab = new UXTab($name);
         $tab->content = new UXAnchorPane();
 
         $tabs->tabs->add($tab);
 
-        $tab = new UXTab($this->getName() . ' 2');
+        $tab = new UXTab($name . ' 2');
         $tab->content = new UXAnchorPane();
         $tabs->tabs->add($tab);
 

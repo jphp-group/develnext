@@ -14,7 +14,7 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 {
     public function getName()
     {
-        return 'Простая программа';
+        return 'Пустая программа';
     }
 
     public function getDescription()
@@ -24,12 +24,12 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
     public function getIcon()
     {
-        return 'icons/windows16.png';
+        return 'icons/program16.png';
     }
 
     public function getIcon32()
     {
-        return 'icons/windows32.png';
+        return 'icons/program32.png';
     }
 
     /**
