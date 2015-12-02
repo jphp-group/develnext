@@ -93,6 +93,11 @@ public class UXDesignProperties extends BaseObject {
     }
 
     @Signature
+    public void removeGroup(String groupCode) {
+        groups.remove(groupCode);
+    }
+
+    @Signature
     public void addProperty(String groupCode, String code, String name, UXDesignPropertyEditor editor) {
         ObservableList<PropertyValue> propertyValues = properties.get(code);
 

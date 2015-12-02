@@ -4,6 +4,7 @@ use php\lang\IllegalStateException;
 use php\gui\UXDialog;
 use ReflectionClass;
 use ReflectionProperty;
+use script\TimerScript;
 
 /**
  * Class AbstractBehaviour
@@ -25,6 +26,11 @@ abstract class AbstractBehaviour
      * @var mixed
      */
     protected $_target;
+
+    /**
+     * @var TimerScript[]
+     */
+    protected $__timers = [];
 
     /**
      * AbstractBehaviour constructor.
@@ -97,5 +103,29 @@ abstract class AbstractBehaviour
     public function enable()
     {
         $this->enabled = true;
+    }
+
+    protected function timer($interval, $callback)
+    {
+        $this->__timers[] = $timerScript = new TimerScript($interval, true, function (TimerScript $e = null) use ($callback) {
+            if ($this->_target->isFree()) {
+                return;
+            }
+
+            if ($this->enabled) {
+                $callback($e);
+            }
+        });
+
+        $timerScript->start();
+
+        return $timerScript;
+    }
+
+    public function free()
+    {
+        foreach ($this->__timers as $timer) {
+            $timer->free();
+        }
     }
 }

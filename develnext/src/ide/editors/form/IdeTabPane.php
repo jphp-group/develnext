@@ -144,6 +144,18 @@ class IdeTabPane
         //$this->addCustomNode($list->makeUi());
     }
 
+    public function hideEventListPane()
+    {
+        $this->remove('eventList');
+    }
+
+    public function showEventListPane()
+    {
+        if ($this->eventListPane) {
+            $this->tab('eventList', 'События', $this->eventListPane->makeUi(), false);
+        }
+    }
+
     public function addEventListPane(IdeEventListPane $pane)
     {
         $this->tab('eventList', 'События', $pane->makeUi(), false);
@@ -151,11 +163,35 @@ class IdeTabPane
         $this->eventListPane = $pane;
     }
 
+    public function hideBehaviourPane()
+    {
+        $this->remove('behaviours');
+    }
+
+    public function showBehaviourPane()
+    {
+        if ($this->behaviourPane) {
+            $this->tab('behaviours', 'Поведения', $this->behaviourPane->makeUi(''));
+        }
+    }
+
     public function addBehaviourPane(IdeBehaviourPane $pane)
     {
         $this->tab('behaviours', 'Поведения', $pane->makeUi(''));
 
         $this->behaviourPane = $pane;
+    }
+
+    public function removePropertiesPane()
+    {
+        $this->remove('properties');
+    }
+
+    public function showPropertiesPane()
+    {
+        if ($this->propertiesPane) {
+            $this->tab('properties', 'Свойства', $this->propertiesPane->makeUi());
+        }
     }
 
     public function addPropertiesPane(IdePropertiesPane $pane)
@@ -191,8 +227,13 @@ class IdeTabPane
     public function updateBehaviours($targetId)
     {
         if ($this->behaviourPane) {
-            $tab = $this->tab('behaviours');
-            $this->behaviourPane->makeUi($targetId, $tab->content->content);
+            if ($this->tabs['behaviours']) {
+                $tab = $this->tab('behaviours');
+
+                if ($tab && $tab->content) {
+                    $this->behaviourPane->makeUi($targetId, $tab->content->content);
+                }
+            }
         }
     }
 

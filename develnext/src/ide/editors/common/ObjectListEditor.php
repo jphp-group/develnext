@@ -319,6 +319,32 @@ class ObjectListEditor
                 }
             }
         }
+
+        $project = Ide::get()->getOpenedProject();
+
+        if ($project && $project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
+            /** @var GuiFrameworkProjectBehaviour $gui */
+            $gui = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
+
+            $editors = $gui->getFactoryEditors();
+
+            if ($editors) {
+                $this->comboBox->items->add(new ObjectListEditorItem('[Фабрики]', null, ''));
+
+                foreach ($editors as $key => $editor) {
+                    $prefix = "factory('{$editor->getTitle()}')";
+
+                    $this->comboBox->items->add(new ObjectListEditorItem(
+                        $editor->getTitle(),
+                        Ide::get()->getImage($editor->getIcon()),
+                        $prefix,
+                        1
+                    ));
+
+                    $this->appendFormEditor($editor, 2, $prefix);
+                }
+            }
+        }
     }
 
     protected function appendFormEditor(FormEditor $formEditor, $level = 0, $prefix = '')

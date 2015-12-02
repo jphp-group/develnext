@@ -22,7 +22,7 @@ class ToFrontMenuCommand extends AbstractMenuCommand
         return 'Alt + Up';
     }
 
-    public function onExecute($e, AbstractEditor $editor)
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         /** @var FormEditor $editor */
         $designer = $editor->getDesigner();

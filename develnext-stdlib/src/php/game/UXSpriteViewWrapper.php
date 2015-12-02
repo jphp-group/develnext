@@ -25,7 +25,5 @@ class UXSpriteViewWrapper extends UXNodeWrapper
         }
 
         $this->node->animated = true;
-
-
     }
 }

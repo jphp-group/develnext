@@ -66,7 +66,7 @@ class ProjectSystem
         TimerScript::executeAfter(1000, function () use ($projectDir, $files, $file) {
             ProjectSystem::open($projectDir . "/" . Items::first($files)->getName());
 
-            Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива \n -> $file");
+            Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива", 3000);
 
             Logger::info("Finish importing project.");
         });

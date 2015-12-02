@@ -51,26 +51,21 @@ class ChatterAnimationBehaviour extends AnimationBehaviour
             }
         });
 
-        $timer->on('action', function (ScriptEvent $e) use ($xValue, $yValue, $sleep) {
+        $this->timer($this->duration, function (ScriptEvent $e) use ($xValue, $yValue, $sleep) {
             $e->sender->interval = $this->duration;
 
-            if ($this->enabled) {
-                /** @var UXNode $target */
-                $target = $this->_target;
+            $target = $this->_target;
 
-                $offsetX = rand(-$this->maxOffset, $this->maxOffset);
-                $offsetY = rand(-$this->maxOffset, $this->maxOffset);
+            $offsetX = rand(-$this->maxOffset, $this->maxOffset);
+            $offsetY = rand(-$this->maxOffset, $this->maxOffset);
 
-                $sleep->set(true);
+            $sleep->set(true);
 
-                $target->x = $xValue->get() + $offsetX;
-                $target->y = $yValue->get() + $offsetY;
+            $target->x = $xValue->get() + $offsetX;
+            $target->y = $yValue->get() + $offsetY;
 
-                $sleep->set(false);
-            }
+            $sleep->set(false);
         });
-
-        $timer->start();
     }
 
     protected function restore()

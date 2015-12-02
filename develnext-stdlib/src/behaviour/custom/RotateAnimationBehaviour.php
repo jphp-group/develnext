@@ -23,16 +23,12 @@ class RotateAnimationBehaviour extends AnimationBehaviour
             return;
         }
 
-        $timer = new TimerScript(25, true, function (ScriptEvent $e) use ($target) {
-            if ($this->enabled) {
-                $percent = ($e->sender->interval * 100 / $this->duration) / 100;
+        $this->timer(25, function (ScriptEvent $e) use ($target) {
+            $percent = ($e->sender->interval * 100 / $this->duration) / 100;
 
-                $step = 360 * $percent;
-                $target->rotate += $this->negative ? -$step : $step;
-            }
+            $step = 360 * $percent;
+            $target->rotate += $this->negative ? -$step : $step;
         });
-
-        $timer->start();
     }
 
     protected function restore()

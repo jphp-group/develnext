@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use ide\editors\AbstractEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\forms\MessageBoxForm;
 use ide\forms\SaveProjectForLibraryForm;
@@ -27,7 +28,7 @@ class SaveProjectForLibraryCommand extends AbstractCommand
         return true;
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $project = Ide::project();
 

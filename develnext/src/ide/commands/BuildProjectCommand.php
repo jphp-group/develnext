@@ -2,6 +2,7 @@
 namespace ide\commands;
 
 use ide\build\AbstractBuildType;
+use ide\editors\AbstractEditor;
 use ide\forms\BuildProjectForm;
 use ide\misc\AbstractCommand;
 use php\lang\IllegalArgumentException;
@@ -32,7 +33,7 @@ class BuildProjectCommand extends AbstractCommand
         return $button;
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $dialog = new BuildProjectForm();
         $dialog->setBuildTypes($this->buildTypes);

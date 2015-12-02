@@ -23,21 +23,21 @@ class AutoDestroyBehaviour extends AnimationBehaviour
             return;
         }
 
-        $timer = new TimerScript(50, true, function (ScriptEvent $e) use ($target) {
-            if ($this->enabled) {
-                $e->sender->stop();
+        $this->timer(50, function (ScriptEvent $e) use ($target) {
+            $e->sender->stop();
 
-                TimerScript::executeAfter($this->delay, function () use ($target, $e) {
-                    if ($this->enabled) {
-                        $e->sender->free();
-                        $target->free();
-                    } else {
-                        $e->sender->start();
-                    }
-                });
-            }
+            TimerScript::executeAfter($this->delay, function () use ($target, $e) {
+                if ($target->isFree()) {
+                    return;
+                }
+
+                if ($this->enabled) {
+                    $e->sender->free();
+                    $target->free();
+                } else {
+                    $e->sender->start();
+                }
+            });
         });
-
-        $timer->start();
     }
 }

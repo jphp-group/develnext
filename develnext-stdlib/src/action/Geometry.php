@@ -1,5 +1,6 @@
 <?php
 namespace action;
+use php\gui\framework\ObjectGroup;
 
 /**
  * Class Geometry
@@ -15,6 +16,26 @@ class Geometry
      */
     static function intersect($one, $two, $type = 'RECTANGLE')
     {
+        if ($one instanceof ObjectGroup) {
+            foreach ($one->getInstances() as $instance) {
+                if (Geometry::intersect($instance, $two, $type)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        if ($two instanceof ObjectGroup) {
+            foreach ($two->getInstances() as $instance) {
+                if (Geometry::intersect($one, $instance, $type)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         list($x, $y) = [$one->x, $one->y];
         list($w, $h) = [$one->width, $one->height];
 

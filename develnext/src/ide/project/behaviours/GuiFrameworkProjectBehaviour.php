@@ -7,14 +7,17 @@ use ide\build\OneJarBuildType;
 use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
 use ide\commands\BuildProjectCommand;
+use ide\commands\CreateFactoryProjectCommand;
 use ide\commands\CreateFormProjectCommand;
 use ide\commands\CreateGameObjectPrototypeProjectCommand;
 use ide\commands\CreateGameSceneProjectCommand;
 use ide\commands\CreateGameSpriteProjectCommand;
 use ide\commands\CreateScriptModuleProjectCommand;
 use ide\commands\ExecuteProjectCommand;
+use ide\editors\FactoryEditor;
 use ide\editors\FormEditor;
 use ide\editors\ScriptModuleEditor;
+use ide\formats\factory\FactoryProjectTreeNavigation;
 use ide\formats\form\FormProjectTreeNavigation;
 use ide\formats\module\ModuleProjectTreeNavigation;
 use ide\formats\ScriptFormat;
@@ -55,6 +58,7 @@ use php\util\Regex;
 class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 {
     const FORMS_DIRECTORY = 'src/.forms';
+    const FACTORY_DIRECTORY = 'src/.factories';
     const PROTOTYPES_DIRECTORY  = 'src/app/prototypes';
     const SCRIPTS_DIRECTORY = 'src/.scripts';
     const GAME_DIRECTORY = 'src/.game';
@@ -102,8 +106,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         Ide::get()->registerCommand(new ExecuteProjectCommand());
         Ide::get()->registerCommand(new CreateFormProjectCommand());
         Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
-       // Ide::get()->registerCommand(new CreateGameSceneProjectCommand());
-      //  Ide::get()->registerCommand(new CreateGameObjectPrototypeProjectCommand());
+        //Ide::get()->registerCommand(new CreateFactoryProjectCommand());
+
+        //Ide::get()->registerCommand(new CreateGameSceneProjectCommand());
+        //Ide::get()->registerCommand(new CreateGameObjectPrototypeProjectCommand());
         Ide::get()->registerCommand(new CreateGameSpriteProjectCommand());
 
         $this->scriptComponentManager = new ScriptComponentManager();
@@ -136,7 +142,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doUpdate()
     {
-        $this->spriteManager->reloadAll();
+        if ($this->spriteManager) {
+            $this->spriteManager->reloadAll();
+        }
     }
 
     public function doReindex(ProjectIndexer $indexer)
@@ -269,6 +277,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree = $this->project->getTree();
 
         $tree->register(new FormProjectTreeNavigation(self::FORMS_DIRECTORY));
+        //$tree->register(new FactoryProjectTreeNavigation(self::FACTORY_DIRECTORY));
         $tree->register(new ModuleProjectTreeNavigation(self::SCRIPTS_DIRECTORY));
         $tree->register(new SpriteProjectTreeNavigation(self::GAME_DIRECTORY . '/sprites'));
 
@@ -352,6 +361,26 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree->updateDirectory('scripts', $this->project->getFile(self::SCRIPTS_DIRECTORY));
     } */
 
+    public function recoveryFactory($filename)
+    {
+        $file = $this->project->getAbsoluteFile($filename);
+
+        $sources = $file->findLinkByExtension('php');
+
+        $rel = FileUtils::relativePath($this->project->getFile(self::FACTORY_DIRECTORY), $filename);
+        $rel = Str::sub($rel, 0, Str::length($rel) - 8);
+        $rel = Str::replace($rel, '\\', '/');
+
+        if (!$sources) {
+            $sources = $this->project->getFile("src/app/factories/$rel.php");
+            $file->addLink($sources);
+        }
+
+        if (!$sources->exists() && !Files::exists("$sources.source")) {
+            $this->createFactory($rel);
+        }
+    }
+
     public function recoveryModule($filename)
     {
         $file = $this->project->getAbsoluteFile($filename);
@@ -359,7 +388,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $sources = $file->findLinkByExtension('php');
 
         $rel = FileUtils::relativePath($this->project->getFile(self::SCRIPTS_DIRECTORY), $filename);
-        //$rel = Str::sub($rel, 0, Str::length($rel) - 5);
         $rel = Str::replace($rel, '\\', '/');
 
         if (!$sources) {
@@ -482,6 +510,26 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
+     * @return FactoryEditor[]
+     */
+    public function getFactoryEditors()
+    {
+        $formDir = $this->project->getFile(self::FACTORY_DIRECTORY);
+
+        $editors = [];
+
+        FileUtils::scan($formDir, function ($filename) use (&$editors) {
+            if (FileUtils::getExtension($filename) == "factory") {
+                $editor = FileSystem::fetchEditor($filename);
+
+                $editors[FileUtils::hashName($filename)] = $editor;
+            }
+        });
+
+        return $editors;
+    }
+
+    /**
      * @param $moduleName
      * @return FormEditor[]
      */
@@ -527,6 +575,35 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         Logger::info("Finish creating prototype '$name'");
         return $prototype;
+    }
+
+    public function createFactory($name)
+    {
+        Logger::info("Creating factory '$name' ...'");
+
+        $factory = $this->project->createFile(self::FACTORY_DIRECTORY . "/$name.factory", new GuiFormFileTemplate());
+
+        $template = new PhpClassFileTemplate($name, 'AbstractFactory');
+        $template->setNamespace('app\\factories');
+        $template->setImports([
+            'php\\gui\\framework\\AbstractFactory'
+        ]);
+
+        $sources = $factory->findLinkByExtension('php');
+
+        if (!$sources) {
+            $sources = $this->project->createFile("src/app/factories/$name.php", $template);
+            $factory->addLink($sources);
+        } else {
+            if (!$sources->exists()) {
+                $sources->applyTemplate($template);
+                $sources->updateTemplate(true);
+            }
+        }
+
+        Logger::info("Finish creating factory '$name'");
+
+        return $factory;
     }
 
     public function createForm($name)
@@ -585,9 +662,15 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $formsPath = $this->project->getFile('src/app/forms');
         $formsPath->setHiddenInTree(true);
 
-        $this->project->getFile('src/.forms')->scan(function ($name, File $file) {
+        $this->project->getFile(self::FORMS_DIRECTORY)->scan(function ($name, File $file) {
             if ($file->isFile() && Str::endsWith($name, '.fxml')) {
                 $this->recoveryForm($file);
+            }
+        });
+
+        $this->project->getFile(self::FACTORY_DIRECTORY)->scan(function ($name, File $file) {
+            if ($file->isFile() && Str::endsWith($name, '.factory')) {
+                $this->recoveryFactory($file);
             }
         });
 

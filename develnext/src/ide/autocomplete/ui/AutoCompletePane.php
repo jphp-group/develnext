@@ -78,6 +78,16 @@ class AutoCompletePane
 
     protected function init()
     {
+        $this->area->observer('focused')->addListener(function ($old, $new) {
+            if (!$new) {
+                $this->hide();
+            }
+        });
+
+        $this->area->on('mouseDown', function () {
+            $this->hide();
+        });
+
         $this->area->on('keyDown', function (UXKeyEvent $e) {
             $this->area->data('oldCaretPosition', $this->area->caretPosition);
 
@@ -116,6 +126,10 @@ class AutoCompletePane
             switch ($e->codeName) {
                 case 'Up':
                 case 'Down':
+                    return;
+
+                case 'Left':
+                case 'Right':
                     return;
             }
 

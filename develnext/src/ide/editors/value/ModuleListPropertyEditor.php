@@ -3,6 +3,7 @@ namespace ide\editors\value;
 
 use ide\forms\FontPropertyEditorForm;
 use ide\forms\ModuleListEditorForm;
+use ide\systems\FileSystem;
 use php\gui\event\UXMouseEvent;
 use php\gui\text\UXFont;
 use php\gui\UXList;
@@ -53,4 +54,18 @@ class ModuleListPropertyEditor extends TextPropertyEditor
 
         parent::updateUi($value);
     }
+
+    public function applyValue($value, $updateUi = true)
+    {
+        parent::applyValue($value, $updateUi);
+
+        $editor = FileSystem::getSelectedEditor();
+
+        if ($editor) {
+            $editor->reindex();
+            $editor->save();
+        }
+    }
+
+
 }

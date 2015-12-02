@@ -45,7 +45,7 @@ class RelocationMenuCommand extends AbstractMenuCommand
         return $this->accelerator;
     }
 
-    public function onExecute($e, AbstractEditor $editor)
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         /** @var FormEditor $editor */
         $designer = $editor->getDesigner();

@@ -7,12 +7,16 @@ use ide\editors\argument\AbstractArgumentEditor;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
 use php\gui\framework\AbstractForm;
+use php\gui\layout\UXPanel;
 use php\gui\layout\UXVBox;
+use php\gui\paint\UXColor;
+use php\gui\text\UXFont;
 use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXLabel;
+use php\gui\UXLabelEx;
 
 /**
  * Class ActionArgumentsDialog
@@ -52,6 +56,10 @@ class ActionArgumentsDialog extends AbstractForm
 
         $attributeLabels = $type->attributeLabels();
 
+        if ($type->getHelpText()) {
+            $this->addHelpText($type->getHelpText());
+        }
+
         $i = 0;
         foreach ($type->attributes() as $name => $value) {
             $label = $attributeLabels[$name];
@@ -85,6 +93,29 @@ class ActionArgumentsDialog extends AbstractForm
 
             $this->height = $height + 180;
         });
+    }
+
+    public function addHelpText($text)
+    {
+        $panel = new UXPanel();
+        $panel->backgroundColor = UXColor::of('white');
+        $panel->borderRadius = 3;
+
+        UXVBox::setMargin($panel, [0, 0, 10]);
+
+        $node = new UXLabelEx($text);
+        $node->padding = [10, 15];
+        $node->wrapText = true;
+        $node->textColor = UXColor::of('gray');
+        $node->font = UXFont::of($node->font, $node->font->size, 'THIN', true);
+
+        $panel->add($node);
+
+        $this->box->observer('width')->addListener(function ($old, $new) use ($node) {
+            $node->maxWidth = $new - $node->paddingLeft - $node->paddingRight;
+        });
+
+        $this->box->add($panel);
     }
 
     public function addArgument($name, $label, $type, array $settings = null)

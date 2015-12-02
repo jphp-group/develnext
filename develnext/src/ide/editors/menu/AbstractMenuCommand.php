@@ -1,13 +1,10 @@
 <?php
 namespace ide\editors\menu;
 
-use ide\editors\AbstractEditor;
+use ide\misc\AbstractCommand;
 
-abstract class AbstractMenuCommand
+abstract class AbstractMenuCommand extends AbstractCommand
 {
-    abstract public function getName();
-    abstract public function onExecute($e, AbstractEditor $editor);
-
     public function getIcon()
     {
         return null;
@@ -26,5 +23,10 @@ abstract class AbstractMenuCommand
     public function withSeparator()
     {
         return false;
+    }
+
+    public function makeUiForHead()
+    {
+        return $this->makeGlyphButton();
     }
 }

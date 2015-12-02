@@ -15,6 +15,8 @@ use php\gui\UXTextArea;
 use php\gui\UXWindow;
 use php\io\IOException;
 use php\io\Stream;
+use php\lang\IllegalArgumentException;
+use php\lib\str;
 use php\util\Configuration;
 
 /**
@@ -40,6 +42,11 @@ class Application
 
     /** @var AbstractForm[] */
     protected $forms = [];
+
+    /**
+     * @var AbstractFactory[]
+     */
+    protected $factories = [];
 
     /** @var AbstractModule[] */
     protected $modules = [];
@@ -191,6 +198,39 @@ class Application
         $form = $this->getForm($name);
         $form->hide();
         return $form;
+    }
+
+    /**
+     * @param $prototype
+     * @return UXNode
+     * @throws IllegalArgumentException
+     */
+    public function create($prototype)
+    {
+        list($factory, $id) = str::split($prototype, '.', 2);
+
+        $factory = $this->factory($factory);
+        return $factory->create($id);
+    }
+
+    /**
+     * @param $name
+     * @return AbstractFactory
+     * @throws IllegalArgumentException
+     */
+    public function factory($name)
+    {
+        if ($factory = $this->factories[$name]) {
+            return $factory;
+        }
+
+        $factoryClass = ($this->getNamespace() ? $this->getNamespace() . "\\factories\\" : "") . $name;
+
+        if (!class_exists($factoryClass)) {
+            throw new IllegalArgumentException("Cannot find the '$name' factory, class '$factoryClass' is not exists");
+        }
+
+        return $this->factories[$name] = new $factoryClass();
     }
 
     /**

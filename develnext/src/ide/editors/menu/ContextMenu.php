@@ -102,7 +102,7 @@ class ContextMenu
             $filter = $this->filter;
 
             if (!$filter || $filter($command)) {
-                $command->onExecute();
+                $command->onExecute($e, $this->editor);
             }
         });
 

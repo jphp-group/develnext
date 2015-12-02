@@ -5,6 +5,7 @@ use action\Element;
 use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
+use php\gui\framework\ScriptEvent;
 use php\gui\framework\Timer;
 use php\gui\UXForm;
 use php\gui\UXNode;
@@ -26,11 +27,7 @@ class WatchMakerBehaviour extends AbstractBehaviour
      */
     protected function applyImpl($target)
     {
-        $updater = function () use ($target) {
-            if (!$this->enabled) {
-                return;
-            }
-
+        $updater = function (ScriptEvent $e = null) use ($target) {
             $now = Time::now();
 
             try {
@@ -40,10 +37,7 @@ class WatchMakerBehaviour extends AbstractBehaviour
             }
         };
 
-        $timer = new TimerScript(50, true, $updater);
-
         $updater();
-
-        $timer->start();
+        $this->timer(50, $updater);
     }
 }

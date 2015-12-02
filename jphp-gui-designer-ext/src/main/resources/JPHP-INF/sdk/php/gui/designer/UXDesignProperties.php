@@ -25,6 +25,13 @@ class UXDesignProperties
 
     /**
      * @param $code
+     */
+    public function removeGroup($code)
+    {
+    }
+
+    /**
+     * @param $code
      * @return UXTitledPane|null
      */
     public function getGroupPane($code)

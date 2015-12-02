@@ -91,7 +91,7 @@ class IdeBehaviourManager extends BehaviourManager
      */
     public function getBehaviours($targetId)
     {
-        return (array) $this->behaviours[$targetId];
+        return (array) $this->behaviours["$targetId"];
     }
 
     /**
@@ -99,7 +99,7 @@ class IdeBehaviourManager extends BehaviourManager
      */
     public function clearBehaviours($targetId)
     {
-        unset($this->behaviours[$targetId]);
+        unset($this->behaviours["$targetId"]);
     }
 
     /**
@@ -108,7 +108,7 @@ class IdeBehaviourManager extends BehaviourManager
      */
     public function removeBehaviour($targetId, $type)
     {
-        unset($this->behaviours[$targetId][$type]);
+        unset($this->behaviours["$targetId"][$type]);
     }
 
     /**
@@ -116,7 +116,7 @@ class IdeBehaviourManager extends BehaviourManager
      */
     public function removeBehaviours($targetId)
     {
-        unset($this->behaviours[$targetId]);
+        unset($this->behaviours["$targetId"]);
     }
 
     public function duplicateBehaviours($targetId, $copyTargetId)
@@ -144,9 +144,9 @@ class IdeBehaviourManager extends BehaviourManager
      */
     public function changeTargetId($oldId, $newId)
     {
-        if ($this->behaviours[$oldId]) {
-            $this->behaviours[$newId] = $this->behaviours[$oldId];
-            unset($this->behaviours[$oldId]);
+        if ($this->behaviours["$oldId"]) {
+            $this->behaviours["$newId"] = $this->behaviours["$oldId"];
+            unset($this->behaviours["$oldId"]);
 
             $this->save();
         }
@@ -166,10 +166,10 @@ class IdeBehaviourManager extends BehaviourManager
         $root = $document->createElement('behaviours');
 
         foreach ($targetIds as $targetId) {
-            $behaviours = (array) $this->behaviours[$targetId];
+            $behaviours = (array) $this->behaviours["$targetId"];
 
             if ($behaviours) {
-                $target = $document->createElement('target', ['@id' => $targetId]);
+                $target = $document->createElement('target', ['@id' => "$targetId"]);
                 $root->appendChild($target);
 
                 /**
@@ -239,11 +239,11 @@ class IdeBehaviourManager extends BehaviourManager
      */
     public function apply($targetId, AbstractBehaviour $behaviour)
     {
-        if ($this->behaviours[$targetId][get_class($behaviour)]) {
-            unset($this->behaviours[$targetId][get_class($behaviour)]);
+        if ($this->behaviours["$targetId"][get_class($behaviour)]) {
+            unset($this->behaviours["$targetId"][get_class($behaviour)]);
         }
 
-        $this->behaviours[$targetId][get_class($behaviour)] = $behaviour;
+        $this->behaviours["$targetId"][get_class($behaviour)] = $behaviour;
     }
 
     /**

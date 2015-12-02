@@ -22,6 +22,16 @@ class ScriptEvent extends \stdClass
      */
     public $usage = 0;
 
+    /**
+     * ScriptEvent constructor.
+     * @param AbstractScript $sender
+     */
+    public function __construct(AbstractScript $sender = null)
+    {
+        $this->sender = $sender;
+    }
+
+
     public function done()
     {
         $this->usage -= 1;

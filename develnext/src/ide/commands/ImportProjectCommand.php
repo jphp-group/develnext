@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use ide\editors\AbstractEditor;
 use ide\forms\BuildSuccessForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
@@ -32,7 +33,7 @@ class ImportProjectCommand extends AbstractCommand
         return true;
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $dialog = new UXFileChooser();
         $dialog->extensionFilters = [['extensions' => ['*.zip'], 'description' => 'Zip Архив с проектом']];

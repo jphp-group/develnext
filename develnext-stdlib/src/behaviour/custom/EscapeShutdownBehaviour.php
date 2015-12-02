@@ -19,12 +19,20 @@ class EscapeShutdownBehaviour extends AbstractBehaviour
 
         if ($target instanceof UXNode) {
             $target->on('keyUp', function (UXKeyEvent $e) use ($self, $target) {
+                if ($this->_target->isFree()) {
+                    return;
+                }
+
                 if ($self->enabled && $e->codeName == 'Esc' && $target->form) {
                     $target->form->hide();
                 }
             }, __CLASS__);
         } elseif ($target instanceof UXForm)  {
             $target->on('keyUp', function (UXKeyEvent $e) use ($self, $target) {
+                if ($this->_target->isFree()) {
+                    return;
+                }
+
                 $enabled = $self->enabled;
 
                 if ($enabled && $e->codeName == 'Esc') {

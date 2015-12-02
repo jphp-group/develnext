@@ -1,6 +1,8 @@
 <?php
 namespace php\gui;
 
+use php\gui\framework\AbstractForm;
+
 class UXNodeWrapper
 {
     /**
@@ -44,5 +46,34 @@ class UXNodeWrapper
     public function bind($event, callable $handler, $group)
     {
         $this->node->on($event, $handler, $group);
+    }
+
+    /**
+     * @param AbstractForm|UXNode $node
+     * @return AbstractFormWrapper|UXNodeWrapper
+     */
+    static function get($node)
+    {
+        $wrapper = $node->data('~wrapper');
+
+        if ($wrapper) {
+            return $wrapper;
+        }
+
+        if ($node instanceof AbstractForm) {
+            $wrapper = new AbstractFormWrapper($node);
+        } else {
+            $class = get_class($node) . 'Wrapper';
+
+            if (class_exists($class)) {
+                $wrapper = new $class($node);
+            } else {
+                $wrapper = new UXNodeWrapper($node);
+            }
+        }
+
+        $node->data('~wrapper', $wrapper);
+
+        return $wrapper;
     }
 }

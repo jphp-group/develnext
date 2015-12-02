@@ -14,6 +14,7 @@ use php\lang\System;
  * @method ServiceResponse startAsync($callback)
  * @method ServiceResponse shutdownAsync($callback)
  * @method ServiceResponse sendErrorAsync(\Exception $e, $callback)
+ * @method ServiceResponse getLastUpdateAsync($channel, $callback)
  */
 class IdeService extends AbstractService
 {
@@ -25,6 +26,15 @@ class IdeService extends AbstractService
     public function shutdown()
     {
         return $this->execute('ide/shutdown', []);
+    }
+
+    /**
+     * @param string $channel NIGHT, BETA, STABLE
+     * @return ServiceResponse
+     */
+    public function getLastUpdate($channel = 'NIGHT')
+    {
+        return $this->execute('ide/get-last-update', ['channel' => $channel]);
     }
 
     public function sendError(\Exception $e)

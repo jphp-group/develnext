@@ -25,7 +25,7 @@ class CutMenuCommand extends AbstractMenuCommand
         return 'icons/cut16.png';
     }
 
-    public function onExecute($e, AbstractEditor $editor)
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $copyCommand = new CopyMenuCommand();
         $deleteCommand = new DeleteMenuCommand();

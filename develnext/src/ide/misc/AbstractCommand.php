@@ -1,6 +1,7 @@
 <?php
 namespace ide\misc;
 
+use ide\editors\AbstractEditor;
 use ide\Ide;
 use php\gui\UXButton;
 use php\gui\UXMenuItem;
@@ -19,7 +20,7 @@ abstract class AbstractCommand
 
     abstract public function getName();
 
-    abstract public function onExecute();
+    abstract public function onExecute($e = null, AbstractEditor $editor = null);
 
     public function withBeforeSeparator()
     {
@@ -143,7 +144,7 @@ class SeparatorCommand extends AbstractCommand
         return '';
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
     }
 
@@ -209,7 +210,7 @@ class SimpleSingleCommand extends AbstractCommand
         return $this->accelerator;
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $onExecute = $this->onExecute;
         $onExecute($this->target);

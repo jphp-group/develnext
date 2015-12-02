@@ -60,6 +60,11 @@ class UXForm extends UXWindow
     public $transparent = false;
 
     /**
+     * @var bool
+     */
+    public $fullScreen = false;
+
+    /**
      * @param UXForm $form (optional)
      */
     public function __construct(UXForm $form)

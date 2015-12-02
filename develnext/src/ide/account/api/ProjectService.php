@@ -22,6 +22,8 @@ use php\util\Configuration;
  * @method updateAsync(Project $project, callable $callback)
  * @method prepareSyncAsync(Project $project, callable $callback)
  * @method syncAsync(Project $project, $prepare, callable $callback)
+ * @method array getAsync($projectId, callable $callback)
+ * @method array getListAsync(callable $callback)
  */
 class ProjectService extends AbstractService
 {
@@ -30,6 +32,16 @@ class ProjectService extends AbstractService
         $config = $project->getIdeConfig('project.ws');
 
         return $config->get('projectId', null);
+    }
+
+    public function get($id)
+    {
+        return $this->execute('project/get', ['id' => $id]);
+    }
+
+    public function getList()
+    {
+        return $this->execute('project/list', []);
     }
 
     public function isUploaded(Project $project)

@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use ide\editors\AbstractEditor;
 use ide\forms\MainForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
@@ -18,7 +19,7 @@ class ExitCommand extends AbstractCommand
         return 'Выход';
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         ProjectSystem::close();
 

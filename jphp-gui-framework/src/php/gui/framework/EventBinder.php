@@ -1,9 +1,14 @@
 <?php
 namespace php\gui\framework;
+use php\gui\event\UXEvent;
 use php\gui\framework\event\AbstractEventAdapter;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
+use php\lang\IllegalArgumentException;
+use php\lib\str;
 use php\util\Scanner;
+use ReflectionClass;
+use ReflectionMethod;
 
 /**
  * Class EventBinder
@@ -22,6 +27,11 @@ class EventBinder
     protected $handler;
 
     /**
+     * @var array
+     */
+    protected $binds = [];
+
+    /**
      * EventBinder constructor.
      * @param $context
      * @param $handler
@@ -30,19 +40,21 @@ class EventBinder
     {
         $this->context = $context;
         $this->handler = $handler ? $handler : $context;
+
+        $this->loadBinds();
     }
 
     /**
-     * @param callable|null $filter
-     * @throws Exception
+     * @return callable[]
      * @throws IllegalStateException
      */
-    public function load(callable $filter = null)
+    protected function loadBinds()
     {
-        $class = new \ReflectionClass($this->handler);
+        $class = new ReflectionClass($this->handler);
         $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
 
         $events = [];
+        $result = [];
 
         foreach ($methods as $method) {
             $comment = $method->getDocComment();
@@ -62,11 +74,82 @@ class EventBinder
                     }
                     $methodName = $method->getName();
 
-                    if (!$filter || $filter($event, [$this->handler, $methodName])) {
-                         $events[$event] = $methodName;
+                    $events[$event] = $methodName;
 
-                        $this->bind($event, [$this->handler, $methodName]);
+                    list($id, $name) = str::split($event, '.', 2);
+
+                    $result[$id][$name] = [$this->handler, $methodName];
+                }
+            }
+        }
+
+        return $this->binds = $result;
+    }
+
+    public function trigger($target, $id, $code)
+    {
+        if ($bind = $this->binds[$id][$code]) {
+            $bind(UXEvent::makeMock($target));
+        }
+    }
+
+    public function loadBind($target, $id, $group = 'general', $ignoreErrors = false)
+    {
+        if ($binds = $this->binds[$id]) {
+            foreach ($binds as $name => $handler) {
+                $eventName = Str::split($name, '-', 2);
+
+                if ($eventName[1]) {
+                    $class = "php\\gui\\framework\\event\\" . Str::upperFirst(Str::lower($eventName[0])) . "EventAdapter";
+
+                    static $adapters;
+
+                    if ($adapters[$class]) {
+                        $adapter = $adapters[$class];
+                    } elseif (class_exists($class)) {
+                        /** @var AbstractEventAdapter $adapter */
+                        $adapter = new $class();
+                        $adapters[$class] = $adapter;
+                    } else {
+                        $adapter = null;
                     }
+
+                    if ($adapter == null) {
+                        throw new Exception("Unable to bind '$name'");
+                    }
+
+                    $handler = $adapter->adapt($target, $handler, $eventName[1]);
+
+                    if (!$handler) {
+                        throw new Exception("Unable to bind '$name'");
+                    }
+
+                    $group = $name;
+                }
+
+                $wrapper = $this->getNodeWrapper($target);
+                try {
+                    $wrapper->bind($eventName[0], $handler, $group);
+                } catch (IllegalArgumentException $e) {
+                    if (!$ignoreErrors) {
+                        throw $e;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param callable|null $filter
+     * @throws Exception
+     * @throws IllegalStateException
+     */
+    public function load(callable $filter = null)
+    {
+        foreach ($this->binds as $id => $binds) {
+            foreach ($binds as $name => $bind) {
+                if (!$filter || $filter("$id.$name", $bind)) {
+                    $this->bind("$id.$name", $bind);
                 }
             }
         }
@@ -109,7 +192,7 @@ class EventBinder
 
         if ($parts) {
             $id = Str::join($parts, '.');
-            $node = $this->{$id};
+            $node = $this->context->{$id};
         } else {
             $node = $this->context;
         }

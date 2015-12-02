@@ -14,6 +14,7 @@ use php\gui\framework\event\AbstractEventAdapter;
 use php\gui\layout\UXAnchorPane;
 use php\gui\paint\UXColor;
 use php\gui\UXApplication;
+use php\gui\UXCustomNode;
 use php\gui\UXData;
 use php\gui\UXDialog;
 use php\gui\UXForm;
@@ -45,6 +46,8 @@ use ReflectionMethod;
  */
 abstract class AbstractForm extends UXForm
 {
+    use ApplicationTrait;
+
     const DEFAULT_PATH = 'res://.forms/';
 
     /** @var Application */
@@ -166,6 +169,11 @@ abstract class AbstractForm extends UXForm
     public function free()
     {
         $this->hide();
+    }
+
+    public function isFree()
+    {
+        return !$this->visible;
     }
 
     public function getContextForm()
@@ -330,7 +338,29 @@ abstract class AbstractForm extends UXForm
             if ($this->layout) {
                 DataUtils::scan($this->layout, function (UXData $data, UXNode $node = null) {
                     if ($node) {
-                        $this->getNodeWrapper($node)->applyData($data);
+                        if ($node instanceof UXCustomNode) {
+                            $type = $node->get('type');
+
+                            if (class_exists($type)) {
+                                /** @var UXFactoryInstance $type */
+                                $type = new $type();
+
+                                $newNode = $type->create($node);
+
+                                if ($newNode) {
+                                    $node->parent->add($newNode);
+                                }
+
+                                $node->free();
+
+                                $node = $newNode;
+                            }
+                        }
+
+                        if ($node) {
+                            $this->getNodeWrapper($node)->applyData($data);
+                        }
+
                         $data->free();
                     }
                 });

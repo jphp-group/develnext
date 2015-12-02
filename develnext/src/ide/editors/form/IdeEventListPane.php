@@ -517,7 +517,7 @@ class IdeEventListPane
             if ($selected) {
                 $this->openInConstructor($selected['eventCode']);
 
-                $this->trigger('edit', [$selected['eventCode']]);
+                $this->trigger('edit', [$selected['eventCode'], $this->getDefaultEventEditor()]);
             }
         });
 

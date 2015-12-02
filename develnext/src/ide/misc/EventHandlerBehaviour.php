@@ -14,7 +14,7 @@ trait EventHandlerBehaviour
     private $handleLock = false;
 
 
-    public function trigger($event, array $args)
+    public function trigger($event, array $args = [])
     {
         if ($this->handleLock) {
             return null;

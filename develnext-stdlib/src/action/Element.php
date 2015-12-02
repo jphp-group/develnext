@@ -3,6 +3,7 @@ namespace action;
 
 use behaviour\SetTextBehaviour;
 use behaviour\StreamLoadableBehaviour;
+use php\gui\framework\ObjectGroup;
 use php\gui\UXApplication;
 use php\gui\UXComboBox;
 use php\gui\UXComboBoxBase;
@@ -28,6 +29,16 @@ class Element
 {
     static function setText($object, $value)
     {
+        if ($object instanceof ObjectGroup) {
+            $result = false;
+
+            foreach ($object->getInstances() as $it) {
+                $result = $result || self::setText($it, $value);
+            }
+
+            return $result;
+        }
+
         if ($object instanceof SetTextBehaviour) {
             $object->setTextBehaviour($value);
             return true;
@@ -56,6 +67,16 @@ class Element
 
     static function appendText($object, $value)
     {
+        if ($object instanceof ObjectGroup) {
+            $result = false;
+
+            foreach ($object->getInstances() as $it) {
+                $result = $result || self::setText($it, $value);
+            }
+
+            return $result;
+        }
+
         if ($object instanceof SetTextBehaviour) {
             $object->appendTextBehaviour($value);
             return true;
@@ -80,6 +101,16 @@ class Element
 
     static function loadContent($object, $path)
     {
+        if ($object instanceof ObjectGroup) {
+            $result = false;
+
+            foreach ($object->getInstances() as $it) {
+                $result = $result || self::loadContent($it, $path);
+            }
+
+            return $result;
+        }
+
         if ($object instanceof StreamLoadableBehaviour) {
             $content = $object->loadContentForObject($path);
             $object->applyContentToObject($content);
@@ -111,6 +142,14 @@ class Element
 
     static function loadContentAsync($object, $path, callable $callback = null)
     {
+        if ($object instanceof ObjectGroup) {
+            foreach ($object->getInstances() as $it) {
+                self::loadContentAsync($it, $path, $callback);
+            }
+
+            return;
+        }
+
         (new Thread(function () use ($object, $path, $callback) {
             if ($object instanceof StreamLoadableBehaviour) {
                 $content = $object->loadContentForObject($path);
@@ -132,7 +171,7 @@ class Element
                         }
                     });
                 });
-            } else if ($object instanceof UXImageView) {
+            } else if ($object instanceof UXImageView || $object instanceof UXImageArea) {
                 $image = new UXImage(Stream::of($path));
 
                 UXApplication::runLater(function () use ($image, $object, $callback) {

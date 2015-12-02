@@ -31,7 +31,7 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
         if ($this->animated) {
             $this->_fadeInCallback();
         } else {
-            $timer = new TimerScript($this->duration, true, function (ScriptEvent $e) use ($target) {
+            $this->timer($this->duration, function (ScriptEvent $e) use ($target) {
                 $e->sender->interval = $this->duration;
 
                 if ($this->enabled || !$target->visible) {
@@ -48,8 +48,6 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
                     }
                 }
             });
-
-            $timer->start();
         }
     }
 

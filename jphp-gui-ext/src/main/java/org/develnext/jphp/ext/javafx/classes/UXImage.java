@@ -43,7 +43,11 @@ public class UXImage extends BaseWrapper<Image> {
     @Signature
     public Color getPixelColor(int x, int y) {
         PixelReader pixelReader = getWrappedObject().getPixelReader();
-        return pixelReader == null ? null : pixelReader.getColor(x, y);
+        try {
+            return pixelReader == null ? null : pixelReader.getColor(x, y);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     @Signature

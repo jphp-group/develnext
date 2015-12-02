@@ -6,3 +6,4 @@ ide\formats\ScriptModuleFormat
 ide\formats\PrototypeFormat
 ide\formats\PhpCodeFormat
 ide\formats\GameSpriteFormat
+ide\formats\FactoryFormat

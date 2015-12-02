@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use ide\editors\AbstractEditor;
 use ide\forms\BuildSuccessForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
@@ -46,7 +47,7 @@ class ExportProjectCommand extends AbstractCommand
         return true;
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $project = Ide::get()->getOpenedProject();
 

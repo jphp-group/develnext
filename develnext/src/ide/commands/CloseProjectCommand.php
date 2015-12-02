@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use ide\editors\AbstractEditor;
 use ide\misc\AbstractCommand;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
@@ -16,7 +17,7 @@ class CloseProjectCommand extends AbstractCommand
         return 'Закрыть проект';
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         ProjectSystem::close();
         FileSystem::open('~welcome');

@@ -40,7 +40,7 @@ class PasteMenuCommand extends AbstractMenuCommand
         return 'icons/paste16.png';
     }
 
-    public function onExecute($e, AbstractEditor $editor)
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         /** @var FormEditor $editor */
 
@@ -171,7 +171,6 @@ class PasteMenuCommand extends AbstractMenuCommand
 
             $document->insertBefore($cloneImport, $document->getDocumentElement());
         }
-
 
         $result = new MemoryStream();
 

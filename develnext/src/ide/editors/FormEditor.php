@@ -25,11 +25,13 @@ use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
+use ide\misc\EventHandlerBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\ProjectFile;
 use ide\project\ProjectIndexer;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
+use ide\utils\UiUtils;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
@@ -91,6 +93,8 @@ use php\util\Regex;
 class FormEditor extends AbstractModuleEditor
 {
     const BORDER_SIZE = 8;
+
+    use EventHandlerBehaviour;
 
     protected $designerCodeEditor;
 
@@ -348,6 +352,8 @@ class FormEditor extends AbstractModuleEditor
      */
     public function load()
     {
+        $this->trigger('load:before');
+
         $this->eventManager->load();
         $this->formDumper->load($this);
 
@@ -360,6 +366,8 @@ class FormEditor extends AbstractModuleEditor
         if ($this->config->get('form.backgroundColor')) {
             $this->layout->backgroundColor = UXColor::of($this->config->get('form.backgroundColor'));
         }
+
+        $this->trigger('load:after');
     }
 
     protected function saveOthers()
@@ -895,7 +903,9 @@ class FormEditor extends AbstractModuleEditor
     protected function makeDesigner($fullArea = false)
     {
         $area = new UXAnchorPane();
-        $this->layout->classes->add('form-editor');
+
+        //$actionPane = UiUtils::makeCommandPane($this->format->getContextCommands());
+        //$area->add($actionPane);
 
         $viewer = new UXScrollPane($area);
 
@@ -913,6 +923,7 @@ class FormEditor extends AbstractModuleEditor
 
             $designPane->add($this->layout);
 
+            $this->trigger('makeDesignPane', [$designPane]);
             UXAnchorPane::setAnchor($this->layout, 0);
         } else {
             $this->layout->style = '-fx-border-width: 1px; -fx-border-style: none; -fx-border-color: silver;';
@@ -928,6 +939,8 @@ class FormEditor extends AbstractModuleEditor
         });
 
         $this->designer->onChanged([$this, '_onChanged']);
+
+        $this->designer->addSelectionControl($area);
 
         foreach ($this->findNodesToRegister($this->layout->children) as $node) {
             $this->designer->registerNode($node);
@@ -1227,8 +1240,15 @@ class FormEditor extends AbstractModuleEditor
         $element = $this->format->getFormElement($node);
         $properties = $element ? static::$typeProperties[get_class($element)] : null;
 
-        $this->propertiesPane->setProperties($properties);
+        $this->propertiesPane->clearProperties();
+
+        $this->trigger('updateNode:before', [$node, $properties]);
+
+        $this->propertiesPane->addProperties($properties);
         $this->eventListPane->setEventTypes($element ? $element->getEventTypes() : []);
+
+        $this->trigger('updateNode:after', [$node, $properties]);
+
         $this->leftPaneUi->update($this->getNodeId($node), $element ? $element->getTarget($node) : $node);
     }
 

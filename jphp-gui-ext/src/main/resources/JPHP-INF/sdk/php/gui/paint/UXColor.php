@@ -50,6 +50,12 @@ class UXColor
     public $saturation;
 
     /**
+     * @readonly
+     * @var string
+     */
+    public $webValue;
+
+    /**
      * @param double $r
      * @param double $g
      * @param double $b

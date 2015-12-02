@@ -4,6 +4,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
@@ -28,7 +29,6 @@ public class UXForm extends UXWindow {
 
         @Property StageStyle style();
 
-        @Property boolean fullScreen();
         @Property boolean iconified();
         @Property boolean resizable();
 
@@ -132,5 +132,18 @@ public class UXForm extends UXWindow {
     @Getter
     public boolean getTransparent() {
         return getWrappedObject().getScene().getFill() == null;
+    }
+
+    @Setter
+    public void setFullScreen(boolean value) {
+        getWrappedObject().setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        getWrappedObject().setFullScreenExitHint(null);
+
+        getWrappedObject().setFullScreen(value);
+    }
+
+    @Getter
+    public boolean getFullScreen() {
+        return getWrappedObject().isFullScreen();
     }
 }

@@ -225,6 +225,7 @@ class Ide extends Application
 
                 $this->serviceManager = new ServiceManager();
                 $this->accountManager = new AccountManager();
+                $this->accountManager->authorize();
             }
         );
     }

@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\argument;
 
+use ide\editors\common\ObjectListEditorButtonRender;
 use ide\editors\common\ObjectListEditorItem;
 use php\gui\UXComboBox;
 use php\gui\UXListCell;
@@ -18,11 +19,21 @@ class EnumArgumentEditor extends AbstractArgumentEditor
     protected $list;
 
     /**
+     * @var bool
+     */
+    protected $noneItem = '...';
+
+    /**
      * @return string
      */
     public function getCode()
     {
         return 'enum';
+    }
+
+    public function disableNoneItem()
+    {
+        $this->noneItem = false;
     }
 
     /**
@@ -35,7 +46,9 @@ class EnumArgumentEditor extends AbstractArgumentEditor
 
         $this->list->visibleRowCount = 30;
 
-        $this->list->items->add('...');
+        if ($this->noneItem) {
+            $this->list->items->add(new ObjectListEditorItem($this->noneItem, null, ''));
+        }
 
         $this->list->items->addAll($this->options);
 
@@ -53,6 +66,7 @@ class EnumArgumentEditor extends AbstractArgumentEditor
         $this->list->maxWidth = 9999;
 
         $this->list->onCellRender($callback);
+        $this->list->onButtonRender(new ObjectListEditorButtonRender());
         //$this->list->onButtonRender($callback);
 
         $this->list->on('action', function () {

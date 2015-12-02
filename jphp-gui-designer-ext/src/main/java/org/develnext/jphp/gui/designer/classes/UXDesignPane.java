@@ -21,6 +21,7 @@ public class UXDesignPane extends UXAnchorPane {
     protected boolean resizing = false;
 
     protected int borderWidth = 8;
+    protected int snapSize = 8;
     protected String borderColor = "gray";
 
     protected double startWidth;
@@ -115,11 +116,23 @@ public class UXDesignPane extends UXAnchorPane {
                     Pane node = (Pane) getWrappedObject().getChildren().get(0);
 
                     if (startDragPoint.getX() > 0) {
-                        node.setPrefWidth(startWidth + hOffset);
+                        double value = startWidth + hOffset;
+
+                        if (snapSize > 1) {
+                            value = Math.round(Math.round(value / snapSize) * snapSize);
+                        }
+
+                        node.setPrefWidth(value);
                     }
 
                     if (startDragPoint.getY() > 0) {
-                        node.setPrefHeight(startHeight + vOffset);
+                        double value = startHeight + vOffset;
+
+                        if (snapSize > 1) {
+                            value = Math.round(Math.round(value / snapSize) * snapSize);
+                        }
+
+                        node.setPrefHeight(value);
                     }
 
                     resizing = true;
@@ -154,7 +167,17 @@ public class UXDesignPane extends UXAnchorPane {
     }
 
     @Getter
-    public boolean isEditing() {
+    public int getSnapSize() {
+        return snapSize;
+    }
+
+    @Setter
+    public void setSnapSize(int snapSize) {
+        this.snapSize = snapSize;
+    }
+
+    @Getter
+    public boolean getEditing() {
         return resizing;
     }
 

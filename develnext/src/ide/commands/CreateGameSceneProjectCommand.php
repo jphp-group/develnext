@@ -3,6 +3,7 @@ namespace ide\commands;
 
 use Dialog;
 use Files;
+use ide\editors\AbstractEditor;
 use ide\forms\BuildProgressForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
@@ -38,7 +39,7 @@ class CreateGameSceneProjectCommand extends AbstractCommand
         return true;
     } */
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $ide = Ide::get();
         $project = $ide->getOpenedProject();

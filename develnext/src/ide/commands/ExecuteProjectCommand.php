@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use ide\editors\AbstractEditor;
 use ide\forms\BuildProgressForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
@@ -89,7 +90,7 @@ class ExecuteProjectCommand extends AbstractCommand
         }
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $ide = Ide::get();
         $project = $ide->getOpenedProject();

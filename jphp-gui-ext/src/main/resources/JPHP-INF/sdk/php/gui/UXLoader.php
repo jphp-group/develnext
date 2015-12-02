@@ -24,4 +24,12 @@ class UXLoader
      * @return UXNode
      */
     public function load($source) {}
+
+    /**
+     * @param $string
+     * @return UXNode
+     */
+    public function loadFromString($string)
+    {
+    }
 }

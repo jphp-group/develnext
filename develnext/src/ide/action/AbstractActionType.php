@@ -15,7 +15,13 @@ abstract class AbstractActionType
     abstract function getDescription(Action $action = null);
     abstract function getIcon(Action $action = null);
 
-    function getGroup() {
+    function getHelpText()
+    {
+        return null;
+    }
+
+    function getGroup()
+    {
         return 'Другое';
     }
 

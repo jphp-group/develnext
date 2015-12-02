@@ -36,12 +36,10 @@ import javafx.scene.web.*;
 import javafx.stage.*;
 import javafx.stage.Window;
 import netscape.javascript.JSException;
-import org.develnext.jphp.ext.javafx.bind.CursorMemoryOperation;
-import org.develnext.jphp.ext.javafx.bind.DurationMemoryOperation;
-import org.develnext.jphp.ext.javafx.bind.InsetsMemoryOperation;
-import org.develnext.jphp.ext.javafx.bind.KeyCombinationMemoryOperation;
+import org.develnext.jphp.ext.javafx.bind.*;
 import org.develnext.jphp.ext.javafx.classes.*;
 import org.develnext.jphp.ext.javafx.classes.animation.*;
+import org.develnext.jphp.ext.javafx.classes.data.CustomNode;
 import org.develnext.jphp.ext.javafx.classes.data.Data;
 import org.develnext.jphp.ext.javafx.classes.event.*;
 import org.develnext.jphp.ext.javafx.classes.layout.*;
@@ -78,6 +76,7 @@ public class JavaFXExtension extends Extension {
         registerMemoryOperation(CursorMemoryOperation.class);
         registerMemoryOperation(InsetsMemoryOperation.class);
         registerMemoryOperation(DurationMemoryOperation.class);
+        registerMemoryOperation(ColorMemoryOperation.class);
 
         registerClass(scope, UXGeometry.class);
 
@@ -194,6 +193,7 @@ public class JavaFXExtension extends Extension {
 
         registerWrapperClass(scope, FXMLLoader.class, UXLoader.class);
         registerWrapperClass(scope, Data.class, UXData.class);
+        registerWrapperClass(scope, CustomNode.class, UXCustomNode.class);
         registerWrapperClass(scope, Alert.class, UXAlert.class);
 
         registerWrapperClass(scope, Desktop.class, UXDesktop.class);

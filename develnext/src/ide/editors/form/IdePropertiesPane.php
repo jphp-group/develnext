@@ -14,9 +14,9 @@ class IdePropertiesPane
     protected $ui;
 
     /**
-     * @var UXDesignProperties
+     * @var UXDesignProperties[]
      */
-    protected $properties;
+    protected $properties = [];
 
     /**
      * @return UXVBox
@@ -37,32 +37,47 @@ class IdePropertiesPane
         $this->ui->children->insert(0, $node);
     }
 
+    public function clearProperties()
+    {
+        if ($this->properties) {
+            foreach ($this->properties as $properties) {
+                foreach ($properties->getGroupPanes() as $pane) {
+                    $this->ui->remove($pane);
+                }
+            }
+        }
+
+        $this->properties = [];
+    }
+
     /**
      * @param UXDesignProperties|null $properties
      */
     public function setProperties($properties)
     {
-        if ($this->properties) {
-            foreach ($this->properties->getGroupPanes() as $pane) {
-                $this->ui->remove($pane);
-            }
-        }
-
-        $this->properties = $properties;
+        $this->clearProperties();
 
         if ($properties) {
-            foreach ($this->properties->getGroupPanes() as $pane) {
-                $this->ui->add($pane);
-            }
+            $this->addProperties($properties);
+        }
+    }
+
+    public function addProperties(UXDesignProperties $properties)
+    {
+        $this->properties[] = $properties;
+
+        foreach ($properties->getGroupPanes() as $pane) {
+            $this->ui->add($pane);
         }
     }
 
     public function update($target)
     {
         if ($this->properties) {
-            $this->properties->target = $target;
-
-            $this->properties->update();
+            foreach ($this->properties as $properties) {
+                $properties->target = $target;
+                $properties->update();
+            }
         }
     }
 }

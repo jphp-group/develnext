@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use ide\editors\AbstractEditor;
 use ide\forms\NewProjectForm;
 use ide\misc\AbstractCommand;
 
@@ -35,7 +36,7 @@ class NewProjectCommand extends AbstractCommand
         return $this->makeGlyphButton();
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $dialog = new NewProjectForm();
 

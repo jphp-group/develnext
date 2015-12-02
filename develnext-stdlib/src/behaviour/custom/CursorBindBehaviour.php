@@ -44,6 +44,10 @@ class CursorBindBehaviour extends AbstractBehaviour
             }
 
             $handler = function (UXMouseEvent $e) use ($target) {
+                if ($target->isFree()) {
+                    return;
+                }
+
                 $target->mouseTransparent = $this->enabled;
 
                 if ($this->enabled) {

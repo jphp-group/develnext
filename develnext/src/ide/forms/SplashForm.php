@@ -37,12 +37,5 @@ class SplashForm extends AbstractForm
     public function hide()
     {
         parent::hide();
-
-        //Ide::get()->getAccountManager()->authorize();
-
-        // FIXME
-        /*if (Ide::accountManager()->isAuthorized()) {
-            Ide::service()->ide()->startAsync(null);
-        }    */
     }
 }

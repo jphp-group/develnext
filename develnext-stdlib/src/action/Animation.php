@@ -3,6 +3,7 @@ namespace action;
 
 use php\gui\animation\UXFadeAnimation;
 use php\gui\animation\UXPathAnimation;
+use php\gui\framework\ObjectGroup;
 use php\gui\framework\ScriptEvent;
 use php\gui\UXNode;
 use php\gui\UXWindow;
@@ -13,6 +14,23 @@ class Animation
 {
     static function fadeTo($object, $duration, $value, callable $callback = null)
     {
+        if ($object instanceof ObjectGroup) {
+            $cnt = sizeof($object);
+
+            $done = function () use (&$cnt, $callback) {
+                $cnt--;
+
+                if ($cnt <= 0) {
+                    $callback();
+                }
+            };
+
+            $object->flow()->map(function () use ($object, $duration, $value, $done) {
+                Animation::fadeTo($object, $duration, $value, $done);
+            });
+            return null;
+        }
+
         if ($object instanceof UXNode) {
             $anim = new UXFadeAnimation($duration, $object);
             $anim->fromValue = $object->opacity;
@@ -78,6 +96,23 @@ class Animation
 
     static function moveTo($object, $duration, $x, $y, callable $callback = null)
     {
+        if ($object instanceof ObjectGroup) {
+            $cnt = sizeof($object);
+
+            $done = function () use (&$cnt, $callback) {
+                $cnt--;
+
+                if ($cnt <= 0) {
+                    $callback();
+                }
+            };
+
+            $object->flow()->map(function () use ($object, $duration, $x, $y, $done) {
+                Animation::moveTo($object, $duration, $x, $y, $done);
+            });
+            return null;
+        }
+
         if ($object instanceof UXNode || $object instanceof UXWindow) {
             $xOffset = $x - $object->x;
             $yOffset = $y - $object->y;

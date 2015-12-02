@@ -120,6 +120,109 @@ public class UXDesigner extends BaseObject {
         }
     }
 
+
+    @Signature
+    public void addSelectionControl(Node node) {
+        node.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (disabled) return;
+
+                if (isEditing()) {
+                    return;
+                }
+
+                if (contextMenu != null && event.getButton() == MouseButton.SECONDARY) {
+                    contextMenu.show(area, event.getScreenX(), event.getScreenY());
+                    event.consume();
+                    return;
+                }
+
+                if (selectionEnabled) {
+                    selectionRectangle.setX(event.getScreenX());
+                    selectionRectangle.setY(event.getScreenY());
+
+                    selectionRectanglePoint = new Point2D(event.getScreenX(), event.getScreenY());
+
+                    selectionRectangle.setWidth(1);
+                    selectionRectangle.setHeight(1);
+                }
+                //event.consume();
+            }
+        });
+
+
+        node.addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (disabled) return;
+
+                if (isEditing()) {
+                    return;
+                }
+
+                if (selectionEnabled && selectionRectanglePoint != null) {
+                    double width = event.getScreenX() - selectionRectanglePoint.getX();
+                    double height = event.getScreenY() - selectionRectanglePoint.getY();
+
+                    selectionRectangle.setWidth(Math.abs(width));
+                    selectionRectangle.setHeight(Math.abs(height));
+
+                    if (width < 0) {
+                        selectionRectangle.setX(selectionRectanglePoint.getX() + width);
+                    } else {
+                        selectionRectangle.setX(selectionRectanglePoint.getX());
+                    }
+
+                    if (height < 0) {
+                        selectionRectangle.setY(selectionRectanglePoint.getY() + height);
+                    } else {
+                        selectionRectangle.setY(selectionRectanglePoint.getY());
+                    }
+
+                    if (Math.abs(width) > 2 && Math.abs(height) > 2) {
+                        selectionRectangle.show();
+                    }
+
+                    //event.consume();
+                }
+            }
+        });
+
+        node.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (disabled) return;
+
+                if (isEditing()) {
+                    return;
+                }
+
+                if (tmpLock) {
+                    tmpLock = false;
+                    return;
+                }
+
+                selectionRectangle.hide();
+                selectionRectanglePoint = null;
+
+                if (!event.isShiftDown()) {
+                    unselectAll();
+                }
+
+                if (selectionEnabled) {
+                    Point2D fromXY = area.screenToLocal(selectionRectangle.getX(), selectionRectangle.getY());
+                    double width = selectionRectangle.getWidth();
+                    double height = selectionRectangle.getHeight();
+
+                    for (Node node : getNodesInArea(fromXY.getX(), fromXY.getY(), width, height)) {
+                        selectNode(node);
+                    }
+                }
+            }
+        });
+    }
+
     @Signature
     public void requestFocus() {
         area.requestFocus();

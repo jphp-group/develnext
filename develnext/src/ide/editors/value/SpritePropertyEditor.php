@@ -57,8 +57,11 @@ class SpritePropertyEditor extends TextPropertyEditor
             foreach ($manager->getSprites() as $name => $spec) {
                 $item = new UXMenuItem($name);
                 $image = Ide::get()->getImage($manager->getSpritePreview($name));
-                $image->preserveRatio = true;
-                $image->size = [16, 16];
+
+                if ($image) {
+                    $image->preserveRatio = true;
+                    $image->size = [16, 16];
+                }
 
                 $item->graphic = $image;
 

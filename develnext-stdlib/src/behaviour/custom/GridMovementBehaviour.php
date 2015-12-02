@@ -71,6 +71,10 @@ class GridMovementBehaviour extends AbstractBehaviour
         $form->addEventFilter('keyDown', function (UXKeyEvent $e) use ($target) {
             $x = $y = 0;
 
+            if ($this->_target->isFree()) {
+                return;
+            }
+
             if (!$this->enabled) {
                 return;
             }

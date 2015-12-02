@@ -3,6 +3,7 @@ namespace behaviour\custom;
 
 use action\Animation;
 use php\gui\framework\behaviour\custom\AnimationBehaviour;
+use php\gui\framework\ScriptEvent;
 use php\gui\layout\UXRegion;
 use php\gui\UXGeometry;
 use php\gui\UXNode;
@@ -33,7 +34,11 @@ class RandomMovementAnimationBehaviour extends AnimationBehaviour
 
             $busy = new SharedValue(false);
 
-            $func = function () use ($target, $timer, $busy) {
+            $func = function (ScriptEvent $e) use ($target, $timer, $busy) {
+                if ($target->isFree()) {
+                    return;
+                }
+
                 $timer->interval = $this->duration;
 
                 if ($this->enabled && !$busy->get()) {
@@ -69,7 +74,7 @@ class RandomMovementAnimationBehaviour extends AnimationBehaviour
                 }
             };
 
-            $func();
+            $func(new ScriptEvent($timer));
 
             $timer->on('action', $func);
             $timer->start();

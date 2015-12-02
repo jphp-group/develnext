@@ -258,6 +258,13 @@ abstract class UXNode
     {
     }
 
+    /**
+     * @return bool
+     */
+    public function isFree()
+    {
+    }
+
     public function free()
     {
     }

@@ -32,6 +32,8 @@ ide\action\types\OpenActionType
 ide\action\types\BrowseActionType
 ide\action\types\ExecActionType
 ide\action\types\AppShutdownActionType
+ide\action\types\FullScreenEnableActionType
+ide\action\types\FullScreenDisableActionType
 
 ide\action\types\IfExprActionType
 ide\action\types\ElseActionType
@@ -44,6 +46,7 @@ ide\action\types\IfTextActionType
 ide\action\types\IfFileExistsActionType
 ide\action\types\IfDirExistsActionType
 ide\action\types\IfIntersectActionType
+ide\action\types\IfPasswordValidActionType
 
 ide\action\types\BehaviourEnableActionType
 ide\action\types\BehaviourDisableActionType

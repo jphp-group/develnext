@@ -5,6 +5,8 @@ use action\Element;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionScript;
+use ide\editors\argument\EnumArgumentEditor;
+use ide\editors\common\ObjectListEditorItem;
 use php\gui\UXDialog;
 use php\lib\Str;
 
@@ -13,14 +15,32 @@ class MessageActionType extends AbstractSimpleActionType
     function attributes()
     {
         return [
-            'value' => 'string'
+            'value' => 'string',
+            'kind'  => 'string',
         ];
     }
 
     function attributeLabels()
     {
         return [
-            'value' => 'Текст сообщения'
+            'value' => 'Текст сообщения',
+            'kind'  => 'Тип сообщения',
+        ];
+    }
+
+    function attributeSettings()
+    {
+        return [
+            'kind' => [
+                'editor' => function ($name, $label) {
+                    return new EnumArgumentEditor([
+                        new ObjectListEditorItem('Информация', ico('information16'), 'INFORMATION'),
+                        new ObjectListEditorItem('Предупреждение', ico('warning16'), 'WARNING'),
+                        new ObjectListEditorItem('Вопрос', ico('confirm16'), 'CONFIRMATION'),
+                        new ObjectListEditorItem('Ошибка', ico('error16'), 'ERROR')
+                    ]);
+                }
+            ]
         ];
     }
 
@@ -52,7 +72,7 @@ class MessageActionType extends AbstractSimpleActionType
             $text = Str::sub($text, 0, 37) . '..';
         }
 
-        return Str::format("Открыть текстовый диалог с сообщением %s", $text);
+        return Str::format("Открыть текстовый диалог с сообщением %s, тип = %s", $text, $action ? $action->get('kind') : '?');
     }
 
     function getIcon(Action $action = null)
@@ -76,6 +96,12 @@ class MessageActionType extends AbstractSimpleActionType
     {
         $value = $action->get('value');
 
-        return "UXDialog::show({$value})";
+        switch ($action->kind) {
+            case '':
+            case 'INFORMATION':
+                return "UXDialog::show({$value})";
+        }
+
+        return "UXDialog::show({$value}, '{$action->kind}')";
     }
 }

@@ -34,19 +34,27 @@ class UiUtils
                 $ui->width = 5;
                 $ui->maxSize = [20, 20];
             } else {
+                if (!$command->getName() && !$command->getIcon()) {
+                    continue;
+                }
+
                 $ui = $command->makeUiForHead();
             }
 
-            if (!is_array($ui)) {
-                if ($name) {
-                    $ui->id = $name;
+            if ($ui) {
+                if (!is_array($ui)) {
+                    if ($name) {
+                        $ui->id = $name;
+                    }
+
+                    $ui = [$ui];
                 }
 
-                $ui = [$ui];
-            }
-
-            foreach ($ui as $el) {
-                $pane->add($el);
+                foreach ($ui as $el) {
+                    if ($el) {
+                        $pane->add($el);
+                    }
+                }
             }
         }
 

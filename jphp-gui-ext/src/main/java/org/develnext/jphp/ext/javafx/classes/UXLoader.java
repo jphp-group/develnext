@@ -10,6 +10,7 @@ import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -41,6 +42,11 @@ public class UXLoader extends BaseWrapper<FXMLLoader> {
     @Signature
     public Memory load(Environment env) throws IOException {
         return Memory.wrap(env, getWrappedObject().load());
+    }
+
+    @Signature
+    public Memory loadFromString(Environment env, String value) throws IOException {
+        return Memory.wrap(env, getWrappedObject().load(new ByteArrayInputStream(value.getBytes("UTF-8"))));
     }
 
     @Signature

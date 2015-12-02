@@ -18,6 +18,8 @@ use ReflectionMethod;
  */
 abstract class AbstractModule extends AbstractScript
 {
+    use ApplicationTrait;
+
     /**
      * @var ModuleBehaviourManager
      */

@@ -206,4 +206,8 @@ class UXDesigner
     public function requestFocus()
     {
     }
+
+    public function addSelectionControl(UXNode $node)
+    {
+    }
 }

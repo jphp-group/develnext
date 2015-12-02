@@ -666,6 +666,11 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Signature
+    public boolean isFree() {
+        return getWrappedObject().getParent() == null;
+    }
+
+    @Signature
     public boolean free() {
         Parent parent = getWrappedObject().getParent();
 

@@ -15,6 +15,11 @@ class UXDesignPane extends UXAnchorPane
     public $borderWidth = 8;
 
     /**
+     * @var int
+     */
+    public $snapSize = 8;
+
+    /**
      * @var string
      */
     public $borderColor = 'gray';

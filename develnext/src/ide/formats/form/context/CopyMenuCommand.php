@@ -30,7 +30,7 @@ class CopyMenuCommand extends AbstractMenuCommand
         return 'icons/copy16.png';
     }
 
-    public function onExecute($e, AbstractEditor $editor, $disableCount = false)
+    public function onExecute($e = null, AbstractEditor $editor = null, $disableCount = false)
     {
         /** @var FormEditor $editor */
         $designer = $editor->getDesigner();

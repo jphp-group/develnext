@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use ide\editors\AbstractEditor;
 use ide\Ide;
 use ide\misc\AbstractCommand;
 use php\gui\UXSeparator;
@@ -36,7 +37,7 @@ class SaveProjectCommand extends AbstractCommand
         return [$this->makeGlyphButton()];
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $project = Ide::get()->getOpenedProject();
 

@@ -7,8 +7,10 @@ use ide\commands\account\AccountLogoutCommand;
 use ide\commands\account\AccountRegisterCommand;
 use ide\forms\LoginForm;
 use ide\Ide;
+use ide\Logger;
 use ide\misc\AbstractCommand;
 use php\gui\UXApplication;
+use php\gui\UXDialog;
 
 /**
  * Class AccountManager
@@ -72,9 +74,26 @@ class AccountManager
 
                     $this->accountData = $response->data();
 
+                    Logger::info("Check updates !!!");
+
+                    $response = Ide::service()->ide()->getLastUpdate('NIGHT');
+                    $hash = Ide::get()->getConfig()->get('app.hash');
+
+                    if ($response->isSuccess()) {
+                        $rHash = $response->data()['hash'];
+
+                        if ($hash < $rHash) {
+                            UXDialog::show('Вышла новая версия');
+                            dump($response->data());
+                        }
+                    } else {
+                        dump($response);
+                    }
+
                     $this->updateIdeUi();
                 }
             });
+
         } else {
             $this->accountData = [];
             $this->updateIdeUi();
@@ -83,8 +102,6 @@ class AccountManager
 
     public function updateIdeUi()
     {
-        return;
-
         $logged = Ide::get()->getInternalList('.dn/account/loggedCommands');
         $unlogged = Ide::get()->getInternalList('.dn/account/unloggedCommands');
 
@@ -152,10 +169,10 @@ class AccountManager
                 }  */
             }
 
-             //$this->loginForm->showAndWait();
+            $this->loginForm->showAndWait();
         }
 
-        //Ide::service()->ide()->startAsync(null);
-        //$this->updateAccount();
+        Ide::service()->ide()->startAsync(null);
+        $this->updateAccount();
     }
 }
