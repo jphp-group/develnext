@@ -20,19 +20,19 @@
          </children>
       </HBox>
       <Button id="convertButton" layoutX="718.0" layoutY="652.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="34.0" prefWidth="167.0" text="Конвертировать в PHP" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
-      <TabPane id="tabs" layoutX="14.0" layoutY="14.0" prefHeight="675.0" prefWidth="872.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="59.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+      <TabPane id="tabs" layoutX="14.0" layoutY="14.0" prefHeight="675.0" prefWidth="872.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="59.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
         <tabs>
           <Tab text="Конструктор">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="654.0" prefWidth="872.0">
                      <children>
-                        <ListView id="list" fixedCellSize="40.0" layoutX="-1.0" prefHeight="643.0" prefWidth="700.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="178.0" AnchorPane.topAnchor="0.0" />
+                        <ListView id="list" fixedCellSize="40.0" layoutX="-1.0" prefHeight="643.0" prefWidth="700.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="178.0" AnchorPane.topAnchor="0.0" />
                         <Label id="hintLabel" layoutX="26.0" layoutY="21.0" text="Перетащите сюда иконки с правой панели ..." textFill="#ababab">
                            <font>
                               <Font name="System Italic" size="22.0" />
                            </font>
                         </Label>
-                        <AnchorPane prefHeight="646.0" prefWidth="176.0" style="-fx-border-color: silver;" AnchorPane.bottomAnchor="3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <AnchorPane prefHeight="646.0" prefWidth="176.0" style="-fx-border-color: silver;" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <TabPane id="actionTypePane" prefHeight="556.0" prefWidth="127.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <opaqueInsets>
@@ -44,7 +44,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab id="generatedCodeTab" text="Сгенерированный код">
+          <Tab id="generatedCodeTab" text="Исходный код">
             <content>
               <AnchorPane id="generatedCodeContent" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
             </content>

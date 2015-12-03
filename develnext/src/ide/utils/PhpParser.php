@@ -89,6 +89,18 @@ class PhpParser
         $this->content = $content;
     }
 
+    public function getCodeOfMethod($class, $method)
+    {
+        $coord = $this->findMethod($class, $method);
+
+        if ($coord) {
+            $line = $coord['line'];
+
+            $this->insertAfterLine($line, $code);
+            return true;
+        }
+    }
+
     /**
      * @param string $class
      * @param string $method

@@ -96,27 +96,23 @@ class ActionConstructorForm extends AbstractForm
     {
         parent::init();
 
-        $codeView = new CodeTextArea('php');
-        $codeView->editable = false;
+        $codeEditor = new CodeEditor(null, 'php');
+        $codeEditor->setReadOnly(true);
+        $codeEditor->registerDefaultCommands();
 
-        UXAnchorPane::setAnchor($codeView, 0);
-        $codeView->bottomAnchor = 3;
-        $codeView->topAnchor = 26;
+        $codeView = $codeEditor->makeUi();
 
-        $label = new UXLabel('Сгенерированный код, только для чтения:');
-        $label->padding = 3;
-
-        $this->generatedCodeContent->add($label);
+        UXAnchorPane::setAnchor($codeView, 2);
         $this->generatedCodeContent->add($codeView);
 
-        $this->tabs->tabs[1]->on('change', function () use ($codeView) {
-            UXApplication::runLater(function () use ($codeView) {
+        $this->tabs->tabs[1]->on('change', function () use ($codeEditor) {
+            UXApplication::runLater(function () use ($codeEditor) {
 
                 $script = new ActionScript();
 
                 $imports = $script->getImports(Items::toArray($this->list->items));
 
-                $code = "<?php \n";
+                $code = "<?php // Сгенерированный код из действий конструктора. \n";
 
                 if ($imports) {
                     $code .= "// Импортируем имена классов ...\n";
@@ -139,7 +135,7 @@ class ActionConstructorForm extends AbstractForm
                     ''
                 );
 
-                $codeView->setValue($code);
+                $codeEditor->setValue($code);
             });
         });
 

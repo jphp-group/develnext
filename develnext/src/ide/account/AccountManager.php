@@ -11,6 +11,7 @@ use ide\Logger;
 use ide\misc\AbstractCommand;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
+use php\gui\UXTrayNotification;
 
 /**
  * Class AccountManager
@@ -69,7 +70,8 @@ class AccountManager
             Ide::service()->account()->getAsync(function (ServiceResponse $response) {
                 if ($response->isSuccess()) {
                     if (!$this->accountData) {
-                        Ide::get()->getMainForm()->toast("Добро пожаловать, вы вошли через {$response->data()['email']}");
+                        $notice = new UXTrayNotification('Приветствие', "Добро пожаловать, вы вошли через {$response->data()['email']}", 'SUCCESS');
+                        $notice->show();
                     }
 
                     $this->accountData = $response->data();
@@ -91,6 +93,11 @@ class AccountManager
                     }
 
                     $this->updateIdeUi();
+                } else {
+                    if ($response->isConnectionFailed()) {
+                        $notice = new UXTrayNotification('Ошибка', 'Нет соединения с интернетом', 'ERROR');
+                        $notice->show();
+                    }
                 }
             });
 

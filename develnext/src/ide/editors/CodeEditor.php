@@ -110,6 +110,11 @@ class CodeEditor extends AbstractEditor
         });
     }
 
+    public function setReadOnly($value)
+    {
+        $this->textArea->editable = !$value;
+    }
+
     public function installAutoCompletion(UXSyntaxAutoCompletion $completion)
     {
         $completion->install($this->textArea);
@@ -182,6 +187,10 @@ class CodeEditor extends AbstractEditor
 
     public function load()
     {
+        if (!$this->file) {
+            return;
+        }
+
         $sourceFile = "$this->file.source";
 
         if (Files::exists($sourceFile)) {
@@ -206,6 +215,10 @@ class CodeEditor extends AbstractEditor
 
     public function save()
     {
+        if (!$this->file) {
+            return;
+        }
+
         Logger::info("Start save file $this->file ...");
 
         $value = $this->getValue();

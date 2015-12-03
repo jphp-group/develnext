@@ -20,13 +20,6 @@ class PhpCodeFormat extends AbstractFormat
     public function createEditor($file)
     {
         $editor = new CodeEditor($file, 'php');
-
-        $completion = new UXSyntaxAutoCompletion();
-        $completion->addVariableCompletion('$this', 'object');
-        $completion->addVariableCompletion('$event', 'mixed');
-
-      //  $editor->installAutoCompletion($completion);
-
         return $editor;
     }
 

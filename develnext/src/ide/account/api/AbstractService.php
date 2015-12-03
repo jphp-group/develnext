@@ -6,6 +6,7 @@ use ide\Ide;
 use ide\utils\Json;
 use php\format\ProcessorException;
 use php\gui\UXApplication;
+use php\gui\UXTrayNotification;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
@@ -194,6 +195,12 @@ abstract class AbstractService
 
                 return $response;
             } catch (SocketException $e) {
+                UXApplication::runLater(function () {
+                    $notice = new UXTrayNotification('Ошибка', 'Сервис временно недоступен или нет соединения с интернетом', 'ERROR');
+                    $notice->animationType = 'POPUP';
+                    $notice->show();
+                });
+
                 return new ServiceResponse([
                     'status' => 'error',
                     'message' => 'ConnectionRefused'

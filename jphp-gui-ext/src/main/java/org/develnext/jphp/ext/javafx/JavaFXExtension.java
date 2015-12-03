@@ -50,6 +50,7 @@ import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.ImageViewEx;
 import org.develnext.jphp.ext.javafx.support.control.*;
 import org.develnext.jphp.ext.javafx.support.event.*;
+import org.develnext.jphp.ext.javafx.support.tray.notification.TrayNotification;
 import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
 import php.runtime.memory.support.MemoryOperation;
@@ -195,6 +196,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Data.class, UXData.class);
         registerWrapperClass(scope, CustomNode.class, UXCustomNode.class);
         registerWrapperClass(scope, Alert.class, UXAlert.class);
+        registerWrapperClass(scope, TrayNotification.class, UXTrayNotification.class);
 
         registerWrapperClass(scope, Desktop.class, UXDesktop.class);
 
