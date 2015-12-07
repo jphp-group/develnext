@@ -37,7 +37,7 @@ public class SlideAnimation implements TrayAnimation {
 
         //Animates the Tray onto the screen and interpolates at a tangent for 300 millis
         Interpolator interpolator = Interpolator.TANGENT(Duration.millis(300), 50);
-        KeyValue kvInter = new KeyValue(stage.xLocationProperty(), stage.getBottomRight().getX(), interpolator);
+        KeyValue kvInter = new KeyValue(stage.xLocationProperty(), stage.getLocation().getX(), interpolator);
         KeyFrame frame2 = new KeyFrame(Duration.millis(1300), kvInter);
 
         //Sets opacity to 0 instantly
@@ -83,8 +83,8 @@ public class SlideAnimation implements TrayAnimation {
             @Override
             public void handle(ActionEvent e) {
                 trayIsShowing = false;
-                stage.close();
-                stage.setLocation(stage.getBottomRight());
+                stage.hide();
+                stage.setLocation(stage.getLocation());
             }
         });
 

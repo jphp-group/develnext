@@ -11,13 +11,20 @@ use php\lang\System;
  * Class IdeService
  * @package ide\account
  *
+ * @method ServiceResponse statusAsync($callback)
  * @method ServiceResponse startAsync($callback)
  * @method ServiceResponse shutdownAsync($callback)
  * @method ServiceResponse sendErrorAsync(\Exception $e, $callback)
  * @method ServiceResponse getLastUpdateAsync($channel, $callback)
+ * @method ServiceResponse noticesAsync(callable $callback)
  */
 class IdeService extends AbstractService
 {
+    public function status()
+    {
+        return $this->execute('ide/status', []);
+    }
+
     public function start()
     {
         return $this->execute('ide/start', []);
@@ -26,6 +33,11 @@ class IdeService extends AbstractService
     public function shutdown()
     {
         return $this->execute('ide/shutdown', []);
+    }
+
+    public function notices()
+    {
+        return $this->execute('ide/notices', []);
     }
 
     /**

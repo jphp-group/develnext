@@ -4,6 +4,7 @@ namespace ide\forms;
 use ide\account\api\AccountService;
 use ide\account\api\ServiceResponse;
 use ide\Ide;
+use ide\Logger;
 use ide\utils\UiUtils;
 use php\gui\UXDesktop;
 use php\gui\framework\AbstractForm;
@@ -28,16 +29,9 @@ use php\gui\UXTextField;
  */
 class LoginForm extends AbstractForm
 {
-    /**
-     * @var AccountService
-     */
-    protected $accountService;
-
     protected function init()
     {
         parent::init();
-
-        $this->accountService = new AccountService();
 
         $this->icon->image = Ide::get()->getImage('DevelNextIco.png')->image;
     }
@@ -51,7 +45,7 @@ class LoginForm extends AbstractForm
     {
         $this->showPreloader('Подождите ...');
 
-        $this->accountService->authAsync($this->emailField->text, $this->passwordField->text,
+        Ide::service()->account()->authAsync($this->emailField->text, $this->passwordField->text,
             function (ServiceResponse $response) {
                 if ($response->isSuccess()) {
                     UXDialog::show($response->message());
@@ -74,7 +68,7 @@ class LoginForm extends AbstractForm
     {
         $this->showPreloader('Входим через VK ...');
 
-        $this->accountService->authVkAsync(function (ServiceResponse $response) {
+        Ide::service()->account()->authVkAsync(function (ServiceResponse $response) {
             if ($response->isSuccess()) {
                 $redirectForm = new LoginVkRedirectForm();
 

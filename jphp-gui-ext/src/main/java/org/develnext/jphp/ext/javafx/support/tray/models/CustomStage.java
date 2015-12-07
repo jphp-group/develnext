@@ -10,6 +10,11 @@ import javafx.stage.StageStyle;
 public class CustomStage extends Stage {
 
     private final Location bottomRight;
+    private final Location bottomLeft;
+    private final Location topLeft;
+    private final Location topRight;
+
+    private Location location;
 
     public CustomStage(AnchorPane ap, StageStyle style) {
         initStyle(style);
@@ -20,11 +25,26 @@ public class CustomStage extends Stage {
         double x = screenBounds.getMinX() + screenBounds.getWidth() - ap.getPrefWidth() - 2;
         double y = screenBounds.getMinY() + screenBounds.getHeight() - ap.getPrefHeight() - 2;
 
-        bottomRight = new Location(x,y);
+        bottomRight = new Location(x, y);
+        bottomLeft = new Location(2, y);
+        topLeft = new Location(2, 2);
+        topRight = new Location(x, 2);
     }
 
     public Location getBottomRight() {
         return bottomRight;
+    }
+
+    public Location getBottomLeft() {
+        return bottomLeft;
+    }
+
+    public Location getTopLeft() {
+        return topLeft;
+    }
+
+    public Location getTopRight() {
+        return topRight;
     }
 
     public void setSize(double width, double height) {
@@ -41,6 +61,12 @@ public class CustomStage extends Stage {
     public void setLocation(Location loc) {
         setX(loc.getX());
         setY(loc.getY());
+
+        location = loc;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 
     private SimpleDoubleProperty xLocationProperty = new SimpleDoubleProperty() {

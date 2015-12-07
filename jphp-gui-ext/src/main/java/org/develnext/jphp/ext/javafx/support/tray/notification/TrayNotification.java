@@ -36,6 +36,7 @@ public final class TrayNotification {
     private AnimationType animationType;
     private EventHandler<ActionEvent> onDismissedCallBack, onShownCallback;
     private TrayAnimation animator;
+    private NotificationLocation location;
     private AnimationProvider animationProvider;
 
     /**
@@ -101,14 +102,41 @@ public final class TrayNotification {
         stage = new CustomStage(rootNode, StageStyle.UNDECORATED);
         stage.setScene(new Scene(rootNode));
         stage.setAlwaysOnTop(true);
-        stage.setLocation(stage.getBottomRight());
 
-        lblClose.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        setLocation(NotificationLocation.BOTTOM_RIGHT);
+
+        EventHandler<MouseEvent> value = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 dismiss();
             }
-        });
+        };
+        lblClose.setOnMouseClicked(value);
+        stage.getScene().setOnMouseClicked(value);
+    }
+
+    public NotificationLocation getLocation() {
+        return location;
+    }
+
+    public void setLocation(NotificationLocation location) {
+        switch (location) {
+            case BOTTOM_RIGHT:
+                stage.setLocation(stage.getBottomRight());
+                break;
+            case BOTTOM_LEFT:
+                stage.setLocation(stage.getBottomLeft());
+                break;
+            case TOP_LEFT:
+                stage.setLocation(stage.getTopLeft());
+                break;
+            case TOP_RIGHT:
+                stage.setLocation(stage.getTopRight());
+                break;
+        }
+
+        this.location = location;
+        animationProvider = new AnimationProvider(new FadeAnimation(stage), new SlideAnimation(stage), new PopupAnimation(stage));
     }
 
     public void setNotificationType(NotificationType nType) {
@@ -264,6 +292,7 @@ public final class TrayNotification {
      */
     public void setTitle(String txt) {
         lblTitle.setText(txt);
+        stage.setTitle(txt);
     }
 
     public String getTitle() {
@@ -301,12 +330,14 @@ public final class TrayNotification {
     }
 
     public void setAnimationType(final AnimationType type) {
-        animator = animationProvider.findFirstWhere(new Callback<Boolean, TrayAnimation>() {
-            @Override
-            public Boolean call(TrayAnimation a) {
-                return a.getAnimationType() == type;
-            }
-        });
+        if (animationProvider != null) {
+            animator = animationProvider.findFirstWhere(new Callback<Boolean, TrayAnimation>() {
+                @Override
+                public Boolean call(TrayAnimation a) {
+                    return a != null && a.getAnimationType() == type;
+                }
+            });
+        }
 
         animationType = type;
     }

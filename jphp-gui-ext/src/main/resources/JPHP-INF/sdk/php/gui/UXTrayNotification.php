@@ -28,6 +28,11 @@ class UXTrayNotification
     public $animationType = 'FADE';
 
     /**
+     * @var string BOTTOM_RIGHT, BOTTOM_LEFT, TOP_LEFT, TOP_RIGHT
+     */
+    public $location = 'BOTTOM_RIGHT';
+
+    /**
      * @var UXImage
      */
     public $image;

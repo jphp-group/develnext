@@ -3,6 +3,8 @@ namespace ide\account\api;
 
 use Exception;
 use ide\Ide;
+use ide\Logger;
+use ide\misc\EventHandlerBehaviour;
 use ide\utils\Json;
 use php\format\ProcessorException;
 use php\gui\UXApplication;
@@ -47,6 +49,8 @@ class ServiceInvalidResponseException extends Exception { }
 
 abstract class AbstractService
 {
+    use EventHandlerBehaviour;
+
     const CONNECTION_TIMEOUT = 10000;
     const READ_TIMEOUT = 60000;
 
@@ -138,7 +142,16 @@ abstract class AbstractService
                 return $response;
             } catch (ProcessorException $e) {
                 throw new ServiceInvalidResponseException($e->getMessage(), 0, $e);
+            } catch (SocketException $e) {
+                $this->trigger('exception', [$methodName, $e]);
+
+                return new ServiceResponse([
+                    'status' => 'error',
+                    'message' => 'ConnectionRefused'
+                ]);
             } catch (IOException $e) {
+                $this->trigger('exception', [$methodName, $e]);
+
                 return new ServiceResponse([
                     'status' => 'error',
                     'message' => 'ConnectionFailed: ' . $e->getMessage() . ' line ' . $e->getLine()
@@ -195,11 +208,7 @@ abstract class AbstractService
 
                 return $response;
             } catch (SocketException $e) {
-                UXApplication::runLater(function () {
-                    $notice = new UXTrayNotification('Ошибка', 'Сервис временно недоступен или нет соединения с интернетом', 'ERROR');
-                    $notice->animationType = 'POPUP';
-                    $notice->show();
-                });
+                $this->trigger('exception', [$methodName, $e]);
 
                 return new ServiceResponse([
                     'status' => 'error',
@@ -208,6 +217,8 @@ abstract class AbstractService
             } catch (ProcessorException $e) {
                 throw new ServiceInvalidResponseException($e->getMessage(), 0, $e);
             } catch (IOException $e) {
+                $this->trigger('exception', [$methodName, $e]);
+
                 return new ServiceResponse([
                     'status' => 'error',
                     'message' => 'ConnectionFailed'
@@ -248,8 +259,11 @@ abstract class AbstractService
 
     protected function makeUrl($url)
     {
-        return ("http://localhost:8080/a/" . $url);
-        //return ("http://develnext.ru/a/" . $url);
+        if (Ide::get()->isDevelopment()) {
+            return ("http://localhost:8080/a/" . $url);
+        } else {
+            return (Ide::service()->getEndpoint() .  "a/" . $url);
+        }
     }
 
     protected function buildConnection($url)
@@ -262,7 +276,11 @@ abstract class AbstractService
         $connection->followRedirects = true;
 
         $connection->setRequestProperty("Content-Type", "application/json");
-        $connection->setRequestProperty("Authorization", Ide::accountManager()->getAccessToken());
+        $accountManager = Ide::accountManager();
+
+        if ($accountManager) {
+            $connection->setRequestProperty("Authorization", $accountManager->getAccessToken());
+        }
 
         $connection->connectTimeout = self::CONNECTION_TIMEOUT;
         $connection->readTimeout = self::READ_TIMEOUT;

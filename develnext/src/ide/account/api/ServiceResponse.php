@@ -49,4 +49,9 @@ class ServiceResponse
     {
         return $this->isError() && $this->message() == "ConnectionFailed";
     }
+
+    public function isConnectionRefused()
+    {
+        return $this->isError() && $this->message() == "ConnectionRefused";
+    }
 }

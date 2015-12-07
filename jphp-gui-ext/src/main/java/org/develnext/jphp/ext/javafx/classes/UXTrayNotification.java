@@ -4,6 +4,7 @@ import javafx.scene.image.Image;
 import javafx.util.Duration;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.tray.animations.AnimationType;
+import org.develnext.jphp.ext.javafx.support.tray.notification.NotificationLocation;
 import org.develnext.jphp.ext.javafx.support.tray.notification.NotificationType;
 import org.develnext.jphp.ext.javafx.support.tray.notification.TrayNotification;
 import php.runtime.annotation.Reflection.Name;
@@ -22,6 +23,7 @@ public class UXTrayNotification extends BaseWrapper<TrayNotification> {
         @Property @Nullable Image image();
         @Property @Nullable Image trayIcon();
         @Property NotificationType notificationType();
+        @Property NotificationLocation location();
         @Property AnimationType animationType();
 
         void showAndWait();

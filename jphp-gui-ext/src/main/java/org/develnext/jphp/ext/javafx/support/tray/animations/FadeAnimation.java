@@ -82,8 +82,8 @@ public class FadeAnimation implements TrayAnimation {
             @Override
             public void handle(ActionEvent e) {
                 trayIsShowing = false;
-                stage.close();
-                stage.setLocation(stage.getBottomRight());
+                stage.hide();
+                stage.setLocation(stage.getLocation());
             }
         });
 

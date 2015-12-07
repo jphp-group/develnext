@@ -46,6 +46,7 @@ use ide\project\templates\DefaultGuiProjectTemplate;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
+use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\gui\framework\Application;
 use php\gui\framework\Timer;
@@ -59,6 +60,7 @@ use php\gui\UXImageView;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
 use php\gui\UXTextArea;
+use php\gui\UXTrayNotification;
 use php\io\File;
 use php\io\IOException;
 use php\io\ResourceStream;
@@ -224,8 +226,22 @@ class Ide extends Application
                 }
 
                 $this->serviceManager = new ServiceManager();
+
+                $this->serviceManager->on('privateEnable', function () {
+                    UXApplication::runLater(function () {
+                        Notifications::showAccountWelcome();
+                    });
+
+                    $this->accountManager->authorize();
+                });
+
+                $this->serviceManager->on('privateDisable', function () {
+                    Notifications::showAccountUnavailable();
+                });
+
+                $this->serviceManager->updateStatus();
+
                 $this->accountManager = new AccountManager();
-                $this->accountManager->authorize();
             }
         );
     }
