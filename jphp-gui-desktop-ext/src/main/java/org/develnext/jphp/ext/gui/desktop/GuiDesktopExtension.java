@@ -1,0 +1,17 @@
+package org.develnext.jphp.ext.gui.desktop;
+
+import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.env.CompileScope;
+
+public class GuiDesktopExtension extends JavaFXExtension {
+    public static final String NS = "php\\gui\\desktop";
+
+    @Override
+    public Status getStatus() {
+        return Status.EXPERIMENTAL;
+    }
+
+    @Override
+    public void onRegister(CompileScope scope) {
+    }
+}

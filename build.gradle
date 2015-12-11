@@ -106,6 +106,13 @@ project(':jphp-game-ext') {
     }
 }
 
+project(':jphp-gui-desktop-ext') {
+    dependencies {
+        compile project(':jphp-gui-ext')
+        compile "org.develnext:jphp-runtime:$jphpVersion"
+    }
+}
+
 project(':jphp-parser') {
     dependencies {
         compile "org.develnext:jphp-core:$jphpVersion"
@@ -123,6 +130,7 @@ project(':develnext') {
     dependencies {
         compile project(':jphp-gui-designer-ext')
         compile project(':jphp-gui-framework')
+        compile project(':jphp-gui-desktop-ext')
         compile project(':jphp-game-ext')
         compile project(':jphp-parser')
         compile project(':develnext-stdlib')

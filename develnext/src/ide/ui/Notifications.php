@@ -11,6 +11,8 @@ class Notifications
         $notify->location = 'TOP_RIGHT';
         $notify->animationType = 'POPUP';
         $notify->show();
+
+        return $notify;
     }
 
     static function showAccountWelcome()
@@ -26,5 +28,10 @@ class Notifications
     public static function showAccountAuthWelcome(array $data)
     {
         static::show('Добро пожаловать в социальную сеть', 'Вы вошли в свой аккаунт под именем ' . $data['email']);
+    }
+
+    public static function showException(\Exception $e)
+    {
+        return static::show('Произошла ошибка', $e->getMessage(), 'ERROR');
     }
 }

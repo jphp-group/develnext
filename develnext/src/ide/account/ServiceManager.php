@@ -4,6 +4,7 @@ namespace ide\account;
 use ide\account\api\AbstractService;
 use ide\account\api\AccountService;
 use ide\account\api\NoticeService;
+use ide\account\api\ProfileService;
 use ide\account\api\ProjectService;
 use ide\account\api\ServiceResponse;
 use ide\Logger;
@@ -42,6 +43,11 @@ class ServiceManager
     protected $accountService;
 
     /**
+     * @var ProjectService
+     */
+    protected $profileService;
+
+    /**
      * @var IdeService
      */
     protected $ideService;
@@ -62,6 +68,7 @@ class ServiceManager
     public function __construct()
     {
         $this->accountService = new AccountService();
+        $this->profileService = new ProfileService();
         $this->ideService = new IdeService();
         $this->projectService = new ProjectService();
         $this->noticeService = new NoticeService();
@@ -217,6 +224,11 @@ class ServiceManager
     public function project()
     {
         return $this->projectService;
+    }
+
+    public function profile()
+    {
+        return $this->profileService;
     }
 
     public function shutdown()

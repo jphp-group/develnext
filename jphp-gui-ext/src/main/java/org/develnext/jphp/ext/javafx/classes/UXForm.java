@@ -38,7 +38,6 @@ public class UXForm extends UXWindow {
         @Property ObservableList<Image> icons();
 
         void show();
-        void showAndWait();
 
         void toBack();
         void toFront();
@@ -145,5 +144,12 @@ public class UXForm extends UXWindow {
     @Getter
     public boolean getFullScreen() {
         return getWrappedObject().isFullScreen();
+    }
+
+    @Signature
+    public void showAndWait() {
+        if (!getWrappedObject().isShowing()) {
+            getWrappedObject().showAndWait();
+        }
     }
 }

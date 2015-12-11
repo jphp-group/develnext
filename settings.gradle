@@ -1,5 +1,6 @@
 
 include 'jphp-gui-ext',
+        'jphp-gui-desktop-ext',
         'jphp-gui-designer-ext',
         'jphp-gui-framework',
         'jphp-game-ext',

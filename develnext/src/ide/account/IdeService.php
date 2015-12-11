@@ -11,8 +11,8 @@ use php\lang\System;
  * Class IdeService
  * @package ide\account
  *
- * @method ServiceResponse statusAsync($callback)
- * @method ServiceResponse startAsync($callback)
+ * @method ServiceResponse statusAsync($callback = null)
+ * @method ServiceResponse startAsync($callback = null)
  * @method ServiceResponse shutdownAsync($callback)
  * @method ServiceResponse sendErrorAsync(\Exception $e, $callback)
  * @method ServiceResponse getLastUpdateAsync($channel, $callback)

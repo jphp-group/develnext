@@ -4,37 +4,9 @@ namespace ide;
 use Files;
 use ide\account\AccountManager;
 use ide\account\ServiceManager;
-use ide\commands\CloseProjectCommand;
-use ide\commands\ExitCommand;
-use ide\commands\NewProjectCommand;
-use ide\commands\OpenProjectCommand;
-use ide\commands\SaveProjectCommand;
 use ide\editors\AbstractEditor;
-use ide\editors\value\BooleanPropertyEditor;
-use ide\editors\value\ColorPropertyEditor;
 use ide\editors\value\ElementPropertyEditor;
-use ide\editors\value\EnumPropertyEditor;
-use ide\editors\value\FloatPropertyEditor;
-use ide\editors\value\FontPropertyEditor;
-use ide\editors\value\IdPropertyEditor;
-use ide\editors\value\ImagePropertyEditor;
-use ide\editors\value\IntegerPropertyEditor;
-use ide\editors\value\ModuleListPropertyEditor;
-use ide\editors\value\PercentPropertyEditor;
-use ide\editors\value\PositionPropertyEditor;
-use ide\editors\value\SimpleTextPropertyEditor;
-use ide\editors\value\StringListPropertyEditor;
-use ide\editors\value\TextPropertyEditor;
 use ide\formats\AbstractFormat;
-use ide\formats\form\ButtonFormElement;
-use ide\formats\form\LabelFormElement;
-use ide\formats\form\TextFieldFormElement;
-use ide\formats\FormFormat;
-use ide\formats\GuiFormFormat;
-use ide\formats\PhpCodeFormat;
-use ide\formats\ScriptFormat;
-use ide\formats\ScriptModuleFormat;
-use ide\formats\WelcomeFormat;
 use ide\forms\MainForm;
 use ide\forms\SplashForm;
 use ide\library\IdeLibrary;
@@ -42,7 +14,6 @@ use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
-use ide\project\templates\DefaultGuiProjectTemplate;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
@@ -60,7 +31,6 @@ use php\gui\UXImageView;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
 use php\gui\UXTextArea;
-use php\gui\UXTrayNotification;
 use php\io\File;
 use php\io\IOException;
 use php\io\ResourceStream;
@@ -173,13 +143,11 @@ class Ide extends Application
                     }
 
                     if (!$showError) {
+                        $notify = Notifications::showException($e);
+
                         Logger::exception("Unknown exception", $e);
 
-                        $showError = true;
-
-                        /*if (Ide::accountManager()->isAuthorized()) {
-                            Ide::service()->ide()->sendErrorAsync($e, null);
-                        } else {    */
+                        $notify->on('click', function () use ($e) {
                             $dialog = new UXAlert('ERROR');
                             $dialog->title = 'Ошибка';
                             $dialog->headerText = 'Произошла ошибка в DevelNext, сообщите об этом авторам';
@@ -202,9 +170,7 @@ class Ide extends Application
                                     Ide::get()->shutdown();
                                     break;
                             }
-                        /*}  */
-
-                        $showError = false;
+                        });
                     }
                 });
 
@@ -213,7 +179,10 @@ class Ide extends Application
                 }
 
                 $this->splash = $splash = new SplashForm();
-                $splash->show();
+
+                if (!$this->isDevelopment()) {
+                    $splash->show();
+                }
 
                 UXApplication::runLater(function () {
                     $this->registerAll();
@@ -228,10 +197,9 @@ class Ide extends Application
                 $this->serviceManager = new ServiceManager();
 
                 $this->serviceManager->on('privateEnable', function () {
-                    UXApplication::runLater(function () {
+                    /*UXApplication::runLater(function () {
                         Notifications::showAccountWelcome();
-                    });
-
+                    });*/
                     $this->accountManager->authorize();
                 });
 

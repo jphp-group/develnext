@@ -10,6 +10,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\ui\Notifications;
+use ide\utils\Json;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\gui\UXTrayNotification;
@@ -83,8 +84,10 @@ class AccountManager
                         $rHash = $response->data()['hash'];
 
                         if ($hash < $rHash) {
-                            UXDialog::show('Вышла новая версия');
-                            dump($response->data());
+                            UXApplication::runLater(function () use ($response) {
+                                UXDialog::show('Вышла новая версия');
+                                dump($response->data());
+                            });
                         }
                     } else {
                         dump($response);
@@ -169,10 +172,16 @@ class AccountManager
                 }  */
             }
 
-            $this->loginForm->showAndWait();
+            if (!$this->loginForm->visible) {
+                $this->loginForm->showAndWait();
+            }
         }
 
-        Ide::service()->ide()->startAsync(null);
+        Ide::service()->ide()->startAsync(function (ServiceResponse $response) {
+            if (!$response->isSuccess()) {
+                Logger::error("Error start api: message = {$response->message()}, data = " . Json::encode($response->data()));
+            }
+        });
         $this->updateAccount();
     }
 }
