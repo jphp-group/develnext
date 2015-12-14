@@ -16,28 +16,36 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.develnext.jphp.ext.javafx.support.tray.animations.*;
 import org.develnext.jphp.ext.javafx.support.tray.models.CustomStage;
-import php.runtime.common.Callback;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class TrayNotification {
     @FXML
     private Label lblTitle, lblMessage, lblClose;
+
     @FXML
     private ImageView imageIcon;
+
     @FXML
     private Rectangle rectangleColor;
+
     @FXML
     private AnchorPane rootNode;
 
     private CustomStage stage;
     private NotificationType notificationType;
     private AnimationType animationType;
-    private EventHandler<ActionEvent> onDismissedCallBack, onShownCallback;
-    private TrayAnimation animator;
+    private EventHandler<ActionEvent> onDismissedCallBack, onShownCallback, onClickCallback;
     private NotificationLocation location;
-    private AnimationProvider animationProvider;
+
+    private int viewIndex = 0;
+    private TrayAnimation __animator;
+
+    private static Map<NotificationLocation, AtomicInteger> trayCounts = new HashMap<>();
 
     /**
      * Initializes an instance of the tray notification object
@@ -71,7 +79,6 @@ public final class TrayNotification {
     }
 
     private void initTrayNotification(String title, String message, NotificationType type) {
-
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/tray/views/TrayNotification.fxml"));
 
@@ -89,12 +96,8 @@ public final class TrayNotification {
     }
 
     private void initAnimations() {
-
-        animationProvider =
-            new AnimationProvider(new FadeAnimation(stage), new SlideAnimation(stage), new PopupAnimation(stage));
-
         //Default animation type
-        setAnimationType(AnimationType.SLIDE);
+        setAnimationType(AnimationType.POPUP);
     }
 
     private void initStage() {
@@ -108,6 +111,10 @@ public final class TrayNotification {
         EventHandler<MouseEvent> value = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                if (onClickCallback != null) {
+                    onClickCallback.handle(new ActionEvent(this, null));
+                }
+
                 dismiss();
             }
         };
@@ -122,21 +129,20 @@ public final class TrayNotification {
     public void setLocation(NotificationLocation location) {
         switch (location) {
             case BOTTOM_RIGHT:
-                stage.setLocation(stage.getBottomRight());
+                stage.setLocation(stage.getBottomRight(viewIndex));
                 break;
             case BOTTOM_LEFT:
-                stage.setLocation(stage.getBottomLeft());
+                stage.setLocation(stage.getBottomLeft(viewIndex));
                 break;
             case TOP_LEFT:
-                stage.setLocation(stage.getTopLeft());
+                stage.setLocation(stage.getTopLeft(viewIndex));
                 break;
             case TOP_RIGHT:
-                stage.setLocation(stage.getTopRight());
+                stage.setLocation(stage.getTopRight(viewIndex));
                 break;
         }
 
         this.location = location;
-        animationProvider = new AnimationProvider(new FadeAnimation(stage), new SlideAnimation(stage), new PopupAnimation(stage));
     }
 
     public void setNotificationType(NotificationType nType) {
@@ -200,8 +206,35 @@ public final class TrayNotification {
         setAnimationType(animType);
     }
 
+    public TrayAnimation animator() {
+        if (__animator == null || !__animator.isShowing()) {
+            switch (animationType) {
+                case FADE:
+                    __animator = new FadeAnimation(stage);
+                    break;
+                case POPUP:
+                    __animator = new PopupAnimation(stage);
+                    break;
+                case SLIDE:
+                    __animator = new SlideAnimation(stage);
+                    break;
+            }
+        }
+
+        if (__animator != null) {
+            __animator.setOnFinished(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    onDismissed();
+                }
+            });
+        }
+
+        return __animator;
+    }
+
     public boolean isTrayShowing() {
-        return animator.isShowing();
+        return animator().isShowing();
     }
 
     /**
@@ -209,30 +242,29 @@ public final class TrayNotification {
      * @param dismissDelay How long to delay the start of the dismiss animation
      */
     public void showAndDismiss(Duration dismissDelay) {
-
         if (isTrayShowing()) {
             dismiss();
         } else {
+            onShown();
+            setLocation(getLocation());
+
             stage.show();
 
-            onShown();
-            animator.playSequential(dismissDelay);
+            animator().playSequential(dismissDelay);
         }
-
-        onDismissed();
     }
 
     /**
      * Displays the notification tray
      */
     public void showAndWait() {
+        if (!isTrayShowing()) {
+            onShown();
 
-        if (! isTrayShowing()) {
+            setLocation(getLocation());
             stage.show();
 
-            animator.playShowAnimation();
-
-            onShown();
+            animator().playShowAnimation();
         }
     }
 
@@ -240,21 +272,42 @@ public final class TrayNotification {
      * Dismisses the notifcation tray
      */
     public void dismiss() {
-
         if (isTrayShowing()) {
-            animator.playDismissAnimation();
-            onDismissed();
+            animator().playDismissAnimation();
         }
+    }
+
+    public int getViewIndex() {
+        return viewIndex;
     }
 
     private void onShown() {
         if (onShownCallback != null)
-            onShownCallback.handle(new ActionEvent());
+            onShownCallback.handle(new ActionEvent(this, null));
+
+        synchronized (this) {
+            AtomicInteger count = trayCounts.get(location);
+
+            if (count == null) {
+                count = new AtomicInteger();
+                trayCounts.put(location, count);
+            }
+
+            viewIndex = count.getAndIncrement();
+        }
     }
 
     private void onDismissed() {
         if (onDismissedCallBack != null)
-            onDismissedCallBack.handle(new ActionEvent());
+            onDismissedCallBack.handle(new ActionEvent(this, null));
+
+        AtomicInteger count = trayCounts.get(location);
+
+        if (count != null) {
+            count.decrementAndGet();
+        }
+
+        viewIndex = 0;
     }
 
     /**
@@ -265,12 +318,28 @@ public final class TrayNotification {
         onDismissedCallBack  = event;
     }
 
+    public EventHandler<ActionEvent> getOnDismissed() {
+        return onDismissedCallBack;
+    }
+
     /**
      * Sets an action event for when the tray has been shown
      * @param event The event to occur after the tray has been shown
      */
     public void setOnShown(EventHandler<ActionEvent> event) {
         onShownCallback  = event;
+    }
+
+    public EventHandler<ActionEvent> getOnShown() {
+        return onShownCallback;
+    }
+
+    public EventHandler<ActionEvent> getOnClick() {
+        return onClickCallback;
+    }
+
+    public void setOnClick(EventHandler<ActionEvent> onClickCallback) {
+        this.onClickCallback = onClickCallback;
     }
 
     /**
@@ -330,15 +399,6 @@ public final class TrayNotification {
     }
 
     public void setAnimationType(final AnimationType type) {
-        if (animationProvider != null) {
-            animator = animationProvider.findFirstWhere(new Callback<Boolean, TrayAnimation>() {
-                @Override
-                public Boolean call(TrayAnimation a) {
-                    return a != null && a.getAnimationType() == type;
-                }
-            });
-        }
-
         animationType = type;
     }
 

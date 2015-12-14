@@ -344,6 +344,8 @@ class Application
                 $showed = false;
             });
 
+            restore_exception_handler();
+
             if ($handler) {
                 $handler();
             }

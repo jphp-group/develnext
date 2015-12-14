@@ -249,22 +249,14 @@ class Ide extends Application
 
     public function getInnoSetupProgram()
     {
-        $innoPath = $this->getOwnFile('tools/innoSetup/ISCC.exe');
-
-        if ($this->isDevelopment() && !$innoPath->exists()) {
-            $innoPath = $this->getOwnFile('../develnext-tools/innoSetup/ISCC.exe');
-        }
+        $innoPath = new File($this->getToolPath(), '/innoSetup/ISCC.exe');
 
         return $innoPath && $innoPath->exists() ? $innoPath->getCanonicalFile() : null;
     }
 
     public function getLaunch4JProgram()
     {
-        $launch4jPath = $this->getOwnFile('tools/Launch4j/launch4jc.exe');
-
-        if ($this->isDevelopment() && !$launch4jPath->exists()) {
-            $launch4jPath = $this->getOwnFile('../develnext-tools/Launch4j/launch4jc.exe');
-        }
+        $launch4jPath = new File($this->getToolPath(), '/Launch4j/launch4jc.exe');
 
         return $launch4jPath && $launch4jPath->exists() ? $launch4jPath->getCanonicalFile() : null;
     }
@@ -282,13 +274,28 @@ class Ide extends Application
         //throw new \Exception("Unable to find gradle bin");
     }
 
+    public function getToolPath()
+    {
+        $launcher = System::getProperty('develnext.launcher');
+
+        switch ($launcher) {
+            case 'root':
+                $path = $this->getOwnFile('tools/');
+                break;
+            default:
+                $path = $this->getOwnFile('../tools/');
+        }
+
+        if ($this->isDevelopment() && !$path->exists()) {
+            $path = $this->getOwnFile('../develnext-tools/');
+        }
+
+        return $path && $path->exists() ? $path->getAbsoluteFile() : null;
+    }
+
     public function getGradlePath()
     {
-        $gradlePath = $this->getOwnFile('tools/gradle');
-
-        if ($this->isDevelopment() && !$gradlePath->exists()) {
-            $gradlePath = $this->getOwnFile('../develnext-tools/gradle');
-        }
+        $gradlePath = new File($this->getToolPath(), '/gradle');
 
         if (!$gradlePath->exists()) {
             $gradlePath = System::getEnv()['GRADLE_HOME'];
@@ -303,12 +310,10 @@ class Ide extends Application
 
     public function getJrePath()
     {
-        if ($this->isWindows()) {
-            $jrePath = $this->getOwnFile('tools/jre');
+        $path = $this->getToolPath();
 
-            if ($this->isDevelopment() && !$jrePath->exists()) {
-                $jrePath = $this->getOwnFile('../develnext-tools/jre');
-            }
+        if ($this->isWindows()) {
+            $jrePath = new File($path, '/jre');
         } else {
             $jrePath = null;
         }

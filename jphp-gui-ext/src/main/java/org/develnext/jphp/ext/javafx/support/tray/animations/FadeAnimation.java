@@ -100,6 +100,11 @@ public class FadeAnimation implements TrayAnimation {
         return AnimationType.FADE;
     }
 
+    @Override
+    public void setOnFinished(EventHandler<ActionEvent> onFinished) {
+        sq.setOnFinished(onFinished);
+    }
+
     /**
      * Plays both the show and dismiss animation using a sequential transition object
      *

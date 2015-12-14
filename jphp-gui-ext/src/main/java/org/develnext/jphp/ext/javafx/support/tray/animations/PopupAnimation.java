@@ -14,7 +14,6 @@ public class PopupAnimation implements TrayAnimation {
     private boolean trayIsShowing;
 
     public PopupAnimation(CustomStage s) {
-
         this.stage = s;
 
         showAnimation = setupShowAnimation();
@@ -24,7 +23,6 @@ public class PopupAnimation implements TrayAnimation {
     }
 
     private Timeline setupDismissAnimation() {
-
         Timeline tl = new Timeline();
 
         KeyValue kv1 = new KeyValue(stage.yLocationProperty(), stage.getY() + stage.getHeight());
@@ -48,7 +46,6 @@ public class PopupAnimation implements TrayAnimation {
     }
 
     private Timeline setupShowAnimation() {
-
         Timeline tl = new Timeline();
 
         KeyValue kv1 = new KeyValue(stage.yLocationProperty(), stage.getLocation().getY() + stage.getHeight());
@@ -83,6 +80,11 @@ public class PopupAnimation implements TrayAnimation {
     @Override
     public AnimationType getAnimationType() {
         return AnimationType.POPUP;
+    }
+
+    @Override
+    public void setOnFinished(EventHandler<ActionEvent> onFinished) {
+        sq.setOnFinished(onFinished);
     }
 
     /**

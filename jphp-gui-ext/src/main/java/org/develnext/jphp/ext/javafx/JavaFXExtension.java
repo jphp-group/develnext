@@ -233,6 +233,7 @@ public class JavaFXExtension extends Extension {
         registerEventProvider(new ListViewEventProvider());
 
         registerEventProvider(new AnimationEventProvider());
+        registerEventProvider(new TrayNotificationEventProvider());
     }
 
     protected void registerEventProvider(EventProvider eventProvider) {

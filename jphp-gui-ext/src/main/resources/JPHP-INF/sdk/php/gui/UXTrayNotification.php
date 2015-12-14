@@ -4,6 +4,8 @@ namespace php\gui;
 /**
  * Class UXTrayNotification
  * @package php\gui
+ *
+ * events - click, show, hide
  */
 class UXTrayNotification
 {
@@ -66,6 +68,32 @@ class UXTrayNotification
     }
 
     public function hide()
+    {
+    }
+
+
+    /**
+     * @param string $event finish, etc.
+     * @param callable $handler
+     * @param string $group
+     */
+    public function on($event, callable $handler, $group = 'general')
+    {
+    }
+
+    /**
+     * @param string $event
+     * @param string $group (optional)
+     */
+    public function off($event, $group)
+    {
+    }
+
+    /**
+     * @param string $event
+     * @param UXEvent $e (optional)
+     */
+    public function trigger($event, UXEvent $e)
     {
     }
 }

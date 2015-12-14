@@ -1,17 +1,21 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.event.Event;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.tray.animations.AnimationType;
 import org.develnext.jphp.ext.javafx.support.tray.notification.NotificationLocation;
 import org.develnext.jphp.ext.javafx.support.tray.notification.NotificationType;
 import org.develnext.jphp.ext.javafx.support.tray.notification.TrayNotification;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
+import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
@@ -72,5 +76,50 @@ public class UXTrayNotification extends BaseWrapper<TrayNotification> {
     @Signature
     public void show(long millis) {
         getWrappedObject().showAndDismiss(Duration.millis(millis));
+    }
+
+    @Reflection.Signature
+    @SuppressWarnings("unchecked")
+    public void on(String event, Invoker invoker, String group) {
+        EventProvider eventProvider = EventProvider.get(getWrappedObject(), event);
+
+        if (eventProvider != null) {
+            eventProvider.on(getWrappedObject(), event, group, invoker);
+        } else {
+            throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
+        }
+    }
+
+    @Reflection.Signature
+    public void on(String event, Invoker invoker) {
+        on(event, invoker, "general");
+    }
+
+    @Reflection.Signature
+    @SuppressWarnings("unchecked")
+    public void off(String event, @Reflection.Nullable String group) {
+        EventProvider eventProvider = EventProvider.get(getWrappedObject(), event);
+
+        if (eventProvider != null) {
+            eventProvider.off(getWrappedObject(), event, group);
+        } else {
+            throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
+        }
+    }
+
+    @Reflection.Signature
+    public void off(String event) {
+        off(event, null);
+    }
+
+    @Reflection.Signature
+    public void trigger(String event, @Reflection.Nullable Event e) {
+        EventProvider eventProvider = EventProvider.get(getWrappedObject(), event);
+
+        if (eventProvider != null) {
+            eventProvider.trigger(getWrappedObject(), event, e);
+        } else {
+            throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
+        }
     }
 }

@@ -1,5 +1,7 @@
 package org.develnext.jphp.ext.javafx.support.tray.animations;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.util.Duration;
 
 //All tray animations must implement TrayAnimation
@@ -10,6 +12,12 @@ public interface TrayAnimation {
      * @return The type of animation this class plays
      */
     AnimationType getAnimationType();
+
+    /**
+     * ...
+     * @param onFinished
+     */
+    void setOnFinished(EventHandler<ActionEvent> onFinished);
 
     /**
      * Plays both the show and dismiss animation using a sequential transition object

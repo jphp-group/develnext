@@ -7,7 +7,6 @@ import javafx.util.Duration;
 import org.develnext.jphp.ext.javafx.support.tray.models.CustomStage;
 
 public class SlideAnimation implements TrayAnimation {
-
     private final Timeline showAnimation, dismissAnimation;
     private final SequentialTransition sq;
     private final CustomStage stage;
@@ -99,6 +98,11 @@ public class SlideAnimation implements TrayAnimation {
     @Override
     public AnimationType getAnimationType() {
         return AnimationType.SLIDE;
+    }
+
+    @Override
+    public void setOnFinished(EventHandler<ActionEvent> onFinished) {
+        sq.setOnFinished(onFinished);
     }
 
     /**

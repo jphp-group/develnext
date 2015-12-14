@@ -31,19 +31,35 @@ public class CustomStage extends Stage {
         topRight = new Location(x, 2);
     }
 
-    public Location getBottomRight() {
+    public Location getBottomRight(int viewIndex) {
+        if (viewIndex > 0) {
+            return new Location(bottomRight.getX(), bottomRight.getY() - (viewIndex * (getHeight() + 2)));
+        }
+
         return bottomRight;
     }
 
-    public Location getBottomLeft() {
+    public Location getBottomLeft(int viewIndex) {
+        if (viewIndex > 0) {
+            return new Location(bottomLeft.getX(), bottomLeft.getY() - (viewIndex * (getHeight() + 2)));
+        }
+
         return bottomLeft;
     }
 
-    public Location getTopLeft() {
+    public Location getTopLeft(int viewIndex) {
+        if (viewIndex > 0) {
+            return new Location(topLeft.getX(), topLeft.getY() - (viewIndex * (getHeight() + 2)));
+        }
+
         return topLeft;
     }
 
-    public Location getTopRight() {
+    public Location getTopRight(int viewIndex) {
+        if (viewIndex > 0) {
+            return new Location(topRight.getX(), topRight.getY() + (viewIndex * (getHeight() + 2)));
+        }
+
         return topRight;
     }
 
@@ -53,7 +69,7 @@ public class CustomStage extends Stage {
     }
 
     public Location getOffScreenBounds() {
-        Location loc = getBottomRight();
+        Location loc = getBottomRight(0);
 
         return new Location(loc.getX() + this.getWidth(), loc.getY());
     }

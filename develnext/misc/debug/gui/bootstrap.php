@@ -55,3 +55,7 @@ set_exception_handler(function (BaseException $e) {
 
     $showed = false;
 });
+
+
+restore_exception_handler();
+restore_exception_handler();
