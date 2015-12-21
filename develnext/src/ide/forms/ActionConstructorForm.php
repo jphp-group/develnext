@@ -51,7 +51,7 @@ use php\xml\XmlProcessor;
  * @property UXAnchorPane $generatedCodeContent
  * @property UXTabPane $tabs
  */
-class ActionConstructorForm extends AbstractForm
+class ActionConstructorForm extends AbstractIdeForm
 {
     /**
      * @var ActionEditor

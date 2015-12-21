@@ -24,7 +24,7 @@ use php\gui\UXNode;
  * Class MessageBoxForm
  * @package ide\forms
  */
-class MessageBoxForm extends AbstractForm
+class MessageBoxForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

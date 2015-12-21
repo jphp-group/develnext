@@ -27,7 +27,7 @@ use php\util\SharedValue;
  * @property UXTabPane $categoryTabPane
  * @property UXListView $list
  */
-class BehaviourCreateForm extends AbstractForm
+class BehaviourCreateForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

@@ -27,7 +27,7 @@ use php\gui\UXTextField;
  * @property UXHyperlink $registerLink
  * @property UXHyperlink $forgetPasswordLink
  */
-class LoginForm extends AbstractForm
+class LoginForm extends AbstractIdeForm
 {
     protected function init()
     {

@@ -23,7 +23,7 @@ use php\lib\Items;
  * @property UXListView $list
  * @property UXButton
  */
-class BuildProjectForm extends AbstractForm
+class BuildProjectForm extends AbstractIdeForm
 {
     /**
      * @var AbstractBuildType[]

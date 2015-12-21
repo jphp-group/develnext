@@ -3,7 +3,7 @@ namespace ide\forms;
 
 use php\gui\framework\AbstractForm;
 
-class ImportFramesForSpriteForm extends AbstractForm
+class ImportFramesForSpriteForm extends AbstractIdeForm
 {
     
 }

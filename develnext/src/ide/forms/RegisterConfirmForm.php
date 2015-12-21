@@ -7,7 +7,7 @@ use ide\Ide;
 use php\gui\framework\AbstractForm;
 use php\gui\UXDialog;
 
-class RegisterConfirmForm extends AbstractForm
+class RegisterConfirmForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

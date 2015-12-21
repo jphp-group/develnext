@@ -28,7 +28,7 @@ class IfPasswordValidActionType extends AbstractSimpleActionType
         ];
     }
 
-    function  attributeSettings()
+    function attributeSettings()
     {
         return [
             'input' => ['def' => '~sender', 'defType' => 'object']

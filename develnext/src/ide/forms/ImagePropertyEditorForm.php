@@ -30,7 +30,7 @@ use php\util\Flow;
  * @property UXScrollPane $imageView
  * @property UXFlowPane $gallery
  */
-class ImagePropertyEditorForm extends AbstractForm
+class ImagePropertyEditorForm extends AbstractIdeForm
 {
     use DialogFormMixin {
         DialogFormMixin::setResult as protected _setResult;

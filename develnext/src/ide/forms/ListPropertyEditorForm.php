@@ -22,7 +22,7 @@ use php\lib\Items;
  * @property UXListView $list
  * @property UXVBox $propPane
  */
-class ListPropertyEditorForm extends AbstractForm
+class ListPropertyEditorForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

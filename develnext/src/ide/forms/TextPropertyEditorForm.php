@@ -19,7 +19,7 @@ use php\gui\UXTooltip;
  * @property UXButton $applyButton
  * @property UXButton $cancelButton
  */
-class TextPropertyEditorForm extends AbstractForm
+class TextPropertyEditorForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

@@ -20,7 +20,7 @@ use php\util\Flow;
  * @property UXButton $saveButton
  * @property UXButton $cancelButton
  */
-class ModuleListEditorForm extends AbstractForm
+class ModuleListEditorForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

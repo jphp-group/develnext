@@ -30,7 +30,7 @@ use php\util\SharedQueue;
  * Class BuildProgressForm
  * @package ide\forms
  */
-class BuildProgressForm extends AbstractForm
+class BuildProgressForm extends AbstractIdeForm
 {
     /**
      * @var Process

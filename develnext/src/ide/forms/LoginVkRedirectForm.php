@@ -24,7 +24,7 @@ use script\TimerScript;
  * @property UXButton $copyButton
  * @property UXTextField $confirmField
  */
-class LoginVkRedirectForm extends AbstractForm
+class LoginVkRedirectForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

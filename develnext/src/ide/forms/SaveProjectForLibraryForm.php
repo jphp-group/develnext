@@ -17,7 +17,7 @@ use php\gui\UXTextField;
  * @property UXTextArea $descriptionField
  * @property UXImageView $icon
  */
-class SaveProjectForLibraryForm extends AbstractForm
+class SaveProjectForLibraryForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

@@ -24,7 +24,7 @@ use php\lib\Str;
  * @property UXCheckbox $showConfigCheckbox
  * @property UXImageView $icon
  */
-class BuildTypeConfigForm extends AbstractForm
+class BuildTypeConfigForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

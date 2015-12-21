@@ -35,8 +35,6 @@ class BuildProjectCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        throw new IllegalArgumentException("Вы слишком мало двигаетесь");
-
         $dialog = new BuildProjectForm();
         $dialog->setBuildTypes($this->buildTypes);
         $dialog->showAndWait();

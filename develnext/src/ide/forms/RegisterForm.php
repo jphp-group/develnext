@@ -6,7 +6,7 @@ use ide\Ide;
 use php\gui\framework\AbstractForm;
 use php\gui\UXDialog;
 
-class RegisterForm extends AbstractForm
+class RegisterForm extends AbstractIdeForm
 {
     protected function init()
     {

@@ -20,7 +20,7 @@ use php\io\File;
  * @property UXButton $exitButton
  * @property UXTextField $pathField
  */
-class BuildSuccessForm extends AbstractForm
+class BuildSuccessForm extends AbstractIdeForm
 {
     /**
      * @var callable

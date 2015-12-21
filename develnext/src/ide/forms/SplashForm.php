@@ -14,7 +14,7 @@ use php\gui\framework\Timer;
 /**
  * @property UXLabel $version
  */
-class SplashForm extends AbstractForm
+class SplashForm extends AbstractIdeForm
 {
     protected function init()
     {

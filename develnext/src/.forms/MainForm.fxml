@@ -9,9 +9,14 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="688.0" prefWidth="988.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <children>
-    <MenuBar id="mainMenu" prefHeight="25.0" prefWidth="900.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <MenuBar id="mainMenu" cache="true" prefHeight="25.0" prefWidth="900.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <menus>
         <Menu id="menuProject" mnemonicParsing="false" text="Проект" />
+            <Menu id="menuLibrary" mnemonicParsing="false" text="Библиотека">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+              </items>
+            </Menu>
         <Menu id="menuAccount" mnemonicParsing="false" text="Аккаунт" />
         <Menu id="menuRun" mnemonicParsing="false" text="Запуск" />
         <Menu id="menuHelp" mnemonicParsing="false" text="Помощь" />
@@ -46,25 +51,6 @@
                         </AnchorPane>
                       </content>
                     </Tab>
-                              <Tab closable="false" text="Мой аккаунт">
-                                <content>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                       <children>
-                                          <ListView id="friendList" layoutX="7.0" layoutY="167.0" prefHeight="453.0" prefWidth="228.0" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="168.0" />
-                                          <Label layoutX="7.0" layoutY="143.0" prefHeight="25.0" prefWidth="228.0" text="Друзья:" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="7.0" />
-                                          <Separator layoutX="9.0" layoutY="134.0" prefHeight="2.0" prefWidth="225.0" />
-                                          <AnchorPane id="avatarPane" layoutX="7.0" layoutY="7.0" prefHeight="64.0" prefWidth="64.0" style="-fx-border-color: silver;" />
-                                          <Label id="userNameLabel" layoutX="79.0" layoutY="7.0" prefHeight="25.0" prefWidth="155.0" text="User Name" textFill="#514f4f" AnchorPane.leftAnchor="79.0" AnchorPane.rightAnchor="8.0">
-                                             <font>
-                                                <Font name="System Bold" size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label id="emailLabel" layoutX="78.0" layoutY="29.0" prefHeight="17.0" prefWidth="155.0" text="user@email.com" textFill="#656262" AnchorPane.leftAnchor="78.0" AnchorPane.rightAnchor="9.0" />
-                                          <Hyperlink id="profileEditLink" layoutX="78.0" layoutY="50.0" prefHeight="9.0" prefWidth="155.0" text="Редактировать профиль" AnchorPane.leftAnchor="78.0" AnchorPane.rightAnchor="9.0" />
-                                       </children>
-                                    </AnchorPane>
-                                </content>
-                              </Tab>
                   </tabs>
                 </TabPane>
               </children>

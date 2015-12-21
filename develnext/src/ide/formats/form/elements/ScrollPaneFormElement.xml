@@ -1,0 +1,20 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="scrollX" name="Скролл по X" editor="float" tooltip="Дробное значение от 0 до 1" />
+        <property code="scrollY" name="Скролл по Y" editor="float" tooltip="Дробное значение от 0 до 1" />
+        <property code="hbarPolicy" name="Горизонтальный бар" editor="enum" defaultValue="AS_NEEDED">
+            <variants>
+                <variant value="AS_NEEDED">По необходимости</variant>
+                <variant value="ALWAYS">Всегда</variant>
+                <variant value="NEVER">Скрыть</variant>
+            </variants>
+        </property>
+        <property code="vbarPolicy" name="Вертикальный бар" editor="enum" defaultValue="AS_NEEDED">
+            <variants>
+                <variant value="AS_NEEDED">По необходимости</variant>
+                <variant value="ALWAYS">Всегда</variant>
+                <variant value="NEVER">Скрыть</variant>
+            </variants>
+        </property>
+    </properties>
+</element>

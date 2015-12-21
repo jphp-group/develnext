@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -134,11 +135,19 @@ public class UXForm extends UXWindow {
     }
 
     @Setter
-    public void setFullScreen(boolean value) {
+    public void setFullScreen(final boolean value) {
         getWrappedObject().setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         getWrappedObject().setFullScreenExitHint(null);
 
         getWrappedObject().setFullScreen(value);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                getWrappedObject().setFullScreen(false);
+                getWrappedObject().setFullScreen(value);
+            }
+        });
     }
 
     @Getter

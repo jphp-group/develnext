@@ -24,7 +24,7 @@ use php\util\Flow;
  * @property UXToggleButton $italicButton
  * @property UXToggleButton $boldWeightButton
  */
-class FontPropertyEditorForm extends AbstractForm
+class FontPropertyEditorForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

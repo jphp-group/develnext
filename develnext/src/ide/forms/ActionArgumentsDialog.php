@@ -30,7 +30,7 @@ use php\gui\UXLabelEx;
  *
  * @property UXVBox $box
  */
-class ActionArgumentsDialog extends AbstractForm
+class ActionArgumentsDialog extends AbstractIdeForm
 {
     use DialogFormMixin;
 

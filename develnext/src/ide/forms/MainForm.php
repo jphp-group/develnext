@@ -32,7 +32,7 @@ use php\gui\UXTreeView;
  * @property UXTreeView $projectTree
  * @property UXHBox $headPane
  */
-class MainForm extends AbstractForm
+class MainForm extends AbstractIdeForm
 {
     protected function init()
     {

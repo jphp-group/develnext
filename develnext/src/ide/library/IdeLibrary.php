@@ -28,7 +28,11 @@ class IdeLibrary
         'images' => [
             'title' => 'Изображения',
             'type' => 'ide\library\IdeLibraryImageResource',
-        ]
+        ],
+        'quests' => [
+            'title' => 'Квесты',
+            'type' => 'ide\library\IdeLibraryQuestResource',
+        ],
     ];
 
     /**
@@ -97,7 +101,12 @@ class IdeLibrary
                         $path = FileUtils::stripExtension($filename);
 
                         Logger::info("Add library resource $filename, type = $type[type]");
-                        $this->resources[$code][] = new $type['type']($path);
+
+                        /** @var IdeLibraryResource $resource */
+                        $resource = new $type['type']($path);
+                        $resource->onRegister($this);
+
+                        $this->resources[$code][] = $resource;
                     }
                 });
             }

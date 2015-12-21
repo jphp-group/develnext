@@ -155,4 +155,9 @@ abstract class IdeLibraryResource
             Logger::error("Unable to delete {$this->getPath()}.resource");
         }
     }
+
+    public function onRegister(IdeLibrary $library)
+    {
+        // ...
+    }
 }

@@ -35,7 +35,7 @@ use php\lib\Str;
  * Class NewProjectForm
  * @package ide\forms
  */
-class NewProjectForm extends AbstractForm
+class NewProjectForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 

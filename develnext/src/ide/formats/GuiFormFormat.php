@@ -38,6 +38,7 @@ use ide\formats\form\elements\ProgressBarFormElement;
 use ide\formats\form\elements\ProgressIndicatorFormElement;
 use ide\formats\form\elements\RectangleFormElement;
 use ide\formats\form\elements\RhombusFormElement;
+use ide\formats\form\elements\ScrollPaneFormElement;
 use ide\formats\form\elements\SeparatorFormElement;
 use ide\formats\form\elements\SliderFormElement;
 use ide\formats\form\elements\SpriteViewFormElement;
@@ -70,6 +71,7 @@ use ide\formats\form\tags\PolygonFormElementTag;
 use ide\formats\form\tags\ProgressBarFormElementTag;
 use ide\formats\form\tags\ProgressIndicatorFormElementTag;
 use ide\formats\form\tags\RectangleFormElementTag;
+use ide\formats\form\tags\ScrollPaneFormElementTag;
 use ide\formats\form\tags\SeparatorFormElementTag;
 use ide\formats\form\tags\ShapeFormElementTag;
 use ide\formats\form\tags\SliderFormElementTag;
@@ -120,6 +122,7 @@ class GuiFormFormat extends AbstractFormFormat
 
         $this->register(new PanelFormElement());
         $this->register(new TitledPaneFormElement());
+        $this->register(new ScrollPaneFormElement());
         $this->register(new TabPaneFormElement());
 
         $this->register(new RectangleFormElement());
@@ -166,6 +169,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new CircleFormElementTag());
         $this->register(new PolygonFormElementTag());
         $this->register(new SpriteViewFormElementTag());
+        $this->register(new ScrollPaneFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());
