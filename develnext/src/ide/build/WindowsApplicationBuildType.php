@@ -196,11 +196,7 @@ class WindowsApplicationBuildType extends AbstractBuildType
 
         if ($config['oneJar']) {
             $commands[] = 'splitConfig';
-        }
-
-        if ($config['oneJar']) {
             $commands[] = 'jar';
-            $commands[] = 'doneJar';
         }
 
         $commands[] = 'installDist';
@@ -211,61 +207,7 @@ class WindowsApplicationBuildType extends AbstractBuildType
         /** @var GradleProjectBehaviour $gradle */
         $gradle = $project->getBehaviour(GradleProjectBehaviour::class);
 
-        $jarCommand = '';
-
-        if ($config['oneJar']) {
-            $jarCommand  = 'from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }' . "\n";
-            $jarCommand .= "manifest { attributes 'Main-Class': 'php.runtime.launcher.Launcher' }";
-        }
-
-        $gradle->getConfig()->appendCodeBlock(__CLASS__, "
-        task splitConfig << {
-             def list = ''<<'';
-
-             configurations.compile.collect {
-                if (it.isFile()) {
-                    def zip = new java.util.zip.ZipFile(it);
-
-                    zip.entries().each {
-                        def name = it.toString().replace(\"\\\\\", \"/\");
-
-                        if (name.endsWith('JPHP-INF/extensions.list')) {
-                            list <<= zip.getInputStream(it).text + '\\n';
-                        }
-                    }
-                }
-             }
-
-             def file = new File(project.buildDir.path + \"/JPHP-INF/extensions.list\");
-
-             file.getParentFile().mkdirs();
-
-             file << list.toString();
-        }
-
-        task doneJar(type: Jar) {
-            from (zipTree(jar.destinationDir.path + '/' + jar.archiveName))
-            from (project.buildDir.path) {
-               include 'JPHP-INF/extensions.list'
-            }
-
-            doLast {
-                new File(project.buildDir.path + \"/JPHP-INF/extensions.list\").delete()
-            }
-
-            manifest { attributes 'Main-Class': 'php.runtime.launcher.Launcher' }
-
-            archiveName = jar.archiveName + '.fix'
-        }
-
-        jar {
-            exclude('.debug/**')
-            exclude('*.source')
-            exclude('JPHP-INF/extensions.list')
-            {$jarCommand}
-        }\n");
-
-        $gradle->getConfig()->save();
+        OneJarBuildType::appendJarTasks($gradle->getConfig(), $config['oneJar']);
 
         $dialog = new BuildProgressForm();
         $dialog->addConsoleLine('> gradle installDist', 'green');
@@ -282,8 +224,6 @@ class WindowsApplicationBuildType extends AbstractBuildType
                 $libPath = File::of($this->getBuildPath($project) . "/lib");
 
                 if ($config['oneJar']) {
-                    FileUtils::copyFile($this->getBuildPath($project, true) . '/dn-compiled-module.jar.fix', "$libPath/dn-compiled-module.jar");
-
                     FileUtils::scan($libPath, function ($filename) {
                         $file = File::of($filename);
 

@@ -41,7 +41,8 @@ abstract class AbstractBuildType
     /**
      * @return string path for fxml
      */
-    public function getConfigForm() {
+    public function getConfigForm()
+    {
         return null;
     }
 

@@ -1,0 +1,10 @@
+<quest uid="firstLaunch">
+    <task>
+        <message>TaskMessage</message>
+        <trigger form="MainForm" node="applyButton">click</trigger>
+    </task>
+    <task>
+        <message>TaskMessage2</message>
+        <trigger form="MainForm" node="apply">click</trigger>
+    </task>
+</quest>

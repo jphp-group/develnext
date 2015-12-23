@@ -140,6 +140,26 @@ class Project
     }
 
     /**
+     * @param string $newName
+     * @return bool
+     */
+    public function setName($newName)
+    {
+        if (FileUtils::copyFile($this->getProjectFile(), $this->getFile($newName . ".dnproject")) == -1) {
+            return false;
+        }
+
+        $this->trigger('changeName', $this->name, $newName);
+
+        $this->getProjectFile()->delete();
+        $this->getProjectFile()->deleteOnExit();
+
+        $this->name = $newName;
+
+        return true;
+    }
+
+    /**
      * @param string $path
      *
      * @return bool

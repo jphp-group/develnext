@@ -199,6 +199,8 @@ class GradleBuildConfig
             $this->writeDependencies($stream);
 
             $this->writeCodeBlocks($stream);
+
+            FileUtils::put(File::of($this->file)->getParent() . "/settings.gradle", "rootProject.name = '{$this->projectName}'");
         } finally {
             if ($stream) $stream->close();
         }
@@ -260,6 +262,22 @@ class GradleBuildConfig
 
             $this->sourceSets[$model['@name']] = $model['value'];
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getProjectName()
+    {
+        return $this->projectName;
+    }
+
+    /**
+     * @param string $projectName
+     */
+    public function setProjectName($projectName)
+    {
+        $this->projectName = $projectName;
     }
 
     public function removePlugin($plugin)

@@ -18,16 +18,6 @@ class Quest
     protected $uid;
 
     /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $description;
-
-    /**
      * @var QuestTask
      */
     protected $task;

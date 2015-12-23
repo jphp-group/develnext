@@ -4,6 +4,7 @@ namespace ide\commands;
 use ide\editors\AbstractEditor;
 use ide\forms\BuildProgressForm;
 use ide\Ide;
+use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
 use php\gui\UXButton;
@@ -12,6 +13,7 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
 use php\lang\Process;
+use php\lib\number;
 use php\lib\Str;
 use php\time\Time;
 
@@ -86,6 +88,7 @@ class ExecuteProjectCommand extends AbstractCommand
                 }
             }
         } catch (IOException $e) {
+            Logger::exception('Cannot stop process', $e);
             UXDialog::show('Невозможно завершить процесс', 'ERROR');
         }
     }
@@ -96,13 +99,17 @@ class ExecuteProjectCommand extends AbstractCommand
         $project = $ide->getOpenedProject();
 
         $this->process = new Process(
-            [$ide->getGradleProgram(), 'run', '--daemon'],
+            [$ide->getGradleProgram(), 'clean', 'run', '--daemon'],
             $project->getRootDir(),
             $ide->makeEnvironment()
         );
 
         if ($project) {
             $this->processDialog = $dialog = new BuildProgressForm();
+
+            $dialog->addConsoleLine('Gradle Command = "' . Ide::get()->getGradleProgram() . '"', 'silver');
+            $dialog->addConsoleLine('Java Home = "' . Ide::get()->getJrePath() . '"', 'silver');
+
             $dialog->addConsoleLine('> gradle run', 'green');
             $dialog->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
 
@@ -113,16 +120,28 @@ class ExecuteProjectCommand extends AbstractCommand
             $this->stopButton->enabled = true;
             $this->startButton->enabled = false;
 
-            $this->process = $this->process->start();
+            try {
+                $this->process = $this->process->start();
 
-            $dialog->show($this->process);
+                $dialog->show($this->process);
 
-            $dialog->setStopProcedure([$this, 'onStopExecute']);
-            $dialog->setOnExitProcess(function () {
+                $dialog->setStopProcedure([$this, 'onStopExecute']);
+                $dialog->setOnExitProcess(function () {
+                    $this->stopButton->enabled = false;
+                    $this->startButton->enabled = true;
+                });
+            } catch (IOException $e) {
                 $this->stopButton->enabled = false;
                 $this->startButton->enabled = true;
-            });
+
+                if (!$dialog->visible) {
+                    $dialog->show();
+                }
+
+                $dialog->stopWithException($e);
+            }
         } else {
+            $this->process = null;
             UXDialog::show('Ошибка запуска', 'ERROR');
         }
     }

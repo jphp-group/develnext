@@ -1,7 +1,6 @@
 *.class
 
 # Package Files #
-*.jar
 *.war
 *.ear
 *.iml
@@ -13,12 +12,7 @@
 /lib/
 /out/
 .idea/
-sdk/.idea/
 settings.xml
-/target/
-/site/
-/scripts/
-/jphp-cli/target
 
 /.gradle/
 build/

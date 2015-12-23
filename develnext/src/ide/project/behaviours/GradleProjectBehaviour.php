@@ -34,6 +34,7 @@ class GradleProjectBehaviour extends AbstractProjectBehaviour
 
     public function doSave()
     {
+        $this->config->setProjectName($this->project->getName());
         $this->config->save();
     }
 

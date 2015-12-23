@@ -154,7 +154,7 @@ class FileUtils
             }
 
             $out = new FileStream($dest, 'w+');
-            $out->write($in->readFully());
+            return $out->write($in->readFully());
         } finally {
             if ($out) $out->close();
             if ($in) $in->close();

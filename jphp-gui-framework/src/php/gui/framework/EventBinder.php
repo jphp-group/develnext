@@ -1,10 +1,15 @@
 <?php
 namespace php\gui\framework;
+use Exception;
+use php\gui\AbstractFormWrapper;
 use php\gui\event\UXEvent;
 use php\gui\framework\event\AbstractEventAdapter;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
+use php\gui\UXWindow;
 use php\lang\IllegalArgumentException;
+use php\lang\IllegalStateException;
+use php\lib\items;
 use php\lib\str;
 use php\util\Scanner;
 use ReflectionClass;
@@ -32,6 +37,11 @@ class EventBinder
     protected $binds = [];
 
     /**
+     * @var null|callable
+     */
+    protected $lookup = null;
+
+    /**
      * EventBinder constructor.
      * @param $context
      * @param $handler
@@ -42,6 +52,14 @@ class EventBinder
         $this->handler = $handler ? $handler : $context;
 
         $this->loadBinds();
+    }
+
+    /**
+     * @param callable|null $lookup
+     */
+    public function setLookup($lookup)
+    {
+        $this->lookup = $lookup;
     }
 
     /**
@@ -188,11 +206,16 @@ class EventBinder
     {
         $parts = Str::split($event, '.');
 
-        $eventName = Items::pop($parts);
+        $eventName = items::pop($parts);
 
         if ($parts) {
             $id = Str::join($parts, '.');
-            $node = $this->context->{$id};
+
+            if ($this->lookup) {
+                $node = call_user_func($this->lookup, $this->context, $id);
+            } else {
+                $node = $this->context->{$id};
+            }
         } else {
             $node = $this->context;
         }

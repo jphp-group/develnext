@@ -320,32 +320,6 @@ class Application
         UXApplication::launch(function(UXForm $mainForm) use ($mainFormClass, $showMainForm, $handler, $after) {
             static::$instance = $this;
 
-            set_exception_handler(function (BaseException $e) {
-                static $showed = false;
-
-                if ($showed) {
-                    return;
-                }
-
-                $showed = true;
-
-                $dialog = new UXAlert('ERROR');
-                $dialog->title = 'Error';
-                $dialog->headerText = 'An error has occurred ...';
-                $dialog->contentText = $e->getMessage();
-                $dialog->setButtonTypes(['Stop', 'Ignore']);
-
-                switch ($dialog->showAndWait()) {
-                    case 'Stop':
-                        Application::get()->shutdown();
-                        break;
-                }
-
-                $showed = false;
-            });
-
-            restore_exception_handler();
-
             if ($handler) {
                 $handler();
             }

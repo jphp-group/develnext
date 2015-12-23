@@ -15,6 +15,7 @@ use php\gui\UXDialog;
 use php\gui\UXImageView;
 use php\gui\UXListCell;
 use php\gui\UXListView;
+use php\io\IOException;
 use php\io\Stream;
 use php\lang\Process;
 use php\lang\ThreadPool;
@@ -145,7 +146,7 @@ class BuildProgressForm extends AbstractIdeForm
     public function doOpen()
     {
         $this->progress->progress = -1;
-        $this->closeAfterDoneCheckbox->selected = Ide::get()->getUserConfigValue('builder.closeAfterDone', true);
+        $this->closeAfterDoneCheckbox->selected = true; Ide::get()->getUserConfigValue('builder.closeAfterDone', true);
     }
 
     /**
@@ -181,9 +182,7 @@ class BuildProgressForm extends AbstractIdeForm
      */
     public function doCloseAfterDoneCheckboxClick(UXMouseEvent $e)
     {
-        if ($e->target) {
-            Ide::get()->setUserConfigValue('builder.closeAfterDone', $e->target->selected);
-        }
+        Ide::get()->setUserConfigValue('builder.closeAfterDone', $this->closeAfterDoneCheckbox->selected);
     }
 
     /**
@@ -191,6 +190,8 @@ class BuildProgressForm extends AbstractIdeForm
      */
     public function hide()
     {
+        Ide::get()->setUserConfigValue('builder.closeAfterDone', $this->closeAfterDoneCheckbox->selected);
+
         $this->threadPool->shutdownNow();
         parent::hide();
     }
@@ -211,12 +212,26 @@ class BuildProgressForm extends AbstractIdeForm
     }
 
     /**
+     * @param \Exception $e
+     */
+    public function stopWithException(\Exception $e)
+    {
+        $this->processDone = true;
+
+        $this->addConsoleLine($e->getMessage(), 'red');
+
+        $this->progress->progress = 100;
+        $this->closeButton->enabled = true;
+    }
+
+    /**
      * @param Process $process
      * @param callable $onExit
      *
      */
     public function doProgress(Process $process, callable $onExit = null)
     {
+        $self = $this;
         $scanner = new Scanner($process->getInput());
 
         UXApplication::runLater(function () {
@@ -241,7 +256,6 @@ class BuildProgressForm extends AbstractIdeForm
             });
         }
 
-        $self = $this;
         $exitValue = $process->getExitValue();
         $this->processDone = true;
 

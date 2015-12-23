@@ -6,9 +6,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="98.0" prefWidth="645.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="98.0" prefWidth="645.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label id="messageLabel" layoutX="57.0" layoutY="14.0" prefHeight="30.0" prefWidth="549.0" text="..." wrapText="true" AnchorPane.leftAnchor="57.0" AnchorPane.rightAnchor="21.0">
+      <Label id="messageLabel" layoutX="57.0" layoutY="14.0" prefHeight="41.0" prefWidth="575.0" text="..." wrapText="true" AnchorPane.leftAnchor="57.0" AnchorPane.rightAnchor="13.0">
          <font>
             <Font size="13.0" />
          </font>

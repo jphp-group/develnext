@@ -290,7 +290,11 @@ class Ide extends Application
             $path = $this->getOwnFile('../develnext-tools/');
         }
 
-        return $path && $path->exists() ? $path->getAbsoluteFile() : null;
+        $file = $path && $path->exists() ? $path->getAbsoluteFile() : null;
+
+        Logger::info("Detect tool path: '$file', mode = {$this->mode}");
+
+        return $file;
     }
 
     public function getGradlePath()

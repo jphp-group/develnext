@@ -5,6 +5,7 @@ use ide\forms\BuildProgressForm;
 use ide\forms\BuildSuccessForm;
 use ide\Ide;
 use ide\Logger;
+use ide\misc\GradleBuildConfig;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\Project;
 use php\gui\UXApplication;
@@ -46,6 +47,57 @@ class OneJarBuildType extends AbstractBuildType
         return $project->getRootDir() . '/build/libs';
     }
 
+    static function appendJarTasks(GradleBuildConfig $config, $oneJar = true)
+    {
+        $code = '';
+
+        if ($oneJar) {
+            $code = "
+                from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+                    exclude('JPHP-INF/extensions.list')
+                    exclude('META-INF/services/php.runtime.ext.support.Extension')
+                }
+
+                from 'src/META-INF/services/php.runtime.ext.support.Extension'
+
+                manifest { attributes 'Main-Class': 'php.runtime.launcher.Launcher' }
+            ";
+        }
+
+        $config->appendCodeBlock(__CLASS__, "
+        task splitConfig << {
+             def list = ''<<'';
+
+             configurations.compile.collect {
+                if (it.isFile()) {
+                    def zip = new java.util.zip.ZipFile(it);
+
+                    zip.entries().each {
+                        def name = it.toString().replace(\"\\\\\", \"/\");
+
+                        if (name.endsWith('META-INF/services/php.runtime.ext.support.Extension')) {
+                            list <<= zip.getInputStream(it).text + '\\n';
+                        }
+                    }
+                }
+             }
+
+             def file = new File(\"src/META-INF/services/php.runtime.ext.support.Extension\");
+             file.getParentFile().mkdirs();
+
+             file << list.toString();
+        }
+
+        jar {
+            exclude('.debug/**')
+            exclude('**/*.source')
+
+            $code
+        }\n");
+
+        $config->save();
+    }
+
     /**
      * @param Project $project
      *
@@ -61,67 +113,13 @@ class OneJarBuildType extends AbstractBuildType
 
         $config = $this->getConfig();
 
-        $process = new Process([$ide->getGradleProgram(), 'clean', 'splitConfig', 'jar', 'doneJar'], $project->getRootDir(), $ide->makeEnvironment());
+        $process = new Process([$ide->getGradleProgram(), 'clean', 'splitConfig', 'jar'], $project->getRootDir(), $ide->makeEnvironment());
         $project->compile(Project::ENV_PROD);
 
         /** @var GradleProjectBehaviour $gradle */
         $gradle = $project->getBehaviour(GradleProjectBehaviour::class);
 
-        $gradle->getConfig()->appendCodeBlock(__CLASS__, "
-
-        task splitConfig << {
-             def list = ''<<'';
-
-             configurations.compile.collect {
-                if (it.isFile()) {
-                    def zip = new java.util.zip.ZipFile(it);
-
-                    zip.entries().each {
-                        def name = it.toString().replace(\"\\\\\", \"/\");
-
-                        if (name.endsWith('JPHP-INF/extensions.list')) {
-                            list <<= zip.getInputStream(it).text + '\\n';
-                        }
-                    }
-                }
-             }
-
-             def file = new File(project.buildDir.path + \"/JPHP-INF/extensions.list\");
-
-             file.getParentFile().mkdirs();
-
-             file << list.toString();
-        }
-
-        task doneJar(type: Jar) {
-            from (zipTree(jar.destinationDir.path + '/project.jar'))
-            from (project.buildDir.path) {
-               include 'JPHP-INF/extensions.list'
-            }
-
-            doLast {
-                new File(project.buildDir.path + \"/JPHP-INF/extensions.list\").delete()
-            }
-
-            manifest { attributes 'Main-Class': 'php.runtime.launcher.Launcher' }
-        }
-
-        jar {
-            exclude('.debug/**')
-            exclude('**/*.source')
-            exclude('JPHP-INF/extensions.list')
-
-            from configurations.compile.collect {
-               it.isDirectory() ? it : zipTree(it)
-            }
-
-            manifest { attributes 'Main-Class': 'php.runtime.launcher.Launcher' }
-
-            archiveName = 'project.jar'
-        }\n");
-
-
-        $gradle->getConfig()->save();
+        self::appendJarTasks($gradle->getConfig());
 
         $dialog = new BuildProgressForm();
         $dialog->addConsoleLine('> gradle jar', 'green');
@@ -135,8 +133,7 @@ class OneJarBuildType extends AbstractBuildType
             Logger::info("Finish executing: exitValue = $exitValue");
 
             if ($exitValue == 0) {
-                File::of($this->getBuildPath($project) . '/project.jar')->renameTo($this->getBuildPath($project) . "/{$project->getName()}.jar");
-                File::of($this->getBuildPath($project) . '/project.jar')->delete();
+                File::of($this->getBuildPath($project) . '/dn-compile-module.jar')->renameTo($this->getBuildPath($project) . "/{$project->getName()}.jar");
 
                 if ($finished) {
                     if (is_callable($finished)) {

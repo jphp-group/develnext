@@ -1,12 +1,8 @@
 <quest uid="exampleQuest">
-    <name>QuestName</name>
-    <description>QuestDescription</description>
-
     <task>
         <message>TaskMessage</message>
         <trigger form="MainForm" node="applyButton">click</trigger>
     </task>
-
     <task>
         <message>TaskMessage2</message>
         <trigger form="MainForm" node="apply">click</trigger>

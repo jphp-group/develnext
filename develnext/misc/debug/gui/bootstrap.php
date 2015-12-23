@@ -14,12 +14,15 @@ $app = Application::get();
 
 $mainForm = $app->getMainForm();
 
-if (!$mainForm->alwaysOnTop) {
-    $mainForm->alwaysOnTop = true;
-    $mainForm->alwaysOnTop = false;
-}
 
-$mainForm->requestFocus();
+UXApplication::runLater(function () use ($mainForm) {
+    if (!$mainForm->alwaysOnTop) {
+        $mainForm->alwaysOnTop = true;
+        $mainForm->alwaysOnTop = false;
+    }
+
+    $mainForm->requestFocus();
+});
 
 set_exception_handler(function (BaseException $e) {
     static $showed = false;

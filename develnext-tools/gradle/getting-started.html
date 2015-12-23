@@ -255,6 +255,7 @@ li em, p em {
 code em, tt em {
   text-decoration: none;
 }
+
             .variablelist dt {
     font-weight: bold;
 }
@@ -403,6 +404,18 @@ a.link {
     margin-top: 0.6em;
 }
 
+.book .toc > dl > dt > .part {
+    display: inline-block;
+    font-size: 1.4em;
+    font-variant: small-caps;
+    margin-top: 0.6em;
+    margin-bottom: 0.3em;
+}
+
+.book .toc > dl > dd {
+    margin-left: 0;
+}
+
 .book .toc, .book .list-of-examples {
     margin-top: 1.5em;
 }
@@ -475,9 +488,14 @@ div.toc p b {
     margin-top: 4em;
 }
 
+.toc .chapter {
+    padding-top: 0;
+}
+
 div.example code.filename {
   font-weight: bold;
 }
+
         </style></head><body><div class="chapter"><div class="titlepage"><div><div><h1 xmlns:xslthl="http://xslthl.sf.net"><a name="installation"></a>Installing Gradle</h1></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10007"></a>Prerequisites</h2></div></div></div><p>Gradle requires a Java JDK or JRE to be installed, version 6 or higher (to check, use <strong class="userinput"><code>java -version</code></strong>).
     	Gradle ships with its own Groovy library, therefore Groovy does not need to be installed. Any existing Groovy installation is ignored by Gradle.
     </p><p>Gradle uses whatever JDK it finds in your path.
