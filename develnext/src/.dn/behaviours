@@ -2,6 +2,7 @@ ide\behaviour\spec\DraggingFormBehaviourSpec
 ide\behaviour\spec\DraggingBehaviourSpec
 ide\behaviour\spec\EscapeShutdownBehaviourSpec
 ide\behaviour\spec\GridMovementBehaviourSpec
+ide\behaviour\spec\KeyInputRuleBehaviourSpec
 
 ide\behaviour\spec\CursorBindBehaviourSpec
 ide\behaviour\spec\WatchMakerBehaviourSpec

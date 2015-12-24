@@ -85,7 +85,7 @@ class ScriptModuleEditor extends FormEditor
             return "icons/appBlock16.png";
         }
 
-        return parent::getTitle();
+        return parent::getIcon();
     }
 
     public function __set($name, $value)

@@ -103,10 +103,6 @@ public class UXApplication extends BaseWrapper<Application> {
     public static void runLater(final Invoker callback) {
         new JFXPanel();
 
-        if (isShutdown()) {
-            return;
-        }
-
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
