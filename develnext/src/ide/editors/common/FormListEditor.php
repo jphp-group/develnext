@@ -10,7 +10,7 @@ class FormListEditor extends ObjectListEditor
     {
         $this->comboBox->items->clear();
 
-        $this->comboBox->items->add(new ObjectListEditorItem('...', null, ''));
+        $this->comboBox->items->add(new ObjectListEditorItem($this->emptyItemText, null, ''));
 
         $project = Ide::get()->getOpenedProject();
 

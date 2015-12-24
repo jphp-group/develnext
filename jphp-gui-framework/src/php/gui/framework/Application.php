@@ -282,7 +282,7 @@ class Application
 
         $this->namespace = $this->config->get('app.namespace', '');
 
-        if ($this->config->has('app.mainForm')) {
+        if ($this->config->get('app.mainForm')) {
             $this->setMainFormClass($this->config->get('app.mainForm'));
         }
     }
@@ -311,7 +311,7 @@ class Application
     public function launch(callable $handler = null, callable $after = null)
     {
         $mainFormClass = $this->mainFormClass;
-        $showMainForm  = $this->config->getBoolean('app.showMainForm');
+        $showMainForm  = $this->config->getBoolean('app.showMainForm') && $mainFormClass;
 
         /*if (!class_exists($mainFormClass)) {    TODO Remove it
             throw new Exception("Unable to start the application without the main form class or the class '$mainFormClass' not found");
@@ -324,7 +324,7 @@ class Application
                 $handler();
             }
 
-            $this->mainForm = $this->getForm($mainFormClass, $mainForm);
+            $this->mainForm = $mainFormClass ? $this->getForm($mainFormClass, $mainForm) : null;
 
             if ($showMainForm && $this->mainForm) {
                 $this->mainForm->show();

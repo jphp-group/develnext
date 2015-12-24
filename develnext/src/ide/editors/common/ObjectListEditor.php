@@ -64,6 +64,11 @@ class ObjectListEditor
     protected $disableForms;
 
     /**
+     * @var string
+     */
+    protected $emptyItemText = '...';
+
+    /**
      * ObjectListEditor constructor.
      * @param AbstractEditor $editor
      * @param array $filters
@@ -72,6 +77,22 @@ class ObjectListEditor
     {
         $this->editor = $editor;
         $this->filters = $filters;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmptyItemText()
+    {
+        return $this->emptyItemText;
+    }
+
+    /**
+     * @param string $emptyItemText
+     */
+    public function setEmptyItemText($emptyItemText)
+    {
+        $this->emptyItemText = $emptyItemText;
     }
 
     public function disableDependencies()
@@ -208,7 +229,7 @@ class ObjectListEditor
         $this->comboBox->items->clear();
 
         $undef = new ObjectListEditorItem();
-        $undef->text = '...';
+        $undef->text = $this->emptyItemText;
         $this->comboBox->items->add($undef);
 
         if ($this->senderCode) {

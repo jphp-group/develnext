@@ -2,14 +2,17 @@
 namespace ide\editors;
 
 use ide\Ide;
+use ide\Logger;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\EventBinder;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXVBox;
+use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\gui\UXLabel;
 use php\gui\UXLoader;
 use php\gui\UXNode;
+use php\gui\UXSeparator;
 use php\io\ResourceStream;
 use php\io\Stream;
 use php\lib\str;
@@ -30,6 +33,11 @@ class ProjectEditor extends AbstractEditor
      * @var UXLabel
      */
     protected $projectNameLabel;
+
+    /**
+     * @var bool
+     */
+    protected $init = false;
 
     public function getTitle()
     {
@@ -53,7 +61,18 @@ class ProjectEditor extends AbstractEditor
         $project = Ide::project();
 
         if ($project) {
+            if ($project && !$this->init) {
+                $this->init = true;
+                UXApplication::runLater(function () use ($project) {
+                    $project->trigger('makeSettings', $this);
+                });
+            }
+
             $this->projectNameLabel->text = $project->getName();
+
+            UXApplication::runLater(function () use ($project) {
+                $project->trigger('updateSettings', $this);
+            });
         }
     }
 
@@ -65,6 +84,22 @@ class ProjectEditor extends AbstractEditor
     public function save()
     {
         // nop.
+    }
+
+    /**
+     * @param UXNode $node
+     */
+    public function addSettingsPane(UXNode $node)
+    {
+        Logger::info("Add settings pane ...");
+
+        $pane = new UXVBox();
+        $pane->add($node);
+        $pane->padding = 10;
+
+        $this->content->add($pane);
+
+        $this->content->add(new UXSeparator());
     }
 
     /**

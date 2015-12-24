@@ -14,8 +14,10 @@ use ide\commands\CreateGameSceneProjectCommand;
 use ide\commands\CreateGameSpriteProjectCommand;
 use ide\commands\CreateScriptModuleProjectCommand;
 use ide\commands\ExecuteProjectCommand;
+use ide\editors\common\FormListEditor;
 use ide\editors\FactoryEditor;
 use ide\editors\FormEditor;
+use ide\editors\ProjectEditor;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\factory\FactoryProjectTreeNavigation;
 use ide\formats\form\FormProjectTreeNavigation;
@@ -43,9 +45,12 @@ use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use php\gui\framework\Timer;
+use php\gui\layout\UXHBox;
+use php\gui\UXLabel;
 use php\gui\UXTreeItem;
 use php\gui\UXTreeView;
 use php\io\File;
+use php\io\IOException;
 use php\io\Stream;
 use php\lib\Str;
 use php\util\Configuration;
@@ -82,10 +87,22 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     protected $spriteManager;
 
     /**
+     * @var FormListEditor
+     */
+    protected $settingsMainFormCombobox;
+
+    /**
+     * @var Configuration
+     */
+    protected $applicationConfig;
+
+    /**
      * ...
      */
     public function inject()
     {
+        $this->applicationConfig = new Configuration();
+
         $this->project->on('recover', [$this, 'doRecover']);
         $this->project->on('create', [$this, 'doCreate']);
         $this->project->on('open', [$this, 'doOpen']);
@@ -94,6 +111,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('export', [$this, 'doExport']);
         $this->project->on('reindex', [$this, 'doReindex']);
         $this->project->on('update', [$this, 'doUpdate']);
+        $this->project->on('makeSettings', [$this, 'doMakeSettings']);
+        $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
 
         WatcherSystem::addListener([$this, 'doWatchFile']);
 
@@ -122,6 +141,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $this->mainForm;
     }
 
+    public function setMainForm($form)
+    {
+        Logger::info("Set main form, old = $this->mainForm, new = $form");
+        $this->mainForm = $form;
+
+        $this->project->createFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
+    }
+
     /**
      * @return IdeSpriteManager
      */
@@ -145,6 +172,42 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         if ($this->spriteManager) {
             $this->spriteManager->reloadAll();
         }
+    }
+
+    public function doUpdateSettings(ProjectEditor $editor)
+    {
+        if ($this->settingsMainFormCombobox) {
+            $mainForm = $this->getMainForm();
+
+            $this->settingsMainFormCombobox->updateUi();
+
+            $this->setMainForm($mainForm);
+            $this->settingsMainFormCombobox->setSelected($mainForm);
+        }
+    }
+
+    public function doMakeSettings(ProjectEditor $editor)
+    {
+        $formListEditor = new FormListEditor();
+        $formListEditor->setEmptyItemText('[Нет]');
+        $formListEditor->build();
+
+        $formListEditor->onChange(function ($value) {
+            $this->setMainForm($value);
+        });
+
+        $formListEditor->getUi()->width = 250;
+
+        $ui = new UXHBox([
+            new UXLabel('Главная форма'),
+            $formListEditor->getUi()
+        ]);
+        $ui->spacing = 10;
+        $ui->alignment = 'CENTER_LEFT';
+
+        $this->settingsMainFormCombobox = $formListEditor;
+
+        $editor->addSettingsPane($ui);
     }
 
     public function doReindex(ProjectIndexer $indexer)
@@ -318,6 +381,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->updateScriptManager();
         $this->updateSpriteManager();
+
+        try {
+            $this->applicationConfig->load($this->project->getFile('src/.system/application.conf'));
+        } catch (IOException $e) {
+            Logger::warn("Unable to load application.conf, {$e->getMessage()}");
+        }
+
+        $this->mainForm = $this->applicationConfig->get('app.mainForm', 'MainForm');
     }
 
     public function doUpdateTree(ProjectTree $tree, $path)

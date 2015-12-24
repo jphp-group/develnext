@@ -6,8 +6,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="345.0" prefWidth="667.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="345.0" prefWidth="667.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox id="content" layoutX="200.0" layoutY="105.0" prefHeight="338.0" prefWidth="667.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -15,7 +14,7 @@
                <children>
                   <VBox>
                      <children>
-                        <Label text="Имя проекта:" />
+                        <Label text="Имя проекта:" textFill="#a8a8a8" />
                         <Label id="projectNameLabel" text="Project Name">
                            <font>
                               <Font name="System Bold" size="16.0" />
@@ -23,9 +22,9 @@
                         </Label>
                      </children>
                   </VBox>
-                  <Button id="changeNameButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Изменить">
+                  <Button id="changeNameButton" mnemonicParsing="false" prefHeight="25.0" styleClass="icon-edit">
                      <padding>
-                        <Insets left="15.0" right="15.0" />
+                        <Insets left="5.0" right="5.0" />
                      </padding>
                   </Button>
                </children>
