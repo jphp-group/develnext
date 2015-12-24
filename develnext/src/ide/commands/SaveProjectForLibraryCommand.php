@@ -28,6 +28,11 @@ class SaveProjectForLibraryCommand extends AbstractCommand
         return true;
     }
 
+    public function getCategory()
+    {
+        return 'library';
+    }
+
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $project = Ide::project();

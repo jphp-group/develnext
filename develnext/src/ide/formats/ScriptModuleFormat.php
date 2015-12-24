@@ -17,6 +17,7 @@ use ide\scripts\elements\MacroScriptComponent;
 use ide\scripts\elements\ModuleScriptComponent;
 use ide\scripts\elements\TimerScriptComponent;
 use ide\scripts\ScriptComponentContainer;
+use ide\utils\FileUtils;
 use php\io\File;
 use php\lib\Str;
 
@@ -60,6 +61,12 @@ class ScriptModuleFormat extends AbstractFormFormat
 
     public function getTitle($path)
     {
+        $name = FileUtils::stripExtension(File::of($path)->getName());
+
+        if ($name == 'AppModule') {
+            return "AppModule [Загрузчик]";
+        }
+
         return parent::getTitle($path);
     }
 

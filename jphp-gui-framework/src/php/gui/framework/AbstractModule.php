@@ -201,4 +201,13 @@ abstract class AbstractModule extends AbstractScript
 
         throw new \EngineException("Unable to call " . get_class($this) . "::" . $name . "() method");
     }
+
+    public function loadForm($form, $saveSize = false, $savePosition = false)
+    {
+        if ($this->getContextForm()) {
+            $this->getContextForm()->loadForm($form, $saveSize, $savePosition);
+        } else {
+            app()->showForm($form);
+        }
+    }
 }

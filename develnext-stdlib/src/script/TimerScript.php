@@ -4,6 +4,7 @@ namespace script;
 use php\gui\framework\AbstractScript;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
+use php\lang\IllegalStateException;
 use php\lang\InterruptedException;
 use php\lang\Thread;
 use php\xml\DomDocument;
@@ -84,6 +85,10 @@ class TimerScript extends AbstractScript
                 }
             } catch (InterruptedException $e) {
                 ;
+            } catch (IllegalStateException $e) {
+                if ($e->getMessage() != "java.lang.IllegalStateException: Platform.exit has been called") {
+                    throw $e;
+                }
             }
         }));
 
@@ -157,6 +162,11 @@ class TimerScript extends AbstractScript
      */
     static function executeAfter($delay, callable $callback)
     {
+        if ($delay <= 0) {
+            $callback();
+            return null;
+        }
+
         $timer = new TimerScript();
         $timer->repeatable = false;
         $timer->interval = $delay;

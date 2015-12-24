@@ -77,6 +77,17 @@ class ScriptModuleEditor extends FormEditor
         });
     }
 
+    public function getIcon()
+    {
+        $name = FileUtils::stripExtension(File::of($this->file)->getName());
+
+        if ($name == 'AppModule') {
+            return "icons/appBlock16.png";
+        }
+
+        return parent::getTitle();
+    }
+
     public function __set($name, $value)
     {
         $this->properties[$name] = $value;

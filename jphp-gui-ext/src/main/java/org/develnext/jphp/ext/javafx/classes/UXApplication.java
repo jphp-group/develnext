@@ -103,6 +103,10 @@ public class UXApplication extends BaseWrapper<Application> {
     public static void runLater(final Invoker callback) {
         new JFXPanel();
 
+        if (isShutdown()) {
+            return;
+        }
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -113,6 +117,10 @@ public class UXApplication extends BaseWrapper<Application> {
                 try {
                     callback.callNoThrow();
                 } catch (Exception e) {
+                    if (e instanceof IllegalStateException && "java.lang.IllegalStateException: Platform.exit has been called".equals(e.getMessage())) {
+                        return;
+                    }
+
                     callback.getEnvironment().catchUncaught(e);
                 }
             }

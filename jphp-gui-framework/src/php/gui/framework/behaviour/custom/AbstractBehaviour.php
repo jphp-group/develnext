@@ -1,5 +1,6 @@
 <?php
 namespace php\gui\framework\behaviour\custom;
+use php\gui\framework\ScriptEvent;
 use php\lang\IllegalStateException;
 use php\gui\UXDialog;
 use ReflectionClass;
@@ -107,7 +108,7 @@ abstract class AbstractBehaviour
 
     protected function timer($interval, $callback)
     {
-        $this->__timers[] = $timerScript = new TimerScript($interval, true, function (TimerScript $e = null) use ($callback) {
+        $this->__timers[] = $timerScript = new TimerScript($interval, true, function (ScriptEvent $e = null) use ($callback) {
             if ($this->_target->isFree()) {
                 return;
             }

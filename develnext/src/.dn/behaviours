@@ -11,3 +11,4 @@ ide\behaviour\spec\BlinkAnimationBehaviourSpec
 ide\behaviour\spec\ChatterAnimationBehaviourSpec
 ide\behaviour\spec\RotateAnimationBehaviourSpec
 ide\behaviour\spec\RandomMovementAnimationBehaviourSpec
+ide\behaviour\spec\VibrationAnimationBehaviourSpec

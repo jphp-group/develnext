@@ -159,6 +159,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doCreate()
     {
+        $appModule = $this->createModule('AppModule');
+        FileSystem::open($appModule);
+
         $mainModule = $this->createModule('MainModule');
         FileSystem::open($mainModule);
 
@@ -724,7 +727,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->makeDirectory('src/.forms');
         $this->project->makeDirectory('src/.system');
         $this->project->makeDirectory('src/.scripts');
-        $this->project->makeDirectory('src/.scripts/MainModule');
+        $this->project->makeDirectory('src/.scripts/AppModule');
         $this->project->makeDirectory('src/JPHP-INF');
 
         $this->project->makeDirectory('src/app');

@@ -262,14 +262,6 @@ class Application
 
                     $this->modules[$module->id] = $module;
                 }
-
-                foreach ($this->modules as $module) {
-                    if ($module->applyToApplication) {
-                        UXApplication::runLater(function () use ($module) {
-                            $module->apply($this);
-                        });
-                    }
-                }
             }
         } catch (IOException $e) {
             ;
@@ -331,6 +323,15 @@ class Application
             }
 
             $this->launched = true;
+
+            foreach ($this->modules as $module) {
+                if ($module->applyToApplication || $module->id == 'AppModule') {
+
+                    UXApplication::runLater(function () use ($module) {
+                        $module->apply($this);
+                    });
+                }
+            }
 
             if ($after) {
                 $after();
