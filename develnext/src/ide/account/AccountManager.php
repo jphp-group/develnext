@@ -9,6 +9,7 @@ use ide\forms\LoginForm;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
+use ide\misc\EventHandlerBehaviour;
 use ide\ui\Notifications;
 use ide\utils\Json;
 use php\gui\UXApplication;
@@ -21,6 +22,8 @@ use php\gui\UXTrayNotification;
  */
 class AccountManager
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var LoginForm
      */
@@ -94,10 +97,18 @@ class AccountManager
                     }
 
                     $this->updateIdeUi();
+
+                    UXApplication::runLater(function () {
+                        $this->trigger('update', [$this->accountData]);
+                    });
                 }
             });
 
         } else {
+            UXApplication::runLater(function () {
+                $this->trigger('update', [null]);
+            });
+
             $this->accountData = [];
             $this->updateIdeUi();
         }
@@ -161,19 +172,12 @@ class AccountManager
     {
         $this->updateIdeUi();
 
-        if (!$this->accessToken) {
-            if (!$always) {
-                $ideHits = (int) Ide::get()->getUserConfigValue('account.ideHits', 0);
-
-                Ide::get()->setUserConfigValue('account.ideHits', $ideHits + 1);
-
-                /*if ($ideHits % 10 != 0) {
-                    return;
-                }  */
-            }
-
+        if (!$this->accessToken || $always) {
             if (!$this->loginForm->visible) {
-                $this->loginForm->showAndWait();
+                $this->loginForm->show();
+                return true;
+            } else {
+                return false;
             }
         }
 
@@ -183,5 +187,7 @@ class AccountManager
             }
         });
         $this->updateAccount();
+
+        return true;
     }
 }

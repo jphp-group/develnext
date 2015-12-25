@@ -133,7 +133,13 @@ public class UXDesigner extends BaseObject {
                 }
 
                 if (contextMenu != null && event.getButton() == MouseButton.SECONDARY) {
-                    contextMenu.show(area, event.getScreenX(), event.getScreenY());
+                    if (contextMenu.isShowing()) {
+                        contextMenu.setX(event.getSceneX());
+                        contextMenu.setY(event.getSceneY());
+                    } else {
+                        contextMenu.show(area, event.getScreenX(), event.getScreenY());
+                    }
+
                     event.consume();
                     return;
                 }
@@ -374,7 +380,7 @@ public class UXDesigner extends BaseObject {
 
         area.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
-            public void handle(MouseEvent event) {
+            public void handle(final MouseEvent event) {
                 if (disabled) return;
 
                 if (event.getX() > area.getPrefWidth() || event.getY() > area.getPrefHeight()) {
@@ -391,9 +397,23 @@ public class UXDesigner extends BaseObject {
                 }
 
                 if (contextMenu != null && event.getButton() == MouseButton.SECONDARY) {
-                    contextMenu.show(area, event.getScreenX(), event.getScreenY());
+                    if (contextMenu.isShowing()) {
+                        contextMenu.hide();
+                    }
+
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            contextMenu.show(area, event.getScreenX(), event.getScreenY());
+                        }
+                    });
+
                     event.consume();
                     return;
+                } else {
+                    if (contextMenu != null) {
+                        contextMenu.hide();
+                    }
                 }
 
                 if (selectionEnabled) {
@@ -775,7 +795,7 @@ public class UXDesigner extends BaseObject {
             throw new RuntimeException("Node already registered");
         }
 
-        node.setFocusTraversable(false);
+        //node.setFocusTraversable(false);
 
         nodes.put(node, new Item(node));
 
@@ -843,8 +863,8 @@ public class UXDesigner extends BaseObject {
         node.addEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
 
         EventHandler<MouseEvent> onMousePressed = new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent e) {
-                Node node = (Node) e.getSource();
+            public void handle(final MouseEvent e) {
+                final Node node = (Node) e.getSource();
 
                 if (onNodeClick != null) {
                     if (onNodeClick.callAny(e).toBoolean()) {
@@ -880,7 +900,17 @@ public class UXDesigner extends BaseObject {
 
                 if (e.getButton() == MouseButton.SECONDARY) {
                     if (contextMenu != null && !(node instanceof Control)) {
-                        contextMenu.show(node, e.getScreenX(), e.getScreenY());
+                        if (contextMenu.isShowing()) {
+                            contextMenu.setX(e.getSceneX());
+                            contextMenu.setY(e.getSceneY());
+                            return;
+                        } else {
+                            contextMenu.show(node, e.getScreenX(), e.getScreenY());
+                        }
+                    }
+                } else {
+                    if (contextMenu != null) {
+                        contextMenu.hide();
                     }
                 }
 
@@ -917,9 +947,9 @@ public class UXDesigner extends BaseObject {
                         onChanged.callAny();
                     }
 
-                    if (e.getButton() == MouseButton.PRIMARY) {
+                    //if (e.getButton() == MouseButton.PRIMARY) {
                         e.consume();
-                    }
+                    //}
                 } else {
                     for (Selection selection : selections.values()) {
                         selection.update();
@@ -927,9 +957,9 @@ public class UXDesigner extends BaseObject {
                 }
 
 
-                if (e.getButton() == MouseButton.PRIMARY) {
+                //if (e.getButton() == MouseButton.PRIMARY) {
                     e.consume();
-                }
+                //}
 
                 tmpLock = true;
 

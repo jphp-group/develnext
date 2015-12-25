@@ -7,6 +7,8 @@ use php\gui\framework\ScriptEvent;
 use php\gui\layout\UXRegion;
 use php\gui\UXGeometry;
 use php\gui\UXNode;
+use php\gui\UXScreen;
+use php\gui\UXWindow;
 use php\util\SharedValue;
 use script\TimerScript;
 
@@ -27,7 +29,7 @@ class RandomMovementAnimationBehaviour extends AnimationBehaviour
      */
     protected function applyImpl($target)
     {
-        if ($target instanceof UXNode) {
+        if ($target instanceof UXNode || $target instanceof UXWindow) {
             $timer = new TimerScript();
             $timer->interval = $this->duration;
             $timer->repeatable = true;
@@ -42,13 +44,26 @@ class RandomMovementAnimationBehaviour extends AnimationBehaviour
                 $timer->interval = $this->duration;
 
                 if ($this->enabled && !$busy->get()) {
-                    $parent = $target->parent;
+                    $paddingX = 0;
+                    $paddingY = 0;
 
-                    $paddingX = $parent instanceof UXRegion ? $parent->paddingRight : 0;
-                    $paddingY = $parent instanceof UXRegion ? $parent->paddingBottom : 0;
+                    if ($target instanceof UXWindow) {
+                        $screen = UXScreen::getPrimary();
+                        $parentWidth  = $screen->visualBounds['width'];
+                        $parentHeight = $screen->visualBounds['height'];
+                    } else {
+                        $parent = $target->parent;
 
-                    $x = rand(0, $parent->width - $target->width - $paddingX);
-                    $y = rand(0, $parent->height - $target->height - $paddingY);
+                        $parentWidth = $parent->width;
+                        $parentHeight = $parent->height;
+
+                        $paddingX = $parent instanceof UXRegion ? $parent->paddingRight : 0;
+                        $paddingY = $parent instanceof UXRegion ? $parent->paddingBottom : 0;
+                    }
+
+
+                    $x = rand(0, $parentWidth - $target->width - $paddingX);
+                    $y = rand(0, $parentHeight - $target->height - $paddingY);
 
                     if ($this->animated) {
                         $busy->set(true);

@@ -4,6 +4,7 @@ namespace ide\behaviour\spec;
 use behaviour\custom\BlinkAnimationBehaviour;
 use behaviour\custom\RandomMovementAnimationBehaviour;
 use ide\behaviour\AbstractBehaviourSpec;
+use ide\formats\form\elements\FormFormElement;
 use ide\scripts\AbstractScriptComponent;
 use php\gui\UXNode;
 

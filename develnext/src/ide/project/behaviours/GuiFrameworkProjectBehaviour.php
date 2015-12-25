@@ -348,6 +348,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree->register(new ModuleProjectTreeNavigation(self::SCRIPTS_DIRECTORY));
         $tree->register(new SpriteProjectTreeNavigation(self::GAME_DIRECTORY . '/sprites'));
 
+        $tree->getRoot()->root->children->add( $tree->createItemForFile($this->project->getFile('src/.theme/style.css'))->getOrigin() );
+
         /*$formsItem = $tree->getOrCreateItem('forms', 'Формы', 'icons/folder16.png', $this->project->getFile(self::FORMS_DIRECTORY));
         $formsItem->setExpanded(true);
         $formsItem->setDisableDelete(true);

@@ -25,11 +25,13 @@ use php\gui\JSException;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;
 use php\gui\UXApplication;
+use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
+use php\gui\UXSeparator;
 use php\gui\UXTextArea;
 use php\io\File;
 use php\io\IOException;
@@ -598,7 +600,16 @@ class Ide extends Application
                     $headUi = [$headUi];
                 }
 
-                foreach ($headUi as $ui) $mainForm->getHeadPane()->add($ui);
+                foreach ($headUi as $ui) {
+                    if ($ui instanceof UXButton) {
+                        $ui->padding = 8;
+                    } else if ($ui instanceof UXSeparator) {
+                        $ui->paddingLeft = 4;
+                        $ui->paddingRight = 2;
+                    }
+
+                    $mainForm->getHeadPane()->add($ui);
+                }
             });
         }
 

@@ -3,6 +3,7 @@ namespace ide\account;
 
 use ide\account\api\AbstractService;
 use ide\account\api\AccountService;
+use ide\account\api\MediaService;
 use ide\account\api\NoticeService;
 use ide\account\api\ProfileService;
 use ide\account\api\ProjectService;
@@ -63,6 +64,11 @@ class ServiceManager
     protected $noticeService;
 
     /**
+     * @var MediaService
+     */
+    protected $mediaService;
+
+    /**
      * ServiceManager constructor.
      */
     public function __construct()
@@ -72,6 +78,7 @@ class ServiceManager
         $this->ideService = new IdeService();
         $this->projectService = new ProjectService();
         $this->noticeService = new NoticeService();
+        $this->mediaService = new MediaService();
 
         $this->accountService->on('exception', function () { $this->updateStatus(); });
         $this->projectService->on('exception', function () { $this->updateStatus(); });
@@ -211,6 +218,14 @@ class ServiceManager
     public function account()
     {
         return $this->accountService;
+    }
+
+    /**
+     * @return MediaService
+     */
+    public function media()
+    {
+        return $this->mediaService;
     }
 
     /**

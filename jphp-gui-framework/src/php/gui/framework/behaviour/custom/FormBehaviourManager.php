@@ -23,7 +23,11 @@ class FormBehaviourManager extends BehaviourManager
 
     public function apply($targetId, AbstractBehaviour $behaviour)
     {
-        $target = $this->form->layout->lookup("#$targetId");
+        if (!$targetId) {
+            $target = $this->form;
+        } else {
+            $target = $this->form->layout->lookup("#$targetId");
+        }
 
         if (!$target) {
             throw new IllegalArgumentException("$targetId is not found to apply behaviour " . get_class($behaviour));

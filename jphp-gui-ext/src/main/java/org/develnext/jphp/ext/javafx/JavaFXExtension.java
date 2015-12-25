@@ -78,12 +78,14 @@ public class JavaFXExtension extends Extension {
         registerMemoryOperation(InsetsMemoryOperation.class);
         registerMemoryOperation(DurationMemoryOperation.class);
         registerMemoryOperation(ColorMemoryOperation.class);
+        registerMemoryOperation(Rectangle2DMemoryOperation.class);
 
         registerClass(scope, UXGeometry.class);
 
         registerWrapperClass(scope, ObservableValue.class, UXValue.class);
         registerWrapperClass(scope, ObservableList.class, UXList.class);
         registerWrapperClass(scope, Application.class, UXApplication.class);
+        registerWrapperClass(scope, Screen.class, UXScreen.class);
 
         registerWrapperClass(scope, Font.class, UXFont.class);
         registerWrapperClass(scope, Color.class, UXColor.class);

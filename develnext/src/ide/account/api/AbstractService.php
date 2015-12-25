@@ -5,6 +5,7 @@ use Exception;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
+use ide\ui\Notifications;
 use ide\utils\Json;
 use php\format\ProcessorException;
 use php\gui\UXApplication;
@@ -165,12 +166,13 @@ abstract class AbstractService
     /**
      * @param $methodName
      * @param $json
+     * @param bool $tryAuth
      * @return ServiceResponse
      * @throws ServiceException
      * @throws ServiceInvalidResponseException
      * @throws ServiceNotAvailableException
      */
-    public function execute($methodName, $json)
+    public function execute($methodName, $json, $tryAuth = true)
     {
         try {
             $connection = $this->buildConnection($methodName);
@@ -204,6 +206,19 @@ abstract class AbstractService
 
                 if ($response->isFail() && $response->message() == "InvalidAuthorization") {
                     Ide::accountManager()->setAccessToken(null);
+                }
+
+                if ($response->isFail()) {
+                    switch ($response->message()) {
+                        case 'AuthorizationExpired':
+                            UXApplication::runLater(function () {
+                                if (Ide::accountManager()->authorize(true)) {
+                                    Notifications::showAccountAuthorizationExpired();
+                                }
+                            });
+
+                            return $response;
+                    }
                 }
 
                 return $response;

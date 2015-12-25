@@ -27,6 +27,7 @@ use php\gui\UXContextMenu;
 use php\gui\UXDesktop;
 use php\gui\UXDialog;
 use php\gui\UXForm;
+use php\gui\UXLabel;
 use php\gui\UXListView;
 use php\gui\UXMenuItem;
 use php\gui\UXNode;
@@ -166,7 +167,7 @@ class CodeEditor extends AbstractEditor
 
     public function getTitle()
     {
-        return File::of($this->file)->getName();
+        return $this->format->getTitle($this->file);
     }
 
     public function jumpToLine($line, $offset = 0)
@@ -256,6 +257,16 @@ class CodeEditor extends AbstractEditor
 
         return $ui;
     }
+
+    public function makeLeftPaneUi()
+    {
+        $tmp = new UXLabel('В разработке ...');
+        $tmp->style = '-fx-font-style: italic;';
+        $tmp->padding = 10;
+
+        return $tmp;
+    }
+
 
     public function registerDefaultCommands()
     {
@@ -349,8 +360,8 @@ class SetDefaultCommand extends AbstractCommand
         return true;
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        ;
+        //
     }
 }

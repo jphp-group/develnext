@@ -40,6 +40,8 @@ class NodeFormElementTag extends AbstractFormElementTag
         $element->setAttribute('prefWidth', $node->size[0]);
         $element->setAttribute('prefHeight', $node->size[1]);
 
+        $element->setAttribute('focusTraversable', $node->focusTraversable ? 'true' : 'false');
+
         if ($node->opacity < 1) {
             $element->setAttribute('opacity', $node->opacity);
         }

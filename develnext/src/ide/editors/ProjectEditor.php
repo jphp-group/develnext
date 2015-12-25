@@ -8,11 +8,13 @@ use php\gui\framework\EventBinder;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXVBox;
 use php\gui\UXApplication;
+use php\gui\UXDesktop;
 use php\gui\UXDialog;
 use php\gui\UXLabel;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXSeparator;
+use php\io\File;
 use php\io\ResourceStream;
 use php\io\Stream;
 use php\lib\str;
@@ -38,6 +40,11 @@ class ProjectEditor extends AbstractEditor
      * @var bool
      */
     protected $init = false;
+
+    /**
+     * @var UXLabel
+     */
+    protected $projectDirLabel;
 
     public function getTitle()
     {
@@ -69,6 +76,7 @@ class ProjectEditor extends AbstractEditor
             }
 
             $this->projectNameLabel->text = $project->getName();
+            $this->projectDirLabel->text = File::of($project->getRootDir());
 
             UXApplication::runLater(function () use ($project) {
                 $project->trigger('updateSettings', $this);
@@ -125,6 +133,7 @@ class ProjectEditor extends AbstractEditor
 
         $this->content = $ui->lookup('#content');
         $this->projectNameLabel = $ui->lookup('#projectNameLabel');
+        $this->projectDirLabel = $ui->lookup('#projectDirLabel');
 
         return $pane;
     }
@@ -155,5 +164,14 @@ class ProjectEditor extends AbstractEditor
                 }
             }
         }
+    }
+
+    /**
+     * @event openProjectDirButton.action
+     */
+    public function doOpenProjectDir()
+    {
+        $desktop = new UXDesktop();
+        $desktop->open(Ide::project()->getRootDir());
     }
 }

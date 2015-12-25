@@ -39,13 +39,21 @@ class ChatterAnimationBehaviour extends AnimationBehaviour
         $this->yValue = $yValue = new SharedValue($target->y);
         $sleep  = new SharedValue(false);
 
-        $target->observer('layoutX')->addListener(function ($old, $new) use ($xValue, $sleep) {
+        $propX = 'x';
+        $propY = 'y';
+
+        if ($target instanceof UXNode) {
+            $propX = 'layoutX';
+            $propY = 'layoutY';
+        }
+
+        $target->observer($propX)->addListener(function ($old, $new) use ($xValue, $sleep) {
             if (!$sleep->get()) {
                 $xValue->set($new);
             }
         });
 
-        $target->observer('layoutY')->addListener(function ($old, $new) use ($yValue, $sleep) {
+        $target->observer($propY)->addListener(function ($old, $new) use ($yValue, $sleep) {
             if (!$sleep->get()) {
                 $yValue->set($new);
             }

@@ -34,4 +34,9 @@ class Notifications
     {
         return static::show('Произошла ошибка', $e->getMessage(), 'ERROR');
     }
+
+    public static function showAccountAuthorizationExpired()
+    {
+        static::show('Данные входа устарели', 'Вам необходимо снова зайти под своим пользователем, т.к. данных предыдущего входа устарели.', 'WARNING');
+    }
 }

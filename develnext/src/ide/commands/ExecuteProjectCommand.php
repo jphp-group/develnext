@@ -58,6 +58,7 @@ class ExecuteProjectCommand extends AbstractCommand
         $this->stopButton->enabled = false;
 
         $this->startButton = $this->makeGlyphButton();
+        $this->startButton->text = 'Запустить';
 
         return [$this->startButton, $this->stopButton];
     }

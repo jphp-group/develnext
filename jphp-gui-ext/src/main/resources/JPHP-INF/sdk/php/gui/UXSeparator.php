@@ -21,4 +21,12 @@ class UXSeparator extends UXControl
      * @var string
      */
     public $vAlignment;
+
+    /**
+     * UXSeparator constructor.
+     * @param string $orientation
+     */
+    public function __construct($orientation = 'HORIZONTAL')
+    {
+    }
 }

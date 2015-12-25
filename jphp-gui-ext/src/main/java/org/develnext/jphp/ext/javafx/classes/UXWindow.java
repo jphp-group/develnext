@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
+import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.UserData;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
@@ -309,6 +310,11 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
         } else {
             throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
         }
+    }
+
+    @Signature
+    public ObservableValue observer(String property) {
+        return JavaFxUtils.findObservable(this.getWrappedObject(), property);
     }
 
     @Signature

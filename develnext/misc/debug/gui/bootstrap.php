@@ -25,7 +25,7 @@ if ($mainForm) {
     });
 }
 
-set_exception_handler(function (BaseException $e) {
+/*set_exception_handler(function (BaseException $e) {
     static $showed = false;
 
     if ($showed) {
@@ -62,4 +62,4 @@ set_exception_handler(function (BaseException $e) {
 
 
 restore_exception_handler();
-restore_exception_handler();
+restore_exception_handler();*/

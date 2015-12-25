@@ -107,10 +107,23 @@ class Animation
                 }
             };
 
-            $object->flow()->map(function () use ($object, $duration, $x, $y, $done) {
-                Animation::moveTo($object, $duration, $x, $y, $done);
+            $result = [];
+
+            $object->flow()->map(function () use ($object, $duration, $x, $y, $done, &$result) {
+                $result[] = Animation::moveTo($object, $duration, $x, $y, $done);
             });
-            return null;
+
+            return $result;
+        }
+
+        if ($object instanceof UXWindow) {
+            if (!$object->visible) {
+                if ($callback) {
+                    TimerScript::executeAfter($duration, $callback);
+                }
+
+                return null;
+            }
         }
 
         if ($object instanceof UXNode || $object instanceof UXWindow) {

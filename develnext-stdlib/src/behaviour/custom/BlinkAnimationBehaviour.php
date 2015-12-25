@@ -5,6 +5,7 @@ use action\Animation;
 use php\gui\framework\behaviour\custom\AnimationBehaviour;
 use php\gui\framework\ScriptEvent;
 use php\gui\UXNode;
+use php\gui\UXWindow;
 use script\TimerScript;
 
 class BlinkAnimationBehaviour extends AnimationBehaviour
@@ -24,7 +25,7 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
      */
     protected function applyImpl($target)
     {
-        if (!($target instanceof UXNode)) {
+        if (!($target instanceof UXNode) && !($target instanceof UXWindow)) {
             return;
         }
 

@@ -117,8 +117,8 @@ class Element
             return true;
         }
 
-        if ($object instanceof UXImageView) {
-            $object->image = new UXImage(Stream::of($path));
+        if ($object instanceof UXImageView || $object instanceof UXImageArea) {
+            $object->image = $path ? new UXImage(Stream::of($path)) : null;
             return true;
         }
 
