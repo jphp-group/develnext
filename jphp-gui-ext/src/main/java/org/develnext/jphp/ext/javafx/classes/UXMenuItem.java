@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -18,8 +19,11 @@ import php.runtime.reflection.ClassEntity;
 public class UXMenuItem extends BaseWrapper<MenuItem> {
     interface WrappedInterface {
         @Property String id();
-        @Property String text();
         @Property String style();
+
+        @Property("classes")
+        ObservableList<String> styleClass();
+
         @Property @Nullable Node graphic();
         @Property ContextMenu parentPopup();
 
@@ -102,6 +106,16 @@ public class UXMenuItem extends BaseWrapper<MenuItem> {
         } else {
             throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
         }
+    }
+
+    @Getter
+    public String getText() {
+        return getWrappedObject().getText();
+    }
+
+    @Setter
+    public void setText(String value) {
+        getWrappedObject().setText(value);
     }
 
     @Signature

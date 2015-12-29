@@ -132,7 +132,7 @@ class Ide extends Application
         parent::launch(
             function () {
                 Logger::reset();
-                Logger::info("Start IDE ...");
+                Logger::info("Start IDE, mode = $this->mode, os = $this->OS, version = {$this->getVersion()}");
 
                 restore_exception_handler();
 
@@ -181,10 +181,7 @@ class Ide extends Application
                 }
 
                 $this->splash = $splash = new SplashForm();
-
-                if (!$this->isDevelopment()) {
-                    $splash->show();
-                }
+                $splash->show();
 
                 UXApplication::runLater(function () {
                     $this->registerAll();
@@ -202,7 +199,7 @@ class Ide extends Application
                     /*UXApplication::runLater(function () {
                         Notifications::showAccountWelcome();
                     });*/
-                    $this->accountManager->authorize();
+                    $this->accountManager->updateAccount();
                 });
 
                 $this->serviceManager->on('privateDisable', function () {
@@ -889,10 +886,8 @@ class Ide extends Application
         }
 
         if ($this->accountManager->isAuthorized()) {
-            Ide::service()->ide()->shutdownAsync(null);
+            //Ide::service()->ide()->shutdownAsync(null);
         }
-
-        Ide::service()->shutdown();
 
         Logger::info("Finish IDE shutdown");
         try {

@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands\account;
 
+use ide\editors\AbstractEditor;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
@@ -21,12 +22,17 @@ class AccountLogoutCommand extends AbstractCommand
         return 'account';
     }
 
+    public function getIcon()
+    {
+        return 'icons/accountLogout16.png';
+    }
+
     public function withBeforeSeparator()
     {
         return true;
     }
 
-    public function onExecute()
+    public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $email = Ide::accountManager()->getAccountEmail();
 
@@ -38,8 +44,6 @@ class AccountLogoutCommand extends AbstractCommand
                 Ide::service()->account()->logoutAsync(null);
 
                 Ide::get()->getMainForm()->toast('Вы успешно вышли из аккаунта');
-
-                Ide::accountManager()->authorize(true);
             }
         }
     }

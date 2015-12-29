@@ -441,74 +441,17 @@ abstract class AbstractForm extends UXForm
         });
     }
 
-    public function showPreloader($text = '', $timeout = 0)
+    public function showPreloader($text = '')
     {
         $this->hidePreloader();
 
-        $pane = $this->layout;
-
-        $preloader = new UXAnchorPane();
-        UXAnchorPane::setAnchor($preloader, 0);
-        $preloader->size = $pane->size;
-
-        $preloader->position = [0, 0];
-        $preloader->opacity = 0.6;
-
-        $indicator = new UXProgressIndicator();
-        $indicator->progress = -1;
-        $indicator->size = [48, 48];
-
-        $label = null;
-
-        if ($text) {
-            $label = new UXLabel($text);
-            $label->text = $text;
-            $preloader->add($label);
-        }
-
-        $preloader->watch('width', function () use ($pane, $indicator, $label, $text) {
-            $indicator->x = $pane->width / 2 - $indicator->width / 2;
-
-            if ($label) {
-                $label->x = $pane->width / 2 - $label->font->calculateTextWidth($text) / 2;
-            }
-        });
-
-        $preloader->watch('height', function () use ($pane, $indicator, $label) {
-            $indicator->y = $pane->height / 2 - $indicator->height / 2;
-
-            if ($label) {
-                $label->y = $indicator->y + $indicator->height + 5;
-            }
-        });
-
-        $preloader->add($indicator);
-
-        $preloader->id = 'x-preloader';
-        $preloader->style = '-fx-background-color: white';
-
-        $pane->add($preloader);
-
-        $preloader->toFront();
-
-        if ($timeout) {
-            (new Thread(function () use ($timeout) {
-                Thread::sleep($timeout);
-
-                UXApplication::runLater(function () {
-                    $this->hidePreloader();
-                });
-            }))->start();
-        }
+        $preloader = new Preloader($this->layout, $text);
+        $preloader->show();
     }
 
     public function hidePreloader()
     {
-        $preloader = $this->layout->lookup('#x-preloader');
-
-        if ($preloader) {
-            $preloader->free();
-        }
+        Preloader::hidePreloader($this->layout);
     }
 
     /**

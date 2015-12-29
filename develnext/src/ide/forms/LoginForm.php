@@ -5,6 +5,7 @@ use ide\account\api\AccountService;
 use ide\account\api\ServiceResponse;
 use ide\Ide;
 use ide\Logger;
+use ide\ui\Notifications;
 use ide\utils\UiUtils;
 use php\gui\UXDesktop;
 use php\gui\framework\AbstractForm;
@@ -27,7 +28,7 @@ use php\gui\UXTextField;
  * @property UXHyperlink $registerLink
  * @property UXHyperlink $forgetPasswordLink
  */
-class LoginForm extends AbstractIdeForm
+class LoginForm extends AbstractOnlineIdeForm
 {
     protected function init()
     {
@@ -48,12 +49,10 @@ class LoginForm extends AbstractIdeForm
         Ide::service()->account()->authAsync($this->emailField->text, $this->passwordField->text,
             function (ServiceResponse $response) {
                 if ($response->isSuccess()) {
-                    UXDialog::show($response->message());
-
                     Ide::accountManager()->setAccessToken($response->data());
                     $this->hide();
                 } else {
-                    UXDialog::show($response->message(), 'ERROR');
+                    Notifications::error('Ошибка входа', $response->message());
                 }
 
                 $this->hidePreloader();
@@ -79,6 +78,9 @@ class LoginForm extends AbstractIdeForm
                     Ide::accountManager()->setAccessToken($redirectForm->getResult());
                     $this->hide();
                 }
+            } else {
+                $this->loginVkButton->enabled = false;
+                Notifications::error('Ошибка входа', 'Сервис временно недоступен, попробуйте позже или используйте обычную регистрацию.');
             }
 
             $this->hidePreloader();
@@ -91,6 +93,9 @@ class LoginForm extends AbstractIdeForm
     public function actionRegister()
     {
         $registerForm = new RegisterForm();
-        $registerForm->showAndWait();
+
+        if ($registerForm->showDialog() && $registerForm->getResult()) {
+            $this->hide();
+        }
     }
 }

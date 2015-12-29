@@ -97,7 +97,10 @@ class FlowListViewDecorator implements \Countable
                 $this->selection->title = '...';
                 $this->selection->size = [1, 1];
 
-                $this->selection->data('drag', true);
+                if ($this->isMultipleSelection()) {
+                    $this->selection->data('drag', true);
+                }
+
                 $this->selection->data('dragX', $e->screenX);
                 $this->selection->data('dragY', $e->screenY);
 
@@ -367,6 +370,10 @@ class FlowListViewDecorator implements \Countable
 
         $node->on('mouseDown', function (UXMouseEvent $e) {
             if (!$e->controlDown && !($e->button == 'SECONDARY' && $e->sender->classes->has('selected'))) {
+                $this->clearSelections();
+            }
+
+            if (!$this->isMultipleSelection()) {
                 $this->clearSelections();
             }
 

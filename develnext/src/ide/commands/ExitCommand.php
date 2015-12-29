@@ -21,9 +21,7 @@ class ExitCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        ProjectSystem::close();
-
-        Ide::get()->shutdown();
+        Ide::get()->getMainForm()->trigger('close', $e);
     }
 
     public function withBeforeSeparator()

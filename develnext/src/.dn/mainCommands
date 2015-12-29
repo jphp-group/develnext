@@ -6,4 +6,11 @@ ide\commands\ExportProjectCommand
 ide\commands\SaveProjectForLibraryCommand
 ide\commands\CloseProjectCommand
 ide\commands\ExitCommand
+
 ide\commands\IdeLogShowCommand
+
+ide\commands\OfficialSiteCommand
+ide\commands\YoutubeChannelCommand
+ide\commands\VkGroupCommand
+
+ide\commands\CheckUpdatesCommand

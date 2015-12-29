@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.effect.*?>
@@ -18,11 +19,42 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
+         <effect>
+            <InnerShadow color="WHITE" />
+         </effect>
       </ImageView>
-      <Label id="version" visible="false" alignment="TOP_RIGHT" layoutX="410.0" layoutY="356.0" prefHeight="20.0" prefWidth="188.0" style="-fx-font-style: italic;" text="... version" textAlignment="RIGHT" textFill="#747575">
+      <Label id="version" alignment="TOP_RIGHT" layoutX="410.0" layoutY="356.0" prefHeight="20.0" prefWidth="188.0" style="-fx-font-style: italic;" text="... version" textAlignment="RIGHT" textFill="#747575" visible="false">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
+      <HBox id="accountPane" layoutX="14.0" layoutY="14.0" spacing="15.0" style="-fx-background-color: white;">
+         <children>
+            <AnchorPane id="accountAvatarImage" prefWidth="50.0" />
+            <VBox HBox.hgrow="ALWAYS">
+               <children>
+                  <Label text="Привет">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label id="accountNameLabel" text="User Name" textFill="#25649c">
+                     <font>
+                        <Font size="23.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+         </padding>
+         <effect>
+            <DropShadow blurType="GAUSSIAN" color="WHITE" />
+         </effect>
+      </HBox>
    </children>
 </AnchorPane>

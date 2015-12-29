@@ -7,6 +7,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
+use ide\ui\Notifications;
 use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\io\IOException;
@@ -68,11 +69,12 @@ class ExecuteProjectCommand extends AbstractCommand
         $ide = Ide::get();
         $project = $ide->getOpenedProject();
 
+        $this->stopButton->enabled = false;
+
         try {
             $pid = Stream::getContents($project->getRootDir() . "/application.pid");
 
             if ($pid) {
-                $this->stopButton->enabled = false;
 
                 if ($ide->isWindows()) {
                     $result = `taskkill /PID $pid /f`;
@@ -81,16 +83,22 @@ class ExecuteProjectCommand extends AbstractCommand
                 }
 
                 if (!$result) {
-                    UXDialog::show('Процесс еще не запущен, дождитесь запуска', 'ERROR');
-                    $this->stopButton->enabled = true;
-                } else {
-                    $this->startButton->enabled = true;
-                    $this->processDialog->hide();
+                    Notifications::showExecuteUnableStop();
                 }
+            } else {
+                Notifications::showExecuteUnableStop();
             }
         } catch (IOException $e) {
             Logger::exception('Cannot stop process', $e);
-            UXDialog::show('Невозможно завершить процесс', 'ERROR');
+            Notifications::showExecuteUnableStop();
+        } finally {
+            $this->startButton->enabled = true;
+            $this->processDialog->hide();
+        }
+
+        if ($this->process instanceof Process) {
+            $this->process->destroy();
+            $this->process = null;
         }
     }
 
@@ -131,6 +139,7 @@ class ExecuteProjectCommand extends AbstractCommand
                     $this->stopButton->enabled = false;
                     $this->startButton->enabled = true;
                 });
+
             } catch (IOException $e) {
                 $this->stopButton->enabled = false;
                 $this->startButton->enabled = true;

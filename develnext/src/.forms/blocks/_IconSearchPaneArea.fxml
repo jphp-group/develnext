@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox prefWidth="200.0" spacing="10.0">
+         <children>
+            <Button id="searchButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-flat-search">
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
+            </Button>
+            <TextField id="queryField" prefHeight="39.0" prefWidth="397.0" promptText="введите ключевые слова для поиска" HBox.hgrow="ALWAYS">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+         </children>
+      </HBox>
+      <Label text="Например: &quot;плюс добавить add&quot;" textFill="#868686">
+         <font>
+            <Font name="System Italic" size="12.0" />
+         </font>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <padding>
+            <Insets left="75.0" />
+         </padding>
+      </Label>
+      <HBox spacing="10.0">
+         <children>
+            <Label text="Размеры:">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <CheckBox id="size16" mnemonicParsing="false" text="16x16" />
+            <CheckBox id="size24" mnemonicParsing="false" text="24x24" />
+            <CheckBox id="size32" mnemonicParsing="false" text="32x32" />
+            <CheckBox id="size48" mnemonicParsing="false" text="48x48" />
+            <CheckBox id="size64" mnemonicParsing="false" text="64x64" />
+            <CheckBox id="size128" mnemonicParsing="false" text="128х128" />
+            <CheckBox id="size256" mnemonicParsing="false" text="256х256" />
+         </children>
+      </HBox>
+      <ScrollPane id="list" fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+         <content>
+            <FlowPane columnHalignment="CENTER" prefHeight="200.0" prefWidth="200.0" />
+         </content>
+      </ScrollPane>
+      <Label text="* Для выбора нужной иконки нажмите на нее дважды" textFill="#868686" />
+   </children>
+   <padding>
+      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+   </padding>
+</VBox>

@@ -4,10 +4,11 @@ namespace ide\forms;
 use ide\account\api\ServiceResponse;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
+use ide\ui\Notifications;
 use php\gui\framework\AbstractForm;
 use php\gui\UXDialog;
 
-class RegisterConfirmForm extends AbstractIdeForm
+class RegisterConfirmForm extends AbstractOnlineIdeForm
 {
     use DialogFormMixin;
 
@@ -34,9 +35,10 @@ class RegisterConfirmForm extends AbstractIdeForm
         Ide::service()->account()->confirmAsync($this->emailField->text, $this->keyField->text,
             function (ServiceResponse $response) {
                 if ($response->isNotSuccess()) {
-                    UXDialog::show($response->message(), 'ERROR');
+                    Notifications::showInvalidValidation();
+
                     $this->hidePreloader();
-                    $this->setResult(null);
+                    $this->setResult(false);
                     return;
                 }
 

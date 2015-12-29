@@ -3,10 +3,12 @@
 namespace ide\commands;
 
 use ide\editors\AbstractEditor;
+use ide\editors\menu\ContextMenu;
 use ide\Ide;
 use ide\misc\AbstractCommand;
 use php\gui\layout\UXPanel;
 use php\gui\text\UXFont;
+use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXImageArea;
 use php\gui\UXLabel;
@@ -30,6 +32,16 @@ class MyAccountCommand extends AbstractCommand
     protected $accountImage;
 
     /**
+     * @var UXPanel
+     */
+    protected $accountImagePanel;
+
+    /**
+     * @var ContextMenu
+     */
+    protected $contextMenu;
+
+    /**
      * MyAccountCommand constructor.
      */
     public function __construct()
@@ -40,17 +52,17 @@ class MyAccountCommand extends AbstractCommand
 
         Ide::service()->on('privateDisable', function () {
             $this->accountButton->enabled = false;
+            $this->accountImage->image = Ide::get()->getImage('noAvatar.jpg')->image;
         }, __CLASS__);
 
         Ide::accountManager()->on('update', function ($data) {
             $this->accountButton->text = $data ? $data['name'] : 'Войти в аккаунт';
 
-            Ide::service()->media()->loadImage($data['avatar'], $this->accountImage);
-
-            if (!$this->accountImage->image) {
-                $this->accountImage->image = Ide::get()->getImage('noAvatar.jpg')->image;
-            }
+            Ide::service()->media()->loadImage($data['avatar'], $this->accountImage, 'noAvatar.jpg');
         }, __CLASS__);
+
+        $this->contextMenu = new ContextMenu();
+        $this->contextMenu->setCssClass('account-menu');
     }
 
     public function getName()
@@ -60,7 +72,17 @@ class MyAccountCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        Ide::accountManager()->authorize();
+        if (Ide::accountManager()->isAuthorized()) {
+            $this->contextMenu->clear();
+
+            foreach (Ide::get()->getInternalList('.dn/account/menuCommands') as $class) {
+                $this->contextMenu->addCommand(new $class());
+            }
+
+            $this->contextMenu->getRoot()->showByNode($this->accountButton, 0, 33);
+        } else {
+            Ide::accountManager()->authorize(true);
+        }
     }
 
     public function getIcon()
@@ -97,6 +119,8 @@ class MyAccountCommand extends AbstractCommand
         $panel->borderWidth = 1;
         $panel->borderColor = 'silver';
         $panel->size = [32, 32];
+
+        $this->accountImagePanel = $panel;
 
         return [$panel, $btn, new UXSeparator('VERTICAL')];
     }

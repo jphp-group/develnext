@@ -2,7 +2,22 @@
 
 }
 
+.flat-button {
+    -fx-background-color: white;
+}
+
+.flat-button:hover {
+    -fx-background-color: #ececec;
+}
+
 /* icons .. */
+.icon-flat-edit { -fx-graphic: url("/.data/img/icons/flatEdit16.png"); }
+.icon-flat-delete { -fx-graphic: url("/.data/img/icons/flatDelete16.png"); }
+.icon-flat-gallery { -fx-graphic: url("/.data/img/icons/flatGallery16.png"); }
+.icon-flat-refresh { -fx-graphic: url("/.data/img/icons/flatRefresh16.png"); }
+.icon-flat-account { -fx-graphic: url("/.data/img/icons/account16.png"); }
+.icon-flat-search { -fx-graphic: url("/.data/img/icons/flatSearch16.png"); }
+
 .icon-exit { -fx-graphic: url("/.data/img/icons/exit16.png"); }
 .icon-exit32 { -fx-graphic: url("/.data/img/icons/exit32.png"); }
 
@@ -24,6 +39,8 @@
 .icon-green-document { -fx-graphic: url("/.data/img/icons/greenDocument16.png"); }
 .icon-red-document { -fx-graphic: url("/.data/img/icons/redDocument16.png"); }
 .icon-rabbit-food { -fx-graphic: url("/.data/img/icons/rabbitFood16.png"); }
+.icon-download-ext { -fx-graphic: url("/.data/img/icons/downloadExt16.png"); }
+.icon-youtube { -fx-graphic: url("/.data/img/icons/youtube16.png"); }
 
 .icon-refresh { -fx-graphic: url("/.data/img/icons/refresh16.png"); }
 .icon-refresh32 { -fx-graphic: url("/.data/img/icons/refresh32.png"); }
@@ -97,4 +114,13 @@
     -fx-font-style: italic;
     -fx-font-size: 1.6em;
     -fx-padding: 20px;
+}
+
+.account-menu {
+    -fx-padding: 5px;
+}
+
+.account-menu-item {
+    -fx-padding: 4px 5px;
+    -fx-cursor: hand;;
 }

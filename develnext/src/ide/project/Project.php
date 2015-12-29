@@ -13,6 +13,7 @@ use ide\utils\FileHelper;
 use ide\utils\FileUtils;
 use php\compress\ArchiveInputStream;
 use php\compress\ArchiveOutputStream;
+use php\gui\UXApplication;
 use php\gui\UXTreeView;
 use php\io\File;
 use php\io\FileStream;
@@ -411,7 +412,9 @@ class Project
             }
 
             if (File::of($file)->exists()) {
-                FileSystem::open($file, false);
+                UXApplication::runLater(function () use ($file) {
+                    FileSystem::open($file, false);
+                });
             }
         }
 
@@ -422,7 +425,9 @@ class Project
         }
 
         if ($selected && File::of($selected)->exists()) {
-            FileSystem::open($selected, true);
+            UXApplication::runLater(function () use ($selected) {
+                FileSystem::open($selected, true);
+            });
         }
 
         //if (!$this->indexer->isValid()) { todo implement it

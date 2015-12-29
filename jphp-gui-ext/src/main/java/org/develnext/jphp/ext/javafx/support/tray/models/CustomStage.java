@@ -9,6 +9,8 @@ import javafx.stage.StageStyle;
 
 public class CustomStage extends Stage {
 
+    public static final int GAP = 5;
+
     private final Location bottomRight;
     private final Location bottomLeft;
     private final Location topLeft;
@@ -22,8 +24,8 @@ public class CustomStage extends Stage {
         setSize(ap.getPrefWidth(), ap.getPrefHeight());
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        double x = screenBounds.getMinX() + screenBounds.getWidth() - ap.getPrefWidth() - 2;
-        double y = screenBounds.getMinY() + screenBounds.getHeight() - ap.getPrefHeight() - 2;
+        double x = screenBounds.getMinX() + screenBounds.getWidth() - ap.getPrefWidth() - GAP;
+        double y = screenBounds.getMinY() + screenBounds.getHeight() - ap.getPrefHeight() - GAP;
 
         bottomRight = new Location(x, y);
         bottomLeft = new Location(2, y);
@@ -33,7 +35,7 @@ public class CustomStage extends Stage {
 
     public Location getBottomRight(int viewIndex) {
         if (viewIndex > 0) {
-            return new Location(bottomRight.getX(), bottomRight.getY() - (viewIndex * (getHeight() + 2)));
+            return new Location(bottomRight.getX(), bottomRight.getY() - (viewIndex * (getHeight() + GAP)));
         }
 
         return bottomRight;
@@ -41,7 +43,7 @@ public class CustomStage extends Stage {
 
     public Location getBottomLeft(int viewIndex) {
         if (viewIndex > 0) {
-            return new Location(bottomLeft.getX(), bottomLeft.getY() - (viewIndex * (getHeight() + 2)));
+            return new Location(bottomLeft.getX(), bottomLeft.getY() - (viewIndex * (getHeight() + GAP)));
         }
 
         return bottomLeft;
@@ -49,7 +51,7 @@ public class CustomStage extends Stage {
 
     public Location getTopLeft(int viewIndex) {
         if (viewIndex > 0) {
-            return new Location(topLeft.getX(), topLeft.getY() - (viewIndex * (getHeight() + 2)));
+            return new Location(topLeft.getX(), topLeft.getY() - (viewIndex * (getHeight() + GAP)));
         }
 
         return topLeft;
@@ -57,7 +59,7 @@ public class CustomStage extends Stage {
 
     public Location getTopRight(int viewIndex) {
         if (viewIndex > 0) {
-            return new Location(topRight.getX(), topRight.getY() + (viewIndex * (getHeight() + 2)));
+            return new Location(topRight.getX(), topRight.getY() + (viewIndex * (getHeight() + GAP)));
         }
 
         return topRight;

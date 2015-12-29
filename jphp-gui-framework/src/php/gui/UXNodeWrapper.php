@@ -33,6 +33,10 @@ class UXNodeWrapper
             $this->node->visible = $data->get('visible');
         }
 
+        if ($data->has('tooltipText') && $this->node instanceof UXControl) {
+            $this->node->tooltipText = $data->get('tooltipText');
+        }
+
         if ($data->has('cursor') && $data->get('cursor') !== 'DEFAULT') {
             $this->node->cursor = $data->get('cursor');
         }

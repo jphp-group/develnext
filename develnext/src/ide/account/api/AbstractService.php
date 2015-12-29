@@ -63,6 +63,11 @@ abstract class AbstractService
     protected $pool;
 
     /**
+     * @var string
+     */
+    protected static $cookie;
+
+    /**
      * AbstractService constructor.
      */
     public function __construct()
@@ -75,7 +80,7 @@ abstract class AbstractService
         $this->pool->shutdown();
     }
 
-    public function upload($methodName, $files)
+    public function upload($methodName, array $files)
     {
         try {
             $connection = $this->buildConnection($methodName);
@@ -165,6 +170,22 @@ abstract class AbstractService
 
     /**
      * @param $methodName
+     * @return Stream
+     */
+    public function getStream($methodName)
+    {
+        try {
+            $connection = $this->buildConnection($methodName);
+            $connection->requestMethod = 'GET';
+
+            return $connection->getInputStream();
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param $methodName
      * @param $json
      * @param bool $tryAuth
      * @return ServiceResponse
@@ -209,15 +230,21 @@ abstract class AbstractService
                 }
 
                 if ($response->isFail()) {
-                    switch ($response->message()) {
-                        case 'AuthorizationExpired':
-                            UXApplication::runLater(function () {
-                                if (Ide::accountManager()->authorize(true)) {
-                                    Notifications::showAccountAuthorizationExpired();
-                                }
-                            });
+                    $message = $response->message();
 
-                            return $response;
+                    if ($message == 'AuthorizationExpired') {
+                        var_dump($response->message());
+                        var_dump($message == 'AuthorizationExpired');
+                        var_dump($message === 'AuthorizationExpired');
+                        Logger::info("{$response->message()}, need auth, methodName = {$methodName}, data = {$data}");
+
+                        UXApplication::runLater(function () {
+                            if (Ide::accountManager()->authorize(true)) {
+                                Notifications::showAccountAuthorizationExpired();
+                            }
+                        });
+
+                        return $response;
                     }
                 }
 
@@ -256,15 +283,18 @@ abstract class AbstractService
                     throw new Exception("Last parameter must be callable for method $name()");
                 }
 
-                $this->pool->execute(function () use ($name, $args, $last) {
-                    $json = $this->{$name}(...$args);
+                if (!$this->pool->isShutdown()) {
+                    $this->pool->execute(function () use ($name, $args, $last) {
+                        $json = $this->{$name}(...$args);
 
-                    if ($last) {
-                        UXApplication::runLater(function () use ($last, $json) {
-                            $last($json);
-                        });
-                    }
-                });
+                        if ($last) {
+                            UXApplication::runLater(function () use ($last, $json) {
+                                $last($json);
+                            });
+                        }
+                    });
+                }
+
                 return;
             }
         }
@@ -277,7 +307,7 @@ abstract class AbstractService
         if (Ide::get()->isDevelopment()) {
             return ("http://localhost:8080/a/" . $url);
         } else {
-            return (Ide::service()->getEndpoint() .  "a/" . $url);
+            return (Ide::service()->getEndpoint() .  "/a/" . $url);
         }
     }
 
@@ -291,6 +321,13 @@ abstract class AbstractService
         $connection->followRedirects = true;
 
         $connection->setRequestProperty("Content-Type", "application/json");
+
+        if (Ide::service()->getSession()) {
+            $connection->setRequestProperty('Cookie', "JSESSIONID=" . Ide::service()->getSession() . ";");
+        }
+
+        Logger::debug('Cookie: ' . self::$cookie);
+
         $accountManager = Ide::accountManager();
 
         if ($accountManager) {

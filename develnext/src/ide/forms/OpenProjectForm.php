@@ -6,11 +6,15 @@ use ide\Ide;
 use ide\project\ProjectConfig;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
+use ide\ui\FlowListViewDecorator;
+use ide\ui\ImageBox;
 use ide\utils\FileUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
+use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
+use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;
@@ -26,7 +30,7 @@ use php\lib\Str;
 /**
  *
  * @property UXImageView $icon
- * @property UXListView $projectList
+ * @property UXScrollPane $projectList
  * @property UXTextField $pathField
  * @property UXButton $openButton
  *
@@ -43,8 +47,19 @@ class OpenProjectForm extends AbstractIdeForm
     /** @var UXFileChooser */
     protected static $fileChooser;
 
+    /**
+     * @var FlowListViewDecorator
+     */
+    protected $projectListHelper;
+
     public function init()
     {
+        parent::init();
+
+        $this->projectListHelper = new FlowListViewDecorator($this->projectList->content);
+        $this->projectListHelper->setEmptyListText('Список проектов пуст.');
+        $this->projectListHelper->setMultipleSelection(false);
+
         $this->directoryChooser = new UXDirectoryChooser();
 
         if (!self::$fileChooser) {
@@ -58,42 +73,11 @@ class OpenProjectForm extends AbstractIdeForm
         $this->icon->image = Ide::get()->getImage('icons/open32.png')->image;
         $this->modality = 'APPLICATION_MODAL';
         $this->title = 'Открыть проект';
-
-        $this->projectList->style = '-fx-cell-hover-color: silver';
-
-        $this->projectList->setCellFactory(function (UXListCell $cell, File $file = null) {
-            if ($file) {
-                $config = ProjectConfig::createForFile($file);
-                $template = $config->getTemplate();
-
-                $titleName = new UXLabel(FileUtils::stripExtension($file->getName()));
-                $titleName->style = '-fx-font-weight: bold;';
-
-                $titleDescription = new UXLabel($file);
-                $titleDescription->style = '-fx-text-fill: gray;';
-
-                $title = new UXVBox([$titleName, $titleDescription]);
-                $title->spacing = 0;
-
-                $list = [];
-
-                $list[] = Ide::get()->getImage($template ? $template->getIcon32() : 'icons/question32.png');
-                $list[] = $title;
-
-                $line = new UXHBox($list);
-
-                $line->spacing = 7;
-                $line->padding = 5;
-
-                $cell->text = null;
-                $cell->graphic = $line;
-            }
-        });
     }
 
     public function update()
     {
-        $this->projectList->items->clear();
+        $this->projectListHelper->clear();
 
         $projectDirectory = File::of(Ide::get()->getUserConfigValue('projectDirectory'));
 
@@ -119,7 +103,25 @@ class OpenProjectForm extends AbstractIdeForm
             return $a->lastModified() > $b->lastModified() ? -1 : 1;
         });
 
-        $this->projectList->items->addAll($projects);
+        foreach ($projects as $project) {
+            /** @var File $project */
+            $config = ProjectConfig::createForFile($project);
+            $template = $config->getTemplate();
+
+            $one = new ImageBox(72, 48);
+            $one->data('file', $project);
+            $one->setTitle(FileUtils::stripExtension($project->getName()));
+            $one->setImage(Ide::get()->getImage($template ? $template->getIcon32() : 'icons/question32.png')->image);
+
+            $one->on('click', function (UXMouseEvent $e) {
+                $fix = $e;
+                UXApplication::runLater(function () use ($e) {
+                    $this->doProjectListClick($e);
+                });
+            });
+
+            $this->projectListHelper->add($one);
+        }
 
         $this->pathField->text = $projectDirectory;
     }
@@ -155,7 +157,8 @@ class OpenProjectForm extends AbstractIdeForm
     public function doProjectListClick(UXMouseEvent $e)
     {
         if ($e->clickCount > 1) {
-            $file = $this->projectList->focusedItem;
+            $node = $this->projectListHelper->getSelectionNode();
+            $file = $node ? $node->data('file') : null;
 
             if ($file && $file->exists()) {
                 ProjectSystem::open($file);

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="395.0" prefWidth="656.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="14.0" layoutY="14.0" prefHeight="428.0" prefWidth="628.0" spacing="10.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="48.0" prefWidth="631.0" spacing="20.0">
+               <children>
+                  <ImageView id="icon" fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" />
+                  <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label prefHeight="35.0" text="Редактирование профиля" textFill="#486aa8">
+                           <font>
+                              <Font name="Tahoma" size="28.0" />
+                           </font>
+                        </Label>
+                        <Label prefHeight="21.0" text="Здесь вы можете поменять отредактировать данные профиля" textFill="#979797">
+                           <font>
+                              <Font name="Tahoma" size="17.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" />
+               </padding>
+            </HBox>
+            <HBox prefHeight="200.0" prefWidth="616.0" spacing="20.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox prefHeight="229.0" prefWidth="195.0" spacing="5.0">
+                     <children>
+                        <AnchorPane id="avatarPane" VBox.vgrow="ALWAYS">
+                           <children>
+                              <HBox layoutX="14.0" layoutY="14.0" prefHeight="29.0" spacing="5.0">
+                                 <children>
+                                    <Button id="avatarEditButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false">
+                                       <styleClass>
+                                          <String fx:value="icon-flat-edit" />
+                                          <String fx:value="flat-button" />
+                                       </styleClass>
+                                    </Button>
+                                    <Button id="avatarClearButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false">
+                                       <styleClass>
+                                          <String fx:value="icon-flat-delete" />
+                                          <String fx:value="flat-button" />
+                                       </styleClass>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="3.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="27.0" text="Email:">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Label id="emailLabel" prefHeight="21.0" text="username@email.com" textFill="#979797">
+                           <font>
+                              <Font name="Tahoma" size="17.0" />
+                           </font>
+                        </Label>
+                        <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="27.0" text="Ваш псевдоним (ник):">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <padding>
+                              <Insets top="10.0" />
+                           </padding>
+                        </Label>
+                        <TextField id="nameField" prefHeight="39.0" prefWidth="369.0">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </TextField>
+                        <Label text="* Отображаемое имя для всех остальных пользователей" textFill="#a1a1a1" />
+                        <Hyperlink id="changePasswordButton" text="Изменить пароль">
+                           <VBox.margin>
+                              <Insets top="20.0" />
+                           </VBox.margin>
+                        </Hyperlink>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <Button id="cancelButton" graphicTextGap="7.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="134.0" text="Отмена">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Button>
+                  <Button id="saveButton" graphicTextGap="7.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="133.0" styleClass="icon-ok" text="Сохранить">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets top="20.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

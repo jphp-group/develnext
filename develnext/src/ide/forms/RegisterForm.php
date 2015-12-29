@@ -2,12 +2,16 @@
 namespace ide\forms;
 
 use ide\account\api\ServiceResponse;
+use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
+use ide\ui\Notifications;
 use php\gui\framework\AbstractForm;
 use php\gui\UXDialog;
 
-class RegisterForm extends AbstractIdeForm
+class RegisterForm extends AbstractOnlineIdeForm
 {
+    use DialogFormMixin;
+
     protected function init()
     {
         parent::init();
@@ -39,8 +43,24 @@ class RegisterForm extends AbstractIdeForm
         $dialog = new RegisterConfirmForm();
         $dialog->setEmail($this->emailField->text);
 
-        if ($dialog->showDialog()) {
+        if ($dialog->showDialog() && $dialog->getResult()) {
             Ide::accountManager()->setAccessToken($dialog->getResult());
+            $this->hide();
+            Ide::accountManager()->updateAccount();
+
+            $this->setResult(true);
+            $this->hide();
+        }
+    }
+
+    /**
+     * @event cancelButton.action
+     */
+    public function actionCancel()
+    {
+        $msg = new MessageBoxForm('Вы уверены, что хотите выйти из регистрации?', ['Да, выйти', 'Нет']);
+
+        if ($msg->showDialog() && $msg->getResultIndex() == 0) {
             $this->hide();
         }
     }
@@ -52,12 +72,23 @@ class RegisterForm extends AbstractIdeForm
     {
         $this->showPreloader();
 
-        Ide::service()->account()->registerAsync($this->emailField->text, $this->passwordField->text, $this->captchaField->text,
+        Ide::service()->account()->registerAsync($this->emailField->text, $this->nameField->text, $this->passwordField->text, $this->captchaField->text,
             function (ServiceResponse $response) {
                 if ($response->isNotSuccess()) {
                     $this->updateCaptcha();
-                    UXDialog::show($response->message(), 'ERROR');
+
+                    if ($response->message() == 'Validation') {
+                        Notifications::showInvalidValidation();
+                    } else {
+                        UXDialog::show($response->message(), 'ERROR');
+                    }
+
                     $this->hidePreloader();
+
+                    if ($response->data() === 'RegisterConfirm') {
+                        $this->confirm();
+                    }
+
                     return;
                 }
 

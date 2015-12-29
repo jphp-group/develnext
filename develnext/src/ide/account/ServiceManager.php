@@ -3,6 +3,7 @@ namespace ide\account;
 
 use ide\account\api\AbstractService;
 use ide\account\api\AccountService;
+use ide\account\api\IconService;
 use ide\account\api\MediaService;
 use ide\account\api\NoticeService;
 use ide\account\api\ProfileService;
@@ -28,7 +29,12 @@ class ServiceManager
     /**
      * @var string
      */
-    protected $endpoint = 'http://develnext.ru';
+    protected $endpoint = 'http://develnext.org';
+
+    /**
+     * @var string
+     */
+    protected $session;
 
     /**
      * @var array
@@ -69,6 +75,11 @@ class ServiceManager
     protected $mediaService;
 
     /**
+     * @var IconService
+     */
+    protected $iconService;
+
+    /**
      * ServiceManager constructor.
      */
     public function __construct()
@@ -79,6 +90,7 @@ class ServiceManager
         $this->projectService = new ProjectService();
         $this->noticeService = new NoticeService();
         $this->mediaService = new MediaService();
+        $this->iconService = new IconService();
 
         $this->accountService->on('exception', function () { $this->updateStatus(); });
         $this->projectService->on('exception', function () { $this->updateStatus(); });
@@ -98,6 +110,13 @@ class ServiceManager
     {
         if ($status['endpoint']) {
             $this->endpoint = $status['endpoint'];
+        }
+
+        if ($status['session']) {
+            if ($status['session'] != $this->status) {
+                Logger::info("Set http sessionId = " . $status['session']);
+                $this->session = $status['session'];
+            }
         }
 
         if ($status['account']) {
@@ -140,6 +159,14 @@ class ServiceManager
     public function getEndpoint()
     {
         return $this->endpoint;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSession()
+    {
+        return $this->session;
     }
 
     public function updateNotices()
@@ -244,6 +271,11 @@ class ServiceManager
     public function profile()
     {
         return $this->profileService;
+    }
+
+    public function icon()
+    {
+        return $this->iconService;
     }
 
     public function shutdown()

@@ -11,7 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
 public class FlatButton extends Button {
-    private static final String DEFAULT_STYLE_CLASS = "flat-button";
+    private static final String DEFAULT_STYLE_CLASS = "x-flat-button";
 
     protected Color color;
     protected Color hoverColor;

@@ -77,7 +77,7 @@ class MainForm extends AbstractIdeForm
      * @throws \Exception
      * @throws \php\io\IOException
      */
-    public function doClose(UXEvent $e)
+    public function doClose(UXEvent $e = null)
     {
         Logger::info("Close main form ...");
 
@@ -99,16 +99,29 @@ class MainForm extends AbstractIdeForm
 
                     Ide::get()->setUserConfigValue('lastProject', $project->getFile($project->getName() . '.dnproject'));
                 } elseif ($result == 'abort') {
-                    $e->consume();
+                    if ($e) {
+                        $e->consume();
+                    }
                     return;
                 } else {
                     Logger::info("Cancel closing main form.");
                     Ide::get()->setUserConfigValue('lastProject', null);
                 }
+
+                Ide::get()->shutdown();
+            } else {
+                if ($e) {
+                    $e->consume();
+                }
+            }
+        } else {
+            $dialog = new MessageBoxForm('Вы уверены, что хотите выйти из среды?', ['Да, выйти', 'Нет']);
+            if ($dialog->showDialog() && $dialog->getResultIndex() == 0) {
+                $this->hide();
+
+                Ide::get()->shutdown();
             }
         }
-
-        Ide::get()->shutdown();
     }
 
     /**

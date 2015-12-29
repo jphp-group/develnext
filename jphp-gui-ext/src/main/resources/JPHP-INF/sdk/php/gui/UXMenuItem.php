@@ -29,6 +29,11 @@ class UXMenuItem
     public $style;
 
     /**
+     * @var UXList
+     */
+    public $classes;
+
+    /**
      * @var string
      */
     public $accelerator;

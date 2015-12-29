@@ -14,7 +14,7 @@ use php\lang\System;
  * @method ServiceResponse authAsync($email, $password, $callback)
  * @method ServiceResponse authExternalAsync($confirmKey, $callback)
  * @method ServiceResponse authVkAsync($callback)
- * @method ServiceResponse registerAsync($email, $password, $captchaWord, $callback)
+ * @method ServiceResponse registerAsync($email, $name, $password, $captchaWord, $callback)
  * @method ServiceResponse confirmAsync($email, $confirmKey, $callback)
  * @method ServiceResponse getAsync($callback)
  * @method ServiceResponse logoutAsync($callback)
@@ -47,7 +47,8 @@ class AccountService extends AbstractService
      */
     public function captcha()
     {
-        return UXImage::ofUrl($this->makeUrl('account/captcha'), true);
+        $stream = $this->getStream('account/captcha');
+        return $stream ? new UXImage($stream) : null;
     }
 
     /**
@@ -87,10 +88,11 @@ class AccountService extends AbstractService
      * @throws ServiceInvalidResponseException
      * @throws ServiceNotAvailableException
      */
-    public function register($email, $password, $captchaWord)
+    public function register($email, $name, $password, $captchaWord)
     {
         return $this->execute('account/register', [
             'email' => $email,
+            'name' => $name,
             'password' => $password,
             'captchaWord' => $captchaWord
         ]);

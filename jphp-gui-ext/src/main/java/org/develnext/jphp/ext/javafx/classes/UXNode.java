@@ -183,14 +183,12 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
     @Getter
     public double getScreenX() {
-        double layoutX = getWrappedObject().getLayoutX();
-
-        Point2D pt = getWrappedObject().localToScreen(layoutX, 0);
+        Bounds pt = getWrappedObject().localToScreen(getWrappedObject().getLayoutBounds());
         if (pt == null) {
             return 0;
         }
 
-        return pt.getX();
+        return pt.getMinX();
     }
 
     @Setter
@@ -203,12 +201,12 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     public double getScreenY() {
         double layoutY = getWrappedObject().getLayoutY();
 
-        Point2D pt = getWrappedObject().localToScreen(0, layoutY);
+        Bounds pt = getWrappedObject().localToScreen(getWrappedObject().getLayoutBounds());
         if (pt == null) {
             return 0;
         }
 
-        return pt.getY();
+        return pt.getMinY();
     }
 
     @Setter

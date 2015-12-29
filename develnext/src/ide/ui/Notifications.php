@@ -15,6 +15,16 @@ class Notifications
         return $notify;
     }
 
+    static function error($title, $message)
+    {
+        return self::show($title, $message, 'ERROR');
+    }
+
+    static function warning($title, $message)
+    {
+        return self::show($title, $message, 'WARNING');
+    }
+
     static function showAccountWelcome()
     {
         static::show('Приветствие', 'Добро пожаловать в социальную сеть DevelNext для разработчиков', 'INFORMATION');
@@ -27,7 +37,7 @@ class Notifications
 
     public static function showAccountAuthWelcome(array $data)
     {
-        static::show('Добро пожаловать в социальную сеть', 'Вы вошли в свой аккаунт под именем ' . $data['email']);
+        static::show('Добро пожаловать', 'Приветствуем тебя, ' . $data['name'] . ".");
     }
 
     public static function showException(\Exception $e)
@@ -38,5 +48,15 @@ class Notifications
     public static function showAccountAuthorizationExpired()
     {
         static::show('Данные входа устарели', 'Вам необходимо снова зайти под своим пользователем, т.к. данных предыдущего входа устарели.', 'WARNING');
+    }
+
+    public static function showExecuteUnableStop()
+    {
+        static::show('Проблемы с запуском', 'Мы не смогли корректно остановить программу, возможно она еще запущена.', 'WARNING');
+    }
+
+    public static function showInvalidValidation()
+    {
+        static::error('Ошибка валидации', 'Введите все необходимые данные корректно, не пропуская обязательные поля!');
     }
 }

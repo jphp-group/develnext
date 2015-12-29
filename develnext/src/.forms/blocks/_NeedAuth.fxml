@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="142.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="10.0" layoutY="10.0" prefHeight="65.0" prefWidth="578.0" style="-fx-background-color: white;" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0">
+         <children>
+            <Label prefHeight="35.0" text="Доступ ограничен" textFill="#486aa8">
+               <font>
+                  <Font name="Tahoma" size="28.0" />
+               </font>
+            </Label>
+            <Label prefHeight="21.0" text="Вам необходимо войти под своим именем или зарегистрироваться" textFill="#979797">
+               <font>
+                  <Font name="Tahoma" size="17.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+      <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="75.0" prefWidth="570.0" spacing="20.0" style="-fx-background-color: white;" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0">
+         <children>
+            <Button id="loginButton" graphicTextGap="7.0" mnemonicParsing="false" prefHeight="39.0" styleClass="icon-flat-account" text="Вход в аккаунт">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
+            </Button>
+            <Hyperlink id="registerLink" text="Регистрация">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Hyperlink>
+         </children>
+         <padding>
+            <Insets top="10.0" />
+         </padding>
+      </HBox>
+   </children>
+</AnchorPane>

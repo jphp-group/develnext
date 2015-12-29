@@ -23,6 +23,16 @@ class UXPopupWindow extends UXWindow
     public $hideOnEscape;
 
     /**
+     * @var string
+     */
+    public $style;
+
+    /**
+     * @var UXList
+     */
+    public $classes;
+
+    /**
      * @param UXWindow $window
      * @param double $screenX (optional)
      * @param double $screenY (optional)

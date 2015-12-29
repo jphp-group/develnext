@@ -20,7 +20,11 @@ public class ColorMemoryOperation extends MemoryOperation<Color> {
             return arg.toObject(UXColor.class).getWrappedObject();
         }
 
-        return Color.valueOf(arg.toString());
+        try {
+            return Color.valueOf(arg.toString());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     @Override

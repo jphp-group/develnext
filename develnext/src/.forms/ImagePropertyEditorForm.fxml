@@ -24,7 +24,7 @@
                   </AnchorPane>
                </content>
             </Tab>
-          <Tab text="Из проекта">
+          <Tab text="Поиск в проекте">
                <content>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
@@ -41,6 +41,11 @@
                      </children>
                   </AnchorPane>
                </content>
+            </Tab>
+            <Tab style="-fx-font-weight: bold;" styleClass="icon-flat-search" text="Поиск иконок">
+              <content>
+                <AnchorPane id="onlineSearchPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              </content>
             </Tab>
         </tabs>
       </TabPane>

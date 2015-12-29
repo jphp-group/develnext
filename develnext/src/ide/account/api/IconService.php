@@ -5,6 +5,9 @@ namespace ide\account\api;
 /**
  * Class IconService
  * @package ide\account
+ *
+ * @method getListAsync($query, $sizes, $page, $limit, callable $callback = null)
+ * @method getAsync($id, callable $callback = null)
  */
 class IconService extends AbstractService
 {
@@ -15,12 +18,12 @@ class IconService extends AbstractService
         ]);
     }
 
-    public function getList($query, $sizes, $page = 0, $limit = 50)
+    public function getList($query, $sizes, $offset = 0, $limit = 50)
     {
         return $this->execute('icon/list', [
             'query' => $query,
             'sizes' => $sizes,
-            'page'  => $page,
+            'offset'  => $offset,
             'limit' => $limit
         ]);
     }

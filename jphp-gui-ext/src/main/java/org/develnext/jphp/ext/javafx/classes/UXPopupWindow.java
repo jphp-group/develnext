@@ -1,15 +1,13 @@
 package org.develnext.jphp.ext.javafx.classes;
 
-import javafx.geometry.Point2D;
+import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.PopupControl;
 import javafx.stage.PopupWindow;
 import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
-import php.runtime.annotation.Reflection.Name;
-import php.runtime.annotation.Reflection.Nullable;
-import php.runtime.annotation.Reflection.Property;
-import php.runtime.annotation.Reflection.Signature;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
@@ -40,6 +38,37 @@ public class UXPopupWindow<T extends PopupWindow> extends UXWindow<PopupWindow> 
         return (T) super.getWrappedObject();
     }
 
+    @Getter
+    public ObservableList<String> getClasses() {
+        T object = getWrappedObject();
+
+        if (object instanceof PopupControl) {
+            return ((PopupControl) object).getStyleClass();
+        }
+
+        return null;
+    }
+
+    @Getter
+    public String getStyle() {
+        T object = getWrappedObject();
+
+        if (object instanceof PopupControl) {
+            return ((PopupControl) object).getStyle();
+        }
+
+        return null;
+    }
+
+    @Setter
+    public void setStyle(String value) {
+        T object = getWrappedObject();
+
+        if (object instanceof PopupControl) {
+            ((PopupControl) object).setStyle(value);
+        }
+    }
+
     @Signature
     public void __construct() {
         __wrappedObject = new PopupControl();
@@ -52,8 +81,8 @@ public class UXPopupWindow<T extends PopupWindow> extends UXWindow<PopupWindow> 
 
     @Signature
     public void showByNode(Node node, int offsetX, int offsetY) {
-        Point2D screen = node.localToScreen(node.getLayoutX(), node.getLayoutY());
+        Bounds screen = node.localToScreen(node.getLayoutBounds());
 
-        getWrappedObject().show(node.getScene().getWindow(), screen.getX() + offsetX, screen.getY() + offsetY);
+        getWrappedObject().show(node.getScene().getWindow(), screen.getMinX() + offsetX, screen.getMinY() + offsetY);
     }
 }

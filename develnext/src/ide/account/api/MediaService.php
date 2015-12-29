@@ -14,6 +14,8 @@ use php\lang\ThreadPool;
 /**
  * Class MediaService
  * @package ide\account\api
+ *
+ * @method uploadAsync($file, callable $callback = null)
  */
 class MediaService extends AbstractService
 {
@@ -40,6 +42,17 @@ class MediaService extends AbstractService
         $this->cachePath->mkdirs();
     }
 
+    /**
+     * @param $file
+     * @return ServiceResponse
+     * @throws ServiceException
+     * @throws ServiceInvalidResponseException
+     * @throws ServiceNotAvailableException
+     */
+    public function upload($file)
+    {
+        return parent::upload('media/upload', ['file' => $file]);
+    }
 
     /**
      * @param $uid
@@ -56,7 +69,11 @@ class MediaService extends AbstractService
      */
     public function getImage($uid)
     {
-        $cacheFilePath = new File($this->cachePath, "/$uid");
+        if (is_array($uid) && $uid['uid']) {
+            $uid = $uid['uid'];
+        }
+
+        $cacheFilePath = new File($this->cachePath, "/$uid.png");
 
         if (!$cacheFilePath->exists()) {
             $response = $this->get($uid);
@@ -68,14 +85,28 @@ class MediaService extends AbstractService
                     Logger::warn("Unable to load media by uid = $uid, error = {$e->getMessage()}");
                     return null;
                 }
+            } else {
+                Logger::warn("Unable to load media by uid = $uid, message = {$response->message()}");
+                return null;
             }
         }
 
         return $cacheFilePath;
     }
 
+    public function getImageAsync($uid, callable $callback)
+    {
+        $this->loadThPool->execute(function () use ($uid, $callback) {
+            $callback($this->getImage($uid));
+        });
+    }
+
     public function loadImage($uid, UXNode $node, $default = null)
     {
+        if ($default) {
+            $default = "res://.data/img/$default";
+        }
+
         if (!$uid) {
             Element::loadContent($node, $default);
             return;
@@ -90,5 +121,10 @@ class MediaService extends AbstractService
                 Element::loadContent($node, $default);
             }
         });
+    }
+
+    public function __destruct()
+    {
+        $this->loadThPool->shutdown();
     }
 }

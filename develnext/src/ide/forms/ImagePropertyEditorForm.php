@@ -2,11 +2,14 @@
 namespace ide\forms;
 
 use Files;
+use ide\account\ui\NeedAuthPane;
+use ide\forms\area\IconSearchPaneArea;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
 use ide\utils\FileUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXScrollPane;
@@ -29,6 +32,7 @@ use php\util\Flow;
  *
  * @property UXScrollPane $imageView
  * @property UXFlowPane $gallery
+ * @property UXAnchorPane $onlineSearchPane
  */
 class ImagePropertyEditorForm extends AbstractIdeForm
 {
@@ -64,6 +68,26 @@ class ImagePropertyEditorForm extends AbstractIdeForm
 
         $this->imageView->content = $imageArea;
         $this->imageArea = $imageArea;
+
+        Ide::accountManager()->on('login', [$this, 'updateOnlineGallery'], __CLASS__);
+        Ide::accountManager()->on('logout', [$this, 'updateOnlineGallery'], __CLASS__);
+    }
+
+    public function updateOnlineGallery()
+    {
+        $this->onlineSearchPane->children->clear();
+
+        if (!Ide::accountManager()->isAuthorized()) {
+            $this->onlineSearchPane->add(new NeedAuthPane());
+        } else {
+            $searchPaneArea = new IconSearchPaneArea();
+            $searchPaneArea->on('action', function ($file) {
+                $this->setResultFile($file);
+                $this->hide();
+            });
+
+            $this->onlineSearchPane->add($searchPaneArea);
+        }
     }
 
     public function updateGallery()
@@ -146,6 +170,26 @@ class ImagePropertyEditorForm extends AbstractIdeForm
     }
 
     /**
+     * @param absolute $file
+     */
+    public function setResultFile($file)
+    {
+        $files = Ide::get()->getOpenedProject()->findDuplicatedFiles($file);
+
+        if ($files) {
+            $file = Items::first($files);
+            $this->setResult($file->getRelativePath('src/'));
+        } else {
+            $project = Ide::get()->getOpenedProject();
+
+            if ($project) {
+                $file = $project->copyFile($file, 'src/.data/img/');
+                $this->setResult($file->getRelativePath('src/'));
+            }
+        }
+    }
+
+    /**
      * @event addToGalleryButton.action
      */
     public function actionAddToGallery()
@@ -197,6 +241,7 @@ class ImagePropertyEditorForm extends AbstractIdeForm
     public function actionShow()
     {
         $this->updateGallery();
+        $this->updateOnlineGallery();
     }
 
     /**

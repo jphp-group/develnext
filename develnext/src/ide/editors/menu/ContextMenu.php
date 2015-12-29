@@ -36,6 +36,16 @@ class ContextMenu
     protected $groups = [];
 
     /**
+     * @var string
+     */
+    protected $style;
+
+    /**
+     * @var string
+     */
+    protected $cssClass;
+
+    /**
      * @param AbstractEditor $editor
      * @param array $commands
      */
@@ -47,6 +57,39 @@ class ContextMenu
         foreach ($commands as $command) {
             $this->add($command);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getCssClass()
+    {
+        return $this->cssClass;
+    }
+
+    /**
+     * @param string $cssClass
+     */
+    public function setCssClass($cssClass)
+    {
+        $this->cssClass = $cssClass;
+        $this->getRoot()->classes->add($cssClass);
+    }
+
+    /**
+     * @return string
+     */
+    public function getStyle()
+    {
+        return $this->style;
+    }
+
+    /**
+     * @param string $style
+     */
+    public function setStyle($style)
+    {
+        $this->style = $style;
     }
 
     /**
@@ -95,8 +138,19 @@ class ContextMenu
 
     public function addCommand(AbstractCommand $command)
     {
-        $menuItem = new UXMenuItem($command->getName(), Ide::get()->getImage($command->getIcon()));
-        $menuItem->accelerator = $command->getAccelerator();
+        if ($command->withBeforeSeparator()) {
+            $this->root->items->add(UXMenuItem::createSeparator());
+        }
+
+        $menuItem = $command->makeMenuItem();
+
+        if ($this->cssClass) {
+            $menuItem->classes->add("$this->cssClass-item");
+        }
+
+        if ($this->style) {
+            $menuItem->style .= ';' . $this->style;
+        }
 
         $menuItem->on('action', function ($e) use ($command) {
             $filter = $this->filter;
@@ -107,12 +161,24 @@ class ContextMenu
         });
 
         $this->root->items->add($menuItem);
+
+        if ($command->withAfterSeparator()) {
+            $this->root->items->add(UXMenuItem::createSeparator());
+        }
     }
 
     public function add(AbstractMenuCommand $command, $group = null)
     {
         $menuItem = new UXMenuItem($command->getName(), Ide::get()->getImage($command->getIcon()));
         $menuItem->accelerator = $command->getAccelerator();
+
+        if ($this->cssClass) {
+            $menuItem->classes->add("$this->cssClass-item");
+        }
+
+        if ($this->style) {
+            $menuItem->style .= ';' . $this->style;
+        }
 
         if ($command->isHidden()) {
             $menuItem->visible = false;

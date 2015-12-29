@@ -6,6 +6,7 @@ use ide\commands\account\AccountLoginCommand;
 use ide\commands\account\AccountLogoutCommand;
 use ide\commands\account\AccountRegisterCommand;
 use ide\forms\LoginForm;
+use ide\forms\UpdateAvailableForm;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
@@ -60,6 +61,18 @@ class AccountManager
      */
     public function setAccessToken($token)
     {
+        if (!$this->accessToken && $token) {
+            UXApplication::runLater(function () {
+                $this->trigger('login');
+            });
+        }
+
+        if (!$token && $this->accessToken) {
+            UXApplication::runLater(function () {
+                $this->trigger('logout');
+            });
+        }
+
         Ide::get()->setUserConfigValue('account.accessToken', $token);
         $this->accessToken = $token;
 
@@ -88,15 +101,14 @@ class AccountManager
 
                         if ($hash < $rHash) {
                             UXApplication::runLater(function () use ($response) {
-                                UXDialog::show('Вышла новая версия');
-                                dump($response->data());
+
+                                $dialog = new UpdateAvailableForm();
+                                $dialog->tryShow($response->data());
                             });
                         }
                     } else {
-                        dump($response);
+                        Logger::warn("Unable get last updates, message = {$response->message()}");
                     }
-
-                    $this->updateIdeUi();
 
                     UXApplication::runLater(function () {
                         $this->trigger('update', [$this->accountData]);
@@ -110,7 +122,6 @@ class AccountManager
             });
 
             $this->accountData = [];
-            $this->updateIdeUi();
         }
     }
 
@@ -170,7 +181,7 @@ class AccountManager
 
     public function authorize($always = false)
     {
-        $this->updateIdeUi();
+        //$this->updateIdeUi();
 
         if (!$this->accessToken || $always) {
             if (!$this->loginForm->visible) {
@@ -181,11 +192,6 @@ class AccountManager
             }
         }
 
-        Ide::service()->ide()->startAsync(function (ServiceResponse $response) {
-            if (!$response->isSuccess()) {
-                Logger::error("Error start api: message = {$response->message()}, data = " . Json::encode($response->data()));
-            }
-        });
         $this->updateAccount();
 
         return true;
