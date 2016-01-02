@@ -44,6 +44,9 @@ public class UXLabeled<T extends Labeled> extends UXControl<Labeled> {
 
         @Property @Nullable
         Font font();
+
+        @Property
+        boolean mnemonicParsing();
     }
 
     public UXLabeled(Environment env, T wrappedObject) {

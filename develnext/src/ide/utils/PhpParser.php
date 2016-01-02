@@ -1,7 +1,9 @@
 <?php
 namespace ide\utils;
 
+use php\lib\Char;
 use php\lib\Str;
+use php\util\Flow;
 use phpx\parser\SourceToken;
 use phpx\parser\SourceTokenizer;
 use php\io\MemoryStream;
@@ -94,11 +96,80 @@ class PhpParser
         $coord = $this->findMethod($class, $method);
 
         if ($coord) {
-            $line = $coord['line'];
+            $startLine = $coord['line'];
+            $endLine = $coord['endLine'];
+            $startPos = $coord['pos'];
+            $endPos = $coord['endPos'];
 
-            $this->insertAfterLine($line, $code);
-            return true;
+            $content = [];
+            $scanner = new Scanner($this->content);
+
+            $line = 0;
+
+            while ($scanner->hasNextLine()) {
+                $line++;
+                $scanner->nextLine();
+
+                if ($line >= $startLine) {
+                    break;
+                }
+            }
+
+            while ($scanner->hasNextLine()) {
+                if ($line > $endLine) {
+                    break;
+                }
+
+                $one = $scanner->nextLine();
+
+                if ($line == $startLine) {
+                    $one = str::sub($one, $startPos + 1);
+
+                    if (!trim($one)) {
+                        $line++;
+                        continue;
+                    }
+                }
+
+                if ($line == $endLine) {
+                    $one = str::sub($one, $endPos + 1);
+
+                    if (!trim($one)) {
+                        $line++;
+                        continue;
+                    }
+                }
+
+                $content[] = $one;
+                $line++;
+            }
+
+            $minPad = 100000;
+
+            foreach ($content as $one) {
+                for ($i = 0; $i < str::length($one); $i++) {
+                    if (!Char::isWhitespace($one[$i])) {
+                        if ($minPad > $i) {
+                            $minPad = $i;
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            $content = Flow::of($content);
+
+            if ($minPad != 0) {
+                $content = $content->map(function ($one) use ($minPad) {
+                    return str::sub($one, $minPad);
+                });
+            }
+
+            return $content->toString("\n");
         }
+
+        return false;
     }
 
     /**
@@ -206,6 +277,10 @@ class PhpParser
 
         $classFound = false;
 
+        $openBraces = 0;
+
+        $result = null;
+
         while ($next = $tokenizer->next()) {
             switch ($next->type) {
                 case 'ClassStmt':
@@ -231,22 +306,41 @@ class PhpParser
                     if ($next->type == 'Name' && Str::equalsIgnoreCase($methodName, $next->word)) {
                         $next = $tokenizer->next();
 
-                        if ($next && $next->word == '(') {
+                        if ($next && $next->type == 'BraceExpr' && $next->word == '(') {
                             while ($next = $tokenizer->next()) {
                                 if ($next->word == '{') {
-                                    return ['line' => $next->line, 'pos' => $next->position];
+                                    $openBraces++;
+                                    $result = ['line' => $next->line, 'pos' => $next->position];
+                                    break;
                                 }
                             }
                         }
                     }
 
                     break;
+                default:
+                    if ($result && $next->type == 'BraceExpr') {
+                        switch ($next->word) {
+                            case '{':
+                                $openBraces++;
+                                break;
+                            case '}':
+                                $openBraces--;
+                                if ($openBraces <= 0) {
+                                    $result['endLine'] = $next->line;
+                                    $result['endPos'] = $next->position;
+                                    return $result;
+                                }
+
+                                break;
+                        }
+                    }
             }
 
             $prev = $next;
         }
 
-        return null;
+        return $result;
     }
 
     /**
@@ -277,6 +371,47 @@ class PhpParser
         }
 
         return ['line' => $line, 'pos' => $pos];
+    }
+
+    public function findAllUseImport(SourceTokenizer $tokenizer = null)
+    {
+        $tokenizer = $this->getTokenizer($tokenizer);
+
+        $result = [];
+
+        while ($token = $tokenizer->next()) {
+            if ($token->type == 'NamespaceUseStmt') {
+                if ($name = $tokenizer->next()) {
+                    $done = true;
+
+                    $item = ['line' => $token->line, 'pos' => $token->position, 0 => $name->word];
+
+                    if ($done) {
+                        $token = $tokenizer->next();
+
+                        if ($token) {
+                            $line['endLine'] = $token->line;
+                            $line['endPos'] = $token->position;
+                        }
+
+                        if ($token && $token->type == 'AsSmt') {
+                            if ($as = $tokenizer->next()) {
+                                $item[1] = $as->word;
+
+                                if ($token = $tokenizer->next()) {
+                                    $line['endLine'] = $token->line;
+                                    $line['endPos'] = $token->position;
+                                }
+                            }
+                        }
+
+                        $result[] = $item;
+                    }
+                }
+            }
+        }
+
+        return $result;
     }
 
     public function findUseImport($class, $alias = null)
@@ -319,7 +454,7 @@ class PhpParser
             $alias = $import[1];
 
             if (!$this->findUseImport($class, $alias)) {
-                $this->insertAfterLine($pos['line'] + $i, "use $class" . ($alias ? " as $alias;" : ";"));
+                $this->insertAfterLine($pos['line'] + $i, "use $class" . (($alias && $alias != $class) ? " as $alias; " : "; "));
                 $i++;
             }
         }
@@ -350,6 +485,61 @@ class PhpParser
 
         if ($pos) {
             $this->insertAfterLine($pos['line'], $code);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function replaceOfMethod($class, $method, $code, $smart = true)
+    {
+        $pos = $this->findMethod($class, $method);
+
+        if ($pos) {
+            $this->removeLines($pos['line'], $pos['endLine']);
+
+            $memory = new MemoryStream();
+            $memory->write("<?\n" . $code);
+            $memory->seek(0);
+
+            $tokenizer = new SourceTokenizer($memory, '', 'UTF-8');
+
+            if ($smart) {
+                $imports = $this->findAllUseImport($tokenizer);
+            }
+
+            $lines = [str::repeat("\t", $pos['pos']) . "{"];
+
+            $scanner = new Scanner($code, 'UTF-8');
+            while ($scanner->hasNextLine()) {
+                $lines[] = str::repeat("\t", $pos['pos'] + 1) . $scanner->nextLine();
+            }
+
+            $lines[] = str::repeat("\t", $pos['pos']) . "}";
+
+
+            if ($smart) {
+                $newLines = [];
+
+                foreach ($imports as $import) {
+                    $lines[$import['line']] = null;
+                }
+
+                foreach ($lines as $line) {
+                    if ($line !== null) {
+                        $newLines[] = $line;
+                    }
+                }
+
+                $lines = $newLines;
+            }
+
+            $this->insertAfterLine($pos['line'] - 1, str::join($lines, "\n"));
+
+            if ($smart) {
+                $this->addUseImports($imports);
+            }
+
             return true;
         }
 

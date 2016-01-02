@@ -13,11 +13,11 @@
          <children>
           <MenuBar id="mainMenu" prefHeight="25.0" prefWidth="900.0">
             <menus>
-              <Menu id="menuProject" mnemonicParsing="false" text="Проект" />
-                  <Menu id="menuLibrary" mnemonicParsing="false" text="Библиотека" />
-              <Menu id="menuAccount" mnemonicParsing="false" text="Аккаунт" visible="false" />
-              <Menu id="menuRun" mnemonicParsing="false" text="Запуск" />
-              <Menu id="menuHelp" mnemonicParsing="false" text="Помощь" />
+              <Menu id="menuProject" mnemonicParsing="false" text="_Проект" />
+                  <Menu id="menuLibrary" mnemonicParsing="false" text="_Библиотека" />
+              <Menu id="menuAccount" mnemonicParsing="false" text="_Аккаунт" visible="false" />
+              <Menu id="menuRun" mnemonicParsing="false" text="_Запуск" />
+              <Menu id="menuHelp" mnemonicParsing="false" text="_Помощь" />
               <Menu id="menuCreate" disable="true" mnemonicParsing="false" style="-fx-text-fill: transparent; -fx-pref-width: 0; -fx-font-size: 0; -fx-text-overrun: '';" text="Создать" />
             </menus>
             <opaqueInsets>

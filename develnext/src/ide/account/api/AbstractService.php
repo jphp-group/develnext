@@ -326,8 +326,6 @@ abstract class AbstractService
             $connection->setRequestProperty('Cookie', "JSESSIONID=" . Ide::service()->getSession() . ";");
         }
 
-        Logger::debug('Cookie: ' . self::$cookie);
-
         $accountManager = Ide::accountManager();
 
         if ($accountManager) {

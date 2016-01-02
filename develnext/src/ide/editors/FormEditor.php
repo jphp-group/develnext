@@ -251,7 +251,13 @@ class FormEditor extends AbstractModuleEditor
         $this->actionEditor->setFormEditor($this);
 
         $this->behaviourManager = new IdeBehaviourManager(FileUtils::stripExtension($phpFile) . '.behaviour', function ($targetId) {
-            return $this->getFormat()->getFormElement($targetId ? $this->layout->lookup("#$targetId") : $this);
+            $node = $targetId ? $this->layout->lookup("#$targetId") : $this;
+
+            if (!$node) {
+                return null;
+            }
+
+            return $this->getFormat()->getFormElement($node);
         });
     }
 

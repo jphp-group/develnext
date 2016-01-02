@@ -26,16 +26,19 @@ public class UXLabel<T extends Label> extends UXLabeled<Label> {
     @Signature
     public void __construct() {
         __wrappedObject = new Label();
+        getWrappedObject().setMnemonicParsing(false);
     }
 
     @Signature
     public void __construct(String text) {
         __wrappedObject = new Label(text);
+        getWrappedObject().setMnemonicParsing(false);
     }
 
     @Signature
     public void __construct(String text, Node graphic) {
         __wrappedObject = new Label(text, graphic);
+        getWrappedObject().setMnemonicParsing(false);
     }
 
     @Override

@@ -83,6 +83,10 @@ use ide\formats\form\tags\TextInputControlFormElementTag;
 use ide\formats\form\tags\TitledPaneFormElementTag;
 use ide\formats\form\tags\ToggleButtonFormElementTag;
 use ide\formats\form\tags\WebViewFormElementTag;
+use ide\forms\SetMainFormForm;
+use ide\Ide;
+use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use php\gui\UXNode;
 use php\io\File;
@@ -215,11 +219,23 @@ class GuiFormFormat extends AbstractFormFormat
         }));
     }
 
-    public function delete($path)
+    public function delete($path, $silent = false)
     {
         parent::delete($path);
 
         $name = FileUtils::stripExtension(File::of($path)->getName());
+
+        if (!$silent) {
+            if ($behaviour = GuiFrameworkProjectBehaviour::get()) {
+                if ($behaviour->getMainForm() == $name) {
+                    $dialog = new SetMainFormForm();
+                    $dialog->setExcludedForms([$name]);
+                    $dialog->showDialog();
+
+                    $behaviour->setMainForm($dialog->getResult(), false);
+                }
+            }
+        }
 
         $parent = File::of($path)->getParent();
 

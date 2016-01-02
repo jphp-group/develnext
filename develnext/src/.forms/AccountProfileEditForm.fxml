@@ -8,7 +8,6 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="395.0" prefWidth="656.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox layoutX="14.0" layoutY="14.0" prefHeight="428.0" prefWidth="628.0" spacing="10.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
@@ -23,7 +22,7 @@
                               <Font name="Tahoma" size="28.0" />
                            </font>
                         </Label>
-                        <Label prefHeight="21.0" text="Здесь вы можете поменять отредактировать данные профиля" textFill="#979797">
+                        <Label prefHeight="21.0" text="Здесь вы можете отредактировать данные профиля" textFill="#979797">
                            <font>
                               <Font name="Tahoma" size="17.0" />
                            </font>
@@ -98,15 +97,21 @@
             </HBox>
             <HBox alignment="CENTER_RIGHT" prefWidth="200.0" spacing="10.0">
                <children>
-                  <Button id="cancelButton" graphicTextGap="7.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="134.0" text="Отмена">
+                  <Button id="cancelButton" graphicTextGap="7.0" mnemonicParsing="false" prefHeight="39.0" text="Отмена">
                      <font>
                         <Font size="15.0" />
                      </font>
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
                   </Button>
-                  <Button id="saveButton" graphicTextGap="7.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="133.0" styleClass="icon-ok" text="Сохранить">
+                  <Button id="saveButton" graphicTextGap="7.0" mnemonicParsing="false" prefHeight="39.0" styleClass="icon-ok" text="Сохранить">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
                   </Button>
                </children>
                <VBox.margin>

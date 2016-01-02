@@ -207,7 +207,12 @@ class IdeBehaviourManager extends BehaviourManager
         $document->appendChild($root);
 
         foreach ($this->behaviours as $targetId => $behaviours) {
+            if (!$this->getTarget($targetId)) {
+                continue;
+            }
+
             $target = $document->createElement('target', ['@id' => $targetId]);
+
             $root->appendChild($target);
 
             /**

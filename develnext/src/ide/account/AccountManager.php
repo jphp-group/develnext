@@ -91,7 +91,7 @@ class AccountManager
                         Notifications::showAccountAuthWelcome($response->data());
                     }
 
-                    $this->accountData = $response->data();
+                    $this->accountData = $data = $response->data();
 
                     $response = Ide::service()->ide()->getLastUpdate('NIGHT');
                     $hash = Ide::get()->getConfig()->get('app.hash');
@@ -110,8 +110,8 @@ class AccountManager
                         Logger::warn("Unable get last updates, message = {$response->message()}");
                     }
 
-                    UXApplication::runLater(function () {
-                        $this->trigger('update', [$this->accountData]);
+                    UXApplication::runLater(function () use ($data) {
+                        $this->trigger('update', [$data]);
                     });
                 }
             });

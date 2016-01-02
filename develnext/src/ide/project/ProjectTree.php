@@ -235,9 +235,16 @@ class ProjectTree
                         $format = Ide::get()->getFormat($file);
 
                         if ($format) {
-                            $format->delete($file);
+                            if ($format->delete($file) === false) {
+                                return;
+                            }
+
                             Timer::run(1000, function () use ($format, $file) {
                                 $format->delete($file);
+
+                                if (Ide::project()) {
+                                    Ide::project()->trigger('updateSettings');
+                                }
                             });
                         }
 

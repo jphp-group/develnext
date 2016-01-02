@@ -55,7 +55,7 @@ class CheckUpdatesCommand extends AbstractCommand
                         $dialog->tryShow($response->data(), true);
                     });
                 } else {
-                    UXDialog::show('Вы используйте последнюю из доступных версий программы.');
+                    UXDialog::show('Вы используете последнюю из доступных версий программы.');
                 }
             } else {
                 Notifications::warning('Сервер недоступен', 'Сервис обновлений недоступен, попробуйте проверить обновления позже.');

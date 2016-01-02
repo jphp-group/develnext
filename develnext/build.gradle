@@ -21,6 +21,29 @@ manifest {
     attributes 'Main-Class': 'php.runtime.launcher.Launcher'
 }
 
+task distPatchZip(type: Zip, dependsOn: ['clean', 'distPatch']) {
+    def ver = new Date(System.currentTimeMillis()).format("yyyyMMddhh");
+
+    from "$project.buildDir/install/$project.name"
+    archiveName "DevelNext.Patch.${ver}.zip"
+
+    doLast {
+        def uploadPath = System.getProperty("uploadPath", "E:/Upload")
+
+        if (new File(uploadPath).isDirectory()) {
+            copy {
+                from distPatchZip.archivePath
+                into "$uploadPath/YandexDisk"
+            }
+
+            copy {
+                from distIdeZip.archivePath
+                into "$uploadPath/mega"
+            }
+        }
+    }
+}
+
 task distIdeZip(type: Zip, dependsOn: ['clean', 'distIde']) {
     def ver = new Date(System.currentTimeMillis()).format("yyyyMMddhh");
 
@@ -40,6 +63,27 @@ task distIdeZip(type: Zip, dependsOn: ['clean', 'distIde']) {
                 from distIdeZip.archivePath
                 into "$uploadPath/mega"
             }
+        }
+    }
+}
+
+task distPatch(dependsOn: ['clean', 'installDist']) {
+    doLast {
+        if (System.properties['os.name'].toLowerCase().contains('windows')) {
+            exec {
+                commandLine "$project.rootDir/develnext-tools/Launch4j/launch4jc.exe"
+                args "$project.rootDir/develnext/launcher/winLauncher.xml"
+            }
+        }
+
+        copy {
+            from "$project.rootDir/develnext/launcher/DevelNext.exe"
+            into "$project.buildDir/install/$project.name"
+        }
+
+        copy {
+            from "$project.rootDir/develnext/misc"
+            into "$project.buildDir/install/$project.name"
         }
     }
 }

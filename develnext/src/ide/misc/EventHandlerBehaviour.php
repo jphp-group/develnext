@@ -1,6 +1,8 @@
 <?php
 namespace ide\misc;
 
+use ide\Logger;
+
 trait EventHandlerBehaviour
 {
     /**
@@ -22,7 +24,7 @@ trait EventHandlerBehaviour
 
         $result = null;
 
-        foreach ((array) $this->handlers[$event] as $handler) {
+        foreach ((array) $this->handlers[$event] as $name => $handler) {
             $result = $handler(...$args);
 
             if ($result) {

@@ -41,6 +41,7 @@ class SaveProjectForLibraryForm extends AbstractIdeForm
     }
 
     /**
+     * @event close
      * @event cancelButton.action
      */
     public function doCancel()

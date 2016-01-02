@@ -63,4 +63,9 @@ abstract class UXLabeled extends UXControl
      * @var string LEFT, TOP, RIGHT, BOTTOM, TEXT_ONLY, GRAPHIC_ONLY
      */
     public $contentDisplay = 'LEFT';
+
+    /**
+     * @var bool
+     */
+    public $mnemonicParsing = false;
 }

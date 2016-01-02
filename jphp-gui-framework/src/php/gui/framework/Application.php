@@ -352,6 +352,14 @@ class Application
     }
 
     /**
+     * @return bool
+     */
+    public static function isCreated()
+    {
+        return !!static::$instance;
+    }
+
+    /**
      * @return Application
      * @throws Exception
      */

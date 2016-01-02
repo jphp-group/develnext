@@ -6,13 +6,16 @@ use ide\ui\ImageBox;
 use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXScrollPane;
 use php\gui\UXDialog;
+use php\gui\UXHyperlink;
 use php\gui\UXImage;
+use php\gui\UXLabel;
 
 /**
  * Class SelectIconSizeForm
  * @package ide\forms
  *
  * @property UXScrollPane $list
+ * @property UXHyperlink $link
  */
 class SelectIconSizeForm extends AbstractIdeForm
 {
@@ -35,6 +38,19 @@ class SelectIconSizeForm extends AbstractIdeForm
 
         $this->listDecorator = new FlowListViewDecorator($this->list->content);
         $this->listDecorator->setMultipleSelection(false);
+    }
+
+    public function setPack($name, $url, $licence)
+    {
+        $this->link->text = $name;
+        $this->link->tooltipText = "Лицензия: $licence";
+
+        if ($url) {
+            $this->link->on('action', function () use ($url) {
+                browse($url);
+                $this->hide();
+            });
+        }
     }
 
     public function addSize($size, UXImage $image)

@@ -7,6 +7,7 @@ use ide\utils\FileUtils;
 use ide\utils\PhpParser;
 use php\io\File;
 use php\io\IOException;
+use php\io\MemoryStream;
 use php\io\Stream;
 use php\lib\Items;
 use php\lib\Str;
@@ -223,6 +224,21 @@ class SourceEventManager
         if ($parser->insertToMethod($class, $method, $code)) {
             $this->save($parser->getContent());
         }
+    }
+
+    public function replaceCodeOfMethod($class, $method, $code)
+    {
+        $parser = new PhpParser($this->loadContent());
+
+        if ($parser->replaceOfMethod($class, $method, $code)) {
+            $this->save($parser->getContent());
+        }
+    }
+
+    public function getCodeOfMethod($class, $method)
+    {
+        $parser = new PhpParser($this->loadContent());
+        return $parser->getCodeOfMethod($class, $method);
     }
 
     public function addUseImports(array $imports)

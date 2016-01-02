@@ -21,5 +21,6 @@ class PasswordFieldFormElementTag extends AbstractFormElementTag
     public function writeAttributes($node, DomElement $element)
     {
         /** @var UXPasswordField $node */
+        $element->setAttribute('alignment', $node->alignment);
     }
 }

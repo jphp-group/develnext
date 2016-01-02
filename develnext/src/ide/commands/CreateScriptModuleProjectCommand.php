@@ -5,6 +5,7 @@ use Dialog;
 use Files;
 use ide\editors\AbstractEditor;
 use ide\forms\BuildProgressForm;
+use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\project\behaviours\GradleProjectBehaviour;
@@ -46,12 +47,11 @@ class CreateScriptModuleProjectCommand extends AbstractCommand
                 /** @var GuiFrameworkProjectBehaviour $guiBehaviour */
                 $guiBehaviour = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
 
-                $path = GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY . '/' . $name;
-
-                if (File::of($path)->exists()) {
-                    Dialog::error('Модуль с таким названием уже существует в проекте');
-                    $this->onExecute();
-                    return;
+                if ($guiBehaviour->hasModule($name)) {
+                    $dialog = new MessageBoxForm("Модуль '$name' уже существует, хотите его пересоздать?", ['Нет, оставить', 'Да, пересоздать']);
+                    if ($dialog->showDialog() && $dialog->getResultIndex() == 0) {
+                        return;
+                    }
                 }
 
                 $file = $guiBehaviour->createModule($name);

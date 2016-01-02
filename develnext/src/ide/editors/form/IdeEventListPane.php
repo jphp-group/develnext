@@ -310,6 +310,7 @@ class IdeEventListPane
 
                 $actionConstructor = new ActionConstructorForm();
                 $actionConstructor->setContext($this->context);
+                $actionConstructor->setLiveCode($this->manager->getCodeOfMethod($selectedClass, $selectedMethod));
 
                 if ($eventType) {
                     $actionConstructor->title = 'Событие - ' . $eventType['name'];
@@ -329,6 +330,11 @@ class IdeEventListPane
                     $actionConstructor->setContextEditor($this->contextEditor);
                 }
                 $actionConstructor->showAndWait($this->actionEditor, $selectedClass, $selectedMethod);
+
+                if ($actionConstructor->getResult()) {
+                    $this->manager->replaceCodeOfMethod($selectedClass, $selectedMethod, $actionConstructor->getLiveCode());
+                    $this->codeEditor->load();
+                }
             }
         }
     }

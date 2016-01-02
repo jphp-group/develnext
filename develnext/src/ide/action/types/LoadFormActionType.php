@@ -23,7 +23,7 @@ class LoadFormActionType extends AbstractSimpleActionType
         return [
             'form' => 'Название формы',
             'saveSize' => 'Сохранить размеры',
-            'savePosition' => 'Сохронить позицию',
+            'savePosition' => 'Сохранить позицию',
         ];
     }
 

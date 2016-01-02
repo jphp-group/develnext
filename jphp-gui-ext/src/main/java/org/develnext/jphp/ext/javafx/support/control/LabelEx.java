@@ -24,6 +24,8 @@ public class LabelEx extends Label {
     public LabelEx(String text, Node graphic) {
         super(text, graphic);
 
+        setMnemonicParsing(false);
+
         textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {

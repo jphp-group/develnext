@@ -73,6 +73,10 @@ class MediaService extends AbstractService
             $uid = $uid['uid'];
         }
 
+        if (!$uid) {
+            return null;
+        }
+
         $cacheFilePath = new File($this->cachePath, "/$uid.png");
 
         if (!$cacheFilePath->exists()) {
@@ -96,6 +100,8 @@ class MediaService extends AbstractService
 
     public function getImageAsync($uid, callable $callback)
     {
+        $fix = $uid;
+
         $this->loadThPool->execute(function () use ($uid, $callback) {
             $callback($this->getImage($uid));
         });

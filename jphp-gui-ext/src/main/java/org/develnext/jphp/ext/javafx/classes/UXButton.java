@@ -28,6 +28,7 @@ public class UXButton extends UXButtonBase {
     @Signature
     public void __construct() {
         __wrappedObject = new Button();
+        getWrappedObject().setMnemonicParsing(false);
     }
 
     @Signature

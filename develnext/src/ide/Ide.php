@@ -42,6 +42,7 @@ use php\lib\Items;
 use php\lib\Str;
 use php\util\Configuration;
 use php\util\Scanner;
+use script\TimerScript;
 
 
 /**
@@ -144,10 +145,11 @@ class Ide extends Application
                         return;
                     }
 
-                    if (!$showError) {
-                        $notify = Notifications::showException($e);
+                    Logger::exception($e->getMessage(), $e);
 
-                        Logger::exception("Unknown exception", $e);
+                    if (!$showError) {
+                        $showError = true;
+                        $notify = Notifications::error('Непредвиденная ошибка', 'Возникла неожиданная ошибка, пожалуйста нажмите сюда, чтобы узнать подробности.');
 
                         $notify->on('click', function () use ($e) {
                             $dialog = new UXAlert('ERROR');
@@ -155,35 +157,35 @@ class Ide extends Application
                             $dialog->headerText = 'Произошла ошибка в DevelNext, сообщите об этом авторам';
                             $dialog->contentText = $e->getMessage();
                             $dialog->setButtonTypes(['Выход из DevelNext', 'Продолжить']);
-
                             $pane = new UXAnchorPane();
                             $pane->maxWidth = 100000;
-
                             $content = new UXTextArea("{$e->getMessage()}\n\nОшибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
                             $content->padding = 10;
                             UXAnchorPane::setAnchor($content, 0);
-
                             $pane->add($content);
                             $dialog->expandableContent = $pane;
                             $dialog->expanded = true;
-
                             switch ($dialog->showAndWait()) {
                                 case 'Выход из DevelNext':
                                     Ide::get()->shutdown();
                                     break;
                             }
                         });
+
+                        $notify->on('hide', function () use (&$showError) {
+                            $showError = false;
+                        });
                     }
                 });
 
-                if ($this->isDevelopment()) {
+                /*if ($this->isDevelopment()) {
                     restore_exception_handler();
-                }
+                } */
 
                 $this->splash = $splash = new SplashForm();
                 $splash->show();
 
-                UXApplication::runLater(function () {
+                TimerScript::executeAfter(1000, function () {
                     $this->registerAll();
                     $this->trigger('start', []);
                 });

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.shape.*?>
@@ -10,15 +11,26 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="364.0" prefWidth="601.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Button id="loginButton" graphicTextGap="7.0" layoutX="470.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="104.0" styleClass="icon-login" text="Войти">
-         <font>
-            <Font name="System Bold" size="15.0" />
-         </font>
-      </Button>
-      <Button id="loginVkButton" graphicTextGap="7.0" layoutX="295.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="161.0" styleClass="icon-vk" text="Войти через VK">
-         <font>
-            <Font size="15.0" />
-         </font></Button>
+      <HBox layoutX="295.0" layoutY="303.0" spacing="13.0" AnchorPane.rightAnchor="28.0">
+         <children>
+            <Button id="loginVkButton" graphicTextGap="7.0" layoutX="295.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" styleClass="icon-vk" text="Войти через VK">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
+            </Button>
+            <Button id="loginButton" graphicTextGap="7.0" layoutX="470.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" styleClass="icon-login" text="Войти">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
+            </Button>
+         </children>
+      </HBox>
       <ImageView id="icon" fitHeight="112.0" fitWidth="104.0" layoutX="23.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true" smooth="false">
       </ImageView>
       <Label layoutX="153.0" layoutY="74.0" prefHeight="21.0" prefWidth="414.0" text="Для разработчиков на DevelNext" textFill="#979797">
@@ -31,7 +43,7 @@
             <Font name="Tahoma" size="28.0" />
          </font>
       </Label>
-      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="38.0" layoutY="148.0" prefHeight="27.0" prefWidth="128.0" text="Email:">
+      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="22.0" layoutY="148.0" prefHeight="27.0" prefWidth="144.0" text="Email:">
          <font>
             <Font size="18.0" />
          </font>
@@ -41,7 +53,7 @@
             <Font size="18.0" />
          </font>
       </TextField>
-      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="38.0" layoutY="209.0" prefHeight="27.0" prefWidth="128.0" text="Пароль:">
+      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="22.0" layoutY="209.0" prefHeight="27.0" prefWidth="144.0" text="Пароль:">
          <font>
             <Font size="18.0" />
          </font>
@@ -55,6 +67,6 @@
          <font>
             <Font size="15.0" />
          </font></Hyperlink>
-      <Hyperlink id="forgetPasswordLink" layoutX="476.0" layoutY="249.0" text="Забыли пароль?" />
+      <Hyperlink id="forgetPasswordLink" layoutX="476.0" layoutY="249.0" text="Забыли пароль?" AnchorPane.rightAnchor="27.0" />
    </children>
 </AnchorPane>

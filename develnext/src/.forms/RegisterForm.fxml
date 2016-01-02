@@ -29,7 +29,7 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <TextField id="nameField" layoutX="177.0" layoutY="192.0" prefHeight="39.0" prefWidth="397.0" promptText="вымешленное имя, ник, и т.д.">
+      <TextField id="nameField" layoutX="177.0" layoutY="192.0" prefHeight="39.0" prefWidth="397.0" promptText="вымышленное имя, ник, и т.д.">
          <font>
             <Font size="18.0" />
          </font>
@@ -60,7 +60,7 @@
             <Font size="18.0" />
          </font>
       </TextField>
-      <Button id="nextButton" graphicTextGap="7.0" layoutX="470.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="104.0" styleClass="icon-ok" text="Даллее" AnchorPane.bottomAnchor="22.0" AnchorPane.rightAnchor="27.0">
+      <Button id="nextButton" graphicTextGap="7.0" layoutX="470.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="104.0" styleClass="icon-ok" text="Далее" AnchorPane.bottomAnchor="22.0" AnchorPane.rightAnchor="27.0">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>

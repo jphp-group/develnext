@@ -153,13 +153,14 @@ class IconSearchPaneArea extends AbstractFormArea
                     }
                 }
 
-                Async::parallel($tasks, function () use ($list) {
+                Async::parallel($tasks, function () use ($list, $data) {
                     if ($list->isEmpty()) {
                         Notifications::error('Ошибка загрузки', 'Невозможно загрузить данную иконку, попробуйте позже.');
-                    } else if ($list->count() == 1) {
+                    /*} else if ($list->count() == 1) {
                         $this->trigger('action', [$list->pop()[1]]);
-                    } else {
+                    */} else {
                         $dialog = new SelectIconSizeForm();
+                        $dialog->setPack($data['pack'], $data['url'], $data['licence']);
                         $sizes = [];
 
                         foreach ($list as $el) {

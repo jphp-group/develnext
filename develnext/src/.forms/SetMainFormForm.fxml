@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="116.0" prefWidth="373.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="409.0" spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         <children>
+            <Label text="Выберите новую главную форму:" />
+            <ComboBox id="list" maxWidth="1.7976931348623157E308" />
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+               <children>
+                  <Button id="saveButton" mnemonicParsing="false" prefHeight="34.0" styleClass="icon-ok" text="Сохранить">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+                  <Label text="* Главная форма отображается при старте" textFill="#9a9a9a" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

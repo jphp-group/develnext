@@ -8,6 +8,8 @@ use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
 use ide\ui\Notifications;
+use ide\utils\FileUtils;
+use php\gui\framework\ScriptEvent;
 use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\io\IOException;
@@ -17,6 +19,7 @@ use php\lang\Process;
 use php\lib\number;
 use php\lib\Str;
 use php\time\Time;
+use script\TimerScript;
 
 class ExecuteProjectCommand extends AbstractCommand
 {
@@ -71,34 +74,66 @@ class ExecuteProjectCommand extends AbstractCommand
 
         $this->stopButton->enabled = false;
 
-        try {
-            $pid = Stream::getContents($project->getRootDir() . "/application.pid");
+        $appPidFile = $project->getFile("application.pid");
 
-            if ($pid) {
+        $mainForm = Ide::get()->getMainForm();
+        $mainForm->showPreloader('Подождите, останавливаем программу ...');
 
-                if ($ide->isWindows()) {
-                    $result = `taskkill /PID $pid /f`;
+        $proc = function () use ($appPidFile, $ide, $mainForm) {
+            try {
+                $pid = Stream::getContents($appPidFile);
+
+                if ($pid) {
+                    if ($ide->isWindows()) {
+                        $result = `taskkill /PID $pid /f`;
+                    } else {
+                        $result = `kill -9 $pid`;
+                    }
+
+                    if (!$result) {
+                        if ($this->process instanceof Process) {
+                            $this->process->destroy();
+                        }
+
+                        Notifications::showExecuteUnableStop();
+                    }
                 } else {
-                    $result = `kill -9 $pid`;
-                }
+                    if ($this->process instanceof Process) {
+                        $this->process->destroy();
+                    }
 
-                if (!$result) {
                     Notifications::showExecuteUnableStop();
                 }
-            } else {
+            } catch (IOException $e) {
+                Logger::exception('Cannot stop process', $e);
                 Notifications::showExecuteUnableStop();
+            } finally {
+                $this->startButton->enabled = true;
+                $this->processDialog->hide();
             }
-        } catch (IOException $e) {
-            Logger::exception('Cannot stop process', $e);
-            Notifications::showExecuteUnableStop();
-        } finally {
-            $this->startButton->enabled = true;
-            $this->processDialog->hide();
-        }
 
-        if ($this->process instanceof Process) {
-            $this->process->destroy();
+            $appPidFile->delete();
+
             $this->process = null;
+
+            $mainForm->hidePreloader();
+        };
+
+        if ($appPidFile->exists()) {
+            $proc();
+        } else {
+            $time = 0;
+
+            $timer = new TimerScript(100, true, function (ScriptEvent $e) use ($appPidFile, $proc, &$time) {
+                $time += $e->sender->interval;
+
+                if ($appPidFile->exists() || $time > 1000 * 25) {
+                    $proc();
+                    $e->sender->free();
+
+                }
+            });
+            $timer->start();
         }
     }
 
@@ -107,8 +142,13 @@ class ExecuteProjectCommand extends AbstractCommand
         $ide = Ide::get();
         $project = $ide->getOpenedProject();
 
+        FileUtils::deleteDirectory($project->getFile("build/"));
+
+        $appPidFile = $project->getFile("application.pid");
+        $appPidFile->delete();
+
         $this->process = new Process(
-            [$ide->getGradleProgram(), 'clean', 'run', '--daemon'],
+            [$ide->getGradleProgram(), 'run', '--daemon'],
             $project->getRootDir(),
             $ide->makeEnvironment()
         );
@@ -134,7 +174,10 @@ class ExecuteProjectCommand extends AbstractCommand
 
                 $dialog->show($this->process);
 
-                $dialog->setStopProcedure([$this, 'onStopExecute']);
+                $dialog->setStopProcedure(function () use ($dialog) {
+                    $this->onStopExecute();
+                    $dialog->hide();
+                });
                 $dialog->setOnExitProcess(function () {
                     $this->stopButton->enabled = false;
                     $this->startButton->enabled = true;

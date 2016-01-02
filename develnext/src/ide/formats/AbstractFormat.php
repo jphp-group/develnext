@@ -41,7 +41,7 @@ abstract class AbstractFormat
         return $this->requireFormats;
     }
 
-    public function delete($path)
+    public function delete($path, $silent = false)
     {
         \Files::delete($path);
     }

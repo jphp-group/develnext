@@ -5,6 +5,7 @@ namespace ide\commands;
 use ide\editors\AbstractEditor;
 use ide\editors\menu\ContextMenu;
 use ide\Ide;
+use ide\Logger;
 use ide\misc\AbstractCommand;
 use php\gui\layout\UXPanel;
 use php\gui\text\UXFont;

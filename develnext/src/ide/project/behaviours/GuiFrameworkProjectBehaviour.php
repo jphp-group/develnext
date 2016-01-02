@@ -141,12 +141,16 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $this->mainForm;
     }
 
-    public function setMainForm($form)
+    public function setMainForm($form, $trigger = true)
     {
         Logger::info("Set main form, old = $this->mainForm, new = $form");
         $this->mainForm = $form;
 
         $this->project->createFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
+
+        if ($trigger) {
+            $this->project->trigger('updateSettings');
+        }
     }
 
     /**
@@ -177,14 +181,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
-    public function doUpdateSettings(ProjectEditor $editor)
+    public function doUpdateSettings(ProjectEditor $editor = null)
     {
         if ($this->settingsMainFormCombobox) {
             $mainForm = $this->getMainForm();
 
             $this->settingsMainFormCombobox->updateUi();
 
-            $this->setMainForm($mainForm);
+            $this->setMainForm($mainForm, false);
             $this->settingsMainFormCombobox->setSelected($mainForm);
         }
     }
@@ -196,7 +200,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $formListEditor->build();
 
         $formListEditor->onChange(function ($value) {
-            $this->setMainForm($value);
+            $this->setMainForm($value, false);
         });
 
         $formListEditor->getUi()->width = 250;
@@ -523,10 +527,25 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $form;
     }
 
-    //public function create
+    public function hasModule($name)
+    {
+        return $this->project->getFile("src/.scripts/$name")->isDirectory();
+    }
+
+    public function getModuleEditor($name)
+    {
+        return FileSystem::fetchEditor($this->project->getFile(self::SCRIPTS_DIRECTORY . '/' . $name));
+    }
 
     public function createModule($name)
     {
+        if ($this->hasModule($name)) {
+            $editor = $this->getModuleEditor($name);
+            $editor->delete(true);
+        }
+
+        Logger::info("Creating module '$name' ...");
+
         $this->project->makeDirectory("src/.scripts/$name");
 
         $file = $this->project->getFile("src/.scripts/$name");
@@ -548,6 +567,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                 $sources->updateTemplate(true);
             }
         }
+
+        Logger::info("Finish creating module '$name'");
 
         return $file;
     }
@@ -683,8 +704,23 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $factory;
     }
 
+    public function hasForm($name)
+    {
+        return $this->project->getFile("src/.forms/$name.fxml")->isFile();
+    }
+
+    public function getFormEditor($name)
+    {
+        return $this->hasForm($name) ? FileSystem::fetchEditor($this->project->getFile("src/.forms/$name.fxml")) : null;
+    }
+
     public function createForm($name)
     {
+        if ($this->hasForm($name)) {
+            $editor = $this->getFormEditor($name);
+            $editor->delete(true);
+        }
+
         Logger::info("Creating form '$name' ...");
 
         $form = $this->project->createFile("src/.forms/$name.fxml", new GuiFormFileTemplate());

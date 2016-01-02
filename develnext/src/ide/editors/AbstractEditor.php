@@ -6,6 +6,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\project\Project;
 use ide\project\ProjectIndexer;
+use ide\systems\FileSystem;
 use php\gui\layout\UXPane;
 use php\gui\UXNode;
 use php\lang\IllegalStateException;
@@ -165,5 +166,12 @@ abstract class AbstractEditor
     public function hide()
     {
         ;
+    }
+
+    public function delete($silent = false)
+    {
+        FileSystem::close($this->file);
+
+        $this->getFormat()->delete($this->file, $silent);
     }
 }

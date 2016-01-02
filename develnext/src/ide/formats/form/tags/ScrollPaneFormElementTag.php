@@ -27,22 +27,14 @@ class ScrollPaneFormElementTag extends AbstractFormElementTag
 
     public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
     {
-        /** @var UXAnchorPane $node */
-        $childrenTag = $document->createElement('children');
+        /** @var UXScrollPane $node */
+        if ($node->content) {
+            $domContent = $document->createElement('content');
+            $element->appendChild($domContent);
 
-        foreach ($node->children as $child) {
-            if (!$child) {
-                continue;
-            }
-
-            $el = $dumper->createElementTag($child, $document);
-
-            if ($el !== null) {
-                $childrenTag->appendChild($el);
-            }
+            $domContentSub = $dumper->createElementTag($node->content, $document, false);
+            $domContent->appendChild($domContentSub);
         }
-
-        $element->appendChild($childrenTag);
     }
 
     public function writeAttributes($node, DomElement $element)

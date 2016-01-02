@@ -29,7 +29,7 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
     public function getIcon32()
     {
-        return 'icons/program32.png';
+        return 'icons/programEx32.png';
     }
 
     /**

@@ -2,6 +2,7 @@
 namespace ide\forms;
 
 use ide\forms\mixins\DialogFormMixin;
+use InvalidArgumentException;
 use php\gui\framework\AbstractForm;
 use php\gui\text\UXFont;
 use php\gui\UXButton;
@@ -47,7 +48,11 @@ class FontPropertyEditorForm extends AbstractIdeForm
         }
 
         $this->fontCombobox->onCellRender(function (UXListCell $cell, $value) {
-            $cell->font = UXFont::of($value, $cell->font->size);
+            try {
+                $cell->font = UXFont::of($value, $cell->font->size);
+            } catch (InvalidArgumentException $e) {
+                $cell->font = UXFont::of('System', $cell->font->size);
+            }
             $cell->text = $value;
         });
     }

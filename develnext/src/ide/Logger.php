@@ -2,6 +2,8 @@
 namespace ide;
 
 use php\io\Stream;
+use php\lang\Environment;
+use php\lang\IllegalArgumentException;
 use php\lib\Str;
 use php\time\Time;
 
@@ -34,7 +36,10 @@ class Logger
     static protected function log($level, $message, ...$args)
     {
         if ($level <= static::$level) {
-            $file = Ide::get()->getFile('ide.log');
+            if (Ide::isCreated()) {
+                $file = Ide::get()->getFile('ide.log');
+            }
+
             $time = Time::now()->toString('YYYY-MM-dd HH:mm:ss');
 
             $stackTrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
@@ -55,7 +60,9 @@ class Logger
             $out = Stream::of('php://stdout');
             $out->write($line);
 
-            Stream::putContents($file, $line, 'a+');
+            if (Ide::isCreated()) {
+                Stream::putContents($file, $line, 'a+');
+            }
         }
     }
 
@@ -91,5 +98,18 @@ class Logger
     {
         $file = Ide::get()->getFile('ide.log');
         $file->delete();
+
+        ob_implicit_flush(true);
+
+        Environment::current()->onOutput(function ($output) {
+            $out = Stream::of('php://stdout');
+            $out->write($output);
+
+            if (Ide::isCreated()) {
+                $file = Ide::get()->getFile('ide.log');
+
+                Stream::putContents($file, $output, 'a+');
+            }
+        });
     }
 }

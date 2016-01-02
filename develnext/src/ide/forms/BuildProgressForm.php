@@ -151,6 +151,7 @@ class BuildProgressForm extends AbstractIdeForm
 
     /**
      * @event close
+     * @event closeButton.action
      *
      * @param UXEvent $e
      */
@@ -173,6 +174,7 @@ class BuildProgressForm extends AbstractIdeForm
         }
 
         $this->threadPool->shutdown();
+        $this->hide();
     }
 
     /**
@@ -183,17 +185,6 @@ class BuildProgressForm extends AbstractIdeForm
     public function doCloseAfterDoneCheckboxClick(UXMouseEvent $e)
     {
         Ide::get()->setUserConfigValue('builder.closeAfterDone', $this->closeAfterDoneCheckbox->selected);
-    }
-
-    /**
-     * @event closeButton.click
-     */
-    public function hide()
-    {
-        Ide::get()->setUserConfigValue('builder.closeAfterDone', $this->closeAfterDoneCheckbox->selected);
-
-        $this->threadPool->shutdownNow();
-        parent::hide();
     }
 
     /**
@@ -221,7 +212,7 @@ class BuildProgressForm extends AbstractIdeForm
         $this->addConsoleLine($e->getMessage(), 'red');
 
         $this->progress->progress = 100;
-        $this->closeButton->enabled = true;
+        //$this->closeButton->enabled = true;
     }
 
     /**
@@ -233,10 +224,6 @@ class BuildProgressForm extends AbstractIdeForm
     {
         $self = $this;
         $scanner = new Scanner($process->getInput());
-
-        UXApplication::runLater(function () {
-            $this->closeButton->enabled = false;
-        });
 
         while ($scanner->hasNextLine()) {
             $line = $scanner->nextLine();
@@ -278,8 +265,6 @@ class BuildProgressForm extends AbstractIdeForm
                     return;
                 }
             }
-
-            $self->closeButton->enabled = true;
 
             if (!$exitValue && $self->closeAfterDoneCheckbox->selected) {
                 $self->hide();

@@ -7,7 +7,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="437.0" spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label text="Выберите иконку нужного размера:" />
       <ScrollPane id="list" fitToHeight="true" fitToWidth="true">
@@ -15,7 +15,7 @@
             <FlowPane />
          </content>
       </ScrollPane>
-      <HBox prefHeight="32.0" prefWidth="652.0" spacing="10.0">
+      <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="10.0">
          <children>
             <Button id="applyButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" styleClass="icon-ok" text="Выбрать">
                <cursor>
@@ -36,6 +36,16 @@
                   <Insets left="15.0" right="15.0" />
                </padding>
             </Button>
+            <Label text="Автор иконки:">
+               <HBox.margin>
+                  <Insets left="15.0" />
+               </HBox.margin>
+            </Label>
+            <Hyperlink id="link" text="Hyperlink">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Hyperlink>
          </children>
       </HBox>
    </children>

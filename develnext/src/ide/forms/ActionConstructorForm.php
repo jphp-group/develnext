@@ -1,6 +1,7 @@
 <?php
 namespace ide\forms;
 
+use Dialog;
 use ide\action\AbstractActionType;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
@@ -11,6 +12,7 @@ use ide\editors\CodeEditor;
 use ide\editors\common\CodeTextArea;
 use ide\editors\FormEditor;
 use ide\editors\menu\ContextMenu;
+use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\utils\PhpParser;
@@ -28,19 +30,23 @@ use php\gui\layout\UXVBox;
 use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXButton;
+use php\gui\UXCheckbox;
 use php\gui\UXClipboard;
 use php\gui\UXContextMenu;
 use php\gui\UXDialog;
+use php\gui\UXForm;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
+use php\io\MemoryStream;
 use php\lang\IllegalStateException;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Flow;
 use php\xml\XmlProcessor;
+use script\TimerScript;
 
 /**
  * Class ActionConstructorForm
@@ -49,10 +55,14 @@ use php\xml\XmlProcessor;
  * @property UXListView $list
  * @property UXTabPane $actionTypePane
  * @property UXAnchorPane $generatedCodeContent
+ * @property UXAnchorPane $codeContent
  * @property UXTabPane $tabs
+ * @property UXCheckbox $useDefaultCheckbox
  */
 class ActionConstructorForm extends AbstractIdeForm
 {
+    use DialogFormMixin;
+
     /**
      * @var ActionEditor
      */
@@ -62,6 +72,11 @@ class ActionConstructorForm extends AbstractIdeForm
      * @var FormEditor
      */
     protected $contextEditor;
+
+    /**
+     * @var CodeEditor
+     */
+    protected $liveCodeEditor;
 
     /** @var string */
     protected $class;
@@ -74,7 +89,13 @@ class ActionConstructorForm extends AbstractIdeForm
      */
     protected $context;
 
+    /**
+     * @var TimerScript
+     */
+    protected $timer;
+
     protected static $tabSelectedIndex = -1;
+    protected static $globalTabSelectedIndex = 0;
 
     /**
      * @return array
@@ -92,53 +113,42 @@ class ActionConstructorForm extends AbstractIdeForm
         $this->context = $context;
     }
 
+    public function setDefaultEventEditor($editor)
+    {
+        Ide::get()->setUserConfigValue(CodeEditor::class . '.editorOnDoubleClick', $editor);
+    }
+
     protected function init()
     {
         parent::init();
 
-        $codeEditor = new CodeEditor(null, 'php');
-        $codeEditor->setReadOnly(true);
-        $codeEditor->registerDefaultCommands();
+        $tabOne = $this->tabs->tabs[0]->text;
+        $tabTwo = $this->tabs->tabs[1]->text;
 
-        $codeView = $codeEditor->makeUi();
+        $this->timer = new TimerScript(1000, true, function () use ($tabOne, $tabTwo) {
+            $this->tabs->tabs[0]->text = "$tabOne (" . $this->list->items->count . ")";
+            $this->tabs->tabs[1]->text = "$tabTwo (" . sizeof(str::split($this->getLiveCode(), "\n")) . ")";
+        });
 
-        UXAnchorPane::setAnchor($codeView, 2);
-        $this->generatedCodeContent->add($codeView);
-
-        $this->tabs->tabs[1]->on('change', function () use ($codeEditor) {
-            UXApplication::runLater(function () use ($codeEditor) {
-
-                $script = new ActionScript();
-
-                $imports = $script->getImports(Items::toArray($this->list->items));
-
-                $code = "<?php // Сгенерированный код из действий конструктора. \n";
-
-                if ($imports) {
-                    $code .= "// Импортируем имена классов ...\n";
+        UXApplication::runLater(function () {
+            $this->useDefaultCheckbox->observer('selected')->addListener(function ($oldValue, $newValue) {
+                if ($newValue) {
+                    $this->setDefaultEventEditor('constructor');
+                } else {
+                    $this->setDefaultEventEditor('php');
                 }
-
-                foreach ($imports as $import) {
-                    $code .= "use $import[0];\n";
-                }
-
-                if ($imports) {
-                    $code .= "\n// Исходный код события \n";
-                }
-
-                $code .= $script->compileActions(
-                    $this->class,
-                    $this->method,
-                    Items::toArray($this->list->items),
-                    "",
-                    '',
-                    ''
-                );
-
-                $codeEditor->setValue($code);
             });
         });
 
+        $this->liveCodeEditor = $liveCodeEditor = new CodeEditor(null, 'php');
+        $liveCodeEditor->registerDefaultCommands();
+
+        $liveCodeView = $liveCodeEditor->makeUi();
+
+        UXAnchorPane::setAnchor($liveCodeView, 2);
+        $this->codeContent->add($liveCodeView);
+
+        // -----
 
         $this->list->multipleSelection = true;
 
@@ -351,8 +361,30 @@ class ActionConstructorForm extends AbstractIdeForm
         return $this->contextEditor;
     }
 
+    public function setLiveCode($value)
+    {
+        $this->liveCodeEditor->setValue("<?\n$value");
+    }
+
+    public function getLiveCode()
+    {
+        $value = $this->liveCodeEditor->getValue();
+
+        if (Str::startsWith($value, "<?\n")) {
+            $value = str::sub($value, 3);
+        }
+
+        if (Str::startsWith($value, "<?")) {
+            $value = str::sub($value, 2);
+        }
+
+        return $value;
+    }
+
     public function showAndWait(ActionEditor $editor = null, $class = null, $method = null)
     {
+        $this->useDefaultCheckbox->selected = Ide::get()->getUserConfigValue(CodeEditor::class . '.editorOnDoubleClick') == "constructor";
+
         $this->buildActionTypePane($editor);
 
         $editor->makeSnapshot();
@@ -372,6 +404,9 @@ class ActionConstructorForm extends AbstractIdeForm
         $this->userData = new \stdClass(); // hack!
         $this->userData->self = $this;
 
+        $this->tabs->selectedIndex = self::$globalTabSelectedIndex;
+
+        $this->timer->start();
         parent::showAndWait();
     }
 
@@ -620,15 +655,93 @@ class ActionConstructorForm extends AbstractIdeForm
         $self->addAction($actionType);
     }
 
+    /**
+     * @event hide
+     */
     public function hide()
     {
         parent::hide();
+
+        $this->timer->stop();
 
         if ($this->editor) {
             $this->editor->cacheData = [];
         }
     }
 
+    /**
+     * @event clearButton.action
+     */
+    public function actionClear()
+    {
+        if (!$this->list->items->count) {
+            Dialog::show('Список из действий пуст.');
+            return;
+        }
+
+        $dlg = new MessageBoxForm('Вы уверены, что хотите удалить все действия?', ['Да, удалить', 'Нет, отмена']);
+
+        if ($dlg->showDialog() && $dlg->getResultIndex() == 0) {
+            $this->editor->removeMethod($this->class, $this->method);
+
+            $this->list->items->clear();
+            $this->list->update();
+            $this->updateList();
+        }
+    }
+
+    /**
+     * @event previewButton.action
+     */
+    public function actionPreview()
+    {
+        if (!$this->list->items->count) {
+            Dialog::show('Список из действий пуст.');
+            return;
+        }
+
+        $script = new ActionScript();
+
+        $imports = $script->getImports(Items::toArray($this->list->items));
+
+        $code = $script->compileActions(
+            $this->class,
+            $this->method,
+            Items::toArray($this->list->items),'','',''
+        );
+
+        $phpParser = new PhpParser("<?\n\n" . $code);
+        $phpParser->addUseImports($imports);
+
+        $dialog = new UXForm();
+        $dialog->title = 'Сгенерированный php код';
+        $dialog->style = 'UTILITY';
+        $dialog->modality = 'APPLICATION_MODAL';
+        $dialog->size = [700, 400];
+
+        $area = new CodeTextArea('php');
+        $area->setValue($phpParser->getContent());
+        UXVBox::setVgrow($area, 'ALWAYS');
+
+        $okButton = new UXButton('Закрыть');
+        $okButton->graphic = ico('ok16');
+        $okButton->padding = [10, 15];
+        $okButton->maxHeight = 9999;
+        $okButton->on('action', function () use ($dialog) { $dialog->hide(); });
+
+        $buttons = new UXHBox([$okButton]);
+        $buttons->spacing = 10;
+        $buttons->height = 40;
+
+        $pane = new UXVBox([$area, $buttons]);
+        $pane->spacing = 10;
+        $pane->padding = 10;
+
+        UXAnchorPane::setAnchor($pane, 0);
+
+        $dialog->add($pane);
+        $dialog->showAndWait();
+    }
 
     /**
      * @event saveButton.action
@@ -638,19 +751,25 @@ class ActionConstructorForm extends AbstractIdeForm
         $this->editor->clearSnapshots();
         $this->editor->save();
         static::$tabSelectedIndex = $this->actionTypePane->selectedIndex;
+        static::$globalTabSelectedIndex = $this->tabs->selectedIndex;
 
+        $this->setResult(true);
         $this->hide();
     }
 
     /**
+     * @event close
      * @event cancelButton.action
      */
     public function actionCancel()
     {
+        $this->setResult(false);
+
         $this->editor->restoreSnapshot();
         $this->editor->clearSnapshots();
         $this->editor->save();
         static::$tabSelectedIndex = $this->actionTypePane->selectedIndex;
+        static::$globalTabSelectedIndex = $this->tabs->selectedIndex;
 
         $this->hide();
     }
@@ -665,52 +784,42 @@ class ActionConstructorForm extends AbstractIdeForm
             return;
         }
 
-        $buttons = ['Конвертировать, удалив действия'/*, 'Конвертировать, сохранив действия'*/, 'Отмена'];
+        $buttons = ['Да, перевести', 'Нет, отмена'];
 
-        $dialog = new MessageBoxForm('Каким образом сконвертировать действия в php код?', $buttons);
+        $dialog = new MessageBoxForm('Вы уверены, что хотите перевести все действия в php код?', $buttons);
 
-        if ($dialog->showDialog()) {
-            switch ($dialog->getResultIndex()) {
-                case 0:
-                    $this->editor->removeMethod($this->class, $this->method);
-                    // ! do not break !
+        if ($dialog->showDialog() && $dialog->getResultIndex() == 0) {
+            $script = new ActionScript();
 
-                case 1:
-                    $script = new ActionScript();
+            $imports = $script->getImports(Items::toArray($this->list->items));
 
-                    $imports = $script->getImports(Items::toArray($this->list->items));
+            $code = $script->compileActions(
+                $this->class,
+                $this->method,
+                Items::toArray($this->list->items),
+                'Сгенерированный код',
+                '------------------',
+                ''
+            );
 
-                    $code = $script->compileActions(
-                        $this->class,
-                        $this->method,
-                        Items::toArray($this->list->items),
-                        'Сгенерированный код',
-                        '------------------'
-                    );
+            $code = $this->getLiveCode() . "\n\n" . $code;
 
-                    $formEditor = $this->editor->getFormEditor();
+            $phpParser = new PhpParser($code);
+            $phpParser->addUseImports($imports);
 
-                    if (!$formEditor) {
-                        throw new IllegalStateException();
-                    }
+            $this->setLiveCode($phpParser->getContent());
 
-                    // TODO FIX!
-                    if ($formEditor->getDefaultEventEditor(false) == 'php') {
-                        $formEditor->switchToSmallSource();
-                    }
+            $this->editor->removeMethod($this->class, $this->method);
+            $this->list->items->clear();
 
-                    $formEditor->addUseImports($imports);
-                    $formEditor->insertCodeToMethod($this->class, $this->method, $code);
+            UXApplication::runLater(function () {
+                $this->tabs->selectedIndex = 1;
 
-                    $this->actionSave();
-                    $this->hide();
-
-                    Timer::run(500, function () use ($formEditor) {
-                        $formEditor->jumpToClassMethod($this->class, $this->method);
-                    });
-
-                    break;
-            }
+                UXApplication::runLater(function () {
+                    $this->liveCodeEditor->requestFocus();
+                    $this->liveCodeEditor->jumpToLine(11);
+                });
+            });
         }
     }
 

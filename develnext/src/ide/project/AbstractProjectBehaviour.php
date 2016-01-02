@@ -1,5 +1,7 @@
 <?php
 namespace ide\project;
+use ide\Ide;
+use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\xml\DomElement;
 use php\xml\DomDocument;
 
@@ -49,5 +51,20 @@ abstract class AbstractProjectBehaviour
         $behavior->inject();
 
         return $behavior;
+    }
+
+    /**
+     * @return $this
+     * @throws \Exception
+     */
+    static function get()
+    {
+        $class = get_called_class();
+
+        if (Ide::project() && Ide::project()->hasBehaviour($class)) {
+            return Ide::project()->getBehaviour($class);
+        }
+
+        return null;
     }
 }

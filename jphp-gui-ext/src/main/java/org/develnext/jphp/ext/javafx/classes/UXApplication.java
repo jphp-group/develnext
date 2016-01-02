@@ -61,9 +61,22 @@ public class UXApplication extends BaseWrapper<Application> {
 
         try {
             ip = InetAddress.getLocalHost();
+
+            if (ip == null) {
+                return null;
+            }
+
             NetworkInterface network = NetworkInterface.getByInetAddress(ip);
 
+            if (network == null) {
+                return null;
+            }
+
             byte[] mac = network.getHardwareAddress();
+
+            if (mac == null) {
+                return null;
+            }
 
             StringBuilder sb = new StringBuilder();
 
@@ -75,6 +88,8 @@ public class UXApplication extends BaseWrapper<Application> {
         } catch (UnknownHostException e) {
             return null;
         } catch (SocketException e){
+            return null;
+        } catch (Exception e) {
             return null;
         }
     }
@@ -137,7 +152,7 @@ public class UXApplication extends BaseWrapper<Application> {
 
     @Signature
     public static void launch(Invoker onStart) {
-        Environment.addThreadSupport();
+        Environment.addThreadSupport(onStart.getEnvironment());
 
         UXApplication.onStart = onStart;
 
@@ -147,7 +162,7 @@ public class UXApplication extends BaseWrapper<Application> {
     public static class CustomApplication extends Application {
         @Override
         public void start(Stage stage) throws Exception {
-            Environment.addThreadSupport();
+            Environment.addThreadSupport(onStart.getEnvironment());
 
             Thread thread = Thread.currentThread();
             ClassLoader old = thread.getContextClassLoader();

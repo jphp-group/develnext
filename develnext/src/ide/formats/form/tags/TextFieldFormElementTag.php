@@ -21,5 +21,6 @@ class TextFieldFormElementTag extends AbstractFormElementTag
     {
         /** @var UXTextField $node */
         $element->setAttribute('prefColumnCount', $node->prefColumnCount);
+        $element->setAttribute('alignment', $node->alignment);
     }
 }

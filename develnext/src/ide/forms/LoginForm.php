@@ -48,14 +48,36 @@ class LoginForm extends AbstractOnlineIdeForm
 
         Ide::service()->account()->authAsync($this->emailField->text, $this->passwordField->text,
             function (ServiceResponse $response) {
+                $this->hidePreloader();
+
                 if ($response->isSuccess()) {
                     Ide::accountManager()->setAccessToken($response->data());
                     $this->hide();
                 } else {
-                    Notifications::error('Ошибка входа', $response->message());
-                }
+                    $message = $response->message();
 
-                $this->hidePreloader();
+                    switch ($message) {
+                        case 'Validation':
+                            $message = 'Введите все данные корректно';
+                            break;
+                    }
+
+                    Notifications::error('Ошибка входа', $message);
+
+                    if ($response->data() == 'RegisterConfirm') {
+                        $dialog = new RegisterConfirmForm();
+                        $dialog->setEmail($this->emailField->text);
+
+                        if ($dialog->showDialog() && $dialog->getResult()) {
+                            Ide::accountManager()->setAccessToken($dialog->getResult());
+                            $this->hide();
+                            Ide::accountManager()->updateAccount();
+                            $this->hide();
+                            return;
+                        }
+                    }
+
+                }
             }
         );
     }

@@ -27,11 +27,15 @@ public class UXCheckbox extends UXButtonBase {
     @Signature
     public void __construct() {
         __wrappedObject = new CheckBox();
+
+        getWrappedObject().setMnemonicParsing(false);
     }
 
     @Signature
     public void __construct(String text) {
         __wrappedObject = new CheckBox(text);
+
+        getWrappedObject().setMnemonicParsing(false);
     }
 
     @Override

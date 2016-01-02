@@ -103,7 +103,9 @@ class AccountProfileEditForm extends AbstractForm
         Async::parallel([
             function ($callback) {
                 $my = $callback;
-                Ide::service()->profile()->updateNameAsync($this->nameField->text, function (ServiceResponse $response) use ($callback) {
+                $oldName = Ide::accountManager()->getAccountData()['name'];
+
+                Ide::service()->profile()->updateNameAsync($this->nameField->text, function (ServiceResponse $response) use ($callback, $oldName) {
                     if ($response->isNotSuccess()) {
                         if ($response->isFail()) {
                             Notifications::error('Ошибка сохранения', $response->message());
@@ -112,7 +114,7 @@ class AccountProfileEditForm extends AbstractForm
                         }
                     }
 
-                    if ($response->isSuccess()) {
+                    if ($response->isSuccess() && $oldName != $this->nameField->text) {
                         Notifications::show('Псевдоним изменен', 'Поздравляем, ваш псевдоним был успешно изменен на - ' . $this->nameField->text, 'SUCCESS');
                     }
 
