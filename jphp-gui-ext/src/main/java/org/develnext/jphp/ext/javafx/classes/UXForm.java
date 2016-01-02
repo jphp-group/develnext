@@ -141,13 +141,15 @@ public class UXForm extends UXWindow {
 
         getWrappedObject().setFullScreen(value);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                getWrappedObject().setFullScreen(false);
-                getWrappedObject().setFullScreen(value);
-            }
-        });
+        if (value) {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    getWrappedObject().setFullScreen(false);
+                    getWrappedObject().setFullScreen(value);
+                }
+            });
+        }
     }
 
     @Getter

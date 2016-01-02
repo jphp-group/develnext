@@ -8,9 +8,11 @@ use ide\Logger;
 use ide\misc\GradleBuildConfig;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\Project;
+use ide\ui\Notifications;
 use php\gui\UXApplication;
 use php\io\File;
 use php\lang\Process;
+use script\TimerScript;
 
 /**
  * Class OneJarBuildType
@@ -133,7 +135,15 @@ class OneJarBuildType extends AbstractBuildType
             Logger::info("Finish executing: exitValue = $exitValue");
 
             if ($exitValue == 0) {
-                File::of($this->getBuildPath($project) . '/dn-compile-module.jar')->renameTo($this->getBuildPath($project) . "/{$project->getName()}.jar");
+                $path = $this->getBuildPath($project) . '/dn-compiled-module.jar';
+                $newPath = $this->getBuildPath($project) . "/{$project->getName()}.jar";
+
+                $done = File::of($path)->renameTo($newPath);
+
+                if (!$done) {
+                    Logger::warn("Unable to rename $path -> $newPath");
+                    Notifications::warning('Необольшое недоразумение', 'Корректно сформировать имя программы после сборки не вышло, вы можете сами переименовать её!');
+                }
 
                 if ($finished) {
                     if (is_callable($finished)) {

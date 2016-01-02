@@ -38,6 +38,7 @@ use php\io\IOException;
 use php\io\ResourceStream;
 use php\io\Stream;
 use php\lang\System;
+use php\lang\Thread;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Configuration;
@@ -861,6 +862,11 @@ class Ide extends Application
 
     public function shutdown()
     {
+        (new Thread(function () {
+            sleep(15);
+            System::halt(0);
+        }))->start();
+
         Logger::info("Start IDE shutdown ...");
 
         $project = $this->getOpenedProject();

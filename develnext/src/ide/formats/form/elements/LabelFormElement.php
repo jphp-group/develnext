@@ -78,5 +78,7 @@ class LabelFormElement extends LabeledFormElement
 
             $node = $new;
         }
+
+        parent::registerNode($node);
     }
 }

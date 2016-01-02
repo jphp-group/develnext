@@ -53,6 +53,13 @@ public class LabelEx extends Label {
                 LabelEx.this.updateAutoSize();
             }
         });
+
+        graphicProperty().addListener(new ChangeListener<Node>() {
+            @Override
+            public void changed(ObservableValue<? extends Node> observable, Node oldValue, Node newValue) {
+                LabelEx.this.updateAutoSize();
+            }
+        });
     }
 
     void updateAutoSize() {
@@ -60,8 +67,19 @@ public class LabelEx extends Label {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    setPrefWidth(UXFont.calculateTextWidth(getText(), LabelEx.this.getFont()));
-                    setPrefHeight(UXFont.getLineHeight(LabelEx.this.getFont()));
+                    Node graphic = getGraphic();
+
+                    double width = UXFont.calculateTextWidth(getText(), LabelEx.this.getFont());
+
+                    if (graphic != null) {
+                        width += graphic.getLayoutBounds().getWidth() + getGraphicTextGap();
+                    }
+
+                    setPrefWidth(width);
+                    setPrefHeight(Math.max(
+                            UXFont.getLineHeight(LabelEx.this.getFont()),
+                            graphic == null ? 0 : graphic.getLayoutBounds().getHeight()
+                    ));
                 }
             });
         }
