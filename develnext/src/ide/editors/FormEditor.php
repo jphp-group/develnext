@@ -412,6 +412,8 @@ class FormEditor extends AbstractModuleEditor
     {
         parent::open();
 
+        $this->elementTypePane->resetConfigurable(get_class($this));
+
         $this->designer->disabled = false;
         $this->opened = true;
         //$this->designer->unselectAll();
@@ -957,6 +959,8 @@ class FormEditor extends AbstractModuleEditor
         }
 
         $this->elementTypePane = new FormElementTypePane($this->format->getFormElements());
+        $this->elementTypePane->applyConfigure(get_class($this));
+
         //$this->behaviourPane = new IdeBehaviourPane($this->behaviourManager);
 
         $designerCodeEditor = new UXAnchorPane();

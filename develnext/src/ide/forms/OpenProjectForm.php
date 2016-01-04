@@ -142,11 +142,13 @@ class OpenProjectForm extends AbstractIdeForm
         if ($file = self::$fileChooser->execute()) {
             $this->hide();
 
-            if (Str::endsWith($file, ".zip")) {
-                ProjectSystem::import($file);
-            } else {
-                ProjectSystem::open($file);
-            }
+            UXApplication::runLater(function () use ($file) {
+                if (Str::endsWith($file, ".zip")) {
+                    ProjectSystem::import($file);
+                } else {
+                    ProjectSystem::open($file);
+                }
+            });
         }
     }
 

@@ -27,7 +27,7 @@
     <runtimeBits>64/32</runtimeBits>
     <initialHeapSize>128</initialHeapSize>
     <maxHeapSize>2048</maxHeapSize>
-    <opt>-Dfile.encoding=UTF8 -Ddevelnext.launcher=root</opt>
+    <opt>-Dfile.encoding=UTF-8 -Ddevelnext.launcher=root</opt>
   </jre>
   <versionInfo>
     <fileVersion>1.0.0.0</fileVersion>

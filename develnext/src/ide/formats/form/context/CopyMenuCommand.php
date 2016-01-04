@@ -37,6 +37,34 @@ class CopyMenuCommand extends AbstractMenuCommand
         $nodes = $designer->getSelectedNodes();
 
         if ($nodes) {
+            $needNodes = [];
+
+            // фильтруем ноды для копирования, убираем дубликаты.
+            foreach ($nodes as $node) {
+                $need = true;
+
+                foreach ($nodes as $one) {
+                    if ($one === $node) continue;
+
+                    if ($one->lookup("#$node->id")) {
+                        $need = false;
+                        break;
+                    }
+                }
+
+                if ($need) {
+                    $needNodes[] = $node;
+                }
+            }
+
+            $nodes = $needNodes;
+
+            if (!$nodes) {
+                return;
+            }
+
+            dump(sizeof($needNodes));
+
             $processor = new XmlProcessor();
             $document = $processor->createDocument();
 

@@ -3,11 +3,14 @@ namespace ide\editors\form;
 use ide\editors\menu\ContextMenu;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
+use ide\misc\EventHandlerBehaviour;
 use ide\scripts\AbstractScriptComponent;
 use php\gui\event\UXMouseEvent;
+use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXVBox;
 use php\gui\text\UXFont;
 use php\gui\UXButton;
+use php\gui\UXComboBox;
 use php\gui\UXDialog;
 use php\gui\UXNode;
 use ide\formats\FormFormat;
@@ -24,6 +27,8 @@ use php\lib\Number;
  */
 class FormElementTypePane
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var UXScrollPane
      */
@@ -33,6 +38,11 @@ class FormElementTypePane
      * @var UXVBox
      */
     protected $layout;
+
+    /**
+     * @var UXTitledPane[]
+     */
+    protected $tiledPanes = [];
 
     /**
      * @var UXToggleGroup
@@ -49,12 +59,25 @@ class FormElementTypePane
      */
     protected $buttons = [];
 
+    /**
+     * @var bool
+     */
     protected $selectable;
 
     /**
      * @var mixed
      */
     protected $selected = null;
+
+    /**
+     * @var bool
+     */
+    protected $onlyIcons = false;
+
+    /**
+     * @var UXComboBox
+     */
+    protected $viewSelect;
 
     /**
      * @param AbstractFormElement[]|AbstractScriptComponent[] $elements
@@ -86,6 +109,22 @@ class FormElementTypePane
         foreach ($groups as $name => $elements) {
             $this->createGroupUi($name, $elements);
         }
+    }
+
+    public function resetConfigurable($id)
+    {
+        $this->setOnlyIcons(Ide::get()->getUserConfigValue(get_class($this) . ".$id.onlyIcons", $this->isOnlyIcons()));
+        $this->setOpenedGroups(Ide::get()->getUserConfigArrayValue(get_class($this) . ".$id.openedGroups", $this->getOpenedGroups()));
+    }
+
+    public function applyConfigure($id)
+    {
+        $this->resetConfigurable($id);
+
+        $this->on('change', function () use ($id) {
+            Ide::get()->setUserConfigValue(get_class($this) . ".$id.onlyIcons", $this->isOnlyIcons());
+            Ide::get()->setUserConfigValue(get_class($this) . ".$id.openedGroups", $this->getOpenedGroups());
+        }, __CLASS__);
     }
 
     /**
@@ -120,6 +159,52 @@ class FormElementTypePane
         $this->selected = null;
     }
 
+    public function getOpenedGroups()
+    {
+        $groups = [];
+
+        foreach ($this->tiledPanes as $group => $pane) {
+            if ($pane->expanded) {
+                $groups[$group] = $group;
+            }
+        }
+
+        return $groups;
+    }
+
+    public function setOpenedGroups(array $groups)
+    {
+        foreach ($this->tiledPanes as $group => $pane) {
+           $pane->expanded = in_array($group, $groups) || isset($groups[$group]);
+        }
+    }
+
+    public function setOnlyIcons($value, $updateUi = true)
+    {
+        if ($value == $this->onlyIcons) {
+            return;
+        }
+
+        $this->clearSelected();
+
+        $this->onlyIcons = $value;
+
+        foreach ($this->tiledPanes as $pane) {
+            $pane->content = $value ? $pane->data('fbox') : $pane->data('vbox');
+        }
+
+        $this->trigger('change');
+
+        if ($this->viewSelect && $updateUi) {
+            $this->viewSelect->selectedIndex = $value ? 1 : 0;
+        }
+    }
+
+    public function isOnlyIcons()
+    {
+        return $this->onlyIcons;
+    }
+
     protected function createHeaderUi()
     {
         if ($this->selectable) {
@@ -127,7 +212,7 @@ class FormElementTypePane
             $vbox->spacing = 1;
             $vbox->padding = 2;
 
-            $button = new UXToggleButton('Курсор');
+            /*$button = new UXToggleButton('Курсор');
 
             $button->toggleGroup = $this->toggleGroup;
             $button->graphic = Ide::get()->getImage('icons/cursor16.png');
@@ -136,10 +221,18 @@ class FormElementTypePane
             $button->style = '-fx-cursor: hand; -fx-font-weight: bold;';
             $button->alignment = 'BASELINE_LEFT';
             $button->selected = true;
+              */
+            $this->unselectedButton = null;
 
-            $this->unselectedButton = $button;
+            $this->viewSelect = $typeSelect = new UXComboBox(['Иконки + текст', 'Только иконки']);
+            $typeSelect->maxWidth = 10000;
+            $typeSelect->selectedIndex = 0;
 
-            $vbox->add($button);
+            $typeSelect->on('action', function () use ($typeSelect) {
+                $this->setOnlyIcons($typeSelect->selectedIndex == 1, false);
+            });
+
+            $vbox->add($typeSelect);
 
             $this->layout->add($vbox);
         }
@@ -151,34 +244,54 @@ class FormElementTypePane
         $vbox->spacing = 1;
         $vbox->padding = 2;
 
+        $fbox = new UXFlowPane();
+        $fbox->hgap = $fbox->vgap = 2;
+        $fbox->padding = 2;
+
         /** @var AbstractFormElement $element */
         foreach ($elements as $element) {
             $button = $this->selectable ? new UXToggleButton($element->getName()) : new UXButton($element->getName());
+            $smallButton = $this->selectable ? new UXToggleButton() : new UXButton();
 
             if ($this->selectable) {
                 $button->toggleGroup = $this->toggleGroup;
+                $smallButton->toggleGroup = $this->toggleGroup;
             }
 
+            $button->classes->add('dn-simple-toggle-button');
             $button->height = 18;
             $button->maxWidth = 10000;
             $button->alignment = 'BASELINE_LEFT';
-
             $button->userData = $element;
-
             $button->graphic = Ide::get()->getImage($element->getIcon());
+            $button->tooltipText = $element->getName();
 
-            $tooltip = new UXTooltip();
-            $tooltip->text = $element->getName();
-
-            $button->tooltip = $tooltip;
+            $smallButton->classes->add('dn-simple-toggle-button');
+            $smallButton->size = [25, 30];
+            $smallButton->userData = $element;
+            $smallButton->graphic = Ide::get()->getImage($element->getIcon());
+            $smallButton->tooltipText = $element->getName();
 
             $vbox->add($button);
+            $fbox->add($smallButton);
+
             $this->buttons[] = $button;
+            $this->buttons[] = $smallButton;
         }
 
         $pane = new UXTitledPane($group, $vbox);
+        $pane->data('vbox', $vbox);
+        $pane->data('fbox', $fbox);
+        $pane->font = UXFont::of($pane->font->family, $pane->font->size, 'BOLD');
         $pane->animated = false;
+        $pane->expanded = true;
         $pane->padding = [1, 3];
+
+        $pane->observer('expanded')->addListener(function () {
+            $this->trigger('change');
+        });
+
+        $this->tiledPanes[$group] = $pane;
 
         $this->layout->add($pane);
     }

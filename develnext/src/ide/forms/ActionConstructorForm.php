@@ -38,6 +38,7 @@ use php\gui\UXForm;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
+use php\gui\UXSplitPane;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\io\MemoryStream;
@@ -58,6 +59,7 @@ use script\TimerScript;
  * @property UXAnchorPane $codeContent
  * @property UXTabPane $tabs
  * @property UXCheckbox $useDefaultCheckbox
+ * @property UXSplitPane $constructorSplitPane
  */
 class ActionConstructorForm extends AbstractIdeForm
 {
@@ -383,6 +385,7 @@ class ActionConstructorForm extends AbstractIdeForm
 
     public function showAndWait(ActionEditor $editor = null, $class = null, $method = null)
     {
+        $this->constructorSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
         $this->useDefaultCheckbox->selected = Ide::get()->getUserConfigValue(CodeEditor::class . '.editorOnDoubleClick') == "constructor";
 
         $this->buildActionTypePane($editor);
@@ -509,6 +512,10 @@ class ActionConstructorForm extends AbstractIdeForm
             if ($subGroup) {
                 $label = new UXLabel($subGroup);
                 $label->minWidth = 34 * 3;
+                $tab->content->observer('width')->addListener(function ($old, $new) use ($label, $tab) {
+                    Ide::get()->setUserConfigValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
+                    $label->minWidth = $new - $tab->content->paddingLeft - $tab->content->paddingRight;
+                });
 
                 if ($subGroups[$actionType->getGroup()]) {
                     $label->paddingTop = 5;
@@ -817,7 +824,6 @@ class ActionConstructorForm extends AbstractIdeForm
 
                 UXApplication::runLater(function () {
                     $this->liveCodeEditor->requestFocus();
-                    $this->liveCodeEditor->jumpToLine(11);
                 });
             });
         }

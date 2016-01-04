@@ -28,5 +28,6 @@
     <runtimeBits>64/32</runtimeBits>
     <initialHeapSize>50</initialHeapSize>
     <maxHeapSize>1024</maxHeapSize>
+    <opt>-Dfile.encoding=UTF-8</opt>
   </jre>
 </launch4jConfig>

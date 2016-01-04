@@ -38,6 +38,8 @@ public class UXToggleGroup extends BaseWrapper<ToggleGroup> {
     public void setSelected(Environment env, @Nullable IObject value) {
         if (value instanceof BaseWrapper && ((BaseWrapper) value).getWrappedObject() instanceof Toggle) {
             getWrappedObject().selectToggle((Toggle) ((BaseWrapper) value).getWrappedObject());
+        } else {
+            getWrappedObject().selectToggle(null);
         }
     }
 }

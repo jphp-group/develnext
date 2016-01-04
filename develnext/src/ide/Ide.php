@@ -179,9 +179,9 @@ class Ide extends Application
                     }
                 });
 
-                /*if ($this->isDevelopment()) {
+                if ($this->isDevelopment()) {
                     restore_exception_handler();
-                } */
+                }
 
                 $this->splash = $splash = new SplashForm();
                 $splash->show();
@@ -400,6 +400,21 @@ class Ide extends Application
     public function getUserConfigValue($key, $def = null)
     {
         return $this->getUserConfig('ide')->get($key, $def);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $def
+     *
+     * @return string
+     */
+    public function getUserConfigArrayValue($key, $def = [])
+    {
+        if ($this->getUserConfig('ide')->has($key)) {
+            return $this->getUserConfig('ide')->getArray($key, $def);
+        } else {
+            return $def;
+        }
     }
 
     /**

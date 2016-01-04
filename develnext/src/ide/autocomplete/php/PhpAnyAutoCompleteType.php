@@ -139,7 +139,7 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                 new StatementAutoCompleteItem('static::', 'Статичное обращение к классу', 'static::'),
                 new StatementAutoCompleteItem('array', 'Тип массив', 'array '),
                 new StatementAutoCompleteItem('callable', 'Тип функция/метод', 'callable '),
-                new StatementAutoCompleteItem('break', 'Выйти из циклы или switch', 'break;'),
+                new StatementAutoCompleteItem('break', 'Выйти из цикла или switch', 'break;'),
                 new StatementAutoCompleteItem('continue', 'К следующей итерации цикла', 'continue;'),
                 new StatementAutoCompleteItem('echo', 'Распечатать в вывод консоли', 'echo '),
             ];

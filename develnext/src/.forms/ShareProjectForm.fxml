@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="552.0" spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox>
+         <children>
+            <Label text="Поделиться проектом">
+               <font>
+                  <Font size="23.0" />
+               </font>
+            </Label>
+            <Label text="У вас есть возможность поделиться проектом с другими пользователями" />
+         </children>
+      </VBox>
+      <Separator prefWidth="200.0" />
+      <HBox prefHeight="35.0" prefWidth="522.0" spacing="10.0">
+         <children>
+            <Button maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-share-ex" text="Поделиться">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Button>
+            <Button maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-share-ex" text="Отмена" />
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+   </padding>
+</VBox>

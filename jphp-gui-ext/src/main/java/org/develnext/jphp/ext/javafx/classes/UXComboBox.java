@@ -42,6 +42,7 @@ public class UXComboBox extends UXComboBoxBase {
     @Signature
     @SuppressWarnings("unchecked")
     public void __construct(Environment env, ForeachIterator iterator) {
+        __construct();
         while (iterator.next()) {
             getWrappedObject().getItems().add(Memory.unwrap(env, iterator.getValue()));
         }

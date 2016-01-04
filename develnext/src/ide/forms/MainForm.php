@@ -20,6 +20,8 @@ use php\gui\UXForm;
 use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXNode;
+use php\gui\UXScreen;
+use php\gui\UXSplitPane;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXTextArea;
@@ -31,12 +33,19 @@ use php\gui\UXTreeView;
  * @property UXVBox $properties
  * @property UXTreeView $projectTree
  * @property UXHBox $headPane
+ * @property UXSplitPane $contentSplitPane
  */
 class MainForm extends AbstractIdeForm
 {
     protected function init()
     {
         parent::init();
+
+        $this->opacity = 0.01;
+
+        Ide::get()->on('start', function () {
+            $this->opacity = 1;
+        });
     }
 
     /**
@@ -63,7 +72,40 @@ class MainForm extends AbstractIdeForm
         parent::show();
         Logger::info("Show main form ...");
 
-        $this->maximized = true;
+        $screen = UXScreen::getPrimary();
+
+        $this->contentSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . '.dividerPositions', $this->contentSplitPane->dividerPositions);
+        $this->width  = Ide::get()->getUserConfigValue(get_class($this) . '.width', $screen->bounds['width'] * 0.75);
+        $this->height = Ide::get()->getUserConfigValue(get_class($this) . '.height', $screen->bounds['height'] * 0.75);
+
+        $this->centerOnScreen();
+
+        $this->x = Ide::get()->getUserConfigValue(get_class($this) . '.x', 0);
+        $this->y = Ide::get()->getUserConfigValue(get_class($this) . '.y', 0);
+
+        if ($this->x > $screen->bounds['width'] - 10 || $this->y > $screen->bounds['height'] - 10) {
+            $this->x = $this->y = 0;
+        }
+
+        $this->maximized = Ide::get()->getUserConfigValue(get_class($this) . '.maximized', true);
+
+        $this->observer('maximized')->addListener(function ($old, $new) {
+            Ide::get()->setUserConfigValue(get_class($this) . '.maximized', $new);
+        });
+
+        $this->contentSplitPane->items[0]->observer('width')->addListener(function ($old, $new) {
+            Ide::get()->setUserConfigValue(get_class($this) . '.dividerPositions', $new);
+        });
+
+        foreach (['width', 'height', 'x', 'y'] as $prop) {
+            $this->observer($prop)->addListener(function ($old, $new) use ($prop) {
+                if (!$this->maximized) {
+                    Ide::get()->setUserConfigValue(get_class($this) . '.' . $prop, $new);
+                }
+
+                Ide::get()->setUserConfigValue(get_class($this) . '.dividerPositions', $this->contentSplitPane->dividerPositions);
+            });
+        }
 
         $this->projectTabs->tabs[0]->graphic = ico('settings16');
         //$this->projectTabs->tabs[1]->graphic = ico('tree16');
@@ -120,6 +162,10 @@ class MainForm extends AbstractIdeForm
                 $this->hide();
 
                 Ide::get()->shutdown();
+            } else {
+                if ($e) {
+                    $e->consume();
+                }
             }
         }
     }

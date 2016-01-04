@@ -131,10 +131,21 @@ abstract class UXWindow
     }
 
     /**
+     * Use observer() ..
+     * @deprecated
      * @param string $property
      * @param callable $listener (UXWindow $self, $property, $oldValue, $newValue)
      */
     public function watch($property, callable $listener)
+    {
+    }
+
+    /**
+     * @param string $property
+     * @return UXValue
+     * @throws IllegalArgumentException
+     */
+    public function observer($property)
     {
     }
 

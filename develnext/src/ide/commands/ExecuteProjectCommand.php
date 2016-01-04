@@ -91,10 +91,6 @@ class ExecuteProjectCommand extends AbstractCommand
                     }
 
                     if (!$result) {
-                        if ($this->process instanceof Process) {
-                            $this->process->destroy();
-                        }
-
                         Notifications::showExecuteUnableStop();
                     }
                 } else {
@@ -148,7 +144,7 @@ class ExecuteProjectCommand extends AbstractCommand
         $appPidFile->delete();
 
         $this->process = new Process(
-            [$ide->getGradleProgram(), 'run', '--daemon'],
+            [$ide->getGradleProgram(), 'run', '-Dfile.encoding=UTF-8', '--daemon'],
             $project->getRootDir(),
             $ide->makeEnvironment()
         );

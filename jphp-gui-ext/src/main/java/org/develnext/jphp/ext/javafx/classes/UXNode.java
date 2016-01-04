@@ -9,10 +9,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.*;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Dragboard;
@@ -707,6 +704,16 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
                     if (node != null) {
                         return node;
                     }
+                } else if (nd instanceof SplitPane) {
+                    for (Node one : ((SplitPane) nd).getItems()) {
+                        if (one instanceof Parent) {
+                            node = __globalLookup(one, select);
+
+                            if (node != null) {
+                                return node;
+                            }
+                        }
+                    }
                 } else if (nd instanceof TabPane) {
                     for (Tab tab : ((TabPane) nd).getTabs()) {
                         if (tab.getContent() instanceof Parent) {
@@ -716,6 +723,12 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
                                 return node;
                             }
                         }
+                    }
+                } else if (nd instanceof Parent) {
+                    Node n = __globalLookup(nd, select);
+
+                    if (n != null) {
+                        return n;
                     }
                 }
             }

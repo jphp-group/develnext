@@ -63,12 +63,7 @@ class ExportProjectCommand extends AbstractCommand
 
                 $project->export($file);
 
-                $dialog = new BuildSuccessForm();
-                $dialog->setBuildPath($file);
-                $dialog->setRunProgram(File::of($file));
-                $dialog->setOpenDirectory(File::of($file)->getParent());
-
-                $dialog->showAndWait();
+                Ide::toast('Проект успешно сохранен в zip архив');
             }
         } else {
             UXDialog::show('Для экспортирования необходимо открыть или создать проект');

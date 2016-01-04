@@ -86,7 +86,7 @@ class Logger
         static::log(self::LEVEL_ERROR, $message);
     }
 
-    static function exception($message, \Exception $e)
+    static function exception($message, \BaseException $e)
     {
         $message .= "\r\n" . $e->getMessage() . " on line {$e->getLine()} at file {$e->getFile()}\r\nStack Trace:\r\n";
         $message .= $e->getTraceAsString();

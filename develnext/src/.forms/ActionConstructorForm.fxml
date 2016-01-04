@@ -9,14 +9,24 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="692.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox layoutX="14.0" layoutY="525.0" prefHeight="34.0" prefWidth="871.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
+      <HBox layoutX="14.0" layoutY="525.0" prefHeight="34.0" prefWidth="692.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="193.0">
          <children>
-            <Button id="saveButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" prefWidth="138.0" styleClass="icon-ok" text="Сохранить">
+            <Button id="saveButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" styleClass="icon-ok" text="Сохранить">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
             </Button>
-            <Button id="cancelButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" prefWidth="138.0" text="Отменить" />
+            <Button id="cancelButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" text="Отмена">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding></Button>
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
       <TabPane id="tabs" layoutX="14.0" layoutY="14.0" prefHeight="675.0" prefWidth="872.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="59.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
@@ -61,11 +71,11 @@
                                     <Insets />
                                  </VBox.margin>
                               </HBox>
-                              <HBox spacing="3.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="ALWAYS">
-                                 <children>
-                                    <AnchorPane HBox.hgrow="ALWAYS">
+                              <SplitPane id="constructorSplitPane" dividerPositions="0.79" style="-fx-border-width: 0px;" VBox.vgrow="ALWAYS">
+                                 <items>
+                                    <AnchorPane style="-fx-border-width: 0px;">
                                        <children>
-                                          <ListView id="list" fixedCellSize="40.0" style="-fx-border-width: 0px;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <ListView id="list" fixedCellSize="40.0" style="-fx-border-width: 0; -fx-border-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                           <Label id="hintLabel" layoutX="33.0" layoutY="28.0" text="Перетащите сюда иконки с правой панели ..." textFill="#ababab">
                                              <font>
                                                 <Font name="System Italic" size="22.0" />
@@ -82,8 +92,8 @@
                                           </TabPane>
                                        </children>
                                     </VBox>
-                                 </children>
-                              </HBox>
+                                 </items>
+                              </SplitPane>
                            </children>
                         </VBox>
                      </children>
