@@ -1,0 +1,3 @@
+[submodule "-f"]
+	path = develnext-control
+	url = git@bitbucket.org:develnext/develnext-control.git
