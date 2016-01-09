@@ -7,8 +7,10 @@ use ide\account\api\IconService;
 use ide\account\api\MediaService;
 use ide\account\api\NoticeService;
 use ide\account\api\ProfileService;
+use ide\account\api\ProjectArchiveService;
 use ide\account\api\ProjectService;
 use ide\account\api\ServiceResponse;
+use ide\Ide;
 use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
 use ide\ui\Notifications;
@@ -29,7 +31,7 @@ class ServiceManager
     /**
      * @var string
      */
-    protected $endpoint = 'http://develnext.org';
+    protected $endpoint = 'http://develnext.org/';
 
     /**
      * @var string
@@ -65,6 +67,11 @@ class ServiceManager
     protected $projectService;
 
     /**
+     * @var ProjectArchiveService
+     */
+    protected $projectArchiveService;
+
+    /**
      * @var NoticeService
      */
     protected $noticeService;
@@ -88,6 +95,7 @@ class ServiceManager
         $this->profileService = new ProfileService();
         $this->ideService = new IdeService();
         $this->projectService = new ProjectService();
+        $this->projectArchiveService = new ProjectArchiveService();
         $this->noticeService = new NoticeService();
         $this->mediaService = new MediaService();
         $this->iconService = new IconService();
@@ -158,6 +166,10 @@ class ServiceManager
      */
     public function getEndpoint()
     {
+        if (Ide::get()->isDevelopment()) {
+            return "http://localhost:8080/";
+        }
+
         return $this->endpoint;
     }
 
@@ -191,6 +203,11 @@ class ServiceManager
     public function updateStatus()
     {
         if ($this->ideService) {
+            if (Ide::get()->isIdle()) {
+                Logger::info("Skip update status, ide in idle mode ...");
+                return;
+            }
+
             Logger::info("Update status ...");
 
             $this->ideService->statusAsync(function (ServiceResponse $response) {
@@ -266,6 +283,11 @@ class ServiceManager
     public function project()
     {
         return $this->projectService;
+    }
+
+    public function projectArchive()
+    {
+        return $this->projectArchiveService;
     }
 
     public function profile()

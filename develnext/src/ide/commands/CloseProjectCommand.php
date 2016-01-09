@@ -10,7 +10,7 @@ use ide\systems\ProjectSystem;
  * Class CloseProjectCommand
  * @package ide\commands
  */
-class CloseProjectCommand extends AbstractCommand
+class CloseProjectCommand extends AbstractProjectCommand
 {
     public function getName()
     {

@@ -17,6 +17,10 @@ class Notifications
 
     static function error($title, $message)
     {
+        if ($message == "Validation") {
+            return "Введите корректные данные"; // TODO improve this
+        }
+
         return self::show($title, $message, 'ERROR');
     }
 
@@ -58,5 +62,15 @@ class Notifications
     public static function showInvalidValidation()
     {
         static::error('Ошибка валидации', 'Введите все необходимые данные корректно, не пропуская обязательные поля!');
+    }
+
+    public static function errorDeleteFile($file)
+    {
+        static::error('Ошибка удаления', "Файл '$file' невозможно удалить в данный момент, возможно он занят другой программой.");
+    }
+
+    public static function errorCopyFile($file)
+    {
+        static::error('Ошибка копирования', "Файл '$file' невозможно скопировать в данный момент, возможно недоступен файл или целевая папка.");
     }
 }

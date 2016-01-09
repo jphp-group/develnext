@@ -130,6 +130,11 @@ abstract class UXNode
     public $classes;
 
     /**
+     * @var string
+     */
+    public $classesString;
+
+    /**
      * @var mixed
      */
     public $userData = null;

@@ -120,4 +120,13 @@ class LoginForm extends AbstractOnlineIdeForm
             $this->hide();
         }
     }
+
+    /**
+     * @event forgetPasswordLink.action
+     */
+    public function actionRestore()
+    {
+        $dialog = new AccountRestorePasswordForm();
+        $dialog->showAndWait();
+    }
 }

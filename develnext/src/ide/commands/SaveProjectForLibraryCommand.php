@@ -11,7 +11,7 @@ use ide\misc\AbstractCommand;
 use ide\project\Project;
 use php\gui\UXDialog;
 
-class SaveProjectForLibraryCommand extends AbstractCommand
+class SaveProjectForLibraryCommand extends AbstractProjectCommand
 {
     public function getName()
     {

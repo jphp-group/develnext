@@ -63,8 +63,6 @@ class CopyMenuCommand extends AbstractMenuCommand
                 return;
             }
 
-            dump(sizeof($needNodes));
-
             $processor = new XmlProcessor();
             $document = $processor->createDocument();
 

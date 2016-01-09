@@ -17,7 +17,9 @@ use php\lang\System;
  * @method ServiceResponse registerAsync($email, $name, $password, $captchaWord, $callback)
  * @method ServiceResponse confirmAsync($email, $confirmKey, $callback)
  * @method ServiceResponse getAsync($callback)
- * @method ServiceResponse logoutAsync($callback)
+ * @method ServiceResponse logoutAsync($callback = null)
+ * @method ServiceResponse restorePasswordAsync($email, callable $callback = null)
+ * @method ServiceResponse restorePasswordConfirmAsync($email, $confirmKey, callable $callback = null)
  */
 class AccountService extends AbstractService
 {
@@ -76,6 +78,30 @@ class AccountService extends AbstractService
             'deviceId' => $this->getDeviceId(),
             'osName' => $this->getOsName(),
             'osUser' => $this->getOsUser(),
+        ]);
+    }
+
+    /**
+     * @param $email
+     * @return ServiceResponse
+     */
+    public function restorePassword($email)
+    {
+        return $this->execute('account/restore-password', [
+            'email' => $email
+        ]);
+    }
+
+    /**
+     * @param $email
+     * @param $confirmKey
+     * @return ServiceResponse
+     */
+    public function restorePasswordConfirm($email, $confirmKey)
+    {
+        return $this->execute('account/restore-password-confirm', [
+            'email' => $email,
+            'confirmKey' => $confirmKey
         ]);
     }
 

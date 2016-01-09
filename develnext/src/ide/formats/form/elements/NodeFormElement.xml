@@ -9,7 +9,7 @@
     <properties group="extra" title="Дополнительно" sort="2000" >
         <property code="id" name="ID" editor="id" tooltip="Уникальный индетификатор элемента в рамках формы" />
         <property code="style" name="CSS стиль" editor="text" tooltip="Набор fx css правил для стиля" />
-        <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />
+        <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" virtual="1" />
 
         <property code="cursor" name="Курсор" editor="enum" tooltip="Тип курсора при наведении на объект" virtual="1" defaultValue="DEFAULT">
             <variants>

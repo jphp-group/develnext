@@ -13,6 +13,7 @@ use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\paint\UXColor;
+use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;
 use php\gui\UXFileChooser;
@@ -195,26 +196,26 @@ class NewProjectForm extends AbstractIdeForm
             return;
         }
 
+
         if ($template instanceof IdeLibraryResource) {
             ProjectSystem::import($template->getPath(), "$path/$name", $name);
+
+            $this->hide();
         } else {
+            $this->hide();
             $filename = File::of("$path/$name/$name.dnproject");
 
-            if ($filename->isFile()) {
-                UXDialog::show('Невозможно создать проект, т.к. проект уже существует.', 'ERROR');
-                return;
-            }
-
-            if (!$filename->createNewFile(true)) {
+            /*if (!$filename->createNewFile(true)) {
                 UXDialog::show("Невозможно создать файл проекта по выбранному пути\n -> $filename", 'ERROR');
                 return;
-            }
+            }*/
 
             ProjectSystem::close();
-            ProjectSystem::create($template, $filename);
-        }
 
-        $this->hide();
+            uiLater(function () use ($template, $filename) {
+                ProjectSystem::create($template, $filename);
+            });
+        }
     }
 
     /**

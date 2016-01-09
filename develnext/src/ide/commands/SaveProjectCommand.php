@@ -10,7 +10,7 @@ use php\gui\UXSeparator;
  * Class SaveProjectCommand
  * @package ide\commands
  */
-class SaveProjectCommand extends AbstractCommand
+class SaveProjectCommand extends AbstractProjectCommand
 {
     public function getName()
     {

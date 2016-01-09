@@ -13,6 +13,7 @@ use php\gui\UXForm;
 use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXNode;
+use php\lib\str;
 
 /**
  * @property UXHBox $buttonBox
@@ -26,7 +27,9 @@ use php\gui\UXNode;
  */
 class MessageBoxForm extends AbstractIdeForm
 {
-    use DialogFormMixin;
+    use DialogFormMixin {
+        showDialog as private _showDialog;
+    }
 
     /** @var string */
     protected $text;
@@ -56,12 +59,19 @@ class MessageBoxForm extends AbstractIdeForm
 
     public function showDialogWithFlag()
     {
-        UXApplication::runLater(function() {
-            $this->flag->visible = true;
-            $this->height += 42;
+        UXApplication::runLater(function () {
+            $this->centerOnScreen();
         });
+        return $this->_showDialog();
+    }
 
-        return $this->showDialog();
+    public function showDialog($x = null, $y = null)
+    {
+        $this->flag->free();
+        UXApplication::runLater(function () {
+            $this->centerOnScreen();
+        });
+        return $this->_showDialog($x, $y);
     }
 
     /**
@@ -92,8 +102,10 @@ class MessageBoxForm extends AbstractIdeForm
             }
 
             $ui = new UXButton($button);
-            $ui->minWidth = 100;
             $ui->maxHeight = 10000;
+            $ui->minWidth = 90;
+            $ui->height = 30;
+            $ui->paddingLeft = $ui->paddingRight = 15;
 
             $ui->on('action', function() use ($value, $i) {
                 $this->setResult($value);
@@ -107,5 +119,27 @@ class MessageBoxForm extends AbstractIdeForm
 
             $this->buttonBox->add($ui);
         }
+
+        UXApplication::runLater(function () {
+            $this->centerOnScreen();
+        });
+    }
+
+    static function confirmDelete($what)
+    {
+        if (is_array($what)) {
+            $what = str::join($what, ", ");
+        }
+
+        $dialog = new static("Вы уверены, что хотите удалить '$what'?", ['Да, удалить', 'Нет']);
+
+        return $dialog->showDialog() && $dialog->getResultIndex() == 0;
+    }
+
+
+    static function confirmExit()
+    {
+        $dialog = new static("Вы уверены, что хотите выйти?", ['Да, выйти', 'Нет']);
+        return $dialog->showDialog() && $dialog->getResultIndex() == 0;
     }
 }

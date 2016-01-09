@@ -11,6 +11,7 @@ use php\gui\UXNode;
 use php\io\IOException;
 use php\io\Stream;
 use php\lib\Items;
+use php\lib\str;
 use php\lib\String;
 use php\util\Flow;
 use php\xml\DomDocument;
@@ -176,6 +177,18 @@ abstract class AbstractFormElement
      */
     public function registerNode(UXNode $node)
     {
+        $classes = [];
+
+        foreach (str::split($node->classesString, ' ') as $class) {
+            $class = str::trim($class);
+            $classes[$class] = $class;
+        }
+
+        uiLater(function () use ($node, $classes) {
+            $node->classes->clear();
+            $node->classes->addAll($classes);
+        });
+
         return null;
     }
 }

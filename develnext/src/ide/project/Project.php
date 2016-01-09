@@ -76,6 +76,11 @@ class Project
     protected $config;
 
     /**
+     * @var Configuration[]
+     */
+    protected $ideConfigs = [];
+
+    /**
      * @var ProjectTree
      */
     protected $tree;
@@ -266,11 +271,23 @@ class Project
     }
 
     /**
+     * @return Configuration
+     */
+    public function getIdeServiceConfig()
+    {
+        return $this->getIdeConfig('project.ws');
+    }
+
+    /**
      * @param $name
      * @return Configuration
      */
     public function getIdeConfig($name)
     {
+        if ($configuration = $this->ideConfigs[$name]) {
+            return $configuration;
+        }
+
         $configuration = new Configuration();
 
         try {
@@ -279,7 +296,7 @@ class Project
             ;
         }
 
-        return $configuration;
+        return $this->ideConfigs[$name] = $configuration;
     }
 
     /**
@@ -288,6 +305,7 @@ class Project
      */
     public function setIdeConfig($name, Configuration $configuration)
     {
+        Logger::info("Save ide config ($name) of project ...");
         $configuration->save($this->getIdeDir() . "/$name");
     }
 
@@ -454,6 +472,7 @@ class Project
     public function makeExporter()
     {
         $exporter = new ProjectExporter($this);
+        $exporter->addDirectory($this->getIdeDir());
         $exporter->addFile($this->getProjectFile());
         $exporter->removeFile($this->indexer->getIndexFile());
 
@@ -504,6 +523,10 @@ class Project
         $this->trigger(__FUNCTION__);
 
         FileSystem::saveAll();
+
+        foreach ($this->ideConfigs as $name => $config) {
+            $this->setIdeConfig($name, $config);
+        }
 
         $files = Flow::of(FileSystem::getOpened())->map(function ($e) { return $this->getAbsoluteFile($e['file']); })->toArray();
 

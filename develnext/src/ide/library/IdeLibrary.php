@@ -80,7 +80,7 @@ class IdeLibrary
 
         $ide->on('start', function () {
             $this->update();
-        });
+        }, __CLASS__);
     }
 
     public function update()

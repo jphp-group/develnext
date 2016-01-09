@@ -60,6 +60,11 @@ abstract class AbstractScript
     /**
      * @var mixed
      */
+    protected $_owner;
+
+    /**
+     * @var mixed
+     */
     protected $form;
 
     /**
@@ -93,6 +98,14 @@ abstract class AbstractScript
         if (!$this->disabled) {
             $this->applyImpl($target);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOwner()
+    {
+        return $this->_owner;
     }
 
     /**
@@ -199,5 +212,10 @@ abstract class AbstractScript
     public function free()
     {
         $this->disabled = true;
+    }
+
+    public function isFree()
+    {
+        return $this->disabled;
     }
 }

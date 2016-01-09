@@ -1,20 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="98.0" prefWidth="645.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label id="messageLabel" layoutX="57.0" layoutY="14.0" prefHeight="41.0" prefWidth="575.0" text="..." wrapText="true" AnchorPane.leftAnchor="57.0" AnchorPane.rightAnchor="13.0">
-         <font>
-            <Font size="13.0" />
-         </font>
-      </Label>
-      <HBox id="buttonBox" alignment="BASELINE_CENTER" layoutX="16.0" layoutY="54.0" prefHeight="30.0" prefWidth="568.0" spacing="7.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" />
-      <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
-      <CheckBox id="flag" layoutX="14.0" layoutY="107.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="498.0" selected="true" text="Запомнить этот выбор" AnchorPane.leftAnchor="14.0" />
+      <VBox spacing="15.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label id="messageLabel" maxHeight="1.7976931348623157E308" text="..." wrapText="true" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox id="buttonBox" alignment="BASELINE_CENTER" fillHeight="false" spacing="7.0" />
+            <CheckBox id="flag" mnemonicParsing="false" prefHeight="17.0" prefWidth="498.0" selected="true" text="Запомнить этот выбор" />
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </VBox>
    </children>
 </AnchorPane>

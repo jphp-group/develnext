@@ -27,6 +27,8 @@ abstract class LabeledFormElement extends AbstractFormElement
 {
     public function registerNode(UXNode $node)
     {
+        parent::registerNode($node);
+
         /** @var UXLabeled $node */
         $data = DataUtils::get($node);
         $image = $data->get('graphic');

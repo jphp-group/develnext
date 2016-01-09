@@ -42,7 +42,7 @@ class RegisterConfirmForm extends AbstractOnlineIdeForm
                     return;
                 }
 
-                UXDialog::show($response->message());
+                Notifications::show('Регистрация завершена', $response->message(), 'SUCCESS');
                 $this->hidePreloader();
 
                 $this->setResult($response->data());

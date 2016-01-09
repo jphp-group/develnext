@@ -20,10 +20,7 @@ import org.fife.ui.rtextarea.SearchResult;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 
 public class SyntaxTextArea extends SwingNode implements SearchListener {
     private final static String OS = System.getProperty("os.name").toLowerCase();
@@ -239,7 +236,7 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
     }
 
     public void showFindDialog() {
-        FindDialog findDialog = new FindDialog((Frame) null, this);
+        final FindDialog findDialog = new FindDialog((Frame) null, this);
         findDialog.setVisible(true);
         findDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         findDialog.addWindowListener(new WindowAdapter() {
@@ -252,10 +249,17 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
                 }
             }
         });
+        findDialog.toFront();
+        findDialog.addWindowFocusListener(new WindowAdapter() {
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                findDialog.setVisible(false);
+            }
+        });
     }
 
     public void showReplaceDialog() {
-        ReplaceDialog dialog = new ReplaceDialog((Frame) null, this);
+        final ReplaceDialog dialog = new ReplaceDialog((Frame) null, this);
         dialog.setVisible(true);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.addWindowListener(new WindowAdapter() {
@@ -266,6 +270,13 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
                 } catch (NullPointerException ex) {
                     ;
                 }
+            }
+        });
+        dialog.toFront();
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                dialog.setVisible(false);
             }
         });
     }

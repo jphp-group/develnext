@@ -57,6 +57,15 @@ ide\action\types\GameStartAnimationActionType
 ide\action\types\GameSetSpeedAnimationActionType
 ide\action\types\IfGameAnimationFreezeActionType
 ide\action\types\IfGameAnimationActionType
+
+ide\action\types\media\OpenMediaAction
+ide\action\types\media\OpenFileMediaAction
+ide\action\types\media\OpenUrlMediaAction
+ide\action\types\media\PlayMediaAction
+ide\action\types\media\PauseMediaAction
+ide\action\types\media\StopMediaAction
+ide\action\types\media\IfStatusMediaAction
+
 ide\action\types\SetScoreActionType
 ide\action\types\IfScoreActionType
 

@@ -8,4 +8,9 @@ trait ApplicationTrait
     {
         return app()->factory($name);
     }
+
+    public function appModule()
+    {
+        return app()->appModule();
+    }
 }

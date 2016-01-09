@@ -11,7 +11,7 @@ class UXImageViewWrapper extends UXNodeWrapper
 
         $image = null;
 
-        if ($data->has('image')) {
+        if ($data->get('image')) {
             try {
                 $image = $this->node->image = new UXImage('res://' . $data->get('image'));
             } catch (\Exception $e) {

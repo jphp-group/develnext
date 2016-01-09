@@ -75,6 +75,11 @@ class Ide extends Application
     protected $projectTemplates = [];
 
     /**
+     * @var AbstractExtension[]
+     */
+    protected $extensions = [];
+
+    /**
      * @var AbstractCommand[]
      */
     protected $commands = [];
@@ -108,6 +113,11 @@ class Ide extends Application
      * @var IdeLibrary
      */
     protected $library;
+
+    /**
+     * @var boolean
+     */
+    protected $idle = false;
 
     /**
      * @var string
@@ -188,6 +198,11 @@ class Ide extends Application
 
                 TimerScript::executeAfter(1000, function () {
                     $this->registerAll();
+
+                    foreach ($this->extensions as $extension) {
+                        $extension->onIdeStart();
+                    }
+
                     $this->trigger('start', []);
                 });
             },
@@ -782,6 +797,22 @@ class Ide extends Application
 
     public function registerAll()
     {
+        $extensions = $this->getInternalList('.dn/extensions');
+
+        foreach ($extensions as $extension) {
+            Logger::info("Register IDE extension $extension");
+
+            /** @var AbstractExtension $extension */
+            $extension = new $extension();
+
+            if (!($extension instanceof AbstractExtension)) {
+                throw new IdeException("Unable to add extension " . get_class($extension) . ", is not correct type");
+            }
+
+            $this->extensions[get_class($extension)] = $extension;
+            $extension->onRegister();
+        }
+
         $valueEditors = $this->getInternalList('.dn/propertyValueEditors');
         foreach ($valueEditors as $valueEditor) {
             $valueEditor = new $valueEditor();
@@ -806,6 +837,32 @@ class Ide extends Application
 
             $this->registerCommand($command);
         }
+
+        /** @var TimerScript $inactiveTimer */
+        $inactiveTimer = null;
+
+        $this->getMainForm()->addEventFilter('mouseMove', function () use (&$inactiveTimer) {
+            if ($inactiveTimer) {
+                $inactiveTimer->stop();
+                $inactiveTimer = null;
+            }
+
+            if ($this->idle) {
+                Logger::info("IDE awake, idle mode = off ...");
+                $this->trigger('idleOff');
+            }
+
+            $this->idle = false;
+
+            // 5 min.
+            $inactiveTimer = TimerScript::executeAfter(5 * 60 * 1000, function () {
+                if (!$this->idle) {
+                    $this->idle = true;
+                    Logger::info("IDE is sleeping, idle mode ...");
+                    $this->trigger('idleOn');
+                }
+            });
+        });
 
         $ideConfig = $this->getUserConfig('ide');
 
@@ -832,6 +889,23 @@ class Ide extends Application
             $this->afterShow[] = $handle;
         }
     }
+
+    /**
+     * @return boolean
+     */
+    public function isIdle()
+    {
+        return $this->idle;
+    }
+
+    /**
+     * @return MainForm
+     */
+    public function getMainForm()
+    {
+        return parent::getMainForm();
+    }
+
 
     /**
      * @return Ide
@@ -883,6 +957,15 @@ class Ide extends Application
         }))->start();
 
         Logger::info("Start IDE shutdown ...");
+
+        foreach ($this->extensions as $extension) {
+            try {
+                Logger::info("Shutdown IDE extension " . get_class($extension) . ' ...');
+                $extension->onIdeShutdown();
+            } catch (\Exception $e) {
+                Logger::exception("Unable to shutdown IDE extension " . get_class($extension), $e);
+            }
+        }
 
         $project = $this->getOpenedProject();
 

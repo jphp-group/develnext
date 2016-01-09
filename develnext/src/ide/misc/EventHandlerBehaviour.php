@@ -2,6 +2,7 @@
 namespace ide\misc;
 
 use ide\Logger;
+use php\lib\str;
 
 trait EventHandlerBehaviour
 {
@@ -53,6 +54,11 @@ trait EventHandlerBehaviour
     public function on($event, callable $handler, $group = 'general')
     {
         $this->handlers[$event][$group] = $handler;
+    }
+
+    public function bind($event, callable $handler)
+    {
+        $this->on($event, $handler, str::uuid());
     }
 
     public function off($event, $group = null)

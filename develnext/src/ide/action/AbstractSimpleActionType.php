@@ -23,6 +23,7 @@ abstract class AbstractSimpleActionType extends AbstractActionType
     const SUB_GROUP_DECOR = 'Декорация';
     const SUB_GROUP_ANIMATION = 'Анимация';
     const SUB_GROUP_DATA = 'Данные';
+    const SUB_GROUP_AUDIO = 'Аудио';
     const SUB_GROUP_ADDITIONAL = 'Другое';
     const SUB_GROUP_BEHAVIOUR = 'Поведение';
 
@@ -39,7 +40,7 @@ abstract class AbstractSimpleActionType extends AbstractActionType
         return [];
     }
 
-    function  attributeSettings()
+    function attributeSettings()
     {
         return [];
     }
@@ -92,9 +93,11 @@ abstract class AbstractSimpleActionType extends AbstractActionType
                 return "'$value'";
 
             case 'string':
+                $value = str::replace($value, "'", "\\'");
                 return "'$value'";
 
             case 'magicString':
+                $value = str::replace($value, '"', '\\"');
                 return '"' . $value . '"';
 
             case 'integer':

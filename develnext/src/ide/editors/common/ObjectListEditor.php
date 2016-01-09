@@ -69,6 +69,11 @@ class ObjectListEditor
     protected $emptyItemText = '...';
 
     /**
+     * @var bool
+     */
+    protected $enableAppModule = true;
+
+    /**
      * ObjectListEditor constructor.
      * @param AbstractEditor $editor
      * @param array $filters
@@ -336,6 +341,25 @@ class ObjectListEditor
                         ));
 
                         $this->appendFormEditor($formEditor, 2, $prefix);
+                    }
+                }
+            }
+        }
+
+        if ($this->enableAppModule) {
+            $gui = GuiFrameworkProjectBehaviour::get();
+            if ($gui) {
+                $appModule = $gui->getModuleEditor('AppModule');
+
+                if ($editor && FileUtils::equalNames($appModule->getFile(), $editor->getFile())) {
+                    // ...
+                } else {
+                    if ($appModule) {
+                        $this->comboBox->items->add(new ObjectListEditorItem(
+                            $appModule->getTitle(), Ide::get()->getImage($appModule->getIcon()), 'appModule()'
+                        ));
+
+                        $this->appendFormEditor($appModule, 1, 'appModule()');
                     }
                 }
             }

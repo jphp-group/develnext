@@ -3,11 +3,13 @@ namespace ide\forms;
 
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
+use ide\project\Project;
 use ide\project\ProjectConfig;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\ui\FlowListViewDecorator;
 use ide\ui\ImageBox;
+use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
@@ -58,7 +60,24 @@ class OpenProjectForm extends AbstractIdeForm
 
         $this->projectListHelper = new FlowListViewDecorator($this->projectList->content);
         $this->projectListHelper->setEmptyListText('Список проектов пуст.');
-        $this->projectListHelper->setMultipleSelection(false);
+        $this->projectListHelper->setMultipleSelection(true);
+        $this->projectListHelper->on('remove', [$this, 'doRemove']);
+        $this->projectListHelper->on('beforeRemove', function ($nodes) {
+            $what = [];
+            foreach ($nodes as $node) {
+                $file = $node->data('file');
+
+                if ($file && $file->exists())  {
+                    $what[] = $node->data('name');
+                }
+            }
+
+            if (!MessageBoxForm::confirmDelete($what)) {
+                return true;
+            }
+
+            return false;
+        });
 
         $this->directoryChooser = new UXDirectoryChooser();
 
@@ -110,6 +129,7 @@ class OpenProjectForm extends AbstractIdeForm
 
             $one = new ImageBox(72, 48);
             $one->data('file', $project);
+            $one->data('name', FileUtils::stripExtension($project->getName()));
             $one->setTitle(FileUtils::stripExtension($project->getName()));
             $one->setImage(Ide::get()->getImage($template ? $template->getIcon32() : 'icons/question32.png')->image);
 
@@ -149,6 +169,31 @@ class OpenProjectForm extends AbstractIdeForm
                     ProjectSystem::open($file);
                 }
             });
+        }
+    }
+
+    /**
+     * @param $nodes
+     * @return bool
+     */
+    public function doRemove(array $nodes)
+    {
+        foreach ($nodes as $node) {
+            $file = $node->data('file');
+
+            if ($file && $file->exists()) {
+                $directory = File::of($file)->getParent();
+
+                if (Ide::project()
+                    && FileUtils::normalizeName(Ide::project()->getRootDir()) == FileUtils::normalizeName($directory)) {
+                    ProjectSystem::closeWithWelcome();
+                }
+
+                if (!FileUtils::deleteDirectory($directory)) {
+                    Notifications::error('Ошибка удаления', 'Папка проекта была не удалена полностью, возможно она занята другими программами.');
+                    $this->update();
+                }
+            }
         }
     }
 

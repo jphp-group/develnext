@@ -3,6 +3,7 @@ namespace ide\forms;
 
 use ide\editors\form\IdeTabPane;
 use ide\Ide;
+use ide\IdeException;
 use ide\Logger;
 use ide\project\templates\DefaultGuiProjectTemplate;
 use ide\systems\FileSystem;
@@ -19,6 +20,8 @@ use php\gui\UXButton;
 use php\gui\UXForm;
 use php\gui\UXImage;
 use php\gui\UXImageView;
+use php\gui\UXMenu;
+use php\gui\UXMenuBar;
 use php\gui\UXNode;
 use php\gui\UXScreen;
 use php\gui\UXSplitPane;
@@ -26,6 +29,7 @@ use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXTextArea;
 use php\gui\UXTreeView;
+use php\lib\str;
 
 /**
  * @property UXTabPane $fileTabPane
@@ -34,6 +38,7 @@ use php\gui\UXTreeView;
  * @property UXTreeView $projectTree
  * @property UXHBox $headPane
  * @property UXSplitPane $contentSplitPane
+ * @property UXMenuBar $mainMenu
  */
 class MainForm extends AbstractIdeForm
 {
@@ -46,6 +51,36 @@ class MainForm extends AbstractIdeForm
         Ide::get()->on('start', function () {
             $this->opacity = 1;
         });
+    }
+
+    /**
+     * @param string $id
+     * @param string $text
+     * @param bool $prepend
+     * @throws IdeException
+     */
+    public function defineMenuGroup($id, $text, $prepend = false)
+    {
+        $id = str::upperFirst($id);
+
+        $menu = $this->{"menu$id"};
+
+        if ($menu == null) {
+            $menu = new UXMenu();
+            $menu->id = "menu$id";
+
+            if ($prepend) {
+                $this->mainMenu->menus->insert(0, $menu);
+            } else {
+                $this->mainMenu->menus->add($menu);
+            }
+        } else {
+            if (!($menu instanceof UXMenu)) {
+                throw new IdeException("Invalid menu class for id = 'menu$id'");
+            }
+        }
+
+        $menu->text = $text;
     }
 
     /**
@@ -83,7 +118,7 @@ class MainForm extends AbstractIdeForm
         $this->x = Ide::get()->getUserConfigValue(get_class($this) . '.x', 0);
         $this->y = Ide::get()->getUserConfigValue(get_class($this) . '.y', 0);
 
-        if ($this->x > $screen->bounds['width'] - 10 || $this->y > $screen->bounds['height'] - 10) {
+        if ($this->x > $screen->visualBounds['width'] - 10 || $this->y > $screen->visualBounds['height'] - 10) {
             $this->x = $this->y = 0;
         }
 
@@ -157,6 +192,8 @@ class MainForm extends AbstractIdeForm
                 }
             }
         } else {
+            Ide::get()->setUserConfigValue('lastProject', null);
+
             $dialog = new MessageBoxForm('Вы уверены, что хотите выйти из среды?', ['Да, выйти', 'Нет']);
             if ($dialog->showDialog() && $dialog->getResultIndex() == 0) {
                 $this->hide();

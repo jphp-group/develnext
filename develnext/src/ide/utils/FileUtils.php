@@ -177,7 +177,10 @@ class FileUtils
             File::of($filename)->delete();
         });
 
-        File::of($directory)->delete();
+        $directory = File::of($directory);
+        $directory->delete();
+
+        return ($directory->exists());
     }
 
     public static function put($filename, $content, $encoding = 'UTF-8')
@@ -194,5 +197,10 @@ class FileUtils
     public static function get($filename, $encoding = 'UTF-8')
     {
         return Str::decode(Stream::getContents($filename), $encoding);
+    }
+
+    public static function equalNames($oneName, $twoName)
+    {
+        return self::hashName($oneName) == self::hashName($twoName);
     }
 }

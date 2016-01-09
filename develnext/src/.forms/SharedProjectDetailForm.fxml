@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="500.0" spacing="10.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+               <children>
+                  <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Проект" textFill="#ababab">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label id="nameLabel" text="Неизвестный проект">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+               <children>
+                  <Label text="Автор:">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Label>
+                  <Hyperlink id="accountLink" text="UserName">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Hyperlink>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+               <children>
+                  <Label text="Дата:" />
+                  <Label id="dateLabel" text="dd.mm.YYYY">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></Label>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+               <children>
+                  <Hyperlink id="urlLink" text="http://develnext.org/project/foobar">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Hyperlink>
+                  <Button id="copyUrlButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="flat-button" text="скопировать" />
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Button id="reuploadButton" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-upload" text="Загрузить">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+                  <Button id="deleteButton" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-delete" text="Удалить">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+                  <Button id="openButton" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-open" text="Открыть проект">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
+                  <HBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Button id="cancelButton" mnemonicParsing="false" prefHeight="35.0" text="Выход">
+                           <padding>
+                              <Insets left="15.0" right="15.0" />
+                           </padding>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

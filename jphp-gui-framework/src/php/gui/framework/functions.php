@@ -53,6 +53,11 @@ function waitAsync($millis, callable $callback)
     }))->start();
 }
 
+function uiLater(callable $callback)
+{
+    UXApplication::runLater($callback);
+}
+
 function uiText($object)
 {
     if (!$object) {

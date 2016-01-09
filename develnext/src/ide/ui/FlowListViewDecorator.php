@@ -447,6 +447,10 @@ class FlowListViewDecorator implements \Countable
     {
         $nodes = $this->getSelectionNodes();
 
+        if ($this->trigger('beforeRemove', [$nodes])) {
+            return;
+        }
+
         foreach ($nodes as $node) {
             $this->remove($node, false);
         }

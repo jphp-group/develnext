@@ -39,8 +39,10 @@ import php.runtime.reflection.ClassEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXNode")
@@ -216,8 +218,12 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     public String getClassesString() {
         StringBuilder sb = new StringBuilder();
 
+        Set<String> set = new HashSet<>();
+
         for (String s : getWrappedObject().getStyleClass()) {
-            sb.append(s.trim()).append(" ");
+            if (set.add(s)) {
+                sb.append(s.trim()).append(" ");
+            }
         }
 
         return sb.toString();
@@ -227,8 +233,13 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     public void setClassesString(String value) {
         String[] strings = value.split(" ");
 
+        Set<String> set = new TreeSet<>();
+        for (String string : strings) {
+            set.add(string);
+        }
+
         getWrappedObject().getStyleClass().clear();
-        getWrappedObject().getStyleClass().addAll(strings);
+        getWrappedObject().getStyleClass().addAll(set);
     }
 
     @Getter

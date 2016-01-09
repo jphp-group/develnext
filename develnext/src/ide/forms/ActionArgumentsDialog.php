@@ -122,6 +122,8 @@ class ActionArgumentsDialog extends AbstractIdeForm
     {
         if (is_callable($settings['editor'])) {
             $editor = $settings['editor']($name, $label, $type, $settings);
+        } elseif (is_string($settings['editor'])) {
+            $editor = AbstractArgumentEditor::make($settings['editor']);
         } else {
             $editor = AbstractArgumentEditor::make($type, (array)$settings['editor']);
         }

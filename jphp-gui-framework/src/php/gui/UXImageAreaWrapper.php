@@ -11,27 +11,27 @@ class UXImageAreaWrapper extends UXNodeWrapper
 
         $image = null;
 
-        if ($data->has('image')) {
+        if ($data->get('image')) {
             try {
                 $this->node->image = new UXImage('res://' . $data->get('image'));
             } catch (\Exception $e) {
-                UXDialog::show('Cannot load image: ' . $data->get('image'), 'ERROR');
+                UXDialog::show('Cannot load image: "' . $data->get('image') . '"', 'ERROR');
             }
         }
 
-        if ($data->has('hoverImage')) {
+        if ($data->get('hoverImage')) {
             try {
                 $this->node->hoverImage = new UXImage('res://' . $data->get('hoverImage'));
             } catch (\Exception $e) {
-                UXDialog::show('Cannot load image: ' . $data->get('hoverImage'), 'ERROR');
+                UXDialog::show('Cannot load image: "' . $data->get('hoverImage') . '"', 'ERROR');
             }
         }
 
-        if ($data->has('clickImage')) {
+        if ($data->get('clickImage')) {
             try {
                 $this->node->clickImage = new UXImage('res://' . $data->get('clickImage'));
             } catch (\Exception $e) {
-                UXDialog::show('Cannot load image: ' . $data->get('clickImage'), 'ERROR');
+                UXDialog::show('Cannot load image: "' . $data->get('clickImage') . '"', 'ERROR');
             }
         }
     }

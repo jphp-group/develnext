@@ -80,7 +80,7 @@ class RegisterForm extends AbstractOnlineIdeForm
                     if ($response->message() == 'Validation') {
                         Notifications::showInvalidValidation();
                     } else {
-                        UXDialog::show($response->message(), 'ERROR');
+                        Notifications::error("Ошибка регистрации", $response->message());
                     }
 
                     $this->hidePreloader();
@@ -92,7 +92,8 @@ class RegisterForm extends AbstractOnlineIdeForm
                     return;
                 }
 
-                UXDialog::show($response->message());
+                Notifications::show('Спасибо за регистрацию', $response->message());
+
                 $this->confirm();
                 $this->hidePreloader();
             }

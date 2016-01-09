@@ -5,6 +5,7 @@ use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXNode;
+use php\lib\str;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 
@@ -32,6 +33,10 @@ class NodeFormElementTag extends AbstractFormElementTag
 
         if ($node->style) {
             $element->setAttribute('style', $node->style);
+        }
+
+        if ($node->classes->count) {
+            $element->setAttribute('styleClass', $node->classesString);
         }
 
         $element->setAttribute('layoutX', $node->x);

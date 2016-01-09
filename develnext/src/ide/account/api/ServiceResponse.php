@@ -2,6 +2,8 @@
 namespace ide\account\api;
 
 
+use ide\utils\Json;
+
 class ServiceResponse
 {
     protected $json;
@@ -53,5 +55,10 @@ class ServiceResponse
     public function isConnectionRefused()
     {
         return $this->isError() && $this->message() == "ConnectionRefused";
+    }
+
+    public function toLog()
+    {
+        return "{message: {$this->message()}, data = " . \Json::encode($this->data(), false) . "}";
     }
 }

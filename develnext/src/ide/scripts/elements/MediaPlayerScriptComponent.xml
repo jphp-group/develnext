@@ -1,0 +1,24 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="autoplay" value="1" />
+        <property code="rate" value="1.0" />
+        <property code="balance" value="0.0" />
+        <property code="volume" value="1.0" />
+    </init>
+
+    <properties group="general" title="Главное">
+        <property code="loop" name="Цикличность" editor="boolean" tooltip="Зацикленное воспроизведение аудио ресурса" />
+        <property code="autoplay" name="Автоплей" editor="boolean" tooltip="Автоматически воспроизводить при открытии аудио ресурса" />
+        <property code="volume" name="Громкость" editor="float" tooltip="Уровень громкости от 0.0 до 1.0"  />
+        <property code="balance" name="Баланс" editor="float" tooltip="Баланс от -1.0 до 1.0" />
+
+        <property code="rate" name="Скорость" editor="float" tooltip="Скорость воспроизведения от 0.0 до 8.0" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="play" name="Воспроизведение" kind="ObjectEvent" icon="icons/audioPlay16.png" />
+        <eventType code="pause" name="Пауза" kind="ObjectEvent" icon="icons/audioPause16.png" />
+        <eventType code="stop" name="Стоп" kind="ObjectEvent" icon="icons/audioStop16.png" />
+        <eventType code="error" name="Ошибка чтения" kind="ObjectEvent" icon="icons/no16.png" />
+    </eventTypes>
+</element>

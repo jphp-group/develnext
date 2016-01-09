@@ -6,4 +6,6 @@ include 'jphp-gui-ext',
         'jphp-game-ext',
         'jphp-parser',
         'develnext',
-        'develnext-stdlib'
+        'develnext-stdlib';
+
+include 'develnext-control';

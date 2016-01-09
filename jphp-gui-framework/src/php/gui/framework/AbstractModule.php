@@ -152,6 +152,8 @@ abstract class AbstractModule extends AbstractScript
     protected function applyImpl($target)
     {
         foreach ($this->scriptManager->getScripts() as $script) {
+            $script->_owner = $this;
+
             if (!$script->disabled) {
                 $script->apply($target);
             }

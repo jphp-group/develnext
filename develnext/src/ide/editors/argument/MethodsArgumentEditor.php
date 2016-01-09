@@ -11,7 +11,7 @@ use php\gui\UXToggleGroup;
 use php\lib\Items;
 use php\lib\Str;
 
-abstract class MethodsArgumentEditor extends AbstractArgumentEditor
+class MethodsArgumentEditor extends AbstractArgumentEditor
 {
     /**
      * @var UXComboBox
@@ -70,5 +70,13 @@ abstract class MethodsArgumentEditor extends AbstractArgumentEditor
         } else {
             $this->comboBox->selectedIndex = 0;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getCode()
+    {
+        return null;
     }
 }

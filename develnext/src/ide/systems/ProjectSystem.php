@@ -1,6 +1,7 @@
 <?php
 namespace ide\systems;
 use ide\forms\MainForm;
+use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectTemplate;
@@ -10,6 +11,7 @@ use ide\utils\FileUtils;
 use php\gui\framework\Timer;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
+use php\gui\UXDirectoryChooser;
 use php\io\File;
 use php\lib\Items;
 use php\lib\Str;
@@ -28,7 +30,43 @@ class ProjectSystem
         Ide::get()->unregisterCommands();
     }
 
-    static function import($file, $projectDir = null, $newName = null)
+    static public function checkDirectory($path)
+    {
+        Logger::info("Check directory: $path");
+
+        if (File::of($path)->find()) {
+            $msg = new MessageBoxForm("Папка $path для проекта должна быть пустой, хотите очистить её, чтобы продолжить?", [
+                'Да, очистить и продолжить',
+                'Нет, выбрать другую',
+                'Отмена'
+            ]);
+
+            if ($msg->showDialog()) {
+                switch ($msg->getResultIndex()) {
+                    case 0:
+                        FileUtils::deleteDirectory($path);
+                        break;
+                    case 1:
+                        $dialog = new UXDirectoryChooser();
+                        $dialog->initialDirectory = $path;
+
+                        if ($file = $dialog->showDialog()) {
+                            return $file;
+                        } else {
+                            return null;
+                        }
+
+                        break;
+                    case 2:
+                        return null;
+                }
+            }
+        }
+
+        return $path;
+    }
+
+    static function import($file, $projectDir = null, $newName = null, callable $afterOpen = null)
     {
         Logger::info("Start import project: file = $file, projectDir = $projectDir");
 
@@ -38,6 +76,11 @@ class ProjectSystem
 
         if (!$projectDir) {
             $projectDir = FileUtils::stripExtension($file);
+        }
+
+        if (!($projectDir = self::checkDirectory($projectDir))) {
+            Ide::get()->getMainForm()->hidePreloader();
+            return;
         }
 
         FileUtils::deleteDirectory($projectDir);
@@ -63,12 +106,16 @@ class ProjectSystem
             $file->renameTo(Items::first($files));
         }
 
-        TimerScript::executeAfter(1000, function () use ($projectDir, $files, $file) {
+        TimerScript::executeAfter(1000, function () use ($projectDir, $files, $file, $afterOpen) {
             ProjectSystem::open($projectDir . "/" . Items::first($files)->getName());
 
             Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива", 3000);
 
             Logger::info("Finish importing project.");
+
+            if ($afterOpen) {
+                $afterOpen();
+            }
         });
     }
 
@@ -80,6 +127,15 @@ class ProjectSystem
     {
         static::clear();
 
+        $parent = File::of($path)->getParent();
+
+        if (!($parent = self::checkDirectory($parent))) {
+            FileSystem::open('~welcome');
+            return;
+        }
+
+        $path = $parent . "/" . File::of($parent)->getName();
+
         $project = Project::createForFile($path);
         $project->setTemplate($template);
 
@@ -89,6 +145,8 @@ class ProjectSystem
         $project->create();
         $project->recover();
         $project->open();
+
+        Ide::get()->trigger('openProject', [$project]);
 
         static::save();
     }
@@ -118,6 +176,8 @@ class ProjectSystem
 
         Ide::get()->getMainForm()->hidePreloader();
 
+        Ide::get()->trigger('openProject', [$project]);
+
         Logger::info("Finish opening project.");
     }
 
@@ -133,6 +193,12 @@ class ProjectSystem
         }
 
         $project->save();
+    }
+
+    static function closeWithWelcome()
+    {
+        self::close();
+        FileSystem::open('~welcome');
     }
 
     /**
@@ -161,5 +227,9 @@ class ProjectSystem
         }
 
         Ide::get()->setOpenedProject(null);
+
+        if ($project) {
+            Ide::get()->trigger('closeProject', [$project]);
+        }
     }
 }

@@ -3,6 +3,7 @@ namespace ide\project;
 
 use Files;
 use ide\editors\menu\ContextMenu;
+use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\misc\SimpleSingleCommand;
 use ide\project\tree\AbstractProjectTreeNavigation;
@@ -229,6 +230,10 @@ class ProjectTree
                 if (!$item->isDisableDelete()) {
                     $this->contextMenu->addCommand(new SimpleSingleCommand('Удалить', 'icons/delete16.png', function () use ($item) {
                         $file = $item->getFile();
+
+                        if (!MessageBoxForm::confirmDelete($file)) {
+                            return;
+                        }
 
                         FileSystem::close($file);
 

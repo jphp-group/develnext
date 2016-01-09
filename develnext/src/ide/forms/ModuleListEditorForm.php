@@ -58,6 +58,10 @@ class ModuleListEditorForm extends AbstractIdeForm
             $modules = $gui->getScriptModules();
 
             foreach ($modules as $item) {
+                if ($item == 'AppModule') {
+                    continue;
+                }
+
                 $checkbox = new UXCheckbox($item);
                 $checkbox->selected = $values[$item];
 

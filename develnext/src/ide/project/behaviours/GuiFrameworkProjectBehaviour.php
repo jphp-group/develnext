@@ -532,6 +532,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $this->project->getFile("src/.scripts/$name")->isDirectory();
     }
 
+    /**
+     * @param $name
+     * @return ScriptModuleEditor|null
+     */
     public function getModuleEditor($name)
     {
         return FileSystem::fetchEditor($this->project->getFile(self::SCRIPTS_DIRECTORY . '/' . $name));
@@ -774,6 +778,17 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $formsPath = $this->project->getFile('src/app/forms');
         $formsPath->setHiddenInTree(true);
+
+        try {
+            $modules = Json::fromFile($this->project->getFile("src/.system/modules.json"));
+
+            foreach ((array)$modules["modules"] as $module) {
+                $name = str::replace($module, "app\\modules\\", "");
+                $this->project->makeDirectory("src/.scripts/$name");
+            }
+        } catch (IOException $e) {
+            ;
+        }
 
         $this->project->getFile(self::FORMS_DIRECTORY)->scan(function ($name, File $file) {
             if ($file->isFile() && Str::endsWith($name, '.fxml')) {

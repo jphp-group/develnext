@@ -25,6 +25,10 @@ class UXNodeWrapper
      */
     public function applyData(UXData $data)
     {
+        if ($data->has('classesString')) {
+            $this->node->classesString .= $data->get('classesString');
+        }
+
         if ($data->has('enabled')) {
             $this->node->enabled = $data->get('enabled');
         }

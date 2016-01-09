@@ -10,20 +10,20 @@ import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 @Reflection.Name(JavaFXExtension.NS + "UXMedia")
 public class UXMedia extends BaseWrapper<Media> {
     interface WrappedInterface {
-        @Property
-        Duration duration();
+        @Property Duration duration();
+        @Property int width();
 
-        @Property
-        int width();
+        @Property int height();
 
-        @Property
-        int height();
-
-        @Property
-        String source();
+        @Property String source();
     }
 
     public UXMedia(Environment env, Media wrappedObject) {
@@ -36,6 +36,22 @@ public class UXMedia extends BaseWrapper<Media> {
 
     @Signature
     public void __construct(String source) {
-        __wrappedObject = new Media(source);
+        __wrappedObject = new Media(new File(source).toURI().toString());
+    }
+
+    @Signature
+    public static Media createFromUrl(String path) throws URISyntaxException {
+        return new Media(path);
+    }
+
+    @Signature
+    public static Media createFromResource(String path) throws URISyntaxException, IOException {
+        URL resource = JavaFXExtension.class.getResource(path);
+
+        if (resource == null) {
+            throw  new IOException("Unable to load resource - " + path);
+        }
+
+        return new Media(resource.toURI().toString());
     }
 }

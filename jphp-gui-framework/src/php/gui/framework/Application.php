@@ -51,6 +51,11 @@ class Application
     /** @var AbstractModule[] */
     protected $modules = [];
 
+    /**
+     * @var null|AbstractModule
+     */
+    protected $appModule = null;
+
     /** @var Configuration */
     protected $config;
 
@@ -234,6 +239,14 @@ class Application
     }
 
     /**
+     * @return null|AbstractModule
+     */
+    public function appModule()
+    {
+        return $this->appModule;
+    }
+
+    /**
      * @return AbstractForm
      */
     public function getMainForm()
@@ -326,6 +339,7 @@ class Application
 
             foreach ($this->modules as $module) {
                 if ($module->applyToApplication || $module->id == 'AppModule') {
+                    $this->appModule = $module;
 
                     UXApplication::runLater(function () use ($module) {
                         $module->apply($this);

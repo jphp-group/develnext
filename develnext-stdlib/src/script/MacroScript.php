@@ -1,6 +1,7 @@
 <?php
 namespace script;
 
+use php\gui\framework\AbstractModule;
 use php\gui\framework\AbstractScript;
 use php\lang\Thread;
 
@@ -16,8 +17,15 @@ class MacroScript extends AbstractScript
      */
     public $runOnApply = false;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $runCount = 0;
+
+    /**
+     * @var array
+     */
+    protected static $alreadyRun = [];
 
     /**
      * @param $target
@@ -32,10 +40,14 @@ class MacroScript extends AbstractScript
 
     public function call()
     {
-        if ($this->runOnce && $this->runCount) {
+        $key = $this->getOwner() instanceof AbstractModule ? $this->getOwner()->id : "";
+        $key .= "#$this->id";
+
+        if ($this->runOnce && self::$alreadyRun[$key]) {
             return null;
         }
 
+        self::$alreadyRun[$key]++;
         $this->runCount += 1;
 
         $e = $this->trigger('action', ['result' => null]);

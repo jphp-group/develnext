@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="396.0" spacing="5.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <padding>
+      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+   </padding>
+   <children>
+      <Label id="label" text="LabelText" />
+      <TextField id="field">
+         <padding>
+            <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" />
+         </padding>
+      </TextField>
+      <HBox prefWidth="366.0" spacing="10.0">
+         <children>
+            <Button id="okButton" minWidth="70.0" mnemonicParsing="false" styleClass="icon-ok" text="OK">
+               <padding>
+                  <Insets bottom="7.0" left="15.0" right="15.0" top="7.0" />
+               </padding>
+            </Button>
+            <Button id="copyButton" minWidth="70.0" mnemonicParsing="false" styleClass="icon-copy" text="Скопировать">
+               <padding>
+                  <Insets bottom="7.0" left="15.0" right="15.0" top="7.0" />
+               </padding>
+            </Button>
+         </children>
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </HBox>
+   </children>
+</VBox>

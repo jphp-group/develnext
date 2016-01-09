@@ -186,6 +186,39 @@ abstract class AbstractService
 
     /**
      * @param $methodName
+     * @return URLConnection
+     */
+    public function getConnection($methodName)
+    {
+        try {
+            $connection = $this->buildConnection($methodName);
+            $connection->requestMethod = 'GET';
+
+            return $connection;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param $url
+     * @return URLConnection
+     */
+    public function getUrlConnection($url)
+    {
+        try {
+            $connection = $this->buildUrlConnection($url);
+            $connection->requestMethod = 'GET';
+
+            return $connection;
+        } catch (Exception $e) {
+            Logger::exception("Unable to get url connection", $e);
+            return null;
+        }
+    }
+
+    /**
+     * @param $methodName
      * @param $json
      * @param bool $tryAuth
      * @return ServiceResponse
@@ -307,20 +340,20 @@ abstract class AbstractService
         if (Ide::get()->isDevelopment()) {
             return ("http://localhost:8080/a/" . $url);
         } else {
-            return (Ide::service()->getEndpoint() .  "/a/" . $url);
+            return (Ide::service()->getEndpoint() .  "a/" . $url);
         }
     }
 
-    protected function buildConnection($url)
+    protected function buildUrlConnection($url)
     {
-        $connection = URLConnection::create($this->makeUrl($url));
+        $connection = URLConnection::create($url);
 
         $connection->doInput = true;
         $connection->doOutput = true;
 
         $connection->followRedirects = true;
 
-        $connection->setRequestProperty("Content-Type", "application/json");
+        $connection->setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
         if (Ide::service()->getSession()) {
             $connection->setRequestProperty('Cookie', "JSESSIONID=" . Ide::service()->getSession() . ";");
@@ -336,5 +369,10 @@ abstract class AbstractService
         $connection->readTimeout = self::READ_TIMEOUT;
 
         return $connection;
+    }
+
+    protected function buildConnection($url)
+    {
+        return $this->buildUrlConnection($this->makeUrl($url));
     }
 }

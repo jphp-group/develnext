@@ -27,6 +27,7 @@
 .icon-run { -fx-graphic: url("/.data/img/icons/run16.png"); }
 
 .icon-plus { -fx-graphic: url("/.data/img/icons/plus16.png"); }
+.icon-add { -fx-graphic: url("/.data/img/icons/add16.png"); }
 .icon-delete { -fx-graphic: url("/.data/img/icons/delete16.png"); }
 .icon-clear { -fx-graphic: url("/.data/img/icons/clear16.png"); }
 
@@ -43,9 +44,11 @@
 .icon-youtube { -fx-graphic: url("/.data/img/icons/youtube16.png"); }
 .icon-convert { -fx-graphic: url("/.data/img/icons/convert16.png"); }
 .icon-trash { -fx-graphic: url("/.data/img/icons/trash16.png"); }
+.icon-trash2 { -fx-graphic: url("/.data/img/icons/trash16.gif"); }
 .icon-php { -fx-graphic: url("/.data/img/icons/phpFile16.png"); }
 .icon-share { -fx-graphic: url("/.data/img/icons/share16.png"); }
 .icon-share-ex { -fx-graphic: url("/.data/img/icons/shareEx16.png"); }
+.icon-upload { -fx-graphic: url("/.data/img/icons/upload16.png"); }
 
 .icon-refresh { -fx-graphic: url("/.data/img/icons/refresh16.png"); }
 .icon-refresh32 { -fx-graphic: url("/.data/img/icons/refresh32.png"); }

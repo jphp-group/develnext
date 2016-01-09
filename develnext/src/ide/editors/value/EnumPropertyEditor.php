@@ -62,7 +62,8 @@ class EnumPropertyEditor extends ElementPropertyEditor
         $this->choiceBox->style = "-fx-background-insets: 0; -fx-background-radius: 0; -fx-background-color: -fx-control-inner-background;";
 
         $this->choiceBox->on('action', function () {
-            $this->applyValue($this->choiceBox->selectedIndex, false);
+            $value = $this->variantKeys[$this->choiceBox->selectedIndex];
+            $this->applyValue($value, false);
         });
 
         return new UXHBox([$this->choiceBox]);
@@ -101,7 +102,7 @@ class EnumPropertyEditor extends ElementPropertyEditor
         $this->choiceBox->selectedIndex = -1;
 
         foreach ($this->variants as $code => $name) {
-            if ($value == $code) {
+            if ("$value" == "$code") {
                 $this->choiceBox->selectedIndex = $i;
                 break;
             }

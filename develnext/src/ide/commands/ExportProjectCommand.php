@@ -15,7 +15,7 @@ use php\lib\Str;
  * Class ExportProjectCommand
  * @package ide\commands
  */
-class ExportProjectCommand extends AbstractCommand
+class ExportProjectCommand extends AbstractProjectCommand
 {
     public function getName()
     {
