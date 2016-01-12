@@ -24,6 +24,7 @@ import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.StyleManager;
 import org.develnext.jphp.ext.javafx.support.UserData;
+import org.develnext.jphp.ext.javafx.support.control.Panel;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;

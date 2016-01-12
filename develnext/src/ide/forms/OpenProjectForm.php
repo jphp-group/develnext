@@ -2,6 +2,7 @@
 namespace ide\forms;
 
 use ide\forms\mixins\DialogFormMixin;
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\project\Project;
 use ide\project\ProjectConfig;
@@ -42,6 +43,7 @@ use php\lib\Str;
 class OpenProjectForm extends AbstractIdeForm
 {
     use DialogFormMixin;
+    use SavableFormMixin;
 
     /** @var UXDirectoryChooser */
     protected $directoryChooser;

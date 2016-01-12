@@ -144,13 +144,13 @@ class ShareProjectCommand extends AbstractProjectCommand
     {
         $item = parent::makeMenuItem();
         $item->disable = true;
+        $item->accelerator = $this->getAccelerator();
 
         Ide::service()->bind('privateEnable', function () use ($item) { $item->disable = false; });
         Ide::service()->bind('privateDisable', function () use ($item) { $item->disable = true; });
 
         return $item;
     }
-
 
     public function makeUiForHead()
     {

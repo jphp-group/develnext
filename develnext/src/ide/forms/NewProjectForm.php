@@ -3,6 +3,7 @@ namespace ide\forms;
 
 use ide\editors\menu\ContextMenu;
 use ide\forms\mixins\DialogFormMixin;
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\library\IdeLibraryResource;
 use ide\misc\AbstractCommand;
@@ -39,6 +40,7 @@ use php\lib\Str;
 class NewProjectForm extends AbstractIdeForm
 {
     use DialogFormMixin;
+    use SavableFormMixin;
 
     /** @var AbstractProjectTemplate[] */
     protected $templates;

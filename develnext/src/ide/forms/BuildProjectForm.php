@@ -2,6 +2,7 @@
 namespace ide\forms;
 
 use ide\build\AbstractBuildType;
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\Logger;
 use php\gui\event\UXMouseEvent;
@@ -25,6 +26,8 @@ use php\lib\Items;
  */
 class BuildProjectForm extends AbstractIdeForm
 {
+    use SavableFormMixin;
+
     /**
      * @var AbstractBuildType[]
      */

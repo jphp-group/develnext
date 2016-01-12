@@ -391,6 +391,8 @@ class Ide extends Application
      */
     public function getUserConfig($name)
     {
+        $name = FileUtils::normalizeName($name);
+
         if ($config = $this->configurations[$name]) {
             return $config;
         }
@@ -398,7 +400,9 @@ class Ide extends Application
         $config = new Configuration();
 
         try {
-            $config->load($this->getFile("$name.conf"));
+            $file = $this->getFile("$name.conf");
+
+            $config->load($file);
         } catch (IOException $e) {
             // ...
         }
@@ -980,12 +984,18 @@ class Ide extends Application
         $stream = null;
 
         foreach ($this->configurations as $name => $config) {
+            $name = FileUtils::normalizeName($name);
+
             try {
                 Logger::info("Save IDE config ($name.conf)");
-                $stream = Stream::of($this->getFile("$name.conf"), 'w+');
+                $file = $this->getFile("$name.conf");
+                $file->createNewFile(true);
+
+                $stream = Stream::of($file, 'w+');
                 $config->save($stream);
             } catch (IOException $e) {
-                throw $e;
+                Logger::error("Unable to save config ($name), {$e->getMessage()}");
+                //throw $e;
             } finally {
                 if ($stream) $stream->close();
             }

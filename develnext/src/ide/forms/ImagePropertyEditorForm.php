@@ -5,6 +5,7 @@ use Files;
 use ide\account\ui\NeedAuthPane;
 use ide\forms\area\IconSearchPaneArea;
 use ide\forms\mixins\DialogFormMixin;
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\utils\FileUtils;
 use php\gui\event\UXMouseEvent;
@@ -39,6 +40,7 @@ class ImagePropertyEditorForm extends AbstractIdeForm
     use DialogFormMixin {
         DialogFormMixin::setResult as protected _setResult;
     }
+    use SavableFormMixin;
 
     protected $copiedFile = null;
 
@@ -65,6 +67,14 @@ class ImagePropertyEditorForm extends AbstractIdeForm
         $imageArea->stretch = false;
         $imageArea->width = $this->imageView->width - 6;
         $imageArea->height = $this->imageView->height - 6;
+
+        $this->imageView->observer('width')->addListener(function ($old, $new) use ($imageArea) {
+            $imageArea->width = $new - 6;
+        });
+
+        $this->imageView->observer('height')->addListener(function ($old, $new) use ($imageArea) {
+            $imageArea->height = $new - 6;
+        });
 
         $this->imageView->content = $imageArea;
         $this->imageArea = $imageArea;
@@ -103,9 +113,9 @@ class ImagePropertyEditorForm extends AbstractIdeForm
                 return;
             }
 
-            if (Str::endsWith($filename, ".jpg") || Str::endsWith($filename, ".jpeg")
-                || Str::endsWith($filename, ".png") || Str::endsWith($filename, ".gif")) {
+            $ext = str::lower(FileUtils::getExtension($filename));
 
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
                 $item = new UXImageArea(new UXImage($filename));
 
                 $item->size = [72, 72];

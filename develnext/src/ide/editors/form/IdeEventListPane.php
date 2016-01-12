@@ -565,7 +565,7 @@ class IdeEventListPane
                         }
                     }
 
-                    $eventContextMenu->getRoot()->showByNode($constructorLink, - 120, $constructorLink->height);
+                    $eventContextMenu->getRoot()->showByNode($constructorLink, 0, 18);
                 });
 
                 $name = new UXLabel($eventType['name']);

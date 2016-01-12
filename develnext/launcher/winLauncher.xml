@@ -8,7 +8,7 @@
   <chdir>.</chdir>
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>
-  <supportUrl></supportUrl>
+  <supportUrl>http://develnext.org</supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
@@ -33,7 +33,7 @@
     <fileVersion>1.0.0.0</fileVersion>
     <txtFileVersion>-</txtFileVersion>
     <fileDescription>RAD Studio for PHP</fileDescription>
-    <copyright>2015, OpenSource</copyright>
+    <copyright>2016, OpenSource</copyright>
     <productVersion>1.0.0.0</productVersion>
     <txtProductVersion>-</txtProductVersion>
     <productName>DevelNext</productName>

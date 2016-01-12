@@ -1,6 +1,7 @@
 <?php
 namespace ide\forms;
 
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
@@ -33,6 +34,8 @@ use php\util\SharedQueue;
  */
 class BuildProgressForm extends AbstractIdeForm
 {
+    use SavableFormMixin;
+
     /**
      * @var Process
      */

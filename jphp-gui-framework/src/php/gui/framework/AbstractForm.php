@@ -351,7 +351,9 @@ abstract class AbstractForm extends UXForm
                                     $node->parent->add($newNode);
                                 }
 
-                                $node->free();
+                                uiLater(function () use ($node) {
+                                    $node->free();
+                                });
 
                                 $node = $newNode;
                             }
@@ -361,7 +363,9 @@ abstract class AbstractForm extends UXForm
                             $this->getNodeWrapper($node)->applyData($data);
                         }
 
-                        $data->free();
+                        uiLater(function () use ($data) {
+                            $data->free();
+                        });
                     }
                 });
             }
@@ -492,8 +496,19 @@ abstract class AbstractForm extends UXForm
         }
     }
 
+    /**
+     * @param $event
+     * @param callable $handler
+     * @param string $group
+     * @throws Exception
+     */
     public function bind($event, callable $handler, $group = 'general')
     {
+        if (sizeof($tmp = str::split($event, ':', 2)) == 2) {
+            $group = str::trim($tmp[0]);
+            $event = str::trim($tmp[1]);
+        }
+
         $parts = Str::split($event, '.');
 
         $eventName = Items::pop($parts);
@@ -537,7 +552,7 @@ abstract class AbstractForm extends UXForm
                 throw new Exception("Unable to bind '$event'");
             }
 
-            $group = $event;
+            $group .= '-' . $event;
         }
 
         $wrapper = $this->getNodeWrapper($node);

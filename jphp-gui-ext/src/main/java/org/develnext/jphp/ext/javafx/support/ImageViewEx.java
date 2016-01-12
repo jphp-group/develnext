@@ -15,6 +15,7 @@ import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 
 public class ImageViewEx extends Canvas implements Styleable {
+    private final GraphicsContext g2;
     protected Image image;
 
     protected Image originImage;
@@ -40,6 +41,8 @@ public class ImageViewEx extends Canvas implements Styleable {
 
     public ImageViewEx() {
         super();
+
+        g2 = this.getGraphicsContext2D();
 
         widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -250,8 +253,6 @@ public class ImageViewEx extends Canvas implements Styleable {
             setWidth(image == null ? 0 : image.getWidth());
             setHeight(image == null ? 0 : image.getHeight());
         }
-
-        GraphicsContext g2 = this.getGraphicsContext2D();
 
         g2.clearRect(0, 0, getWidth(), getHeight());
 

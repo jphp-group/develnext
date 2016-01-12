@@ -3,6 +3,7 @@ namespace ide\forms;
 
 use ide\account\api\AccountService;
 use ide\account\api\ServiceResponse;
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\Logger;
 use ide\ui\Notifications;
@@ -30,6 +31,8 @@ use php\gui\UXTextField;
  */
 class LoginForm extends AbstractOnlineIdeForm
 {
+    use SavableFormMixin;
+
     protected function init()
     {
         parent::init();

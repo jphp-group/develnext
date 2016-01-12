@@ -8,6 +8,8 @@ use php\gui\UXTextArea;
 use php\io\Stream;
 use php\lang\System;
 
+define('DEVELNEXT_PROJECT_DEBUG', true);
+
 Stream::putContents("application.pid", UXApplication::getPid());
 
 $app = Application::get();

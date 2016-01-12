@@ -11,6 +11,7 @@ use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
 use php\gui\designer\UXDesigner;
 use php\gui\event\UXEvent;
+use php\gui\event\UXKeyEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;

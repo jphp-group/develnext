@@ -2,6 +2,7 @@
 namespace ide\forms;
 
 use ide\forms\mixins\DialogFormMixin;
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
@@ -22,6 +23,7 @@ use php\gui\UXTooltip;
 class TextPropertyEditorForm extends AbstractIdeForm
 {
     use DialogFormMixin;
+    //use SavableFormMixin;
 
     protected function init()
     {

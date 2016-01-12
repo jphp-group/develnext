@@ -7,17 +7,17 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="688.0" prefWidth="988.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="688.0" prefWidth="988.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <children>
       <VBox layoutX="-86.0" layoutY="-52.0" prefHeight="151.0" prefWidth="1055.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-          <MenuBar id="mainMenu" prefHeight="25.0" prefWidth="900.0">
+          <MenuBar id="mainMenu" focusTraversable="false" prefHeight="25.0" prefWidth="900.0">
             <menus>
-              <Menu id="menuProject" mnemonicParsing="false" text="_Проект" />
-                  <Menu id="menuLibrary" mnemonicParsing="false" text="_Библиотека" />
-              <Menu id="menuAccount" mnemonicParsing="false" text="_Аккаунт" visible="false" />
-              <Menu id="menuRun" mnemonicParsing="false" text="_Запуск" />
-              <Menu id="menuHelp" mnemonicParsing="false" text="_Помощь" />
+              <Menu id="menuProject" mnemonicParsing="false" text="Проект" />
+                  <Menu id="menuLibrary" mnemonicParsing="false" text="Библиотека" />
+              <Menu id="menuAccount" text="Аккаунт" visible="false" />
+              <Menu id="menuRun" text="Запуск" />
+              <Menu id="menuHelp" text="Помощь" />
               <Menu id="menuCreate" disable="true" mnemonicParsing="false" style="-fx-text-fill: transparent; -fx-pref-width: 0; -fx-font-size: 0; -fx-text-overrun: '';" text="Создать" />
             </menus>
             <opaqueInsets>

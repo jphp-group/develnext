@@ -13,6 +13,7 @@ use ide\editors\common\CodeTextArea;
 use ide\editors\FormEditor;
 use ide\editors\menu\ContextMenu;
 use ide\forms\mixins\DialogFormMixin;
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
@@ -68,6 +69,7 @@ use script\TimerScript;
 class ActionConstructorForm extends AbstractIdeForm
 {
     use DialogFormMixin;
+    use SavableFormMixin;
     //use EventHandlerBehaviour;
 
     /**
