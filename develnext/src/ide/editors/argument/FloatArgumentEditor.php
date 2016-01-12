@@ -10,6 +10,6 @@ class FloatArgumentEditor extends MixedArgumentEditor
 
     protected function valueTypes()
     {
-        return ['float', 'object', 'score', 'variable', 'expr'];
+        return ['float', 'object', 'score', 'globalVariable', 'variable', 'expr'];
     }
 }

@@ -65,6 +65,7 @@ class MixedArgumentEditor extends AbstractArgumentEditor
             'magicString' => 'Строка с переменными',
             'object' => 'Объект',
             'form' => 'Форма',
+            'globalVariable' => 'Глобальная переменная',
             'variable' => 'Переменная',
             'expr' => 'PHP код',
             'integer' => 'Число',

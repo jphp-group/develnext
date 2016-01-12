@@ -15,6 +15,7 @@ use ide\editors\menu\ContextMenu;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
 use ide\misc\AbstractCommand;
+use ide\misc\EventHandlerBehaviour;
 use ide\utils\PhpParser;
 use php\format\ProcessorException;
 use php\gui\event\UXDragEvent;
@@ -28,10 +29,12 @@ use php\gui\layout\UXHBox;
 use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
 use php\gui\paint\UXColor;
+use php\gui\text\UXFont;
 use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXCheckbox;
 use php\gui\UXClipboard;
+use php\gui\UXComboBox;
 use php\gui\UXContextMenu;
 use php\gui\UXDialog;
 use php\gui\UXForm;
@@ -60,10 +63,12 @@ use script\TimerScript;
  * @property UXTabPane $tabs
  * @property UXCheckbox $useDefaultCheckbox
  * @property UXSplitPane $constructorSplitPane
+ * @property UXComboBox $actionTypePaneViewCombobox
  */
 class ActionConstructorForm extends AbstractIdeForm
 {
     use DialogFormMixin;
+    //use EventHandlerBehaviour;
 
     /**
      * @var ActionEditor
@@ -100,6 +105,11 @@ class ActionConstructorForm extends AbstractIdeForm
     protected static $globalTabSelectedIndex = 0;
 
     /**
+     * @var bool
+     */
+    protected $onlyIcons = false;
+
+    /**
      * @return array
      */
     public function getContext()
@@ -120,9 +130,43 @@ class ActionConstructorForm extends AbstractIdeForm
         Ide::get()->setUserConfigValue(CodeEditor::class . '.editorOnDoubleClick', $editor);
     }
 
+    public function setOnlyIcons($value, $updateUi = true)
+    {
+        if ($value == $this->onlyIcons) {
+            return;
+        }
+
+        $this->onlyIcons = $value;
+
+        foreach ($this->actionTypePane->tabs as $tab) {
+            $tab->content->content = $value ? $tab->content->data('fbox') : $tab->content->data('vbox');
+        }
+
+        Ide::get()->setUserConfigValue(get_class($this) . ".onlyIcons", $this->isOnlyIcons());
+
+        if ($this->actionTypePaneViewCombobox && $updateUi) {
+            $this->actionTypePaneViewCombobox->selectedIndex = $value ? 1 : 0;
+        }
+    }
+
+    public function isOnlyIcons()
+    {
+        return $this->onlyIcons;
+    }
+
     protected function init()
     {
         parent::init();
+
+        $this->actionTypePaneViewCombobox->items->addAll([
+            'Иконки + текст',
+            'Только иконки'
+        ]);
+        $this->actionTypePaneViewCombobox->selectedIndex = 0;
+
+        $this->actionTypePaneViewCombobox->on('action', function () {
+            $this->setOnlyIcons($this->actionTypePaneViewCombobox->selectedIndex == 1, false);
+        });
 
         $tabOne = $this->tabs->tabs[0]->text;
         $tabTwo = $this->tabs->tabs[1]->text;
@@ -385,8 +429,10 @@ class ActionConstructorForm extends AbstractIdeForm
 
     public function showAndWait(ActionEditor $editor = null, $class = null, $method = null)
     {
-        $this->constructorSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
-        $this->useDefaultCheckbox->selected = Ide::get()->getUserConfigValue(CodeEditor::class . '.editorOnDoubleClick') == "constructor";
+        uiLater(function () {
+            $this->constructorSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
+            $this->useDefaultCheckbox->selected = Ide::get()->getUserConfigValue(CodeEditor::class . '.editorOnDoubleClick') == "constructor";
+        });
 
         $this->buildActionTypePane($editor);
 
@@ -410,6 +456,9 @@ class ActionConstructorForm extends AbstractIdeForm
         $this->tabs->selectedIndex = self::$globalTabSelectedIndex;
 
         $this->timer->start();
+
+        $this->setOnlyIcons(Ide::get()->getUserConfigValue(get_class($this) . ".onlyIcons", $this->isOnlyIcons()));
+
         parent::showAndWait();
     }
 
@@ -472,6 +521,8 @@ class ActionConstructorForm extends AbstractIdeForm
             $t->closable = false;
             $t->content = new UXScrollPane($tab->content);
             $t->content->fitToWidth = true;
+            $t->content->data('vbox', $tab->data('vbox'));
+            $t->content->data('fbox', $tab->data('fbox'));
 
             $t->graphic = $tab->graphic;
             $t->style = $tab->style;
@@ -493,17 +544,24 @@ class ActionConstructorForm extends AbstractIdeForm
 
         if (!$tab) {
             $tab = new UXTab();
+            $tab->style = '-fx-cursor: hand;';
             $tab->closable = false;
             $tab->text = $actionType->getGroup();
 
-            $tab->content = new UXFlowPane();
-            $tab->content->hgap = 6;
-            $tab->content->vgap = 6;
+            $flowPane = new UXFlowPane();
+            $flowPane->hgap = $flowPane->vgap = 6;
+            $flowPane->padding = 9;
 
-            $tab->content->padding = 11;
-            $tab->style = '-fx-cursor: hand;';
+            $vPane = new UXVBox();
+            $vPane->spacing = 2;
+            $vPane->padding = 5;
 
-            $tab->content->alignment = 'TOP_LEFT';
+            $flowPane->alignment = $vPane->alignment = 'TOP_LEFT';
+
+            $tab->data('fbox', $flowPane);
+            $tab->data('vbox', $vPane);
+
+            $tab->content = $vPane;
 
             $buildTabs[$actionType->getGroup()] = $tab;
         }
@@ -511,17 +569,30 @@ class ActionConstructorForm extends AbstractIdeForm
         if (!$subGroups[$actionType->getGroup()][$subGroup]) {
             if ($subGroup) {
                 $label = new UXLabel($subGroup);
-                $label->minWidth = 34 * 3;
-                $tab->content->observer('width')->addListener(function ($old, $new) use ($label, $tab) {
+                $label->font = UXFont::of($label->font, $label->font->size, 'BOLD');
+                $tab->data('vbox')->observer('width')->addListener(function ($old, $new) use ($label, $tab) {
                     Ide::get()->setUserConfigValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
-                    $label->minWidth = $new - $tab->content->paddingLeft - $tab->content->paddingRight;
                 });
 
                 if ($subGroups[$actionType->getGroup()]) {
                     $label->paddingTop = 5;
                 }
 
-                $tab->content->add($label);
+                $tab->data('vbox')->add($label);
+
+
+                $label = new UXLabel($subGroup);
+                $label->font = UXFont::of($label->font, $label->font->size, 'BOLD');
+                $tab->data('fbox')->observer('width')->addListener(function ($old, $new) use ($label, $tab) {
+                    Ide::get()->setUserConfigValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
+                    $label->minWidth = $new - $tab->data('fbox')->paddingLeft - $tab->data('fbox')->paddingRight;
+                });
+
+                if ($subGroups[$actionType->getGroup()]) {
+                    $label->paddingTop = 5;
+                }
+
+                $tab->data('fbox')->add($label);
             }
 
             $subGroups[$actionType->getGroup()][$subGroup] = 1;
@@ -530,9 +601,13 @@ class ActionConstructorForm extends AbstractIdeForm
         $btn = new UXButton();
         $btn->tooltipText = $actionType->getTitle() . " \n -> " . $actionType->getDescription();
         $btn->graphic = Ide::get()->getImage($actionType->getIcon());
-        $btn->size = [34, 34];
+        $btn->height = 29;
+        $btn->maxWidth = 99999;
+        $btn->alignment = 'CENTER_LEFT';
+        $btn->text = $actionType->getTitle();
+
         $btn->userData = $actionType;
-        $btn->style = '-fx-background-color: white; -fx-border-color: silver; -fx-border-width: 1px; -fx-border-radius: 3px;';
+        $btn->classes->add('dn-simple-toggle-button');
 
         if ($btn->graphic == null) {
             $btn->graphic = ico('blocks16');
@@ -540,7 +615,7 @@ class ActionConstructorForm extends AbstractIdeForm
 
         $btn->on('action', [$this, 'actionTypeClick']);
 
-        $btn->on('dragDetect', function (UXMouseEvent $e) {
+        $dragDetect = function (UXMouseEvent $e) {
             $dragboard = $e->sender->startDrag(['MOVE']);
             $dragboard->dragView = $e->sender->snapshot();
 
@@ -550,9 +625,29 @@ class ActionConstructorForm extends AbstractIdeForm
             $dragboard->string = get_class($e->sender->userData);
 
             $e->consume();
-        });
+        };
 
-        $tab->content->add($btn);
+        $btn->on('dragDetect', $dragDetect);
+
+        $tab->data('vbox')->add($btn);
+
+        // ---
+
+        $smallBtn = new UXButton();
+        $smallBtn->tooltipText = $btn->tooltipText;
+        $smallBtn->graphic = Ide::get()->getImage($actionType->getIcon());
+        $smallBtn->size = [34, 34];
+        $smallBtn->userData = $actionType;
+        $smallBtn->classes->addAll($btn->classes);
+
+        if ($smallBtn->graphic == null) {
+            $smallBtn->graphic = ico('blocks16');
+        }
+
+        $smallBtn->on('action', [$this, 'actionTypeClick']);
+        $smallBtn->on('dragDetect', $dragDetect);
+
+        $tab->data('fbox')->add($smallBtn);
     }
 
 

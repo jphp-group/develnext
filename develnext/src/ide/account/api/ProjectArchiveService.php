@@ -49,7 +49,7 @@ class ProjectArchiveService extends AbstractService
             $output = new FileStream($file, 'w+');
 
             try {
-                while ($buff = $input->read(2048)) {
+                while (($buff = $input->read(2048)) !== false) {
                     $output->write($buff);
                 }
 

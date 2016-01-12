@@ -10,6 +10,6 @@ class ExprArgumentEditor extends MixedArgumentEditor
 
     protected function valueTypes()
     {
-        return ['expr', 'variable', 'object'];
+        return ['expr', 'globalVariable', 'variable', 'object'];
     }
 }

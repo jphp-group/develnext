@@ -10,6 +10,6 @@ class StringArgumentEditor extends MixedArgumentEditor
 
     protected function valueTypes()
     {
-        return ['string', 'magicString', 'object', 'score', 'variable', 'expr'];
+        return ['string', 'magicString', 'object', 'score', 'globalVariable', 'variable', 'expr'];
     }
 }

@@ -37,15 +37,10 @@
                      <children>
                         <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <HBox prefHeight="30.0" spacing="5.0">
+                              <HBox minHeight="34.0" prefHeight="34.0" spacing="5.0">
                                  <children>
                                     <Pane prefHeight="30.0" prefWidth="0.0" />
                                     <Button id="clearButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="34.0" styleClass="icon-trash" text="Удалить все">
-                                       <padding>
-                                          <Insets left="15.0" right="15.0" />
-                                       </padding>
-                                    </Button>
-                                    <Button id="previewButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="34.0" styleClass="icon-php" text="Просмотреть код">
                                        <padding>
                                           <Insets left="15.0" right="15.0" />
                                        </padding>
@@ -57,6 +52,11 @@
                                        <HBox.margin>
                                           <Insets />
                                        </HBox.margin>
+                                    </Button>
+                                    <Button id="previewButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="34.0" styleClass="icon-php" text="Как это выглядит в коде?">
+                                       <padding>
+                                          <Insets left="15.0" right="15.0" />
+                                       </padding>
                                     </Button>
                                     <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                                        <children>
@@ -83,8 +83,13 @@
                                           </Label>
                                        </children>
                                     </AnchorPane>
-                                    <VBox spacing="10.0">
+                                    <VBox>
                                        <children>
+                                          <ComboBox id="actionTypePaneViewCombobox" maxWidth="1.7976931348623157E308">
+                                             <VBox.margin>
+                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                             </VBox.margin>
+                                          </ComboBox>
                                           <TabPane id="actionTypePane" prefWidth="176.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                                              <opaqueInsets>
                                                 <Insets />

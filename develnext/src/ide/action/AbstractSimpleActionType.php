@@ -57,15 +57,24 @@ abstract class AbstractSimpleActionType extends AbstractActionType
         switch ($type) {
             case 'variable':
                 if (!$value) {
-                    $value = 'any';
-                }
-
-                if ($value[0] != '$') {
-                    $value = '$' . $value;
+                    $value = 'null';
+                } else {
+                    if ($value[0] != '$') {
+                        $value = '$' . $value;
+                    }
                 }
 
                 return $value;
+            case 'globalVariable':
+                if (!$value) {
+                    $value = "null";
+                }  else {
+                    if ($value[0] == '$') {
+                        $value = str::sub($value, 1);
+                    }
+                }
 
+                return "\$GLOBALS['$value']";
             case 'object':
                 if ($value == '~sender') {
                     $result = '$event->sender';
