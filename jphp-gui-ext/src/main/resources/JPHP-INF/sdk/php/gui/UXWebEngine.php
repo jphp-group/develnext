@@ -32,6 +32,21 @@ abstract class UXWebEngine
     public $userStyleSheetLocation;
 
     /**
+     * @var string
+     */
+    public $userDataDirectory;
+
+    /**
+     * @var string
+     */
+    public $url;
+
+    /**
+     * @var string
+     */
+    public $userAgent;
+
+    /**
      * @readonly
      * @var string
      */

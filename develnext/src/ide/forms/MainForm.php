@@ -31,6 +31,7 @@ use php\gui\UXTabPane;
 use php\gui\UXTextArea;
 use php\gui\UXTreeView;
 use php\lib\str;
+use script\TimerScript;
 
 /**
  * @property UXTabPane $fileTabPane

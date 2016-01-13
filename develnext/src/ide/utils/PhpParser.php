@@ -382,30 +382,33 @@ class PhpParser
         while ($token = $tokenizer->next()) {
             if ($token->type == 'NamespaceUseStmt') {
                 if ($name = $tokenizer->next()) {
-                    $done = true;
 
-                    $item = ['line' => $token->line, 'pos' => $token->position, 0 => $name->word];
+                    if ($name->type == 'Name' || $name->type == 'FulledName') {
+                        $done = true;
 
-                    if ($done) {
-                        $token = $tokenizer->next();
+                        $item = ['line' => $token->line, 'pos' => $token->position, 0 => $name->word];
 
-                        if ($token) {
-                            $line['endLine'] = $token->line;
-                            $line['endPos'] = $token->position;
-                        }
+                        if ($done) {
+                            $token = $tokenizer->next();
 
-                        if ($token && $token->type == 'AsSmt') {
-                            if ($as = $tokenizer->next()) {
-                                $item[1] = $as->word;
+                            if ($token) {
+                                $line['endLine'] = $token->line;
+                                $line['endPos'] = $token->position;
+                            }
 
-                                if ($token = $tokenizer->next()) {
-                                    $line['endLine'] = $token->line;
-                                    $line['endPos'] = $token->position;
+                            if ($token && $token->type == 'AsSmt') {
+                                if ($as = $tokenizer->next()) {
+                                    $item[1] = $as->word;
+
+                                    if ($token = $tokenizer->next()) {
+                                        $line['endLine'] = $token->line;
+                                        $line['endPos'] = $token->position;
+                                    }
                                 }
                             }
-                        }
 
-                        $result[] = $item;
+                            $result[] = $item;
+                        }
                     }
                 }
             }

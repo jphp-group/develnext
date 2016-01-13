@@ -21,6 +21,8 @@ import php.runtime.lang.BaseWrapper;
 import php.runtime.memory.ArrayMemory;
 import php.runtime.reflection.ClassEntity;
 
+import java.io.File;
+
 @Abstract
 @Name(JavaFXExtension.NS + "UXWebEngine")
 public class UXWebEngine extends BaseWrapper<WebEngine> {
@@ -31,7 +33,9 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
         @Property String location();
         @Property String title();
 
+        @Property String userAgent();
         @Property String userStyleSheetLocation();
+        @Property File userDataDirectory();
 
         void load(String url);
         void loadContent(String content);
@@ -46,6 +50,16 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
 
     public UXWebEngine(Environment env, ClassEntity clazz) {
         super(env, clazz);
+    }
+
+    @Setter
+    public void setUrl(String url) {
+        getWrappedObject().load(url);
+    }
+
+    @Getter
+    public String getUrl() {
+        return getWrappedObject().getLocation();
     }
 
     @Signature

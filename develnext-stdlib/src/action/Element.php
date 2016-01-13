@@ -180,15 +180,13 @@ class Element
                     if ($callback) $callback();
                 });
             } else {
-                if (Element::setText($object, '')) {
-                    $content = Stream::getContents($path);
+                $content = Stream::getContents($path);
 
-                    UXApplication::runLater(function () use ($content, $object, $callback) {
-                        Element::setText($object, $content);
+                UXApplication::runLater(function () use ($content, $object, $callback) {
+                    $done = Element::setText($object, $content);
 
-                        if ($callback) $callback();
-                    });
-                }
+                    if ($callback && $done) $callback();
+                });
             }
         }))->start();
     }

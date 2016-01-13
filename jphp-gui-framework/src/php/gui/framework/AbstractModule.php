@@ -69,7 +69,7 @@ abstract class AbstractModule extends AbstractScript
             'res://.scripts/' . $this->id . '/'
         );
 
-        if ($json) {
+        if ($json && is_array($json['properties'])) {
             foreach ((array)$json['properties'] as $key => $value) {
                 $this->{$key} = $value;
             }

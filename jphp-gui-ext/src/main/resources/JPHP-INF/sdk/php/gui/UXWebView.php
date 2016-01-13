@@ -37,4 +37,10 @@ class UXWebView extends UXParent
      * @var bool
      */
     public $contextMenuEnabled;
+
+    /**
+     * See also ->engine->url (this is alias)
+     * @var string
+     */
+    public $url;
 }

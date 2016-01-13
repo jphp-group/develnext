@@ -41,6 +41,16 @@ public class UXWebView extends UXParent {
         __wrappedObject = new WebView();
     }
 
+    @Getter
+    public String getUrl() {
+        return getWrappedObject().getEngine().getLocation();
+    }
+
+    @Setter
+    public void setUrl(String url) {
+        getWrappedObject().getEngine().load(url);
+    }
+
     @Signature
     @Override
     protected void setSize(double[] size) {
