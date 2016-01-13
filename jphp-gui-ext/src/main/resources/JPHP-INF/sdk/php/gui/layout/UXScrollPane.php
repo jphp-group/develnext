@@ -51,4 +51,11 @@ class UXScrollPane extends UXControl
     public function __construct(UXNode $node)
     {
     }
+
+    /**
+     * @param UXNode $node
+     */
+    public function scrollToNode(UXNode $node)
+    {
+    }
 }

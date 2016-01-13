@@ -66,4 +66,17 @@ public class UXScrollPane<T extends ScrollPane> extends UXControl<ScrollPane> {
     public void setScrollY(double value) {
         getWrappedObject().setVvalue(value);
     }
+
+    @Signature
+    public void scrollToNode(Node node) {
+        double width = getWrappedObject().getContent().getBoundsInLocal().getWidth();
+        double height = getWrappedObject().getContent().getBoundsInLocal().getHeight();
+
+        double x = node.getBoundsInParent().getMaxX();
+        double y = node.getBoundsInParent().getMaxY();
+
+        // scrolling values range from 0 to 1
+        getWrappedObject().setVvalue(y / height);
+        getWrappedObject().setHvalue(x/width);
+    }
 }

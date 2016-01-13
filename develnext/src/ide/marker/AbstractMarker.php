@@ -1,8 +1,12 @@
 <?php
 namespace ide\marker;
+use ide\marker\target\AbstractMarkerTarget;
+use ide\marker\target\MarkerTargable;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\framework\ScriptEvent;
 use php\gui\event\UXEvent;
+use php\gui\UXNode;
+use script\TimerScript;
 
 /**
  * Class AbstractMarker
@@ -13,7 +17,12 @@ abstract class AbstractMarker
     use EventHandlerBehaviour;
 
     /**
-     * @var mixed
+     * @var int
+     */
+    public $timeout = 5000;
+
+    /**
+     * @var MarkerTargable
      */
     protected $target;
 
@@ -23,10 +32,20 @@ abstract class AbstractMarker
     protected $context;
 
     /**
-     * AbstractMarker constructor.
-     * @param mixed $target
+     * @var bool
      */
-    public function __construct($target)
+    protected $showing = false;
+
+    /**
+     * @var UXNode
+     */
+    protected $targetNode;
+
+    /**
+     * AbstractMarker constructor.
+     * @param MarkerTargable $target
+     */
+    public function __construct(MarkerTargable $target)
     {
         $this->target = $target;
     }
@@ -39,30 +58,48 @@ abstract class AbstractMarker
         $this->trigger('link', [$event, $context]);
     }
 
-    abstract protected function showImpl();
-    abstract protected function hideImpl();
+    abstract protected function showImpl(UXNode $node);
+    abstract protected function hideImpl(UXNode $node);
 
     public function show()
     {
-        $event = UXEvent::makeMock($this);
-        $this->trigger('show', [$event]);
-
-        if ($event->isConsumed()) {
-            return;
+        if ($this->showing) {
+            $this->hide();
         }
 
-        $this->showImpl();
+        $this->targetNode = $node = $this->target->getMarkerNode();
+
+        if ($node instanceof UXNode) {
+            $this->showing = true;
+
+            $event = UXEvent::makeMock($this);
+            $this->trigger('show', [$event]);
+
+            if ($event->isConsumed()) {
+                return;
+            }
+
+            $this->showImpl($node);
+
+            if ($this->timeout) {
+                TimerScript::executeAfter($this->timeout, [$this, 'hide']);
+            }
+        }
     }
 
     public function hide()
     {
-        $event = UXEvent::makeMock($this);
-        $this->trigger('hide', [$event]);
+        if ($this->targetNode) {
+            $event = UXEvent::makeMock($this);
+            $this->trigger('hide', [$event]);
 
-        if ($event->isConsumed()) {
-            return;
+            if ($event->isConsumed()) {
+                return;
+            }
+
+            $this->hideImpl($this->targetNode);
         }
 
-        $this->hideImpl();
+        $this->showing = false;
     }
 }

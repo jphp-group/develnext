@@ -880,7 +880,7 @@ class Ide extends Application
             FileSystem::open('~welcome');
 
             if ($projectFile && File::of($projectFile)->exists()) {
-                ProjectSystem::open($projectFile);
+                ProjectSystem::open($projectFile, false);
             }
         });
     }
@@ -977,6 +977,7 @@ class Ide extends Application
 
         if ($project) {
             $project->save();
+            ProjectSystem::close();
         }
 
         WatcherSystem::shutdown();

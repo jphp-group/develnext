@@ -281,6 +281,16 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Getter
+    public Bounds getBoundsInParent() {
+        return getWrappedObject().getBoundsInParent();
+    }
+
+    @Getter
+    public Bounds getLayoutBounds() {
+        return getWrappedObject().getLayoutBounds();
+    }
+
+    @Getter
     protected double getWidth() {
         return getWrappedObject().getLayoutBounds().getWidth();
     }

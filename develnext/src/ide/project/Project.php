@@ -4,6 +4,7 @@ use Exception;
 use Files;
 use ide\formats\AbstractFileTemplate;
 use ide\forms\MainForm;
+use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
@@ -24,6 +25,7 @@ use php\lib\Str;
 use php\time\Time;
 use php\util\Configuration;
 use php\util\Flow;
+use script\TimerScript;
 
 /**
  * Class Project
@@ -96,6 +98,11 @@ class Project
     protected $indexer;
 
     /**
+     * @var TimerScript
+     */
+    protected $tickTimer;
+
+    /**
      * Project constructor.
      *
      * @param string $rootDir
@@ -112,6 +119,8 @@ class Project
 
         $this->tree = new ProjectTree($this, new UXTreeView());
         $this->indexer = new ProjectIndexer($this);
+
+        $this->tickTimer = new TimerScript(1000 * 9, true, [$this, 'doTick']);
     }
 
     /**
@@ -130,6 +139,12 @@ class Project
         }
 
         return new Project($file->getParent(), $name);
+    }
+
+    public function doTick()
+    {
+        $file = $this->getIdeFile("ide.lock");
+        FileUtils::put($file, Time::millis());
     }
 
     public function getProjectFile()
@@ -318,6 +333,15 @@ class Project
     }
 
     /**
+     * @param $name
+     * @return File
+     */
+    public function getIdeFile($name)
+    {
+        return new File($this->getIdeDir(), "/$name");
+    }
+
+    /**
      * @return string[]
      */
     public function getSourceRoots()
@@ -449,8 +473,12 @@ class Project
         }
 
         //if (!$this->indexer->isValid()) { todo implement it
-            $this->reindex();
+        $this->reindex();
         //  }
+
+        $this->doTick();
+
+        $this->tickTimer->start();
     }
 
     /**
@@ -475,6 +503,7 @@ class Project
         $exporter->addDirectory($this->getIdeDir());
         $exporter->addFile($this->getProjectFile());
         $exporter->removeFile($this->indexer->getIndexFile());
+        $exporter->removeFile($this->getIdeFile("ide.lock"));
 
         $this->trigger('export', $exporter);
 
@@ -686,6 +715,12 @@ class Project
     {
         Logger::info("Close project ...");
 
+        $this->tickTimer->stop();
+
+        $file = $this->getIdeFile("ide.lock");
+        $file->delete();
+        $file->deleteOnExit();
+
         $this->save();
         $this->tree->clear(true);
     }
@@ -752,5 +787,22 @@ class Project
         FileUtils::copyFile($fileName, $newFile);
 
         return $this->getAbsoluteFile($newFile);
+    }
+
+    public function isOpenedInOtherIde()
+    {
+        $lockFile = $this->getIdeFile("ide.lock");
+
+        if ($lockFile->exists()) {
+            $pid = FileUtils::get($lockFile);
+
+            if ($pid) {
+                if ($pid > Time::millis() - 15 * 1000) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

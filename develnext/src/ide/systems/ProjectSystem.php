@@ -2,6 +2,7 @@
 namespace ide\systems;
 use ide\forms\MainForm;
 use ide\forms\MessageBoxForm;
+use ide\forms\OpenProjectForm;
 use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectTemplate;
@@ -153,8 +154,9 @@ class ProjectSystem
 
     /**
      * @param string $fileName
+     * @param bool $showDialogAlreadyOpened
      */
-    static function open($fileName)
+    static function open($fileName, $showDialogAlreadyOpened = true)
     {
         Logger::info("Start opening project: $fileName");
 
@@ -166,6 +168,25 @@ class ProjectSystem
         $file = File::of($fileName);
 
         $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
+
+        if ($project->isOpenedInOtherIde()) {
+            if ($showDialogAlreadyOpened) {
+                $msg = new MessageBoxForm('Данный проект уже открыт в другом экземпляре среды!', ['ОК, открыть другой проект', 'Выход']);
+                $msg->showDialog();
+
+                if ($msg->getResultIndex() == 0) {
+                    uiLater(function () {
+                        $dialog = new OpenProjectForm();
+                        $dialog->showDialog();
+                    });
+                }
+            }
+
+            FileSystem::open('~welcome');
+            Ide::get()->getMainForm()->hidePreloader();
+            return;
+        }
+
         Ide::get()->setOpenedProject($project);
 
         FileSystem::open('~project');

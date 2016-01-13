@@ -5,6 +5,8 @@ use ide\editors\AbstractEditor;
 use ide\forms\BuildProgressForm;
 use ide\Ide;
 use ide\Logger;
+use ide\marker\ArrowPointMarker;
+use ide\marker\target\NodeMarkerTarget;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
 use ide\ui\Notifications;

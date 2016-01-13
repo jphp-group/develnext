@@ -7,6 +7,7 @@ use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionEditor;
 use ide\action\ActionScript;
+use ide\action\types\SleepActionType;
 use ide\editors\AbstractEditor;
 use ide\editors\CodeEditor;
 use ide\editors\common\CodeTextArea;
@@ -15,6 +16,8 @@ use ide\editors\menu\ContextMenu;
 use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
+use ide\marker\ArrowPointMarker;
+use ide\marker\target\ActionTypeMarketTarget;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use ide\utils\PhpParser;
@@ -434,6 +437,14 @@ class ActionConstructorForm extends AbstractIdeForm
         uiLater(function () {
             $this->constructorSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
             $this->useDefaultCheckbox->selected = Ide::get()->getUserConfigValue(CodeEditor::class . '.editorOnDoubleClick') == "constructor";
+
+            /*TimerScript::executeAfter(1000, function () {
+                $marker = new ArrowPointMarker(new ActionTypeMarketTarget($this, SleepActionType::class));
+                $marker->direction = 'UP';
+                $marker->timeout = 10 * 1000;
+                $marker->tooltipText = "Добавьте это действие,\n если хотите сделать паузу в коде.";
+                $marker->show();
+            });*/
         });
 
         $this->buildActionTypePane($editor);
@@ -517,8 +528,9 @@ class ActionConstructorForm extends AbstractIdeForm
 
         /** @var UXTab $tab */
         $i = 0;
-        foreach ($buildTabs as $tab) {
+        foreach ($buildTabs as $group => $tab) {
             $t = new UXTab();
+            $t->data('group', $group);
             $t->text = $tab->text;
             $t->closable = false;
             $t->content = new UXScrollPane($tab->content);
@@ -537,6 +549,30 @@ class ActionConstructorForm extends AbstractIdeForm
                 });
             }
         }
+    }
+
+    public function getAndShowActionType($typeClass)
+    {
+        /** @var AbstractSimpleActionType $type */
+        $type = new $typeClass();
+
+        $group = $type->getGroup();
+        foreach ($this->actionTypePane->tabs as $tab) {
+            if ($tab->data('group') == $group) {
+                $this->actionTypePane->selectTab($tab);
+
+                foreach ($tab->content->content->children as $node) {
+                    if ($node->data('type') == $typeClass) {
+                        $tab->content->scrollToNode($node);
+                        return $node;
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return null;
     }
 
     private function addActionType(AbstractActionType $actionType, &$buildTabs, &$subGroups)
@@ -607,6 +643,7 @@ class ActionConstructorForm extends AbstractIdeForm
         $btn->maxWidth = 99999;
         $btn->alignment = 'CENTER_LEFT';
         $btn->text = $actionType->getTitle();
+        $btn->data('type', get_class($actionType));
 
         $btn->userData = $actionType;
         $btn->classes->add('dn-simple-toggle-button');
@@ -641,6 +678,7 @@ class ActionConstructorForm extends AbstractIdeForm
         $smallBtn->size = [34, 34];
         $smallBtn->userData = $actionType;
         $smallBtn->classes->addAll($btn->classes);
+        $smallBtn->data('type', get_class($actionType));
 
         if ($smallBtn->graphic == null) {
             $smallBtn->graphic = ico('blocks16');

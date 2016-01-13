@@ -149,3 +149,7 @@
     -fx-padding: 4px 5px;
     -fx-cursor: hand;;
 }
+
+.point-marker {
+    -fx-border-color: red;
+}

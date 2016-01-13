@@ -24,6 +24,7 @@ use ide\forms\MainForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
+use ide\marker\target\MarkerTargable;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
@@ -90,7 +91,7 @@ use php\util\Regex;
  *
  * @property AbstractFormFormat $format
  */
-class FormEditor extends AbstractModuleEditor
+class FormEditor extends AbstractModuleEditor implements MarkerTargable
 {
     const BORDER_SIZE = 8;
 
@@ -211,6 +212,11 @@ class FormEditor extends AbstractModuleEditor
      * @var IdeObjectTreeList
      */
     protected $objectTreeList;
+
+    /**
+     * @var UXNode
+     */
+    protected $markerNode;
 
     public function __construct($file, AbstractFormDumper $dumper)
     {
@@ -929,11 +935,14 @@ class FormEditor extends AbstractModuleEditor
                 $this->designer->update();
             });
 
+            $this->markerNode = $designPane;
             $designPane->add($this->layout);
 
             $this->trigger('makeDesignPane', [$designPane]);
             UXAnchorPane::setAnchor($this->layout, 0);
         } else {
+            $this->markerNode = $this->layout;
+
             $this->layout->style = '-fx-border-width: 1px; -fx-border-style: none; -fx-border-color: silver;';
             $this->layout->position = [10, 10];
             $area->add($this->layout);
@@ -1325,5 +1334,10 @@ class FormEditor extends AbstractModuleEditor
         }
 
         return $editorType;
+    }
+
+    function getMarkerNode()
+    {
+        return $this->markerNode;
     }
 }

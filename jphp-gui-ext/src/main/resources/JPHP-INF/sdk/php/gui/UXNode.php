@@ -160,6 +160,18 @@ abstract class UXNode
     public $anchors = [];
 
     /**
+     * @readonly
+     * @var array
+     */
+    public $layoutBounds = ['x' => 0.0, 'y' => 0.0, 'z' => 0.0, 'width' => 0.0, 'height' => 0.0, 'depth' => 0.0];
+
+    /**
+     * @readonly
+     * @var array
+     */
+    public $boundsInParent = ['x' => 0.0, 'y' => 0.0, 'z' => 0.0, 'width' => 0.0, 'height' => 0.0, 'depth' => 0.0];
+
+    /**
      * UXNode constructor.
      */
     public function __construct()

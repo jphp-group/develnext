@@ -3,6 +3,8 @@ namespace ide\commands;
 
 use ide\editors\AbstractEditor;
 use ide\Ide;
+use ide\marker\ArrowPointMarker;
+use ide\marker\target\CurrentEditorMarkerTarget;
 use ide\misc\AbstractCommand;
 use php\gui\UXSeparator;
 
@@ -43,6 +45,10 @@ class SaveProjectCommand extends AbstractProjectCommand
 
         if ($project) {
             $project->save();
+
+            $marker = new ArrowPointMarker(new CurrentEditorMarkerTarget());
+            $marker->tooltipText = "Нажмите на это поле, \nчтобы добавить выделенный компонент!";
+            $marker->show();
 
             Ide::get()->getMainForm()->toast('Проект успешно сохранен');
         }

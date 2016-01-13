@@ -81,6 +81,7 @@ public class JavaFXExtension extends Extension {
         registerMemoryOperation(DurationMemoryOperation.class);
         registerMemoryOperation(ColorMemoryOperation.class);
         registerMemoryOperation(Rectangle2DMemoryOperation.class);
+        registerMemoryOperation(BoundsMemoryOperation.class);
 
         registerClass(scope, UXGeometry.class);
 

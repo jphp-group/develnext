@@ -84,16 +84,6 @@ class MyAccountCommand extends AbstractCommand
             }
 
             $this->contextMenu->getRoot()->showByNode($this->accountButton, 0, 33);
-
-
-            TimerScript::executeAfter(1000, function () {
-                $marker = new ArrowPointMarker($this->accountImage);
-                $marker->show();
-
-                TimerScript::executeAfter(5000, function () use ($marker) {
-                    $marker->hide();
-                });
-            });
         } else {
             Ide::accountManager()->authorize(true);
         }
