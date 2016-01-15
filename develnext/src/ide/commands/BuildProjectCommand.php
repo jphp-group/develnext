@@ -4,6 +4,8 @@ namespace ide\commands;
 use ide\build\AbstractBuildType;
 use ide\editors\AbstractEditor;
 use ide\forms\BuildProjectForm;
+use ide\forms\MessageBoxForm;
+use ide\Ide;
 use ide\misc\AbstractCommand;
 use php\lang\IllegalArgumentException;
 
@@ -35,6 +37,28 @@ class BuildProjectCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
+        /** @var ExecuteProjectCommand $command */
+        $command = Ide::get()->getRegisteredCommand(ExecuteProjectCommand::class);
+
+        if ($command && $command->isRunning()) {
+            $msg = new MessageBoxForm('Чтобы собрать проект необходимо остановить запущенную программу, остановить её?',
+                [
+                    'Да, остановить и собрать',
+                    'Нет, отмена'
+                ]
+            );
+
+            if ($msg->showDialog()) {
+                if ($msg->getResultIndex() == 0) {
+                    $command->onStopExecute(function () use ($e, $editor) {
+                        $this->onExecute($e, $editor);
+                    });
+                }
+
+                return;
+            }
+        }
+
         $dialog = new BuildProjectForm();
         $dialog->setBuildTypes($this->buildTypes);
         $dialog->showAndWait();

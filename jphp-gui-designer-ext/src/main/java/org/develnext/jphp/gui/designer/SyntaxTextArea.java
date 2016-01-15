@@ -6,10 +6,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
-import org.fife.rsta.ui.search.FindDialog;
-import org.fife.rsta.ui.search.ReplaceDialog;
-import org.fife.rsta.ui.search.SearchEvent;
-import org.fife.rsta.ui.search.SearchListener;
+import org.fife.rsta.ui.search.*;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -20,7 +17,10 @@ import org.fife.ui.rtextarea.SearchResult;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class SyntaxTextArea extends SwingNode implements SearchListener {
     private final static String OS = System.getProperty("os.name").toLowerCase();
@@ -236,35 +236,35 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
     }
 
     public void showFindDialog() {
-        final FindDialog findDialog = new FindDialog((Frame) null, this);
-        findDialog.setVisible(true);
-        findDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        findDialog.addWindowListener(new WindowAdapter() {
+        final FindDialog findDialog = new FindDialog((Frame) null, this) {
             @Override
-            public void windowClosed(WindowEvent e) {
-                try {
-                    SearchEngine.markAll(content, null);
-                } catch (NullPointerException ex) {
-                    ;
+            public void setVisible(boolean visible) {
+                if (visible) {
+                    SearchComboBox old = this.findTextCombo;
+                    this.findTextCombo = new SearchComboBox(null, false) {
+                        @Override
+                        public void addItem(Object item) {
+
+                        }
+                    };
+
+                    super.setVisible(true);
+                    this.findTextCombo = old;
+                }
+                else {
+                    super.setVisible(false);
                 }
             }
-        });
+        };
+
+        findDialog.setVisible(true);
+        findDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         findDialog.toFront();
         findDialog.addWindowFocusListener(new WindowAdapter() {
             @Override
             public void windowLostFocus(WindowEvent e) {
                 findDialog.setVisible(false);
-            }
-        });
-    }
 
-    public void showReplaceDialog() {
-        final ReplaceDialog dialog = new ReplaceDialog((Frame) null, this);
-        dialog.setVisible(true);
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
                 try {
                     SearchEngine.markAll(content, null);
                 } catch (NullPointerException ex) {
@@ -272,11 +272,42 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
                 }
             }
         });
+    }
+
+    public void showReplaceDialog() {
+        final ReplaceDialog dialog = new ReplaceDialog((Frame) null, this) {
+            @Override
+            public void setVisible(boolean visible) {
+                if (visible) {
+                    SearchComboBox old = this.findTextCombo;
+                    this.findTextCombo = new SearchComboBox(null, false) {
+                        @Override
+                        public void addItem(Object item) {
+
+                        }
+                    };
+
+                    super.setVisible(true);
+                    this.findTextCombo = old;
+                }
+                else {
+                    super.setVisible(false);
+                }
+            }
+        };
+
+        dialog.setVisible(true);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.toFront();
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowLostFocus(WindowEvent e) {
                 dialog.setVisible(false);
+                try {
+                    SearchEngine.markAll(content, null);
+                } catch (NullPointerException ex) {
+                    ;
+                }
             }
         });
     }
@@ -314,7 +345,8 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
 
     @Override
     public String getSelectedText() {
-        return content.getSelectedText();
+        String selectedText = content.getSelectedText();
+        return selectedText;
     }
 
     public void setCaretPosition(int value) {

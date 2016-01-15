@@ -35,6 +35,15 @@ class ExecuteProjectCommand extends AbstractCommand
     /** @var Process */
     protected $process;
 
+    function __construct()
+    {
+        Ide::get()->on('closeProject', function () {
+            if ($this->isRunning()) {
+                $this->onStopExecute();
+            }
+        }, __CLASS__);
+    }
+
     public function getName()
     {
         return 'Запустить проект';
@@ -69,7 +78,12 @@ class ExecuteProjectCommand extends AbstractCommand
         return [$this->startButton, $this->stopButton];
     }
 
-    public function onStopExecute()
+    public function isRunning()
+    {
+        return $this->stopButton->enabled;
+    }
+
+    public function onStopExecute(callable $callback = null)
     {
         $ide = Ide::get();
         $project = $ide->getOpenedProject();
@@ -81,7 +95,7 @@ class ExecuteProjectCommand extends AbstractCommand
         $mainForm = Ide::get()->getMainForm();
         $mainForm->showPreloader('Подождите, останавливаем программу ...');
 
-        $proc = function () use ($appPidFile, $ide, $mainForm) {
+        $proc = function () use ($appPidFile, $ide, $mainForm, $callback) {
             try {
                 $pid = Stream::getContents($appPidFile);
 
@@ -115,6 +129,10 @@ class ExecuteProjectCommand extends AbstractCommand
             $this->process = null;
 
             $mainForm->hidePreloader();
+
+            if ($callback) {
+                $callback();
+            }
         };
 
         if ($appPidFile->exists()) {
@@ -128,7 +146,6 @@ class ExecuteProjectCommand extends AbstractCommand
                 if ($appPidFile->exists() || $time > 1000 * 25) {
                     $proc();
                     $e->sender->free();
-
                 }
             });
             $timer->start();

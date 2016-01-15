@@ -599,15 +599,30 @@ class Ide extends Application
     {
         Logger::info("Execute command - $commandClass");
 
+        $command = $this->getRegisteredCommand($commandClass);
+
+        if ($command) {
+            $command->onExecute();
+        } else {
+            throw new \InvalidArgumentException("Unable to execute $commandClass command, it is not registered");
+        }
+    }
+
+    /**
+     * @param $commandClass
+     * @return AbstractCommand|null
+     */
+    public function getRegisteredCommand($commandClass)
+    {
         $command = $this->commands[$commandClass];
 
         if ($command) {
             /** @var AbstractCommand $command */
             $command = $command['command'];
-            $command->onExecute();
-        } else {
-            throw new \InvalidArgumentException("Unable to execute $commandClass command, it is not registered");
+            return $command;
         }
+
+        return null;
     }
 
     /**

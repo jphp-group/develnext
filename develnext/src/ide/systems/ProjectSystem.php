@@ -230,6 +230,10 @@ class ProjectSystem
         $project = Ide::get()->getOpenedProject();
 
         if ($project) {
+            Ide::get()->trigger('closeProject', [$project]);
+        }
+
+        if ($project) {
             $project->close();
         }
 
@@ -250,7 +254,7 @@ class ProjectSystem
         Ide::get()->setOpenedProject(null);
 
         if ($project) {
-            Ide::get()->trigger('closeProject', [$project]);
+            Ide::get()->trigger('afterCloseProject', [$project]);
         }
     }
 }

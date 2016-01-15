@@ -52,7 +52,7 @@ public class UXApplication extends BaseWrapper<Application> {
 
     @Signature
     public static boolean isShutdown() {
-        return !Platform.isFxApplicationThread();
+        return shutdown;
     }
 
     @Signature
@@ -101,6 +101,10 @@ public class UXApplication extends BaseWrapper<Application> {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                if (isShutdown()) {
+                    return;
+                }
+
                 if (value.instanceOf(Stream.class)) {
                     if (value.instanceOf(ResourceStream.class)) {
                         Application.setUserAgentStylesheet(value.toObject(ResourceStream.class).getUrl().toExternalForm());
@@ -189,6 +193,12 @@ public class UXApplication extends BaseWrapper<Application> {
             } finally {
                 thread.setContextClassLoader(old);
             }
+        }
+
+        @Override
+        public void stop() throws Exception {
+            super.stop();
+            shutdown = true;
         }
     }
 }
