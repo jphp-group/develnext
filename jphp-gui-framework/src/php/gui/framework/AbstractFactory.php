@@ -52,8 +52,6 @@ abstract class AbstractFactory
      */
     protected $behaviourManager;
 
-
-
     /**
      * @throws Exception
      */
@@ -138,9 +136,9 @@ abstract class AbstractFactory
         return Str::replace($class, '\\', '/');
     }
 
-    protected function loadPrototypes()
+    protected function loadPrototypes($path = null)
     {
-        $path = static::DEFAULT_PATH . $this->getResourceName() . '.factory';
+        $path = $path ?: static::DEFAULT_PATH . $this->getResourceName() . '.factory';
 
         Stream::tryAccess($path, function (Stream $stream) {
             $xml = new XmlProcessor();

@@ -13,6 +13,7 @@ use php\gui\designer\UXDesigner;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\framework\Preloader;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
@@ -143,6 +144,13 @@ class MainForm extends AbstractIdeForm
                 Ide::get()->setUserConfigValue(get_class($this) . '.dividerPositions', $this->contentSplitPane->dividerPositions);
             });
         }
+
+
+       /* $overlay = new UXAnchorPane();
+        $overlay->opacity = 0.01;
+        UXAnchorPane::setAnchor($overlay, 0);
+        $this->layout->add($overlay);*/
+
 
         $this->projectTabs->tabs[0]->graphic = ico('settings16');
         //$this->projectTabs->tabs[1]->graphic = ico('tree16');

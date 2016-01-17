@@ -28,7 +28,7 @@ class DataFormElementTag extends AbstractFormElementTag
         $element->setAttribute('id', $node->id);
 
         foreach ($node->toArray() as $key => $value) {
-            $element->setAttribute($key, $value);
+            $element->setAttribute($key, self::escapeText($value));
         }
     }
 }

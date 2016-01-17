@@ -39,7 +39,7 @@ class ImageViewFormElementTag extends AbstractFormElementTag
         $element->setAttribute('height', $node->height);
 
         if ($node->text) {
-            $element->setAttribute('text', $node->text);
+            $element->setAttribute('text', self::escapeText($node->text));
         }
 
         $textColor = $node->textColor;
@@ -57,19 +57,6 @@ class ImageViewFormElementTag extends AbstractFormElementTag
 
     public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
     {
-        /** @var UXImageArea $node */
-        $font = $node->font;
-
-        if ($font && ($font->family !== 'System' || $font->size != 12)) {
-            $domFontProperty = $document->createElement('font');
-
-            $domFont = $document->createElement('Font');
-            $domFont->setAttribute('name', $font->name);
-            $domFont->setAttribute('size', $font->size);
-
-            $domFontProperty->appendChild($domFont);
-
-            $element->appendChild($domFontProperty);
-        }
+        $this->writeFontForContent($node, $element, $document);
     }
 }

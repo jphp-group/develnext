@@ -6,6 +6,7 @@ use ide\Ide;
 use php\gui\UXImageArea;
 use php\gui\UXNode;
 use php\gui\UXPopupWindow;
+use php\gui\UXScreen;
 use php\gui\UXTooltip;
 
 /**
@@ -27,7 +28,7 @@ class ArrowPointMarker extends AbstractMarker
     /**
      * @var string
      */
-    public $direction = 'UP';
+    public $direction = 'AUTO';
 
     /**
      * @var string
@@ -89,10 +90,37 @@ class ArrowPointMarker extends AbstractMarker
         $this->vibration = $behaviour;
     }
 
+    protected function getDetectedDirection(UXNode $node)
+    {
+        $direction = $this->direction;
+
+        $x = $node->screenX;
+        $y = $node->screenY;
+        $screen = UXScreen::getPrimary()->visualBounds;
+
+        if ($direction == 'AUTO') {
+            if ($x < $this->radius + $this->popup->width) {
+                $direction = 'LEFT';
+            } elseif ($x > $screen['width'] - $this->radius - $this->popup->width) {
+                $direction = 'RIGHT';
+            } elseif ($y > $screen['height'] - $this->radius - $this->popup->height) {
+                $direction = 'DOWN';
+            } elseif ($y < $this->radius + $this->popup->height) {
+                $direction = 'UP';
+            } else {
+                $direction = 'LEFT';
+            }
+        }
+
+        return $direction;
+    }
+
     protected function showImpl(UXNode $node)
     {
         if ($node instanceof UXNode) {
             $node->classes->add('point-marker');
+
+            $direction = $this->getDetectedDirection($node);
 
             $this->popup->opacity = 0;
 
@@ -115,7 +143,7 @@ class ArrowPointMarker extends AbstractMarker
 
             $this->vibration->offsetX = $this->vibration->offsetY = 0;
 
-            switch ($this->direction) {
+            switch ($direction) {
                 case 'UP':
                     $this->vibration->offsetY = -1 * $this->radius;
                     $imageArea->rotate = 0;
@@ -151,9 +179,8 @@ class ArrowPointMarker extends AbstractMarker
                     $offsetX = $bounds['width'];
                     $offsetY = -($this->popup->height / 2) + $bounds['height'] / 2;
 
-
-                    $tooltipY = $node->screenY + $this->popup->height;
-                    $tooltipX = $node->screenX + $bounds['width'] + $this->popup->height + $this->radius;
+                    $tooltipY = $node->screenY + $bounds['height'] / 2 + $this->popup->height / 2 + 10;
+                    $tooltipX = $node->screenX + $bounds['width'];
                     break;
                 case 'RIGHT':
                     $this->vibration->offsetX = 1 * $this->radius;
@@ -164,6 +191,10 @@ class ArrowPointMarker extends AbstractMarker
 
                     $tooltipY = $node->screenY + $this->popup->height;
                     $tooltipX = $node->screenX - $this->popup->height - $this->radius;
+
+                    $tooltip->on('show', function () use ($tooltip, $bounds) {
+                        $tooltip->x += -($tooltip->width / 2);
+                    });
                     break;
             }
 

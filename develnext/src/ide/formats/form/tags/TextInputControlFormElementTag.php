@@ -21,8 +21,8 @@ class TextInputControlFormElementTag extends AbstractFormElementTag
     public function writeAttributes($node, DomElement $element)
     {
         /** @var UXTextInputControl $node */
-        $element->setAttribute('text', $node->text);
+        $element->setAttribute('text', self::escapeText($node->text));
         $element->setAttribute('editable', $node->editable ? 'true' : 'false');
-        $element->setAttribute('promptText', $node->promptText);
+        $element->setAttribute('promptText', self::escapeText($node->promptText));
     }
 }

@@ -65,6 +65,11 @@ abstract class AbstractForm extends UXForm
     protected $behaviourManager;
 
     /**
+     * @var StandaloneFactory
+     */
+    protected $standaloneFactory;
+
+    /**
      * @param UXForm $origin
      * @throws Exception
      */

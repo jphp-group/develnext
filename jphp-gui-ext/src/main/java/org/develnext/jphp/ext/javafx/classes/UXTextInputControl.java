@@ -1,8 +1,11 @@
 package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.scene.control.TextInputControl;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Abstract;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Property;

@@ -1,16 +1,9 @@
 <?php
 
 use php\gui\framework\Application;
-use php\gui\layout\UXAnchorPane;
-use php\gui\UXAlert;
 use php\gui\UXApplication;
-use php\gui\UXTextArea;
 use php\io\Stream;
 use php\lang\System;
-
-define('DEVELNEXT_PROJECT_DEBUG', true);
-
-Stream::putContents("application.pid", UXApplication::getPid());
 
 $app = Application::get();
 

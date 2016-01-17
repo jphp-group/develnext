@@ -18,6 +18,7 @@ use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\marker\ArrowPointMarker;
 use ide\marker\target\ActionTypeMarketTarget;
+use ide\marker\target\CancelButtonMarkerTarget;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use ide\utils\PhpParser;
@@ -439,10 +440,16 @@ class ActionConstructorForm extends AbstractIdeForm
             $this->useDefaultCheckbox->selected = Ide::get()->getUserConfigValue(CodeEditor::class . '.editorOnDoubleClick') == "constructor";
 
             TimerScript::executeAfter(1000, function () {
-                $marker = new ArrowPointMarker(new ActionTypeMarketTarget($this, SleepActionType::class));
+                /*$marker = new ArrowPointMarker(new ActionTypeMarketTarget($this, SleepActionType::class));
                 $marker->direction = 'RIGHT';
+
                 $marker->timeout = 10 * 1000;
                 $marker->tooltipText = "Добавьте это действие,\n если хотите сделать паузу в коде.";
+                $marker->show();*/
+
+                $marker = new ArrowPointMarker(new CancelButtonMarkerTarget($this));
+                $marker->direction = 'AUTO';
+                $marker->tooltipText = "Сохраните добавленные действия!";
                 $marker->show();
             });
         });
@@ -608,9 +615,6 @@ class ActionConstructorForm extends AbstractIdeForm
             if ($subGroup) {
                 $label = new UXLabel($subGroup);
                 $label->font = UXFont::of($label->font, $label->font->size, 'BOLD');
-                $tab->data('vbox')->observer('width')->addListener(function ($old, $new) use ($label, $tab) {
-                    Ide::get()->setUserConfigValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
-                });
 
                 if ($subGroups[$actionType->getGroup()]) {
                     $label->paddingTop = 5;
@@ -622,7 +626,6 @@ class ActionConstructorForm extends AbstractIdeForm
                 $label = new UXLabel($subGroup);
                 $label->font = UXFont::of($label->font, $label->font->size, 'BOLD');
                 $tab->data('fbox')->observer('width')->addListener(function ($old, $new) use ($label, $tab) {
-                    Ide::get()->setUserConfigValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
                     $label->minWidth = $new - $tab->data('fbox')->paddingLeft - $tab->data('fbox')->paddingRight;
                 });
 
@@ -803,6 +806,8 @@ class ActionConstructorForm extends AbstractIdeForm
     public function hide()
     {
         parent::hide();
+
+        Ide::get()->setUserConfigValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
 
         $this->timer->stop();
 

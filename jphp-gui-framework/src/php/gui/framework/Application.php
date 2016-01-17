@@ -65,6 +65,10 @@ class Application
      */
     public function __construct($configPath = null)
     {
+        if (Stream::exists('res://.debug/preloader.php')) {
+            include 'res://.debug/preloader.php';
+        }
+
         if ($configPath === null) {
             $configPath = 'res://.system/application.conf';
         }

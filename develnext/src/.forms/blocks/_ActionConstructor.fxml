@@ -5,7 +5,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="575.0" prefWidth="849.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="575.0" prefWidth="849.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TabPane layoutX="719.0" layoutY="37.0" prefHeight="475.0" prefWidth="130.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="63.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="37.0">
         <tabs>
@@ -20,7 +20,7 @@
       <HBox layoutX="13.0" prefHeight="36.0" prefWidth="704.0" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="132.0" AnchorPane.topAnchor="0.0" />
       <HBox layoutX="14.0" layoutY="525.0" prefHeight="36.0" prefWidth="704.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="131.0">
          <children>
-            <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" prefWidth="138.0" styleClass="icon-ok" text="Сохранить">
+            <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" prefWidth="138.0" styleClass="icon-ok" text="\%Сохранить%">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>

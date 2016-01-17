@@ -2,6 +2,7 @@
 namespace ide\formats\form;
 
 use php\gui\UXNode;
+use php\lib\str;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 
@@ -34,5 +35,32 @@ abstract class AbstractFormElementTag
     protected function createElement($node, DomDocument $document)
     {
         // TODO.
+    }
+
+    protected function writeFontForContent($node, DomElement $element, DomDocument $document)
+    {
+        /** @var UXNode $node */
+        $font = $node->font;
+
+        if ($font && ($font->family !== 'System' || $font->size != 12 || $font->style !== 'Regular')) {
+            $domFontProperty = $document->createElement('font');
+
+            $domFont = $document->createElement('Font');
+            $domFont->setAttribute('name', $font->name);
+            $domFont->setAttribute('size', $font->size);
+
+            $domFontProperty->appendChild($domFont);
+
+            $element->appendChild($domFontProperty);
+        }
+    }
+
+    static function escapeText($text)
+    {
+        if (str::startsWith($text, '%')) {
+            return "\\$text";
+        }
+
+        return $text;
     }
 }

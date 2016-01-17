@@ -23,12 +23,12 @@ class LabeledFormElementTag extends AbstractFormElementTag
     public function writeAttributes($node, DomElement $element)
     {
         /** @var UXLabeled $node */
-        $element->setAttribute('text', $node->text);
+        $element->setAttribute('text', self::escapeText($node->text));
         $element->setAttribute('alignment', $node->alignment);
         $element->setAttribute('textAlignment', $node->textAlignment);
         $element->setAttribute('wrapText', $node->wrapText ? 'true' : 'false');
         $element->setAttribute('underline', $node->underline ? 'true' : 'false');
-        $element->setAttribute('ellipsisString', $node->ellipsisString);
+        $element->setAttribute('ellipsisString', self::escapeText($node->ellipsisString));
         $element->setAttribute('graphicTextGap', $node->graphicTextGap);
         $element->setAttribute('contentDisplay', $node->contentDisplay);
 
@@ -41,19 +41,6 @@ class LabeledFormElementTag extends AbstractFormElementTag
 
     public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
     {
-        /** @var UXLabeled $node */
-        $font = $node->font;
-
-        if ($font && ($font->family !== 'System' || $font->size != 12 || $font->style !== 'Regular')) {
-            $domFontProperty = $document->createElement('font');
-
-            $domFont = $document->createElement('Font');
-            $domFont->setAttribute('name', $font->name);
-            $domFont->setAttribute('size', $font->size);
-
-            $domFontProperty->appendChild($domFont);
-
-            $element->appendChild($domFontProperty);
-        }
+        $this->writeFontForContent($node, $element, $document);
     }
 }
