@@ -439,19 +439,19 @@ class ActionConstructorForm extends AbstractIdeForm
             $this->constructorSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
             $this->useDefaultCheckbox->selected = Ide::get()->getUserConfigValue(CodeEditor::class . '.editorOnDoubleClick') == "constructor";
 
-            TimerScript::executeAfter(1000, function () {
-                /*$marker = new ArrowPointMarker(new ActionTypeMarketTarget($this, SleepActionType::class));
+            /*TimerScript::executeAfter(1000, function () {
+                $marker = new ArrowPointMarker(new ActionTypeMarketTarget($this, SleepActionType::class));
                 $marker->direction = 'RIGHT';
 
                 $marker->timeout = 10 * 1000;
                 $marker->tooltipText = "Добавьте это действие,\n если хотите сделать паузу в коде.";
-                $marker->show();*/
+                $marker->show();
 
                 $marker = new ArrowPointMarker(new CancelButtonMarkerTarget($this));
                 $marker->direction = 'AUTO';
                 $marker->tooltipText = "Сохраните добавленные действия!";
                 $marker->show();
-            });
+            });*/
         });
 
         $this->buildActionTypePane($editor);

@@ -5,12 +5,11 @@ use ide\editors\AbstractEditor;
 use ide\forms\BuildProgressForm;
 use ide\Ide;
 use ide\Logger;
-use ide\marker\ArrowPointMarker;
-use ide\marker\target\NodeMarkerTarget;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
+use php\gui\event\UXEvent;
 use php\gui\framework\ScriptEvent;
 use php\gui\UXButton;
 use php\gui\UXDialog;
@@ -83,7 +82,7 @@ class ExecuteProjectCommand extends AbstractCommand
         return $this->stopButton->enabled;
     }
 
-    public function onStopExecute(callable $callback = null)
+    public function onStopExecute(UXEvent $e = null, callable $callback = null)
     {
         $ide = Ide::get();
         $project = $ide->getOpenedProject();

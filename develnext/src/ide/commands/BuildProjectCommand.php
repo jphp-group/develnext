@@ -50,7 +50,7 @@ class BuildProjectCommand extends AbstractCommand
 
             if ($msg->showDialog()) {
                 if ($msg->getResultIndex() == 0) {
-                    $command->onStopExecute(function () use ($e, $editor) {
+                    $command->onStopExecute(null, function () use ($e, $editor) {
                         $this->onExecute($e, $editor);
                     });
                 }
