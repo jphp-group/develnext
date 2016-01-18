@@ -87,7 +87,7 @@ class IfTextActionType extends AbstractSimpleActionType
         return 'icons/ifText16.png';
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Str::class,

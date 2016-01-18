@@ -74,6 +74,16 @@ class ObjectListEditor
     protected $enableAppModule = true;
 
     /**
+     * @var bool
+     */
+    protected $disableModules = false;
+
+    /**
+     * @var bool
+     */
+    protected $stringValues = false;
+
+    /**
      * ObjectListEditor constructor.
      * @param AbstractEditor $editor
      * @param array $filters
@@ -100,6 +110,13 @@ class ObjectListEditor
         $this->emptyItemText = $emptyItemText;
     }
 
+    public function disableAppModule()
+    {
+        $this->enableAppModule = false;
+
+        return $this;
+    }
+
     public function disableDependencies()
     {
         $this->disableDependencies = true;
@@ -112,6 +129,20 @@ class ObjectListEditor
         $this->disableForms = true;
 
         return $this;
+    }
+
+    public function disableModules()
+    {
+        $this->disableModules = true;
+
+        return $this;
+    }
+
+    public function stringValues()
+    {
+        $this->stringValues = true;
+
+        return;
     }
 
     public function enableSender($code = '~sender', $target = '~target')
@@ -246,8 +277,13 @@ class ObjectListEditor
             }
         }
 
+        $formsAdded = [];
+
         if ($editor instanceof FormEditor) {
-            if (!$this->disableForms) {
+            $isModule = $editor instanceof ScriptModuleEditor;
+            $isForm   = !$isModule;
+
+            if (($isModule && !$this->disableModules) || ($isForm && !$this->disableForms)) {
                 $this->addItem(new ObjectListEditorItem(
                     $editor->getTitle(),
                     Ide::get()->getImage($editor->getIcon()),
@@ -274,7 +310,7 @@ class ObjectListEditor
             if (!$this->disableDependencies) {
                 $moduleEditors = $editor->getModuleEditors();
 
-                if ($moduleEditors) {
+                if ($moduleEditors && !$this->disableModules) {
                     $this->comboBox->items->add(new ObjectListEditorItem('[Модули]', null, ''));
 
                     foreach ($moduleEditors as $module => $moduleEditor) {
@@ -300,6 +336,8 @@ class ObjectListEditor
                         $this->comboBox->items->add(new ObjectListEditorItem('Формы модуля', null, '_context'));
 
                         foreach ($formEditors as $formEditor) {
+                            $formsAdded[$formEditor->getTitle()] = $formEditor;
+
                             $this->comboBox->items->add(new ObjectListEditorItem(
                                 "{$formEditor->getTitle()}",
                                 Ide::get()->getImage($formEditor->getIcon()),
@@ -331,7 +369,15 @@ class ObjectListEditor
                             continue;
                         }
 
-                        $prefix = "form('{$formEditor->getTitle()}')";
+                        if (isset($formsAdded[$formEditor->getTitle()])) {
+                            continue;
+                        }
+
+                        if ($this->stringValues) {
+                            $prefix = "{$formEditor->getTitle()}.";
+                        } else {
+                            $prefix = "form('{$formEditor->getTitle()}')";
+                        }
 
                         $this->comboBox->items->add(new ObjectListEditorItem(
                             $formEditor->getTitle(),
@@ -346,7 +392,7 @@ class ObjectListEditor
             }
         }
 
-        if ($this->enableAppModule) {
+        if ($this->enableAppModule && !$this->disableModules) {
             $gui = GuiFrameworkProjectBehaviour::get();
             if ($gui) {
                 $appModule = $gui->getModuleEditor('AppModule');
@@ -364,32 +410,6 @@ class ObjectListEditor
                 }
             }
         }
-
-        $project = Ide::get()->getOpenedProject();
-
-        if ($project && $project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
-            /** @var GuiFrameworkProjectBehaviour $gui */
-            $gui = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
-
-            $editors = $gui->getFactoryEditors();
-
-            if ($editors) {
-                $this->comboBox->items->add(new ObjectListEditorItem('[Фабрики]', null, ''));
-
-                foreach ($editors as $key => $editor) {
-                    $prefix = "factory('{$editor->getTitle()}')";
-
-                    $this->comboBox->items->add(new ObjectListEditorItem(
-                        $editor->getTitle(),
-                        Ide::get()->getImage($editor->getIcon()),
-                        $prefix,
-                        1
-                    ));
-
-                    $this->appendFormEditor($editor, 2, $prefix);
-                }
-            }
-        }
     }
 
     protected function appendFormEditor(FormEditor $formEditor, $level = 0, $prefix = '')
@@ -399,7 +419,7 @@ class ObjectListEditor
         if ($list) {
             foreach ($list as $item) {
                 $new = $item->duplicate();
-                $new->value = $prefix ? "{$prefix}->$item->text" : $item->text;
+                $new->value = $prefix ? ($this->stringValues ? "{$prefix}{$item->text}" : "{$prefix}->{$item->text}") : $item->text;
                 $new->level = $level;
                 $new->prefix = $formEditor->getTitle();
 

@@ -11,7 +11,7 @@ class ScrollEventKind extends AbstractEventKind
     public function getArguments()
     {
         return [
-            [UXScrollEvent::class, 'event']
+            [UXScrollEvent::class, 'event', 'null']
         ];
     }
 }

@@ -79,7 +79,7 @@ class SetScoreActionType extends AbstractSimpleActionType
         return "icons/number16.png";
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Score::class

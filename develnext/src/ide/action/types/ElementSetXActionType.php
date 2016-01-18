@@ -75,7 +75,7 @@ class ElementSetXActionType extends AbstractSimpleActionType
         return 'icons/right16.png';
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Element::class,

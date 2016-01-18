@@ -12,6 +12,7 @@ abstract class AbstractSimpleActionType extends AbstractActionType
 {
     const GROUP_OTHER = 'Другок';
     const GROUP_APP = 'Система';
+    const GROUP_MEDIA = 'Медиа';
     const GROUP_GAME = 'Игра';
     const GROUP_CONTROL = 'Управление';
     const GROUP_CONDITIONS = 'Условия';
@@ -100,6 +101,9 @@ abstract class AbstractSimpleActionType extends AbstractActionType
                 }
 
                 return "'$value'";
+
+            case 'instances':
+                return "\$this->instances('$value')";
 
             case 'string':
                 $value = str::replace($value, "'", "\\'");

@@ -40,4 +40,9 @@ class WatchMakerBehaviour extends AbstractBehaviour
         $updater();
         $this->timer(50, $updater);
     }
+
+    public function getCode()
+    {
+        return 'WatchMaker';
+    }
 }

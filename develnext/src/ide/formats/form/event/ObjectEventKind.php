@@ -16,7 +16,7 @@ class ObjectEventKind extends AbstractEventKind
     public function getArguments()
     {
         return [
-            [ScriptEvent::class, 'event']
+            [ScriptEvent::class, 'event', 'null']
         ];
     }
 }

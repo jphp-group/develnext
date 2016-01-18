@@ -79,7 +79,7 @@ class ElementSetTextActionType extends AbstractSimpleActionType
         return 'icons/textEdit16.png';
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Element::class,

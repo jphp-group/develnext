@@ -29,6 +29,9 @@ class MixedArgumentEditor extends AbstractArgumentEditor
     protected $objectListEditor;
 
     /** @var ObjectListEditor */
+    protected $instancesListEditor;
+
+    /** @var ObjectListEditor */
     protected $formListEditor;
 
     /**
@@ -55,7 +58,7 @@ class MixedArgumentEditor extends AbstractArgumentEditor
 
     protected function valueTypes()
     {
-        return ['string', 'magicString', 'integer', 'float', 'object', 'form', 'variable', 'expr', 'score'];
+        return ['string', 'magicString', 'integer', 'float', 'object', 'instances', 'form', 'variable', 'expr', 'score'];
     }
 
     protected function valueTypeLabels()
@@ -64,6 +67,7 @@ class MixedArgumentEditor extends AbstractArgumentEditor
             'string' => 'Строка',
             'magicString' => 'Строка с переменными',
             'object' => 'Объект',
+            'instances' => 'Объекты (клоны)',
             'form' => 'Форма',
             'globalVariable' => 'Глобальная переменная',
             'variable' => 'Переменная',
@@ -75,21 +79,8 @@ class MixedArgumentEditor extends AbstractArgumentEditor
         ];
     }
 
-    /**
-     * @param null $label
-     * @return UXNode
-     */
-    public function makeUi($label = null)
+    protected function makeObjectListUi()
     {
-        $this->formListEditor = new FormListEditor();
-        $this->formListEditor->enableSender();
-        $this->formListEditor->build();
-
-        $this->formListEditor->getUi()->maxWidth = 9999;
-        $this->formListEditor->onChange(function ($value) {
-            $this->input->text = $value;
-        });
-
         $this->objectListEditor = new ObjectListEditor();
 
         if ($filter = $this->options['objectFilter']) {
@@ -108,6 +99,47 @@ class MixedArgumentEditor extends AbstractArgumentEditor
         $this->objectListEditor->onChange(function ($value) {
             $this->input->text = $value;
         });
+    }
+
+    protected function makeFormListUi()
+    {
+        $this->formListEditor = new FormListEditor();
+        $this->formListEditor->enableSender();
+        $this->formListEditor->build();
+
+        $this->formListEditor->getUi()->maxWidth = 9999;
+        $this->formListEditor->onChange(function ($value) {
+            $this->input->text = $value;
+        });
+    }
+
+    protected function makeInstancesListUi()
+    {
+        $this->instancesListEditor = new ObjectListEditor();
+
+        if ($filter = $this->options['objectFilter']) {
+            $this->instancesListEditor->addFilter($filter);
+        }
+
+        $this->instancesListEditor->disableDependencies();
+        $this->instancesListEditor->enableAllForms();
+        $this->instancesListEditor->build();
+
+        $this->instancesListEditor->getUi()->maxWidth = 9999;
+        $this->instancesListEditor->onChange(function ($value) {
+            $this->input->text = $value;
+        });
+    }
+
+    /**
+     * @param null $label
+     * @return UXNode
+     */
+    public function makeUi($label = null)
+    {
+        $this->makeFormListUi();
+        $this->makeObjectListUi();
+        $this->makeInstancesListUi();
 
         $this->typeSelect = new UXComboBox();
         $this->typeSelect->editable = false;
@@ -128,6 +160,7 @@ class MixedArgumentEditor extends AbstractArgumentEditor
         UXHBox::setHgrow($this->input, 'ALWAYS');
         UXHBox::setHgrow($this->objectListEditor->getUi(), 'ALWAYS');
         UXHBox::setHgrow($this->formListEditor->getUi(), 'ALWAYS');
+        UXHBox::setHgrow($this->instancesListEditor->getUi(), 'ALWAYS');
 
         $this->typeSelect->on('action', function () {
             $this->updateUi();
@@ -154,6 +187,13 @@ class MixedArgumentEditor extends AbstractArgumentEditor
 
             if (!$this->value) {
                 $this->formListEditor->setSelected(null);
+            }
+        } elseif ($this->typeSelect->selected == $this->valueTypeLabels()['instances']) {
+            $this->box->add($this->instancesListEditor->getUi());
+            $this->instancesListEditor->getUi()->requestFocus();
+
+            if (!$this->value) {
+                $this->instancesListEditor->setSelected(null);
             }
         } else {
             $this->box->add($this->input);
@@ -182,6 +222,7 @@ class MixedArgumentEditor extends AbstractArgumentEditor
             $this->objectListEditor->setSelected($value);
         }
 
+        $this->instancesListEditor->setSelected($value);
         $this->formListEditor->setSelected($value);
 
         $this->updateUi();

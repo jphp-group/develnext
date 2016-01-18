@@ -51,6 +51,7 @@ ide\action\types\IfPasswordValidActionType
 ide\action\types\BehaviourEnableActionType
 ide\action\types\BehaviourDisableActionType
 
+ide\action\types\game\CreateInstanceActionType
 ide\action\types\GameChangeAnimationActionType
 ide\action\types\GameStopAnimationActionType
 ide\action\types\GameStartAnimationActionType

@@ -10,3 +10,4 @@ ide\editors\argument\FloatArgumentEditor
 ide\editors\argument\TextMethodsArgumentEditor
 ide\editors\argument\NumberMethodsArgumentEditor
 ide\editors\argument\AudioArgumentEditor
+ide\editors\argument\PrototypeArgumentEditor

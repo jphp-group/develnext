@@ -15,7 +15,7 @@ class KeyEventKind extends AbstractEventKind
     public function getArguments()
     {
         return [
-            [UXKeyEvent::class, 'event']
+            [UXKeyEvent::class, 'event', 'null']
         ];
     }
 }

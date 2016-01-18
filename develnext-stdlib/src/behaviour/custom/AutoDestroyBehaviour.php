@@ -59,4 +59,9 @@ class AutoDestroyBehaviour extends AnimationBehaviour
             });
         });
     }
+
+    public function getCode()
+    {
+        return 'AutoDestroy';
+    }
 }

@@ -68,13 +68,13 @@ abstract class AbstractFactory
 
     /**
      * @param $name
-     * @return ObjectGroup
+     * @return Instances
      */
     public function __get($name)
     {
         $instances = $this->prototypeInstances[$name];
 
-        return new ObjectGroup((array) $instances);
+        return new Instances((array) $instances);
     }
 
     /**
@@ -101,13 +101,11 @@ abstract class AbstractFactory
 
             UXNodeWrapper::get($node)->applyData($data);
 
-            UXApplication::runLater(function () use ($id, $node) {
-                $this->behaviourManager->applyForInstance($id, $node);
-            });
-
             $this->eventBinder->loadBind($node, $id, __CLASS__, true);
 
             $this->prototypeInstances[$id][] = $node;
+
+            $this->behaviourManager->applyForInstance($id, $node);
 
             $this->eventBinder->trigger($node, $id, 'create');
 

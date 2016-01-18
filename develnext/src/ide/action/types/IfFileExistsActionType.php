@@ -73,7 +73,7 @@ class IfFileExistsActionType extends AbstractSimpleActionType
         return 'icons/ifFile16.png';
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             File::class

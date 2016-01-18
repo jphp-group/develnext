@@ -92,7 +92,7 @@ class MoveToActionType extends AbstractSimpleActionType
         return !$action->continue;
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Animation::class

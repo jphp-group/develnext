@@ -65,4 +65,9 @@ class VibrationAnimationBehaviour extends AnimationBehaviour
             TimerScript::executeAfter($this->delay, $func);
         });
     }
+
+    public function getCode()
+    {
+        return 'Vibration';
+    }
 }

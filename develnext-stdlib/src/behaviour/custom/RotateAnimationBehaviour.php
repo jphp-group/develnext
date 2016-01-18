@@ -35,4 +35,9 @@ class RotateAnimationBehaviour extends AnimationBehaviour
     {
         $this->_target->rotate = 0;
     }
+
+    public function getCode()
+    {
+        return 'Rotate';
+    }
 }

@@ -79,7 +79,7 @@ class ElementLoadContentActionType extends AbstractSimpleActionType
         return !$action->sync && $action->getFieldType('object') != 'variable';
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Element::class,

@@ -56,7 +56,7 @@ class Action
     {
         $result = [];
 
-        foreach ($this->type->imports() as $import) {
+        foreach ($this->type->imports($this) as $import) {
             if (is_array($import)) {
                 $result[$import[0]] = $import;
             } else {

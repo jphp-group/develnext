@@ -15,7 +15,7 @@ class WindowEventKind extends AbstractEventKind
     public function getArguments()
     {
         return [
-            [UXWindowEvent::class, 'event']
+            [UXWindowEvent::class, 'event', 'null']
         ];
     }
 }

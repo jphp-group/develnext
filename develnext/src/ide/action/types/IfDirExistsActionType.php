@@ -73,7 +73,7 @@ class IfDirExistsActionType extends AbstractSimpleActionType
         return 'icons/ifDir16.png';
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             File::class

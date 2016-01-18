@@ -84,7 +84,7 @@ class IfVarActionType extends AbstractSimpleActionType
         return 'icons/ifVar16.png';
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Str::class,

@@ -39,7 +39,7 @@ abstract class AbstractMediaAction extends AbstractSimpleActionType
 
     function getGroup()
     {
-        return self::GROUP_GAME;
+        return self::GROUP_MEDIA;
     }
 
     function getSubGroup()
@@ -52,7 +52,7 @@ abstract class AbstractMediaAction extends AbstractSimpleActionType
         return $this->getMediaMethod() . "Media";
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Media::class

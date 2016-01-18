@@ -43,7 +43,7 @@ class OpenMediaAction extends AbstractSimpleActionType
 
     function getGroup()
     {
-        return self::GROUP_GAME;
+        return self::GROUP_MEDIA;
     }
 
     function getSubGroup()
@@ -81,7 +81,7 @@ class OpenMediaAction extends AbstractSimpleActionType
         return "icons/audio16.png";
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Media::class

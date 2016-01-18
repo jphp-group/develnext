@@ -12,6 +12,7 @@ use php\gui\framework\behaviour\custom\BehaviourManager;
 use php\gui\framework\behaviour\custom\FormBehaviourManager;
 use php\gui\framework\event\AbstractEventAdapter;
 use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXRegion;
 use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXCustomNode;
@@ -23,6 +24,7 @@ use php\gui\UXLabel;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
+use php\gui\UXParent;
 use php\gui\UXProgressIndicator;
 use php\gui\UXTooltip;
 use php\gui\UXWindow;
@@ -65,6 +67,11 @@ abstract class AbstractForm extends UXForm
     protected $behaviourManager;
 
     /**
+     * @var EventBinder
+     */
+    protected $eventBinder;
+
+    /**
      * @var StandaloneFactory
      */
     protected $standaloneFactory;
@@ -83,6 +90,8 @@ abstract class AbstractForm extends UXForm
         $this->loadConfig(null, false);
 
         $this->loadDesign();
+
+        $this->eventBinder = new EventBinder(null, $this);
         $this->loadBindings($this);
 
         $this->applyConfig();
@@ -102,6 +111,103 @@ abstract class AbstractForm extends UXForm
     public function behaviour($target, $class)
     {
         return $this->behaviourManager->getBehaviour($target, $class);
+    }
+
+    protected function getFactory()
+    {
+        if (!$this->standaloneFactory) {
+            $this->standaloneFactory = new StandaloneFactory(
+                $this,
+                static::DEFAULT_PATH . $this->getResourceName() . '.fxml',
+                $this->behaviourManager,
+                $this->eventBinder
+            );
+        }
+        return $this->standaloneFactory;
+    }
+
+    /**
+     * @param $id
+     * @param null|int $x
+     * @param null|int $y
+     * @return UXNode
+     * @throws IllegalArgumentException
+     */
+    public function instance($id, $x = null, $y = null)
+    {
+        if (str::contains($id, '.')) {
+            $id = str::split($id, '.', 2);
+            return $this->form($id[0])->instance($id[1], $x, $y);
+        }
+
+        $instance = $this->getFactory()->create($id);
+
+        if ($x !== null) {
+            $instance->x = $x;
+        }
+
+        if ($y !== null) {
+            $instance->y = $y;
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @param $id
+     * @param UXNode|UXWindow $initiator
+     * @param int $offsetX
+     * @param int $offsetY
+     * @param bool $relative
+     * @return UXNode
+     * @throws IllegalStateException
+     */
+    public function create($id, $initiator = null, $offsetX = 0, $offsetY = 0, $relative = true)
+    {
+        if ($initiator == null || !($initiator instanceof UXNode || $initiator instanceof UXWindow)) {
+            $initiator = $this;
+        }
+
+        $instance = $this->instance($id);
+
+        if ($relative && $initiator instanceof UXNode) {
+            $instance->x = $initiator->x + $offsetX;
+            $instance->y = $initiator->y + $offsetY;
+        } else {
+            $instance->x = $offsetX;
+            $instance->y = $offsetY;
+        }
+
+        $parent = $initiator instanceof UXWindow ? $initiator : $initiator->parent;
+
+        if ($parent instanceof UXParent || $parent instanceof UXWindow) {
+            $parent->children->add($instance);
+        } else {
+            if ($initiator->form) {
+                $initiator->form->add($instance);
+            } else {
+                throw new IllegalStateException("Unable to create instance by destroyed object");
+            }
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @param $id
+     * @return Instances
+     */
+    public function instances($id)
+    {
+        $node = parent::__get($id);
+
+        if (!$node) {
+            return new Instances([]);
+        }
+
+        $group = $this->getFactory()->{$id};
+
+        return $group;
     }
 
     /**

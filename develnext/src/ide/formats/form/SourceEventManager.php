@@ -289,6 +289,10 @@ class SourceEventManager
                 $className = $className[sizeof($className) - 1];
 
                 $arguments[] = $className . " $" . $arg[1];
+
+                if ($arg[2]) {
+                    $arguments[sizeof($arguments) - 1] .= " = $arg[2]";
+                }
             } else {
                 $arguments[] = "$" . $arg[0];
             }

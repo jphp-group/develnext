@@ -72,4 +72,9 @@ class DraggingFormBehaviour extends AbstractBehaviour
             }, __CLASS__);
         }
     }
+
+    public function getCode()
+    {
+        return 'DraggingForm';
+    }
 }

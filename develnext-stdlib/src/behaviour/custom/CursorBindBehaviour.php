@@ -68,4 +68,9 @@ class CursorBindBehaviour extends AbstractBehaviour
             $target->form->addEventFilter('mouseDrag', $handler);
         }
     }
+
+    public function getCode()
+    {
+        return 'CursorObject';
+    }
 }

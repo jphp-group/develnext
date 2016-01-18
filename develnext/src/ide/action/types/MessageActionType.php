@@ -80,7 +80,7 @@ class MessageActionType extends AbstractSimpleActionType
         return 'icons/chat16.png';
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             UXDialog::class,

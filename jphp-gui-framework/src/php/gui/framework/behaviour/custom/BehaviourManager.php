@@ -1,5 +1,7 @@
 <?php
 namespace php\gui\framework\behaviour\custom;
+use Traversable;
+use php\gui\framework\Instances;
 
 /**
  * Class BehaviourManager
@@ -21,6 +23,16 @@ abstract class BehaviourManager
      */
     public function getBehaviour($target, $type)
     {
+        if ($target instanceof Traversable || is_array($target)) {
+            $result = [];
+
+            foreach ($target as $one) {
+                $result[] = $this->getBehaviour($one, $type);
+            }
+
+            return new Instances($result);
+        }
+
         if (method_exists($target, 'data')) {
             $data = $target->data('~behaviour~' . $type);
 

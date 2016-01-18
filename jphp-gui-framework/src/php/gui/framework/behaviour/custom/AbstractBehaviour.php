@@ -44,6 +44,11 @@ abstract class AbstractBehaviour
         }
     }
 
+    public function getCode()
+    {
+        return null;
+    }
+
     /**
      * @param mixed $target
      */
@@ -128,5 +133,10 @@ abstract class AbstractBehaviour
         foreach ($this->__timers as $timer) {
             $timer->free();
         }
+    }
+
+    public function __clone()
+    {
+        $this->_target = null;
     }
 }

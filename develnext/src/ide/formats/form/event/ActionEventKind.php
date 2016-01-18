@@ -15,7 +15,7 @@ class ActionEventKind extends AbstractEventKind
     public function getArguments()
     {
         return [
-            [UXEvent::class, 'event']
+            [UXEvent::class, 'event', 'null']
         ];
     }
 }

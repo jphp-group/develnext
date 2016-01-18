@@ -52,5 +52,8 @@
         <eventType code="keyPress" name="Клавиатура" kind="KeyEvent" icon="icons/keyboard16.png" />
 
         <eventType code="scroll" name="Прокрутка" kind="ScrollParamEvent" icon="icons/scroll16.png" />
+
+        <eventType code="create" name="Клонирование" kind="ActionEvent" icon="icons/idea16.png" />
+        <eventType code="destroy" name="Уничтожение" kind="ActionEvent" icon="icons/trash16.gif" />
     </eventTypes>
 </element>

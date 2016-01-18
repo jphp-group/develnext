@@ -67,4 +67,9 @@ class KeyInputRuleBehaviour extends AbstractBehaviour
             });
         }
     }
+
+    public function getCode()
+    {
+        return 'KeyInputRule';
+    }
 }

@@ -201,7 +201,6 @@ class OpenProjectForm extends AbstractIdeForm
 
     /**
      * @param UXMouseEvent $e
-     * @event projectList.click
      */
     public function doProjectListClick(UXMouseEvent $e)
     {

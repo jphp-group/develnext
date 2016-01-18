@@ -13,6 +13,11 @@ class FormBehaviourManager extends BehaviourManager
     protected $form;
 
     /**
+     * @var array
+     */
+    protected $behaviours = [];
+
+    /**
      * FormBehaviourManager constructor.
      * @param AbstractForm $form
      */
@@ -33,7 +38,23 @@ class FormBehaviourManager extends BehaviourManager
             throw new IllegalArgumentException("$targetId is not found to apply behaviour " . get_class($behaviour));
         }
 
+        $this->behaviours[$targetId][get_class($behaviour)] = $behaviour;
+
         $target->data('~behaviour~' . get_class($behaviour), $behaviour);
         $behaviour->apply($target);
+    }
+
+    public function applyForInstance($id, $target)
+    {
+        foreach ((array) $this->behaviours[$id] as $type => $behaviour) {
+            /**
+             * @var string $type
+             * @var AbstractBehaviour $behaviour
+             */
+            $behaviour = clone $behaviour;
+
+            $target->data('~behaviour~' . $type, $behaviour);
+            $behaviour->apply($target);
+        }
     }
 }

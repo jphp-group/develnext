@@ -84,4 +84,9 @@ class ChatterAnimationBehaviour extends AnimationBehaviour
         $target->x = $this->xValue->get();
         $target->y = $this->yValue->get();
     }
+
+    public function getCode()
+    {
+        return 'Chatter';
+    }
 }

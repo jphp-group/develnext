@@ -10,6 +10,6 @@ class ObjectArgumentEditor extends MixedArgumentEditor
 
     protected function valueTypes()
     {
-        return ['object', 'variable', 'expr'];
+        return ['object', 'instances', 'variable', 'expr'];
     }
 }

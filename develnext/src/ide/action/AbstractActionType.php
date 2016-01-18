@@ -75,9 +75,10 @@ abstract class AbstractActionType
     }
 
     /**
+     * @param Action $action
      * @return array classes for use section
-     **/
-    function imports()
+     */
+    function imports(Action $action = null)
     {
         return [];
     }

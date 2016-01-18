@@ -6,6 +6,7 @@ use ide\behaviour\AbstractBehaviourSpec;
 use ide\behaviour\IdeBehaviourManager;
 use ide\editors\common\ObjectListEditorItem;
 use ide\Ide;
+use php\gui\framework\behaviour\custom\AbstractBehaviour;
 
 class BehaviourTypeArgumentEditor extends EnumArgumentEditor
 {
@@ -34,7 +35,17 @@ class BehaviourTypeArgumentEditor extends EnumArgumentEditor
 
             /** @var AbstractBehaviourSpec $spec */
             foreach ($specs as $spec) {
-                $variants[] = new ObjectListEditorItem($spec->getName(), Ide::get()->getImage($spec->getIcon()), $spec->getType(), 1);
+                $type = $spec->getType();
+
+                /** @var AbstractBehaviour $tmp */
+                // $tmp = new $type();
+
+                $variants[] = new ObjectListEditorItem(
+                    $spec->getName() /*. ($tmp->getCode() ? " [{$tmp->getCode()}]" : "")*/,
+                    Ide::get()->getImage($spec->getIcon()),
+                    /*$tmp->getCode() ?:*/ $type,
+                    1
+                );
             }
         }
 

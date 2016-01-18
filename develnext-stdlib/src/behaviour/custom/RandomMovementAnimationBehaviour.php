@@ -95,4 +95,9 @@ class RandomMovementAnimationBehaviour extends AnimationBehaviour
             $timer->start();
         }
     }
+
+    public function getCode()
+    {
+        return 'RandomMove';
+    }
 }

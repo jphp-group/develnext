@@ -53,6 +53,10 @@ class UXNodeWrapper
      */
     public function bind($event, callable $handler, $group)
     {
+        if (in_array($event, ['create', 'destroy'])) {
+            return;
+        }
+
         $this->node->on($event, $handler, $group);
     }
 

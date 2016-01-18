@@ -1,18 +1,26 @@
 <?php
 namespace php\gui\framework;
+use ArrayAccess;
 use Countable;
+use Iterator;
+use php\lang\IllegalStateException;
 use php\util\Flow;
 
 /**
  * Class ObjectGroup
  * @package php\gui\framework
  */
-class ObjectGroup implements Countable
+class Instances implements Countable, Iterator, ArrayAccess
 {
     /**
      * @var array
      */
     protected $instances = [];
+
+    /**
+     * @var int
+     */
+    protected $cur = 0;
 
     /**
      * @param array $instances
@@ -70,5 +78,54 @@ class ObjectGroup implements Countable
     public function count()
     {
         return sizeof($this->instances);
+    }
+
+    public function current()
+    {
+        return $this->instances[$this->cur];
+    }
+
+    public function next()
+    {
+        $this->cur++;
+    }
+
+    public function key()
+    {
+        return $this->cur;
+    }
+
+    public function valid()
+    {
+        return $this->cur >= 0 && $this->cur < sizeof($this->instances);
+    }
+
+    public function rewind()
+    {
+        $this->cur = 0;
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->instances[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->instances[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        if ($offset === null) {
+            $this->instances[] = $value;
+        } else {
+            $this->instances[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->instances[$offset]);
     }
 }

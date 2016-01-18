@@ -80,7 +80,7 @@ class IfIntersectActionType extends AbstractSimpleActionType
         return 'icons/intersection16.png';
     }
 
-    function imports()
+    function imports(Action $action = null)
     {
         return [
             Geometry::class,
