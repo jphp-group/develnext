@@ -3,6 +3,7 @@ namespace php\gui\framework;
 
 use ide\Logger;
 use php\gui\layout\UXPane;
+use php\gui\layout\UXScrollPane;
 use php\gui\UXData;
 use php\gui\UXNode;
 use php\gui\UXParent;
@@ -32,7 +33,7 @@ class DataUtils
                 if ($nd) {
                     $callback($node, $nd);
                 }
-            } else if ($node instanceof UXTitledPane) {
+            } else if ($node instanceof UXTitledPane || $node instanceof UXScrollPane) {
                 if ($node->content instanceof UXParent) {
                     self::scan($node->content, $callback);
                 }

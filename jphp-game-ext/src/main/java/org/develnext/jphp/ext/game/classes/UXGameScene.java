@@ -16,6 +16,11 @@ public class UXGameScene extends BaseWrapper<GameScene> {
     interface WrappedInterface {
         @Property boolean physicsEnabled();
         @Property AnchorPane content();
+
+        void play();
+        void pause();
+
+        void setGravity(double x, double y);
     }
 
     public UXGameScene(Environment env, GameScene wrappedObject) {

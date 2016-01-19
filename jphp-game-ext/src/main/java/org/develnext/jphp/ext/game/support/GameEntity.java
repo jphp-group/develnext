@@ -4,6 +4,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,6 +15,7 @@ import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.transform.Scale;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 
@@ -21,7 +24,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class GameEntity {
-    private boolean collidable = false;
+    private boolean collidable = true;
     private boolean physics = false;
 
     /*package-private*/ FixtureDef fixtureDef = new FixtureDef();
@@ -42,9 +45,33 @@ public class GameEntity {
 
     protected final String entityType;
 
-    public GameEntity(String entityType, Node node) {
+    public GameEntity(String entityType, final Node node) {
         this.entityType = entityType;
         this.node = node;
+
+        double layoutX = node.getLayoutX();
+        double layoutY = node.getLayoutY();
+
+        node.setLayoutX(0);
+        node.setLayoutY(0);
+
+        setX(layoutX);
+        setY(layoutY);
+
+        node.translateXProperty().bind(xProperty());
+        node.translateYProperty().bind(yProperty());
+        node.rotateProperty().bind(rotationProperty());
+
+        xFlippedProperty().addListener((new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> obs, Boolean oldValue, Boolean isFlipped) {
+                if (isFlipped) {
+                    node.getTransforms().setAll(new Scale(-1, 1, GameEntity.this.getXFlipLine(), 0));
+                } else {
+                    node.getTransforms().clear();
+                }
+            }
+        }));
     }
 
     public void init(GameScene world) {
@@ -172,6 +199,14 @@ public class GameEntity {
 
     public void setBodyType(BodyType type) {
         bodyDef.type = type;
+
+        /*if (type == BodyType.DYNAMIC) {
+            // 3. set various physics properties
+            FixtureDef fd = new FixtureDef();
+            fd.density = 0.5f;
+            fd.restitution = 0.3f;
+            setFixtureDef(fd);
+        }*/
     }
 
     public BodyType getBodyType() {
@@ -551,5 +586,11 @@ public class GameEntity {
      */
     public final boolean isCollidingWith(GameEntity other) {
         return checkCollision(other) != CollisionResult.NO_COLLISION;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Entity [type=" + getEntityType() + ", collidable=" + collidable + ", x=" + getX() + ", y=" + getY() + "]";
     }
 }

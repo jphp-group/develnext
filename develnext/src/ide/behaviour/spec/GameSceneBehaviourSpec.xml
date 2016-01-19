@@ -1,0 +1,23 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property name="Автозапуск" code="autoplay" editor="boolean" tooltip="Проигрывать всю сцену при старте" />
+        <property name="Физика" code="physicsEnabled" editor="boolean" tooltip="Включить/отключить законы физики 2d мира" />
+        <property name="Уровень гравитации" code="gravityType" editor="enum" tooltip="Величина гравитации (притяжения)">
+            <variants>
+                <variant value="EARTH">Земля (9.8)</variant>
+                <variant value="MARS">Марс (3.7)</variant>
+                <variant value="MOON">Луна (1.6)</variant>
+                <variant value="ZERO">Нулевой (0.0)</variant>
+            </variants>
+        </property>
+
+        <property name="Направление гравитации" code="gravityDirection" editor="enum">
+            <variants>
+                <variant value="DOWN">Вниз</variant>
+                <variant value="UP">Вверх</variant>
+                <variant value="RIGHT">Вправо</variant>
+                <variant value="LEFT">Влево</variant>
+            </variants>
+        </property>
+    </properties>
+</behaviour>

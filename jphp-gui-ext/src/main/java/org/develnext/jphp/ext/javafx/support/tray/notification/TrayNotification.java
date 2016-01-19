@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.StageStyle;
@@ -41,6 +42,9 @@ public final class TrayNotification {
     private AnimationType animationType;
     private EventHandler<ActionEvent> onDismissedCallBack, onShownCallback, onClickCallback;
     private NotificationLocation location;
+
+    private double horGap = 5;
+    private double verGap = 5;
 
     private int viewIndex = 0;
     private TrayAnimation __animator;
@@ -101,8 +105,7 @@ public final class TrayNotification {
     }
 
     private void initStage() {
-
-        stage = new CustomStage(rootNode, StageStyle.UNDECORATED);
+        stage = new CustomStage(rootNode, StageStyle.UNDECORATED, horGap, verGap);
         stage.setScene(new Scene(rootNode));
         stage.setAlwaysOnTop(true);
 
@@ -127,6 +130,9 @@ public final class TrayNotification {
     }
 
     public void setLocation(NotificationLocation location) {
+        stage.setHorGap(horGap);
+        stage.setVerGap(verGap);
+
         switch (location) {
             case BOTTOM_RIGHT:
                 stage.setLocation(stage.getBottomRight(viewIndex));
@@ -404,5 +410,23 @@ public final class TrayNotification {
 
     public AnimationType getAnimationType() {
         return animationType;
+    }
+
+    public double getHorGap() {
+        return horGap;
+    }
+
+    public void setHorGap(double horGap) {
+        this.horGap = horGap;
+        setLocation(getLocation());
+    }
+
+    public double getVerGap() {
+        return verGap;
+    }
+
+    public void setVerGap(double verGap) {
+        this.verGap = verGap;
+        setLocation(getLocation());
     }
 }

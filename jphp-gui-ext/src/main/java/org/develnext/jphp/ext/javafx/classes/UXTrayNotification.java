@@ -30,6 +30,9 @@ public class UXTrayNotification extends BaseWrapper<TrayNotification> {
         @Property NotificationLocation location();
         @Property AnimationType animationType();
 
+        @Property double horGap();
+        @Property double verGap();
+
         void showAndWait();
     }
 

@@ -45,6 +45,16 @@ class UXTrayNotification
     public $trayIcon;
 
     /**
+     * @var int
+     */
+    public $horGap = 5;
+
+    /**
+     * @var int
+     */
+    public $verGap = 5;
+
+    /**
      * @param string $title
      * @param string $message
      * @param string $type

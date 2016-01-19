@@ -8,34 +8,59 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class CustomStage extends Stage {
+    private Location bottomRight;
+    private Location bottomLeft;
+    private Location topLeft;
+    private Location topRight;
 
-    public static final int GAP = 5;
-
-    private final Location bottomRight;
-    private final Location bottomLeft;
-    private final Location topLeft;
-    private final Location topRight;
+    private final AnchorPane ap;
+    private double horGap;
+    private double verGap;
 
     private Location location;
 
-    public CustomStage(AnchorPane ap, StageStyle style) {
+    public CustomStage(AnchorPane ap, StageStyle style, double horGap, double verGap) {
+        this.ap = ap;
+        this.horGap = horGap;
+        this.verGap = verGap;
+
         initStyle(style);
 
         setSize(ap.getPrefWidth(), ap.getPrefHeight());
+    }
 
+    protected void reinit() {
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        double x = screenBounds.getMinX() + screenBounds.getWidth() - ap.getPrefWidth() - GAP;
-        double y = screenBounds.getMinY() + screenBounds.getHeight() - ap.getPrefHeight() - GAP;
+        double x = screenBounds.getMinX() + screenBounds.getWidth() - ap.getPrefWidth() - horGap;
+        double y = screenBounds.getMinY() + screenBounds.getHeight() - ap.getPrefHeight() - verGap;
 
         bottomRight = new Location(x, y);
-        bottomLeft = new Location(2, y);
-        topLeft = new Location(2, 2);
-        topRight = new Location(x, 2);
+        bottomLeft = new Location(horGap, y);
+        topLeft = new Location(horGap, verGap);
+        topRight = new Location(x, verGap);
+    }
+
+    public double getHorGap() {
+        return horGap;
+    }
+
+    public double getVerGap() {
+        return verGap;
+    }
+
+    public void setHorGap(double horGap) {
+        this.horGap = horGap;
+        reinit();
+    }
+
+    public void setVerGap(double verGap) {
+        this.verGap = verGap;
+        reinit();
     }
 
     public Location getBottomRight(int viewIndex) {
         if (viewIndex > 0) {
-            return new Location(bottomRight.getX(), bottomRight.getY() - (viewIndex * (getHeight() + GAP)));
+            return new Location(bottomRight.getX(), bottomRight.getY() - (viewIndex * (getHeight() + 2)));
         }
 
         return bottomRight;
@@ -43,7 +68,7 @@ public class CustomStage extends Stage {
 
     public Location getBottomLeft(int viewIndex) {
         if (viewIndex > 0) {
-            return new Location(bottomLeft.getX(), bottomLeft.getY() - (viewIndex * (getHeight() + GAP)));
+            return new Location(bottomLeft.getX(), bottomLeft.getY() - (viewIndex * (getHeight() + 2)));
         }
 
         return bottomLeft;
@@ -51,7 +76,7 @@ public class CustomStage extends Stage {
 
     public Location getTopLeft(int viewIndex) {
         if (viewIndex > 0) {
-            return new Location(topLeft.getX(), topLeft.getY() - (viewIndex * (getHeight() + GAP)));
+            return new Location(topLeft.getX(), topLeft.getY() - (viewIndex * (getHeight() + 2)));
         }
 
         return topLeft;
@@ -59,7 +84,7 @@ public class CustomStage extends Stage {
 
     public Location getTopRight(int viewIndex) {
         if (viewIndex > 0) {
-            return new Location(topRight.getX(), topRight.getY() + (viewIndex * (getHeight() + GAP)));
+            return new Location(topRight.getX(), topRight.getY() + (viewIndex * (getHeight() + 2)));
         }
 
         return topRight;

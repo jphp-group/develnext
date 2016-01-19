@@ -16,6 +16,8 @@ import php.runtime.reflection.ClassEntity;
 public class UXGameEntity extends BaseWrapper<GameEntity> {
     interface WrappedInterface {
         @Property BodyType bodyType();
+        @Property boolean physics();
+        @Property boolean collidable();
     }
 
     public UXGameEntity(Environment env, GameEntity wrappedObject) {

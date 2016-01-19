@@ -67,6 +67,7 @@ class OneJarBuildType extends AbstractBuildType
         }
 
         $config->appendCodeBlock(__CLASS__, "
+
         task splitConfig << {
              def list = ''<<'';
 
@@ -91,6 +92,8 @@ class OneJarBuildType extends AbstractBuildType
         }
 
         jar {
+            encoding = 'UTF-8'
+
             exclude('.debug/**')
             exclude('**/*.source')
 

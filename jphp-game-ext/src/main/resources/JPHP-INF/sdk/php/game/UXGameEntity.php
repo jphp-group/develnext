@@ -22,6 +22,16 @@ class UXGameEntity
     public $gameScene = null;
 
     /**
+     * @var bool
+     */
+    public $physics = true;
+
+    /**
+     * @var bool
+     */
+    public $collidable = true;
+
+    /**
      * @param string $entityType
      * @param UXNode $node
      */

@@ -40,4 +40,20 @@ class UXGameScene
     public function remove(UXGameEntity $entity)
     {
     }
+
+    public function play()
+    {
+    }
+
+    public function pause()
+    {
+    }
+
+    /**
+     * @param double $x
+     * @param double $y
+     */
+    public function setGravity($x, $y)
+    {
+    }
 }

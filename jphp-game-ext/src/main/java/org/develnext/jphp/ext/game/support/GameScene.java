@@ -2,7 +2,9 @@ package org.develnext.jphp.ext.game.support;
 
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.DoubleProperty;
+import javafx.geometry.Bounds;
 import javafx.scene.layout.AnchorPane;
+import org.jbox2d.common.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +34,15 @@ public class GameScene {
     public void addEntity(GameEntity entity) {
         entity.setGameScene(this);
         world.createBody(entity);
+
+        entities.add(entity);
     }
 
     public void removeEntity(GameEntity entity) {
         world.destroyBody(entity);
         entity.setGameScene(null);
+
+        entities.remove(entity);
     }
 
     public DoubleProperty sceneWidthProperty() {
@@ -118,6 +124,10 @@ public class GameScene {
 
     public AnchorPane getContent() {
         return content;
+    }
+
+    public void setGravity(double x, double y) {
+        world.setGravity(x, y);
     }
 
     @SuppressWarnings("unchecked")

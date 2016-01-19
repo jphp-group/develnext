@@ -1,0 +1,12 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property name="Физический" code="physics" editor="boolean" tooltip="Участвовать в физике игровой сцены" />
+        <property name="Тип объекта" code="bodyType" editor="enum" tooltip="Тип объекта в физическом мире">
+            <variants>
+                <variant value="STATIC">Статичный</variant>
+                <variant value="DYNAMIC">Динамичный</variant>
+                <variant value="KINEMATIC">Динамичный, без массы</variant>
+            </variants>
+        </property>
+    </properties>
+</behaviour>

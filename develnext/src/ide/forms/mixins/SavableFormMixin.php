@@ -31,7 +31,22 @@ trait SavableFormMixin
 
         $screen = UXScreen::getPrimary();
 
-        if ($this->x > $screen->visualBounds['width'] - 20 || $this->y > $screen->visualBounds['height'] - 20) {
+        if ($this->height < 50) {
+            uiLater(function () {
+                /** @var $this AbstractForm */
+                $this->height = 300;
+            });
+        }
+
+        if ($this->width < 70) {
+            uiLater(function () {
+                /** @var $this AbstractForm */
+                $this->width = 400;
+            });
+        }
+
+        if ($this->x > $screen->visualBounds['width'] - 20 || $this->y > $screen->visualBounds['height'] - 20
+            || $this->x < -$this->width/3 || $this->y < -$this->height/3) {
             uiLater(function () {
                 /** @var $this AbstractForm */
                 $this->x = $this->y = 30;
@@ -50,7 +65,7 @@ trait SavableFormMixin
 
         $config = Ide::get()->getUserConfig($class);
 
-        if (!$this->maximized) {
+        if (!$this->maximized && !$this->iconified) {
             $config->set("x", $this->x);
             $config->set("y", $this->y);
             $config->set("width", $this->width);

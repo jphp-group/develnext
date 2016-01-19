@@ -42,6 +42,9 @@ public class GameWorld {
                 GameEntity e1 = (GameEntity) contact.getFixtureA().getBody().getUserData();
                 GameEntity e2 = (GameEntity) contact.getFixtureB().getBody().getUserData();
 
+                System.out.println("Collision for " + e1.getEntityType() + " with " + e2.getEntityType());
+                System.exit(1);
+
                 if (!e1.isCollidable() || !e2.isCollidable())
                     return;
 
@@ -53,6 +56,7 @@ public class GameWorld {
                         collisions.put(pair, tick.get());
                     }
                 }
+
             }
 
             @Override
@@ -171,14 +175,10 @@ public class GameWorld {
         for (Body body = world.getBodyList(); body != null; body = body.getNext()) {
             GameEntity e = (GameEntity) body.getUserData();
 
-            e.setX(
-                    Math.round(toPixels(
-                            body.getPosition().x
-                                    - toMeters(e.getWidth() / 2))));
-            e.setY(
-                    Math.round(toPixels(
-                            toMeters(scene.getAppHeight()) - body.getPosition().y
-                                    - toMeters(e.getHeight() / 2))));
+            System.out.println(e);
+
+            e.setX(Math.round(toPixels(body.getPosition().x - toMeters(e.getWidth() / 2))));
+            e.setY(Math.round(toPixels(/*toMeters(scene.getAppHeight())*/ - body.getPosition().y - toMeters(e.getHeight() / 2))));
 
             e.setRotation(-Math.toDegrees(body.getAngle()));
         }

@@ -47,12 +47,20 @@ class ImagePropertyEditorForm extends AbstractIdeForm
     /** @var UXImageArea */
     protected $imageArea;
 
+    protected $searchPaneArea;
+
     /** @var UXFileChooser */
     protected $dialog;
 
     protected function init()
     {
         parent::init();
+
+        $this->searchPaneArea = new IconSearchPaneArea();
+        $this->searchPaneArea->on('action', function ($file) {
+            $this->setResultFile($file);
+            $this->hide();
+        });
 
         $dialog = new UXFileChooser();
         $dialog->extensionFilters = [
@@ -90,13 +98,7 @@ class ImagePropertyEditorForm extends AbstractIdeForm
         if (!Ide::accountManager()->isAuthorized()) {
             $this->onlineSearchPane->add(new NeedAuthPane());
         } else {
-            $searchPaneArea = new IconSearchPaneArea();
-            $searchPaneArea->on('action', function ($file) {
-                $this->setResultFile($file);
-                $this->hide();
-            });
-
-            $this->onlineSearchPane->add($searchPaneArea);
+            $this->onlineSearchPane->add($this->searchPaneArea);
         }
     }
 

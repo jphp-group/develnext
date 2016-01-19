@@ -20,6 +20,7 @@ abstract class AbstractBehaviourSpec
     const GROUP_INPUT = 'Управление';
     const GROUP_ANIMATION = 'Анимация';
     const GROUP_LOGIC = 'Логика';
+    const GROUP_GAME = 'Игра';
 
     /**
      * @return string

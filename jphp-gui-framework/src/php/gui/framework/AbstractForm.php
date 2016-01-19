@@ -123,6 +123,7 @@ abstract class AbstractForm extends UXForm
                 $this->eventBinder
             );
         }
+
         return $this->standaloneFactory;
     }
 
@@ -462,64 +463,27 @@ abstract class AbstractForm extends UXForm
                                     $node->parent->add($newNode);
                                 }
 
-                                /*uiLater(function () use ($node) {
-                                    $node->free();
-                                });*/
-
                                 $node = $newNode;
                             }
                         }
 
                         if ($node) {
-                            $this->getNodeWrapper($node)->applyData($data);
+                            UXNodeWrapper::get($node)->applyData($data);
                         }
-
-                        uiLater(function () use ($data) {
-                            $data->free();
-                        });
                     }
                 });
             }
         });
     }
 
-    /**
-     * @param UXWindow|UXNode $node
-     * @return UXNodeWrapper
-     */
-    public function getNodeWrapper($node)
-    {
-        $wrapper = $node->data('~wrapper');
-
-        if ($wrapper) {
-            return $wrapper;
-        }
-
-        if ($node instanceof AbstractForm) {
-            $wrapper = new AbstractFormWrapper($this);
-        } else {
-            $class = get_class($node) . 'Wrapper';
-
-            if (class_exists($class)) {
-                $wrapper = new $class($node);
-            } else {
-                $wrapper = new UXNodeWrapper($node);
-            }
-        }
-
-        $node->data('~wrapper', $wrapper);
-
-        return $wrapper;
-    }
-
     public function toast($message, $timeout = 0)
     {
-        UXApplication::runLater(function () use ($message, $timeout) {
+        uiLater(function () use ($message, $timeout) {
             $tooltip = new UXTooltip();
             $tooltip->text = $message;
 
             if ($timeout <= 0) {
-                $length = Str::length($message);
+                $length = Str::length(str::replace($message, ' ', ''));
                 $timeout = $length * 100;
 
                 if ($timeout < 1500) {
@@ -544,7 +508,7 @@ abstract class AbstractForm extends UXForm
                 Thread::sleep($timeout);
 
                 try {
-                    UXApplication::runLater(function () use ($tooltip) {
+                    uiLater(function () use ($tooltip) {
                         Animation::fadeOut($tooltip, 300, function () use ($tooltip) {
                             $tooltip->hide();
                         });
@@ -666,7 +630,7 @@ abstract class AbstractForm extends UXForm
             $group .= '-' . $event;
         }
 
-        $wrapper = $this->getNodeWrapper($node);
+        $wrapper = UXNodeWrapper::get($node);
         $wrapper->bind($eventName[0], $handler, $group);
     }
 

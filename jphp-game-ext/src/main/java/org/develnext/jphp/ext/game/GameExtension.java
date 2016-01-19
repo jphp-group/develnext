@@ -21,6 +21,6 @@ public class GameExtension extends JavaFXExtension {
         registerWrapperClass(scope, GameScene.class, UXGameScene.class);
         registerWrapperClass(scope, GamePane.class, UXGamePane.class);
 
-        registerEventProvider(new GameObjectEventProvider());
+        //registerEventProvider(new GameObjectEventProvider());
     }
 }

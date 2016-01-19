@@ -10,6 +10,7 @@ class Notifications
         $notify = new UXTrayNotification($title, $message, $type);
         $notify->location = 'TOP_RIGHT';
         $notify->animationType = 'POPUP';
+        $notify->verGap = 30;
         $notify->show();
 
         return $notify;
