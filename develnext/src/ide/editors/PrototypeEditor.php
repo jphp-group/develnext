@@ -1,7 +1,7 @@
 <?php
 namespace ide\editors;
 
-use game\GameObject;
+use game\GameEntity;
 use game\SpriteSpec;
 use ide\action\ActionEditor;
 use ide\behaviour\IdeBehaviourManager;
@@ -145,7 +145,7 @@ class PrototypeEditor extends CodeEditor
         $pane->addCustomNode($this->spritePane->makeUi());
 
         $pane = new IdeEventListPane($this->eventManager);
-        $pane->setContext(GameObject::class);
+        $pane->setContext(GameEntity::class);
         $pane->setEventTypes($this->element->getEventTypes());
         $pane->setContextEditor($this);
         $pane->setCodeEditor($this);

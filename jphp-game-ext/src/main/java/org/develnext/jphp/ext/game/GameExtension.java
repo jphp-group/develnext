@@ -17,7 +17,7 @@ public class GameExtension extends JavaFXExtension {
     public void onRegister(CompileScope scope) {
         registerWrapperClass(scope, Sprite.class, UXSprite.class);
         registerWrapperClass(scope, SpriteView.class, UXSpriteView.class);
-        registerWrapperClass(scope, GameObject.class, UXGameObject.class);
+        registerWrapperClass(scope, GameEntity.class, UXGameEntity.class);
         registerWrapperClass(scope, GameScene.class, UXGameScene.class);
         registerWrapperClass(scope, GamePane.class, UXGamePane.class);
 

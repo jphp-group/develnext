@@ -139,4 +139,22 @@ abstract class AbstractBehaviour
     {
         $this->_target = null;
     }
+
+    /**
+     * @param $target
+     * @return $this
+     * @throws IllegalStateException
+     */
+    static function get($target)
+    {
+        $type = get_called_class();
+
+        if (method_exists($target, 'data')) {
+            $data = $target->data('~behaviour~' . $type);
+
+            return $data;
+        }
+
+        return null;
+    }
 }

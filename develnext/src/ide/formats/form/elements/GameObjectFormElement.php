@@ -4,7 +4,7 @@ namespace ide\formats\form\elements;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use ide\project\Project;
-use php\game\UXGameObject;
+use php\game\UXGameEntity;
 use php\game\UXGamePane;
 use php\game\UXSprite;
 use php\gui\framework\DataUtils;
@@ -46,7 +46,7 @@ class GameObjectFormElement extends AbstractFormElement
         $sprite = new UXSprite();
         $sprite->image = ico('grayQuestion16')->image;
 
-        $object = new UXGameObject($sprite);
+        $object = new UXGameEntity($sprite);
 
         UXApplication::runLater(function () use ($object) {
             if ($object->parent && !($object->parent->userData instanceof UXGamePane)) {
@@ -64,6 +64,6 @@ class GameObjectFormElement extends AbstractFormElement
 
     public function isOrigin($any)
     {
-        return $any instanceof UXGameObject;
+        return $any instanceof UXGameEntity;
     }
 }

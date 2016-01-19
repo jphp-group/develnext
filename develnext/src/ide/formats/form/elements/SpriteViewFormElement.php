@@ -6,7 +6,7 @@ use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\Project;
-use php\game\UXGameObject;
+use php\game\UXGameEntity;
 use php\game\UXGamePane;
 use php\game\UXSprite;
 use php\game\UXSpriteView;

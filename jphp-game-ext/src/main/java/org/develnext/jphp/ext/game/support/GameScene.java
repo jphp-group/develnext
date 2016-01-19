@@ -2,19 +2,15 @@ package org.develnext.jphp.ext.game.support;
 
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.DoubleProperty;
-import javafx.collections.ListChangeListener;
-import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameScene {
-    protected GamePane pane;
     protected AnchorPane content;
-    protected final GamePhysics physics;
-    protected List<GameObject> entities = new ArrayList<>();
+    protected final GameWorld world;
+    protected List<GameEntity> entities = new ArrayList<>();
 
     private AnimationTimer timer = new AnimationTimer() {
         @Override
@@ -27,49 +23,19 @@ public class GameScene {
 
     private boolean physicsEnabled = true;
 
-    public GameScene() {
-        this.physics = new GamePhysics(this);
+    public GameScene(AnchorPane layout) {
+        this.world = new GameWorld(this);
 
-        content = new AnchorPane();
-        content.setPrefSize(800, 600);
-
-        content.getChildren().addListener(new ListChangeListener<Node>() {
-            @Override
-            public void onChanged(Change<? extends Node> c) {
-                if (c.wasAdded()) {
-                    for (int i = c.getFrom(); i < c.getTo(); i++) {
-                        Node node = c.getList().get(i);
-
-                        if (node instanceof GameObject) {
-                            GameScene.this.addEntity((GameObject) node);
-                        }
-                    }
-                } else if (c.wasRemoved()) {
-                    for (Node node : c.getRemoved()) {
-                        if (node instanceof GameObject) {
-                            removeEntity((GameObject) node);
-                        }
-                    }
-                }
-            }
-        });
+        content = layout;
     }
 
-    void addEntity(GameObject entity) {
+    public void addEntity(GameEntity entity) {
         entity.setGameScene(this);
-        physics.createBody(entity);
-
-        if (entity.getOnCreate() != null) {
-            entity.getOnCreate().handle(new ActionEvent(entity, entity));
-        }
+        world.createBody(entity);
     }
 
-    void removeEntity(GameObject entity) {
-        if (entity.getOnDestroy() != null) {
-            entity.getOnDestroy().handle(new ActionEvent(entity, entity));
-        }
-
-        physics.destroyBody(entity);
+    public void removeEntity(GameEntity entity) {
+        world.destroyBody(entity);
         entity.setGameScene(null);
     }
 
@@ -118,10 +84,10 @@ public class GameScene {
 
     protected void processUpdate(long now) {
         if (physicsEnabled) {
-            physics.onUpdate(now);
+            world.onUpdate(now);
         }
 
-        for (GameObject entity : entities) {
+        for (GameEntity entity : entities) {
             entity.update(now);
         }
 
@@ -146,8 +112,8 @@ public class GameScene {
         return content.getWidth();
     }
 
-    public GamePhysics getPhysics() {
-        return physics;
+    public GameWorld getWorld() {
+        return world;
     }
 
     public AnchorPane getContent() {

@@ -462,9 +462,9 @@ abstract class AbstractForm extends UXForm
                                     $node->parent->add($newNode);
                                 }
 
-                                uiLater(function () use ($node) {
+                                /*uiLater(function () use ($node) {
                                     $node->free();
-                                });
+                                });*/
 
                                 $node = $newNode;
                             }

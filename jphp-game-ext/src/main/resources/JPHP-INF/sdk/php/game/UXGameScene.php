@@ -18,4 +18,26 @@ class UXGameScene
      * @var bool
      */
     public $physicsEnabled = true;
+
+    /**
+     * UXGameScene constructor.
+     * @param UXAnchorPane $content
+     */
+    public function __construct(UXAnchorPane $content)
+    {
+    }
+
+    /**
+     * @param UXGameEntity $entity
+     */
+    public function add(UXGameEntity $entity)
+    {
+    }
+
+    /**
+     * @param UXGameEntity $entity
+     */
+    public function remove(UXGameEntity $entity)
+    {
+    }
 }

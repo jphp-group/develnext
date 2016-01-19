@@ -8,7 +8,7 @@ use php\gui\UXParent;
  * Class UXGameObject
  * @package php\game
  */
-class UXGameObject extends UXNode
+class UXGameEntity
 {
     /**
      * @var string STATIC, DYNAMIC, KINEMATIC
@@ -20,4 +20,12 @@ class UXGameObject extends UXNode
      * @var UXGameScene
      */
     public $gameScene = null;
+
+    /**
+     * @param string $entityType
+     * @param UXNode $node
+     */
+    public function __construct($entityType, UXNode $node)
+    {
+    }
 }

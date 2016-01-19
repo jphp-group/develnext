@@ -53,7 +53,7 @@ public class GamePane extends ScrollPane {
 
     class WatchingControl implements Control {
         @Override
-        public void onUpdate(GameObject entity, long now) {
+        public void onUpdate(GameEntity entity, long now) {
             if (watchingNode != null) {
                 scrollTo(watchingNode);
             }
