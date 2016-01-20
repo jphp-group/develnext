@@ -69,20 +69,20 @@ class GameSceneBehaviour extends AbstractBehaviour
 
         switch ($this->gravityDirection) {
             case 'RIGHT':
-                //$this->scene->setGravity($gravity, 0);
+                $this->scene->gravity = [$gravity, 0];
                 break;
 
             case 'LEFT':
-                //$this->scene->setGravity(-$gravity, 0);
+                $this->scene->gravity = [-$gravity, 0];
                 break;
 
             case 'UP':
-                //$this->scene->setGravity(0, -$gravity);
+                $this->scene->gravity = [0, -$gravity];
                 break;
 
             case 'DOWN':
             default:
-                //$this->scene->setGravity(0, $gravity);
+                $this->scene->gravity = [0, $gravity];
                 break;
         }
     }

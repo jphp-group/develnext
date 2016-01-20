@@ -19,6 +19,8 @@ public class GameScene2D {
 
     protected List<GameEntity2D> entities = new ArrayList<>();
 
+    protected Vec2d gravity = new Vec2d(0, 0);
+
     DoubleProperty width = new SimpleDoubleProperty(0);
     DoubleProperty height = new SimpleDoubleProperty(0);
 
@@ -73,7 +75,7 @@ public class GameScene2D {
         long delta = internalTime - previousTime;
 
         for (GameEntity2D entity : entities) {
-            entity.update(TIME_STEP);
+            entity.update(TIME_STEP, this);
         }
     }
 
@@ -83,5 +85,13 @@ public class GameScene2D {
 
     public void removeEntity(GameEntity2D entity) {
         entities.remove(entity);
+    }
+
+    public Vec2d getGravity() {
+        return gravity;
+    }
+
+    public void setGravity(Vec2d gravity) {
+        this.gravity = gravity;
     }
 }

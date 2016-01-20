@@ -11,7 +11,10 @@ public class GameEntity2D {
     private static final float TIME = 1 / 60.0f;
 
     protected BodyType bodyType = BodyType.STATIC;
+
+    protected double mass = 1;
     protected Vec2d velocity = new Vec2d(0, 0);
+    protected Vec2d gravity = null;
 
     private final String entityType;
     private final Node node;
@@ -61,7 +64,7 @@ public class GameEntity2D {
     }
 
     public void setVelocity(Vec2d velocity) {
-        this.velocity = velocity;
+        this.velocity = velocity == null ? new Vec2d(0, 0) : velocity;
     }
 
     public double getHorizontalVelocity() {
@@ -98,15 +101,26 @@ public class GameEntity2D {
         return bounds.getHeight();
     }
 
-    void update(float dt) {
+    void update(float dt, GameScene2D scene) {
         switch (bodyType) {
             case DYNAMIC:
             case KINEMATIC:
-                if (velocity.x > 0.001 || velocity.x < -000.1) {
+                Vec2d gravity = this.gravity;
+
+                if (gravity == null) {
+                    gravity = scene.gravity;
+                }
+
+                if (gravity != null) {
+                    velocity.x += gravity.x * dt;
+                    velocity.y += gravity.y * dt;
+                }
+
+                if (velocity.x > 0.00001 || velocity.x < -00000.1) {
                     x.set(x.get() + GameScene2D.toPixels(velocity.x * dt));
                 }
 
-                if (velocity.y > 0.001 || velocity.y < -000.1) {
+                if (velocity.y > 0.00001 || velocity.y < -00000.1) {
                     y.set(y.get() + GameScene2D.toPixels(velocity.y * dt));
                 }
 
@@ -127,5 +141,13 @@ public class GameEntity2D {
 
     public void setBodyType(BodyType bodyType) {
         this.bodyType = bodyType;
+    }
+
+    public Vec2d getGravity() {
+        return gravity;
+    }
+
+    public void setGravity(Vec2d gravity) {
+        this.gravity = gravity;
     }
 }

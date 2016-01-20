@@ -185,6 +185,12 @@ class IdeBehaviourManager extends BehaviourManager
                         unset($attributes['enabled']);
                     }
 
+                    foreach ($attributes as $name => &$value) {
+                        if (is_array($value)) {
+                            $value = "[" . str::join($value, ',') . "]";
+                        }
+                    }
+
                     $item->setAttributes($attributes);
 
                     $target->appendChild($item);
@@ -226,6 +232,12 @@ class IdeBehaviourManager extends BehaviourManager
 
                 if ($attributes['enabled']) {
                     unset($attributes['enabled']);
+                }
+
+                foreach ($attributes as &$value) {
+                    if (is_array($value)) {
+                        $value = "[" . str::join($value, ',') . "]";
+                    }
                 }
 
                 $item->setAttributes($attributes);

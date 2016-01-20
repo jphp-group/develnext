@@ -7,5 +7,7 @@
                 <variant value="KINEMATIC">Динамичный, без массы</variant>
             </variants>
         </property>
+
+        <property code="velocity" name="Скорость (X, Y)" editor="doubleArray" tooltip="Начальная скорость по X и Y" />
     </properties>
 </behaviour>

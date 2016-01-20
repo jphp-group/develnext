@@ -9,6 +9,11 @@ use php\gui\layout\UXAnchorPane;
 class UXGameScene
 {
     /**
+     * @var array [x, y]
+     */
+    public $gravity = [0.0, 0.0];
+
+    /**
      * UXGameScene constructor.
      */
     public function __construct()

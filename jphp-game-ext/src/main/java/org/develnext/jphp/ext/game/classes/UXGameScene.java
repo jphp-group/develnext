@@ -3,7 +3,9 @@ package org.develnext.jphp.ext.game.classes;
 import org.develnext.jphp.ext.game.GameExtension;
 import org.develnext.jphp.ext.game.support.GameEntity2D;
 import org.develnext.jphp.ext.game.support.GameScene2D;
+import org.develnext.jphp.ext.game.support.Vec2d;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
@@ -12,6 +14,8 @@ import php.runtime.reflection.ClassEntity;
 @Reflection.Namespace(GameExtension.NS)
 public class UXGameScene extends BaseWrapper<GameScene2D> {
     interface WrappedInterface {
+        @Property Vec2d gravity();
+
         void play();
         void pause();
     }

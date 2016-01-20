@@ -19,6 +19,11 @@ class GameEntityBehaviour extends AbstractBehaviour
     public $physics = true;
 
     /**
+     * @var array
+     */
+    public $velocity = [0, 0];
+
+    /**
      * @var UXGameEntity
      */
     protected $entity;
@@ -41,7 +46,8 @@ class GameEntityBehaviour extends AbstractBehaviour
         if ($sceneBehaviour) {
             $this->entity = new UXGameEntity($type, $target);
             $this->entity->bodyType = $this->bodyType;
-            $this->entity->physics = $this->physics;
+            //$this->entity->physics = $this->physics;
+            $this->entity->velocity = $this->velocity;
 
             $sceneBehaviour->getScene()->add($this->entity);
         } else {

@@ -3,10 +3,9 @@ package org.develnext.jphp.ext.game.classes;
 import javafx.scene.Node;
 import org.develnext.jphp.ext.game.GameExtension;
 import org.develnext.jphp.ext.game.support.GameEntity2D;
-import php.runtime.annotation.Reflection.Getter;
-import php.runtime.annotation.Reflection.Namespace;
-import php.runtime.annotation.Reflection.Property;
-import php.runtime.annotation.Reflection.Signature;
+import org.develnext.jphp.ext.game.support.Vec2d;
+import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
@@ -15,6 +14,8 @@ import php.runtime.reflection.ClassEntity;
 public class UXGameEntity extends BaseWrapper<GameEntity2D> {
     interface WrappedInterface {
         @Property GameEntity2D.BodyType bodyType();
+        @Property @Nullable Vec2d gravity();
+        @Property Vec2d velocity();
     }
 
     public UXGameEntity(Environment env, GameEntity2D wrappedObject) {

@@ -16,10 +16,21 @@ class UXGameEntity
     public $bodyType = 'STATIC';
 
     /**
+     * If null, using scene gravity
+     * @var array|null [x, y]
+     */
+    public $gravity = null;
+
+    /**
      * @readonly
      * @var UXGameScene
      */
     public $gameScene = null;
+
+    /**
+     * @var array
+     */
+    public $velocity = [0, 0];
 
     /**
      * @param string $entityType

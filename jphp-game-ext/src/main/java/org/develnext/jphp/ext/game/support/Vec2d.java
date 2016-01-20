@@ -3,6 +3,7 @@ package org.develnext.jphp.ext.game.support;
 import java.io.Serializable;
 
 public class Vec2d implements Serializable {
+    public static final Vec2d ZERO = new Vec2d(0, 0);
 
     /** A "close to zero" float epsilon value for use */
     public static final float EPSILON = 1.1920928955078125E-7f;

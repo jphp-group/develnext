@@ -4,6 +4,7 @@ namespace php\gui\framework\behaviour\custom;
 use php\format\ProcessorException;
 use php\io\IOException;
 use php\io\Stream;
+use php\lib\str;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 use php\xml\XmlProcessor;
@@ -31,8 +32,15 @@ class BehaviourLoader
                 $attributes = $domBehaviour->getAttributes();
                 unset($attributes['type']);
 
+                foreach ($attributes as &$value) {
+                    if ($value[0] == '[' && str::endsWith($value, ']')) {
+                        $value = str::split(str::sub($value, 1, str::length($value) - 2), ',');
+                    }
+                }
+
                 /** @var AbstractBehaviour $behaviour */
                 $behaviour = new $type();
+
                 $behaviour->setProperties($attributes);
 
                 $manager->apply($newTargetId === null ? $targetId : $newTargetId, $behaviour);
@@ -54,6 +62,12 @@ class BehaviourLoader
 
                 $attributes = $domBehaviour->getAttributes();
                 unset($attributes['type']);
+
+                foreach ($attributes as &$value) {
+                    if ($value[0] == '[' && str::endsWith($value, ']')) {
+                        $value = str::split(str::sub($value, 1, str::length($value) - 1), ',');
+                    }
+                }
 
                 /** @var AbstractBehaviour $behaviour */
                 $behaviour = new $type();

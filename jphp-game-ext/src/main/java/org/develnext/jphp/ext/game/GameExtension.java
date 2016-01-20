@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.game;
 
+import org.develnext.jphp.ext.game.bind.Vec2dMemoryOperation;
 import org.develnext.jphp.ext.game.classes.*;
 import org.develnext.jphp.ext.game.support.*;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
@@ -15,6 +16,8 @@ public class GameExtension extends JavaFXExtension {
 
     @Override
     public void onRegister(CompileScope scope) {
+        registerMemoryOperation(Vec2dMemoryOperation.class);
+
         registerWrapperClass(scope, Sprite.class, UXSprite.class);
         registerWrapperClass(scope, SpriteView.class, UXSpriteView.class);
         registerWrapperClass(scope, GameEntity2D.class, UXGameEntity.class);
