@@ -1,29 +1,22 @@
 package org.develnext.jphp.ext.game.classes;
 
-import javafx.scene.layout.AnchorPane;
 import org.develnext.jphp.ext.game.GameExtension;
-import org.develnext.jphp.ext.game.support.GameEntity;
-import org.develnext.jphp.ext.game.support.GameScene;
+import org.develnext.jphp.ext.game.support.GameEntity2D;
+import org.develnext.jphp.ext.game.support.GameScene2D;
 import php.runtime.annotation.Reflection;
-import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
 @Reflection.Namespace(GameExtension.NS)
-public class UXGameScene extends BaseWrapper<GameScene> {
+public class UXGameScene extends BaseWrapper<GameScene2D> {
     interface WrappedInterface {
-        @Property boolean physicsEnabled();
-        @Property AnchorPane content();
-
         void play();
         void pause();
-
-        void setGravity(double x, double y);
     }
 
-    public UXGameScene(Environment env, GameScene wrappedObject) {
+    public UXGameScene(Environment env, GameScene2D wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -32,17 +25,17 @@ public class UXGameScene extends BaseWrapper<GameScene> {
     }
 
     @Signature
-    public void __construct(AnchorPane region) {
-        __wrappedObject = new GameScene(region);
+    public void __construct() {
+        __wrappedObject = new GameScene2D();
     }
 
     @Signature
-    public void add(GameEntity entity) {
+    public void add(GameEntity2D entity) {
         getWrappedObject().addEntity(entity);
     }
 
     @Signature
-    public void remove(GameEntity entity) {
+    public void remove(GameEntity2D entity) {
         getWrappedObject().removeEntity(entity);
     }
 }

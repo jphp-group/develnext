@@ -32,30 +32,13 @@ class GameSceneBehaviour extends AbstractBehaviour
     protected $scene;
 
     /**
-     * @var bool
-     */
-    protected $_physicsEnabled = true;
-
-    /**
      * @param mixed $target
      */
     protected function applyImpl($target)
     {
         $layout = null;
 
-        if ($target instanceof UXScrollPane) {
-            $target = $target->content;
-        } elseif ($target instanceof UXWindow) {
-            $target = $target->layout;
-        }
-
-        if ($target instanceof UXAnchorPane) {
-            $layout = $target;
-        }
-
-        $scene = new UXGameScene($layout);
-        $scene->physicsEnabled = $this->_physicsEnabled;
-
+        $scene = new UXGameScene();
         $this->scene = $scene;
 
         $this->initGravity();
@@ -86,36 +69,22 @@ class GameSceneBehaviour extends AbstractBehaviour
 
         switch ($this->gravityDirection) {
             case 'RIGHT':
-                $this->scene->setGravity($gravity, 0);
+                //$this->scene->setGravity($gravity, 0);
                 break;
 
             case 'LEFT':
-                $this->scene->setGravity(-$gravity, 0);
+                //$this->scene->setGravity(-$gravity, 0);
                 break;
 
             case 'UP':
-                $this->scene->setGravity(0, -$gravity);
+                //$this->scene->setGravity(0, -$gravity);
                 break;
 
             case 'DOWN':
             default:
-                $this->scene->setGravity(0, $gravity);
+                //$this->scene->setGravity(0, $gravity);
                 break;
         }
-    }
-
-    public function setPhysicsEnabled($value)
-    {
-        $this->_physicsEnabled = $value;
-
-        if ($this->scene) {
-            $this->scene->physicsEnabled = $value;
-        }
-    }
-
-    public function getPhysicsEnabled()
-    {
-        return $this->_physicsEnabled;
     }
 
     /**

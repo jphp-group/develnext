@@ -1,7 +1,6 @@
 <behaviour extends="BehaviourSpec">
     <properties>
         <property name="Автозапуск" code="autoplay" editor="boolean" tooltip="Проигрывать всю сцену при старте" />
-        <property name="Физика" code="physicsEnabled" editor="boolean" tooltip="Включить/отключить законы физики 2d мира" />
         <property name="Уровень гравитации" code="gravityType" editor="enum" tooltip="Величина гравитации (притяжения)">
             <variants>
                 <variant value="EARTH">Земля (9.8)</variant>

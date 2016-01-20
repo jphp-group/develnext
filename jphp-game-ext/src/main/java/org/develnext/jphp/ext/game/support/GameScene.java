@@ -2,9 +2,7 @@ package org.develnext.jphp.ext.game.support;
 
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.DoubleProperty;
-import javafx.geometry.Bounds;
 import javafx.scene.layout.AnchorPane;
-import org.jbox2d.common.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
