@@ -15,6 +15,8 @@ import php.runtime.reflection.ClassEntity;
 public class UXGameScene extends BaseWrapper<GameScene2D> {
     interface WrappedInterface {
         @Property Vec2d gravity();
+        @Property double gravityX();
+        @Property double gravityY();
 
         void play();
         void pause();

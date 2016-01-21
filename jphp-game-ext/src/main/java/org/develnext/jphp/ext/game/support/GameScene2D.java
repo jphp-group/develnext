@@ -94,4 +94,20 @@ public class GameScene2D {
     public void setGravity(Vec2d gravity) {
         this.gravity = gravity;
     }
+
+    public double getGravityX() {
+        return gravity.x;
+    }
+
+    public void setGravityX(double x) {
+        gravity.x = x;
+    }
+
+    public double getGravityY() {
+        return gravity.y;
+    }
+
+    public void setGravityY(double y) {
+        gravity.y = y;
+    }
 }

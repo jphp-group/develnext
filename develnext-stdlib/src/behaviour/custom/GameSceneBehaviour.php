@@ -41,6 +41,12 @@ class GameSceneBehaviour extends AbstractBehaviour
         $scene = new UXGameScene();
         $this->scene = $scene;
 
+        if ($target instanceof UXWindow) {
+            $target->layout->data('--property-phys', $scene);
+        } else {
+            $target->data('--property-phys', $scene);
+        }
+
         $this->initGravity();
 
         if ($this->autoplay) {

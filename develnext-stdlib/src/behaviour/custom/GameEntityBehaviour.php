@@ -49,6 +49,8 @@ class GameEntityBehaviour extends AbstractBehaviour
             //$this->entity->physics = $this->physics;
             $this->entity->velocity = $this->velocity;
 
+            $target->data("--property-phys", $this->entity);
+
             $sceneBehaviour->getScene()->add($this->entity);
         } else {
             throw new IllegalStateException("Unable to init GameEntity for $type");

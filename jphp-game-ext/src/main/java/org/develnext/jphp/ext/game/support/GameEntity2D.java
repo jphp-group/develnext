@@ -22,6 +22,8 @@ public class GameEntity2D {
     protected DoubleProperty x = new SimpleDoubleProperty(0);
     protected DoubleProperty y = new SimpleDoubleProperty(0);
 
+    private Double direction;
+
     GameScene2D scene;
 
     public GameEntity2D(String entityType, Node node) {
@@ -31,8 +33,8 @@ public class GameEntity2D {
         setX(node.getLayoutX());
         setY(node.getLayoutY());
 
-        //node.layoutXProperty().bindBidirectional(x);
-        //node.layoutYProperty().bindBidirectional(y);
+        node.layoutXProperty().bindBidirectional(x);
+        node.layoutYProperty().bindBidirectional(y);
     }
 
     public DoubleProperty xProperty() {
@@ -149,5 +151,93 @@ public class GameEntity2D {
 
     public void setGravity(Vec2d gravity) {
         this.gravity = gravity;
+    }
+
+
+    public double getGravityX() {
+        return gravity == null ? 0.0 : gravity.x;
+    }
+
+    public void setGravityX(double x) {
+        if (gravity == null) {
+            gravity = new Vec2d(x, 0.0);
+        } else {
+            gravity.x = x;
+        }
+    }
+
+    public double getGravityY() {
+        return gravity.y;
+    }
+
+    public void setGravityY(double y) {
+        if (gravity == null) {
+            gravity = new Vec2d(0.0, y);
+        } else {
+            gravity.y = y;
+        }
+    }
+
+    public double getVelocityX() {
+        return velocity.x;
+    }
+
+    public double getVelocityY() {
+        return velocity.y;
+    }
+
+    public void setVelocityX(double value) {
+        velocity.x = value;
+    }
+
+    public void setVelocityY(double value) {
+        velocity.y = value;
+    }
+
+    public void setAngleSpeed(Vec2d speed) {
+        double direction = -Math.toRadians(speed.x);
+        velocity = new Vec2d(speed.y * Math.cos(direction), speed.y * Math.sin(direction));
+    }
+
+    public Vec2d getAngleSpeed() {
+        return new Vec2d(getDirection(), getSpeed());
+    }
+
+    public double getSpeed() {
+        return velocity.length();
+    }
+
+    public double getDirection() {
+        if (this.direction != null) {
+            return this.direction;
+        }
+
+        return 360 - Math.toDegrees(Math.atan2(velocity.y, velocity.x));
+    }
+
+    public void setDirection(double value) {
+        if (getSpeed() == 0.0) {
+            direction = value;
+        } else {
+            value = -Math.toRadians(value);
+
+            double speed = getSpeed();
+            velocity = new Vec2d(speed * Math.cos(value), speed * Math.sin(value));
+        }
+    }
+
+    public void setSpeed(double value) {
+        double oldDirection = getDirection();
+
+        if (this.direction != null) {
+            setAngleSpeed(new Vec2d(this.direction, value));
+            this.direction = null;
+        } else {
+            setAngleSpeed(new Vec2d(getDirection(), value));
+        }
+
+        if (value == 0.0) {
+            direction = oldDirection;
+        }
     }
 }

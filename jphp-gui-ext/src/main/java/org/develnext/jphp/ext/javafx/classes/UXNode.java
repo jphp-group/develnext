@@ -31,6 +31,7 @@ import php.runtime.env.Environment;
 import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
+import php.runtime.lang.support.MagicSignatureClass;
 import php.runtime.memory.ArrayMemory;
 import php.runtime.memory.DoubleMemory;
 import php.runtime.memory.ObjectMemory;
@@ -700,9 +701,9 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
     @Signature
     public Memory __get(String name) {
-        Memory result = data("--property-" + name);
+        Memory data = data("--property-" + name);
 
-        return result;
+        return data;
     }
 
     @Override

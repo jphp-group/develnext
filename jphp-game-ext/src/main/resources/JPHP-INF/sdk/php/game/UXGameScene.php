@@ -14,6 +14,16 @@ class UXGameScene
     public $gravity = [0.0, 0.0];
 
     /**
+     * @var float
+     */
+    public $gravityX = 0.0;
+
+    /**
+     * @var float
+     */
+    public $gravityY = 0.0;
+
+    /**
      * UXGameScene constructor.
      */
     public function __construct()
