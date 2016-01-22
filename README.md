@@ -2,6 +2,8 @@
 
 > GUI and IDE for php based on jphp, for beginners only.
 
+![DevelNext Logo](https://github.com/jphp-compiler/develnext/raw/master/develnext/src/.data/img/splash.png)
+
 ---
 
 **Dependencies**
