@@ -71,6 +71,6 @@ class CursorBindBehaviour extends AbstractBehaviour
 
     public function getCode()
     {
-        return 'CursorObject';
+        return 'cursorBind';
     }
 }

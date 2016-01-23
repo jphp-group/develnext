@@ -104,4 +104,23 @@ class GameSceneBehaviour extends AbstractBehaviour
     {
         $this->scene->pause();
     }
+
+    public function __get($name)
+    {
+        return $this->scene->{$name};
+    }
+
+    public function __set($name, $value)
+    {
+        $this->scene->{$name} = $value;
+    }
+
+    public function __call($name, array $args) {
+        return call_user_func([$this->scene, $name], $args);
+    }
+
+    public function getCode()
+    {
+        return 'phys';
+    }
 }

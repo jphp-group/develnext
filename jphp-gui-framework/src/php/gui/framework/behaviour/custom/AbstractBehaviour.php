@@ -98,6 +98,12 @@ abstract class AbstractBehaviour
 
         $this->_target = $target;
 
+        $code = $this->getCode();
+
+        if ($code && method_exists($target, 'data')) {
+            $target->data("--property-$code", $this);
+        }
+
         $this->applyImpl($target);
     }
 

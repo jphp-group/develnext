@@ -63,4 +63,23 @@ class GameEntityBehaviour extends AbstractBehaviour
             $this->entity->gameScene->remove($this->entity);
         }
     }
+
+    public function __get($name)
+    {
+        return $this->entity->{$name};
+    }
+
+    public function __set($name, $value)
+    {
+        $this->entity->{$name} = $value;
+    }
+
+    public function __call($name, array $args) {
+        return call_user_func([$this->entity, $name], $args);
+    }
+
+    public function getCode()
+    {
+        return 'phys';
+    }
 }

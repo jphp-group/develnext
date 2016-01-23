@@ -74,6 +74,6 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
 
     public function getCode()
     {
-        return 'Blink';
+        return 'blinkAnim';
     }
 }

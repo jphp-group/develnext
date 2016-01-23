@@ -54,6 +54,7 @@ use php\lang\IllegalStateException;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Flow;
+use php\util\Regex;
 use php\xml\XmlProcessor;
 use script\TimerScript;
 
@@ -179,7 +180,16 @@ class ActionConstructorForm extends AbstractIdeForm
 
         $this->timer = new TimerScript(1000, true, function () use ($tabOne, $tabTwo) {
             $this->tabs->tabs[0]->text = "$tabOne (" . $this->list->items->count . ")";
-            $this->tabs->tabs[1]->text = "$tabTwo (" . sizeof(str::split($this->getLiveCode(), "\n")) . ")";
+            $split = Flow::of(str::split($this->getLiveCode(), "\n"))->find(function ($it) {
+                $regex = Regex::of("\\/\\/ \\+Actions\\:[ ]+?[0-9]+?[ ]+?//")->with($it);
+                $it = $regex->replace("");
+
+                $it = str::trim($it);
+
+                return !!$it;
+            })->toArray();
+
+            $this->tabs->tabs[1]->text = "$tabTwo (" . sizeof($split) . ")";
         });
 
         UXApplication::runLater(function () {
@@ -415,6 +425,9 @@ class ActionConstructorForm extends AbstractIdeForm
 
     public function setLiveCode($value)
     {
+        $regex = Regex::of("\\/\\/ \\+Actions\\:[ ]+?[0-9]+?[ ]+?//")->with($value);
+        $value = $regex->replace("");
+
         $this->liveCodeEditor->setValue("<?\n$value");
     }
 
@@ -428,6 +441,20 @@ class ActionConstructorForm extends AbstractIdeForm
 
         if (Str::startsWith($value, "<?")) {
             $value = str::sub($value, 2);
+        }
+
+        $regex = Regex::of("\\/\\/ \\+Actions\\:[ ]+?[0-9]+?[ ]+?//")->with($value);
+
+        if ($regex->matches()) {
+            if ($this->list->items->count) {
+                $value = $regex->replace("// +Actions: {$this->list->items->count} //");
+            } else {
+                $value = $regex->replace("");
+            }
+        } else {
+            if ($this->list->items->count) {
+                $value = "// +Actions: {$this->list->items->count} //\n" . $value;
+            }
         }
 
         return $value;

@@ -84,6 +84,7 @@ use php\time\Time;
 use php\util\Configuration;
 use php\util\Flow;
 use php\util\Regex;
+use script\TimerScript;
 
 /**
  * Class FormEditor
@@ -272,10 +273,45 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
         $this->codeEditor->register(AbstractCommand::make('Скрыть', 'icons/close16.png', function () {
             $this->codeEditor->save();
+
+            Ide::get()->setUserConfigValue(get_class($this) . ".multipleEditor", false);
             $this->switchToDesigner(true);
         }));
-        $this->codeEditor->register(AbstractCommand::make('Поменять расположение', 'icons/layoutHorizontal16.png', function () {
-            $this->viewerAndEvents->orientation = $this->viewerAndEvents->orientation == 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL';
+
+       /* $this->codeEditor->register(AbstractCommand::make('На весь экран', 'icons/fullScreenEnable16.png', function () {
+            $fullScreen = Ide::get()->getUserConfigValue(get_class($this) . ".codeEditorFullScreen", true);
+
+            Ide::get()->setUserConfigValue(get_class($this) . ".codeEditorFullScreen", !$fullScreen);
+
+            if ($this->tabs->selectedTab === $this->codeTab) {
+                $this->switchToDesigner();
+
+                uiLater(function () {
+                    $this->switchToSmallSource();
+                });
+            } else {
+                $this->switchToDesigner(true);
+
+                uiLater(function () {
+                    $this->switchToSource();
+                });
+            }
+        }));*/
+
+        $this->codeEditor->register(AbstractCommand::make('Совместное редактирование', 'icons/layoutHorizontal16.png', function () {
+            Ide::get()->setUserConfigValue(get_class($this) . ".multipleEditor", true);
+
+            if ($this->tabs->selectedTab === $this->codeTab) {
+                $this->switchToDesigner();
+
+                uiLater(function () {
+                    $this->switchToSmallSource();
+                });
+            } else {
+                uiLater(function () {
+                    $this->viewerAndEvents->orientation = $this->viewerAndEvents->orientation == 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL';
+                });
+            }
         }));
 
         $this->codeEditor->register(AbstractCommand::makeSeparator());
@@ -429,6 +465,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->refresh();
         $this->leftPaneUi->refresh();
         $this->leftPaneUi->refreshObjectTreeList();
+
+        $this->updateMultipleEditor();
 
         UXApplication::runLater(function () {
             $this->updateProperties($this->designer->pickedNode ?: $this);
@@ -668,6 +706,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $codeTab = new UXTab();
         $codeTab->text = 'Исходный код';
+        $codeTab->content = $this->codeEditorUi;
         $codeTab->style = '-fx-cursor: hand;';
         $codeTab->graphic = Ide::get()->getImage($this->codeEditor->getIcon());
         $codeTab->tooltip = UXTooltip::of($this->codeFile);
@@ -685,15 +724,21 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->codeTab = $codeTab;
 
         if (File::of($this->codeFile)->exists()) {
-            $codeTab->on('change', function () use ($tabs) {
-                UXApplication::runLater(function () use ($tabs) {
-                    $tabs->selectedTab = $this->designerTab;
-                });
-                Timer::run(300, function () use ($tabs) {
-                    //if ($tabs->selectedTab === $this->codeTab) {
-                        $this->switchToSmallSource();
-                        //$tabs->selectedTab = $this->designerTab;
-                    //}
+            $codeTab->on('change', function (UXEvent $e) use ($tabs) {
+                uiLater(function () use ($tabs) {
+                    if ($tabs->selectedTab === $this->codeTab) {
+                        if ($this->viewerAndEvents->items[1] != null) {
+                            $this->hideCodeEditorInDesigner();
+
+                            uiLater(function () {
+                                $this->switchToSource();
+                            });
+                        }
+                    }
+
+                    if ($tabs->selectedTab === $this->designerTab) {
+                        $this->updateMultipleEditor();
+                    }
                 });
             });
 
@@ -702,11 +747,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->tabs = $tabs;
 
-        if (Ide::get()->getUserConfigValue(__CLASS__ . '.sourceEditorEx', false)) {
+        /*if (Ide::get()->getUserConfigValue(__CLASS__ . '.sourceEditorEx', false)) {
             UXApplication::runLater(function () {
                 $this->switchToSmallSource();
             });
-        }
+        }*/
 
         return $this->tabs;
     }
@@ -716,8 +761,27 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->tabs->selectTab($this->codeTab);
     }
 
+    public function switchToFullSource()
+    {
+        Logger::info("Start switch to full source editor...");
+
+        $count = $this->viewerAndEvents->items->count();
+
+        if ($count > 1) {
+            $item = $this->viewerAndEvents->items[$count - 1];
+            $this->viewerAndEvents->items->remove($item);
+
+            Logger::info(".. reset small code editor");
+        }
+
+        $this->codeTab->content = $this->codeEditorUi;
+    }
+
     public function switchToSmallSource()
     {
+        /*$this->switchToSource();
+        return;*/
+
         static $dividerPositions;
 
         Logger::info("Start switch to small source editor...");
@@ -730,53 +794,45 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             })->toArray();
         }
 
-        UXApplication::runLater(function () { // FIX LOCK EDITOR
+        /*UXApplication::runLater(function () {
             $this->switchToDesigner();
             $this->codeEditor->requestFocus();
-        });
+        });*/
 
-        $count = $this->viewerAndEvents->items->count();
-
-        if ($count > 1) {
-            $dividerPositions = $this->viewerAndEvents->dividerPositions;
-
-            $item = $this->viewerAndEvents->items[$count - 1];
-            $this->viewerAndEvents->items->remove($item);
-
-            Logger::info(".. reset small code editor");
-        }
-
-        $panel = new UXAnchorPane();
-
-        // Странный фикс плавающего лока редактора кода, но он работает 0_0
-        $field = new UXTextField('');
-        $field->y = 50;
-        $panel->add($field);
-        // --------------------------
-
-        $content = $this->codeEditorUi;
-        UXAnchorPane::setAnchor($content, 0);
-
-        $panel->add($content);
-
-        if ($dividerPositions) {
-            $this->viewerAndEvents->dividerPositions = $dividerPositions;
-        }
 
         $class = __CLASS__;
 
-        $func = function () use ($class) {
-            UXApplication::runLater(function () use ($class) {
-                if ($this->viewerAndEvents->items->count() > 1) {
-                    Ide::get()->setUserConfigValue("$class.dividerPositions", Str::join($this->viewerAndEvents->dividerPositions, ','));
-                }
+        $count = $this->viewerAndEvents->items->count();
+
+        if ($count < 2) {
+            $panel = new UXAnchorPane();
+
+            if ($dividerPositions) {
+                $this->viewerAndEvents->dividerPositions = $dividerPositions;
+            }
+
+            $func = function () use ($class) {
+                UXApplication::runLater(function () use ($class) {
+                    if ($this->viewerAndEvents->items->count() > 1) {
+                        Ide::get()->setUserConfigValue("$class.dividerPositions", Str::join($this->viewerAndEvents->dividerPositions, ','));
+                    }
+                });
+            };
+
+            $this->codeTab->content = null;
+            $this->viewerAndEvents->items->add($panel);
+
+            $panel->observer('width')->addListener($func);
+            $panel->observer('height')->addListener($func);
+
+            uiLater(function () use ($panel) {
+                $content = $this->codeEditorUi;
+                UXAnchorPane::setAnchor($content, 0);
+
+                $panel->add($content);
+                $this->codeEditor->requestFocus();
             });
-        };
-
-        $this->viewerAndEvents->items->add($panel);
-
-        $panel->observer('width')->addListener($func);
-        $panel->observer('height')->addListener($func);
+        }
 
         Ide::get()->setUserConfigValue("$class.sourceEditorEx", true);
 
@@ -823,16 +879,42 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return $this->modules;
     }
 
+    public function hideCodeEditorInDesigner()
+    {
+        if ($this->viewerAndEvents->items->count() > 1) {
+            $content = $this->viewerAndEvents->items[1];
+
+            $this->viewerAndEvents->items->removeByIndex(1);
+
+            uiLater(function () use ($content) {
+                $this->codeTab->content = $content;
+            });
+        }
+    }
+
+    public function updateMultipleEditor()
+    {
+        if ($this->tabs->selectedTab === $this->designerTab) {
+            $multipleEditor = Ide::get()->getUserConfigValue(get_class($this) . ".multipleEditor", false);
+
+            if ($multipleEditor) {
+                if ($this->viewerAndEvents->items[1] == null) {
+                    $this->switchToSmallSource();
+                }
+            } else {
+                if ($this->viewerAndEvents->items[1] != null) {
+                    $this->switchToDesigner(true);
+                }
+            }
+        }
+    }
+
     public function switchToDesigner($hideSource = false)
     {
         $this->tabs->selectTab($this->designerTab);
 
-        if ($hideSource && $this->viewerAndEvents->items->count() > 1) {
-            $class = __CLASS__;
-
-            Ide::get()->setUserConfigValue("$class.sourceEditorEx", false);
-            $this->codeTab->content = $this->viewerAndEvents->items[1];
-            unset($this->viewerAndEvents->items[1]);
+        if ($hideSource) {
+            $this->hideCodeEditorInDesigner();
         }
     }
 

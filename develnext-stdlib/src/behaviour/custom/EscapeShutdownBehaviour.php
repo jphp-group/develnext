@@ -44,6 +44,6 @@ class EscapeShutdownBehaviour extends AbstractBehaviour
 
     public function getCode()
     {
-        return 'EscapeShutdown';
+        return 'escapeShutdown';
     }
 }

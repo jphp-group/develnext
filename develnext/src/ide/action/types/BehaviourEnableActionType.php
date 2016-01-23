@@ -15,6 +15,7 @@ use ide\editors\common\ObjectListEditorItem;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use ide\scripts\elements\MacroScriptComponent;
+use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\UXApplication;
 use php\lib\Items;
 use php\lib\Str;
@@ -106,6 +107,15 @@ class BehaviourEnableActionType extends AbstractSimpleActionType
      */
     function convertToCode(Action $action, ActionScript $actionScript)
     {
-        return "\$this->behaviour({$action->get('object')}, {$action->get('behaviour')})->enable()";
+        $type = $action->behaviour;
+
+        /** @var AbstractBehaviour $behaviour */
+        $behaviour = new $type();
+
+        if ($code = $behaviour->getCode()) {
+            return "{$action->get('object')}->{$code}->enable()";
+        } else {
+            return "\$this->behaviour({$action->get('object')}, {$action->get('behaviour')})->enable()";
+        }
     }
 }

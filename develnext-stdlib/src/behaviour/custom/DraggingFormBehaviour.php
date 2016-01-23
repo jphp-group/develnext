@@ -75,6 +75,6 @@ class DraggingFormBehaviour extends AbstractBehaviour
 
     public function getCode()
     {
-        return 'DraggingForm';
+        return 'draggingForm';
     }
 }

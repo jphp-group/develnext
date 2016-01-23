@@ -698,6 +698,13 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         return false;
     }
 
+    @Signature
+    public Memory __get(String name) {
+        Memory result = data("--property-" + name);
+
+        return result;
+    }
+
     @Override
     public int getPointer() {
         return getWrappedObject().hashCode();

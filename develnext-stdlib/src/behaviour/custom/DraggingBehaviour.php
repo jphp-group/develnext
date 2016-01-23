@@ -130,6 +130,6 @@ class DraggingBehaviour extends AbstractBehaviour
 
     public function getCode()
     {
-        return 'Dragging';
+        return 'dragging';
     }
 }

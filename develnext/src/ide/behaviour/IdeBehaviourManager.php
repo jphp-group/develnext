@@ -24,6 +24,11 @@ class IdeBehaviourManager extends BehaviourManager
     protected static $specs = [];
 
     /**
+     * @var AbstractBehaviourSpec[]
+     */
+    protected static $specsByCode = [];
+
+    /**
      * @var string
      */
     protected $file;
@@ -51,7 +56,16 @@ class IdeBehaviourManager extends BehaviourManager
                 /** @var AbstractBehaviourSpec $behaviour */
                 $behaviour = new $behaviour();
 
-                self::$specs[$behaviour->getType()] = $behaviour;
+                $type = $behaviour->getType();
+
+                self::$specs[$type] = $behaviour;
+
+                /** @var AbstractBehaviour $tmp */
+                $tmp = new $type();
+
+                if ($code = $tmp->getCode()) {
+                    self::$specsByCode[$code] = $behaviour;
+                }
             }
         }
 
@@ -70,6 +84,10 @@ class IdeBehaviourManager extends BehaviourManager
 
     public function getBehaviourSpecByClass($className)
     {
+        if ($spec = self::$specsByCode[$className]) {
+            return $spec;
+        }
+
         if ($className[0] == '\\') {
             $className = Str::sub($className, 1);
         }

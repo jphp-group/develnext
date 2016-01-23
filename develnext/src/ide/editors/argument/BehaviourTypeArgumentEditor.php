@@ -38,10 +38,10 @@ class BehaviourTypeArgumentEditor extends EnumArgumentEditor
                 $type = $spec->getType();
 
                 /** @var AbstractBehaviour $tmp */
-                // $tmp = new $type();
+                $tmp = new $type();
 
                 $variants[] = new ObjectListEditorItem(
-                    $spec->getName() /*. ($tmp->getCode() ? " [{$tmp->getCode()}]" : "")*/,
+                    $spec->getName() . ($tmp->getCode() ? " [{$tmp->getCode()}]" : ""),
                     Ide::get()->getImage($spec->getIcon()),
                     /*$tmp->getCode() ?:*/ $type,
                     1

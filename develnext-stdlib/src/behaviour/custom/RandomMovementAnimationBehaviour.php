@@ -98,6 +98,6 @@ class RandomMovementAnimationBehaviour extends AnimationBehaviour
 
     public function getCode()
     {
-        return 'RandomMove';
+        return 'randomMove';
     }
 }

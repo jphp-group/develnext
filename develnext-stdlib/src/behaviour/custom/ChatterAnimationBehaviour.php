@@ -87,6 +87,6 @@ class ChatterAnimationBehaviour extends AnimationBehaviour
 
     public function getCode()
     {
-        return 'Chatter';
+        return 'chatterAnim';
     }
 }

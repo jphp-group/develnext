@@ -43,6 +43,6 @@ class WatchMakerBehaviour extends AbstractBehaviour
 
     public function getCode()
     {
-        return 'WatchMaker';
+        return 'watchMaker';
     }
 }

@@ -68,6 +68,6 @@ class VibrationAnimationBehaviour extends AnimationBehaviour
 
     public function getCode()
     {
-        return 'Vibration';
+        return 'vibrationAnim';
     }
 }

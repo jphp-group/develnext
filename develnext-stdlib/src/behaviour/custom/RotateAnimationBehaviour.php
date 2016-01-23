@@ -38,6 +38,6 @@ class RotateAnimationBehaviour extends AnimationBehaviour
 
     public function getCode()
     {
-        return 'Rotate';
+        return 'rotateAnim';
     }
 }

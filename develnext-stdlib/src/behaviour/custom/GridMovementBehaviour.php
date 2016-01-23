@@ -148,4 +148,9 @@ class GridMovementBehaviour extends AbstractBehaviour
             }
         });
     }
+
+    public function getCode()
+    {
+        return 'gridMove';
+    }
 }
