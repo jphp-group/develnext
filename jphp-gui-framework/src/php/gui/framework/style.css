@@ -51,3 +51,20 @@
     -fx-background-insets: 1 -3 1 1, 1 -2 1 1 ;
     -fx-background-color: gray;
 }
+
+.without-focus, .without-focus:focused {
+    -fx-focus-color: transparent;
+}
+
+.scroll-pane.without-focus {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane.without-focus:focused {
+    -fx-background-insets: 0;
+}
+
+.scroll-pane.without-focus .corner {
+    -fx-background-insets: 0;
+}

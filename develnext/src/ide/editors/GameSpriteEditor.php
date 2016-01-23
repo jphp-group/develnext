@@ -216,6 +216,7 @@ class GameSpriteEditor extends AbstractEditor
 
         $gc = $canvas->getGraphicsContext();
         $gc->setFillColor(null);
+        $gc->clearRect(0, 0, $canvas->size[0], $canvas->size[1]);
 
         foreach ($files as $i => $file) {
             $image = new UXImage($file);
@@ -223,15 +224,52 @@ class GameSpriteEditor extends AbstractEditor
             $x = 0;
             $y = 0;
 
+            $width = $this->spec->frameWidth;
+            $height = $this->spec->frameHeight;
+            $frameWidth = $this->spec->frameWidth;
+            $frameHeight = $this->spec->frameHeight;
+
+            $resized = false;
+
+            if ($this->spec->metaAutoSize
+                && ($image->width > $this->spec->frameWidth || $image->height > $this->spec->frameHeight)) {
+                $width = $image->width;
+                $height = $image->height;
+
+                $percent = false;
+
+                if ($height > $width) {
+                    $percent = (($frameHeight * 100) / $height) / 100;
+                } elseif ($width > $height) {
+                    $percent = (($frameWidth * 100) / $width) / 100;
+                }
+
+                if ($percent) {
+                    $frameWidth = round($width * $percent);
+                    $frameHeight = round($height * $percent);
+                }
+
+                $resized = true;
+            }
+
             if ($this->spec->metaCentred) {
-                $x = round($image->width / 2 - $this->spec->frameWidth / 2);
-                $y = round($image->height / 2 - $this->spec->frameHeight / 2);
+                if ($resized) {
+                    $x = round($this->spec->frameWidth / 2 - $frameWidth / 2);
+                    $y = round($this->spec->frameHeight / 2 - $frameHeight / 2);
+                } else {
+                    $x = round($this->spec->frameWidth / 2 - $image->width / 2);
+                    $y = round($this->spec->frameHeight / 2 - $image->height / 2);
+                }
             }
 
             $gc->drawImage(
                 $image,
-                $x, $y, $this->spec->frameWidth, $this->spec->frameHeight,
-                $i * $this->spec->frameWidth, 0, $this->spec->frameWidth, $this->spec->frameHeight
+
+                0, 0,
+                $width, $height,
+
+                $i * $this->spec->frameWidth + $x, $y,
+                $frameWidth, $frameHeight
             );
         }
 
@@ -266,7 +304,8 @@ class GameSpriteEditor extends AbstractEditor
                 'frameHeight' => $this->spec->frameHeight,
                 'speed' => $this->spec->speed,
                 'defaultAnimation' => $this->spec->defaultAnimation,
-                'metaCentred' => $this->spec->metaCentred
+                'metaCentred' => $this->spec->metaCentred,
+                'metaAutoSize' => $this->spec->metaAutoSize,
             ]);
 
             foreach ($this->spec->animations as $name => $indexes) {
@@ -314,6 +353,7 @@ class GameSpriteEditor extends AbstractEditor
 
         $properties->addProperty('general', 'frameWidth', 'Ширина кадра', new IntegerPropertyEditor(null, $setter));
         $properties->addProperty('general', 'frameHeight', 'Высота кадра', new IntegerPropertyEditor(null, $setter));
+        $properties->addProperty('general', 'metaAutoSize', 'Авторазмер', new BooleanPropertyEditor(null, $setter));
         $properties->addProperty('general', 'metaCentred', 'По центру', new BooleanPropertyEditor(null, $setter));
 
         $properties->addProperty('animation', 'defaultAnimation', 'Главная анимация', $animationPropertyEditor);
@@ -329,8 +369,11 @@ class GameSpriteEditor extends AbstractEditor
     {
         $area = new UXImageArea(new UXImage($file));
         $area->size = [$this->spec->frameWidth, $this->spec->frameHeight];
-        $area->stretch = false;
+        $area->stretch = $this->spec->metaAutoSize;
+        $area->smartStretch = $area->stretch;
         $area->centered = $this->spec->metaCentred;
+        $area->proportional = true;
+
         $area->classes->add('preview');
 
         $border = new UXVBox();

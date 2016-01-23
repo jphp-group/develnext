@@ -5,13 +5,14 @@ use php\game\UXGameEntity;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\UXNode;
 use php\lang\IllegalStateException;
+use script\TimerScript;
 
 class GameEntityBehaviour extends AbstractBehaviour
 {
     /**
      * @var string
      */
-    public $bodyType = 'STATIC';
+    public $bodyType = 'DYNAMIC';
 
     /**
      * @var bool
@@ -29,32 +30,65 @@ class GameEntityBehaviour extends AbstractBehaviour
     protected $entity;
 
     /**
+     * @var GameSceneBehaviour
+     */
+    private $foundScene;
+
+    /**
      * @param mixed $target
      * @throws IllegalStateException
      */
     protected function applyImpl($target)
     {
         /** @var UXNode $target */
-        $sceneBehaviour = GameSceneBehaviour::get($target->parent);
 
-        if (!$sceneBehaviour && $target->form) {
-            $sceneBehaviour = GameSceneBehaviour::get($target->form);
+        TimerScript::executeWhile(function () use ($target) {
+            return $this->findScene();
+        }, function () use ($target) {
+            $sceneBehaviour = $this->findScene();
+
+            $type = $target->data('-factory-id') ?: $target->id;
+
+            if ($sceneBehaviour) {
+                $this->entity = new UXGameEntity($type, $target);
+                $this->entity->bodyType = $this->bodyType;
+                //$this->entity->physics = $this->physics;
+                $this->entity->velocity = $this->velocity;
+
+                unset($this->velocity, $this->bodyType);
+
+                $target->data("--property-phys", $this->entity);
+
+                $sceneBehaviour->getScene()->add($this->entity);
+            } else {
+                throw new IllegalStateException("Unable to init GameEntity for $type, scene is not found");
+            }
+        });
+    }
+
+    protected function findScene()
+    {
+        if ($this->foundScene) {
+            return $this->foundScene;
         }
 
-        $type = $target->data('-factory-id') ?: $target->id;
-
-        if ($sceneBehaviour) {
-            $this->entity = new UXGameEntity($type, $target);
-            $this->entity->bodyType = $this->bodyType;
-            //$this->entity->physics = $this->physics;
-            $this->entity->velocity = $this->velocity;
-
-            $target->data("--property-phys", $this->entity);
-
-            $sceneBehaviour->getScene()->add($this->entity);
-        } else {
-            throw new IllegalStateException("Unable to init GameEntity for $type");
+        if (!$this->_target || !$this->_target->parent) {
+            return null;
         }
+
+        $parent = $this->_target->parent;
+
+        $sceneBehaviour = $parent->data('--game-scene');
+
+        if (!$sceneBehaviour) {
+            $sceneBehaviour = GameSceneBehaviour::get($parent);
+
+            if (!$sceneBehaviour && $this->_target->form) {
+                $sceneBehaviour = GameSceneBehaviour::get($this->_target->form);
+            }
+        }
+
+        return $this->foundScene = $sceneBehaviour;
     }
 
     public function free()
@@ -83,5 +117,13 @@ class GameEntityBehaviour extends AbstractBehaviour
     public function getCode()
     {
         return 'phys';
+    }
+
+    /**
+     * @return UXGameEntity
+     */
+    public function getEntity()
+    {
+        return $this->entity;
     }
 }

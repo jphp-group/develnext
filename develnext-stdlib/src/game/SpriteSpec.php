@@ -49,6 +49,11 @@ class SpriteSpec
     public $metaCentred = true;
 
     /**
+     * @var bool
+     */
+    public $metaAutoSize = false;
+
+    /**
      * @var string
      */
     public $defaultAnimation;
@@ -68,6 +73,7 @@ class SpriteSpec
             $this->frameHeight = (int)$element->getAttribute('frameHeight');
             $this->defaultAnimation = $element->getAttribute('defaultAnimation');
             $this->metaCentred = (bool) $element->getAttribute('metaCentred');
+            $this->metaAutoSize = (bool) $element->getAttribute('metaAutoSize');
 
             if ($element->hasAttribute('speed')) {
                 $this->speed = (int)$element->getAttribute('speed');

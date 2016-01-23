@@ -2,6 +2,7 @@
 namespace php\game;
 
 use php\gui\layout\UXScrollPane;
+use php\gui\paint\UXColor;
 use php\gui\UXNode;
 
 /**
@@ -16,9 +17,29 @@ class UXGamePane extends UXScrollPane
     public $scene;
 
     /**
-     * @var UXNode
+     * @var int
      */
-    public $watchingNode;
+    public $areaWidth = 800;
+
+    /**
+     * @var int
+     */
+    public $areaHeight = 600;
+
+    /**
+     * @var array
+     */
+    public $areaSize = [800, 600];
+
+    /**
+     * @var bool
+     */
+    public $autoSize = false;
+
+    /**
+     * @var string|UXColor
+     */
+    public $areaBackgroundColor = 'white';
 
     /**
      * @var int

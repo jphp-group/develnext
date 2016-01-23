@@ -2,12 +2,23 @@ package org.develnext.jphp.ext.game.support;
 
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import org.dyn4j.dynamics.Capacity;
+import org.dyn4j.dynamics.World;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameScene2D {
+    public interface ScrollHandler {
+        void scrollTo(double x, double y);
+    }
+
+    protected World world;
+
+
     private static final float TIME_STEP = 1 / 60.0f;
 
     private AnimationTimer timer = new AnimationTimer() {
@@ -21,8 +32,26 @@ public class GameScene2D {
 
     protected Vec2d gravity = new Vec2d(0, 0);
 
-    DoubleProperty width = new SimpleDoubleProperty(0);
-    DoubleProperty height = new SimpleDoubleProperty(0);
+    protected DoubleProperty width = new SimpleDoubleProperty(0);
+    protected DoubleProperty height = new SimpleDoubleProperty(0);
+
+    protected ObjectProperty<GameEntity2D> observedObject = new SimpleObjectProperty<>(null);
+    protected ObjectProperty<ScrollHandler> scrollHandler = new SimpleObjectProperty<>(null);
+
+    public GameScene2D() {
+        world = new World(Capacity.DEFAULT_CAPACITY);
+
+        /*world.addListener(new CollisionAdapter() {
+            @Override
+            public boolean collision(ContactConstraint contactConstraint) {
+                System.out.println(contactConstraint.getNormal().x + ":" + contactConstraint.getNormal().y);
+                GameEntity2D e1 = (GameEntity2D) contactConstraint.getBody1().getUserData();
+                GameEntity2D e2 = (GameEntity2D) contactConstraint.getBody2().getUserData();
+
+                return true;
+            }
+        }); */
+    }
 
     public void play() {
         timer.start();
@@ -32,12 +61,36 @@ public class GameScene2D {
         timer.stop();
     }
 
+    public ObjectProperty<GameEntity2D> observedObjectProperty() {
+        return observedObject;
+    }
+
     public DoubleProperty widthProperty() {
         return width;
     }
 
     public DoubleProperty heightProperty() {
         return height;
+    }
+
+    public GameEntity2D getObservedObject() {
+        return observedObject.get();
+    }
+
+    public void setObservedObject(GameEntity2D observedObject) {
+        this.observedObject.set(observedObject);
+    }
+
+    public ScrollHandler getScrollHandler() {
+        return scrollHandler.get();
+    }
+
+    public ObjectProperty<ScrollHandler> scrollHandlerProperty() {
+        return scrollHandler;
+    }
+
+    public void setScrollHandler(ScrollHandler scrollHandler) {
+        this.scrollHandler.set(scrollHandler);
     }
 
     public void setWidth(double v) {
@@ -74,17 +127,35 @@ public class GameScene2D {
 
         long delta = internalTime - previousTime;
 
+        world.update(TIME_STEP);
+
         for (GameEntity2D entity : entities) {
             entity.update(TIME_STEP, this);
+
+            GameEntity2D entity2D = observedObject.get();
+
+            if (entity2D != null) {
+                ScrollHandler scrollHandler = this.scrollHandler.get();
+
+                if (scrollHandler != null) {
+                    scrollHandler.scrollTo(entity.getCenterX(), entity.getCenterY());
+                }
+            }
         }
     }
 
     public void addEntity(GameEntity2D entity) {
-        entities.add(entity);
+        if (entity.getScene() == null) {
+            entity.scene = this;
+            entities.add(entity);
+           // world.addBody(entity.body);
+        }
     }
 
     public void removeEntity(GameEntity2D entity) {
         entities.remove(entity);
+        //world.removeBody(entity.body);
+        entity.scene = null;
     }
 
     public Vec2d getGravity() {
@@ -93,6 +164,7 @@ public class GameScene2D {
 
     public void setGravity(Vec2d gravity) {
         this.gravity = gravity;
+        //this.world.setGravity(new Vector2(gravity.x, gravity.y));
     }
 
     public double getGravityX() {

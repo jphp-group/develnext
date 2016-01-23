@@ -43,6 +43,13 @@ class GameSceneBehaviour extends AbstractBehaviour
 
         if ($target instanceof UXWindow) {
             $target->layout->data('--property-phys', $scene);
+            $target->layout->data('--game-scene', $this);
+        } elseif ($target instanceof UXScrollPane) {
+            $target->content->data('--game-scene', $this);
+            $scene->setScrollHandler(function ($x, $y) use ($target) {
+                $target->scrollX = $x;
+                $target->scrollY = $y;
+            });
         } else {
             $target->data('--property-phys', $scene);
         }

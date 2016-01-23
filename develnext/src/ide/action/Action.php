@@ -39,7 +39,7 @@ class Action
 
         if ($type instanceof AbstractSimpleActionType) {
             foreach ($type->attributeSettings() as $code => $settings) {
-                if ($settings['def']) {
+                if (isset($settings['def'])) {
                     $this->{$code} = $settings['def'];
 
                     if ($settings['defType']) {

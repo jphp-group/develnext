@@ -1,6 +1,7 @@
 <?php
 namespace ide\formats\form\elements;
 
+use ide\behaviour\spec\GameSceneBehaviourSpec;
 use ide\editors\value\BooleanPropertyEditor;
 use ide\editors\value\ColorPropertyEditor;
 use ide\editors\value\FontPropertyEditor;
@@ -15,6 +16,7 @@ use php\gui\designer\UXDesignProperties;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
+use php\gui\layout\UXPane;
 use php\gui\UXButton;
 use php\gui\UXNode;
 use php\gui\UXTableCell;
@@ -30,7 +32,7 @@ class GamePaneFormElement extends AbstractFormElement
 
     public function getName()
     {
-        return 'Игровая панель';
+        return 'Игровая комната';
     }
 
     public function getIcon()
@@ -43,14 +45,50 @@ class GamePaneFormElement extends AbstractFormElement
         return "game%s";
     }
 
+
+    public function isLayout()
+    {
+        return true;
+    }
+
+    public function addToLayout($self, $node, $screenX, $screenY)
+    {
+        /** @var UXScrollPane $self */
+        $content = $self->content;
+
+        if ($content instanceof UXPane) {
+            $node->position = $content->screenToLocal($screenX, $screenY);
+            $content->add($node);
+        }
+    }
+
+    public function getLayoutChildren($layout)
+    {
+        $result = [];
+
+        if ($layout->content) {
+            foreach ($layout->content->children as $node) {
+                $result[] = $node;
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * @return UXNode
      */
     public function createElement()
     {
         $button = new UXGamePane();
-        Ide::get()->getMainForm()->toast('Игровое поле эмулирует физику 2D мира для игровых объектов - гравитацию, скорость, столкновения и т.д.');
         return $button;
+    }
+
+    public function getInitialBehaviours()
+    {
+        return [
+            new GameSceneBehaviourSpec()
+        ];
     }
 
     public function getDefaultSize()

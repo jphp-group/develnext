@@ -2,6 +2,7 @@
 namespace ide\formats\form\elements;
 
 use game\SpriteManager;
+use ide\behaviour\spec\GameEntityBehaviourSpec;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
@@ -29,7 +30,7 @@ class SpriteViewFormElement extends AbstractFormElement
 
     public function getName()
     {
-        return 'Спрайтовый объект';
+        return 'Игровой объект';
     }
 
     public function getIcon()
@@ -39,7 +40,7 @@ class SpriteViewFormElement extends AbstractFormElement
 
     public function getIdPattern()
     {
-        return "spObject%s";
+        return "object%s";
     }
 
     /**
@@ -53,6 +54,13 @@ class SpriteViewFormElement extends AbstractFormElement
         $object = new UXSpriteView($sprite);
 
         return $object;
+    }
+
+    public function getInitialBehaviours()
+    {
+        return [
+            new GameEntityBehaviourSpec()
+        ];
     }
 
     public function refreshNode(UXNode $node)

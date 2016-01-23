@@ -1,6 +1,7 @@
 <?php
 namespace php\gui;
 
+use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
 
 class UXNodeWrapper
@@ -53,8 +54,18 @@ class UXNodeWrapper
      */
     public function bind($event, callable $handler, $group)
     {
-        if (in_array($event, ['create', 'destroy'])) {
-            return;
+        switch ($event) {
+            case 'create':
+                return;
+
+            case 'destroy':
+                $this->node->observer('parent')->addListener(function ($old, $new) use ($handler) {
+                    if (!$new) {
+                        $handler(UXEvent::makeMock($this->node));
+                    }
+                });
+
+                return;
         }
 
         $this->node->on($event, $handler, $group);

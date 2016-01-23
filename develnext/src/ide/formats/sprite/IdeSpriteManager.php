@@ -94,6 +94,8 @@ class IdeSpriteManager
     {
         $this->sprites[$name] = $spec = new SpriteSpec($name);
         $spec->frameWidth = $spec->frameHeight = 32;
+        $spec->metaAutoSize = true;
+        $spec->metaCentred = true;
         $this->saveSprite($name);
 
         return $this->project->getFile(self::SPRITE_PATH . "/$name.sprite");

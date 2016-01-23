@@ -730,9 +730,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                         if ($this->viewerAndEvents->items[1] != null) {
                             $this->hideCodeEditorInDesigner();
 
-                            uiLater(function () {
+                            /*TimerScript::executeAfter(2000, function () {
                                 $this->switchToSource();
-                            });
+                            });  */
                         }
                     }
 
@@ -825,7 +825,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $panel->observer('width')->addListener($func);
             $panel->observer('height')->addListener($func);
 
-            uiLater(function () use ($panel) {
+            TimerScript::executeAfter(100, function () use ($panel) {
                 $content = $this->codeEditorUi;
                 UXAnchorPane::setAnchor($content, 0);
 
@@ -886,7 +886,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             $this->viewerAndEvents->items->removeByIndex(1);
 
-            uiLater(function () use ($content) {
+            TimerScript::executeAfter(100, function () use ($content) {
                 $this->codeTab->content = $content;
             });
         }
@@ -1171,6 +1171,16 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             } else if ($key !== 'width' && $key !== 'height') {
                 $node->{$key} = $property['value'];
             }
+        }
+
+        $initialBehaviours = $element->getInitialBehaviours();
+
+        if ($initialBehaviours) {
+            foreach ($initialBehaviours as $spec) {
+                $this->behaviourManager->apply($node->id, $spec->createBehaviour());
+            }
+
+            $this->behaviourManager->save();
         }
 
         $element->refreshNode($node);

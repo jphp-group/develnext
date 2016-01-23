@@ -109,6 +109,12 @@ abstract class AbstractFactory
 
             $this->eventBinder->trigger($node, $id, 'create');
 
+            $node->observer('parent')->addListener(function ($old, $new) use ($node, $id) {
+                if (!$new) {
+                    $this->eventBinder->trigger($node, $id, 'destroy');
+                }
+            });
+
             return $node;
         }
 

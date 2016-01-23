@@ -24,6 +24,11 @@ class UXGameScene
     public $gravityY = 0.0;
 
     /**
+     * @var UXGameEntity|null
+     */
+    public $observedObject = null;
+
+    /**
      * UXGameScene constructor.
      */
     public function __construct()
@@ -49,6 +54,13 @@ class UXGameScene
     }
 
     public function pause()
+    {
+    }
+
+    /**
+     * @param callable|null $handler (x, y)
+     */
+    public function setScrollHandler(callable $handler)
     {
     }
 }

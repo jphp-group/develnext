@@ -2,6 +2,7 @@ package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
@@ -28,6 +29,9 @@ public class UXImage extends BaseWrapper<Image> {
     public UXImage(Environment env, Image wrappedObject) {
         super(env, wrappedObject);
     }
+    public UXImage(Environment env, WritableImage wrappedObject) {
+        super(env, wrappedObject);
+    }
 
     public UXImage(Environment env, ClassEntity clazz) {
         super(env, clazz);
@@ -36,6 +40,18 @@ public class UXImage extends BaseWrapper<Image> {
     @Signature
     public void __construct(Environment env, InputStream is) throws IOException {
         __wrappedObject = new Image(is);
+
+        Stream.closeStream(env, is);
+    }
+
+    @Signature
+    public void __construct(Environment env, InputStream is, double requiredWidth, double requiredHeight) throws IOException {
+        __construct(env, is, requiredWidth, requiredHeight, true);
+    }
+
+    @Signature
+    public void __construct(Environment env, InputStream is, double requiredWidth, double requiredHeight, boolean proportional) throws IOException {
+        __wrappedObject = new Image(is, requiredWidth, requiredHeight, proportional, false);
 
         Stream.closeStream(env, is);
     }

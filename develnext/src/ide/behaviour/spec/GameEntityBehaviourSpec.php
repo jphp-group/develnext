@@ -10,6 +10,7 @@ use behaviour\custom\GameSceneBehaviour;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\GamePaneFormElement;
 use ide\formats\form\elements\PanelFormElement;
 use ide\formats\form\elements\ScrollPaneFormElement;
 use ide\scripts\AbstractScriptComponent;
@@ -22,7 +23,7 @@ class GameEntityBehaviourSpec extends AbstractBehaviourSpec
      */
     public function getName()
     {
-        return 'Игровой объект';
+        return 'Объект игровой сцены';
     }
 
     public function getGroup()
@@ -40,7 +41,7 @@ class GameEntityBehaviourSpec extends AbstractBehaviourSpec
      */
     public function getDescription()
     {
-        return 'Делает объект игровым, добавляя ему свойства физики и не только';
+        return 'Объект для игровой сцены со свойства физики и не только';
     }
 
     /**
@@ -58,6 +59,6 @@ class GameEntityBehaviourSpec extends AbstractBehaviourSpec
     public function isAllowedFor($target)
     {
         return !($target instanceof AbstractScriptComponent)
-                && !($target instanceof FormFormElement);
+                && !($target instanceof FormFormElement) && !($target instanceof GamePaneFormElement);
     }
 }

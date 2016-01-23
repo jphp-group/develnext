@@ -1,6 +1,7 @@
 package org.develnext.jphp.ext.game.classes;
 
 import javafx.scene.Node;
+import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.game.GameExtension;
 import org.develnext.jphp.ext.game.support.GamePane;
 import org.develnext.jphp.ext.javafx.classes.layout.UXScrollPane;
@@ -16,8 +17,13 @@ public class UXGamePane extends UXScrollPane<GamePane> {
         @Property("scrollY") double vvalue();
         @Property("scrollX") double hvalue();
 
-        @Property Node watchingNode();
-        void scrollTo(Node node);
+        @Property double areaWidth();
+        @Property double areaHeight();
+        @Property double[] areaSize();
+
+        @Property boolean autoSize();
+
+        @Property Color areaBackgroundColor();
     }
 
     public UXGamePane(Environment env, GamePane wrappedObject) {

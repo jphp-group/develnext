@@ -261,6 +261,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $buildConfig->setDependency('jphp-gui-ext');
         $buildConfig->setDependency('jphp-gui-desktop-ext');
         $buildConfig->setDependency('jphp-game-ext');
+        $buildConfig->setDependency('dyn4j');
         $buildConfig->setDependency('jphp-zend-ext');
         $buildConfig->setDependency('jphp-gui-framework');
         $buildConfig->setDependency('develnext-stdlib');

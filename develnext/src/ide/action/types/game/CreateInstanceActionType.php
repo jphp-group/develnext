@@ -45,8 +45,8 @@ class CreateInstanceActionType extends AbstractSimpleActionType
     {
         return [
             'id' => ['def' => '~sender'],
-            'x'  => ['def' => 0],
-            'y'  => ['def' => 0],
+            'x'  => ['def' => '0'],
+            'y'  => ['def' => '0'],
         ];
     }
 

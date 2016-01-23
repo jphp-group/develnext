@@ -5,6 +5,7 @@ use ide\action\AbstractSimpleActionType;
 use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\utils\FileUtils;
+use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\io\IOException;
 use php\lib\Str;
 use php\xml\DomElement;
@@ -124,5 +125,16 @@ abstract class AbstractBehaviourSpec
     public function isAllowedFor($target)
     {
         return true;
+    }
+
+    /**
+     * @return AbstractBehaviour
+     */
+    public function createBehaviour()
+    {
+        $class = $this->getType();
+
+        $behaviour = new $class();
+        return $behaviour;
     }
 }

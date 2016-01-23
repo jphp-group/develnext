@@ -11,6 +11,26 @@ use php\gui\UXParent;
 class UXGameEntity
 {
     /**
+     * @var float
+     */
+    public $x;
+
+    /**
+     * @var float
+     */
+    public $y;
+
+    /**
+     * @var float
+     */
+    public $centerX;
+
+    /**
+     * @var float
+     */
+    public $centerY;
+
+    /**
      * @var string STATIC, DYNAMIC, KINEMATIC
      */
     public $bodyType = 'STATIC';

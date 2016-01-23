@@ -1,5 +1,7 @@
 <element extends="NodeFormElement">
     <properties>
-        <property code="autoSize" name="Авторазмер" editor="boolean" tooltip="Подгонять размер игровой панели под размер сцены" />
+        <property code="areaBackgroundColor" name="Цвет фона" editor="color" tooltip="Фоновый цвет игровой комнаты" />
+        <property code="areaSize" name="Размеры комнаты" editor="doubleArray" tooltip="Высота и ширина комнаты" />
+        <property code="autoSize" name="Авторазмер" editor="boolean" tooltip="Подгонять размер игровой комнаты под размер панели" />
     </properties>
 </element>

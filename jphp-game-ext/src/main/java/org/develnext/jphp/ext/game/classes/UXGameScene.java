@@ -5,9 +5,11 @@ import org.develnext.jphp.ext.game.support.GameEntity2D;
 import org.develnext.jphp.ext.game.support.GameScene2D;
 import org.develnext.jphp.ext.game.support.Vec2d;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
+import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
@@ -17,6 +19,7 @@ public class UXGameScene extends BaseWrapper<GameScene2D> {
         @Property Vec2d gravity();
         @Property double gravityX();
         @Property double gravityY();
+        @Property @Nullable GameEntity2D observedObject();
 
         void play();
         void pause();
@@ -43,5 +46,19 @@ public class UXGameScene extends BaseWrapper<GameScene2D> {
     @Signature
     public void remove(GameEntity2D entity) {
         getWrappedObject().removeEntity(entity);
+    }
+
+    @Signature
+    public void setScrollHandler(@Nullable final Invoker invoker) {
+        if (invoker == null) {
+            getWrappedObject().setScrollHandler(null);
+        } else {
+            getWrappedObject().setScrollHandler(new GameScene2D.ScrollHandler() {
+                @Override
+                public void scrollTo(double x, double y) {
+                    invoker.callAny(x, y);
+                }
+            });
+        }
     }
 }

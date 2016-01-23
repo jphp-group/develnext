@@ -154,9 +154,7 @@ class IdeBehaviourPane
                 /** @var AbstractBehaviourSpec $result */
                 $result = $dialog->getResult();
 
-                $class = $result->getType();
-
-                $behaviour = new $class();
+                $behaviour = $result->createBehaviour();
                 $this->behaviourManager->apply($targetId, $behaviour);
                 $this->behaviourManager->save();
 

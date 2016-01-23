@@ -9,8 +9,10 @@ use behaviour\custom\GameSceneBehaviour;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\GamePaneFormElement;
 use ide\formats\form\elements\PanelFormElement;
 use ide\formats\form\elements\ScrollPaneFormElement;
+use ide\formats\form\tags\GamePaneFormElementTag;
 use ide\scripts\AbstractScriptComponent;
 use php\gui\UXNode;
 
@@ -57,7 +59,6 @@ class GameSceneBehaviourSpec extends AbstractBehaviourSpec
     public function isAllowedFor($target)
     {
         return ($target instanceof FormFormElement)
-                || ($target instanceof ScrollPaneFormElement)
-                || ($target instanceof PanelFormElement);
+                || ($target instanceof GamePaneFormElement);
     }
 }

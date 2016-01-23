@@ -1,6 +1,7 @@
 <?php
 namespace ide\formats\form;
 
+use ide\behaviour\AbstractBehaviourSpec;
 use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
@@ -63,6 +64,14 @@ abstract class AbstractFormElement
      * @return UXNode
      */
     abstract public function createElement();
+
+    /**
+     * @return AbstractBehaviourSpec[]
+     */
+    public function getInitialBehaviours()
+    {
+        return [];
+    }
 
     public function addToLayout($layout, $node, $screenX, $screenY)
     {

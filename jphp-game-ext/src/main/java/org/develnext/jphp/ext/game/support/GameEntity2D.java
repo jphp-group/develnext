@@ -4,11 +4,14 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import org.dyn4j.dynamics.Body;
 
 public class GameEntity2D {
     public enum BodyType { STATIC, DYNAMIC, KINEMATIC }
 
     private static final float TIME = 1 / 60.0f;
+
+    Body body;
 
     protected BodyType bodyType = BodyType.STATIC;
 
@@ -30,12 +33,37 @@ public class GameEntity2D {
         this.entityType = entityType;
         this.node = node;
 
+        /*this.body = new Body();
+        this.body.setUserData(this);
+        this.body.setMass(MassType.NORMAL);
+        this.body.addFixture(new Rectangle(getWidth(), getHeight()));
+
+        xProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                //body.setActive(true);
+                updateBodyPos();
+            }
+        });
+
+        yProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                //body.setActive(true);
+                updateBodyPos();
+            }
+        });      */
+
         setX(node.getLayoutX());
         setY(node.getLayoutY());
 
         node.layoutXProperty().bindBidirectional(x);
         node.layoutYProperty().bindBidirectional(y);
     }
+
+   /* protected void updateBodyPos() {
+        body.getTransform().setTranslation((getCenterX()), (getCenterY()));
+    }   */
 
     public DoubleProperty xProperty() {
         return x;
@@ -59,6 +87,22 @@ public class GameEntity2D {
 
     public double getY() {
         return yProperty().get();
+    }
+
+    public double getCenterX() {
+        return getX() + getWidth() / 2;
+    }
+
+    public double getCenterY() {
+        return getY() + getHeight() / 2;
+    }
+
+    public void setCenterX(double v) {
+        setX(v - getWidth() / 2);
+    }
+
+    public void setCenterY(double v) {
+        setY(v - getHeight() / 2);
     }
 
     public Vec2d getVelocity() {

@@ -2,6 +2,7 @@
 namespace script;
 
 use php\gui\framework\AbstractScript;
+use php\gui\framework\ScriptEvent;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\lang\IllegalStateException;
@@ -173,6 +174,24 @@ class TimerScript extends AbstractScript
         $timer->on('action', $callback);
         $timer->start();
 
+        return $timer;
+    }
+
+    static function executeWhile(callable $condition, callable $callback, $checkInterval = 100)
+    {
+        if ($condition()) {
+            $callback();
+            return null;
+        }
+
+        $timer = new TimerScript($checkInterval, true, function (ScriptEvent $e) use ($callback, $condition) {
+            if ($condition()) {
+                $e->sender->free();
+                $callback();
+            }
+        });
+
+        $timer->start();
         return $timer;
     }
 }

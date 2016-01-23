@@ -29,8 +29,11 @@ class UXImage {
 
     /**
      * @param Stream|string $stream
+     * @param $requiredWidth (optional)
+     * @param $requiredHeight (optional)
+     * @param bool $proportional
      */
-    public function __construct($stream) {}
+    public function __construct($stream, $requiredWidth, $requiredHeight, $proportional = true) {}
 
     /**
      * @param $x

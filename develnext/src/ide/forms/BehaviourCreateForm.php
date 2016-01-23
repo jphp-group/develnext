@@ -4,6 +4,7 @@ namespace ide\forms;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\behaviour\IdeBehaviourManager;
 use ide\forms\mixins\DialogFormMixin;
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
@@ -30,6 +31,7 @@ use php\util\SharedValue;
 class BehaviourCreateForm extends AbstractIdeForm
 {
     use DialogFormMixin;
+    use SavableFormMixin;
 
     /**
      * @var IdeBehaviourManager

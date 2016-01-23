@@ -14,7 +14,7 @@ class UXGraphicsContext
      * @param $w
      * @param $h
      */
-    public function clearReact($x, $y, $w, $h)
+    public function clearRect($x, $y, $w, $h)
     {
     }
 

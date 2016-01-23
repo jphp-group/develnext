@@ -100,6 +100,7 @@ project(':jphp-gui-ext') {
 project(':jphp-game-ext') {
     dependencies {
         compile 'org.jbox2d:jbox2d-library:2.2.1.1'
+        compile 'org.dyn4j:dyn4j:3.2.1'
 
         compile project(':jphp-gui-ext')
         compile "org.develnext:jphp-runtime:$jphpVersion"
