@@ -36,6 +36,23 @@ class EnumArgumentEditor extends AbstractArgumentEditor
         $this->noneItem = false;
     }
 
+
+    /**
+     * @return mixed
+     */
+    public function updateUi()
+    {
+        if ($this->list) {
+            $this->list->items->clear();
+
+            if ($this->noneItem) {
+                $this->list->items->add(new ObjectListEditorItem($this->noneItem, null, ''));
+            }
+
+            $this->list->items->addAll($this->options);
+        }
+    }
+
     /**
      * @param null $label
      * @return UXNode

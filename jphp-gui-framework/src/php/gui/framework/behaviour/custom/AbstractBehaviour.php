@@ -1,11 +1,14 @@
 <?php
 namespace php\gui\framework\behaviour\custom;
 use php\gui\framework\ScriptEvent;
+use php\gui\UXNode;
+use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\gui\UXDialog;
 use ReflectionClass;
 use ReflectionProperty;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 /**
  * Class AbstractBehaviour
@@ -104,7 +107,18 @@ abstract class AbstractBehaviour
             $target->data("--property-$code", $this);
         }
 
+        /** @var UXNode $target */
         $this->applyImpl($target);
+
+        try {
+            $target->observer('parent')->addListener(function ($old, $new) {
+                if (!$new) {
+                    $this->free();
+                }
+            });
+        } catch (IllegalArgumentException $e) {
+            ;
+        }
     }
 
     public function disable()
@@ -117,7 +131,7 @@ abstract class AbstractBehaviour
         $this->enabled = true;
     }
 
-    protected function timer($interval, $callback)
+    protected function timer($interval, callable $callback)
     {
         $this->__timers[] = $timerScript = new TimerScript($interval, true, function (ScriptEvent $e = null) use ($callback) {
             if ($this->_target->isFree()) {
@@ -134,11 +148,22 @@ abstract class AbstractBehaviour
         return $timerScript;
     }
 
+    protected function accurateTimer($interval, callable $handle)
+    {
+        $this->__timers[] = $timer = new AccurateTimer($interval, $handle);
+
+        $timer->start();
+
+        return $timer;
+    }
+
     public function free()
     {
         foreach ($this->__timers as $timer) {
             $timer->free();
         }
+
+        $this->__timers = [];
     }
 
     public function __clone()

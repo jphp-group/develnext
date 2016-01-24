@@ -78,6 +78,18 @@ public class GamePane extends ScrollPane {
         });
     }
 
+    public void loadArea(AnchorPane area) {
+        if (!getAutoSize()) {
+            setAreaWidth(area.getWidth());
+            setAreaHeight(area.getHeight());
+        } else {
+            area.setPrefWidth(getWidth());
+            area.setPrefHeight(getHeight());
+        }
+
+        setContent(area);
+    }
+
     public boolean getAutoSize() {
         return autoSizeProperty.get();
     }

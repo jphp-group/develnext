@@ -6,7 +6,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.dyn4j.dynamics.Capacity;
+import org.dyn4j.dynamics.CollisionAdapter;
 import org.dyn4j.dynamics.World;
+import org.dyn4j.dynamics.contact.ContactConstraint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,16 +43,18 @@ public class GameScene2D {
     public GameScene2D() {
         world = new World(Capacity.DEFAULT_CAPACITY);
 
-        /*world.addListener(new CollisionAdapter() {
+        world.addListener(new CollisionAdapter() {
             @Override
             public boolean collision(ContactConstraint contactConstraint) {
-                System.out.println(contactConstraint.getNormal().x + ":" + contactConstraint.getNormal().y);
                 GameEntity2D e1 = (GameEntity2D) contactConstraint.getBody1().getUserData();
                 GameEntity2D e2 = (GameEntity2D) contactConstraint.getBody2().getUserData();
 
-                return true;
+                boolean consume1 = e1.triggerCollision(e2, contactConstraint);
+                boolean consume2 = e2.triggerCollision(e1, contactConstraint);
+
+                return consume1 || consume2;
             }
-        }); */
+        });
     }
 
     public void play() {
@@ -148,14 +152,24 @@ public class GameScene2D {
         if (entity.getScene() == null) {
             entity.scene = this;
             entities.add(entity);
-           // world.addBody(entity.body);
+            world.addBody(entity.body);
         }
     }
 
     public void removeEntity(GameEntity2D entity) {
         entities.remove(entity);
-        //world.removeBody(entity.body);
+        world.removeBody(entity.body);
         entity.scene = null;
+    }
+
+    public void clear() {
+        world.removeAllBodies();
+
+        for (GameEntity2D entity : entities) {
+            entity.scene = null;
+        }
+
+        entities.clear();
     }
 
     public Vec2d getGravity() {
@@ -164,7 +178,6 @@ public class GameScene2D {
 
     public void setGravity(Vec2d gravity) {
         this.gravity = gravity;
-        //this.world.setGravity(new Vector2(gravity.x, gravity.y));
     }
 
     public double getGravityX() {

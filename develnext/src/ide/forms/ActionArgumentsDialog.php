@@ -17,6 +17,7 @@ use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXLabelEx;
+use php\lib\items;
 
 /**
  * Class ActionArgumentsDialog
@@ -39,6 +40,20 @@ class ActionArgumentsDialog extends AbstractIdeForm
      */
     protected $argumentEditors = [];
 
+    public function updateAction(Action $action, $isNew = false)
+    {
+        if ($isNew) {
+            $action->fillDefaults();
+        }
+
+        foreach ($this->argumentEditors as $name => $editor) {
+            $editor->updateUi();
+            $editor->setValue($action->{$name}, $action->{"$name-type"});
+        }
+
+        items::first($this->argumentEditors)->requestUiFocus();
+    }
+
     public function setAction(Action $action, $isNew = false)
     {
         $this->box->children->clear();
@@ -60,7 +75,6 @@ class ActionArgumentsDialog extends AbstractIdeForm
             $this->addHelpText($type->getHelpText());
         }
 
-        $i = 0;
         foreach ($type->attributes() as $name => $value) {
             $label = $attributeLabels[$name];
 
@@ -72,14 +86,10 @@ class ActionArgumentsDialog extends AbstractIdeForm
 
             $editor = $this->addArgument($name, $label, $value, $settings);
 
-            if ($i == 0) {
-                $editor->requestUiFocus();
-            }
-
             $editor->setValue($action->{$name}, $action->{"$name-type"});
-
-            $i++;
         }
+
+        items::first($this->argumentEditors)->requestUiFocus();
 
         UXApplication::runLater(function () {
             $height = 0;

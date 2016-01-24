@@ -30,7 +30,6 @@ class MethodsArgumentEditor extends AbstractArgumentEditor
     public function makeUi($label = null)
     {
         $this->comboBox = new UXComboBox();
-        $this->comboBox->items->addAll($this->options);
 
         $labelUi = new UXLabel($label);
         $labelUi->style = '-fx-font-style: italic;';
@@ -39,6 +38,8 @@ class MethodsArgumentEditor extends AbstractArgumentEditor
         $box = new UXHBox([$labelUi, $this->comboBox]);
         $box->spacing = 10;
         $box->paddingLeft = 50;
+
+        $this->updateUi();
 
         return $box;
     }
@@ -78,5 +79,14 @@ class MethodsArgumentEditor extends AbstractArgumentEditor
     public function getCode()
     {
         return null;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function updateUi()
+    {
+        $this->comboBox->items->clear();
+        $this->comboBox->items->addAll($this->options);
     }
 }

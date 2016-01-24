@@ -585,7 +585,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     {
         $editors = [];
         foreach ($this->getScriptModules() as $file) {
-            $editor = FileSystem::fetchEditor($this->project->getFile(self::SCRIPTS_DIRECTORY . '/' . $file));
+            $editor = FileSystem::fetchEditor($this->project->getFile(self::SCRIPTS_DIRECTORY . '/' . $file), true);
             $editors[FileUtils::hashName($file)] = $editor;
         }
 
@@ -603,7 +603,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         FileUtils::scan($formDir, function ($filename) use (&$editors) {
             if (FileUtils::getExtension($filename) == "fxml") {
-                $editor = FileSystem::fetchEditor($filename);
+                $editor = FileSystem::fetchEditor($filename, true);
 
                 $editors[FileUtils::hashName($filename)] = $editor;
             }

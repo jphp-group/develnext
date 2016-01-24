@@ -1,11 +1,12 @@
 <?php
 namespace ide\formats\form\event;
 
+use ide\editors\AbstractEditor;
 use php\gui\event\UXMouseEvent;
 
 class MouseParamEventKind extends MouseEventKind
 {
-    public function getParamVariants()
+    public function getParamVariants(AbstractEditor $contextEditor = null)
     {
         return [
             'Любая кнопка' => '',

@@ -1,5 +1,6 @@
 <behaviour extends="BehaviourSpec">
     <properties>
+        <property name="Начальная сцена" code="initialScene" editor="form" tooltip="Вы можете подгрузить другую форму в сцену и сделать ее начальной" />
         <property name="Автозапуск" code="autoplay" editor="boolean" tooltip="Проигрывать всю сцену при старте" />
         <property name="Уровень гравитации" code="gravityType" editor="enum" tooltip="Величина гравитации (притяжения)">
             <variants>

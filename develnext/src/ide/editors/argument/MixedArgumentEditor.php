@@ -89,9 +89,9 @@ class MixedArgumentEditor extends AbstractArgumentEditor
 
         $this->objectListEditor->enableSender();
 
-        if (!($this->userData instanceof ScriptModuleEditor)) {
+        //if (!($this->userData instanceof ScriptModuleEditor)) {
             $this->objectListEditor->enableAllForms();
-        }
+        //}
 
         $this->objectListEditor->build();
 
@@ -99,6 +99,8 @@ class MixedArgumentEditor extends AbstractArgumentEditor
         $this->objectListEditor->onChange(function ($value) {
             $this->input->text = $value;
         });
+
+        UXHBox::setHgrow($this->objectListEditor->getUi(), 'ALWAYS');
     }
 
     protected function makeFormListUi()
@@ -111,6 +113,9 @@ class MixedArgumentEditor extends AbstractArgumentEditor
         $this->formListEditor->onChange(function ($value) {
             $this->input->text = $value;
         });
+
+
+        UXHBox::setHgrow($this->formListEditor->getUi(), 'ALWAYS');
     }
 
     protected function makeInstancesListUi()
@@ -129,6 +134,8 @@ class MixedArgumentEditor extends AbstractArgumentEditor
         $this->instancesListEditor->onChange(function ($value) {
             $this->input->text = $value;
         });
+
+        UXHBox::setHgrow($this->instancesListEditor->getUi(), 'ALWAYS');
     }
 
     /**
@@ -137,9 +144,17 @@ class MixedArgumentEditor extends AbstractArgumentEditor
      */
     public function makeUi($label = null)
     {
-        $this->makeFormListUi();
-        $this->makeObjectListUi();
-        $this->makeInstancesListUi();
+        if (in_array('form', $this->valueTypes())) {
+            $this->makeFormListUi();
+        }
+
+        if (in_array('object', $this->valueTypes())) {
+            $this->makeObjectListUi();
+        }
+
+        if (in_array('instances', $this->valueTypes())) {
+            $this->makeInstancesListUi();
+        }
 
         $this->typeSelect = new UXComboBox();
         $this->typeSelect->editable = false;
@@ -148,7 +163,7 @@ class MixedArgumentEditor extends AbstractArgumentEditor
             $this->typeSelect->items->add($this->valueTypeLabels()[$code] ?: $code);
         }
 
-        $this->typeSelect->width = 120;
+        $this->typeSelect->width = 135;
 
         $this->input = new UXTextField();
         $this->input->maxWidth = 9999;
@@ -158,18 +173,32 @@ class MixedArgumentEditor extends AbstractArgumentEditor
         $this->box->maxWidth = 99999;
 
         UXHBox::setHgrow($this->input, 'ALWAYS');
-        UXHBox::setHgrow($this->objectListEditor->getUi(), 'ALWAYS');
-        UXHBox::setHgrow($this->formListEditor->getUi(), 'ALWAYS');
-        UXHBox::setHgrow($this->instancesListEditor->getUi(), 'ALWAYS');
 
         $this->typeSelect->on('action', function () {
-            $this->updateUi();
+            $this->update();
         });
 
         return $this->box;
     }
 
     public function updateUi()
+    {
+        if ($this->objectListEditor) {
+            $this->objectListEditor->updateUi();
+        }
+
+        if ($this->formListEditor) {
+            $this->formListEditor->updateUi();
+        }
+
+        if ($this->instancesListEditor) {
+            $this->instancesListEditor->updateUi();
+        }
+
+        //$this->update();
+    }
+
+    public function update()
     {
         $this->box->children->clear();
         $this->box->add($this->typeSelect);
@@ -218,14 +247,19 @@ class MixedArgumentEditor extends AbstractArgumentEditor
             $this->typeSelect->selectedIndex = 0;
         }
 
-        if ($type == 'object') {
+        if ($type == 'object' && $this->objectListEditor) {
             $this->objectListEditor->setSelected($value);
         }
 
-        $this->instancesListEditor->setSelected($value);
-        $this->formListEditor->setSelected($value);
+        if ($this->instancesListEditor) {
+            $this->instancesListEditor->setSelected($value);
+        }
 
-        $this->updateUi();
+        if ($this->formListEditor) {
+            $this->formListEditor->setSelected($value);
+        }
+
+        $this->update();
     }
 
     public function getValue()

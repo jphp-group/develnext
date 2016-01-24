@@ -45,4 +45,12 @@ class NameArgumentEditor extends AbstractArgumentEditor
 
         $this->inputField->text = $value;
     }
+
+    /**
+     * @return mixed
+     */
+    public function updateUi()
+    {
+        // nop.
+    }
 }

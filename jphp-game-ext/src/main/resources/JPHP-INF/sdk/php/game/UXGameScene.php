@@ -57,6 +57,10 @@ class UXGameScene
     {
     }
 
+    public function clear()
+    {
+    }
+
     /**
      * @param callable|null $handler (x, y)
      */

@@ -17,7 +17,7 @@ function dump($arg)
 
     ob_end_clean();
 
-    UXDialog::show($str);
+    UXDialog::showAndWait($str);
 }
 
 /**

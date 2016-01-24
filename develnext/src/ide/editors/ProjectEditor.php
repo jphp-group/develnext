@@ -157,7 +157,7 @@ class ProjectEditor extends AbstractEditor
 
             if ($input) {
                 if (!Ide::project()->setName($input)) {
-                    UXDialog::show("Невозможно дать проекту введенное имя '$input', попробуйте другое.");
+                    UXDialog::showAndWait("Невозможно дать проекту введенное имя '$input', попробуйте другое.");
                 } else {
                     $this->projectNameLabel->text = $input;
                     Ide::get()->setOpenedProject(Ide::project());

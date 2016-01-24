@@ -18,6 +18,8 @@ class StandaloneFactory extends AbstractFactory
      */
     public function __construct(AbstractForm $form, $fxmlFile, BehaviourManager $manager, EventBinder $eventBinder)
     {
+        $this->factoryName = $form->getName();
+
         $this->eventBinder = $eventBinder;
         $this->behaviourManager = $manager;
         $this->loadPrototypes($fxmlFile);

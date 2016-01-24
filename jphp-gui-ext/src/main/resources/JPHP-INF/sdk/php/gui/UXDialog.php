@@ -18,6 +18,14 @@ class UXDialog
 
     /**
      * @param $text
+     * @param string $type
+     */
+    public static function showAndWait($text, $type = 'INFORMATION')
+    {
+    }
+
+    /**
+     * @param $text
      * @param UXNode $content
      * @param $expanded
      * @param $type

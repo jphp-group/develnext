@@ -71,6 +71,14 @@ abstract class ResourceArgumentEditor extends AbstractArgumentEditor
     }
 
     /**
+     * @return mixed
+     */
+    public function updateUi()
+    {
+        $this->ui->update();
+    }
+
+    /**
      * @param $value
      * @param $type
      */

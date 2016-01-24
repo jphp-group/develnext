@@ -62,4 +62,11 @@ class UXDesignProperties
     public function update()
     {
     }
+
+    /**
+     * @param $groupCode
+     */
+    public function updateOne($groupCode)
+    {
+    }
 }

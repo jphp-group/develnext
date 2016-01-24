@@ -8,6 +8,7 @@ use php\lang\IllegalStateException;
 use php\lang\ThreadPool;
 use php\lang\Thread;
 use php\lib\Str;
+use script\TimerScript;
 
 /**
  * Class Timer
@@ -17,17 +18,6 @@ class Timer
 {
     public static function run($delay, callable $handler)
     {
-        $timeline = new UXTimeline([new UXKeyFrame($delay, function () use ($handler) {
-            try {
-                UXApplication::runLater($handler);
-            } catch (IllegalStateException $e) {
-                if ($e->getMessage() == "java.lang.IllegalStateException: Platform.exit has been called") {
-                    return;
-                }
-
-                throw $e;
-            }
-        })]);
-        $timeline->play();
+        TimerScript::executeAfter($delay, $handler);
     }
 }

@@ -1,6 +1,7 @@
 package org.develnext.jphp.ext.game.classes;
 
 import javafx.scene.Node;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.game.GameExtension;
 import org.develnext.jphp.ext.game.support.GamePane;
@@ -24,6 +25,8 @@ public class UXGamePane extends UXScrollPane<GamePane> {
         @Property boolean autoSize();
 
         @Property Color areaBackgroundColor();
+
+        void loadArea(AnchorPane area);
     }
 
     public UXGamePane(Environment env, GamePane wrappedObject) {

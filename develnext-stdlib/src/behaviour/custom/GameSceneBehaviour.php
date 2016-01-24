@@ -1,6 +1,7 @@
 <?php
 namespace behaviour\custom;
 
+use php\game\UXGamePane;
 use php\game\UXGameScene;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\layout\UXAnchorPane;
@@ -9,6 +10,11 @@ use php\gui\UXWindow;
 
 class GameSceneBehaviour extends AbstractBehaviour
 {
+    /**
+     * @var string|null
+     */
+    public $initialScene = null;
+
     /**
      * @var bool
      */
@@ -42,7 +48,6 @@ class GameSceneBehaviour extends AbstractBehaviour
         $this->scene = $scene;
 
         if ($target instanceof UXWindow) {
-            $target->layout->data('--property-phys', $scene);
             $target->layout->data('--game-scene', $this);
         } elseif ($target instanceof UXScrollPane) {
             $target->content->data('--game-scene', $this);
@@ -50,14 +55,40 @@ class GameSceneBehaviour extends AbstractBehaviour
                 $target->scrollX = $x;
                 $target->scrollY = $y;
             });
-        } else {
-            $target->data('--property-phys', $scene);
         }
 
         $this->initGravity();
 
+        if ($this->initialScene) {
+            uiLater(function () {
+                $this->loadScene($this->initialScene);
+            });
+        }
+
         if ($this->autoplay) {
             $this->play();
+        }
+    }
+
+    public function loadScene($name)
+    {
+        $this->scene->pause();
+        $this->scene->clear();
+
+        $form = app()->getNewForm($name, null, false);
+
+        $form->layout->data('--game-scene', $this);
+
+        if ($this->_target instanceof UXWindow) {
+            $this->_target->layout = $form->layout;
+        } elseif ($this->_target instanceof UXGamePane) {
+            $this->_target->loadArea($form->layout);
+        }
+
+        $form->loadBehaviours();
+
+        if ($this->autoplay) {
+            $this->scene->play();
         }
     }
 

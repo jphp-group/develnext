@@ -93,6 +93,16 @@ public class UXDesignProperties extends BaseObject {
     }
 
     @Signature
+    public void updateOne(String group) {
+        TitledPane titledPane = groups.get(group);
+
+        if (titledPane != null) {
+            PropertyTableView content = (PropertyTableView) titledPane.getContent();
+            content.update();
+        }
+    }
+
+    @Signature
     public void removeGroup(String groupCode) {
         groups.remove(groupCode);
     }

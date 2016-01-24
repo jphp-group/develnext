@@ -2,11 +2,22 @@ package org.develnext.jphp.ext.game.support;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventDispatchChain;
+import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import org.dyn4j.dynamics.Body;
+import org.dyn4j.dynamics.contact.ContactConstraint;
+import org.dyn4j.geometry.MassType;
+import org.dyn4j.geometry.Rectangle;
 
-public class GameEntity2D {
+import java.util.HashMap;
+import java.util.Map;
+
+public class GameEntity2D implements EventTarget {
     public enum BodyType { STATIC, DYNAMIC, KINEMATIC }
 
     private static final float TIME = 1 / 60.0f;
@@ -29,19 +40,21 @@ public class GameEntity2D {
 
     GameScene2D scene;
 
+    protected Map<String, EventHandler<CollisionEvent>> collisionHandlers = new HashMap<>();
+
     public GameEntity2D(String entityType, Node node) {
         this.entityType = entityType;
         this.node = node;
 
-        /*this.body = new Body();
+        this.body = new Body();
         this.body.setUserData(this);
         this.body.setMass(MassType.NORMAL);
         this.body.addFixture(new Rectangle(getWidth(), getHeight()));
+        this.body.setActive(node.isVisible());
 
         xProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                //body.setActive(true);
                 updateBodyPos();
             }
         });
@@ -49,21 +62,27 @@ public class GameEntity2D {
         yProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                //body.setActive(true);
                 updateBodyPos();
             }
-        });      */
+        });
 
         setX(node.getLayoutX());
         setY(node.getLayoutY());
 
         node.layoutXProperty().bindBidirectional(x);
         node.layoutYProperty().bindBidirectional(y);
+
+        node.visibleProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                body.setActive(newValue);
+            }
+        });
     }
 
-   /* protected void updateBodyPos() {
+    protected void updateBodyPos() {
         body.getTransform().setTranslation((getCenterX()), (getCenterY()));
-    }   */
+    }
 
     public DoubleProperty xProperty() {
         return x;
@@ -222,6 +241,22 @@ public class GameEntity2D {
         }
     }
 
+    public double getHspeed() {
+        return getVelocityX();
+    }
+
+    public double getVspeed() {
+        return getVelocityY();
+    }
+
+    public void setHspeed(double value) {
+        setVelocityX(value);
+    }
+
+    public void setVspeed(double value) {
+        setVelocityY(value);
+    }
+
     public double getVelocityX() {
         return velocity.x;
     }
@@ -283,5 +318,27 @@ public class GameEntity2D {
         if (value == 0.0) {
             direction = oldDirection;
         }
+    }
+
+    public boolean triggerCollision(GameEntity2D other, ContactConstraint constraint) {
+        EventHandler<CollisionEvent> eventHandler = collisionHandlers.get(other.getEntityType());
+
+        if (eventHandler != null) {
+            CollisionEvent event = new CollisionEvent(this, other, constraint);
+            eventHandler.handle(event);
+
+            return event.isConsumed();
+        }
+
+        return false;
+    }
+
+    public void setCollisionHandler(String entityType, EventHandler<CollisionEvent> collisionHandler) {
+        collisionHandlers.put(entityType, collisionHandler);
+    }
+
+    @Override
+    public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
+        return null;
     }
 }

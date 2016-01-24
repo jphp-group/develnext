@@ -1,8 +1,10 @@
 <?php
 namespace action;
 
+use php\gui\animation\UXAnimationTimer;
 use php\gui\animation\UXFadeAnimation;
 use php\gui\animation\UXPathAnimation;
+use php\gui\framework\Instances;
 use php\gui\framework\ObjectGroup;
 use php\gui\framework\ScriptEvent;
 use php\gui\UXNode;
@@ -14,7 +16,7 @@ class Animation
 {
     static function fadeTo($object, $duration, $value, callable $callback = null)
     {
-        if ($object instanceof ObjectGroup) {
+        if ($object instanceof Instances) {
             $cnt = sizeof($object);
 
             $done = function () use (&$cnt, $callback) {
@@ -31,52 +33,38 @@ class Animation
             return null;
         }
 
-        if ($object instanceof UXNode) {
-            $anim = new UXFadeAnimation($duration, $object);
-            $anim->fromValue = $object->opacity;
-            $anim->toValue = $value;
+        $diff = $value - $object->opacity;
 
-            if ($callback) {
-                $anim->on('finish', $callback);
+        $steps = $duration / UXAnimationTimer::FRAME_INTERVAL_MS;
+        $step = $diff / $steps;
+
+        $timer = new UXAnimationTimer(function () use ($object, $step, $value, $callback, &$steps) {
+            $opacity = $object->opacity + $step;
+
+            if ($opacity > 1) {
+                $opacity = 1;
             }
 
-            $anim->play();
-            return $anim;
-        } else {
-            $diff = $value - $object->opacity;
+            $object->opacity = $opacity < 0 ? 0 : $opacity;
 
-            $steps = $duration / 25;
+            $steps--;
 
-            $step = $diff / $steps;
+            if ($steps <= 0) {
+                $object->opacity = (double) $value;
 
-            $timer = new TimerScript();
-            $timer->interval = 25;
-            $timer->repeatable = true;
-
-            $timer->on('action', function (ScriptEvent $e) use ($object, $step, $value, $callback, &$steps) {
-                $opacity = $object->opacity + $step;
-
-                if ($opacity > 1) {
-                    $opacity = 1;
+                if ($callback) {
+                    $callback();
                 }
 
-                $object->opacity = $opacity < 0 ? 0 : $opacity;
+                return true;
+            }
 
-                $steps--;
+            return false;
+        });
 
-                if ($steps <= 0) {
-                    $e->sender->free();
-                    $object->opacity = (double) $value;
+        $timer->start();
 
-                    if ($callback) {
-                        $callback();
-                    }
-                }
-            });
-            $timer->start();
-
-            return $timer;
-        }
+        return $timer;
     }
 
     static function fadeIn($object, $duration, callable $callback = null)
@@ -96,7 +84,7 @@ class Animation
 
     static function moveTo($object, $duration, $x, $y, callable $callback = null)
     {
-        if ($object instanceof ObjectGroup) {
+        if ($object instanceof Instances) {
             $cnt = sizeof($object);
 
             $done = function () use (&$cnt, $callback) {
@@ -130,29 +118,28 @@ class Animation
             $xOffset = $x - $object->x;
             $yOffset = $y - $object->y;
 
-            $steps = $duration / 25;
+            $steps = $duration / UXAnimationTimer::FRAME_INTERVAL_MS;
 
             $xStep = $xOffset / $steps;
             $yStep = $yOffset / $steps;
 
-            $timer = new TimerScript();
-            $timer->interval = 25;
-            $timer->repeatable = true;
-
-            $timer->on('action', function (ScriptEvent $e) use ($object, $xStep, $yStep, $x, $y, $callback, &$steps) {
+            $timer = new UXAnimationTimer(function () use ($object, $xStep, $yStep, $x, $y, $callback, &$steps) {
                 $object->x += $xStep;
                 $object->y += $yStep;
 
                 $steps--;
 
                 if ($steps <= 0) {
-                    $e->sender->free();
                     $object->position = [$x, $y];
 
                     if ($callback) {
                         $callback();
                     }
+
+                    return true;
                 }
+
+                return false;
             });
             $timer->start();
 

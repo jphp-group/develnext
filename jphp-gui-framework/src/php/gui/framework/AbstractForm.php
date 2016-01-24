@@ -78,13 +78,13 @@ abstract class AbstractForm extends UXForm
 
     /**
      * @param UXForm $origin
+     * @param bool $loadBehaviours
      * @throws Exception
+     * @throws IllegalStateException
      */
-    public function __construct(UXForm $origin = null)
+    public function __construct(UXForm $origin = null, $loadBehaviours = true)
     {
         parent::__construct($origin);
-
-        $name = Str::replace(get_class($this), '\\', '/');
 
         $this->_app = Application::get();
         $this->loadConfig(null, false);
@@ -105,7 +105,17 @@ abstract class AbstractForm extends UXForm
         }
 
         $this->behaviourManager = $behaviourManager = new FormBehaviourManager($this);
-        BehaviourLoader::load("res://$name.behaviour", $behaviourManager);
+
+        if ($loadBehaviours) {
+            $this->loadBehaviours();
+        }
+    }
+
+    public function loadBehaviours()
+    {
+        $name = Str::replace(get_class($this), '\\', '/');
+
+        BehaviourLoader::load("res://$name.behaviour", $this->behaviourManager);
     }
 
     public function behaviour($target, $class)
@@ -200,6 +210,11 @@ abstract class AbstractForm extends UXForm
      */
     public function instances($id)
     {
+        if (str::contains($id, '.')) {
+            $id = str::split($id, '.', 2);
+            return $this->form($id[0])->instances($id[1]);
+        }
+
         $node = parent::__get($id);
 
         if (!$node) {
@@ -468,6 +483,8 @@ abstract class AbstractForm extends UXForm
                         }
 
                         if ($node) {
+                            $node->data('-factory-name', $this->getName());
+                            $node->data('-factory', $this);
                             UXNodeWrapper::get($node)->applyData($data);
                         }
                     }
@@ -625,6 +642,10 @@ abstract class AbstractForm extends UXForm
 
             if (!$handler) {
                 throw new Exception("Unable to bind '$event'");
+            }
+
+            if ($handler === true) {
+                return;
             }
 
             $group .= '-' . $event;

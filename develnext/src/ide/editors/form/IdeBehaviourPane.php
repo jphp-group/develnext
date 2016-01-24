@@ -8,6 +8,7 @@ use ide\editors\value\ElementPropertyEditor;
 use ide\forms\BehaviourCreateForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
+use ide\Logger;
 use php\gui\designer\UXDesignProperties;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\layout\UXHBox;
@@ -35,6 +36,26 @@ class IdeBehaviourPane
     protected $lastUi;
 
     /**
+     * @var UXDesignProperties
+     */
+    protected $pane;
+
+    /**
+     * @var array
+     */
+    protected $targetBehaviours = [];
+
+    /**
+     * @var UXNode
+     */
+    protected $hintNode;
+
+    /**
+     * @var string
+     */
+    protected $hintNodeText;
+
+    /**
      * @param IdeBehaviourManager $manager
      */
     public function __construct(IdeBehaviourManager $manager)
@@ -42,41 +63,79 @@ class IdeBehaviourPane
         $this->behaviourManager = $manager;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getHintNode()
+    {
+        return $this->hintNode;
+    }
+
+    /**
+     * @param mixed $hintNode
+     */
+    public function setHintNode($hintNode)
+    {
+        $this->hintNode = $hintNode;
+        $this->hintNodeText = $hintNode->text;
+    }
+
     public function makeUi($targetId, UXVBox $box = null)
     {
-        $pane = new UXDesignProperties();
+        if ($this->pane) {
+            $pane = $this->pane;
+        } else {
+            $pane = $this->pane = new UXDesignProperties();
+        }
 
         $behaviours = $this->behaviourManager->getBehaviours($targetId);
+        $groupPanes = [];
 
-        foreach ($behaviours as $behaviour) {
+        $this->targetBehaviours = $behaviours;
+
+        foreach ($behaviours as $class => $behaviour) {
             $spec = $this->behaviourManager->getBehaviourSpec($behaviour);
             $properties = $spec->getProperties();
 
-            $code = get_class($spec);
-
-            $pane->addGroup($code, $spec->getName());
+            $code = $class;
 
             $groupPane = $pane->getGroupPane($code);
-            $groupPane->graphic = new UXHBox([
-                Ide::get()->getImage($spec->getIcon()),
-                new UXLabel($spec->getName()),
-            ]);
 
-            $this->initDeleteBehaviourButton($groupPane->graphic, $targetId, $behaviour);
+            if (!$groupPane) {
+                $pane->addGroup($code, $spec->getName());
 
-            $groupPane->graphic->spacing = 4;
-            $groupPane->text = null;
+                $groupPane = $pane->getGroupPane($code);
+                $groupPane->graphic = new UXHBox([
+                    Ide::get()->getImage($spec->getIcon()),
+                    new UXLabel($spec->getName()),
+                ]);
 
-            $groupPane->collapsible = false;
+                $this->initDeleteBehaviourButton($groupPane->graphic, $targetId, $behaviour);
 
-            $this->initProperties($code, $behaviour, $pane, $properties);
+                $groupPane->graphic->spacing = 4;
+                $groupPane->text = null;
+
+                $groupPane->collapsible = false;
+
+                $this->initProperties($code, $pane, $properties);
+            }
+
+            $groupPanes[$code] = $groupPane;
         }
 
         if ($box) {
             $box->children->clear();
-            $box->children->addAll($pane->getGroupPanes());
+            $box->children->addAll($groupPanes);
         } else {
-            $box = new UXVBox($pane->getGroupPanes());
+            $box = new UXVBox($groupPanes);
+        }
+
+        foreach ($groupPanes as $code => $one) {
+            $this->pane->updateOne($code);
+        }
+
+        if ($this->hintNode) {
+            $this->hintNode->text = "{$this->hintNodeText} [{$box->children->count}]";
         }
 
         if ($box->children->count == 0) {
@@ -102,7 +161,6 @@ class IdeBehaviourPane
     protected function initDeleteBehaviourButton(UXHBox $title, $targetId, AbstractBehaviour $behaviour)
     {
         $box = new UXHBox();
-        $box->alignment = 'TOP_RIGHT';
 
         $button = new UXLabel();
         $button->cursor = 'HAND';
@@ -125,9 +183,6 @@ class IdeBehaviourPane
         });
 
         $box->add($button);
-
-        $box->maxWidth = 10000;
-        UXHBox::setHgrow($box, 'ALWAYS');
 
         $title->add($box);
     }
@@ -165,23 +220,29 @@ class IdeBehaviourPane
         $pane->add($button);
     }
 
-    private function initProperties($groupCode, AbstractBehaviour $behaviour, UXDesignProperties $pane, array $properties)
+    private function initProperties($class, UXDesignProperties $pane, array $properties)
     {
         foreach ($properties as $code => $item) {
             /** @var ElementPropertyEditor $editor */
             $editor = $item['editorFactory']();
 
-            $editor->setSetter(function (ElementPropertyEditor $editor, $value) use ($behaviour) {
-                $behaviour->{$editor->code} = $value;
+            $editor->setSetter(function (ElementPropertyEditor $editor, $value) use ($class) {
+                if ($this->targetBehaviours[$class]) {
+                    $this->targetBehaviours[$class]->{$editor->code} = $value;
+                }
             });
 
-            $editor->setGetter(function (ElementPropertyEditor $editor) use ($behaviour) {
-                return $behaviour->{$editor->code};
+            $editor->setGetter(function (ElementPropertyEditor $editor) use ($class) {
+                if (!$this->targetBehaviours[$class]) {
+                    return null;
+                }
+
+                return $this->targetBehaviours[$class]->{$editor->code};
             });
 
             $editor->setTooltip($item['tooltip']);
 
-            $pane->addProperty($groupCode, $code, $item['name'], $editor);
+            $pane->addProperty($class, $code, $item['name'], $editor);
         }
     }
 }

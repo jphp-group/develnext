@@ -45,7 +45,7 @@ class Instances implements Countable, Iterator, ArrayAccess
             $result[] = $instance->{$name};
         }
 
-        return $result;
+        return new Instances($result);
     }
 
     public function __call($name, array $args)

@@ -66,9 +66,7 @@ class IdePropertiesPane
     {
         $this->properties[] = $properties;
 
-        foreach ($properties->getGroupPanes() as $pane) {
-            $this->ui->add($pane);
-        }
+        $this->ui->children->addAll($properties->getGroupPanes());
     }
 
     public function update($target)

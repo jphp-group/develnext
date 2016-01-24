@@ -7,6 +7,7 @@ use ide\editors\FormEditor;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
+use ide\Logger;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\scripts\AbstractScriptComponent;
 use ide\scripts\elements\MacroScriptComponent;
@@ -251,18 +252,23 @@ class ObjectListEditor
         return true;
     }
 
+    protected $comboBoxItems = [];
+
     public function addItem(ObjectListEditorItem $item)
     {
         if ($this->isFiltered($item)) {
-            $this->comboBox->items->add($item);
+            $this->comboBoxItems[] = $item;
         }
     }
 
     public function updateUi()
     {
+        Logger::trace();
+
         $editor = $this->editor ?: FileSystem::getSelectedEditor();
 
         $this->comboBox->items->clear();
+        $this->comboBoxItems = [];
 
         $undef = new ObjectListEditorItem();
         $undef->text = $this->emptyItemText;
@@ -290,18 +296,14 @@ class ObjectListEditor
                     ''
                 ));
 
-                $nodes = $editor->getDesigner()->getNodes();
+                $nodes = $editor->getObjectList();
 
-                foreach ($nodes as $node) {
-                    /** @var AbstractFormElement $element */
-                    $element = $editor->getFormat()->getFormElement($node);
+                foreach ($nodes as $item) {
+                    $item->level = 1;
 
-                    $item = new ObjectListEditorItem(
-                        $editor->getNodeId($node), Ide::get()->getImage($element->getIcon()), null, 1
-                    );
-
-                    $item->hint = $element->getName();
-                    $item->element = $element;
+                    if ($this->stringValues) {
+                        $item->value = "{$editor->getTitle()}.{$item->value}";
+                    }
 
                     $this->addItem($item);
                 }
@@ -311,13 +313,13 @@ class ObjectListEditor
                 $moduleEditors = $editor->getModuleEditors();
 
                 if ($moduleEditors && !$this->disableModules) {
-                    $this->comboBox->items->add(new ObjectListEditorItem('[Модули]', null, ''));
+                    $this->addItem(new ObjectListEditorItem('[Модули]', null, ''));
 
                     foreach ($moduleEditors as $module => $moduleEditor) {
                         $nodes = $moduleEditor->getManager()->getComponents();
 
                         if ($nodes) {
-                            $this->comboBox->items->add(new ObjectListEditorItem(
+                            $this->addItem(new ObjectListEditorItem(
                                 "[$module]",
                                 Ide::get()->getImage($moduleEditor->getIcon()),
                                 '',
@@ -333,12 +335,12 @@ class ObjectListEditor
                     $formEditors = $editor->getFormEditors();
 
                     if ($formEditors) {
-                        $this->comboBox->items->add(new ObjectListEditorItem('Формы модуля', null, '_context'));
+                        $this->addItem(new ObjectListEditorItem('Формы модуля', null, '_context'));
 
                         foreach ($formEditors as $formEditor) {
                             $formsAdded[$formEditor->getTitle()] = $formEditor;
 
-                            $this->comboBox->items->add(new ObjectListEditorItem(
+                            $this->addItem(new ObjectListEditorItem(
                                 "{$formEditor->getTitle()}",
                                 Ide::get()->getImage($formEditor->getIcon()),
                                 'form',
@@ -362,7 +364,7 @@ class ObjectListEditor
                 $formEditors = $gui->getFormEditors();
 
                 if (!($editor instanceof FormEditor) || sizeof($formEditors) > 1) {
-                    $this->comboBox->items->add(new ObjectListEditorItem('[Другие формы]', null, ''));
+                    $this->addItem(new ObjectListEditorItem('[Другие формы]', null, ''));
 
                     foreach ($formEditors as $key => $formEditor) {
                         if (FileUtils::hashName($formEditor->getFile()) == FileUtils::hashName($editor->getFile())) {
@@ -379,7 +381,7 @@ class ObjectListEditor
                             $prefix = "form('{$formEditor->getTitle()}')";
                         }
 
-                        $this->comboBox->items->add(new ObjectListEditorItem(
+                        $this->addItem(new ObjectListEditorItem(
                             $formEditor->getTitle(),
                             Ide::get()->getImage($formEditor->getIcon()),
                             $prefix,
@@ -401,7 +403,7 @@ class ObjectListEditor
                     // ...
                 } else {
                     if ($appModule) {
-                        $this->comboBox->items->add(new ObjectListEditorItem(
+                        $this->addItem(new ObjectListEditorItem(
                             $appModule->getTitle(), Ide::get()->getImage($appModule->getIcon()), 'appModule()'
                         ));
 
@@ -410,6 +412,9 @@ class ObjectListEditor
                 }
             }
         }
+
+        $this->comboBox->items->addAll($this->comboBoxItems);
+        Logger::trace("update done.");
     }
 
     protected function appendFormEditor(FormEditor $formEditor, $level = 0, $prefix = '')

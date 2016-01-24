@@ -1,8 +1,11 @@
 <?php
 namespace behaviour\custom;
 
+use php\game\event\UXCollisionEvent;
 use php\game\UXGameEntity;
+use php\gui\framework\AbstractForm;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
+use php\gui\framework\event\CollisionEventAdapter;
 use php\gui\UXNode;
 use php\lang\IllegalStateException;
 use script\TimerScript;
@@ -35,6 +38,11 @@ class GameEntityBehaviour extends AbstractBehaviour
     private $foundScene;
 
     /**
+     * @var
+     */
+    private $factoryName;
+
+    /**
      * @param mixed $target
      * @throws IllegalStateException
      */
@@ -47,17 +55,28 @@ class GameEntityBehaviour extends AbstractBehaviour
         }, function () use ($target) {
             $sceneBehaviour = $this->findScene();
 
-            $type = $target->data('-factory-id') ?: $target->id;
+            $this->factoryName = $target->data('-factory-name');
+
+            $type = $target->data('-factory-id') ?: ($this->factoryName ? "{$this->factoryName}.{$target->id}" : $target->id);
 
             if ($sceneBehaviour) {
                 $this->entity = new UXGameEntity($type, $target);
                 $this->entity->bodyType = $this->bodyType;
-                //$this->entity->physics = $this->physics;
                 $this->entity->velocity = $this->velocity;
 
                 unset($this->velocity, $this->bodyType);
 
                 $target->data("--property-phys", $this->entity);
+
+                $collisionHandlers = $target->data(CollisionEventAdapter::class);
+
+                if ($collisionHandlers) {
+                    foreach ($collisionHandlers as $entityType => $handler) {
+                        $this->setCollisionHandler($entityType, $handler);
+                    }
+
+                    $target->data(CollisionEventAdapter::class, null);
+                }
 
                 $sceneBehaviour->getScene()->add($this->entity);
             } else {
@@ -95,8 +114,8 @@ class GameEntityBehaviour extends AbstractBehaviour
     {
         parent::free();
 
-        if ($this->entity) {
-            $this->entity->gameScene->remove($this->entity);
+        if ($this->entity && $this->foundScene) {
+            $this->foundScene->getScene()->remove($this->entity);
         }
     }
 
@@ -125,5 +144,21 @@ class GameEntityBehaviour extends AbstractBehaviour
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    public function setCollisionHandler($entityType, callable $handler)
+    {
+        if ($this->factoryName) {
+            $entityType = "{$this->factoryName}.$entityType";
+        }
+
+        $this->entity->setCollisionHandler($entityType, function (UXCollisionEvent $e) use ($handler) {
+            $event = new UXCollisionEvent($e, $e->sender->node, $e->target->node);
+            $handler($event);
+
+            if ($event->isConsumed()) {
+                $e->consume();
+            }
+        });
     }
 }

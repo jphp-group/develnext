@@ -1,17 +1,21 @@
 package org.develnext.jphp.ext.game.classes;
 
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import org.develnext.jphp.ext.game.GameExtension;
+import org.develnext.jphp.ext.game.support.CollisionEvent;
 import org.develnext.jphp.ext.game.support.GameEntity2D;
 import org.develnext.jphp.ext.game.support.Vec2d;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
+import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
 @Namespace(GameExtension.NS)
 public class UXGameEntity extends BaseWrapper<GameEntity2D> {
     interface WrappedInterface {
+        @Property Node node();
         @Property GameEntity2D.BodyType bodyType();
         @Property @Nullable Vec2d gravity();
 
@@ -24,6 +28,8 @@ public class UXGameEntity extends BaseWrapper<GameEntity2D> {
         @Property Vec2d velocity();
 
         @Property Vec2d angleSpeed();
+        @Property double hspeed();
+        @Property double vspeed();
         @Property double speed();
         @Property double direction();
     }
@@ -44,5 +50,19 @@ public class UXGameEntity extends BaseWrapper<GameEntity2D> {
     @Getter
     public UXGameScene getGameScene(Environment env) {
         return getWrappedObject().getScene() == null ? null : new UXGameScene(env, getWrappedObject().getScene());
+    }
+
+    @Signature
+    public void setCollisionHandler(String entityType, @Nullable final Invoker handler) {
+        if (handler == null) {
+            getWrappedObject().setCollisionHandler(entityType, null);
+        } else {
+            getWrappedObject().setCollisionHandler(entityType, new EventHandler<CollisionEvent>() {
+                @Override
+                public void handle(CollisionEvent event) {
+                    handler.callAny(event);
+                }
+            });
+        }
     }
 }

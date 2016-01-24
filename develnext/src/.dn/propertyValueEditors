@@ -17,3 +17,4 @@ ide\editors\value\DoubleArrayPropertyEditor
 ide\editors\value\AnchorPropertyEditor
 ide\editors\value\SpritePropertyEditor
 ide\editors\value\TabsPropertyEditor
+ide\editors\value\FormPropertyEditor

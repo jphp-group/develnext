@@ -15,7 +15,7 @@ class UXImageAreaWrapper extends UXNodeWrapper
             try {
                 $this->node->image = new UXImage('res://' . $data->get('image'));
             } catch (\Exception $e) {
-                UXDialog::show('Cannot load image: "' . $data->get('image') . '"', 'ERROR');
+                UXDialog::showAndWait('Cannot load image: "' . $data->get('image') . '"', 'ERROR');
             }
         }
 
@@ -23,7 +23,7 @@ class UXImageAreaWrapper extends UXNodeWrapper
             try {
                 $this->node->hoverImage = new UXImage('res://' . $data->get('hoverImage'));
             } catch (\Exception $e) {
-                UXDialog::show('Cannot load image: "' . $data->get('hoverImage') . '"', 'ERROR');
+                UXDialog::showAndWait('Cannot load image: "' . $data->get('hoverImage') . '"', 'ERROR');
             }
         }
 
@@ -31,7 +31,7 @@ class UXImageAreaWrapper extends UXNodeWrapper
             try {
                 $this->node->clickImage = new UXImage('res://' . $data->get('clickImage'));
             } catch (\Exception $e) {
-                UXDialog::show('Cannot load image: "' . $data->get('clickImage') . '"', 'ERROR');
+                UXDialog::showAndWait('Cannot load image: "' . $data->get('clickImage') . '"', 'ERROR');
             }
         }
     }

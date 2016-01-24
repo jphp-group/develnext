@@ -1,5 +1,6 @@
 <?php
 namespace ide\formats\form\event;
+use ide\editors\AbstractEditor;
 
 /**
  * Class AbstractEventKind
@@ -13,16 +14,17 @@ abstract class AbstractEventKind
     abstract public function getArguments();
 
     /**
+     * @param \ide\editors\AbstractEditor $contextEditor
      * @return array
      */
-    public function getParamVariants()
+    public function getParamVariants(AbstractEditor $contextEditor = null)
     {
         return [];
     }
 
-    final public function findParamName($param)
+    final public function findParamName($param, AbstractEditor $contextEditor = null)
     {
-        $variants = $this->getParamVariants();
+        $variants = $this->getParamVariants($contextEditor);
 
         $func = function ($variants) use ($param, &$func) {
             foreach ($variants as $name => $value) {

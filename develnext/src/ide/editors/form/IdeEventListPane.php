@@ -357,7 +357,7 @@ class IdeEventListPane
                 /** @var AbstractEventKind $kind */
                 $kind = $type['kind'];
 
-                $variants = $kind->getParamVariants();
+                $variants = $kind->getParamVariants($this->contextEditor);
 
                 if (!$variants) {
                     $menuItem->on('action', function () use ($type) {
@@ -413,6 +413,11 @@ class IdeEventListPane
                             }
 
                             $item = new UXMenuItem($name);
+
+                            if ($param === false) {
+                                $item->disable = true;
+                            }
+
                             $item->on('action', function () use ($type, $code) {
                                 $this->manager->addBind($this->targetId, $code, $type['kind']);
 
@@ -658,7 +663,7 @@ class IdeEventListPane
                     'type' => $eventType,
                     'info' => $info,
                     'param' => $param,
-                    'paramName' => $eventType['kind']->findParamName($param),
+                    'paramName' => $eventType['kind']->findParamName($param, $this->contextEditor),
                     'eventCode' => $param ? "$eventType[code]-$param" : $eventType['code'],
                 ]);
             }

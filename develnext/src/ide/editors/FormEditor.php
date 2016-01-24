@@ -586,9 +586,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $this->codeEditor->load();
-        $this->reindex();
-
         $node->id = $newId;
+
+        $this->reindex();
 
         $this->leftPaneUi->updateEventList($newId);
         $this->leftPaneUi->updateBehaviours($newId);
@@ -1246,7 +1246,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $node = $this->designer->pickedNode;
 
         if ($node) {
-            Timer::run(50, function () use ($node) {
+            uiLater(function () use ($node) {
                 $this->updateProperties($node);
             });
         }
@@ -1356,6 +1356,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->trigger('updateNode:before', [$node, $properties]);
 
         $this->propertiesPane->addProperties($properties);
+
         $this->eventListPane->setEventTypes($element ? $element->getEventTypes() : []);
 
         $this->trigger('updateNode:after', [$node, $properties]);

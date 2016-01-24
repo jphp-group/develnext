@@ -23,6 +23,7 @@ public class UXGameScene extends BaseWrapper<GameScene2D> {
 
         void play();
         void pause();
+        void clear();
     }
 
     public UXGameScene(Environment env, GameScene2D wrappedObject) {

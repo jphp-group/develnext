@@ -176,7 +176,7 @@ OUT
         $config = $this->getConfig();
 
         if (!$config['name']) {
-            UXDialog::show('Укажите название программы', 'ERROR');
+            UXDialog::showAndWait('Укажите название программы', 'ERROR');
             if ($this->showConfigDialog()) {
                 $this->onExecute($project, $finished);
             }
@@ -192,7 +192,7 @@ OUT
         }*/
 
         if (!$config['version']) {
-            UXDialog::show('Укажите версию программы', 'ERROR');
+            UXDialog::showAndWait('Укажите версию программы', 'ERROR');
             if ($this->showConfigDialog()) {
                 $this->onExecute($project, $finished);
             }

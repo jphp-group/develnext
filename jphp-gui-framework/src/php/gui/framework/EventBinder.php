@@ -142,6 +142,10 @@ class EventBinder
                         throw new Exception("Unable to bind '$name'");
                     }
 
+                    if ($handler === true) {
+                        return;
+                    }
+
                     $group = $name;
                 }
 

@@ -27,6 +27,11 @@ class FileSystem
     static protected $openedEditors = [];
 
     /**
+     * @var AbstractEditor[]
+     */
+    static protected $cachedEditors = [];
+
+    /**
      * @var UXTab
      */
     static protected $addTab;
@@ -131,8 +136,18 @@ class FileSystem
         return null;
     }
 
-    static function fetchEditor($path)
+    static function fetchEditor($path, $cache = false)
     {
+        $hash = FileUtils::hashName($path);
+
+        if ($editor = static::$openedEditors[$hash]) {
+            return $editor;
+        }
+
+        if ($cache && ($editor = static::$cachedEditors[$hash])) {
+            return $editor;
+        }
+
         $editor = Ide::get()->createEditor($path);
 
         if (!$editor) {
@@ -140,6 +155,9 @@ class FileSystem
         }
 
         $editor->load();
+
+        static::$cachedEditors[$hash] = $editor;
+
         return $editor;
     }
 
@@ -249,7 +267,7 @@ class FileSystem
         $editor = static::$openedEditors[$hash];
         $tab    = static::$openedTabs[$hash];
 
-        unset(static::$openedTabs[$hash], static::$openedEditors[$hash], static::$openedFiles[$hash]);
+        unset(static::$openedTabs[$hash], static::$openedEditors[$hash], static::$openedFiles[$hash], static::$cachedEditors[$hash]);
 
         if ($editor) {
             $editor->close();

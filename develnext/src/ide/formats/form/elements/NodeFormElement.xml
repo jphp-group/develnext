@@ -55,5 +55,7 @@
 
         <eventType code="create" name="Клонирование" kind="ActionEvent" icon="icons/idea16.png" />
         <eventType code="destroy" name="Уничтожение" kind="ActionEvent" icon="icons/trash16.gif" />
+
+        <eventType code="collision" name="Столкновение" kind="CollisionParamEvent" icon="icons/collision16.gif" />
     </eventTypes>
 </element>

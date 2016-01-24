@@ -223,6 +223,8 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Timeline.class, UXTimeline.class);
         registerWrapperClass(scope, FadeTransition.class, UXFadeAnimation.class);
         registerWrapperClass(scope, PathTransition.class, UXPathAnimation.class);
+
+        registerWrapperClass(scope, AnimationTimer.class, UXAnimationTimer.class);
     }
 
     protected void registerEvents() {

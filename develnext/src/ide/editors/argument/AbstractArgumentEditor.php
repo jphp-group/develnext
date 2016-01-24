@@ -77,6 +77,10 @@ abstract class AbstractArgumentEditor
      */
     abstract public function makeUi($label = null);
 
+    /**
+     * @return mixed
+     */
+    abstract public function updateUi();
 
     private static $editors = [];
 

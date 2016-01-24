@@ -1,6 +1,7 @@
 <?php
 namespace php\game;
 
+use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXScrollPane;
 use php\gui\paint\UXColor;
 use php\gui\UXNode;
@@ -50,6 +51,13 @@ class UXGamePane extends UXScrollPane
      * @param UXNode $node
      */
     public function scrollTo(UXNode $node)
+    {
+    }
+
+    /**
+     * @param UXAnchorPane $area
+     */
+    public function loadArea(UXAnchorPane $area)
     {
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace ide;
 
+use php\gui\framework\Timer;
 use php\io\Stream;
 use php\lang\Environment;
 use php\lang\IllegalArgumentException;
@@ -84,6 +85,21 @@ class Logger
     static function error($message)
     {
         static::log(self::LEVEL_ERROR, $message);
+    }
+
+    public static function trace($message = null)
+    {
+        static $time;
+
+        if ($message != null) {
+            $diff = Time::millis() - $time;
+
+            if ($time) {
+                static::log(self::LEVEL_DEBUG, "[$diff ms] $message");
+            }
+        }
+
+        $time = Time::millis();
     }
 
     static function exception($message, \BaseException $e)

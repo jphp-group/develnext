@@ -287,9 +287,9 @@ class FormElementTypePane
         $pane->expanded = true;
         $pane->padding = [1, 3];
 
-        $pane->observer('expanded')->addListener(function () {
+        /*$pane->observer('expanded')->addListener(function () {
             $this->trigger('change');
-        });
+        }); */
 
         $this->tiledPanes[$group] = $pane;
 

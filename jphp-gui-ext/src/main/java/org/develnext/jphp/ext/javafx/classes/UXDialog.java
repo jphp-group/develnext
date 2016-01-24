@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -20,7 +21,22 @@ public class UXDialog extends BaseObject {
     }
 
     @Signature
-    public static String show(String text, Alert.AlertType type) {
+    public static void show(final String text) {
+        show(text, Alert.AlertType.INFORMATION);
+    }
+
+    @Signature
+    public static void show(final String text, final Alert.AlertType type) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                showAndWait(text, type);
+            }
+        });
+    }
+
+    @Signature
+    public static String showAndWait(String text, Alert.AlertType type) {
         Alert alert = new Alert(type);
 
         alert.setResizable(false);
@@ -32,8 +48,8 @@ public class UXDialog extends BaseObject {
     }
 
     @Signature
-    public static String show(String text) {
-        return show(text, Alert.AlertType.INFORMATION);
+    public static String showAndWait(String text) {
+        return showAndWait(text, Alert.AlertType.INFORMATION);
     }
 
     @Signature

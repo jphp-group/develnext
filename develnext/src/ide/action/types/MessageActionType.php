@@ -17,6 +17,7 @@ class MessageActionType extends AbstractSimpleActionType
         return [
             'value' => 'string',
             'kind'  => 'string',
+            'wait'  => 'flag'
         ];
     }
 
@@ -25,6 +26,7 @@ class MessageActionType extends AbstractSimpleActionType
         return [
             'value' => 'Текст сообщения',
             'kind'  => 'Тип сообщения',
+            'wait'  => 'Ожидать закрытия'
         ];
     }
 
@@ -96,12 +98,14 @@ class MessageActionType extends AbstractSimpleActionType
     {
         $value = $action->get('value');
 
+        $method = $action->wait ? 'showAndWait' : 'show';
+
         switch ($action->kind) {
             case '':
             case 'INFORMATION':
-                return "UXDialog::show({$value})";
+                return "UXDialog::$method({$value})";
         }
 
-        return "UXDialog::show({$value}, '{$action->kind}')";
+        return "UXDialog::$method({$value}, '{$action->kind}')";
     }
 }

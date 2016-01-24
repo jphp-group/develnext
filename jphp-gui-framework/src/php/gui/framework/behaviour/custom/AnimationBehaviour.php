@@ -1,5 +1,6 @@
 <?php
 namespace php\gui\framework\behaviour\custom;
+use php\gui\animation\UXAnimationTimer;
 use php\gui\framework\Timer;
 use script\TimerScript;
 
@@ -30,6 +31,11 @@ abstract class AnimationBehaviour extends AbstractBehaviour
      * @var int
      **/
     public $repeatCount = -1;
+
+    /**
+     * @var UXAnimationTimer[]
+     */
+    protected $__animTimers = [];
 
     public function apply($target)
     {
@@ -88,6 +94,24 @@ abstract class AnimationBehaviour extends AbstractBehaviour
         $repeats += 1;
 
         return true;
+    }
+
+    protected function animTimer(callable $func)
+    {
+        $this->__animTimers[] = $timer = new UXAnimationTimer($func);
+        $timer->start();
+        return $timer;
+    }
+
+    public function free()
+    {
+        parent::free();
+
+        foreach ($this->__animTimers as $timer) {
+            $timer->stop();
+        }
+
+        $this->__animTimers = [];
     }
 
     protected function restore()

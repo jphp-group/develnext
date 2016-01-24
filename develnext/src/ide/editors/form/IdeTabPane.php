@@ -1,5 +1,6 @@
 <?php
 namespace ide\editors\form;
+use ide\Logger;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
@@ -177,8 +178,9 @@ class IdeTabPane
 
     public function addBehaviourPane(IdeBehaviourPane $pane)
     {
-        $this->tab('behaviours', 'Поведения', $pane->makeUi(''));
+        $tab = $this->tab('behaviours', 'Поведения', $pane->makeUi(''));
 
+        $pane->setHintNode($tab);
         $this->behaviourPane = $pane;
     }
 
@@ -205,6 +207,7 @@ class IdeTabPane
     {
         $this->updateBehaviours($targetId);
         $this->updateEventList($targetId);
+
         $this->updateProperties($target);
 
         $this->updateObjectTreeList($targetId);

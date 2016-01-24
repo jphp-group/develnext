@@ -49,4 +49,12 @@ class FlagArgumentEditor extends AbstractArgumentEditor
 
         $this->checkbox->selected = $value;
     }
+
+    /**
+     * @return mixed
+     */
+    public function updateUi()
+    {
+        // nop.
+    }
 }

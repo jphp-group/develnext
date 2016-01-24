@@ -11,6 +11,7 @@ use php\gui\UXScreen;
 use php\gui\UXWindow;
 use php\util\SharedValue;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 class RandomMovementAnimationBehaviour extends AnimationBehaviour
 {
@@ -25,18 +26,19 @@ class RandomMovementAnimationBehaviour extends AnimationBehaviour
     public $animationSpeed = 1000;
 
     /**
+     * @var null|TimerScript
+     */
+    protected $_animTimer = null;
+
+    /**
      * @param mixed $target
      */
     protected function applyImpl($target)
     {
         if ($target instanceof UXNode || $target instanceof UXWindow) {
-            $timer = new TimerScript();
-            $timer->interval = $this->duration;
-            $timer->repeatable = true;
-
             $busy = new SharedValue(false);
 
-            $func = function (ScriptEvent $e) use ($target, $timer, $busy) {
+            $func = function (AccurateTimer $timer) use ($target, $busy) {
                 if ($target->isFree()) {
                     return;
                 }
@@ -72,8 +74,9 @@ class RandomMovementAnimationBehaviour extends AnimationBehaviour
                             $distance = UXGeometry::distance($target->x, $target->y, $x, $y);
                             $time = ($distance / 100) * $this->animationSpeed;
 
-                            Animation::moveTo($target, $time, $x, $y, function () use ($busy) {
+                            $this->_animTimer = Animation::moveTo($target, $time, $x, $y, function () use ($busy) {
                                 $busy->set(false);
+                                $this->_animTimer = null;
                             });
                         };
 
@@ -89,15 +92,22 @@ class RandomMovementAnimationBehaviour extends AnimationBehaviour
                 }
             };
 
-            $func(new ScriptEvent($timer));
-
-            $timer->on('action', $func);
-            $timer->start();
+            $timer = $this->accurateTimer($this->duration, $func);
+            $timer->trigger();
         }
     }
 
     public function getCode()
     {
         return 'randomMove';
+    }
+
+    public function disable()
+    {
+        parent::disable();
+
+        if ($this->_animTimer) {
+            $this->_animTimer->stop();
+        }
     }
 }

@@ -1,11 +1,12 @@
 <?php
 namespace ide\formats\form\event;
 
+use ide\editors\AbstractEditor;
 use php\gui\event\UXKeyEvent;
 
 class KeyParamEventKind extends KeyEventKind
 {
-    public function getParamVariants()
+    public function getParamVariants(AbstractEditor $contextEditor = null)
     {
         $letters = [
             'A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D', 'E' => 'E', 'F' => 'F', 'G' => 'G', 'H' => 'H', 'I' => 'I',

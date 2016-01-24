@@ -22,6 +22,16 @@ class BehaviourTypeArgumentEditor extends EnumArgumentEditor
     {
         $this->manager = $behaviourManager;
 
+        parent::__construct([]);
+
+        $this->updateUi();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function updateUi()
+    {
         $variants = [];
 
         $byGroup = [];
@@ -49,6 +59,8 @@ class BehaviourTypeArgumentEditor extends EnumArgumentEditor
             }
         }
 
-        parent::__construct($variants);
+        $this->options = $variants;
+
+        parent::updateUi();
     }
 }

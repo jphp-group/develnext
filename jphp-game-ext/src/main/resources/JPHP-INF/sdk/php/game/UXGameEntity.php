@@ -11,6 +11,11 @@ use php\gui\UXParent;
 class UXGameEntity
 {
     /**
+     * @var UXNode
+     */
+    public $node;
+
+    /**
      * @var float
      */
     public $x;
@@ -68,25 +73,48 @@ class UXGameEntity
     public $velocityX = 0.0;
 
     /**
+     * @var float
+     */
+    public $velocityY = 0.0;
+
+    /**
      * @var array alias of velocity property
      */
-    public $speed = [0, 0];
+    public $angleSpeed = [0, 0];
 
     /**
-     * @var float
+     * @var float angle speed
      */
-    public $speedX = 0.0;
+    public $speed = 0.0;
 
     /**
-     * @var float
+     * @var float angle for speed, from 0 to 360
      */
-    public $speedY = 0.0;
+    public $direction = 0.0;
+
+    /**
+     * @var float alias of velocityX
+     */
+    public $hspeed = 0.0;
+
+    /**
+     * @var float alias of velocityY
+     */
+    public $vspeed = 0.0;
 
     /**
      * @param string $entityType
      * @param UXNode $node
      */
     public function __construct($entityType, UXNode $node)
+    {
+    }
+
+    /**
+     * @param string $entityType
+     * @param callable|null $handler
+     */
+    public function setCollisionHandler($entityType, callable $handler)
     {
     }
 }

@@ -97,7 +97,7 @@ function uiConfirm($message)
 
 function pre($var)
 {
-    UXDialog::show(print_r($var, true));
+    UXDialog::showAndWait(print_r($var, true));
 }
 
 function dump($var)
@@ -107,15 +107,15 @@ function dump($var)
     $text = ob_get_contents();
     ob_end_clean();
 
-    UXDialog::show($text);
+    UXDialog::showAndWait($text);
 }
 
 function alert($message)
 {
-    UXDialog::show($message);
+    UXDialog::showAndWait($message);
 }
 
 function message($message)
 {
-    UXDialog::show($message);
+    UXDialog::showAndWait($message);
 }

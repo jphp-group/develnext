@@ -3,6 +3,7 @@ namespace ide\action;
 
 use action\Score;
 use ide\forms\ActionArgumentsDialog;
+use ide\Logger;
 use php\jsoup\Document;
 use php\lib\Str;
 use php\xml\DomDocument;
@@ -172,6 +173,11 @@ abstract class AbstractSimpleActionType extends AbstractActionType
     }
 
     /**
+     * @var ActionArgumentsDialog[]
+     */
+    static protected $showDialogCache = [];
+
+    /**
      * @param Action $action
      * @param $userData
      * @param bool $asNew
@@ -183,9 +189,22 @@ abstract class AbstractSimpleActionType extends AbstractActionType
             return true;
         }
 
-        $dialog = new ActionArgumentsDialog();
-        $dialog->userData = $userData;
-        $dialog->setAction($action, $asNew);
+        if ($dialog = static::$showDialogCache[get_class($action->getType())]) {
+            $dialog->userData = $userData;
+            $dialog->updateAction($action, $asNew);
+        } else {
+            Logger::trace();
+
+            $dialog = new ActionArgumentsDialog();
+
+            $dialog->userData = $userData;
+            $dialog->setAction($action, $asNew);
+
+            Logger::trace("ActionArgumentsDialog[{$action->getType()->getTagName()}] created.");
+
+            static::$showDialogCache[get_class($action->getType())] = $dialog;
+        }
+
 
         if ($dialog->showDialog()) {
             $result = $dialog->getResult();

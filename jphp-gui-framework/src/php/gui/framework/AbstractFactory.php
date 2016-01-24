@@ -53,6 +53,11 @@ abstract class AbstractFactory
     protected $behaviourManager;
 
     /**
+     * @var string
+     */
+    protected $factoryName = null;
+
+    /**
      * @throws Exception
      */
     public function __construct()
@@ -97,13 +102,12 @@ abstract class AbstractFactory
             $loader = new UXLoader();
             $node = $loader->loadFromString($prototype);
             $node->data('-factory', $this);
-            $node->data('-factory-id', $id);
+            $node->data('-factory-name', $this->factoryName);
+            $node->data('-factory-id', $this->factoryName ? $this->factoryName . ".$id" : $id);
 
             UXNodeWrapper::get($node)->applyData($data);
 
             $this->eventBinder->loadBind($node, $id, __CLASS__, true);
-
-            $this->prototypeInstances[$id][] = $node;
 
             $this->behaviourManager->applyForInstance($id, $node);
 
@@ -114,6 +118,8 @@ abstract class AbstractFactory
                     $this->eventBinder->trigger($node, $id, 'destroy');
                 }
             });
+
+            $this->prototypeInstances[$id][] = $node;
 
             return $node;
         }

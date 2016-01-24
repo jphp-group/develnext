@@ -62,4 +62,12 @@ class PrototypeArgumentEditor extends AbstractArgumentEditor
 
         $this->instancesListEditor->setSelected($value);
     }
+
+    /**
+     * @return mixed
+     */
+    public function updateUi()
+    {
+        $this->instancesListEditor->updateUi();
+    }
 }

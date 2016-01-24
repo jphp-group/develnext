@@ -112,7 +112,7 @@ class WindowsApplicationBuildType extends AbstractBuildType
         $launch4j = Ide::get()->getLaunch4JProgram();
 
         if (!$launch4j) {
-            UXDialog::show('Невозможно собрать исполняемый файл, не найдена утилита Launch4j', 'ERROR');
+            UXDialog::showAndWait('Невозможно собрать исполняемый файл, не найдена утилита Launch4j', 'ERROR');
 
             return false;
         }

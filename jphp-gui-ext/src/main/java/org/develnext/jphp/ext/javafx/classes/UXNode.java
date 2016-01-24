@@ -24,14 +24,12 @@ import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.StyleManager;
 import org.develnext.jphp.ext.javafx.support.UserData;
-import org.develnext.jphp.ext.javafx.support.control.Panel;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
-import php.runtime.lang.support.MagicSignatureClass;
 import php.runtime.memory.ArrayMemory;
 import php.runtime.memory.DoubleMemory;
 import php.runtime.memory.ObjectMemory;
@@ -704,6 +702,15 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         Memory data = data("--property-" + name);
 
         return data;
+    }
+
+    @Signature
+    public Memory __isset(String name) {
+        if (data("--property-" + name).isNotNull()) {
+            return Memory.TRUE;
+        }
+
+        return Memory.FALSE;
     }
 
     @Override
