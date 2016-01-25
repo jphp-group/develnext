@@ -8,7 +8,7 @@ use php\gui\UXScreen;
 trait SavableFormMixin
 {
     /**
-     * @event SavableFormMixin:show
+     * @event SavableFormMixin:showing
      */
     public function doSavableFormMixinShow()
     {

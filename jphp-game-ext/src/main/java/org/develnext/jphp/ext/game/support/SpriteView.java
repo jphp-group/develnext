@@ -1,6 +1,8 @@
 package org.develnext.jphp.ext.game.support;
 
 import javafx.animation.AnimationTimer;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -11,7 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 public class SpriteView extends Canvas {
-    protected Sprite sprite;
+    protected ObjectProperty<Sprite> sprite = new SimpleObjectProperty<>(null);
 
     private boolean animationEnabled = false;
     private AnimationTimer timer = new AnimationTimer() {
@@ -27,7 +29,7 @@ public class SpriteView extends Canvas {
         EventHandler<MouseEvent> eventFilter = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (sprite == null) {
+                if (sprite.get() == null) {
                     event.consume();
                 }
 
@@ -66,21 +68,25 @@ public class SpriteView extends Canvas {
         setSprite(sprite);
     }
 
+    public ObjectProperty<Sprite> spriteProperty() {
+        return sprite;
+    }
+
     public void setSprite(Sprite sprite) {
-        this.sprite = sprite == null ? null : new Sprite(sprite);
+        this.sprite.set( sprite == null ? null : new Sprite(sprite) );
 
         if (sprite == null) {
             GraphicsContext gc = getGraphicsContext2D();
             gc.clearRect(0, 0, getWidth(), getHeight());
         } else {
-            setWidth(this.sprite.getFrameWidth());
-            setHeight(this.sprite.getFrameHeight());
+            setWidth(this.sprite.get().getFrameWidth());
+            setHeight(this.sprite.get().getFrameHeight());
             sprite.drawNext(this);
         }
     }
 
     public Sprite getSprite() {
-        return sprite;
+        return sprite.get();
     }
 
     public boolean getAnimationEnabled() {
@@ -88,19 +94,19 @@ public class SpriteView extends Canvas {
     }
 
     public String getAnimationName() {
-        return sprite.getCurrentAnimation();
+        return sprite.get().getCurrentAnimation();
     }
 
     public void setAnimationName(String name) {
-        sprite.setCurrentAnimation(name);
+        sprite.get().setCurrentAnimation(name);
     }
 
     public void setAnimationSpeed(int speed) {
-        sprite.setSpeed(speed);
+        sprite.get().setSpeed(speed);
     }
 
     public int getAnimationSpeed() {
-        return sprite.getSpeed();
+        return sprite.get().getSpeed();
     }
 
     public void setAnimationEnabled(boolean value) {
@@ -123,6 +129,8 @@ public class SpriteView extends Canvas {
         if (!isVisible()) {
             return;
         }
+
+        Sprite sprite = this.sprite.get();
 
         if (sprite != null) {
             sprite.drawByTime(this, now);

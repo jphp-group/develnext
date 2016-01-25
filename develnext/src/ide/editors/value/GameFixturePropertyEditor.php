@@ -6,27 +6,31 @@ use ide\forms\ModuleListEditorForm;
 use ide\systems\FileSystem;
 use php\gui\event\UXMouseEvent;
 use php\gui\text\UXFont;
+use php\gui\UXDialog;
 use php\gui\UXList;
 use php\lib\Str;
 use php\lib\String;
 use php\util\Flow;
+use php\util\Regex;
 
-class ModuleListPropertyEditor extends TextPropertyEditor
+class GameFixturePropertyEditor extends TextPropertyEditor
 {
     public function makeUi()
     {
         $result = parent::makeUi();
 
-        $this->editorForm = new ModuleListEditorForm();
+        //$this->editorForm = new ModuleListEditorForm();
 
         $this->textField->promptText = 'редактировать';
         $this->textField->editable = false;
         $this->textField->on('click', function () {
-            $this->showDialog();
+            UXDialog::showAndWait('Функция в разработке ...');
+            //$this->showDialog();
         });
 
         $this->dialogButton->on('click', function (UXMouseEvent $e) {
-            $this->showDialog();
+            UXDialog::showAndWait('Функция в разработке ...');
+            //$this->showDialog();
         });
 
         return $result;
@@ -34,13 +38,22 @@ class ModuleListPropertyEditor extends TextPropertyEditor
 
     public function getCode()
     {
-        return 'moduleList';
+        return 'gameFixture';
     }
 
     public function getNormalizedValue($value)
     {
         if (!is_array($value)) {
-            $value = Flow::of(Str::split($value, '|'))->map(Str::class . '::trim')->toArray();
+            if (!$value) {
+                return null;
+            }
+
+            $regex = Regex::of('^([A-Z]+)\\[(.+?)\\]$')->with($value);
+
+            $type = $regex->group(0);
+            $data = str::split($regex->group(1), ',');
+
+            return [$type, $data];
         }
 
         return parent::getNormalizedValue($value);
@@ -49,23 +62,9 @@ class ModuleListPropertyEditor extends TextPropertyEditor
     public function updateUi($value)
     {
         if (is_array($value)) {
-            $value = Str::join($value, '|');
+            $value = $value[0] . "[" . str::split($value[1], ',') . "]";
         }
 
         parent::updateUi($value);
     }
-
-    public function applyValue($value, $updateUi = true)
-    {
-        parent::applyValue($value, $updateUi);
-
-        $editor = FileSystem::getSelectedEditor();
-
-        if ($editor) {
-            $editor->reindex();
-            $editor->save();
-        }
-    }
-
-
 }

@@ -111,6 +111,36 @@ class UXGameEntity
     }
 
     /**
+     * @param array $points  [[x,y], [x,y], [x,y], [x,y] ...]
+     */
+    public function setPolygonFixture(array $points)
+    {
+    }
+
+    /**
+     * @param float $width
+     * @param float $height
+     */
+    public function setRectangleFixture($width, $height)
+    {
+    }
+
+    /**
+     * @param float $width
+     * @param float $height
+     */
+    public function setEllipseFixture($width, $height)
+    {
+    }
+
+    /**
+     * @param float $radius
+     */
+    public function setCircleFixture($radius)
+    {
+    }
+
+    /**
      * @param string $entityType
      * @param callable|null $handler
      */

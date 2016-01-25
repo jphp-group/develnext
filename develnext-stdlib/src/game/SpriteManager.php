@@ -4,6 +4,7 @@ namespace game;
 use php\game\UXSprite;
 use php\gui\UXDialog;
 use php\gui\UXImage;
+use php\gui\UXNode;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
@@ -19,6 +20,11 @@ class SpriteManager
      * @var UXSprite[]
      */
     protected $sprites = [];
+
+    /**
+     * @var SpriteSpec[]
+     */
+    protected $spriteSpecs = [];
 
     /**
      * SpriteManager constructor.
@@ -88,8 +94,30 @@ class SpriteManager
             $document = $xml->parse(Stream::getContents("res://.game/sprites/$name.sprite"));
 
             $spec = new SpriteSpec($name, $document->find('/sprite'));
+            $this->spriteSpecs[$name] = $spec;
 
             return $this->register($spec);
+        } catch (IOException $e) {
+            return null;
+        }
+    }
+
+    public function fetchSpec($name)
+    {
+        if ($spriteSpec = $this->spriteSpecs[$name]) {
+            return $spriteSpec;
+        }
+
+        $xml = new XmlProcessor();
+        try {
+            $document = $xml->parse(Stream::getContents("res://.game/sprites/$name.sprite"));
+
+            $spec = new SpriteSpec($name, $document->find('/sprite'));
+            $this->spriteSpecs[$name] = $spec;
+
+            $this->register($spec);
+
+            return $spec;
         } catch (IOException $e) {
             return null;
         }
@@ -112,4 +140,5 @@ class SpriteManager
     {
         return $this->get($name);
     }
+
 }

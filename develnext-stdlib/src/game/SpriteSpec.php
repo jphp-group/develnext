@@ -2,6 +2,7 @@
 namespace game;
 
 use php\game\UXSprite;
+use php\gui\UXNode;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Flow;
@@ -13,6 +14,8 @@ use php\xml\DomElement;
  */
 class SpriteSpec
 {
+    const DATA_PROPERTY_NAME = '--sprite-spec';
+
     /**
      * @var string
      */
@@ -44,6 +47,16 @@ class SpriteSpec
     public $animations = [];
 
     /**
+     * @var string
+     */
+    public $fixtureType;
+
+    /**
+     * @var array
+     */
+    public $fixtureData = [];
+
+    /**
      * @var bool
      */
     public $metaCentred = true;
@@ -57,6 +70,21 @@ class SpriteSpec
      * @var string
      */
     public $defaultAnimation;
+
+    /**
+     * @param string $sprite
+     * @param UXNode $node
+     */
+    public static function apply($sprite, $node)
+    {
+        $manager = SpriteManager::current();
+
+        $sprite = $manager->fetch($sprite);
+        $spriteSpec = $manager->fetchSpec($sprite);
+
+        $node->data(SpriteSpec::DATA_PROPERTY_NAME, $spriteSpec);
+        $node->sprite = $sprite;
+    }
 
     /**
      * @param $name
@@ -79,14 +107,45 @@ class SpriteSpec
                 $this->speed = (int)$element->getAttribute('speed');
             }
 
-            /** @var DomElement $domAnimation */
-            foreach ($element->findAll('./animation') as $domAnimation) {
-                $name = $domAnimation->getAttribute('name');
+            $this->readFixture($element);
+            $this->readAnimation($element);
+        }
+    }
 
-                $this->animations[$name] = Flow::of(Str::split($domAnimation->getAttribute('indexes'), ','))->map(function ($one) {
-                    return (int)trim($one);
-                })->toArray();
+    private function readAnimation(DomElement $element)
+    {
+        /** @var DomElement $domAnimation */
+        foreach ($element->findAll('./animation') as $domAnimation) {
+            $name = $domAnimation->getAttribute('name');
+
+            $this->animations[$name] = Flow::of(Str::split($domAnimation->getAttribute('indexes'), ','))->map(function ($one) {
+                return (int)trim($one);
+            })->toArray();
+        }
+    }
+
+    private function readFixture(DomElement $element)
+    {
+        if ($element->getAttribute('fixtureType')) {
+            $this->fixtureType = $element->getAttribute('fixtureType');
+
+            $point = [];
+            $data  = [];
+
+            foreach (str::split($element->getAttribute('fixtureData'), ',') as $p) {
+                $point[] = $p;
+
+                if (sizeof($point) == 2) {
+                    $data[] = $point;
+                    $point = [];
+                }
             }
+
+            if (sizeof($data) == 1) {
+                $data = $data[0];
+            }
+
+            $this->fixtureData = $data;
         }
     }
 

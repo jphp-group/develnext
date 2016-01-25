@@ -143,6 +143,10 @@ class PasteMenuCommand extends AbstractMenuCommand
                     $rootElement->setAttribute('count', $count + 1);
                 }
 
+                if ($editor) {
+                    $editor->reindex();
+                }
+
                 UXClipboard::setText($processor->format($document));
             } catch (ProcessorException $e) {
                 return;

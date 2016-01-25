@@ -1,8 +1,11 @@
 <?php
 namespace behaviour\custom;
 
+use game\Jumping;
+use game\SpriteSpec;
 use php\game\event\UXCollisionEvent;
 use php\game\UXGameEntity;
+use php\game\UXSpriteView;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\event\CollisionEventAdapter;
@@ -18,9 +21,14 @@ class GameEntityBehaviour extends AbstractBehaviour
     public $bodyType = 'DYNAMIC';
 
     /**
+     * @var string
+     */
+    public $fixtureType = 'INHERITED';
+
+    /**
      * @var bool
      */
-    public $physics = true;
+    public $solid = false;
 
     /**
      * @var array
@@ -55,6 +63,12 @@ class GameEntityBehaviour extends AbstractBehaviour
         }, function () use ($target) {
             $sceneBehaviour = $this->findScene();
 
+            if ($target instanceof UXSpriteView) {
+                $target->observer('sprite')->addListener(function () {
+                    $this->__loadFixture();
+                });
+            }
+
             $this->factoryName = $target->data('-factory-name');
 
             $type = $target->data('-factory-id') ?: ($this->factoryName ? "{$this->factoryName}.{$target->id}" : $target->id);
@@ -63,6 +77,12 @@ class GameEntityBehaviour extends AbstractBehaviour
                 $this->entity = new UXGameEntity($type, $target);
                 $this->entity->bodyType = $this->bodyType;
                 $this->entity->velocity = $this->velocity;
+
+                if ($this->solid) {
+                    $target->data(Jumping::DATA_SOLID_PROPERTY, true);
+                }
+
+                $this->__loadFixture();
 
                 unset($this->velocity, $this->bodyType);
 
@@ -121,12 +141,16 @@ class GameEntityBehaviour extends AbstractBehaviour
 
     public function __get($name)
     {
-        return $this->entity->{$name};
+        if ($this->entity) {
+            return $this->entity->{$name};
+        }
     }
 
     public function __set($name, $value)
     {
-        $this->entity->{$name} = $value;
+        if ($this->entity) {
+            $this->entity->{$name} = $value;
+        }
     }
 
     public function __call($name, array $args) {
@@ -144,6 +168,41 @@ class GameEntityBehaviour extends AbstractBehaviour
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    public function __loadFixture()
+    {
+        $target = $this->_target;
+
+        switch ($this->fixtureType) {
+            case 'ELLIPSE':
+                $this->entity->setEllipseFixture($target->width, $target->height);
+                break;
+
+            case 'RECTANGLE':
+                $this->entity->setRectangleFixture($target->width, $target->height);
+                break;
+
+            case 'INHERITED':
+                /** @var SpriteSpec $spriteSpec */
+                if ($spriteSpec = $target->data(SpriteSpec::DATA_PROPERTY_NAME)) {
+                    $fixtureData = $spriteSpec->fixtureData;
+
+                    switch ($spriteSpec->fixtureType) {
+                        case 'ELLIPSE':
+                            $this->entity->setEllipseFixture($fixtureData[0], $fixtureData[1]);
+                            break;
+                        case 'RECTANGLE':
+                            $this->entity->setRectangleFixture($fixtureData[0], $fixtureData[1]);
+                            break;
+                        case 'POLYGON':
+                            $this->entity->setPolygonFixture($fixtureData);
+                            break;
+                    }
+                }
+
+                break;
+        }
     }
 
     public function setCollisionHandler($entityType, callable $handler)

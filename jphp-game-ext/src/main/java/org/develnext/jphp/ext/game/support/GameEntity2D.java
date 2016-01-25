@@ -11,8 +11,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.contact.ContactConstraint;
-import org.dyn4j.geometry.MassType;
-import org.dyn4j.geometry.Rectangle;
+import org.dyn4j.geometry.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +25,7 @@ public class GameEntity2D implements EventTarget {
 
     protected BodyType bodyType = BodyType.STATIC;
 
+    protected boolean solid = false;
     protected double mass = 1;
     protected Vec2d velocity = new Vec2d(0, 0);
     protected Vec2d gravity = null;
@@ -78,6 +78,39 @@ public class GameEntity2D implements EventTarget {
                 body.setActive(newValue);
             }
         });
+    }
+
+    public void setPolygonFixture(Vec2d[] points) {
+        this.body.removeAllFixtures();
+
+        Vector2[] _points = new Vector2[points.length];
+
+        for (int i = 0; i < points.length; i++) {
+            _points[i] = new Vector2(points[i].x, points[i].y);
+        }
+
+        if (_points.length == 2) {
+            this.body.addFixture(new Segment(_points[0], _points[1]));
+        } else if (_points.length == 3) {
+            this.body.addFixture(new Triangle(_points[0], _points[1], _points[2]));
+        } else {
+            this.body.addFixture(new Polygon(_points));
+        }
+    }
+
+    public void setCircleFixture(double radius) {
+        this.body.removeAllFixtures();
+        this.body.addFixture(new Circle(radius));
+    }
+
+    public void setEllipseFixture(double width, double height) {
+        this.body.removeAllFixtures();
+        this.body.addFixture(new Ellipse(width, height));
+    }
+
+    public void setRectangleFixture(double width, double height) {
+        this.body.removeAllFixtures();
+        this.body.addFixture(new Rectangle(width, height));
     }
 
     protected void updateBodyPos() {
@@ -340,5 +373,13 @@ public class GameEntity2D implements EventTarget {
     @Override
     public EventDispatchChain buildEventDispatchChain(EventDispatchChain tail) {
         return null;
+    }
+
+    public boolean isSolid() {
+        return solid;
+    }
+
+    public void setSolid(boolean solid) {
+        this.solid = solid;
     }
 }

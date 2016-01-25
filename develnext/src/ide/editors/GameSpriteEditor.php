@@ -10,7 +10,9 @@ use ide\editors\sprite\IdeAnimationSpritePane;
 use ide\editors\value\BooleanPropertyEditor;
 use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\EnumPropertyEditor;
+use ide\editors\value\GameFixturePropertyEditor;
 use ide\editors\value\IntegerPropertyEditor;
+use ide\editors\value\TextPropertyEditor;
 use ide\forms\ImagePropertyEditorForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
@@ -306,6 +308,8 @@ class GameSpriteEditor extends AbstractEditor
                 'defaultAnimation' => $this->spec->defaultAnimation,
                 'metaCentred' => $this->spec->metaCentred,
                 'metaAutoSize' => $this->spec->metaAutoSize,
+                'fixtureType'  => $this->spec->fixtureType,
+                'fixtureData'  => str::split(items::toList($this->spec->fixtureData), ',')
             ]);
 
             foreach ($this->spec->animations as $name => $indexes) {
@@ -332,6 +336,7 @@ class GameSpriteEditor extends AbstractEditor
     {
         $properties->addGroup('general', 'Кадры');
         $properties->addGroup('animation', 'Анимация');
+        $properties->addGroup('fixture', 'Фигура (fixture)');
 
         $setter = function (ElementPropertyEditor $editor, $value) {
             $this->spec->{$editor->code} = $value;
@@ -357,7 +362,14 @@ class GameSpriteEditor extends AbstractEditor
         $properties->addProperty('general', 'metaCentred', 'По центру', new BooleanPropertyEditor(null, $setter));
 
         $properties->addProperty('animation', 'defaultAnimation', 'Главная анимация', $animationPropertyEditor);
-        $properties->addProperty('animation', 'speed', 'Скорость анимации', new IntegerPropertyEditor());
+        $properties->addProperty('animation', 'speed', 'Скорость анимации', new IntegerPropertyEditor(null, $setter));
+
+        $properties->addProperty('fixture', 'fixture', 'Фигура', new GameFixturePropertyEditor(null, function (ElementPropertyEditor $editor, $value) {
+            $this->spec->fixtureType = $value ? $value[0] : null;
+            $this->spec->fixtureData = $value ? $value[1] : null;
+
+            $this->save();
+        }));
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 namespace action;
+use php\gui\framework\Instances;
 use php\gui\framework\ObjectGroup;
 
 /**
@@ -9,6 +10,27 @@ use php\gui\framework\ObjectGroup;
 class Geometry
 {
     /**
+     * @param $what
+     * @param $x
+     * @param $y
+     * @return bool
+     */
+    static function hasPoint($what, $x, $y)
+    {
+        list($ax, $ay) = [$what->x, $what->y];
+        list($aw, $ah) = [$what->width, $what->height];
+
+        if ($x >= $ax &&         // right of the left edge AND
+            $x <= $ax + $aw &&    // left of the right edge AND
+            $y >= $ay &&         // below the top AND
+            $y <= $ay + $ah) {    // above the bottom
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param object $one
      * @param object $two
      * @param string $type
@@ -16,7 +38,7 @@ class Geometry
      */
     static function intersect($one, $two, $type = 'RECTANGLE')
     {
-        if ($one instanceof ObjectGroup) {
+        if ($one instanceof Instances) {
             foreach ($one->getInstances() as $instance) {
                 if (Geometry::intersect($instance, $two, $type)) {
                     return true;
@@ -26,7 +48,7 @@ class Geometry
             return false;
         }
 
-        if ($two instanceof ObjectGroup) {
+        if ($two instanceof Instances) {
             foreach ($two->getInstances() as $instance) {
                 if (Geometry::intersect($one, $instance, $type)) {
                     return true;

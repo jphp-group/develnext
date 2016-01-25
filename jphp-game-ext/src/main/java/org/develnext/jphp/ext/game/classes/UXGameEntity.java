@@ -19,6 +19,8 @@ public class UXGameEntity extends BaseWrapper<GameEntity2D> {
         @Property GameEntity2D.BodyType bodyType();
         @Property @Nullable Vec2d gravity();
 
+        @Property boolean solid();
+
         @Property double gravityX();
         @Property double gravityY();
 
@@ -32,6 +34,11 @@ public class UXGameEntity extends BaseWrapper<GameEntity2D> {
         @Property double vspeed();
         @Property double speed();
         @Property double direction();
+
+        void setPolygonFixture(Vec2d[] points);
+        void setRectangleFixture(double width, double height);
+        void setEllipseFixture(double width, double height);
+        void setCircleFixture(double radius);
     }
 
     public UXGameEntity(Environment env, GameEntity2D wrappedObject) {

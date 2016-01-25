@@ -115,7 +115,7 @@ class IdeBehaviourPane
                 $groupPane->graphic->spacing = 4;
                 $groupPane->text = null;
 
-                $groupPane->collapsible = false;
+                $groupPane->collapsible = true;
 
                 $this->initProperties($code, $pane, $properties);
             }

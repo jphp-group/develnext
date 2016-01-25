@@ -20,7 +20,6 @@ public class GameScene2D {
 
     protected World world;
 
-
     private static final float TIME_STEP = 1 / 60.0f;
 
     private AnimationTimer timer = new AnimationTimer() {

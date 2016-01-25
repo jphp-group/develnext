@@ -45,6 +45,8 @@ class UXNodeWrapper
         if ($data->has('cursor') && $data->get('cursor') !== 'DEFAULT') {
             $this->node->cursor = $data->get('cursor');
         }
+
+        $this->node->data('--start-position', [$this->node->position]);
     }
 
     /**

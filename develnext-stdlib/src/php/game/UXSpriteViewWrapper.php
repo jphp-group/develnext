@@ -2,6 +2,7 @@
 namespace php\game;
 
 use game\SpriteManager;
+use game\SpriteSpec;
 use ide\formats\sprite\IdeSpriteManager;
 use php\gui\UXData;
 use php\gui\UXNodeWrapper;
@@ -13,9 +14,7 @@ class UXSpriteViewWrapper extends UXNodeWrapper
         parent::applyData($data);
 
         if ($sprite = $data->get('sprite')) {
-            $sprite = SpriteManager::current()->fetch($sprite);
-
-            $this->node->sprite = $sprite;
+            SpriteSpec::apply($sprite, $this->node);
 
             if ($data->get('animated')) {
                 $this->node->sprite->unfreeze();
