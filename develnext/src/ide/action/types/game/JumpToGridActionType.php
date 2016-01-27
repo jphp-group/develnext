@@ -7,7 +7,7 @@ use ide\action\Action;
 use ide\action\ActionScript;
 use php\lib\str;
 
-class JumpToStartActionType extends AbstractSimpleActionType
+class JumpToGridActionType extends AbstractSimpleActionType
 {
     function getGroup()
     {
@@ -22,14 +22,18 @@ class JumpToStartActionType extends AbstractSimpleActionType
     function attributes()
     {
         return [
-            'object' => 'object'
+            'object' => 'object',
+            'gridX' => 'integer',
+            'gridY' => 'integer',
         ];
     }
 
     function attributeLabels()
     {
         return [
-            'object' => 'Объект'
+            'object' => 'Объект',
+            'gridX' => 'Grid X (горизонтальное выравнивание)',
+            'gridY' => 'Grid Y (вертикальное выравнивание)',
         ];
     }
 
@@ -37,31 +41,36 @@ class JumpToStartActionType extends AbstractSimpleActionType
     {
         return [
             'object' => ['def' => '~sender'],
+            'gridX' => ['def' => '1'],
+            'gridY' => ['def' => '1'],
         ];
     }
 
     function getTagName()
     {
-        return "jumpingToStart";
+        return "jumpingToGrid";
     }
 
     function getTitle(Action $action = null)
     {
-        return "Прыгнуть к началу";
+        return "Выровнять по сетке";
     }
 
     function getDescription(Action $action = null)
     {
         if ($action) {
-            return str::format("Переместить объект %s к начальной позиции", $action->get('object'));
+            $gridX = $action->get('gridX');
+            $gridY = $action->get('gridY');
+
+            return str::format("Выровнять %s объект по сетке (x: %s, y: %s)", $action->get('object'), $gridX, $gridY);
         } else {
-            return "Переместить объект к начальной позиции";
+            return "Выровнять объект по сетке";
         }
     }
 
     function getIcon(Action $action = null)
     {
-        return 'icons/jumpToStart16.png';
+        return 'icons/gridSnap16.png';
     }
 
     function imports(Action $action = null)
@@ -78,6 +87,10 @@ class JumpToStartActionType extends AbstractSimpleActionType
      */
     function convertToCode(Action $action, ActionScript $actionScript)
     {
-        return "Jumping::toStart({$action->get('object')})";
+        $gridX = $action->get('gridX');
+        $gridY = $action->get('gridY');
+        $object = $action->get('object');
+
+        return "Jumping::toGrid({$object}, $gridX, $gridY)";
     }
 }

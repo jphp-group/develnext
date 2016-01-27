@@ -15,6 +15,9 @@ class Jumping
      */
     static function toGrid(UXNode $node, $gridX, $gridY)
     {
+        $gridX = $gridX < 1 ? 1 : $gridX;
+        $gridY = $gridY < 1 ? 1 : $gridY;
+
         $x = $node->x;
         $y = $node->y;
 
@@ -62,10 +65,16 @@ class Jumping
      * @param UXNode $node
      * @param $x
      * @param $y
+     * @param bool $relative
      */
-    static function to(UXNode $node, $x, $y)
+    static function to(UXNode $node, $x, $y, $relative = false)
     {
-        $node->x = $x;
-        $node->y = $y;
+        if ($relative) {
+            $node->x += $x;
+            $node->y += $y;
+        } else {
+            $node->x = $x;
+            $node->y = $y;
+        }
     }
 }

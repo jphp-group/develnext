@@ -21,6 +21,7 @@ abstract class AbstractSimpleActionType extends AbstractActionType
 
     const SUB_GROUP_WINDOW = 'Форма';
     const SUB_GROUP_COMPONENT = 'Объект';
+    const SUB_GROUP_MOVING = 'Движение';
     const SUB_GROUP_COMMON = 'Главное';
     const SUB_GROUP_DECOR = 'Декорация';
     const SUB_GROUP_ANIMATION = 'Анимация';

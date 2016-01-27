@@ -13,6 +13,7 @@ use ide\formats\form\elements\FormFormElement;
 use ide\formats\form\elements\GamePaneFormElement;
 use ide\formats\form\elements\PanelFormElement;
 use ide\formats\form\elements\ScrollPaneFormElement;
+use ide\formats\form\elements\SpriteViewFormElement;
 use ide\scripts\AbstractScriptComponent;
 use php\gui\UXNode;
 
@@ -58,7 +59,6 @@ class GameEntityBehaviourSpec extends AbstractBehaviourSpec
      */
     public function isAllowedFor($target)
     {
-        return !($target instanceof AbstractScriptComponent)
-                && !($target instanceof FormFormElement) && !($target instanceof GamePaneFormElement);
+        return ($target instanceof SpriteViewFormElement);
     }
 }

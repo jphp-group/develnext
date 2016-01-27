@@ -27,6 +27,25 @@ ide\action\types\FadeInActionType
 ide\action\types\FadeToActionType
 ide\action\types\DisplaceActionType
 ide\action\types\MoveToActionType
+ide\action\types\BehaviourEnableActionType
+ide\action\types\BehaviourDisableActionType
+
+ide\action\types\game\CreateInstanceActionType
+ide\action\types\game\JumpToActionType
+ide\action\types\game\JumpToStartActionType
+ide\action\types\game\JumpToRandActionType
+ide\action\types\game\JumpToGridActionType
+ide\action\types\game\CollisionBounceActionType
+ide\action\types\game\SetGravityActionType
+ide\action\types\game\SetAngleSpeedActionType
+ide\action\types\game\SetHorizontalSpeedActionType
+ide\action\types\game\SetVerticalSpeedActionType
+ide\action\types\GameChangeAnimationActionType
+ide\action\types\GameStopAnimationActionType
+ide\action\types\GameStartAnimationActionType
+ide\action\types\GameSetSpeedAnimationActionType
+ide\action\types\IfGameAnimationFreezeActionType
+ide\action\types\IfGameAnimationActionType
 
 ide\action\types\OpenActionType
 ide\action\types\BrowseActionType
@@ -47,17 +66,6 @@ ide\action\types\IfFileExistsActionType
 ide\action\types\IfDirExistsActionType
 ide\action\types\IfIntersectActionType
 ide\action\types\IfPasswordValidActionType
-
-ide\action\types\BehaviourEnableActionType
-ide\action\types\BehaviourDisableActionType
-
-ide\action\types\game\CreateInstanceActionType
-ide\action\types\GameChangeAnimationActionType
-ide\action\types\GameStopAnimationActionType
-ide\action\types\GameStartAnimationActionType
-ide\action\types\GameSetSpeedAnimationActionType
-ide\action\types\IfGameAnimationFreezeActionType
-ide\action\types\IfGameAnimationActionType
 
 ide\action\types\media\OpenMediaAction
 ide\action\types\media\OpenFileMediaAction

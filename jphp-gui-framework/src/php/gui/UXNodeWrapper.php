@@ -46,7 +46,7 @@ class UXNodeWrapper
             $this->node->cursor = $data->get('cursor');
         }
 
-        $this->node->data('--start-position', [$this->node->position]);
+        $this->node->data('--start-position', $this->node->position);
     }
 
     /**

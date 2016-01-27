@@ -341,6 +341,12 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
 
     @Signature
     public Memory __get(Environment env, String name) throws NoSuchFieldException, IllegalAccessException {
+        Memory prop = data("--property-" + name);
+
+        if (prop.isNotNull()) {
+            return prop;
+        }
+
         Node node = UXNode.__globalLookup(getLayout(), "#" + name);
 
         if (node instanceof MenuButton && node.getClass().getName().endsWith("MenuBarButton")) {

@@ -5,6 +5,7 @@ use ide\editors\AbstractEditor;
 use ide\editors\menu\ContextMenu;
 use ide\forms\MainForm;
 use ide\Ide;
+use ide\Logger;
 use ide\utils\FileUtils;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
@@ -212,12 +213,19 @@ class FileSystem
                 static::close($path, false);
             });
 
-            $tab->on('change', function (UXEvent $e) use ($mainForm) {
-                Timer::run(100, function () use ($mainForm) {
-                    /** @var UXTabPane $fileTabPane */
-                    $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+            $tab->on('change', function (UXEvent $e) use ($mainForm, $path) {
+                /** @var UXTabPane $fileTabPane */
+                $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+
+                if ($e->sender === $fileTabPane->selectedTab) {
+                    return;
+                }
+
+                uiLater(function () use ($mainForm, $path, $fileTabPane) {
 
                     $tab = $fileTabPane->selectedTab;
+
+                    Logger::info("Opening selected tab '$tab->text'");
 
                     if (static::$previousEditor) {
                         static::$previousEditor->hide();

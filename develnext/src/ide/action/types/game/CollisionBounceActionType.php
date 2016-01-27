@@ -1,13 +1,14 @@
 <?php
 namespace ide\action\types\game;
 
+use action\Collision;
 use game\Jumping;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionScript;
 use php\lib\str;
 
-class JumpToStartActionType extends AbstractSimpleActionType
+class CollisionBounceActionType extends AbstractSimpleActionType
 {
     function getGroup()
     {
@@ -42,32 +43,32 @@ class JumpToStartActionType extends AbstractSimpleActionType
 
     function getTagName()
     {
-        return "jumpingToStart";
+        return "collisionBounce";
     }
 
     function getTitle(Action $action = null)
     {
-        return "Прыгнуть к началу";
+        return "Отскочить";
     }
 
     function getDescription(Action $action = null)
     {
         if ($action) {
-            return str::format("Переместить объект %s к начальной позиции", $action->get('object'));
+            return str::format("Выполнить отскок для объекта %s (во время столкновения)", $action->get('object'));
         } else {
-            return "Переместить объект к начальной позиции";
+            return "Выполнить отскок для объекта (во время столкновения)";
         }
     }
 
     function getIcon(Action $action = null)
     {
-        return 'icons/jumpToStart16.png';
+        return 'icons/bounce16.png';
     }
 
     function imports(Action $action = null)
     {
         return [
-            Jumping::class
+            Collision::class
         ];
     }
 
@@ -78,6 +79,6 @@ class JumpToStartActionType extends AbstractSimpleActionType
      */
     function convertToCode(Action $action, ActionScript $actionScript)
     {
-        return "Jumping::toStart({$action->get('object')})";
+        return "Collision::bounce({$action->get('object')}, \$event->normal)";
     }
 }
