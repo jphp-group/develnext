@@ -449,6 +449,12 @@ abstract class AbstractForm extends UXForm
         if ($applyConfig) $this->applyConfig();
     }
 
+    protected function loadCustomNode(UXCustomNode $node)
+    {
+        // nop.
+        return null;
+    }
+
     protected function loadDesign()
     {
         $loader = new UXLoader();
@@ -466,18 +472,10 @@ abstract class AbstractForm extends UXForm
                 DataUtils::scan($this->layout, function (UXData $data, UXNode $node = null) {
                     if ($node) {
                         if ($node instanceof UXCustomNode) {
-                            $type = $node->get('type');
+                            $newNode = $this->loadCustomNode($node);
 
-                            if (class_exists($type)) {
-                                /** @var UXFactoryInstance $type */
-                                $type = new $type();
-
-                                $newNode = $type->create($node);
-
-                                if ($newNode) {
-                                    $node->parent->add($newNode);
-                                }
-
+                            if ($newNode) {
+                                $node->parent->add($newNode);
                                 $node = $newNode;
                             }
                         }

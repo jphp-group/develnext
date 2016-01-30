@@ -59,6 +59,6 @@ class GameEntityBehaviourSpec extends AbstractBehaviourSpec
      */
     public function isAllowedFor($target)
     {
-        return ($target instanceof SpriteViewFormElement);
+        return !($target instanceof AbstractScriptComponent);
     }
 }

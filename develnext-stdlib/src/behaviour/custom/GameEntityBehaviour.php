@@ -179,13 +179,14 @@ class GameEntityBehaviour extends AbstractBehaviour
                 $this->entity->setEllipseFixture($target->width, $target->height);
                 break;
 
+            case 'INHERITED':
             case 'RECTANGLE':
                 $this->entity->setRectangleFixture($target->width, $target->height);
                 break;
 
-            case 'INHERITED':
+            /*case 'INHERITED':*/
                 /** @var SpriteSpec $spriteSpec */
-                if ($spriteSpec = $target->data(SpriteSpec::DATA_PROPERTY_NAME)) {
+                /*if ($spriteSpec = $target->data(SpriteSpec::DATA_PROPERTY_NAME)) {
                     $fixtureData = $spriteSpec->fixtureData;
 
                     switch ($spriteSpec->fixtureType) {
@@ -201,8 +202,10 @@ class GameEntityBehaviour extends AbstractBehaviour
                     }
                 }
 
-                break;
+                break;*/
         }
+
+       // $this->entity->setRectangleFixture(32, 32);
     }
 
     public function setCollisionHandler($entityType, callable $handler)

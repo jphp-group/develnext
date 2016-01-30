@@ -6,6 +6,7 @@ use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
 use ide\Ide;
+use ide\Logger;
 use php\gui\designer\UXDesigner;
 use php\gui\framework\DataUtils;
 use php\gui\layout\UXAnchorPane;
@@ -81,6 +82,12 @@ class GuiFormDumper extends AbstractFormDumper
         $document = $this->processor->createDocument();
 
         $element = $this->createElementTag($editor->getLayout(), $document, false);
+
+        if ($element == null) {
+            Logger::error("Unable to save editor '{$editor->getTitle()}'");
+            return;
+        }
+
         $element->setAttribute('xmlns', 'http://javafx.com/javafx/8');
         $element->setAttribute('xmlns:fx', 'http://javafx.com/fxml/1');
 

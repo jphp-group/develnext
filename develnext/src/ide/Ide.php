@@ -531,6 +531,12 @@ class Ide extends Application
 
         $this->formats[$class] = $format;
 
+        $createCommand = $format->createBlankCommand();
+
+        if ($createCommand) {
+            $this->registerCommand($createCommand, 'create');
+        }
+
         foreach ($format->getRequireFormats() as $el) {
             $this->registerFormat($el);
         }
@@ -627,8 +633,9 @@ class Ide extends Application
 
     /**
      * @param AbstractCommand $command
+     * @param null $category
      */
-    public function registerCommand(AbstractCommand $command)
+    public function registerCommand(AbstractCommand $command, $category = null)
     {
         $this->unregisterCommand(get_class($command));
 
@@ -662,17 +669,18 @@ class Ide extends Application
             });
         }
 
+        $category = $category ?: $command->getCategory();
         $menuItem = $command->makeMenuItem();
 
         if ($menuItem) {
             $data['menuItem'] = $menuItem;
 
-            $this->afterShow(function () use ($menuItem, $command, &$data) {
+            $this->afterShow(function () use ($menuItem, $command, &$data, $category) {
                 /** @var MainForm $mainForm */
                 $mainForm = $this->getMainForm();
 
                 /** @var UXMenu $menu */
-                $menu = $mainForm->{'menu' . Str::upperFirst($command->getCategory())};
+                $menu = $mainForm->{'menu' . Str::upperFirst($category)};
 
                 if ($menu instanceof UXMenu) {
                     $items = [];

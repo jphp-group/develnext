@@ -127,7 +127,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
         //Ide::get()->registerCommand(new CreateFactoryProjectCommand());
 
-        //Ide::get()->registerCommand(new CreateGameSceneProjectCommand());
         //Ide::get()->registerCommand(new CreateGameObjectPrototypeProjectCommand());
         Ide::get()->registerCommand(new CreateGameSpriteProjectCommand());
 

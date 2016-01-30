@@ -6,6 +6,10 @@ use game\Jumping;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionScript;
+use ide\editors\argument\ObjectArgumentEditor;
+use ide\editors\common\ObjectListEditorItem;
+use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\SpriteViewFormElement;
 use php\lib\str;
 
 class CollisionBounceActionType extends AbstractSimpleActionType
@@ -18,6 +22,11 @@ class CollisionBounceActionType extends AbstractSimpleActionType
     function getSubGroup()
     {
         return self::SUB_GROUP_MOVING;
+    }
+
+    function getHelpText()
+    {
+        return 'Данное действие работает только в событии столкновения для движущихся игровых объектов';
     }
 
     function attributes()

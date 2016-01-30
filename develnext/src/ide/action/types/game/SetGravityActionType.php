@@ -5,6 +5,11 @@ use game\Jumping;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionScript;
+use ide\editors\argument\ObjectArgumentEditor;
+use ide\editors\common\ObjectListEditorItem;
+use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\GamePaneFormElement;
+use ide\formats\form\elements\SpriteViewFormElement;
 use php\lib\str;
 
 class SetGravityActionType extends AbstractSimpleActionType
@@ -45,7 +50,15 @@ class SetGravityActionType extends AbstractSimpleActionType
     function attributeSettings()
     {
         return [
-            'object' => ['def' => '~sender'],
+            'object' => ['def' => '~sender', 'editor' => function () {
+                return new ObjectArgumentEditor([
+                    'objectFilter' => function (ObjectListEditorItem $item) {
+                        return $item->element instanceof SpriteViewFormElement
+                        || $item->element instanceof FormFormElement || $item->element == null
+                            || $item->element instanceof GamePaneFormElement;
+                    }
+                ]);
+            }],
             'x' => ['def' => 0],
             'y' => ['def' => 0],
         ];

@@ -9,6 +9,7 @@ use ide\editors\argument\ObjectArgumentEditor;
 use ide\editors\common\ObjectListEditor;
 use ide\editors\common\ObjectListEditorItem;
 use ide\formats\form\AbstractFormElement;
+use ide\formats\form\elements\FormFormElement;
 use ide\scripts\elements\MacroScriptComponent;
 use php\gui\UXApplication;
 use php\lib\Items;
@@ -41,9 +42,12 @@ class CallScriptActionType extends AbstractSimpleActionType
             'script' => [
                 'editor' => function ($name, $label) {
                     $editor = new ObjectArgumentEditor([
+                        'objectDisableForms' => true,
+
                         'objectFilter' => function (ObjectListEditorItem $item) {
 
-                            return $item->element instanceof MacroScriptComponent;
+                            return $item->element instanceof MacroScriptComponent
+                            || $item->element instanceof FormFormElement || $item->element == null;
                         }
                     ]);
                     return $editor;

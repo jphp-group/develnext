@@ -24,6 +24,21 @@ abstract class AbstractBehaviourSpec
     const GROUP_GAME = 'Игра';
 
     /**
+     * @var bool
+     */
+    public $deletable = true;
+
+    /**
+     * AbstractBehaviourSpec constructor.
+     * @param bool $deletable
+     */
+    public function __construct($deletable = true)
+    {
+        $this->deletable = $deletable;
+    }
+
+
+    /**
      * @return string
      */
     abstract public function getName();
@@ -98,6 +113,14 @@ abstract class AbstractBehaviourSpec
     public function getGroup()
     {
         return self::GROUP_MAIN;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDeletable()
+    {
+        return $this->deletable;
     }
 
     /**

@@ -7,6 +7,10 @@ use ide\action\ActionScript;
 use ide\editors\argument\MixedArgumentEditor;
 use ide\editors\argument\ObjectArgumentEditor;
 use ide\editors\common\ObjectListEditor;
+use ide\editors\common\ObjectListEditorItem;
+use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\GamePaneFormElement;
+use ide\formats\form\elements\PanelFormElement;
 use php\lib\str;
 
 class CreateInstanceActionType extends AbstractSimpleActionType
@@ -27,6 +31,7 @@ class CreateInstanceActionType extends AbstractSimpleActionType
             'id' => 'prototype',
             'x' => 'integer',
             'y' => 'integer',
+            'parent' => 'object',
             'relative' => 'flag',
         ];
     }
@@ -37,6 +42,7 @@ class CreateInstanceActionType extends AbstractSimpleActionType
             'id' => 'Объект (прототип)',
             'x' => 'X (координата)',
             'y' => 'Y (координата)',
+            'parent' => 'Относительно какого объекта',
             'relative' => 'Относительно',
         ];
     }
@@ -45,8 +51,8 @@ class CreateInstanceActionType extends AbstractSimpleActionType
     {
         return [
             'id' => ['def' => '~sender'],
-            'x'  => ['def' => '0'],
-            'y'  => ['def' => '0'],
+            'x' => ['def' => '0'],
+            'y' => ['def' => '0'],
         ];
     }
 
@@ -63,10 +69,19 @@ class CreateInstanceActionType extends AbstractSimpleActionType
     function getDescription(Action $action = null)
     {
         if ($action) {
-            return str::format(
-                "Создать клона от объекта %s, относительно = %s, [x, y] = [%s, %s]",
-                $action->get('id'), $action->relative ? 'да' : 'нет', $action->get('x'), $action->get('y')
-            );
+            $parent = $action->get('parent');
+
+            if ($parent) {
+                return str::format(
+                    "Создать клона от объекта %s, относительно = %s, [x, y] = [%s, %s], относительно объекта %s",
+                    $action->get('id'), $action->relative ? 'да' : 'нет', $action->get('x'), $action->get('y'), $parent
+                );
+            } else {
+                return str::format(
+                    "Создать клона от объекта %s, относительно = %s, [x, y] = [%s, %s]",
+                    $action->get('id'), $action->relative ? 'да' : 'нет', $action->get('x'), $action->get('y')
+                );
+            }
         } else {
             return "Создать клона от объекта";
         }
@@ -86,18 +101,19 @@ class CreateInstanceActionType extends AbstractSimpleActionType
     {
         $x = $action->get('x');
         $y = $action->get('y');
+        $parent = $action->get('parent') ?: ($action->relative ? '$event->sender' : 'null');
 
         if (!$action->relative) {
             if ($x == 0 && $y == 0) {
-                return "\$this->create({$action->get('id')})";
+                return "\$this->create({$action->get('id')}, $parent)";
             } else {
-                return "\$this->create({$action->get('id')}, null, $x, $y)";
+                return "\$this->create({$action->get('id')}, $parent, $x, $y)";
             }
         } else {
             if ($x == 0 && $y == 0) {
-                return "\$this->create({$action->get('id')}, \$event->sender)";
+                return "\$this->create({$action->get('id')}, $parent)";
             } else {
-                return "\$this->create({$action->get('id')}, \$event->sender, $x, $y)";
+                return "\$this->create({$action->get('id')}, $parent, $x, $y)";
             }
         }
     }

@@ -13,19 +13,17 @@ class Collision
      * Отскок исходя из нормали столкновения
      * @param $object
      * @param array $normal [x, y]
+     * @param float|int $bounciness
      */
-    static function bounce($object, array $normal)
+    static function bounce($object, array $normal, $bounciness = 1.0)
     {
         $velocity = $object->phys->velocity;
 
-        if ($normal[0]) {
-            $velocity[0] *= $normal[0];
-        }
+        $speed = $object->phys->speed;
 
-        if ($normal[1]) {
-            $velocity[1] *= $normal[1];
-        }
-
-        $object->phys->velocity = $velocity;
+        $object->phys->velocity = [
+            $velocity[0] - (1 + $bounciness) * $speed * $normal[0],
+            $velocity[1] - (1 + $bounciness) * $speed * $normal[1]
+        ];
     }
 }

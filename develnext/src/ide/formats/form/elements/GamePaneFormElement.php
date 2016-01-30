@@ -87,7 +87,7 @@ class GamePaneFormElement extends AbstractFormElement
     public function getInitialBehaviours()
     {
         return [
-            new GameSceneBehaviourSpec()
+            new GameSceneBehaviourSpec(false)
         ];
     }
 

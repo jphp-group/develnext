@@ -148,6 +148,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     protected $elementTypePane;
 
     /**
+     * @var UXScrollPane
+     */
+    protected $elementTypePaneContainer;
+
+    /**
      * @var ContextMenu
      */
     protected $contextMenu;
@@ -1080,6 +1085,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $scrollPane = new UXScrollPane($this->elementTypePane->getContent());
         $scrollPane->fitToWidth = true;
         $scrollPane->maxWidth = $scrollPane->content->maxWidth;
+        $this->elementTypePaneContainer = $scrollPane;
 
         $split = new UXSplitPane([$this->viewerAndEvents, $scrollPane]);
 
@@ -1118,7 +1124,15 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return $id;
     }
 
-    protected function createElement(AbstractFormElement $element, $screenX, $screenY, $parent = null)
+    /**
+     * @param AbstractFormElement $element
+     * @param $screenX
+     * @param $screenY
+     * @param null $parent
+     * @return mixed|UXNode
+     * @throws \php\lang\IllegalArgumentException
+     */
+    protected function createElement($element, $screenX, $screenY, $parent = null)
     {
         Logger::info("Create element: element = " . get_class($element) . ", screenX = $screenX, screenY = $screenY, parent = $parent");
 
@@ -1177,7 +1191,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         if ($initialBehaviours) {
             foreach ($initialBehaviours as $spec) {
-                $this->behaviourManager->apply($node->id, $spec->createBehaviour());
+                $behaviour = $spec->createBehaviour();
+                $this->behaviourManager->apply($node->id, $behaviour);
             }
 
             $this->behaviourManager->save();
@@ -1340,24 +1355,34 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function updateEventTypes($node, $selected = null)
     {
-        $this->eventManager->load();
-        $this->eventListPane->update($this->getNodeId($node));
+        if ($this->eventManager) {
+            $this->eventManager->load();
+            $this->eventListPane->update($this->getNodeId($node));
+        }
     }
 
     protected function updateProperties($node)
     {
-        $this->eventManager->load();
+        if ($this->eventManager) {
+            $this->eventManager->load();
+        }
 
         $element = $this->format->getFormElement($node);
         $properties = $element ? static::$typeProperties[get_class($element)] : null;
 
-        $this->propertiesPane->clearProperties();
+        if ($this->propertiesPane) {
+            $this->propertiesPane->clearProperties();
+        }
 
         $this->trigger('updateNode:before', [$node, $properties]);
 
-        $this->propertiesPane->addProperties($properties);
+        if ($this->propertiesPane) {
+            $this->propertiesPane->addProperties($properties);
+        }
 
-        $this->eventListPane->setEventTypes($element ? $element->getEventTypes() : []);
+        if ($this->eventListPane) {
+            $this->eventListPane->setEventTypes($element ? $element->getEventTypes() : []);
+        }
 
         $this->trigger('updateNode:after', [$node, $properties]);
 

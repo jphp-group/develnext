@@ -354,7 +354,7 @@ class ObjectListEditor
             }
         }
 
-        if ($this->enableAllForms) {
+        if ($this->enableAllForms && !$this->disableForms) {
             $project = Ide::get()->getOpenedProject();
 
             if ($project && $project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {

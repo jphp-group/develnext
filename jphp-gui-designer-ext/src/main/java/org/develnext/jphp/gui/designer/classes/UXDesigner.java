@@ -16,6 +16,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
@@ -45,10 +46,13 @@ import java.util.*;
 
 @Namespace(GuiDesignerExtension.NS)
 public class UXDesigner extends BaseObject {
+    public enum SnapType { DOTS, GRID }
+
     private Pane area;
 
     private Point2D startPoint;
 
+    protected SnapType snapType = SnapType.DOTS;
     protected int snapSize = 8;
     protected boolean snapEnabled = true;
     protected boolean helpersEnabled = true;
@@ -82,6 +86,11 @@ public class UXDesigner extends BaseObject {
         super(env, clazz);
     }
 
+    public static Color getContrastColor(Color color) {
+        double y = (299 * color.getRed() + 587 * color.getGreen() + 114 * color.getBlue()) / 1000;
+        return y >= 128 ? Color.BLACK.brighter() : Color.WHITE.darker();
+    }
+
     protected void updateHelpers() {
         if (dots != null) {
             area.getChildren().removeAll(dots);
@@ -90,6 +99,7 @@ public class UXDesigner extends BaseObject {
         if (snapSize > 2) {
             dots = new Canvas(area.getWidth(), area.getHeight());
             dots.setMouseTransparent(true);
+            dots.setBlendMode(BlendMode.DIFFERENCE);
 
             GraphicsContext context2D = dots.getGraphicsContext2D();
 
@@ -97,10 +107,21 @@ public class UXDesigner extends BaseObject {
             int h = (int) dots.getHeight();
 
             context2D.setFill(Color.GRAY);
+            context2D.setLineDashes(2, 2);
 
-            for (int i = 0; i < (w / snapSize) + 1; i++) {
-                for (int j = 0; j < (h / snapSize) + 1; j++) {
-                    context2D.fillRect(i * snapSize, j * snapSize, 1, 1);
+            if (snapType == SnapType.DOTS) {
+                for (int i = 0; i < (w / snapSize) + 1; i++) {
+                    for (int j = 0; j < (h / snapSize) + 1; j++) {
+                        context2D.fillRect(i * snapSize, j * snapSize, 1, 1);
+                    }
+                }
+            } else {
+                for (int i = 0; i < (w / snapSize) + 1; i++) {
+                    context2D.fillRect(i * snapSize, 0, 1, h);
+                }
+
+                for (int i = 0; i < (h / snapSize) + 1; i++) {
+                    context2D.fillRect(0, i * snapSize, w, 1);
                 }
             }
 
@@ -327,6 +348,17 @@ public class UXDesigner extends BaseObject {
     @Setter
     protected void setSnapSize(int size) {
         snapSize = size;
+        updateHelpers();
+    }
+
+    @Getter
+    public SnapType getSnapType() {
+        return snapType;
+    }
+
+    @Setter
+    public void setSnapType(SnapType snapType) {
+        this.snapType = snapType;
         updateHelpers();
     }
 
@@ -1203,6 +1235,8 @@ public class UXDesigner extends BaseObject {
                     POINT_SIZE, POINT_SIZE,
                     Paint.valueOf(locked ? "gray" : "black")
             );
+
+            //rectangle.setBlendMode(BlendMode.DIFFERENCE);
 
             return rectangle;
         }

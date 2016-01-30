@@ -76,4 +76,19 @@ class ObjectListEditorItem extends \stdClass
 
         return $item;
     }
+
+    public function getName()
+    {
+        return $this->text;
+    }
+
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    public function getIcon()
+    {
+        return $this->graphic;
+    }
 }

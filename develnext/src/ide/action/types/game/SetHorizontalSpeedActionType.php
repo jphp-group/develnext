@@ -5,6 +5,10 @@ use game\Jumping;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionScript;
+use ide\editors\argument\ObjectArgumentEditor;
+use ide\editors\common\ObjectListEditorItem;
+use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\SpriteViewFormElement;
 use php\lib\str;
 
 class SetHorizontalSpeedActionType extends AbstractSimpleActionType
@@ -21,7 +25,7 @@ class SetHorizontalSpeedActionType extends AbstractSimpleActionType
 
     function getHelpText()
     {
-        return 'Это действие работает только для объектов с поведением "Объект игровой сцены" внутри игровой комнаты или для объектов с поведением "Игровая сцена"!';
+        return 'Это действие работает только для игровых объектов с поведением "Объект игровой сцены" внутри игровой комнаты или для объектов с поведением "Игровая сцена"!';
     }
 
     function attributes()
@@ -29,6 +33,7 @@ class SetHorizontalSpeedActionType extends AbstractSimpleActionType
         return [
             'object' => 'object',
             'speed' => 'float',
+            'relative' => 'flag',
         ];
     }
 
@@ -36,7 +41,8 @@ class SetHorizontalSpeedActionType extends AbstractSimpleActionType
     {
         return [
             'object' => 'Объект',
-            'speed' => 'Скорость (м/с)'
+            'speed' => 'Скорость (м/с)',
+            'relative' => 'Относительно'
         ];
     }
 
@@ -79,6 +85,8 @@ class SetHorizontalSpeedActionType extends AbstractSimpleActionType
      */
     function convertToCode(Action $action, ActionScript $actionScript)
     {
-        return "{$action->get('object')}->phys->hspeed = {$action->get('speed')}";
+        $oper = $action->relative ? '+=' : '=';
+
+        return "{$action->get('object')}->phys->hspeed $oper {$action->get('speed')}";
     }
 }

@@ -44,6 +44,11 @@ class IdeBehaviourManager extends BehaviourManager
     protected $targetGetter = null;
 
     /**
+     * @var array
+     */
+    protected $undeletable = [];
+
+    /**
      * @param $file
      * @param callable $targetGetter
      */

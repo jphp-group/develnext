@@ -1,5 +1,6 @@
 <?php
 namespace ide\editors\form;
+use ide\editors\common\ObjectListEditorItem;
 use ide\editors\menu\ContextMenu;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
@@ -80,7 +81,7 @@ class FormElementTypePane
     protected $viewSelect;
 
     /**
-     * @param AbstractFormElement[]|AbstractScriptComponent[] $elements
+     * @param AbstractFormElement[]|AbstractScriptComponent[]|ObjectListEditorItem[] $elements
      * @param bool $selectable
      */
     public function __construct(array $elements, $selectable = true)

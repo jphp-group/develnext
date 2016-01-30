@@ -110,7 +110,9 @@ class IdeBehaviourPane
                     new UXLabel($spec->getName()),
                 ]);
 
-                $this->initDeleteBehaviourButton($groupPane->graphic, $targetId, $behaviour);
+                if ($spec->isDeletable()) {
+                    $this->initDeleteBehaviourButton($groupPane->graphic, $targetId, $behaviour);
+                }
 
                 $groupPane->graphic->spacing = 4;
                 $groupPane->text = null;

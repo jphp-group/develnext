@@ -59,7 +59,7 @@ class SpriteViewFormElement extends AbstractFormElement
     public function getInitialBehaviours()
     {
         return [
-            new GameEntityBehaviourSpec()
+            new GameEntityBehaviourSpec(false)
         ];
     }
 

@@ -2,7 +2,11 @@
 namespace ide\formats;
 
 use ide\editors\AbstractEditor;
+use ide\misc\AbstractCommand;
+use ide\project\Project;
+use ide\project\ProjectFile;
 use php\io\File;
+use php\lang\IllegalStateException;
 
 /**
  * Class AbstractFormat
@@ -56,6 +60,26 @@ abstract class AbstractFormat
      * @return null TODO
      */
     public function createCreator()
+    {
+        return null;
+    }
+
+    /**
+     * @param Project $project
+     * @param $file
+     * @param array $options
+     * @throws IllegalStateException
+     * @return ProjectFile
+     */
+    public function createBlank(Project $project, $file, array $options)
+    {
+        throw new IllegalStateException("Unable to create blank file");
+    }
+
+    /**
+     * @return AbstractCommand|null
+     */
+    public function createBlankCommand()
     {
         return null;
     }

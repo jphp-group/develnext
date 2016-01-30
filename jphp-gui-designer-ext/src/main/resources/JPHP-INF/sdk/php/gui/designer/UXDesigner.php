@@ -31,6 +31,11 @@ class UXDesigner
     public $resizing;
 
     /**
+     * @var string DOTS, GRID
+     */
+    public $snapType = 'DOTS';
+
+    /**
      * @var int
      */
     public $snapSize = 8;

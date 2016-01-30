@@ -62,11 +62,13 @@ class IdePropertiesPane
         }
     }
 
-    public function addProperties(UXDesignProperties $properties)
+    public function addProperties(UXDesignProperties $properties = null)
     {
-        $this->properties[] = $properties;
+        if ($properties) {
+            $this->properties[] = $properties;
 
-        $this->ui->children->addAll($properties->getGroupPanes());
+            $this->ui->children->addAll($properties->getGroupPanes());
+        }
     }
 
     public function update($target)
