@@ -50,7 +50,7 @@ public class GameEntity2D implements EventTarget {
         this.body.setUserData(this);
         this.body.setMass(MassType.NORMAL);
         this.body.addFixture(new Rectangle(getWidth(), getHeight()));
-        this.body.setActive(node.isVisible());
+        this.body.setActive(!node.isDisabled());
 
         xProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -72,10 +72,19 @@ public class GameEntity2D implements EventTarget {
         node.layoutXProperty().bindBidirectional(x);
         node.layoutYProperty().bindBidirectional(y);
 
-        node.visibleProperty().addListener(new ChangeListener<Boolean>() {
+        ChangeListener<Number> activeTrigger = new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                body.setActive(true);
+            }
+        };
+        node.layoutYProperty().addListener(activeTrigger);
+        node.layoutYProperty().addListener(activeTrigger);
+
+        node.disabledProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                body.setActive(newValue);
+                body.setActive(!newValue);
             }
         });
     }
@@ -96,6 +105,14 @@ public class GameEntity2D implements EventTarget {
         } else {
             this.body.addFixture(new Polygon(_points));
         }
+    }
+
+    public boolean getActive() {
+        return body.isActive();
+    }
+
+    public void setActive(boolean value) {
+        body.setActive(value);
     }
 
     public void setCircleFixture(double radius) {
@@ -203,30 +220,33 @@ public class GameEntity2D implements EventTarget {
         switch (bodyType) {
             case DYNAMIC:
             case KINEMATIC:
-                Vec2d gravity = this.gravity;
+                if (body.isActive()) {
+                    Vec2d gravity = this.gravity;
 
-                if (gravity == null) {
-                    gravity = scene.gravity;
-                }
+                    if (gravity == null) {
+                        gravity = scene.gravity;
+                    }
 
-                if (gravity != null) {
-                    velocity.x += gravity.x * dt;
-                    velocity.y += gravity.y * dt;
-                }
+                    if (gravity != null) {
+                        velocity.x += gravity.x * dt;
+                        velocity.y += gravity.y * dt;
+                    }
 
-                if (velocity.x > 0.00001 || velocity.x < -00000.1) {
-                    x.set(x.get() + GameScene2D.toPixels(velocity.x * dt));
-                }
+                    if (velocity.x > 0.00001 || velocity.x < -00000.1) {
+                        x.set(x.get() + GameScene2D.toPixels(velocity.x * dt));
+                    }
 
-                if (velocity.y > 0.00001 || velocity.y < -00000.1) {
-                    y.set(y.get() + GameScene2D.toPixels(velocity.y * dt));
+                    if (velocity.y > 0.00001 || velocity.y < -00000.1) {
+                        y.set(y.get() + GameScene2D.toPixels(velocity.y * dt));
+                    }
+
+                   // node.setLayoutX(x.get());
+                   // node.setLayoutY(y.get());
                 }
 
                 break;
         }
 
-        node.setLayoutX(x.get());
-        node.setLayoutY(y.get());
     }
 
     public GameScene2D getScene() {
@@ -248,7 +268,6 @@ public class GameEntity2D implements EventTarget {
     public void setGravity(Vec2d gravity) {
         this.gravity = gravity;
     }
-
 
     public double getGravityX() {
         return gravity == null ? 0.0 : gravity.x;
@@ -300,15 +319,19 @@ public class GameEntity2D implements EventTarget {
 
     public void setVelocityX(double value) {
         velocity.x = value;
+        body.setActive(true);
     }
 
     public void setVelocityY(double value) {
         velocity.y = value;
+        body.setActive(true);
     }
 
     public void setAngleSpeed(Vec2d speed) {
         double direction = -Math.toRadians(speed.x);
         velocity = new Vec2d(speed.y * Math.cos(direction), speed.y * Math.sin(direction));
+
+        body.setActive(true);
     }
 
     public Vec2d getAngleSpeed() {
@@ -336,6 +359,8 @@ public class GameEntity2D implements EventTarget {
             double speed = getSpeed();
             velocity = new Vec2d(speed * Math.cos(value), speed * Math.sin(value));
         }
+
+        body.setActive(true);
     }
 
     public void setSpeed(double value) {
@@ -351,13 +376,19 @@ public class GameEntity2D implements EventTarget {
         if (value == 0.0) {
             direction = oldDirection;
         }
+
+        body.setActive(true);
     }
 
-    public boolean triggerCollision(GameEntity2D other, ContactConstraint constraint) {
+    public boolean triggerCollision(GameEntity2D other, ContactConstraint constraint, boolean negative) {
         EventHandler<CollisionEvent> eventHandler = collisionHandlers.get(other.getEntityType());
 
         if (eventHandler != null) {
             CollisionEvent event = new CollisionEvent(this, other, constraint);
+            if (negative) {
+                event.normal.negateLocal();
+            }
+
             eventHandler.handle(event);
 
             return event.isConsumed();

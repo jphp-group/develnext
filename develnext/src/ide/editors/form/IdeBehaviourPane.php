@@ -10,6 +10,7 @@ use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
 use php\gui\designer\UXDesignProperties;
+use php\gui\event\UXEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXPane;
@@ -17,6 +18,7 @@ use php\gui\layout\UXVBox;
 use php\gui\UXButton;
 use php\gui\UXLabel;
 use php\gui\UXNode;
+use php\gui\UXTitledPane;
 use php\util\Flow;
 
 /**
@@ -111,7 +113,7 @@ class IdeBehaviourPane
                 ]);
 
                 if ($spec->isDeletable()) {
-                    $this->initDeleteBehaviourButton($groupPane->graphic, $targetId, $behaviour);
+                    $this->initDeleteBehaviourButton($groupPane, $spec);
                 }
 
                 $groupPane->graphic->spacing = 4;
@@ -122,6 +124,7 @@ class IdeBehaviourPane
                 $this->initProperties($code, $pane, $properties);
             }
 
+            $groupPane->data('--target-id', $targetId);
             $groupPanes[$code] = $groupPane;
         }
 
@@ -160,7 +163,7 @@ class IdeBehaviourPane
         return $this->lastUi = $box;
     }
 
-    protected function initDeleteBehaviourButton(UXHBox $title, $targetId, AbstractBehaviour $behaviour)
+    protected function initDeleteBehaviourButton(UXTitledPane $pane, AbstractBehaviourSpec $spec)
     {
         $box = new UXHBox();
 
@@ -169,14 +172,18 @@ class IdeBehaviourPane
         $button->text = null;
         $button->graphic = ico('smallDelete16');
 
-        $button->on('click', function () use ($targetId, $behaviour) {
-            $spec = $this->behaviourManager->getBehaviourSpec($behaviour);
+        $targetId = $pane->data('--target-id');
 
+        $button->on('click', function (UXEvent $e) use ($targetId, $spec, $pane) {
             $msg = new MessageBoxForm('Вы уверены, что хотите удалить поведение "' . $spec->getName() . '"?', ['yes' => 'Да, удалить', 'no' => 'Нет']);
+
+            uiLater(function () use ($pane) {
+                $pane->expanded = !$pane->expanded;
+            });
 
             if ($msg->showDialog()) {
                 if ($msg->getResult() == 'yes') {
-                    $this->behaviourManager->removeBehaviour($targetId, get_class($behaviour));
+                    $this->behaviourManager->removeBehaviour($targetId, $spec->getType());
                     $this->behaviourManager->save();
 
                     $this->makeUi($targetId, $this->lastUi);
@@ -185,8 +192,7 @@ class IdeBehaviourPane
         });
 
         $box->add($button);
-
-        $title->add($box);
+        $pane->graphic->add($box);
     }
 
     protected function initButtonAdd(UXPane $pane, $targetId)

@@ -16,6 +16,11 @@ class UXGameEntity
     public $node;
 
     /**
+     * @var bool
+     */
+    public $active = true;
+
+    /**
      * @var float
      */
     public $x;

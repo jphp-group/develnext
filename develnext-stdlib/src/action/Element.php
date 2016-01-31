@@ -3,6 +3,8 @@ namespace action;
 
 use behaviour\SetTextBehaviour;
 use behaviour\StreamLoadableBehaviour;
+use php\gui\framework\behaviour\ValuableBehaviour;
+use php\gui\framework\Instances;
 use php\gui\framework\ObjectGroup;
 use php\gui\UXApplication;
 use php\gui\UXComboBox;
@@ -14,6 +16,7 @@ use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXLabeled;
 use php\gui\UXListView;
+use php\gui\UXSlider;
 use php\gui\UXTextInputControl;
 use php\gui\UXWebView;
 use php\io\IOException;
@@ -27,9 +30,84 @@ use php\lib\Str;
  */
 class Element
 {
+    static function setValue($object, $value)
+    {
+        if ($object instanceof Instances) {
+            $result = false;
+
+            foreach ($object->getInstances() as $it) {
+                $result = $result || self::setValue($it, $value);
+            }
+
+            return $result;
+        }
+
+        if ($object instanceof ValuableBehaviour) {
+            $object->setObjectValue($value);
+            return true;
+        }
+
+        if ($object instanceof UXComboBox) {
+            $object->selectedIndex = $value;
+            return true;
+        }
+
+        if ($object instanceof UXListView) {
+            $object->selectedIndex = $value;
+            return true;
+        }
+
+        if (property_exists($object, 'value')) {
+            $object->value = $value;
+            return true;
+        }
+
+        return self::setText($object, $value);
+    }
+
+    static function appendValue($object, $value)
+    {
+        if ($object instanceof Instances) {
+            $result = false;
+
+            foreach ($object->getInstances() as $it) {
+                $result = $result || self::appendValue($it, $value);
+            }
+
+            return $result;
+        }
+
+        if ($object instanceof ValuableBehaviour) {
+            $object->appendObjectValue($value);
+            return true;
+        }
+
+        if ($object instanceof UXComboBox) {
+            $object->selectedIndex += $value;
+            return true;
+        }
+
+        if ($object instanceof UXListView) {
+            $object->selectedIndex += $value;
+            return true;
+        }
+
+        if (property_exists($object, 'value')) {
+            if (is_int($object->value) || is_float($object->value)) {
+                $object->value += $value;
+            } else {
+                $object->value .= $value;
+            }
+
+            return true;
+        }
+
+        return self::setText($object, $value);
+    }
+
     static function setText($object, $value)
     {
-        if ($object instanceof ObjectGroup) {
+        if ($object instanceof Instances) {
             $result = false;
 
             foreach ($object->getInstances() as $it) {
@@ -67,11 +145,11 @@ class Element
 
     static function appendText($object, $value)
     {
-        if ($object instanceof ObjectGroup) {
+        if ($object instanceof Instances) {
             $result = false;
 
             foreach ($object->getInstances() as $it) {
-                $result = $result || self::setText($it, $value);
+                $result = $result || self::appendText($it, $value);
             }
 
             return $result;

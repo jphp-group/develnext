@@ -6,9 +6,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -28,6 +31,27 @@ public class GamePane extends ScrollPane {
         setVbarPolicy(ScrollBarPolicy.NEVER);
         setHbarPolicy(ScrollBarPolicy.NEVER);
         setFocusTraversable(false);
+
+        addEventHandler(KeyEvent.ANY, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                switch (event.getCode()) {
+                    case UP:
+                    case DOWN:
+                    case LEFT:
+                    case SPACE:
+                    case RIGHT:
+                        event.consume();
+                }
+            }
+        });
+
+        addEventFilter(ScrollEvent.ANY, new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                event.consume();
+            }
+        });
 
         contentProperty().addListener(new ChangeListener<Node>() {
             @Override
@@ -88,6 +112,8 @@ public class GamePane extends ScrollPane {
         }
 
         setContent(area);
+
+        requestFocus();
     }
 
     public boolean getAutoSize() {

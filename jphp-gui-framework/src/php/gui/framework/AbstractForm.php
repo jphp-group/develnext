@@ -632,18 +632,18 @@ abstract class AbstractForm extends UXForm
                 $adapter = null;
             }
 
-            if ($adapter == null) {
-                throw new Exception("Unable to bind '$event'");
-            }
+            if ($adapter != null) {
+                $handler = $adapter->adapt($node, $handler, $eventName[1]);
 
-            $handler = $adapter->adapt($node, $handler, $eventName[1]);
+                if (!$handler) {
+                    throw new Exception("Unable to bind '$event'");
+                }
 
-            if (!$handler) {
-                throw new Exception("Unable to bind '$event'");
-            }
-
-            if ($handler === true) {
-                return;
+                if ($handler === true) {
+                    return;
+                }
+            } else {
+                $eventName[0] .= "-$eventName[1]";
             }
 
             $group .= '-' . $event;

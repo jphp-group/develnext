@@ -4,6 +4,7 @@ namespace ide\forms;
 use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
+use ide\library\IdeLibraryProjectResource;
 use ide\project\Project;
 use ide\project\ProjectConfig;
 use ide\systems\FileSystem;
@@ -22,9 +23,11 @@ use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;
 use php\gui\UXFileChooser;
+use php\gui\UXHyperlink;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
+use php\gui\UXTabPane;
 use php\gui\UXTextField;
 use php\io\File;
 use php\lib\Items;
@@ -36,6 +39,8 @@ use php\lib\Str;
  * @property UXScrollPane $projectList
  * @property UXTextField $pathField
  * @property UXButton $openButton
+ * @property UXTabPane $tabPane
+ * @property UXListView $libraryList
  *
  * Class OpenProjectForm
  * @package ide\forms
@@ -59,6 +64,47 @@ class OpenProjectForm extends AbstractIdeForm
     public function init()
     {
         parent::init();
+
+        $this->libraryList->setCellFactory(function (UXListCell $cell, IdeLibraryProjectResource $resource) {
+            $titleName = new UXLabel($resource->getName());
+            $titleName->style = '-fx-font-weight: bold;';
+
+            $titleDescription = new UXLabel($resource->getDescription());
+            $titleDescription->style = '-fx-text-fill: gray;';
+
+            if (!$titleDescription->text) {
+                $titleDescription->text = 'Проект без описания ...';
+            }
+
+            $actions = new UXHBox();
+            $actions->spacing = 7;
+
+            $openLink = new UXHyperlink('Открыть');
+            $openLink->on('click', function () use ($resource) {
+                $this->libraryList->selectedIndex = $this->libraryList->items->indexOf($resource);
+                $this->doCreate();
+            });
+            $actions->add($openLink);
+
+            $deleteLink = new UXHyperlink('Удалить');
+            $deleteLink->on('click', function () use ($resource) {
+                $this->libraryList->selectedIndex = $this->libraryList->items->indexOf($resource);
+                $this->doDelete();
+            });
+            $actions->add($deleteLink);
+
+            $title = new UXVBox([$titleName, $titleDescription, $actions]);
+            $title->spacing = 0;
+
+            $line = new UXHBox([ico('archive32'), $title]);
+            $line->alignment = 'CENTER_LEFT';
+            $line->spacing = 12;
+            $line->padding = 5;
+
+            $cell->text = null;
+            $cell->graphic = $line;
+            $cell->style = '';
+        });
 
         $this->projectListHelper = new FlowListViewDecorator($this->projectList->content);
         $this->projectListHelper->setEmptyListText('Список проектов пуст.');
@@ -148,12 +194,27 @@ class OpenProjectForm extends AbstractIdeForm
         $this->pathField->text = $projectDirectory;
     }
 
+    public function updateLibrary()
+    {
+        $this->libraryList->items->clear();
+
+        $libraryResources = Ide::get()->getLibrary()->getResources('projects');
+
+        $this->libraryList->items->addAll($libraryResources);
+        $this->libraryList->selectedIndex = 0;
+    }
+
     /**
      * @event show
      */
     public function doShow()
     {
         $this->update();
+        $this->updateLibrary();
+
+        if ($this->projectListHelper->count() == 0) {
+            $this->tabPane->selectedIndex = 1;
+        }
     }
 
     /**
@@ -229,6 +290,44 @@ class OpenProjectForm extends AbstractIdeForm
 
             Ide::get()->setUserConfigValue('projectDirectory', $path);
             $this->update();
+        }
+    }
+
+    /**
+     * @event libraryList.click-2x
+     */
+    public function doCreate()
+    {
+        /** @var IdeLibraryProjectResource $selected */
+        $selected = $this->libraryList->selectedItem;
+
+        if ($selected) {
+            $path = File::of($this->pathField->text);
+
+            if (!$path->isDirectory()) {
+                if (!$path->mkdirs()) {
+                    UXDialog::show('Невозможно создать папку проектов', 'ERROR');
+                    return;
+                }
+            }
+
+            $name = FileUtils::stripExtension(File::of($selected->getPath())->getName());
+
+            ProjectSystem::import($selected->getPath(), "$path/$name", $name, [$this, 'hide']);
+        }
+    }
+
+    public function doDelete()
+    {
+        /** @var IdeLibraryProjectResource $selected */
+        $selected = $this->libraryList->selectedItem;
+
+        if ($selected) {
+            if (MessageBoxForm::confirmDelete($selected->getName())) {
+                Ide::get()->getLibrary()->delete($selected);
+                $this->updateLibrary();
+                $this->libraryList->selectedIndex = -1;
+            }
         }
     }
 }

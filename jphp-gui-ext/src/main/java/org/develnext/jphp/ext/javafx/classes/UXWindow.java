@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.MenuButton;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -144,25 +145,40 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
         }
     }
 
+
     @Getter
-    protected Pane getLayout() {
+    protected Pane getLayout(Environment env) {
+        Memory data = data("~~virtual-layout");
+
+        if (data.isNotNull()) {
+            return (Pane) Memory.unwrap(env, data);
+        }
+
+
         return getWrappedObject().getScene() == null ? null : (Pane) getWrappedObject().getScene().getRoot();
     }
 
     @Setter
-    protected void setLayout(Pane pane) {
+    protected void setLayout(Environment env, Pane pane) {
         if (getWrappedObject().getScene() == null) {
             throw new IllegalStateException("Unable to set layout");
         }
 
         getWrappedObject().getScene().setRoot(pane);
         getWrappedObject().sizeToScene();
+        data(env, "~~virtual-layout", Memory.NULL);
     }
 
+    @Signature
+    public void makeVirtualLayout(Environment env) {
+        Pane layout = getLayout(env);
+        data(env, "~~virtual-layout", Memory.wrap(env, layout));
+        getWrappedObject().getScene().setRoot(new AnchorPane());
+    }
 
     @Getter
-    public ObservableList<Node> getChildren() {
-        Pane root = (Pane) getWrappedObject().getScene().getRoot();
+    public ObservableList<Node> getChildren(Environment env) {
+        Pane root = getLayout(env);
         return root == null ? null : root.getChildren();
     }
 
@@ -172,8 +188,8 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
-    public void add(Node node) {
-        ObservableList<Node> children = getChildren();
+    public void add(Environment env, Node node) {
+        ObservableList<Node> children = getChildren(env);
 
         if (children != null) {
             children.add(node);
@@ -183,8 +199,8 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
-    public boolean remove(Node node) {
-        ObservableList<Node> children = getChildren();
+    public boolean remove(Environment env, Node node) {
+        ObservableList<Node> children = getChildren(env);
 
         if (children != null) {
             return children.remove(node);
@@ -254,12 +270,12 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
 
     @Signature
     @SuppressWarnings("unchecked")
-    public void on(String event, Invoker invoker, String group) {
+    public void on(String event, Invoker invoker, String group, Environment env) {
         Object target = getWrappedObject();
         EventProvider eventProvider = EventProvider.get(target, event);
 
         if (eventProvider == null) {
-            eventProvider = EventProvider.get(target = getWrappedObject().getScene().getRoot(), event);
+            eventProvider = EventProvider.get(target = getLayout(env), event);
         }
 
         if (eventProvider != null) {
@@ -270,18 +286,18 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
-    public void on(String event, Invoker invoker) {
-        on(event, invoker, "general");
+    public void on(String event, Invoker invoker, Environment env) {
+        on(event, invoker, "general", env);
     }
 
     @Signature
     @SuppressWarnings("unchecked")
-    public void off(String event, @Nullable String group) {
+    public void off(Environment env, String event, @Nullable String group) {
         Object target = getWrappedObject();
         EventProvider eventProvider = EventProvider.get(target, event);
 
         if (eventProvider == null) {
-            eventProvider = EventProvider.get(target = getWrappedObject().getScene().getRoot(), event);
+            eventProvider = EventProvider.get(target = getLayout(env), event);
         }
 
         if (eventProvider != null) {
@@ -292,17 +308,17 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
-    public void off(String event) {
-        off(event, null);
+    public void off(Environment env, String event) {
+        off(env, event, null);
     }
 
     @Signature
-    public void trigger(String event, @Nullable Event e) {
+    public void trigger(Environment env, String event, @Nullable Event e) {
         Object target = getWrappedObject();
         EventProvider eventProvider = EventProvider.get(target, event);
 
         if (eventProvider == null) {
-            eventProvider = EventProvider.get(target = getWrappedObject().getScene().getRoot(), event);
+            eventProvider = EventProvider.get(target = getLayout(env), event);
         }
 
         if (eventProvider != null) {
@@ -347,7 +363,7 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
             return prop;
         }
 
-        Node node = UXNode.__globalLookup(getLayout(), "#" + name);
+        Node node = UXNode.__globalLookup(getLayout(env), "#" + name);
 
         if (node instanceof MenuButton && node.getClass().getName().endsWith("MenuBarButton")) {
             Field field = node.getClass().getDeclaredField("menu");
@@ -359,7 +375,7 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
-    public boolean __isset(String name) {
-        return getWrappedObject().getScene().lookup("#" + name) != null;
+    public boolean __isset(Environment env, String name) {
+        return UXNode.__globalLookup(getLayout(env), "#" + name) != null;
     }
 }

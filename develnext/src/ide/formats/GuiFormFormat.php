@@ -88,12 +88,15 @@ use ide\forms\SetMainFormForm;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\FileSystem;
+use ide\systems\RefactorSystem;
 use ide\utils\FileUtils;
 use php\gui\UXNode;
 use php\io\File;
 
 class GuiFormFormat extends AbstractFormFormat
 {
+    const REFACTOR_ELEMENT_ID_TYPE = 'GUI_FORM_FORMAT_ELEMENT_ID';
+
     function __construct()
     {
         $this->requireFormat(new PhpCodeFormat());
@@ -188,6 +191,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new LockMenuCommand());
 
         $this->registerRelocationCommands();
+        $this->registerRefactor();
 
         $this->registerDone();
     }
@@ -260,5 +264,16 @@ class GuiFormFormat extends AbstractFormFormat
     public function createEditor($file)
     {
         return new FormEditor($file, new GuiFormDumper($this->formElementTags));
+    }
+
+    private function registerRefactor()
+    {
+        RefactorSystem::onRename(self::REFACTOR_ELEMENT_ID_TYPE, function ($target, $newId) {
+            $editor = FileSystem::getSelectedEditor();
+
+            if ($editor instanceof FormEditor) {
+                return $editor->changeNodeId($target, $newId);
+            }
+        });
     }
 }

@@ -26,7 +26,7 @@ class SetGravityActionType extends AbstractSimpleActionType
 
     function getHelpText()
     {
-        return 'Это действие работает только для объектов с поведеними "Объект игровой сцены" и "Игровая сцена"!';
+        return 'Это действие работает только для объектов с поведениями "Объект игровой сцены" и "Игровая сцена"!';
     }
 
     function attributes()

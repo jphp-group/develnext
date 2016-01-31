@@ -2,6 +2,7 @@
 
 use php\gui\framework\Application;
 use php\gui\framework\behaviour\TextableBehaviour;
+use php\gui\framework\behaviour\ValuableBehaviour;
 use php\gui\UXAlert;
 use php\gui\UXApplication;
 use php\gui\UXComboBox;
@@ -17,6 +18,7 @@ use php\lang\Process;
 use php\lang\Thread;
 use php\lib\Items;
 use php\lib\Str;
+use timer\AccurateTimer;
 
 function app()
 {
@@ -47,15 +49,33 @@ function wait($millis)
 
 function waitAsync($millis, callable $callback)
 {
-    (new Thread(function () use ($millis, $callback) {
-        Thread::sleep($millis);
-        UXApplication::runLater($callback);
-    }))->start();
+    (new AccurateTimer($millis, $callback))->start();
 }
 
 function uiLater(callable $callback)
 {
     UXApplication::runLater($callback);
+}
+
+function uiValue($object)
+{
+    if (!$object) {
+        return null;
+    }
+
+    if ($object instanceof ValuableBehaviour) {
+        return $object->getObjectValue();
+    }
+
+    if ($object instanceof UXListView || $object instanceof UXComboBox) {
+        return $object->selectedIndex;
+    }
+
+    if (property_exists($object, 'value')) {
+        return $object->value;
+    }
+
+    return uiText($object);
 }
 
 function uiText($object)

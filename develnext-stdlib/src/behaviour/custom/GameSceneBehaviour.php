@@ -79,10 +79,13 @@ class GameSceneBehaviour extends AbstractBehaviour
 
         $form->layout->data('--game-scene', $this);
 
+        $layout = $form->layout;
+        $form->makeVirtualLayout();
+
         if ($this->_target instanceof UXWindow) {
-            $this->_target->layout = $form->layout;
+            $this->_target->layout = $layout;
         } elseif ($this->_target instanceof UXGamePane) {
-            $this->_target->loadArea($form->layout);
+            $this->_target->loadArea($layout);
         }
 
         $form->loadBehaviours();
@@ -108,6 +111,15 @@ class GameSceneBehaviour extends AbstractBehaviour
                 break;
             case 'MOON':
                 $gravity = 1.6345;
+                break;
+            case 'URANUS':
+                $gravity = 9.0;
+                break;
+            case 'JUPITER':
+                $gravity = 25.8;
+                break;
+            case 'SATURN':
+                $gravity = 11.3;
                 break;
         }
 

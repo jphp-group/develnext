@@ -69,4 +69,14 @@ class MacroScript extends AbstractScript
             }
         }))->start();
     }
+
+    public function setEnabled($value)
+    {
+        $this->disabled = !$value;
+    }
+
+    public function getEnabled()
+    {
+        return $this->disabled;
+    }
 }

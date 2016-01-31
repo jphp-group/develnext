@@ -77,6 +77,15 @@ class Animation
         return self::fadeTo($object, $duration, 0.0, $callback);
     }
 
+    static function stopMove($object)
+    {
+        $timer = $object->data(Animation::class . "#moveTo");
+
+        if ($timer instanceof UXAnimationTimer) {
+            $timer->stop();
+        }
+    }
+
     static function displace($object, $duration, $x, $y, callable $callback = null)
     {
         return self::moveTo($object, $duration, $object->x + $x, $object->y + $y, $callback);
@@ -130,9 +139,10 @@ class Animation
                 $steps--;
 
                 if ($steps <= 0) {
-                    $object->position = [$x, $y];
+                    $object->position = [round($object->x), round($object->y)];
 
                     if ($callback) {
+                        $object->data(Animation::class . "#moveTo", null);
                         $callback();
                     }
 
@@ -141,6 +151,8 @@ class Animation
 
                 return false;
             });
+
+            $object->data(Animation::class . "#moveTo", $timer);
             $timer->start();
 
             return $timer;

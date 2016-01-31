@@ -128,13 +128,13 @@ class NewProjectForm extends AbstractIdeForm
             $this->templateList->items->add($template);
         }
 
-        $libraryResources = Ide::get()->getLibrary()->getResources('projects');
+        /*$libraryResources = Ide::get()->getLibrary()->getResources('projects');
 
         if ($libraryResources) {
             $this->templateList->items->add('Библиотека проектов');
         }
 
-        $this->templateList->items->addAll($libraryResources);
+        $this->templateList->items->addAll($libraryResources);  */
 
         if ($templates) {
             $this->templateList->selectedIndexes = [0];

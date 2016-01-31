@@ -14,12 +14,12 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 {
     public function getName()
     {
-        return 'Пустая программа';
+        return 'Десктопная программа';
     }
 
     public function getDescription()
     {
-        return 'Десктопная программа с GUI интерфейсом для запуска на Linux/Windows/MacOS';
+        return 'Программа с GUI интерфейсом для запуска на Linux/Windows/MacOS';
     }
 
     public function getIcon()

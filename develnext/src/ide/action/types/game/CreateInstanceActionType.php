@@ -22,7 +22,7 @@ class CreateInstanceActionType extends AbstractSimpleActionType
 
     function getSubGroup()
     {
-        return self::SUB_GROUP_COMPONENT;
+        return self::SUB_GROUP_COMMON;
     }
 
     function attributes()

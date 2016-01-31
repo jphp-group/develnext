@@ -10,18 +10,20 @@ ide\action\types\HidePreloaderActionType
 
 ide\action\types\ElementSetTextActionType
 ide\action\types\ElementLoadContentActionType
-ide\action\types\ElementDestroyActionType
+ide\action\types\ElementSetValueActionType
 ide\action\types\ElementShowActionType
 ide\action\types\ElementHideActionType
 ide\action\types\ElementToggleActionType
 ide\action\types\ElementEnabledOnActionType
 ide\action\types\ElementEnabledOffActionType
 ide\action\types\ElementEnabledSwitchActionType
-ide\action\types\ElementFocusActionType
 ide\action\types\ElementSetXActionType
 ide\action\types\ElementSetYActionType
+ide\action\types\ElementFocusActionType
 ide\action\types\ElementSetWidthActionType
 ide\action\types\ElementSetHeightActionType
+ide\action\types\ElementDestroyActionType
+
 ide\action\types\FadeOutActionType
 ide\action\types\FadeInActionType
 ide\action\types\FadeToActionType
@@ -31,6 +33,7 @@ ide\action\types\BehaviourEnableActionType
 ide\action\types\BehaviourDisableActionType
 
 ide\action\types\game\CreateInstanceActionType
+ide\action\types\game\GameLoadSceneActionType
 ide\action\types\game\JumpToActionType
 ide\action\types\game\JumpToStartActionType
 ide\action\types\game\JumpToRandActionType

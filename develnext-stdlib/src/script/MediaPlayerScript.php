@@ -4,6 +4,7 @@ namespace script;
 use behaviour\StreamLoadableBehaviour;
 use php\gui\framework\AbstractScript;
 use php\gui\framework\behaviour\TextableBehaviour;
+use php\gui\framework\behaviour\ValuableBehaviour;
 use php\gui\UXMedia;
 use php\gui\UXMediaPlayer;
 use php\lib\str;
@@ -21,7 +22,7 @@ use php\lib\str;
  * @property bool $mute
  * @property string $status
  */
-class MediaPlayerScript extends AbstractScript implements TextableBehaviour, StreamLoadableBehaviour
+class MediaPlayerScript extends AbstractScript implements TextableBehaviour, ValuableBehaviour, StreamLoadableBehaviour
 {
     /**
      * @var bool
@@ -363,5 +364,20 @@ class MediaPlayerScript extends AbstractScript implements TextableBehaviour, Str
     function applyContentToObject($content)
     {
         $this->setSource($content);
+    }
+
+    function getObjectValue()
+    {
+        return $this->positionMs;
+    }
+
+    function setObjectValue($value)
+    {
+        return $this->positionMs = $value;
+    }
+
+    function appendObjectValue($value)
+    {
+        $this->positionMs += $value;
     }
 }

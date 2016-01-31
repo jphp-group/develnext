@@ -3,6 +3,7 @@ namespace php\gui;
 
 use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\framework\View;
 
 class UXNodeWrapper
 {
@@ -67,6 +68,62 @@ class UXNodeWrapper
                     }
                 });
 
+                return;
+
+            case 'outside-partly':
+                $listener = function () use ($handler) {
+                    $handle = function () use ($handler) {
+                        $handler(UXEvent::makeMock($this->node));
+                    };
+
+                    if ($parent = $this->node->parent) {
+                        $x = $this->node->x;
+                        $y = $this->node->y;
+
+                        $bounds = View::bounds($parent);
+
+                        if ($x < $bounds['x']) {
+                            $handle();
+                        } elseif ($y < $bounds['y']) {
+                            $handle();
+                        } elseif ($x > $bounds['width'] - $this->node->width) {
+                            $handle();
+                        } elseif ($y > $bounds['height'] - $this->node->height) {
+                            $handle();
+                        }
+                    }
+                };
+
+                $this->node->observer('layoutX')->addListener($listener);
+                $this->node->observer('layoutY')->addListener($listener);
+                return;
+
+            case 'outside':
+                $listener = function () use ($handler) {
+                    $handle = function () use ($handler) {
+                        $handler(UXEvent::makeMock($this->node));
+                    };
+
+                    if ($parent = $this->node->parent) {
+                        $x = $this->node->x;
+                        $y = $this->node->y;
+
+                        $bounds = View::bounds($parent);
+
+                        if ($x + $this->node->width < $bounds['x']) {
+                            $handle();
+                        } elseif ($y + $this->node->height < $bounds['y']) {
+                            $handle();
+                        } elseif ($x > $bounds['width']) {
+                            $handle();
+                        } elseif ($y > $bounds['height']) {
+                            $handle();
+                        }
+                    }
+                };
+
+                $this->node->observer('layoutX')->addListener($listener);
+                $this->node->observer('layoutY')->addListener($listener);
                 return;
         }
 

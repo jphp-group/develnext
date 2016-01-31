@@ -3,6 +3,7 @@ namespace ide\formats\form;
 
 use ide\formats\form\event\AbstractEventKind;
 use ide\Logger;
+use ide\misc\EventHandlerBehaviour;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
 use php\io\File;
@@ -17,7 +18,7 @@ use phpx\parser\SourceToken;
 use phpx\parser\SourceTokenizer;
 
 /**
- * Class FormEventManager
+ * Class SourceEventManager
  * @package ide\formats\form
  */
 class SourceEventManager
@@ -167,9 +168,10 @@ class SourceEventManager
     /**
      * @param string $oldId
      * @param string $newId
+     * @param array $eventsWithIdParam  e.g. ['collision']
      * @return array
      */
-    public function renameBind($oldId, $newId)
+    public function renameBind($oldId, $newId, array $eventsWithIdParam = [])
     {
         $parser = new PhpParser($this->loadContent());
 
@@ -184,14 +186,35 @@ class SourceEventManager
             $methodLines[$bind['methodLine']] = $bind;
         }
 
-        $parser->processLines(0, 999999, function ($line) use ($oldId, $newId, $methodLines, &$result, &$i) {
+        $parser->processLines(0, 999999, function ($line) use ($oldId, $newId, $methodLines, $eventsWithIdParam, &$result, &$i) {
             $tmp = Str::trim($line);
             $tmp = Regex::of('[ ]+?')->with($tmp)->replace(' ');
 
-            if (Str::startsWith($tmp, "* ") && Str::contains($tmp, "@event $oldId.")) {
-                $k = Str::pos($line, '@event ');
+            if (Str::startsWith($tmp, "* ")) {
+                $regex = Regex::of('\\*[ ]{0,}\\@event[ ]+([\w\d\\_]+)\\.([\w\d\\_]+)')->with(Regex::CASE_INSENSITIVE)->with($line);
 
-                $line = Str::sub($line, 0, $k) . "@event $newId" . Str::sub($line, $k + Str::length("@event $oldId"));
+                if ($regex->find()) {
+                    $id = $regex->group(1);
+
+                    if ($id == $oldId) {
+                        $line = $regex->replaceGroup(1, $newId);
+                    }
+                }
+
+                if ($eventsWithIdParam) {
+                    $regex = Regex::of('\\*[ ]{0,}\\@event[ ]+([\w\d\\_]+)\\.([\w\d\\_]+)\\-([a-z0-9\\_]+)')
+                                ->withFlags(Regex::CASE_INSENSITIVE)
+                                ->with($line);
+
+                    if ($regex->find()) {
+                        $event = $regex->group(2);
+                        $paramId = $regex->group(3);
+
+                        if ($paramId == $oldId && in_array($event, $eventsWithIdParam)) {
+                            $line = $regex->replaceGroup(3, $newId);
+                        }
+                    }
+                }
             } elseif ($methodLines[$i] && Str::startsWith($tmp, "function do" . Str::upperFirst($oldId))) {
                 $k = Str::pos($line, "function do");
 

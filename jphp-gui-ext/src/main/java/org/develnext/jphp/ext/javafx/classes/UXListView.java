@@ -106,6 +106,12 @@ public class UXListView extends UXControl<ListView> {
     }
 
     @Getter
+    public Object getSelectedItem() {
+        ObservableList selectedItems = getWrappedObject().getSelectionModel().getSelectedItems();
+        return selectedItems.isEmpty() ? null : selectedItems.get(0);
+    }
+
+    @Getter
     public Object getFocusedIndex() {
         return getWrappedObject().getFocusModel().getFocusedIndex();
     }

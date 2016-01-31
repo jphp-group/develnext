@@ -2,6 +2,7 @@
 namespace script;
 
 use php\gui\framework\AbstractScript;
+use php\gui\framework\behaviour\ValuableBehaviour;
 use php\gui\framework\ScriptEvent;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
@@ -14,7 +15,7 @@ use php\xml\DomDocument;
  * Class TimerScript
  * @package script
  */
-class TimerScript extends AbstractScript
+class TimerScript extends AbstractScript implements ValuableBehaviour
 {
     /**
      * @var int
@@ -193,5 +194,20 @@ class TimerScript extends AbstractScript
 
         $timer->start();
         return $timer;
+    }
+
+    function getObjectValue()
+    {
+        return $this->interval;
+    }
+
+    function setObjectValue($value)
+    {
+        return $this->interval = $value;
+    }
+
+    function appendObjectValue($value)
+    {
+        $this->interval += $value;
     }
 }

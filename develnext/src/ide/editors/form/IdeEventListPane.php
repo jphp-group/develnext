@@ -384,7 +384,7 @@ class IdeEventListPane
                     $menuItem = new UXMenu($menuItem->text, $menuItem->graphic);
                 }
 
-                if ($prevKind && $prevKind != $type['kind']) {
+                if ($prevKind && get_class($prevKind) != get_class($type['kind'])) {
                     $menu->items->add(UXMenuItem::createSeparator());
                 }
 

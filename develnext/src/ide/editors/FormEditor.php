@@ -18,6 +18,7 @@ use ide\formats\form\elements\FormFormElement;
 use ide\formats\form\event\AbstractEventKind;
 use ide\formats\form\SourceEventManager;
 use ide\formats\FormFormat;
+use ide\formats\GuiFormFormat;
 use ide\formats\PhpCodeFormat;
 use ide\forms\ActionConstructorForm;
 use ide\forms\MainForm;
@@ -528,6 +529,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return $uiNode;
     }
 
+    public function getRefactorRenameNodeType()
+    {
+        return GuiFormFormat::REFACTOR_ELEMENT_ID_TYPE;
+    }
+
     protected function reindexImpl(ProjectIndexer $indexer)
     {
         if (!$this->layout) {
@@ -576,6 +582,17 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             return 'busy';
         }
 
+        $element = $this->format->getFormElement($node);
+        $eventsWithIdParam = [];
+
+        if ($element) {
+            foreach ($element->getEventTypes() as $it) {
+                if ($it['idParameter']) {
+                    $eventsWithIdParam[] = $it['code'];
+                }
+            }
+        }
+
         $data = DataUtils::get($node, $this->layout, false);
 
         if ($data) {
@@ -584,7 +601,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->behaviourManager->changeTargetId($node->id, $newId);
 
-        $binds = $this->eventManager->renameBind($node->id, $newId);
+        $binds = $this->eventManager->renameBind($node->id, $newId, $eventsWithIdParam);
 
         foreach ($binds as $bind) {
             $this->actionEditor->renameMethod($bind['className'], $bind['methodName'], $bind['newMethodName']);
@@ -872,13 +889,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         foreach ($modules as $module) {
             $module = Str::trim($module);
-
-            if ($this->modules[$module]) {
-                $this->modules[$module]->load();
-            } else {
-                $this->modules[$module] = FileSystem::fetchEditor(Ide::get()->getOpenedProject()->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY . "/$module"));
-                $this->modules[$module]->makeUi();
-            }
+            $this->modules[$module] = FileSystem::fetchEditor(Ide::get()->getOpenedProject()->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY . "/$module"), true);
         }
 
         return $this->modules;

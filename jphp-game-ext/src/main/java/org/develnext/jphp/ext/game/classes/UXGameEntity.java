@@ -20,6 +20,7 @@ public class UXGameEntity extends BaseWrapper<GameEntity2D> {
         @Property @Nullable Vec2d gravity();
 
         @Property boolean solid();
+        @Property boolean active();
 
         @Property double gravityX();
         @Property double gravityY();

@@ -5,6 +5,7 @@ use behaviour\SetTextBehaviour;
 use behaviour\StreamLoadableBehaviour;
 use php\gui\framework\AbstractScript;
 use php\gui\framework\behaviour\TextableBehaviour;
+use php\gui\framework\behaviour\ValuableBehaviour;
 use php\gui\UXApplication;
 use php\io\File;
 use php\io\IOException;
@@ -16,7 +17,7 @@ use php\lang\ThreadPool;
  * Class FileScript
  * @package script
  */
-class FileScript extends AbstractScript implements TextableBehaviour, SetTextBehaviour, StreamLoadableBehaviour
+class FileScript extends AbstractScript implements TextableBehaviour, SetTextBehaviour, ValuableBehaviour, StreamLoadableBehaviour
 {
     /**
      * @var bool
@@ -203,5 +204,20 @@ class FileScript extends AbstractScript implements TextableBehaviour, SetTextBeh
         } catch (IOException $e) {
             ;
         }
+    }
+
+    function getObjectValue()
+    {
+        return $this->getPath();
+    }
+
+    function setObjectValue($value)
+    {
+        $this->setPath($value);
+    }
+
+    function appendObjectValue($value)
+    {
+        $this->setPath($this->getPath() . $value);
     }
 }

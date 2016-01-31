@@ -430,4 +430,9 @@ class ScriptModuleEditor extends FormEditor
 
         return $id;
     }
+
+    public function getRefactorRenameNodeType()
+    {
+        return ScriptModuleFormat::REFACTOR_ELEMENT_ID_TYPE;
+    }
 }

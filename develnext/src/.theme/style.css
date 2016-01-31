@@ -153,3 +153,17 @@
 .point-marker {
     -fx-border-color: red;
 }
+
+.tab-pane.dn-style
+{
+    -fx-tab-min-width: 120px;
+}
+
+.tab-pane.dn-style .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.tab-pane.dn-style .tab-content-area {
+    -fx-border-width: 1px;
+    -fx-border-color: silver;
+}

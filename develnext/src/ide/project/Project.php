@@ -98,6 +98,11 @@ class Project
     protected $indexer;
 
     /**
+     * @var ProjectRefactorManager
+     */
+    protected $refactorManager;
+
+    /**
      * @var TimerScript
      */
     protected $tickTimer;
@@ -119,6 +124,7 @@ class Project
 
         $this->tree = new ProjectTree($this, new UXTreeView());
         $this->indexer = new ProjectIndexer($this);
+        $this->refactorManager = new ProjectRefactorManager($this);
 
         $this->tickTimer = new TimerScript(1000 * 9, true, [$this, 'doTick']);
     }
@@ -407,6 +413,14 @@ class Project
     }
 
     /**
+     * @return ProjectRefactorManager
+     */
+    public function getRefactorManager()
+    {
+        return $this->refactorManager;
+    }
+
+    /**
      * @return ProjectTree
      */
     public function getTree()
@@ -446,6 +460,10 @@ class Project
 
         $this->tree->update();
 
+        //if (!$this->indexer->isValid()) { todo implement it
+        $this->reindex();
+        //  }
+
         foreach ($this->config->getOpenedFiles() as $file) {
             if ($this->getFile($file)->exists()) {
                 $file = $this->getFile($file);
@@ -454,9 +472,9 @@ class Project
             }
 
             if (File::of($file)->exists()) {
-                UXApplication::runLater(function () use ($file) {
+                //UXApplication::runLater(function () use ($file) {
                     FileSystem::open($file, false);
-                });
+                //});
             }
         }
 
@@ -467,14 +485,10 @@ class Project
         }
 
         if ($selected && File::of($selected)->exists()) {
-            UXApplication::runLater(function () use ($selected) {
+            uiLater(function () use ($selected) {
                 FileSystem::open($selected, true);
             });
         }
-
-        //if (!$this->indexer->isValid()) { todo implement it
-        $this->reindex();
-        //  }
 
         $this->doTick();
 

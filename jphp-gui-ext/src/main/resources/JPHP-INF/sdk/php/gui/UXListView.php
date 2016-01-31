@@ -68,6 +68,12 @@ class UXListView extends UXControl
      * @readonly
      * @var mixed
      */
+    public $selectedItem = null;
+
+    /**
+     * @readonly
+     * @var mixed
+     */
     public $focusedItem = null;
 
     /**

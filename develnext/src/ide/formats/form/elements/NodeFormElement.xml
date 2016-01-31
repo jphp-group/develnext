@@ -54,8 +54,14 @@
         <eventType code="scroll" name="Прокрутка" kind="ScrollParamEvent" icon="icons/scroll16.png" />
 
         <eventType code="create" name="Клонирование" kind="ActionEvent" icon="icons/idea16.png" />
+        <eventType code="outside" name="Выход за пределы" kind="ActionEvent" icon="icons/out16.png">
+            <variants>
+                <variant value="">Полностью</variant>
+                <variant value="partly">Частично</variant>
+            </variants>
+        </eventType>
         <eventType code="destroy" name="Уничтожение" kind="ActionEvent" icon="icons/trash16.gif" />
 
-        <eventType code="collision" name="Столкновение" kind="CollisionParamEvent" icon="icons/collision16.gif" />
+        <eventType code="collision" name="Столкновение" kind="CollisionParamEvent" idParameter="1" icon="icons/collision16.gif" />
     </eventTypes>
 </element>

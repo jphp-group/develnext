@@ -227,11 +227,11 @@ class FileSystem
 
                     Logger::info("Opening selected tab '$tab->text'");
 
-                    if (static::$previousEditor) {
-                        static::$previousEditor->hide();
-                    }
+                    if ($tab->userData instanceof AbstractEditor && $tab->userData !== static::$previousEditor) {
+                        if (static::$previousEditor) {
+                            static::$previousEditor->hide();
+                        }
 
-                    if ($tab->userData instanceof AbstractEditor) {
                         $mainForm->clearLeftPane();
 
                         if ($tab->userData->getLeftPaneUi()) {

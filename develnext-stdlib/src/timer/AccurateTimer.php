@@ -97,6 +97,7 @@ class AccurateTimer
 
     public function start()
     {
+        $this->_lastTick = Time::millis();
         $this->active = true;
     }
 

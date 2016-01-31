@@ -2,5 +2,12 @@
     <properties>
         <property name="Анимировать" code="animated" editor="boolean" />
         <property name="Скорость анимации" code="animationSpeed" editor="integer" tooltip="Скорость перемещения объекта" />
+        <property name="Направление" code="direction" editor="enum" tooltip="Направление случайных перемещений">
+            <variants>
+                <variant value="ANY">Случайно</variant>
+                <variant value="HORIZONTAL">Влево + Вправо</variant>
+                <variant value="VERTICAL">Вверх + Вниз</variant>
+            </variants>
+        </property>
     </properties>
 </behaviour>

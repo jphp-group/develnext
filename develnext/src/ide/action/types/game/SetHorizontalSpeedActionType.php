@@ -67,7 +67,10 @@ class SetHorizontalSpeedActionType extends AbstractSimpleActionType
     function getDescription(Action $action = null)
     {
         if ($action) {
-            return str::format("Задать %s объекту горозинтальную скорость движения = %s", $action->get('object'), $action->get('speed'));
+            return str::format(
+                "Задать %s объекту горозинтальную скорость движения = %s, относительно = %s",
+                $action->get('object'), $action->get('speed'), $action->relative ? 'да' : 'нет'
+            );
         } else {
             return "Задать объекту горозинтальную скорость движения";
         }

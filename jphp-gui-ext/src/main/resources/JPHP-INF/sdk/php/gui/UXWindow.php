@@ -176,6 +176,13 @@ abstract class UXWindow
     }
 
     /**
+     * Make layout virtual.
+     */
+    public function makeVirtualLayout()
+    {
+    }
+
+    /**
      * @param string $id
      *
      * @return UXNode|null

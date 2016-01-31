@@ -132,6 +132,7 @@ class MixedArgumentEditor extends AbstractArgumentEditor
 
         $this->instancesListEditor->disableDependencies();
         $this->instancesListEditor->enableAllForms();
+        $this->instancesListEditor->stringValues();
         $this->instancesListEditor->build();
 
         $this->instancesListEditor->getUi()->maxWidth = 9999;

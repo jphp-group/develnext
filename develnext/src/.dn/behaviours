@@ -16,3 +16,4 @@ ide\behaviour\spec\VibrationAnimationBehaviourSpec
 
 ide\behaviour\spec\GameSceneBehaviourSpec
 ide\behaviour\spec\GameEntityBehaviourSpec
+ide\behaviour\spec\WrapScreenBehaviourSpec

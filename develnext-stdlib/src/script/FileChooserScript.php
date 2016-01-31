@@ -1,8 +1,10 @@
 <?php
 namespace script;
 
+use behaviour\SetTextBehaviour;
 use php\gui\framework\AbstractScript;
 use php\gui\framework\behaviour\TextableBehaviour;
+use php\gui\framework\behaviour\ValuableBehaviour;
 use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXDialog;
@@ -19,7 +21,7 @@ use script\support\ScriptHelpers;
  * Class TimerScript
  * @package script
  */
-class FileChooserScript extends AbstractScript implements TextableBehaviour
+class FileChooserScript extends AbstractScript implements TextableBehaviour, SetTextBehaviour, ValuableBehaviour
 {
     use ScriptHelpers;
 
@@ -100,5 +102,30 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour
     function getObjectText()
     {
         return (string) $this->file;
+    }
+
+    function getObjectValue()
+    {
+        return $this->_dialog->initialDirectory;
+    }
+
+    function setObjectValue($value)
+    {
+        $this->_dialog->initialDirectory = $value;
+    }
+
+    function setTextBehaviour($text)
+    {
+        $this->_dialog->title = $text;
+    }
+
+    function appendTextBehaviour($text)
+    {
+        $this->_dialog->title .= $text;
+    }
+
+    function appendObjectValue($value)
+    {
+        $this->_dialog->initialDirectory .= $value;
     }
 }

@@ -4,9 +4,11 @@ namespace ide\editors\value;
 use Dialog;
 use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
+use ide\formats\GuiFormFormat;
 use ide\forms\FontPropertyEditorForm;
 use ide\forms\TextPropertyEditorForm;
 use ide\systems\FileSystem;
+use ide\systems\RefactorSystem;
 use php\gui\event\UXMouseEvent;
 use php\gui\text\UXFont;
 use php\gui\UXList;
@@ -50,7 +52,9 @@ class IdPropertyEditor extends TextPropertyEditor
         $editor = FileSystem::getSelectedEditor();
 
         if ($editor instanceof FormEditor) {
-            switch ($editor->changeNodeId($this->designProperties->target, $value)) {
+            $result = RefactorSystem::rename($editor->getRefactorRenameNodeType(), $this->designProperties->target, $value);
+
+            switch ($result) {
                 case 'invalid':
                     Dialog::error("'$value' - не подходящее название для id, используйте только английские буквы, цифры и символ подчеркивания");
                     $this->showDialog();

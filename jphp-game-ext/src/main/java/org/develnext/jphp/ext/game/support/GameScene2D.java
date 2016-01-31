@@ -48,8 +48,8 @@ public class GameScene2D {
                 GameEntity2D e1 = (GameEntity2D) contactConstraint.getBody1().getUserData();
                 GameEntity2D e2 = (GameEntity2D) contactConstraint.getBody2().getUserData();
 
-                boolean consume1 = e1.triggerCollision(e2, contactConstraint);
-                boolean consume2 = e2.triggerCollision(e1, contactConstraint);
+                boolean consume1 = e1.triggerCollision(e2, contactConstraint, true);
+                boolean consume2 = e2.triggerCollision(e1, contactConstraint, false);
 
                 return consume1 || consume2;
             }

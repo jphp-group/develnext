@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
@@ -23,13 +24,41 @@
       </Button>
       <Label layoutX="22.0" layoutY="443.0" prefHeight="24.0" prefWidth="559.0" text="Папка избранных проектов:" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="33.0" />
       <TextField id="pathField" disable="true" editable="false" layoutX="54.0" layoutY="467.0" prefHeight="25.0" prefWidth="533.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="27.0" />
-      <Label layoutX="32.0" layoutY="113.0" prefHeight="24.0" prefWidth="550.0" text="Избранные проекты:" />
-      <Label layoutX="171.0" layoutY="79.0" prefHeight="24.0" prefWidth="410.0" text="Выбрать файл или архив с проектоми и открыть" textFill="#6f6f6f" AnchorPane.leftAnchor="171.0" AnchorPane.rightAnchor="33.0" />
-      <Button id="openButton" layoutX="33.0" layoutY="78.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="128.0" text="Открыть другой ..." />
-      <ScrollPane id="projectList" fitToHeight="true" fitToWidth="true" layoutX="32.0" layoutY="137.0" prefHeight="292.0" prefWidth="550.0" AnchorPane.bottomAnchor="84.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="137.0">
-         <content>
-            <FlowPane />
-         </content>
-      </ScrollPane>
+      <TabPane id="tabPane" layoutX="31.0" layoutY="116.0" prefHeight="344.0" prefWidth="617.0" styleClass="dn-style" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="81.0" AnchorPane.leftAnchor="31.0" AnchorPane.rightAnchor="33.0" AnchorPane.topAnchor="116.0">
+        <tabs>
+          <Tab text="Избранные проекты">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ScrollPane id="projectList" fitToHeight="true" fitToWidth="true" prefHeight="292.0" prefWidth="550.0" style="-fx-border-color: transparent; -fx-border-width: 0px;" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
+                           <content>
+                              <FlowPane style="-fx-border-width: 0px;" />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Библиотека проектов">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ListView id="libraryList" layoutX="26.0" layoutY="35.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+      <HBox alignment="CENTER_LEFT" layoutX="32.0" layoutY="76.0" prefHeight="28.0" prefWidth="617.0" spacing="10.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="32.0">
+         <children>
+            <Button id="openButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Открыть другой ...">
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
+            </Button>
+            <Label prefHeight="24.0" text="Выбрать файл или архив с проектоми и открыть" textFill="#6f6f6f" />
+         </children>
+      </HBox>
    </children>
 </AnchorPane>

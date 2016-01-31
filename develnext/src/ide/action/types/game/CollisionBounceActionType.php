@@ -32,14 +32,16 @@ class CollisionBounceActionType extends AbstractSimpleActionType
     function attributes()
     {
         return [
-            'object' => 'object'
+            'object' => 'object',
+            'bounciness' => 'float',
         ];
     }
 
     function attributeLabels()
     {
         return [
-            'object' => 'Объект'
+            'object' => 'Объект',
+            'bounciness' => 'Коэфициент отскока'
         ];
     }
 
@@ -47,6 +49,7 @@ class CollisionBounceActionType extends AbstractSimpleActionType
     {
         return [
             'object' => ['def' => '~sender'],
+            'bounciness' => ['def' => 1],
         ];
     }
 
@@ -63,7 +66,7 @@ class CollisionBounceActionType extends AbstractSimpleActionType
     function getDescription(Action $action = null)
     {
         if ($action) {
-            return str::format("Выполнить отскок для объекта %s (во время столкновения)", $action->get('object'));
+            return str::format("Выполнить отскок для объекта %s (во время столкновения) с коэфициентом %s", $action->get('object'), $action->get('bounciness'));
         } else {
             return "Выполнить отскок для объекта (во время столкновения)";
         }
@@ -88,6 +91,8 @@ class CollisionBounceActionType extends AbstractSimpleActionType
      */
     function convertToCode(Action $action, ActionScript $actionScript)
     {
-        return "Collision::bounce({$action->get('object')}, \$event->normal)";
+        $bounciness = $action->get('bounciness');
+
+        return "Collision::bounce({$action->get('object')}, \$event->normal, $bounciness)";
     }
 }

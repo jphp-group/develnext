@@ -33,6 +33,7 @@ class SetVerticalSpeedActionType extends AbstractSimpleActionType
         return [
             'object' => 'object',
             'speed' => 'float',
+            'relative' => 'flag',
         ];
     }
 
@@ -40,7 +41,8 @@ class SetVerticalSpeedActionType extends AbstractSimpleActionType
     {
         return [
             'object' => 'Объект',
-            'speed' => 'Скорость (м/с)'
+            'speed' => 'Скорость (м/с)',
+            'relative' => 'Относительно'
         ];
     }
 
@@ -65,7 +67,10 @@ class SetVerticalSpeedActionType extends AbstractSimpleActionType
     function getDescription(Action $action = null)
     {
         if ($action) {
-            return str::format("Задать %s объекту вертикальную скорость движения = %s", $action->get('object'), $action->get('speed'));
+            return str::format(
+                "Задать %s объекту вертикальную скорость движения = %s, относительно = %s",
+                $action->get('object'), $action->get('speed'), $action->relative ? 'да' : 'нет'
+            );
         } else {
             return "Задать объекту вертикальную скорость движения";
         }
@@ -83,6 +88,8 @@ class SetVerticalSpeedActionType extends AbstractSimpleActionType
      */
     function convertToCode(Action $action, ActionScript $actionScript)
     {
-        return "{$action->get('object')}->phys->vspeed = {$action->get('speed')}";
+        $oper = $action->relative ? '+=' : '=';
+
+        return "{$action->get('object')}->phys->vspeed $oper {$action->get('speed')}";
     }
 }

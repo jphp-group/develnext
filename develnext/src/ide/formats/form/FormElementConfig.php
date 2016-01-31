@@ -3,6 +3,7 @@ namespace ide\formats\form;
 
 use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
+use ide\formats\form\event\AbstractEventKind;
 use ide\Logger;
 use php\io\File;
 use InvalidArgumentException;
@@ -385,9 +386,11 @@ class FormElementConfig
 
             $icon = $eventType->getAttribute('icon');
             $kind = $eventType->getAttribute('kind');
+            $idParameter = $eventType->getAttribute('idParameter');
 
             $kind = "ide\\formats\\form\\event\\{$kind}Kind";
 
+            /** @var AbstractEventKind $kind */
             $kind = new $kind();
 
             $this->eventTypes[$code] = [
@@ -396,7 +399,17 @@ class FormElementConfig
                 'description' => $description,
                 'icon'        => $icon,
                 'kind'        => $kind,
+                'idParameter' => $idParameter,
             ];
+
+            $paramVariants = [];
+
+            /** @var DomElement $it */
+            foreach ($eventType->findAll("variants/variant") as $it) {
+                $paramVariants[str::trim($it->getTextContent())] = $it->getAttribute('value');
+            }
+
+            $kind->setParamVariants($paramVariants);
         }
     }
 }

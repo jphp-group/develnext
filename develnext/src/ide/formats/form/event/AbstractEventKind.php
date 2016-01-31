@@ -9,6 +9,11 @@ use ide\editors\AbstractEditor;
 abstract class AbstractEventKind
 {
     /**
+     * @var array
+     */
+    protected $paramVariants = [];
+
+    /**
      * @return array
      */
     abstract public function getArguments();
@@ -19,7 +24,15 @@ abstract class AbstractEventKind
      */
     public function getParamVariants(AbstractEditor $contextEditor = null)
     {
-        return [];
+        return $this->paramVariants;
+    }
+
+    /**
+     * @param array $paramVariants
+     */
+    public function setParamVariants($paramVariants)
+    {
+        $this->paramVariants = $paramVariants;
     }
 
     final public function findParamName($param, AbstractEditor $contextEditor = null)
