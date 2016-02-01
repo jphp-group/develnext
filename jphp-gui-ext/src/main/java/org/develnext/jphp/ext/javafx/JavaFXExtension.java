@@ -50,6 +50,7 @@ import org.develnext.jphp.ext.javafx.classes.shape.*;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.ImageViewEx;
+import org.develnext.jphp.ext.javafx.support.KeyboardManager;
 import org.develnext.jphp.ext.javafx.support.control.*;
 import org.develnext.jphp.ext.javafx.support.event.*;
 import org.develnext.jphp.ext.javafx.support.tray.notification.TrayNotification;
@@ -214,7 +215,7 @@ public class JavaFXExtension extends Extension {
         registerJavaException(scope, WrapJSException.class, JSException.class);
 
         registerAnimationPackage(scope);
-        registerEvents();
+        registerEvents(scope);
     }
 
     protected void registerAnimationPackage(CompileScope scope) {
@@ -227,7 +228,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, AnimationTimer.class, UXAnimationTimer.class);
     }
 
-    protected void registerEvents() {
+    protected void registerEvents(CompileScope scope) {
         registerEventProvider(new NodeEventProvider());
         registerEventProvider(new WindowEventProvider());
         registerEventProvider(new ContextMenuEventProvider());
@@ -244,6 +245,8 @@ public class JavaFXExtension extends Extension {
 
         registerEventProvider(new AnimationEventProvider());
         registerEventProvider(new TrayNotificationEventProvider());
+
+        registerWrapperClass(scope, KeyboardManager.class, UXKeyboardManager.class);
     }
 
     protected void registerEventProvider(EventProvider eventProvider) {
