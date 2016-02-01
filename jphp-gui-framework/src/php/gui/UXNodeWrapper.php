@@ -73,7 +73,9 @@ class UXNodeWrapper
             case 'outside-partly':
                 $listener = function () use ($handler) {
                     $handle = function () use ($handler) {
-                        $handler(UXEvent::makeMock($this->node));
+                        uiLater(function () use ($handler) {
+                            $handler(UXEvent::makeMock($this->node));
+                        });
                     };
 
                     if ($parent = $this->node->parent) {
@@ -101,7 +103,9 @@ class UXNodeWrapper
             case 'outside':
                 $listener = function () use ($handler) {
                     $handle = function () use ($handler) {
-                        $handler(UXEvent::makeMock($this->node));
+                        uiLater(function () use ($handler) {
+                            $handler(UXEvent::makeMock($this->node));
+                        });
                     };
 
                     if ($parent = $this->node->parent) {

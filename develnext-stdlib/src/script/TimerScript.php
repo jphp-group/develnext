@@ -80,7 +80,7 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
 
         $this->th = (new Thread(function() {
             try {
-                Thread::sleep($this->interval);
+                Thread::sleep($this->interval < 1 ? 1 : $this->interval);
 
                 if (!$this->stopped && !$this->disabled) {
                     UXApplication::runLater([$this, 'doInterval']);

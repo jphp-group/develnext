@@ -15,7 +15,7 @@
             </variants>
         </property>
 
-        <property code="velocity" name="Скорость (X, Y)" editor="doubleArray" tooltip="Начальная скорость по X и Y" />
+        <property code="startVelocity" name="Скорость (X, Y)" editor="doubleArray" tooltip="Начальная скорость по X и Y" />
         <!-- <property code="solid" name="Твердый" editor="boolean" />  -->
     </properties>
 </behaviour>

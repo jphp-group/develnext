@@ -363,7 +363,7 @@ class ObjectListEditor
 
                 $formEditors = $gui->getFormEditors();
 
-                if (!($editor instanceof FormEditor) || sizeof($formEditors) > 1) {
+                if (/*!($editor instanceof FormEditor) || sizeof($formEditors) > 1*/true) {
                     $this->addItem(new ObjectListEditorItem('[Другие формы]', null, ''));
 
                     foreach ($formEditors as $key => $formEditor) {

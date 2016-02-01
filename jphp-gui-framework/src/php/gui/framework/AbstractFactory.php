@@ -111,7 +111,9 @@ abstract class AbstractFactory
 
             $this->behaviourManager->applyForInstance($id, $node);
 
-            $this->eventBinder->trigger($node, $id, 'create');
+            uiLater(function () use ($node, $id) {
+                $this->eventBinder->trigger($node, $id, 'create');
+            });
 
             $node->observer('parent')->addListener(function ($old, $new) use ($node, $id) {
                 if (!$new) {

@@ -2,6 +2,7 @@
 namespace php\gui\framework\event;
 use php\gui\UXNode;
 use behaviour\custom\GameEntityBehaviour;
+use php\lib\items;
 
 /**
  * Class CollisionEventAdapter

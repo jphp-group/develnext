@@ -144,7 +144,7 @@ class EventBinder
                     }
 
                     if ($handler === true) {
-                        return;
+                        continue;
                     }
 
                     $group = $name;

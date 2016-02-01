@@ -101,7 +101,7 @@ class CreateInstanceActionType extends AbstractSimpleActionType
     {
         $x = $action->get('x');
         $y = $action->get('y');
-        $parent = $action->get('parent') ?: ($action->relative ? '$event->sender' : 'null');
+        $parent = $action->parent ? $action->get('parent') : ($action->relative ? '$event->sender' : 'null');
 
         if (!$action->relative) {
             if ($x == 0 && $y == 0) {

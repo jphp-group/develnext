@@ -33,7 +33,7 @@ class GameEntityBehaviour extends AbstractBehaviour
     /**
      * @var array
      */
-    public $velocity = [0, 0];
+    public $startVelocity = [0, 0];
 
     /**
      * @var UXGameEntity
@@ -76,15 +76,13 @@ class GameEntityBehaviour extends AbstractBehaviour
             if ($sceneBehaviour) {
                 $this->entity = new UXGameEntity($type, $target);
                 $this->entity->bodyType = $this->bodyType;
-                $this->entity->velocity = $this->velocity;
+                $this->entity->velocity = $this->startVelocity;
 
                 if ($this->solid) {
                     $target->data(Jumping::DATA_SOLID_PROPERTY, true);
                 }
 
                 $this->__loadFixture();
-
-                unset($this->velocity, $this->bodyType);
 
                 $target->data("--property-phys", $this->entity);
 
