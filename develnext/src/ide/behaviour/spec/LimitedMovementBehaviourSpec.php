@@ -7,6 +7,8 @@ use behaviour\custom\DraggingBehaviour;
 use behaviour\custom\DraggingFormBehaviour;
 use behaviour\custom\GameEntityBehaviour;
 use behaviour\custom\GameSceneBehaviour;
+use behaviour\custom\LimitedMovementBehaviour;
+use behaviour\custom\WrapScreenBehaviour;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\elements\FormFormElement;
@@ -17,14 +19,14 @@ use ide\formats\form\elements\SpriteViewFormElement;
 use ide\scripts\AbstractScriptComponent;
 use php\gui\UXNode;
 
-class GameEntityBehaviourSpec extends AbstractBehaviourSpec
+class LimitedMovementBehaviourSpec extends AbstractBehaviourSpec
 {
     /**
      * @return string
      */
     public function getName()
     {
-        return 'Объект игровой сцены';
+        return 'Ограниченное перемещение';
     }
 
     public function getGroup()
@@ -42,7 +44,7 @@ class GameEntityBehaviourSpec extends AbstractBehaviourSpec
      */
     public function getDescription()
     {
-        return 'Объект для игровой сцены со свойства физики и не только';
+        return 'Объект будет ограничен в передвижении и будет всегда находится в зоне видимости';
     }
 
     /**
@@ -50,7 +52,7 @@ class GameEntityBehaviourSpec extends AbstractBehaviourSpec
      */
     public function getType()
     {
-        return GameEntityBehaviour::class;
+        return LimitedMovementBehaviour::class;
     }
 
     /**
