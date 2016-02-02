@@ -1308,6 +1308,15 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
+    public static function fetchElementProperties(AbstractFormElement $element)
+    {
+        if ($result = static::$typeProperties[get_class($element)]) {
+            return $result;
+        }
+
+        return self::initializeElement($element);
+    }
+
     public static function initializeElement(AbstractFormElement $element)
     {
         Logger::info("Initialize element = " . get_class($element));
@@ -1379,7 +1388,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $element = $this->format->getFormElement($node);
-        $properties = $element ? static::$typeProperties[get_class($element)] : null;
+        $properties = $element ? static::fetchElementProperties($element) : null;
 
         if ($this->propertiesPane) {
             $this->propertiesPane->clearProperties();

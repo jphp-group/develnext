@@ -95,7 +95,7 @@ abstract class AbstractFormFormat extends AbstractFormat
     {
         if ($any instanceof AbstractFormElement) {
             $this->formElements[] = $any;
-            FormEditor::initializeElement($any);
+            //FormEditor::initializeElement($any);
         } else if ($any instanceof AbstractMenuCommand) {
             $this->contextCommands[] = $any;
         } else if ($any instanceof AbstractFormElementTag) {

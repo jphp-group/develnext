@@ -2,6 +2,7 @@ package org.develnext.jphp.ext.javafx.classes.event;
 
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Property;
@@ -27,6 +28,11 @@ public class UXKeyEvent extends UXEvent {
 
     public UXKeyEvent(Environment env, ClassEntity clazz) {
         super(env, clazz);
+    }
+
+    @Reflection.Signature
+    public void __construct(KeyEvent event, Object sender) {
+        __wrappedObject = new KeyEvent(sender, null, event.getEventType(), event.getCharacter(), event.getText(), event.getCode(), event.isShiftDown(), event.isControlDown(), event.isAltDown(), event.isMetaDown());
     }
 
     @Override

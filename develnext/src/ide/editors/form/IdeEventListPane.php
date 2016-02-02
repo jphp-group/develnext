@@ -390,6 +390,10 @@ class IdeEventListPane
 
                 $menu->items->add($menuItem);
 
+                if ($type['separator']) {
+                    $menu->items->add(UXMenuItem::createSeparator());
+                }
+
                 if ($variants) {
                     $appendVariants = function ($variants, UXMenu $menuItem) use ($type, &$appendVariants) {
                         foreach ($variants as $name => $param) {

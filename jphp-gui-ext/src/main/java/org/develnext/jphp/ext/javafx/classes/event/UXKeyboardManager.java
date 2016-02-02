@@ -35,12 +35,12 @@ public class UXKeyboardManager extends BaseWrapper<KeyboardManager> {
     }
 
     @Signature
-    public void onPress(Environment env, KeyCombination keys, Invoker handler) {
-        onPress(env, keys, handler, "general");
+    public void onPress(KeyCombination keys, Invoker handler, Environment env) {
+        onPress(keys, handler, "general", env);
     }
 
     @Signature
-    public void onPress(Environment env, KeyCombination keys, Invoker handler, String group) {
+    public void onPress(KeyCombination keys, Invoker handler, String group, Environment env) {
         EventHandler<KeyEvent> onPress = getWrappedObject().getOnPress(keys);
 
         if (onPress == null) {
@@ -54,12 +54,12 @@ public class UXKeyboardManager extends BaseWrapper<KeyboardManager> {
     }
 
     @Signature
-    public void onDown(Environment env, KeyCombination keys, Invoker handler) {
-        onDown(env, keys, handler, "general");
+    public void onDown(KeyCombination keys, Invoker handler, Environment env) {
+        onDown(keys, handler, "general", env);
     }
 
     @Signature
-    public void onDown(Environment env, KeyCombination keys, Invoker handler, String group) {
+    public void onDown(KeyCombination keys, Invoker handler, String group, Environment env) {
         EventHandler<KeyEvent> onDown = getWrappedObject().getOnDown(keys);
 
         if (onDown == null) {
@@ -73,12 +73,12 @@ public class UXKeyboardManager extends BaseWrapper<KeyboardManager> {
     }
 
     @Signature
-    public void onUp(Environment env, KeyCombination keys, Invoker handler) {
-        onUp(env, keys, handler, "general");
+    public void onUp(KeyCombination keys, Invoker handler, Environment env) {
+        onUp(keys, handler, "general", env);
     }
 
     @Signature
-    public void onUp(Environment env, KeyCombination keys, Invoker handler, String group) {
+    public void onUp(KeyCombination keys, Invoker handler, String group, Environment env) {
         EventHandler<KeyEvent> onUp = getWrappedObject().getOnUp(keys);
 
         if (onUp == null) {

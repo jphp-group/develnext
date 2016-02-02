@@ -19,6 +19,7 @@ public class KeyboardManager {
     protected Map<KeyCode, KeyEvent> keys = new LinkedHashMap<>();
 
     protected Set<KeyCombination> keyHits = new HashSet<>();
+    protected boolean keyGlobalHit = false;
 
     protected Map<KeyCombination, EventHandler<KeyEvent>> pressHandlers = new LinkedHashMap<>();
     protected Map<KeyCombination, EventHandler<KeyEvent>> downHandlers = new LinkedHashMap<>();
@@ -52,6 +53,8 @@ public class KeyboardManager {
             }
         };
         window.addEventFilter(KeyEvent.KEY_RELEASED, upEventFilter);
+
+        timer.start();
     }
 
     public void free() {
@@ -141,30 +144,34 @@ public class KeyboardManager {
 
             if (down) {
                 if (keyHits.add(keyCombination)) {
-                    trigger(keyCombination, downHandlers);
+                    trigger(keyCombination, code, downHandlers);
                 }
 
-                trigger(keyCombination, pressHandlers);
+                if (!keyGlobalHit) {
+                    keyGlobalHit = true;
+                    trigger(null, code, downHandlers);
+                }
+
+                trigger(keyCombination, code, pressHandlers);
+                trigger(null, code, pressHandlers);
             } else {
                 keyHits.remove(keyCombination);
-                trigger(keyCombination, upHandlers);
+
+                trigger(keyCombination, code, upHandlers);
+                trigger(null, code, upHandlers);
             }
         }
     }
 
-    protected void trigger(KeyCombination keyCombination, Map<KeyCombination, EventHandler<KeyEvent>> handlers) {
+    protected void trigger(KeyCombination keyCombination, KeyCode code, Map<KeyCombination, EventHandler<KeyEvent>> handlers) {
         EventHandler<KeyEvent> eventHandler = handlers.get(keyCombination);
 
         if (eventHandler != null) {
-            if (keyCombination instanceof  KeyCodeCombination) {
-                KeyCode keyCode = ((KeyCodeCombination) keyCombination).getCode();
+            KeyEvent event = new KeyEvent(
+                    window, window, KeyEvent.KEY_PRESSED, null, null, code, shiftDown, controlDown, altDown, false
+            );
 
-                KeyEvent event = new KeyEvent(
-                        window, null, KeyEvent.KEY_TYPED, null, null, keyCode, shiftDown, controlDown, altDown, false
-                );
-
-                eventHandler.handle(event);
-            }
+            eventHandler.handle(event);
         }
     }
 }

@@ -400,6 +400,7 @@ class FormElementConfig
                 'icon'        => $icon,
                 'kind'        => $kind,
                 'idParameter' => $idParameter,
+                'separator'   => !!$eventType->getAttribute('separator')
             ];
 
             $paramVariants = [];

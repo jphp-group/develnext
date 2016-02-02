@@ -80,15 +80,15 @@ class GameSceneBehaviour extends AbstractBehaviour
         $form->layout->data('--game-scene', $this);
 
         $layout = $form->layout;
-        $form->makeVirtualLayout();
 
         if ($this->_target instanceof UXWindow) {
+            $form->makeVirtualLayout();
             $this->_target->layout = $layout;
+            $form->loadBehaviours();
         } elseif ($this->_target instanceof UXGamePane) {
             $this->_target->loadArea($layout);
+            $form->loadBehaviours();
         }
-
-        $form->loadBehaviours();
 
         if ($this->autoplay) {
             $this->scene->play();

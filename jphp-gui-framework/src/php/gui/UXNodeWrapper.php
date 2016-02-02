@@ -2,8 +2,11 @@
 namespace php\gui;
 
 use php\gui\event\UXEvent;
+use php\gui\event\UXKeyboardManager;
+use php\gui\event\UXKeyEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\View;
+use php\lib\str;
 
 class UXNodeWrapper
 {
@@ -48,6 +51,48 @@ class UXNodeWrapper
         }
 
         $this->node->data('--start-position', $this->node->position);
+    }
+
+    protected function bindGlobalKey($event, callable $_handler, $group)
+    {
+        $form = $this->node->form;
+
+        if ($form) {
+            $manager = $form->data(UXKeyboardManager::class);
+
+            if (!$manager) {
+                $manager = new UXKeyboardManager($this->node->form);
+                $form->data(UXKeyboardManager::class, $manager);
+            }
+
+            list($kind, $param) = str::split($event, '-', 2);
+
+            $group = $this->node->id . "-$group-$param";
+
+            $param = $param ? $param : null;
+
+            $handler = function (UXKeyEvent $e) use ($_handler) {
+                $e = new UXKeyEvent($e, $this->node);
+                $_handler($e);
+            };
+
+            switch ($kind) {
+                case 'globalKeyPress':
+                    $manager->onPress($param, $handler, $group);
+                    break;
+
+                case 'globalKeyDown':
+                    $manager->onDown($param, $handler, $group);
+                    break;
+
+                case 'globalKeyUp':
+                    $manager->onUp($param, $handler, $group);
+                    break;
+
+                default:
+                    throw new \Exception("Unable to bind '$kind' event with param = '$param'");
+            }
+        }
     }
 
     /**
@@ -131,7 +176,11 @@ class UXNodeWrapper
                 return;
         }
 
-        $this->node->on($event, $handler, $group);
+        if (str::startsWith($event, 'globalKey')) {
+            $this->bindGlobalKey($event, $handler, $group);
+        } else {
+            $this->node->on($event, $handler, $group);
+        }
     }
 
     /**

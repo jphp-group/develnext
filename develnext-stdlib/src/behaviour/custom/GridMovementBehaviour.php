@@ -2,6 +2,7 @@
 namespace behaviour\custom;
 
 use action\Animation;
+use php\gui\event\UXKeyboardManager;
 use php\gui\event\UXKeyEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\UXForm;
@@ -69,9 +70,9 @@ class GridMovementBehaviour extends AbstractBehaviour
                 return;
             }
 
-            $form->addEventFilter('keyDown', function (UXKeyEvent $e) use ($target) {
-                $x = $y = 0;
+            $keyboardManager = new UXKeyboardManager($form);
 
+            $pressHandler = function (UXKeyEvent $e) use ($target) {
                 if ($this->_target->isFree()) {
                     return;
                 }
@@ -84,7 +85,7 @@ class GridMovementBehaviour extends AbstractBehaviour
                     return;
                 }
 
-                $this->__busy = true;
+                $x = $y = 0;
 
                 list($up, $down, $left, $right) = ['Up', 'Down', 'Left', 'Right'];
 
@@ -136,7 +137,12 @@ class GridMovementBehaviour extends AbstractBehaviour
                         }
 
                         break;
+
+                    default:
+                        return;
                 }
+
+                $this->__busy = true;
 
                 if ($this->animated && ($x != 0 || $y != 0)) {
                     $this->timer = Animation::displace($target, $this->speed, $x, $y, function () {
@@ -147,7 +153,11 @@ class GridMovementBehaviour extends AbstractBehaviour
                     $target->x += $x;
                     $target->y += $y;
                 }
-            });
+            };
+
+            foreach (['Up', 'Down', 'Left', 'Right', 'W', 'S', 'A', 'D'] as $key) {
+                $keyboardManager->onPress($key, $pressHandler, __CLASS__);
+            }
         });
     }
 

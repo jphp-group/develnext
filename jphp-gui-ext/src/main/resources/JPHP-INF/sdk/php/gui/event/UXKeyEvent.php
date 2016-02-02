@@ -46,4 +46,12 @@ class UXKeyEvent extends UXEvent
      * @var bool
      */
     public $shortcutDown;
+
+    /**
+     * @param UXKeyEvent $parent
+     * @param $sender
+     */
+    public function __construct(UXKeyEvent $parent, $sender)
+    {
+    }
 }
