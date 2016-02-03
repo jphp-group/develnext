@@ -9,6 +9,7 @@ use ide\forms\BehaviourCreateForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
+use ide\misc\EventHandlerBehaviour;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
@@ -27,6 +28,8 @@ use php\util\Flow;
  */
 class IdeBehaviourPane
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var IdeBehaviourManager
      */
@@ -58,6 +61,11 @@ class IdeBehaviourPane
     protected $hintNodeText;
 
     /**
+     * @var mixed
+     */
+    protected $targetId;
+
+    /**
      * @param IdeBehaviourManager $manager
      */
     public function __construct(IdeBehaviourManager $manager)
@@ -84,6 +92,7 @@ class IdeBehaviourPane
 
     public function makeUi($targetId, UXVBox $box = null)
     {
+        $this->targetId = $targetId;
         if ($this->pane) {
             $pane = $this->pane;
         } else {
@@ -187,6 +196,8 @@ class IdeBehaviourPane
                     $this->behaviourManager->save();
 
                     $this->makeUi($targetId, $this->lastUi);
+
+                    $this->trigger('remove', [$spec->getType()]);
                 }
             }
         });
@@ -252,5 +263,13 @@ class IdeBehaviourPane
 
             $pane->addProperty($class, $code, $item['name'], $editor);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTargetId()
+    {
+        return $this->targetId;
     }
 }

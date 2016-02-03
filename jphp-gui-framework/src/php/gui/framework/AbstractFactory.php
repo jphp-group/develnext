@@ -10,6 +10,7 @@ use php\gui\UXData;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
+use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
 use php\lib\str;
@@ -17,7 +18,7 @@ use php\xml\DomElement;
 use php\xml\DomNode;
 use php\xml\XmlProcessor;
 
-abstract class AbstractFactory
+class AbstractFactory
 {
     const DEFAULT_PATH = 'res://.factories/';
 
@@ -58,17 +59,22 @@ abstract class AbstractFactory
     protected $factoryName = null;
 
     /**
-     * @throws Exception
+     * @param null|string $path
      */
-    public function __construct()
+    public function __construct($path = null)
     {
-        $name = Str::replace(get_class($this), '\\', '/');
-
-        $this->loadPrototypes();
+        $this->loadPrototypes($path);
 
         $this->eventBinder = new EventBinder(null, $this);
         $this->behaviourManager = $behaviourManager = new FactoryBehaviourManager($this);
-        BehaviourLoader::load("res://$name.behaviour", $behaviourManager);
+
+        try {
+            $name = Str::replace(get_class($this), '\\', '/');
+
+            BehaviourLoader::load("res://$name.behaviour", $behaviourManager);
+        } catch (IOException $e) {
+            ;
+        }
     }
 
     /**
@@ -151,6 +157,11 @@ abstract class AbstractFactory
     protected function loadPrototypes($path = null)
     {
         $path = $path ?: static::DEFAULT_PATH . $this->getResourceName() . '.factory';
+
+        $this->prototypes = [];
+        $this->prototypeData = [];
+        $this->prototypeImports = [];
+        $this->prototypeInstances = [];
 
         Stream::tryAccess($path, function (Stream $stream) {
             $xml = new XmlProcessor();

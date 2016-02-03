@@ -38,7 +38,12 @@ class UXDesigner
     /**
      * @var int
      */
-    public $snapSize = 8;
+    public $snapSizeX = 8;
+
+    /**
+     * @var int
+     */
+    public $snapSizeY = 8;
 
     /**
      * @var bool
@@ -120,6 +125,14 @@ class UXDesigner
 
     /**
      * @param UXNode $node
+     * @return bool
+     */
+    public function isSelectedNode(UXNode $node)
+    {
+    }
+
+    /**
+     * @param UXNode $node
      */
     public function selectNode(UXNode $node)
     {
@@ -152,6 +165,23 @@ class UXDesigner
      * @return bool
      */
     public function getNodeLock(UXNode $node)
+    {
+    }
+
+
+    /**
+     * @param UXNode $node
+     * @param bool $enabled
+     */
+    public function setNodeSimple(UXNode $node, $enabled)
+    {
+    }
+
+    /**
+     * @param UXNode $node
+     * @return bool
+     */
+    public function getNodeSimple(UXNode $node)
     {
     }
 

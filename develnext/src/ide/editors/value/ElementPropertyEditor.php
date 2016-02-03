@@ -2,6 +2,7 @@
 namespace ide\editors\value;
 
 use ide\editors\FormEditor;
+use ide\misc\EventHandlerBehaviour;
 use ide\systems\FileSystem;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\framework\DataUtils;
@@ -20,6 +21,8 @@ use php\xml\DomElement;
  */
 abstract class ElementPropertyEditor extends UXDesignPropertyEditor
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var UXNode
      */
@@ -143,6 +146,8 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
                 if ($realCode) {
                     $target->{$realCode} = $value;
                 }
+
+                $this->trigger('change');
             }
         };
 
@@ -170,11 +175,18 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
 
             if ($target->id) {
                 $data = DataUtils::get($target);
-                $data->set($editor->code, $value);
+
+                if ($data) {
+                    $data->set($editor->code, $value);
+                } else {
+                    $target->data($editor->code, $value);
+                }
 
                 if ($realCode) {
                     $target->{$realCode} = $value;
                 }
+
+                $this->trigger('change');
             }
         };
 
@@ -184,7 +196,11 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             if ($target->id) {
                 $data = DataUtils::get($target);
 
-                return $data->get($editor->code);
+                if ($data) {
+                    return $data->get($editor->code);
+                } else {
+                    return $target->data($editor->code);
+                }
             }
 
             return '';
@@ -222,6 +238,8 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             if ($realCode) {
                 $target->{$realCode} = $value;
             }
+
+            $this->trigger('change');
         };
 
         $this->getter = function (ElementPropertyEditor $editor) {
@@ -239,10 +257,13 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
         try {
             if (!$this->setter) {
                 $this->designProperties->target->{$this->code} = $value;
+                $this->trigger('change');
             } else {
                 $setter = $this->setter;
                 $setter($this, $value);
             }
+
+            $this->designProperties->triggerChange();
 
             if ($updateUi) {
                 $this->updateUi($value);

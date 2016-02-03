@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\form;
 use ide\Logger;
+use ide\misc\EventHandlerBehaviour;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
@@ -16,6 +17,8 @@ use php\lib\Items;
  */
 class IdeTabPane
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var UXVBox
      */
@@ -30,6 +33,11 @@ class IdeTabPane
      * @var
      */
     protected $tabs = [];
+
+    /**
+     * @var array
+     */
+    protected $hiddenTabs = [];
 
     /**
      * @var IdeBehaviourPane
@@ -147,13 +155,28 @@ class IdeTabPane
 
     public function hideEventListPane()
     {
+        if ($tab = $this->tabs['eventList']) {
+            $this->hiddenTabs['eventList'] = $tab;
+        }
+
         $this->remove('eventList');
     }
 
     public function showEventListPane()
     {
+        $content = null;
+
+        if ($this->tabs['eventList']) {
+            return;
+        }
+
+        if ($tab = $this->hiddenTabs['eventList']) {
+            $content = $tab->content;
+            unset($this->hiddenTabs['eventList']);
+        }
+
         if ($this->eventListPane) {
-            $this->tab('eventList', 'События', $this->eventListPane->makeUi(), false);
+            $this->tab('eventList', 'События', $content ?: $this->eventListPane->makeUi(), false);
         }
     }
 
@@ -162,17 +185,39 @@ class IdeTabPane
         $this->tab('eventList', 'События', $pane->makeUi(), false);
 
         $this->eventListPane = $pane;
+
+        $handler = function () {
+            $this->trigger('change', [$this->eventListPane->getTargetId()]);
+        };
+
+        $pane->on('add', $handler, __CLASS__);
+        $pane->on('remove', $handler, __CLASS__);
     }
 
     public function hideBehaviourPane()
     {
+        if ($tab = $this->tabs['behaviours']) {
+            $this->hiddenTabs['behaviours'] = $tab;
+        }
+
         $this->remove('behaviours');
     }
 
     public function showBehaviourPane()
     {
+        $content = null;
+
+        if ($this->tabs['behaviours']) {
+            return;
+        }
+
+        if ($tab = $this->hiddenTabs['behaviours']) {
+            $content = $tab->content;
+            unset($this->hiddenTabs['behaviours']);
+        }
+
         if ($this->behaviourPane) {
-            $this->tab('behaviours', 'Поведения', $this->behaviourPane->makeUi(''));
+            $this->tab('behaviours', 'Поведения', $content->content ?: $this->behaviourPane->makeUi(''));
         }
     }
 
@@ -182,6 +227,14 @@ class IdeTabPane
 
         $pane->setHintNode($tab);
         $this->behaviourPane = $pane;
+
+        $handler = function () {
+            $this->trigger('change', [$this->behaviourPane->getTargetId()]);
+        };
+
+        $pane->on('add', $handler, __CLASS__);
+        $pane->on('edit', $handler, __CLASS__);
+        $pane->on('remove', $handler, __CLASS__);
     }
 
     public function removePropertiesPane()
@@ -201,6 +254,12 @@ class IdeTabPane
         $this->tab('properties', 'Свойства', $pane->makeUi());
 
         $this->propertiesPane = $pane;
+
+        $handler = function () {
+            $this->trigger('change', [$this->eventListPane->getTargetId()]);
+        };
+
+        $pane->on('change', $handler, __CLASS__);
     }
 
     public function update($targetId, $target = null)

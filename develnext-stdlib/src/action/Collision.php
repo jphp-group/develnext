@@ -41,6 +41,7 @@ class Collision
             }
 
             $object->phys->velocity = $velocity;
+            $object->phys->speed = $speed * $bounciness;
         }
 
         $object->data($lastTriggerKey, Time::millis());

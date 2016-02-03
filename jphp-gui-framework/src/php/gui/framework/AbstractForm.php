@@ -452,7 +452,17 @@ abstract class AbstractForm extends UXForm
     protected function loadCustomNode(UXCustomNode $node)
     {
         // nop.
-        return null;
+        $instance = $this->create($node->get('type'), $node, $node->get('x'), $node->get('y'));
+
+        if ($node->get('hidden')) {
+            $instance->visible = false;
+        }
+
+        if ($node->get('disabled')) {
+            $instance->enabled = false;
+        }
+
+        return $instance;
     }
 
     protected function loadDesign()
@@ -469,21 +479,26 @@ abstract class AbstractForm extends UXForm
             }
 
             if ($this->layout) {
-                DataUtils::scan($this->layout, function (UXData $data, UXNode $node = null) {
+                DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node = null) {
                     if ($node) {
                         if ($node instanceof UXCustomNode) {
                             $newNode = $this->loadCustomNode($node);
 
                             if ($newNode) {
-                                $node->parent->add($newNode);
+                                if (!$newNode->parent) {
+                                    $node->parent->add($newNode);
+                                }
+
                                 $node = $newNode;
                             }
-                        }
+                        } else {
+                            if ($node) {
+                                $node->data('-factory-name', $this->getName());
+                                $node->data('-factory', $this);
 
-                        if ($node) {
-                            $node->data('-factory-name', $this->getName());
-                            $node->data('-factory', $this);
-                            UXNodeWrapper::get($node)->applyData($data);
+                                $data = $data ?: new UXData();
+                                UXNodeWrapper::get($node)->applyData($data);
+                            }
                         }
                     }
                 });

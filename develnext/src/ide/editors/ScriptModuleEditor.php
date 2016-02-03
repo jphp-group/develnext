@@ -118,7 +118,6 @@ class ScriptModuleEditor extends FormEditor
         return $result;
     }
 
-
     public function save()
     {
         foreach ($this->manager->getComponents() as $el) {
@@ -261,6 +260,16 @@ class ScriptModuleEditor extends FormEditor
         return null;
     }
 
+    protected function makeActionsUi()
+    {
+        return null;
+    }
+
+    protected function makePrototypePane()
+    {
+        return null;
+    }
+
     protected function makeDesigner($fullArea = true)
     {
         return parent::makeDesigner(true);
@@ -378,14 +387,15 @@ class ScriptModuleEditor extends FormEditor
 
             $position = [$e->x, $e->y];
 
-            $snapSize = $this->designer->snapSize;
+            $snapSizeX = $this->designer->snapSizeX;
+            $snapSizeY = $this->designer->snapSizeY;
 
             if ($this->designer->snapEnabled) {
-                $size[0] = floor($size[0] / $snapSize) * $snapSize;
-                $size[1] = floor($size[1] / $snapSize) * $snapSize;
+                $size[0] = floor($size[0] / $snapSizeX) * $snapSizeX;
+                $size[1] = floor($size[1] / $snapSizeY) * $snapSizeY;
 
-                $position[0] = floor($position[0] / $snapSize) * $snapSize;
-                $position[1] = floor($position[1] / $snapSize) * $snapSize;
+                $position[0] = floor($position[0] / $snapSizeX) * $snapSizeX;
+                $position[1] = floor($position[1] / $snapSizeY) * $snapSizeY;
             }
 
             $node->position = $position;

@@ -34,7 +34,8 @@ class FileUtils
 
     public static function hash($file)
     {
-        throw new \Exception("Not implemented");
+        return File::of($file)->hash('SHA-256');
+       // throw new \Exception("Not implemented");
     }
 
     /**

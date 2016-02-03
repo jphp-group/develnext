@@ -21,11 +21,13 @@ class CollisionEventAdapter extends AbstractEventAdapter
         /** @var UXNode $node */
         $entity = GameEntityBehaviour::get($node);
 
+        $factoryName = $node->data('-factory-name');
+
         if ($entity) {
-            $entity->setCollisionHandler($param, $handler);
+            $entity->setCollisionHandler($param, $handler, $factoryName);
         } else {
             $collisionHandlers = $node->data(__CLASS__);
-            $collisionHandlers[$param] = $handler;
+            $collisionHandlers[$factoryName ? "$factoryName.$param" : $param] = $handler;
 
             $node->data(__CLASS__, $collisionHandlers);
         }

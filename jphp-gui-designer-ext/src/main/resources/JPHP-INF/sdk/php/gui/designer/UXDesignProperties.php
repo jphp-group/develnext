@@ -15,6 +15,17 @@ class UXDesignProperties
     public $target;
 
     /**
+     * @param callable|null $handler
+     */
+    public function onChange($handler)
+    {
+    }
+
+    public function triggerChange()
+    {
+    }
+
+    /**
      * @param $code
      * @param $title
      * @return UXTitledPane

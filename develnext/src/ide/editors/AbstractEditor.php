@@ -11,6 +11,7 @@ use php\gui\layout\UXPane;
 use php\gui\UXNode;
 use php\lang\IllegalStateException;
 use php\lang\Thread;
+use php\lib\str;
 
 /**
  * Class AbstractEditor
@@ -41,6 +42,26 @@ abstract class AbstractEditor
     public function __construct($file)
     {
         $this->file = $file;
+    }
+
+    /**
+     * @return \php\util\Configuration
+     */
+    protected function getIdeConfig()
+    {
+        $file = Ide::project()->getAbsoluteFile($this->file);
+        $name = str::replace(get_class($this), "\\", "/") . "/" . $file->getRelativePath() . ".conf";
+
+        return Ide::project()->getIdeConfig($name);
+    }
+
+
+    protected function saveIdeConfig()
+    {
+        $file = Ide::project()->getAbsoluteFile($this->file);
+        $name = str::replace(get_class($this), "\\", "/") . "/" . $file->getRelativePath() . ".conf";
+
+        Ide::project()->saveIdeConfig($name);
     }
 
     /**

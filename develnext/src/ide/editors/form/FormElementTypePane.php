@@ -83,18 +83,40 @@ class FormElementTypePane
     /**
      * @param AbstractFormElement[]|AbstractScriptComponent[]|ObjectListEditorItem[] $elements
      * @param bool $selectable
+     * @param UXToggleGroup $toggleGroup
      */
-    public function __construct(array $elements, $selectable = true)
+    public function __construct(array $elements, $selectable = true, UXToggleGroup $toggleGroup = null)
     {
-        $this->toggleGroup = new UXToggleGroup();
+        $this->toggleGroup = $toggleGroup ?: new UXToggleGroup();
         $this->selectable = $selectable;
 
         $this->layout = new UXVBox();
-        $this->layout->maxWidth = 250;
+        $this->layout->maxWidth = 265;
         $this->layout->fillWidth = true;
 
         $this->content = new UXScrollPane($this->layout);
         $this->content->fitToWidth = true;
+
+        $this->createHeaderUi();
+
+        $this->setElements($elements);
+    }
+
+    /**
+     * @return UXToggleGroup
+     */
+    public function getToggleGroup()
+    {
+        return $this->toggleGroup;
+    }
+
+    public function setElements(array $elements)
+    {
+        $head = $this->layout->children[0];
+
+        $this->layout->children->clear();
+
+        $this->layout->add($head);
 
         $groups = [];
 
@@ -104,8 +126,6 @@ class FormElementTypePane
                 $groups[$element->getGroup()][] = $element;
             }
         }
-
-        $this->createHeaderUi();
 
         foreach ($groups as $name => $elements) {
             $this->createGroupUi($name, $elements);

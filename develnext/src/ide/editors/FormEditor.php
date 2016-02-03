@@ -4,9 +4,11 @@ namespace ide\editors;
 use ide\action\ActionEditor;
 use ide\behaviour\IdeBehaviourManager;
 use ide\editors\common\ObjectListEditorItem;
+use ide\editors\form\IdeActionsPane;
 use ide\editors\form\IdeBehaviourPane;
 use ide\editors\form\FormElementTypePane;
 use ide\editors\form\IdeEventListPane;
+use ide\editors\form\IdeFormFactory;
 use ide\editors\form\IdeObjectTreeList;
 use ide\editors\form\IdePropertiesPane;
 use ide\editors\form\IdeTabPane;
@@ -39,6 +41,7 @@ use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
+use php\gui\framework\AbstractFactory;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\DataUtils;
 use php\gui\framework\Timer;
@@ -52,6 +55,7 @@ use php\gui\text\UXFont;
 use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXContextMenu;
+use php\gui\UXCustomNode;
 use php\gui\UXData;
 use php\gui\UXDialog;
 use php\gui\UXForm;
@@ -68,15 +72,19 @@ use php\gui\UXMenuItem;
 use php\gui\UXNode;
 use php\gui\UXParent;
 use php\gui\UXPopupWindow;
+use php\gui\UXSeparator;
 use php\gui\UXSplitPane;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXTextArea;
 use php\gui\UXTextField;
+use php\gui\UXToggleButton;
+use php\gui\UXToggleGroup;
 use php\gui\UXTooltip;
 use php\gui\UXWebView;
 use php\io\File;
 use php\io\Stream;
+use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\lib\Items;
 use php\lib\Str;
@@ -85,6 +93,7 @@ use php\time\Time;
 use php\util\Configuration;
 use php\util\Flow;
 use php\util\Regex;
+use php\util\SharedStack;
 use script\TimerScript;
 
 /**
@@ -225,6 +234,21 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
      */
     protected $markerNode;
 
+    /**
+     * @var IdeActionsPane
+     */
+    protected $actionsPane;
+
+    /**
+     * @var IdeFormFactory
+     */
+    protected $factory;
+
+    /**
+     * @var FormElementTypePane
+     */
+    protected $prototypeTypePane;
+
     public function __construct($file, AbstractFormDumper $dumper)
     {
         parent::__construct($file);
@@ -236,6 +260,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $confFile = $file;
 
         if (Str::endsWith($phpFile, '.fxml')) {
+            $this->factory = new IdeFormFactory(FileUtils::stripExtension(File::of($file)->getName()), $this->file);
+
             $phpFile = Str::sub($phpFile, 0, Str::length($phpFile) - 5);
             $confFile = $phpFile;
         }
@@ -408,6 +434,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $this->trigger('load:before');
 
+        if ($this->factory) {
+            $this->factory->reload();
+        }
+
         $this->eventManager->load();
         $this->formDumper->load($this);
 
@@ -432,6 +462,12 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->actionEditor->save();
         $this->behaviourManager->save();
+
+        if ($this->actionsPane) {
+            $this->getIdeConfig()->put($this->actionsPane->getConfig());
+        }
+
+        $this->saveIdeConfig();
     }
 
     public function save()
@@ -443,6 +479,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         Stream::tryAccess($this->configFile, function (Stream $stream) {
             $this->config->save($stream);
         }, 'w+');
+
+        if ($this->factory) {
+            $this->factory->reload();
+        }
     }
 
     public function close()
@@ -456,9 +496,145 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
+    public function createClone($id)
+    {
+        if (str::contains($id, '.')) {
+            $gui = GuiFrameworkProjectBehaviour::get();
+
+            if ($gui) {
+                list($factoryName, $factoryId) = str::split($id, '.');
+
+                $formEditor = $gui->getFormEditor($factoryName);
+
+                if ($formEditor) {
+                    return $formEditor->createClone($factoryId);
+                }
+            }
+
+            return null;
+        }
+
+        $clone = $this->factory->create($id);
+        $clone->id = "";
+        $clone->data('-factory-version', $this->getObjectVersion($id));
+
+        return $clone;
+    }
+
+    public function reloadClones()
+    {
+        $this->factory->reload();
+
+        $gui = GuiFrameworkProjectBehaviour::get();
+
+        $freeNodes = new SharedStack();
+
+        DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node) use ($gui, $freeNodes) {
+            if ($node instanceof UXCustomNode) {
+                $freeNodes->push($node);
+            } else {
+                $factoryId = $node->data('-factory-id');
+
+                if ($factoryId) {
+                    $freeNodes->push($node);
+                }
+            }
+        });
+
+        foreach ($freeNodes as $node) {
+            if ($node instanceof UXCustomNode) {
+                $type = $node->get('type');
+                list($factoryName, $factoryId) = str::split($type, '.');
+
+                $formEditor = $gui->getFormEditor($factoryName);
+
+                if ($formEditor) {
+                    $clone = $formEditor->createClone($factoryId);
+
+                    if ($clone) {
+                        $clone->x = $node->get('x');
+                        $clone->y = $node->get('y');
+
+                        $this->designer->unregisterNode($node);
+                        $node->parent->add($clone);
+
+                        $this->registerNode($clone);
+                        $this->refreshNode($clone);
+                    }
+                }
+            } elseif ($node instanceof UXNode) {
+                $factoryId = $node->data('-factory-id');
+
+                if ($factoryId) {
+                    list($factoryName, $factoryId) = str::split($factoryId, '.');
+
+                    $formEditor = $gui->getFormEditor($factoryName);
+
+                    if ($formEditor) {
+                        $factoryVersion = $node->data('-factory-version');
+
+                        if ($formEditor->getObjectVersion($factoryId) == $factoryVersion) {
+                            continue;
+                        }
+
+                        $clone = $formEditor->createClone($factoryId);
+
+                        if ($clone) {
+                            $clone->position = $node->position;
+
+                            if ($this->designer->isSelectedNode($node)) {
+                                $this->designer->unselectNode($node);
+
+                                uiLater(function () use ($clone) {
+                                    $this->designer->selectNode($clone);
+                                });
+                            }
+
+                            $this->designer->unregisterNode($node);
+
+                            $node->parent->add($clone);
+
+                            $this->registerNode($clone);
+                            $this->refreshNode($clone);
+                        }
+                    }
+                }
+            }
+
+            $node->free();
+        }
+    }
+
     public function open()
     {
         parent::open();
+
+        $this->reloadClones();
+
+        if ($this->prototypeTypePane) {
+            $gui = GuiFrameworkProjectBehaviour::get();
+
+            if ($gui) {
+                $elements = [];
+                foreach ($gui->getFormEditors() as $editor) {
+                    if (FileUtils::hashName($this->file) == FileUtils::hashName($editor->getFile())) {
+                        continue;
+                    }
+
+                    foreach ($editor->getObjectList() as $it) {
+                        $it->group = $editor->getTitle();
+                        $it->value = "{$it->getGroup()}.{$it->value}";
+                        $elements[] = $it;
+                    }
+                }
+
+                $this->prototypeTypePane->setElements($elements);
+            }
+        }
+
+        if ($this->actionsPane) {
+            $this->actionsPane->setConfig($this->getIdeConfig()->toArray());
+        }
 
         $this->elementTypePane->resetConfigurable(get_class($this));
 
@@ -488,6 +664,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         parent::hide();
 
+        $this->save();
         $this->designer->disabled = true;
         $this->reindex();
     }
@@ -526,6 +703,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->designer->registerNode($uiNode);
 
+        $this->designer->setNodeSimple($uiNode, $uiNode->data('-factory-id'));
+
         return $uiNode;
     }
 
@@ -548,12 +727,14 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $index = [];
 
+        /** @var UXNode $node */
         foreach ($nodes as $node) {
             $element = $this->format->getFormElement($node);
 
             $index[$this->getNodeId($node)] = [
                 'id' => $this->getNodeId($node),
                 'type' => get_class($element),
+                'version' => (int) $node->data('-factory-version')
             ];
         }
 
@@ -618,6 +799,20 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return '';
     }
 
+
+    public function getObjectVersion($id)
+    {
+        $project = Ide::get()->getOpenedProject();
+
+        if ($project) {
+            $index = (array) $project->getIndexer()->get($this->file, '_objects');
+
+            return (int) $index[$id]['version'];
+        }
+
+        return -1;
+    }
+
     /**
      * @return ObjectListEditorItem[]
      */
@@ -640,6 +835,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
                 $item->hint = $element ? $element->getName() : '';
                 $item->element = $element;
+                $item->version = (int) $it['version'];
             }
         }
 
@@ -713,6 +909,17 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
+    protected function makeActionsUi()
+    {
+        $this->actionsPane = $ui = new IdeActionsPane($this->designer);
+
+        $ui->on('change', function () {
+            $this->save();
+        });
+
+        return $ui;
+    }
+
     public function makeUi()
     {
         if (!$this->layout) {
@@ -735,7 +942,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $designerTab = new UXTab();
         $designerTab->text = 'Дизайн';
+
         $designerTab->content = $designer;
+
         $designerTab->style = '-fx-cursor: hand;';
         $designerTab->graphic = Ide::get()->getImage($this->getIcon());
 
@@ -1012,12 +1221,17 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return $result;
     }
 
+    protected function makePrototypePane()
+    {
+        $prototypeTypePane = new FormElementTypePane([], true, $this->elementTypePane->getToggleGroup());
+        $prototypeTypePane->applyConfigure(get_class($this) . "#prototype");
+
+        return $prototypeTypePane;
+    }
+
     protected function makeDesigner($fullArea = false)
     {
         $area = new UXAnchorPane();
-
-        //$actionPane = UiUtils::makeCommandPane($this->format->getContextCommands());
-        //$area->add($actionPane);
 
         $viewer = new UXScrollPane($area);
 
@@ -1068,6 +1282,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->elementTypePane = new FormElementTypePane($this->format->getFormElements());
         $this->elementTypePane->applyConfigure(get_class($this));
 
+        $this->prototypeTypePane = $this->makePrototypePane();
         //$this->behaviourPane = new IdeBehaviourPane($this->behaviourManager);
 
         $designerCodeEditor = new UXAnchorPane();
@@ -1098,7 +1313,38 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $scrollPane->maxWidth = $scrollPane->content->maxWidth;
         $this->elementTypePaneContainer = $scrollPane;
 
-        $split = new UXSplitPane([$this->viewerAndEvents, $scrollPane]);
+        if ($this->prototypeTypePane) {
+            $typePanes = new UXTabPane();
+            $typePanes->tabClosingPolicy = 'UNAVAILABLE';
+            $typePanes->side = 'RIGHT';
+
+            $elementTab = new UXTab();
+            $elementTab->text = 'Объекты';
+            $elementTab->content = $scrollPane;
+
+            $typePanes->tabs->add($elementTab);
+
+            $prototypeTab = new UXTab();
+            $prototypeTab->text = 'Прототипы';
+            $prototypeTab->content = new UXScrollPane($this->prototypeTypePane->getContent());
+            $prototypeTab->content->fitToWidth = true;
+
+            $typePanes->tabs->add($prototypeTab);
+            $typePanes->maxWidth = $scrollPane->content->maxWidth;
+
+            $scrollPane = $typePanes;
+        }
+
+        $actions = $this->makeActionsUi();
+
+        if ($actions) {
+            $wrap = new UXVBox([$actions, $this->viewerAndEvents]);
+            UXVBox::setVgrow($this->viewerAndEvents, 'ALWAYS');
+
+            $split = new UXSplitPane([$wrap, $scrollPane]);
+        } else {
+            $split = new UXSplitPane([$this->viewerAndEvents, $scrollPane]);
+        }
 
         $this->makeContextMenu();
 
@@ -1147,13 +1393,22 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         Logger::info("Create element: element = " . get_class($element) . ", screenX = $screenX, screenY = $screenY, parent = $parent");
 
-        $node = $element->createElement();
+        $isClone = false;
 
-        if (!$node->id) {
-            $node->id = $this->generateNodeId($element);
+        if ($element instanceof ObjectListEditorItem) {
+            $isClone = true;
+            $node = $this->createClone($element->value);
+
+            $size = $node->size;
+        } else {
+            $node = $element->createElement();
+
+            if (!$node->id) {
+                $node->id = $this->generateNodeId($element);
+            }
+
+            $size = $element->getDefaultSize();
         }
-
-        $size = $element->getDefaultSize();
 
         $selectionRectangle = $this->designer->getSelectionRectangle();
 
@@ -1164,17 +1419,22 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $position = [$screenX, $screenY];
 
-        $snapSize = $this->designer->snapSize;
+        $snapSizeX = $this->designer->snapSizeX;
+        $snapSizeY = $this->designer->snapSizeY;
 
         if ($this->designer->snapEnabled) {
-            $size[0] = floor($size[0] / $snapSize) * $snapSize;
-            $size[1] = floor($size[1] / $snapSize) * $snapSize;
+            if (!$isClone) {
+                $size[0] = floor($size[0] / $snapSizeX) * $snapSizeX;
+                $size[1] = floor($size[1] / $snapSizeY) * $snapSizeY;
+            }
 
-            $position[0] = floor($position[0] / $snapSize) * $snapSize;
-            $position[1] = floor($position[1] / $snapSize) * $snapSize;
+            $position[0] = floor($position[0] / $snapSizeX) * $snapSizeX;
+            $position[1] = floor($position[1] / $snapSizeY) * $snapSizeY;
         }
 
-        $node->size = $size;
+        if (!$isClone) {
+            $node->size = $size;
+        }
 
         if ($parent) {
             $parentElement = $this->format->getFormElement($parent);
@@ -1188,31 +1448,36 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $element = $this->format->getFormElement($node);
 
         $node = $this->registerNode($node);
-        $data = DataUtils::get($node);
 
-        foreach ($element->getInitProperties() as $key => $property) {
-            if ($property['virtual']) {
-                $data->set($key, $property['value']);
-            } else if ($key !== 'width' && $key !== 'height') {
-                $node->{$key} = $property['value'];
-            }
-        }
+        if (!$isClone) {
+            $data = DataUtils::get($node);
 
-        $initialBehaviours = $element->getInitialBehaviours();
-
-        if ($initialBehaviours) {
-            foreach ($initialBehaviours as $spec) {
-                $behaviour = $spec->createBehaviour();
-                $this->behaviourManager->apply($node->id, $behaviour);
+            foreach ($element->getInitProperties() as $key => $property) {
+                if ($property['virtual']) {
+                    $data->set($key, $property['value']);
+                } else if ($key !== 'width' && $key !== 'height') {
+                    $node->{$key} = $property['value'];
+                }
             }
 
-            $this->behaviourManager->save();
+            $initialBehaviours = $element->getInitialBehaviours();
+
+            if ($initialBehaviours) {
+                foreach ($initialBehaviours as $spec) {
+                    $behaviour = $spec->createBehaviour();
+                    $this->behaviourManager->apply($node->id, $behaviour);
+                }
+
+                $this->behaviourManager->save();
+            }
         }
 
         $element->refreshNode($node);
 
-        $this->reindex();
-        $this->leftPaneUi->refreshObjectTreeList($this->getNodeId($node));
+        if (!$isClone) {
+            $this->reindex();
+            $this->leftPaneUi->refreshObjectTreeList($this->getNodeId($node));
+        }
 
         return $node;
     }
@@ -1228,7 +1493,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             $node = $this->createElement($selected, $selectionRectangle->x, $selectionRectangle->y, null, !$e->controlDown);
 
-            if (!$e->controlDown) {
+            if (!$e->controlDown && !($selected instanceof ObjectListEditorItem)) {
                 $this->elementTypePane->clearSelected();
             }
 
@@ -1241,6 +1506,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         } else {
             $this->updateProperties($this);
         }
+
+        uiLater(function () {
+            $this->layout->requestFocus();
+        });
     }
 
     public function addUseImports(array $imports)
@@ -1280,6 +1549,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function _onNodeClick(UXMouseEvent $e)
     {
+        $node = $e->target;
+        if ($node && $node->data('-factory-id')) {
+            return false;
+        }
+
         $selected = $this->elementTypePane->getSelected();
 
         $this->layout->requestFocus();
@@ -1290,7 +1564,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             if ($element) {
                 $node = $this->createElement($selected, $e->screenX, $e->screenY, $element->isLayout() ? $e->sender : null, !$e->controlDown);
 
-                if (!$e->controlDown) {
+                if (!$e->controlDown && !($selected instanceof ObjectListEditorItem)) {
                     $this->elementTypePane->clearSelected();
                 }
 
@@ -1370,6 +1644,15 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->behaviourPane = new IdeBehaviourPane($this->behaviourManager);
         $ui->addBehaviourPane($this->behaviourPane);
 
+        $ui->on('change', function ($targetId) {
+            $node = $this->layout->lookup("#$targetId");
+
+            if ($node instanceof UXNode) {
+                $node->data('-factory-version', $version = $node->data('-factory-version') + 1);
+                Logger::debug("Change object factory version '$targetId', set version = $version");
+            }
+        });
+
         return $ui;
     }
 
@@ -1383,25 +1666,50 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function updateProperties($node)
     {
-        if ($this->eventManager) {
-            $this->eventManager->load();
+        if ($node instanceof UXNode) {
+            $factoryId = $node->data('-factory-id');
+        } else {
+            $factoryId = null;
         }
 
-        $element = $this->format->getFormElement($node);
-        $properties = $element ? static::fetchElementProperties($element) : null;
+        if ($factoryId) {
+            $this->leftPaneUi->hideBehaviourPane();
+            $this->leftPaneUi->hideEventListPane();
 
-        if ($this->propertiesPane) {
-            $this->propertiesPane->clearProperties();
-        }
+            $properties = new UXDesignProperties();
 
-        $this->trigger('updateNode:before', [$node, $properties]);
+            if ($this->propertiesPane) {
+                $this->propertiesPane->clearProperties();
+            }
 
-        if ($this->propertiesPane) {
-            $this->propertiesPane->addProperties($properties);
-        }
+            $this->trigger('updateNode:before', [$node, $properties]);
 
-        if ($this->eventListPane) {
-            $this->eventListPane->setEventTypes($element ? $element->getEventTypes() : []);
+            if ($this->propertiesPane) {
+                $this->propertiesPane->addProperties($properties);
+            }
+        } else {
+            $this->leftPaneUi->showEventListPane();
+            $this->leftPaneUi->showBehaviourPane();
+            if ($this->eventManager) {
+                $this->eventManager->load();
+            }
+
+            $element = $this->format->getFormElement($node);
+            $properties = $element ? static::fetchElementProperties($element) : null;
+
+            if ($this->propertiesPane) {
+                $this->propertiesPane->clearProperties();
+            }
+
+            $this->trigger('updateNode:before', [$node, $properties]);
+
+            if ($this->propertiesPane) {
+                $this->propertiesPane->addProperties($properties);
+            }
+
+            if ($this->eventListPane) {
+                $this->eventListPane->setEventTypes($element ? $element->getEventTypes() : []);
+            }
         }
 
         $this->trigger('updateNode:after', [$node, $properties]);

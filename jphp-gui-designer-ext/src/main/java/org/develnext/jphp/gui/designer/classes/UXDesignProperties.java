@@ -19,10 +19,13 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.develnext.jphp.ext.javafx.classes.UXTableCell;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Namespace;
+import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
+import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseObject;
 import php.runtime.memory.ObjectMemory;
 import php.runtime.memory.TrueMemory;
@@ -40,6 +43,7 @@ public class UXDesignProperties extends BaseObject {
 
     protected Map<String, TitledPane> groups = new LinkedHashMap<>();
     protected Map<String, ObservableList<PropertyValue>> properties = new LinkedHashMap<>();
+    protected Invoker onChangeHandler;
 
     public UXDesignProperties(Environment env, ClassEntity clazz) {
         super(env, clazz);
@@ -128,6 +132,18 @@ public class UXDesignProperties extends BaseObject {
         PropertyTableView content = (PropertyTableView) pane.getContent();
 
         content.getItems().add(value);
+    }
+
+    @Signature
+    public void onChange(@Nullable Invoker invoker) {
+        this.onChangeHandler = invoker;
+    }
+
+    @Signature
+    public void triggerChange() {
+        if (onChangeHandler != null) {
+            onChangeHandler.callAny();
+        }
     }
 
     public class PropertyValue {

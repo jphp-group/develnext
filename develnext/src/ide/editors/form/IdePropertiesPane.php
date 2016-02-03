@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\form;
 
+use ide\misc\EventHandlerBehaviour;
 use php\gui\designer\UXDesignProperties;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXVBox;
@@ -8,6 +9,8 @@ use php\gui\UXNode;
 
 class IdePropertiesPane
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var UXVBox
      */
@@ -58,6 +61,10 @@ class IdePropertiesPane
         $this->clearProperties();
 
         if ($properties) {
+            $properties->onChange(function () {
+                $this->trigger('change');
+            });
+
             $this->addProperties($properties);
         }
     }
@@ -66,6 +73,10 @@ class IdePropertiesPane
     {
         if ($properties) {
             $this->properties[] = $properties;
+
+            $properties->onChange(function () {
+                $this->trigger('change');
+            });
 
             $this->ui->children->addAll($properties->getGroupPanes());
         }

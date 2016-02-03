@@ -327,7 +327,18 @@ class Project
     public function setIdeConfig($name, Configuration $configuration)
     {
         Logger::info("Save ide config ($name) of project ...");
-        $configuration->save($this->getIdeDir() . "/$name");
+
+        $file = $this->getIdeFile("$name");
+
+        if ($file->isDirectory()) {
+            $file->delete();
+        }
+
+        if ($file->getParentFile()) {
+            $file->getParentFile()->mkdirs();
+        }
+
+        $configuration->save($file);
     }
 
     /**
@@ -554,6 +565,15 @@ class Project
         $this->tree->clear();
 
         $this->trigger(__FUNCTION__);
+    }
+
+    public function saveIdeConfig($name)
+    {
+        $config = $this->ideConfigs[$name];
+
+        if ($config) {
+            $this->setIdeConfig($name, $config);
+        }
     }
 
     /**

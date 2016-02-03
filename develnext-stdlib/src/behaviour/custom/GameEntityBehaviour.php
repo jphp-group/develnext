@@ -11,6 +11,7 @@ use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\event\CollisionEventAdapter;
 use php\gui\UXNode;
 use php\lang\IllegalStateException;
+use php\lib\str;
 use script\TimerScript;
 
 class GameEntityBehaviour extends AbstractBehaviour
@@ -90,7 +91,7 @@ class GameEntityBehaviour extends AbstractBehaviour
 
                 if ($collisionHandlers) {
                     foreach ($collisionHandlers as $entityType => $handler) {
-                        $this->setCollisionHandler($entityType, $handler);
+                        $this->setCollisionHandler($entityType, $handler, null);
                     }
 
                     $target->data(CollisionEventAdapter::class, null);
@@ -206,10 +207,12 @@ class GameEntityBehaviour extends AbstractBehaviour
        // $this->entity->setRectangleFixture(32, 32);
     }
 
-    public function setCollisionHandler($entityType, callable $handler)
+    public function setCollisionHandler($entityType, callable $handler, $factoryName)
     {
-        if ($this->factoryName) {
-            $entityType = "{$this->factoryName}.$entityType";
+        $factoryName = $factoryName ?: $this->factoryName;
+
+        if ($factoryName && !str::contains($entityType, '.')) {
+            $entityType = "{$factoryName}.$entityType";
         }
 
         $this->entity->setCollisionHandler($entityType, function (UXCollisionEvent $e) use ($handler) {

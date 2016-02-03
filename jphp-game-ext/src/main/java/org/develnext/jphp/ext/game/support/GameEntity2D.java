@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.contact.ContactConstraint;
 import org.dyn4j.geometry.*;
+import php.runtime.common.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;

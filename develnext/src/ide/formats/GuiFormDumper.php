@@ -5,12 +5,14 @@ use Exception;
 use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
+use ide\formats\form\tags\CloneFormElementTag;
 use ide\Ide;
 use ide\Logger;
 use php\gui\designer\UXDesigner;
 use php\gui\framework\DataUtils;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXPane;
+use php\gui\UXCustomNode;
 use php\gui\UXData;
 use php\gui\UXDialog;
 use php\gui\UXLoader;
@@ -152,47 +154,54 @@ class GuiFormDumper extends AbstractFormDumper
     public function createElementTag(UXNode $node, DomDocument $document, $ignoreUnregistered = true)
     {
         if ($ignoreUnregistered && $this->designer
-            && (!$this->designer->isRegisteredNode($node) && !($node instanceof UXData))) {
+            && (!$this->designer->isRegisteredNode($node) && !($node instanceof UXData) && !($node instanceof UXCustomNode))) {
             return null;
         }
 
-        $class = new ReflectionClass($node);
+        $factoryId = $node->data('-factory-id');
 
-        do {
-            $tag = $this->formElementTags[$class->getName()];
+        if ($factoryId || $node instanceof UXCustomNode) {
+            $oTag = new CloneFormElementTag();
+            $element = $document->createElement($oTag->getTagName());
+        } else {
+            $class = new ReflectionClass($node);
 
-            if ($tag != null) {
-                break;
-            }
+            do {
+                $tag = $this->formElementTags[$class->getName()];
 
-            $class = $class->getParentClass();
+                if ($tag != null) {
+                    break;
+                }
 
-            if ($class == null) {
-                break;
-            }
-        } while ($tag == null);
-
-        if ($tag == null || $tag->isAbstract()) {
-            return null;
-        }
-
-        $element = $document->createElement($tag->getTagName());
-
-        $oTag = $tag;
-
-        if (!$tag->isFinal()) {
-            while ($class != null) {
                 $class = $class->getParentClass();
 
-                if ($class != null) {
-                    $tag = $this->formElementTags[$class->getName()];
+                if ($class == null) {
+                    break;
+                }
+            } while ($tag == null);
 
-                    if ($tag != null) {
-                        $tag->writeAttributes($node, $element);
-                        $tag->writeContent($node, $element, $document, $this);
+            if ($tag == null || $tag->isAbstract()) {
+                return null;
+            }
 
-                        if ($tag->isFinal()) {
-                            break;
+            $element = $document->createElement($tag->getTagName());
+
+            $oTag = $tag;
+
+            if (!$tag->isFinal()) {
+                while ($class != null) {
+                    $class = $class->getParentClass();
+
+                    if ($class != null) {
+                        $tag = $this->formElementTags[$class->getName()];
+
+                        if ($tag != null) {
+                            $tag->writeAttributes($node, $element);
+                            $tag->writeContent($node, $element, $document, $this);
+
+                            if ($tag->isFinal()) {
+                                break;
+                            }
                         }
                     }
                 }

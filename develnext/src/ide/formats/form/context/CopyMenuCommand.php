@@ -7,6 +7,7 @@ use ide\editors\menu\AbstractMenuCommand;
 use ide\Ide;
 use php\gui\framework\DataUtils;
 use php\gui\UXClipboard;
+use php\gui\UXNode;
 use php\xml\XmlProcessor;
 
 /**
@@ -43,12 +44,14 @@ class CopyMenuCommand extends AbstractMenuCommand
             foreach ($nodes as $node) {
                 $need = true;
 
-                foreach ($nodes as $one) {
-                    if ($one === $node) continue;
+                if ($node->id) {
+                    foreach ($nodes as $one) {
+                        if ($one === $node) continue;
 
-                    if ($one->lookup("#$node->id")) {
-                        $need = false;
-                        break;
+                        if ($one->lookup("#$node->id")) {
+                            $need = false;
+                            break;
+                        }
                     }
                 }
 
@@ -71,11 +74,17 @@ class CopyMenuCommand extends AbstractMenuCommand
             $targetIds = [];
 
             foreach ($nodes as $node) {
-                $targetIds[] = $editor->getNodeId($node);
+                $id = $editor->getNodeId($node);
+
+                if ($id) {
+                    $targetIds[] = $id;
+                }
             }
 
-            $behaviourElement = $editor->getBehaviourManager()->dump($document, $targetIds);
-            $rootElement->appendChild($behaviourElement);
+            if ($targetIds) {
+                $behaviourElement = $editor->getBehaviourManager()->dump($document, $targetIds);
+                $rootElement->appendChild($behaviourElement);
+            }
 
             if ($disableCount) {
                 $rootElement->setAttribute('count', -1);
@@ -94,6 +103,11 @@ class CopyMenuCommand extends AbstractMenuCommand
 
                 if ($nodeElement != null) {
                     $wrapElement = $document->createElement('node');
+
+                    if ($node instanceof UXNode && $node->data('-factory-id')) {
+                        $wrapElement->setAttribute('factoryId', $node->data('-factory-id'));
+                    }
+
                     $wrapElement->appendChild($nodeElement);
 
                     $wrapElement->setAttributes(DataUtils::get($node)->toArray());

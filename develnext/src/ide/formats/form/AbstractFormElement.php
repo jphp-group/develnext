@@ -53,6 +53,11 @@ abstract class AbstractFormElement
         return (new \ReflectionClass($this))->getShortName() . "%s";
     }
 
+    public function canBePrototype()
+    {
+        return !$this->isLayout();
+    }
+
     abstract public function isOrigin($any);
 
     /**

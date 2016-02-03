@@ -31,6 +31,7 @@ abstract class LabeledFormElement extends AbstractFormElement
 
         /** @var UXLabeled $node */
         $data = DataUtils::get($node);
+
         $image = $data->get('graphic');
 
         if ($image) {

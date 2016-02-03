@@ -12,6 +12,7 @@ use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\DataUtils;
 use php\gui\framework\Timer;
 use php\gui\UXClipboard;
+use php\gui\UXCustomNode;
 use php\gui\UXDialog;
 use php\gui\UXLoader;
 use php\gui\UXNode;
@@ -87,8 +88,31 @@ class PasteMenuCommand extends AbstractMenuCommand
                 foreach ($nodes as $one) {
                     $element = $one->find("./*");
 
-                    $loader = new UXLoader();
-                    $uiNode = $loader->load($this->makeXmlForLoader($element, $imports));
+                    $uiNode = null;
+                    $targetId = null;
+
+                    if ($factoryId = $one->getAttribute('factoryId')) {
+                        $uiNode = $editor->createClone($factoryId);
+
+                        if ($uiNode) {
+                            $loader = new UXLoader();
+                            $customNode = $loader->load($this->makeXmlForLoader($element, $imports));
+
+                            if ($customNode instanceof UXCustomNode) {
+                                $uiNode->x = $customNode->get('x');
+                                $uiNode->y = $customNode->get('y');
+                            }
+                        } else {
+                            continue;
+                        }
+                    }
+
+                    if ($uiNode == null) {
+                        $loader = new UXLoader();
+                        $uiNode = $loader->load($this->makeXmlForLoader($element, $imports));
+
+                        $targetId = $editor->getNodeId($uiNode);
+                    }
 
                     $type = $editor->getFormat()->getFormElement($uiNode);
 
@@ -96,15 +120,14 @@ class PasteMenuCommand extends AbstractMenuCommand
                         continue;
                     }
 
-                    $targetId = $editor->getNodeId($uiNode);
+                    $offsetX = $editor->getDesigner()->snapSizeX * ($count + 1);
+                    $offsetY = $editor->getDesigner()->snapSizeY * ($count + 1);
 
-                    $offset = $editor->getDesigner()->snapSize * ($count + 1);
-
-                    $uiNode->x += $offset;
-                    $uiNode->y += $offset;
+                    $uiNode->x += $offsetX;
+                    $uiNode->y += $offsetY;
 
                     if ($selectedType && $selectedType->isLayout()) {
-                        $selectedType->addToLayout($selectedNode, $uiNode, $selectedNode->screenX + $offset, $selectedNode->screenY + $offset);
+                        $selectedType->addToLayout($selectedNode, $uiNode, $selectedNode->screenX + $offsetX, $selectedNode->screenY + $offsetY);
                     } else {
                         $editor->getLayout()->add($uiNode);
                     }
@@ -126,7 +149,7 @@ class PasteMenuCommand extends AbstractMenuCommand
                         $editor->getDesigner()->selectNode($uiNode);
                     });
 
-                    if ($behaviours) {
+                    if ($behaviours && $targetId) {
                         BehaviourLoader::loadOne($targetId, $behaviours, $editor->getBehaviourManager(), $editor->getNodeId($uiNode));
                     }
                 }

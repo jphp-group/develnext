@@ -53,7 +53,8 @@ public class UXDesigner extends BaseObject {
     private Point2D startPoint;
 
     protected SnapType snapType = SnapType.DOTS;
-    protected int snapSize = 8;
+    protected int snapSizeX = 8;
+    protected int snapSizeY = 8;
     protected boolean snapEnabled = true;
     protected boolean helpersEnabled = true;
     protected boolean selectionEnabled = true;
@@ -96,7 +97,7 @@ public class UXDesigner extends BaseObject {
             area.getChildren().removeAll(dots);
         }
 
-        if (snapSize > 2) {
+        if (snapSizeX > 2 && snapSizeY > 2) {
             dots = new Canvas(area.getWidth(), area.getHeight());
             dots.setMouseTransparent(true);
             dots.setBlendMode(BlendMode.DIFFERENCE);
@@ -110,18 +111,18 @@ public class UXDesigner extends BaseObject {
             context2D.setLineDashes(2, 2);
 
             if (snapType == SnapType.DOTS) {
-                for (int i = 0; i < (w / snapSize) + 1; i++) {
-                    for (int j = 0; j < (h / snapSize) + 1; j++) {
-                        context2D.fillRect(i * snapSize, j * snapSize, 1, 1);
+                for (int i = 0; i < (w / snapSizeX) + 1; i++) {
+                    for (int j = 0; j < (h / snapSizeY) + 1; j++) {
+                        context2D.fillRect(i * snapSizeX, j * snapSizeY, 1, 1);
                     }
                 }
             } else {
-                for (int i = 0; i < (w / snapSize) + 1; i++) {
-                    context2D.fillRect(i * snapSize, 0, 1, h);
+                for (int i = 0; i < (w / snapSizeX) + 1; i++) {
+                    context2D.fillRect(i * snapSizeX, 0, 1, h);
                 }
 
-                for (int i = 0; i < (h / snapSize) + 1; i++) {
-                    context2D.fillRect(0, i * snapSize, w, 1);
+                for (int i = 0; i < (h / snapSizeY) + 1; i++) {
+                    context2D.fillRect(0, i * snapSizeY, w, 1);
                 }
             }
 
@@ -341,13 +342,24 @@ public class UXDesigner extends BaseObject {
     }
 
     @Getter
-    protected int getSnapSize() {
-        return snapSize;
+    protected int getSnapSizeX() {
+        return snapSizeX;
     }
 
     @Setter
-    protected void setSnapSize(int size) {
-        snapSize = size;
+    protected void setSnapSizeX(int size) {
+        snapSizeX = size;
+        updateHelpers();
+    }
+
+    @Getter
+    protected int getSnapSizeY() {
+        return snapSizeY;
+    }
+
+    @Setter
+    protected void setSnapSizeY(int size) {
+        snapSizeY = size;
         updateHelpers();
     }
 
@@ -740,6 +752,17 @@ public class UXDesigner extends BaseObject {
     }
 
     @Signature
+    public boolean isSelectedNode(Node node) {
+        if (!nodes.containsKey(node)) {
+            throw new RuntimeException("Node is not registered");
+        }
+
+        Selection selection = selections.get(node);
+
+        return selection != null;
+    }
+
+    @Signature
     public void selectNode(Node node, MouseEvent e) {
         if (!nodes.containsKey(node)) {
             throw new RuntimeException("Node is not registered");
@@ -763,6 +786,7 @@ public class UXDesigner extends BaseObject {
 
         if (item != null) {
             selection.setLocked(item.isLocked());
+            selection.setDots(item.isSimpled());
         }
     }
 
@@ -808,9 +832,29 @@ public class UXDesigner extends BaseObject {
     }
 
     @Signature
+    public void setNodeSimple(Node node, boolean value) {
+        if (nodes.containsKey(node)) {
+            nodes.get(node).setSimpled(value);
+
+            if (selections.containsKey(node)) {
+                selections.get(node).setDots(value);
+            }
+        }
+    }
+
+    @Signature
     public boolean getNodeLock(Node node) {
         if (nodes.containsKey(node)) {
             return nodes.get(node).isLocked();
+        }
+
+        return false;
+    }
+
+    @Signature
+    public boolean getNodeSimple(Node node) {
+        if (nodes.containsKey(node)) {
+            return nodes.get(node).isSimpled();
         }
 
         return false;
@@ -879,9 +923,9 @@ public class UXDesigner extends BaseObject {
                         double x = sel.node.getLayoutX() + dx;
                         double y = sel.node.getLayoutY() + dy;
 
-                        if (!e.isAltDown() && snapSize > 1 && snapEnabled) {
-                            x = Math.round((x / snapSize)) * snapSize;
-                            y = Math.round((y / snapSize)) * snapSize;
+                        if (!e.isAltDown() && snapSizeX > 1 && snapSizeY > 1 && snapEnabled) {
+                            x = Math.round((x / snapSizeX)) * snapSizeX;
+                            y = Math.round((y / snapSizeY)) * snapSizeY;
                         }
 
                         sel.drag(x, y);
@@ -1014,6 +1058,7 @@ public class UXDesigner extends BaseObject {
         public final Node node;
 
         protected boolean locked = false;
+        protected boolean simpled = false;
 
         public Item(Node node) {
             this.node = node;
@@ -1026,15 +1071,23 @@ public class UXDesigner extends BaseObject {
         public void setLocked(boolean locked) {
             this.locked = locked;
         }
+
+        public boolean isSimpled() {
+            return simpled;
+        }
+
+        public void setSimpled(boolean simpled) {
+            this.simpled = simpled;
+        }
     }
 
     public class Selection {
         public static final int POINT_SIZE = 6;
-        public static final int POINT_SIZE_HALF = POINT_SIZE / 2;
 
         public final ImageView dragImageView = new ImageView();
 
         protected boolean locked = false;
+        protected boolean dots = false;
 
         protected Rectangle ltPoint;
         protected Rectangle tPoint;
@@ -1126,6 +1179,11 @@ public class UXDesigner extends BaseObject {
 
         public void setLocked(boolean locked) {
             this.locked = locked;
+            rebuildHelpers();
+        }
+
+        public void setDots(boolean dots) {
+            this.dots = dots;
             rebuildHelpers();
         }
 
@@ -1231,12 +1289,20 @@ public class UXDesigner extends BaseObject {
         }
 
         public Rectangle buildPoint() {
+            int pointSize = POINT_SIZE;
+
+            if (dots) {
+                pointSize = POINT_SIZE - 1;
+            }
+
             Rectangle rectangle = new Rectangle(
-                    POINT_SIZE, POINT_SIZE,
-                    Paint.valueOf(locked ? "gray" : "black")
+                    pointSize, pointSize,
+                    Paint.valueOf(locked ? "gray" : (dots ? "blue" : "black"))
             );
 
-            //rectangle.setBlendMode(BlendMode.DIFFERENCE);
+            if (dots) {
+                rectangle.setMouseTransparent(true);
+            }
 
             return rectangle;
         }
@@ -1258,12 +1324,20 @@ public class UXDesigner extends BaseObject {
             return node.hashCode();
         }
 
-        protected int normalize(int value, MouseEvent e) {
-            if (e.isAltDown() || snapSize == 1 || !snapEnabled) {
+        protected int normalizeX(int value, MouseEvent e) {
+            if (e.isAltDown() || snapSizeX == 1 || !snapEnabled) {
                 return value;
             }
 
-            return value - (value % snapSize);
+            return value - (value % snapSizeX);
+        }
+
+        protected int normalizeY(int value, MouseEvent e) {
+            if (e.isAltDown() || snapSizeY == 1 || !snapEnabled) {
+                return value;
+            }
+
+            return value - (value % snapSizeY);
         }
 
         protected void bindEvents() {
@@ -1371,8 +1445,8 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize((int) (nodeW + (localPoint.getX() - startX)), e);
-                    resizeH = normalize((int) (nodeH + (localPoint.getY() - startY)), e);
+                    resizeW = normalizeX((int) (nodeW + (localPoint.getX() - startX)), e);
+                    resizeH = normalizeY((int) (nodeH + (localPoint.getY() - startY)), e);
 
                     updateResized();
                     e.consume();
@@ -1384,7 +1458,7 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize((int) (nodeW + (localPoint.getX() - startX)), e);
+                    resizeW = normalizeX((int) (nodeW + (localPoint.getX() - startX)), e);
 
                     updateResized();
                     e.consume();
@@ -1396,7 +1470,7 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeH = normalize((int) (nodeH + (localPoint.getY() - startY)), e);
+                    resizeH = normalizeY((int) (nodeH + (localPoint.getY() - startY)), e);
 
                     updateResized();
                     e.consume();
@@ -1408,8 +1482,8 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeH = normalize(startH + (int) (startY - localPoint.getY()), e);
-                    resizeY = normalize((int) (node.getLayoutY() - (resizeH - startH)), e);
+                    resizeH = normalizeY(startH + (int) (startY - localPoint.getY()), e);
+                    resizeY = normalizeY((int) (node.getLayoutY() - (resizeH - startH)), e);
 
                     updateResized();
                     e.consume();
@@ -1421,8 +1495,8 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize(startW + (int) (startX - localPoint.getX()), e);
-                    resizeX = normalize((int) (node.getLayoutX() - (resizeW - startW)), e);
+                    resizeW = normalizeX(startW + (int) (startX - localPoint.getX()), e);
+                    resizeX = normalizeX((int) (node.getLayoutX() - (resizeW - startW)), e);
 
                     updateResized();
 
@@ -1435,10 +1509,10 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize((int) (nodeW + (localPoint.getX() - startX)), e);
+                    resizeW = normalizeX((int) (nodeW + (localPoint.getX() - startX)), e);
 
-                    resizeH = normalize(startH + (int) (startY - localPoint.getY()), e);
-                    resizeY = normalize((int) (node.getLayoutY() - (resizeH - startH)), e);
+                    resizeH = normalizeY(startH + (int) (startY - localPoint.getY()), e);
+                    resizeY = normalizeY((int) (node.getLayoutY() - (resizeH - startH)), e);
 
                     updateResized();
 
@@ -1451,11 +1525,11 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize(startW + (int) (startX - localPoint.getX()), e);
-                    resizeX = normalize((int) (node.getLayoutX() - (resizeW - startW)), e);
+                    resizeW = normalizeX(startW + (int) (startX - localPoint.getX()), e);
+                    resizeX = normalizeX((int) (node.getLayoutX() - (resizeW - startW)), e);
 
-                    resizeH = normalize(startH + (int) (startY - localPoint.getY()), e);
-                    resizeY = normalize((int) (node.getLayoutY() - (resizeH - startH)), e);
+                    resizeH = normalizeY(startH + (int) (startY - localPoint.getY()), e);
+                    resizeY = normalizeY((int) (node.getLayoutY() - (resizeH - startH)), e);
 
                     updateResized();
 
@@ -1468,10 +1542,10 @@ public class UXDesigner extends BaseObject {
                 public void handle(MouseEvent e) {
                     Point2D localPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
-                    resizeW = normalize(startW + (int) (startX - localPoint.getX()), e);
-                    resizeX = normalize((int) (node.getLayoutX() - (resizeW - startW)), e);
+                    resizeW = normalizeX(startW + (int) (startX - localPoint.getX()), e);
+                    resizeX = normalizeX((int) (node.getLayoutX() - (resizeW - startW)), e);
 
-                    resizeH = normalize((int) (nodeH + (localPoint.getY() - startY)), e);
+                    resizeH = normalizeY((int) (nodeH + (localPoint.getY() - startY)), e);
 
                     updateResized();
 
