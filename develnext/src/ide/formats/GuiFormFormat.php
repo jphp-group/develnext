@@ -86,6 +86,7 @@ use ide\formats\form\tags\ToggleButtonFormElementTag;
 use ide\formats\form\tags\WebViewFormElementTag;
 use ide\forms\SetMainFormForm;
 use ide\Ide;
+use ide\Logger;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\FileSystem;
 use ide\systems\RefactorSystem;
@@ -272,7 +273,27 @@ class GuiFormFormat extends AbstractFormFormat
             $editor = FileSystem::getSelectedEditor();
 
             if ($editor instanceof FormEditor) {
-                return $editor->changeNodeId($target, $newId);
+                $oldId = $editor->getNodeId($target);
+                $result = $editor->changeNodeId($target, $newId);
+
+                if ($result == '') {
+                    $gui = GuiFrameworkProjectBehaviour::get();
+
+                    if ($gui) {
+                        foreach ($gui->getFormEditors() as $it) {
+                            if ($editor === $it) {
+                                continue;
+                            }
+
+                            $factoryName = $editor->getTitle();
+
+                            if ($count = $it->updateClonesForNewType("$factoryName.$oldId", "$factoryName.$newId")) {
+                                Logger::debug("Rename prototypes in '$factoryName', count = $count");
+                                $it->save();
+                            }
+                        }
+                    }
+                }
             }
         });
     }

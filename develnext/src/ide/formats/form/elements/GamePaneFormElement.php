@@ -11,6 +11,7 @@ use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
+use ide\ui\Notifications;
 use php\game\UXGamePane;
 use php\gui\designer\UXDesignProperties;
 use php\gui\designer\UXDesignPropertyEditor;
@@ -45,7 +46,6 @@ class GamePaneFormElement extends AbstractFormElement
         return "game%s";
     }
 
-
     public function isLayout()
     {
         return true;
@@ -53,6 +53,9 @@ class GamePaneFormElement extends AbstractFormElement
 
     public function addToLayout($self, $node, $screenX, $screenY)
     {
+        Notifications::show('Извините, но...', 'В игоровую комнату теперь можно загружать только сцены из других форм!', 'WARNING');
+
+        return;
         /** @var UXScrollPane $self */
         $content = $self->content;
 
@@ -73,6 +76,11 @@ class GamePaneFormElement extends AbstractFormElement
         }
 
         return $result;
+    }
+
+    public function canBePrototype()
+    {
+        return false;
     }
 
     /**

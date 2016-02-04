@@ -14,12 +14,15 @@ use ide\commands\CreateGameSceneProjectCommand;
 use ide\commands\CreateGameSpriteProjectCommand;
 use ide\commands\CreateScriptModuleProjectCommand;
 use ide\commands\ExecuteProjectCommand;
+use ide\editors\AbstractEditor;
 use ide\editors\common\FormListEditor;
+use ide\editors\common\ObjectListEditorItem;
 use ide\editors\FactoryEditor;
 use ide\editors\FormEditor;
 use ide\editors\ProjectEditor;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\factory\FactoryProjectTreeNavigation;
+use ide\formats\form\AbstractFormElement;
 use ide\formats\form\FormProjectTreeNavigation;
 use ide\formats\module\ModuleProjectTreeNavigation;
 use ide\formats\ScriptFormat;
@@ -763,6 +766,62 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         Logger::info("Finish creating form '$name'");
 
         return $form;
+    }
+
+    /**
+     * @param AbstractEditor|null $contextEditor
+     * @return array
+     */
+    public function getAllPrototypes(AbstractEditor $contextEditor = null)
+    {
+        $elements = [];
+
+        foreach ($this->getFormEditors() as $editor) {
+            if ($contextEditor && FileUtils::hashName($contextEditor->getFile()) == FileUtils::hashName($editor->getFile())) {
+                continue;
+            }
+
+            foreach ($editor->getObjectList() as $it) {
+                if ($it->element && $it->element->canBePrototype()) {
+                    $it->group = $editor->getTitle();
+                    $it->value = "{$it->getGroup()}.{$it->value}";
+                    $elements[] = $it;
+                }
+            }
+        }
+
+        return $elements;
+    }
+
+    public function getObjectListOfForm($formName)
+    {
+        $result = [];
+        $project = $this->project;
+
+        $index = $project->getIndexer()->get($this->project->getFile("src/.forms/$formName.fxml"), '_objects');
+
+        foreach ((array) $index as $it) {
+            /** @var AbstractFormElement $element */
+            $element = class_exists($it['type']) ? new $it['type']() : null;
+
+            $result[] = $item = new ObjectListEditorItem(
+                $it['id'], null
+            );
+
+            $item->hint = $element ? $element->getName() : '';
+            $item->element = $element;
+            $item->version = (int) $it['version'];
+
+            if ($element) {
+                if ($graphic = $element->getCustomPreviewImage((array) $it['data'])) {
+                    $item->graphic = $graphic;
+                } else {
+                    $item->graphic = $element->getIcon();
+                }
+            }
+        }
+
+        return $result;
     }
 
     protected function _recoverDirectories()

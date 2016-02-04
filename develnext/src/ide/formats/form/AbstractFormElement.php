@@ -71,6 +71,27 @@ abstract class AbstractFormElement
     abstract public function createElement();
 
     /**
+     * Get data to index element.
+     * @param UXNode $node
+     * @return array
+     */
+    public function getIndexData(UXNode $node)
+    {
+        return [];
+    }
+
+
+    /**
+     * Get preview image of element from index data.
+     * @param array $indexData
+     * @return null|UXImage
+     */
+    public function getCustomPreviewImage(array $indexData)
+    {
+        return null;
+    }
+
+    /**
      * @return AbstractBehaviourSpec[]
      */
     public function getInitialBehaviours()

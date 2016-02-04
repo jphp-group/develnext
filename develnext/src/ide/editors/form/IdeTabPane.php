@@ -256,7 +256,9 @@ class IdeTabPane
         $this->propertiesPane = $pane;
 
         $handler = function () {
-            $this->trigger('change', [$this->eventListPane->getTargetId()]);
+            if ($this->eventListPane) {
+                $this->trigger('change', [$this->eventListPane->getTargetId()]);
+            }
         };
 
         $pane->on('change', $handler, __CLASS__);

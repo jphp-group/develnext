@@ -249,6 +249,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
      */
     protected $prototypeTypePane;
 
+    /**
+     * @var bool
+     */
+    protected $loaded = false;
+
     public function __construct($file, AbstractFormDumper $dumper)
     {
         parent::__construct($file);
@@ -434,6 +439,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $this->trigger('load:before');
 
+        $this->loaded = true;
+
         if ($this->factory) {
             $this->factory->reload();
         }
@@ -515,93 +522,133 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $clone = $this->factory->create($id);
-        $clone->id = "";
-        $clone->data('-factory-version', $this->getObjectVersion($id));
+
+        if ($clone) {
+            $clone->id = "";
+            $clone->data('-factory-version', $this->getObjectVersion($id));
+        }
 
         return $clone;
     }
 
-    public function reloadClones()
+    public function updateClonesForNewType($oldType, $newType)
     {
-        $this->factory->reload();
+        $count = 0;
 
-        $gui = GuiFrameworkProjectBehaviour::get();
+        Logger::info("UpdateClonesForNewType '$oldType' to '$newType' ...");
 
-        $freeNodes = new SharedStack();
+        if (!$this->loaded) {
+            $this->formDumper->load($this);
+        }
 
-        DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node) use ($gui, $freeNodes) {
+        DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node) use ($oldType, $newType, &$count) {
             if ($node instanceof UXCustomNode) {
-                $freeNodes->push($node);
+                if ($node->get('type') == $oldType) {
+                    $node->set('type', $newType);
+                    $count++;
+                }
             } else {
                 $factoryId = $node->data('-factory-id');
 
-                if ($factoryId) {
-                    $freeNodes->push($node);
+                if ($factoryId && $factoryId == $oldType) {
+                    $node->data('-factory-id', $newType);
+                    $count++;
                 }
             }
         });
 
-        foreach ($freeNodes as $node) {
-            if ($node instanceof UXCustomNode) {
-                $type = $node->get('type');
-                list($factoryName, $factoryId) = str::split($type, '.');
+        if ($count > 0) {
+            $this->formDumper->save($this);
+        }
 
-                $formEditor = $gui->getFormEditor($factoryName);
+        return $count;
+    }
 
-                if ($formEditor) {
-                    $clone = $formEditor->createClone($factoryId);
+    public function reloadClones()
+    {
+        if ($this->factory) {
+            $this->factory->reload();
+        }
 
-                    if ($clone) {
-                        $clone->x = $node->get('x');
-                        $clone->y = $node->get('y');
+        $gui = GuiFrameworkProjectBehaviour::get();
 
-                        $this->designer->unregisterNode($node);
-                        $node->parent->add($clone);
+        if ($gui) {
+            $freeNodes = new SharedStack();
 
-                        $this->registerNode($clone);
-                        $this->refreshNode($clone);
+            DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node) use ($gui, $freeNodes) {
+                if ($node instanceof UXCustomNode) {
+                    $freeNodes->push($node);
+                } else {
+                    $factoryId = $node->data('-factory-id');
+
+                    if ($factoryId) {
+                        $freeNodes->push($node);
                     }
                 }
-            } elseif ($node instanceof UXNode) {
-                $factoryId = $node->data('-factory-id');
+            });
 
-                if ($factoryId) {
-                    list($factoryName, $factoryId) = str::split($factoryId, '.');
+            foreach ($freeNodes as $node) {
+                if ($node instanceof UXCustomNode) {
+                    $type = $node->get('type');
+                    list($factoryName, $factoryId) = str::split($type, '.');
 
                     $formEditor = $gui->getFormEditor($factoryName);
 
                     if ($formEditor) {
-                        $factoryVersion = $node->data('-factory-version');
-
-                        if ($formEditor->getObjectVersion($factoryId) == $factoryVersion) {
-                            continue;
-                        }
-
                         $clone = $formEditor->createClone($factoryId);
 
                         if ($clone) {
-                            $clone->position = $node->position;
-
-                            if ($this->designer->isSelectedNode($node)) {
-                                $this->designer->unselectNode($node);
-
-                                uiLater(function () use ($clone) {
-                                    $this->designer->selectNode($clone);
-                                });
-                            }
+                            $clone->x = $node->get('x');
+                            $clone->y = $node->get('y');
 
                             $this->designer->unregisterNode($node);
-
                             $node->parent->add($clone);
 
                             $this->registerNode($clone);
                             $this->refreshNode($clone);
                         }
                     }
-                }
-            }
+                } elseif ($node instanceof UXNode) {
+                    $factoryId = $node->data('-factory-id');
 
-            $node->free();
+                    if ($factoryId) {
+                        list($factoryName, $factoryId) = str::split($factoryId, '.');
+
+                        $formEditor = $gui->getFormEditor($factoryName);
+
+                        if ($formEditor) {
+                            $factoryVersion = $node->data('-factory-version');
+
+                            if ($formEditor->getObjectVersion($factoryId) == $factoryVersion) {
+                                continue;
+                            }
+
+                            $clone = $formEditor->createClone($factoryId);
+
+                            if ($clone) {
+                                $clone->position = $node->position;
+
+                                if ($this->designer->isSelectedNode($node)) {
+                                    $this->designer->unselectNode($node);
+
+                                    uiLater(function () use ($clone) {
+                                        $this->designer->selectNode($clone);
+                                    });
+                                }
+
+                                $this->designer->unregisterNode($node);
+
+                                $node->parent->add($clone);
+
+                                $this->registerNode($clone);
+                                $this->refreshNode($clone);
+                            }
+                        }
+                    }
+                }
+
+                $node->free();
+            }
         }
     }
 
@@ -611,32 +658,20 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->reloadClones();
 
-        if ($this->prototypeTypePane) {
-            $gui = GuiFrameworkProjectBehaviour::get();
-
-            if ($gui) {
-                $elements = [];
-                foreach ($gui->getFormEditors() as $editor) {
-                    if (FileUtils::hashName($this->file) == FileUtils::hashName($editor->getFile())) {
-                        continue;
-                    }
-
-                    foreach ($editor->getObjectList() as $it) {
-                        $it->group = $editor->getTitle();
-                        $it->value = "{$it->getGroup()}.{$it->value}";
-                        $elements[] = $it;
-                    }
-                }
-
-                $this->prototypeTypePane->setElements($elements);
-            }
-        }
-
         if ($this->actionsPane) {
             $this->actionsPane->setConfig($this->getIdeConfig()->toArray());
         }
 
         $this->elementTypePane->resetConfigurable(get_class($this));
+
+        if ($this->prototypeTypePane) {
+            $gui = GuiFrameworkProjectBehaviour::get();
+            $this->prototypeTypePane->resetConfigurable(get_class($this) . "#prototype");
+
+            if ($gui) {
+                $this->prototypeTypePane->setElements($gui->getAllPrototypes());
+            }
+        }
 
         $this->designer->disabled = false;
         $this->opened = true;
@@ -734,7 +769,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $index[$this->getNodeId($node)] = [
                 'id' => $this->getNodeId($node),
                 'type' => get_class($element),
-                'version' => (int) $node->data('-factory-version')
+                'version' => (int) $node->data('-factory-version'),
+                'data' => $element->getIndexData($node),
             ];
         }
 
@@ -751,6 +787,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     public function changeNodeId($node, $newId)
     {
+        Logger::info("ChangeNodeId '{$node->id}' to '$newId'");
+
         if (!$this->checkNodeId($newId)) {
             return 'invalid';
         }
@@ -814,32 +852,12 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     }
 
     /**
+     * @deprecated TODO use GuiFrameworkProjectBehaviour::getObjectListOfForm()
      * @return ObjectListEditorItem[]
      */
     public function getObjectList()
     {
-        $project = Ide::get()->getOpenedProject();
-        $result = [];
-
-        if ($project) {
-
-            $index = $project->getIndexer()->get($this->file, '_objects');
-
-            foreach ((array)$index as $it) {
-                /** @var AbstractFormElement $element */
-                $element = class_exists($it['type']) ? new $it['type']() : null;
-
-                $result[] = $item = new ObjectListEditorItem(
-                    $it['id'], $element ? Ide::get()->getImage($element->getIcon()) : null
-                );
-
-                $item->hint = $element ? $element->getName() : '';
-                $item->element = $element;
-                $item->version = (int) $it['version'];
-            }
-        }
-
-        return $result;
+        return GuiFrameworkProjectBehaviour::get()->getObjectListOfForm($this->getTitle());
     }
 
     public function deleteNode($node)
@@ -1417,8 +1435,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $selectionRectangle->size = [1, 1];
         }
 
-        $position = [$screenX, $screenY];
-
         $snapSizeX = $this->designer->snapSizeX;
         $snapSizeY = $this->designer->snapSizeY;
 
@@ -1427,9 +1443,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 $size[0] = floor($size[0] / $snapSizeX) * $snapSizeX;
                 $size[1] = floor($size[1] / $snapSizeY) * $snapSizeY;
             }
-
-            $position[0] = floor($position[0] / $snapSizeX) * $snapSizeX;
-            $position[1] = floor($position[1] / $snapSizeY) * $snapSizeY;
         }
 
         if (!$isClone) {
@@ -1441,6 +1454,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $parentElement->addToLayout($parent, $node, $screenX, $screenY);
         } else {
             $position = $this->layout->screenToLocal($screenX, $screenY);
+
+            $position[0] = floor($position[0] / $snapSizeX) * $snapSizeX;
+            $position[1] = floor($position[1] / $snapSizeY) * $snapSizeY;
+
             $node->position = $position;
             $this->layout->add($node);
         }
@@ -1493,7 +1510,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             $node = $this->createElement($selected, $selectionRectangle->x, $selectionRectangle->y, null, !$e->controlDown);
 
-            if (!$e->controlDown && !($selected instanceof ObjectListEditorItem)) {
+            if (!$e->controlDown) {
                 $this->elementTypePane->clearSelected();
             }
 
@@ -1564,7 +1581,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             if ($element) {
                 $node = $this->createElement($selected, $e->screenX, $e->screenY, $element->isLayout() ? $e->sender : null, !$e->controlDown);
 
-                if (!$e->controlDown && !($selected instanceof ObjectListEditorItem)) {
+                if (!$e->controlDown) {
                     $this->elementTypePane->clearSelected();
                 }
 
@@ -1649,7 +1666,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             if ($node instanceof UXNode) {
                 $node->data('-factory-version', $version = $node->data('-factory-version') + 1);
-                Logger::debug("Change object factory version '$targetId', set version = $version");
+               // Logger::debug("Change object factory version '$targetId', set version = $version");
             }
         });
 

@@ -63,6 +63,32 @@ class SpriteViewFormElement extends AbstractFormElement
         ];
     }
 
+    public function getIndexData(UXNode $node)
+    {
+        $gui = GuiFrameworkProjectBehaviour::get();
+
+        if ($gui) {
+            $data = DataUtils::get($node);
+
+            return [
+                'sprite' => $data->get('sprite'),
+            ];
+        }
+
+        return [];
+    }
+
+    public function getCustomPreviewImage(array $indexData)
+    {
+        $gui = GuiFrameworkProjectBehaviour::get();
+
+        if ($gui) {
+            return $gui->getSpriteManager()->getSpritePreview($indexData['sprite']);
+        }
+
+        return null;
+    }
+
     public function refreshNode(UXNode $node)
     {
         parent::refreshNode($node);

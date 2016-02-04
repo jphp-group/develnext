@@ -112,6 +112,10 @@ class FormElementTypePane
 
     public function setElements(array $elements)
     {
+        $this->tiledPanes = [];
+
+        $this->toggleGroup->selected = null;
+
         $head = $this->layout->children[0];
 
         $this->layout->children->clear();
@@ -284,13 +288,20 @@ class FormElementTypePane
             $button->maxWidth = 10000;
             $button->alignment = 'BASELINE_LEFT';
             $button->userData = $element;
+
             $button->graphic = Ide::get()->getImage($element->getIcon());
+            $button->graphic->size = [16, 16];
+            $button->graphic->preserveRatio = true;
+
             $button->tooltipText = $element->getName();
 
             $smallButton->classes->add('dn-simple-toggle-button');
             $smallButton->size = [25, 30];
             $smallButton->userData = $element;
             $smallButton->graphic = Ide::get()->getImage($element->getIcon());
+            $smallButton->graphic->size = [16, 16];
+            $smallButton->graphic->preserveRatio = true;
+
             $smallButton->tooltipText = $element->getName();
 
             $vbox->add($button);
@@ -300,7 +311,7 @@ class FormElementTypePane
             $this->buttons[] = $smallButton;
         }
 
-        $pane = new UXTitledPane($group, $vbox);
+        $pane = new UXTitledPane($group, $this->isOnlyIcons() ? $fbox : $vbox);
         $pane->data('vbox', $vbox);
         $pane->data('fbox', $fbox);
         $pane->font = UXFont::of($pane->font->family, $pane->font->size, 'BOLD');
