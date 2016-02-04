@@ -570,6 +570,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->factory->reload();
         }
 
+        Logger::trace();
+
         $gui = GuiFrameworkProjectBehaviour::get();
 
         if ($gui) {
@@ -587,12 +589,19 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 }
             });
 
+            Logger::trace('Reload Clones scanned ...');
+
+            $factories = [];
+
+            $clones = [];
+
             foreach ($freeNodes as $node) {
                 if ($node instanceof UXCustomNode) {
                     $type = $node->get('type');
                     list($factoryName, $factoryId) = str::split($type, '.');
 
-                    $formEditor = $gui->getFormEditor($factoryName);
+                    $formEditor = $factories[$factoryName] ?: $gui->getFormEditor($factoryName);
+                    $factories[$factoryName] = $formEditor;
 
                     if ($formEditor) {
                         $clone = $formEditor->createClone($factoryId);
@@ -602,10 +611,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                             $clone->y = $node->get('y');
 
                             $this->designer->unregisterNode($node);
-                            $node->parent->add($clone);
-
-                            $this->registerNode($clone);
-                            $this->refreshNode($clone);
+                            $clones[] = [$clone, $node->parent];
                         }
                     }
                 } elseif ($node instanceof UXNode) {
@@ -614,7 +620,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                     if ($factoryId) {
                         list($factoryName, $factoryId) = str::split($factoryId, '.');
 
-                        $formEditor = $gui->getFormEditor($factoryName);
+                        $formEditor = $factories[$factoryName] ?: $gui->getFormEditor($factoryName);
+                        $factories[$factoryName] = $formEditor;
 
                         if ($formEditor) {
                             $factoryVersion = $node->data('-factory-version');
@@ -638,10 +645,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
                                 $this->designer->unregisterNode($node);
 
-                                $node->parent->add($clone);
-
-                                $this->registerNode($clone);
-                                $this->refreshNode($clone);
+                                $clones[] = [$clone, $node->parent];
                             }
                         }
                     }
@@ -649,7 +653,16 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
                 $node->free();
             }
+
+            foreach ($clones as $it) {
+                $it[1]->add($it[0]);
+
+                $this->registerNode($it[0]);
+                $this->refreshNode($it[0]);
+            }
         }
+
+        Logger::trace('Reload Clones finished.');
     }
 
     public function open()

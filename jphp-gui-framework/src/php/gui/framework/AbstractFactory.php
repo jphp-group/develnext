@@ -31,6 +31,11 @@ class AbstractFactory
     /**
      * @var DomElement[]
      */
+    protected $prototypeElements = [];
+
+    /**
+     * @var DomElement[]
+     */
     protected $prototypeData = [];
 
     /**
@@ -172,12 +177,12 @@ class AbstractFactory
 
                 /** @var DomElement $element */
                 foreach ($document->findAll("/AnchorPane//*") as $element) {
-                    if (!$element->getAttribute('id')) continue;
+                    $id = $element->getAttribute('id');
+
+                    if (!$id) continue;
 
                     switch ($element->getTagName()) {
                         case 'Data':
-                            $id = $element->getAttribute('id');
-
                             if (str::startsWith($id, 'data-')) {
                                 $id = str::sub($id, 5);
                                 $this->prototypeData[$id] = $element;
@@ -185,7 +190,8 @@ class AbstractFactory
                             break;
 
                         default:
-                            $this->prototypes[$element->getAttribute('id')] = $this->makeXmlForLoader($element, $this->prototypeImports);
+                            $this->prototypeElements[$id] = $element;
+                            $this->prototypes[$id] = $this->makeXmlForLoader($element, $this->prototypeImports);
                             break;
                     }
                 }

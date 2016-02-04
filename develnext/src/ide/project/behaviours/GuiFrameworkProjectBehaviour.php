@@ -722,7 +722,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
      */
     public function getFormEditor($name)
     {
-        return $this->hasForm($name) ? FileSystem::fetchEditor($this->project->getFile("src/.forms/$name.fxml")) : null;
+        return $this->hasForm($name) ? FileSystem::fetchEditor($this->project->getFile("src/.forms/$name.fxml"), true) : null;
     }
 
     public function createForm($name)

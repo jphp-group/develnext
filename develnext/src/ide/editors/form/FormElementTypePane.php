@@ -273,7 +273,7 @@ class FormElementTypePane
         $fbox->hgap = $fbox->vgap = 2;
         $fbox->padding = 2;
 
-        /** @var AbstractFormElement $element */
+        /** @var AbstractFormElement|ObjectListEditorItem $element */
         foreach ($elements as $element) {
             $button = $this->selectable ? new UXToggleButton($element->getName()) : new UXButton($element->getName());
             $smallButton = $this->selectable ? new UXToggleButton() : new UXButton();
@@ -295,6 +295,10 @@ class FormElementTypePane
 
             $button->tooltipText = $element->getName();
 
+            if ($element instanceof ObjectListEditorItem) {
+                $button->tooltipText .= ": "  . $element->element->getName();
+            }
+
             $smallButton->classes->add('dn-simple-toggle-button');
             $smallButton->size = [25, 30];
             $smallButton->userData = $element;
@@ -303,6 +307,10 @@ class FormElementTypePane
             $smallButton->graphic->preserveRatio = true;
 
             $smallButton->tooltipText = $element->getName();
+
+            if ($element instanceof ObjectListEditorItem) {
+                $smallButton->tooltipText .= ": "  . $element->element->getName();
+            }
 
             $vbox->add($button);
             $fbox->add($smallButton);

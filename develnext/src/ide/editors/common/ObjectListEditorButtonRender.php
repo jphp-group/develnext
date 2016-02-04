@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\common;
 
+use ide\Ide;
 use php\gui\layout\UXHBox;
 use php\gui\paint\UXColor;
 use php\gui\UXImageView;
@@ -22,7 +23,7 @@ class ObjectListEditorButtonRender
         $cell->text = null;
 
         $label = new UXLabel($item->prefix ? $item->prefix . '.' . $item->text : $item->text);
-        $label->graphic = $item->graphic ? new UXImageView($item->graphic->image) : null;
+        $label->graphic = $item->graphic ? new UXImageView(Ide::get()->getImage($item->graphic->image)->image) : null;
         $label->textColor = UXColor::of('black');
 
         if ($this->hideHint) {

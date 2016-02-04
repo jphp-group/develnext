@@ -18,6 +18,7 @@ use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\misc\SimpleSingleCommand;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\systems\Cache;
 use ide\ui\FlowListViewDecorator;
 use ide\utils\FileUtils;
 use ParseException;
@@ -221,7 +222,7 @@ class GameSpriteEditor extends AbstractEditor
         $gc->clearRect(0, 0, $canvas->size[0], $canvas->size[1]);
 
         foreach ($files as $i => $file) {
-            $image = new UXImage($file);
+            $image = Cache::getImage($file);
 
             $x = 0;
             $y = 0;
@@ -660,7 +661,7 @@ class GameSpriteEditor extends AbstractEditor
             if ($result && $project) {
                 $result = $project->getFile("src/$result");
 
-                $image = new UXImage($result);
+                $image = Cache::getImage($result);
 
                 $multiple = false;
 

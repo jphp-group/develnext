@@ -65,17 +65,11 @@ class SpriteViewFormElement extends AbstractFormElement
 
     public function getIndexData(UXNode $node)
     {
-        $gui = GuiFrameworkProjectBehaviour::get();
+        $data = DataUtils::get($node);
 
-        if ($gui) {
-            $data = DataUtils::get($node);
-
-            return [
-                'sprite' => $data->get('sprite'),
-            ];
-        }
-
-        return [];
+        return [
+            'sprite' => $data->get('sprite'),
+        ];
     }
 
     public function getCustomPreviewImage(array $indexData)

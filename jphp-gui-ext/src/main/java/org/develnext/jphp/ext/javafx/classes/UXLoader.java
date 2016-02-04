@@ -41,16 +41,19 @@ public class UXLoader extends BaseWrapper<FXMLLoader> {
 
     @Signature
     public Memory load(Environment env) throws IOException {
+        getWrappedObject().setRoot(null);
         return Memory.wrap(env, getWrappedObject().load());
     }
 
     @Signature
     public Memory loadFromString(Environment env, String value) throws IOException {
+        getWrappedObject().setRoot(null);
         return Memory.wrap(env, getWrappedObject().load(new ByteArrayInputStream(value.getBytes("UTF-8"))));
     }
 
     @Signature
     public Memory load(Environment env, InputStream stream) throws IOException {
+        getWrappedObject().setRoot(null);
         return Memory.wrap(env, getWrappedObject().load(stream));
     }
 }

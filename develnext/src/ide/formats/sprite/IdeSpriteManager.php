@@ -6,6 +6,7 @@ use game\SpriteSpec;
 use ide\Logger;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\Project;
+use ide\systems\Cache;
 use ide\utils\FileUtils;
 use php\format\ProcessorException;
 use php\game\UXSprite;
@@ -69,7 +70,7 @@ class IdeSpriteManager
             if ($spec->file) {
                 $file = $this->project->getFile("src/{$spec->file}");
 
-                return $file->exists() ? new UXImage($file) : null;
+                return $file->exists() ? Cache::getImage($file) : null;
             } else {
                 return null;
             }

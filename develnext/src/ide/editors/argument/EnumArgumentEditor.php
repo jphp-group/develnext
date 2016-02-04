@@ -3,6 +3,7 @@ namespace ide\editors\argument;
 
 use ide\editors\common\ObjectListEditorButtonRender;
 use ide\editors\common\ObjectListEditorItem;
+use ide\Ide;
 use php\gui\UXComboBox;
 use php\gui\UXListCell;
 use php\gui\UXNode;
@@ -72,7 +73,7 @@ class EnumArgumentEditor extends AbstractArgumentEditor
         $callback = function (UXListCell $cell, $item) {
             if ($item instanceof ObjectListEditorItem) {
                 $cell->text = $item->text;
-                $cell->graphic = $item->graphic;
+                $cell->graphic = Ide::get()->getImage($item->graphic);
                 $cell->padding = 3;
                 $cell->paddingLeft = 3 + $item->level * 10;
             } else {

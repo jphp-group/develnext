@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\common;
 
+use ide\Ide;
 use php\gui\layout\UXHBox;
 use php\gui\paint\UXColor;
 use php\gui\UXLabel;
@@ -21,7 +22,7 @@ class ObjectListEditorCellRender
         $cell->text = null;
 
         $label = new UXLabel($item->text);
-        $label->graphic = $item->graphic;
+        $label->graphic = Ide::get()->getImage($item->graphic);
 
         $label->paddingLeft = $item->level * 10;
 

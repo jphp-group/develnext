@@ -3,7 +3,10 @@ namespace ide\formats\form\elements;
 
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
+use ide\Logger;
 use ide\project\Project;
+use ide\systems\Cache;
+use ide\utils\FileUtils;
 use php\gui\framework\DataUtils;
 use php\gui\UXApplication;
 use php\gui\UXImage;
@@ -11,7 +14,10 @@ use php\gui\UXImageArea;
 use php\gui\UXImageView;
 use php\gui\UXListView;
 use php\gui\UXNode;
+use php\io\File;
 use php\io\Stream;
+use php\lang\System;
+use php\time\Time;
 
 /**
  * Class ImageViewFormElement
@@ -32,6 +38,34 @@ class ImageViewFormElement extends AbstractFormElement
     public function getIdPattern()
     {
         return "image%s";
+    }
+
+    public function getIndexData(UXNode $node)
+    {
+        $data = DataUtils::get($node);
+
+        return [
+            'image' => $data->get('image'),
+        ];
+    }
+
+    public function getCustomPreviewImage(array $indexData)
+    {
+        if ($indexData['image']) {
+            if (Ide::project()) {
+                $file = Ide::project()->getFile("src/{$indexData['image']}");
+
+                if ($file->isFile()) {
+                    try {
+                        return Cache::getImage($file);
+                    } catch (\Exception $e) {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -84,7 +118,7 @@ class ImageViewFormElement extends AbstractFormElement
                     $file = $project->getFile("src/$image");
 
                     if ($file->exists()) {
-                        $node->image = new UXImage($file);
+                        $node->image = Cache::getImage($file);
                     }
                 }
             }
