@@ -83,6 +83,10 @@ class AccurateTimer
 
     public function trigger()
     {
+        if (!$this->active) {
+            return;
+        }
+
         $handler = $this->handler;
 
         if ($handler($this) === true) {

@@ -66,6 +66,14 @@ abstract class AbstractFormElement
     abstract public function getName();
 
     /**
+     * @return null
+     */
+    public function getElementClass()
+    {
+        return null;
+    }
+
+    /**
      * @return UXNode
      */
     abstract public function createElement();

@@ -7,6 +7,7 @@ use ide\autocomplete\AutoCompleteType;
 use ide\autocomplete\MethodAutoCompleteItem;
 use ide\autocomplete\PropertyAutoCompleteItem;
 use ide\autocomplete\VariableAutoCompleteItem;
+use ide\Ide;
 use ide\Logger;
 use php\gui\designer\UXSyntaxTextArea;
 use php\gui\event\UXKeyEvent;
@@ -23,6 +24,8 @@ use php\lib\Char;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Flow;
+use script\TimerScript;
+use timer\AccurateTimer;
 
 class AutoCompletePane
 {
@@ -183,8 +186,23 @@ class AutoCompletePane
         }, __CLASS__);
     }
 
+    /**
+     * @var AccurateTimer
+     */
+    protected $showTimer;
+
     public function show($x, $y) {
-        UXApplication::runLater(function () use ($x, $y) {
+        if ($this->showTimer) {
+            $this->showTimer->stop();
+        }
+
+        $this->showTimer = waitAsync(300, function () use ($x, $y) {
+            $this->showTimer = null;
+
+            if (!$this->list->items->count) {
+                return;
+            }
+
             if (!$this->shown) {
                 $this->list->selectedIndex = 0;
             }
@@ -317,6 +335,7 @@ class AutoCompletePane
         $list = new UXListView();
         $list->maxHeight = 9999;
         $list->fixedCellSize = 20;
+        $list->classes->add('hide-hor-scroll');
         $list->style = '-fx-font-family: "Courier new"';
         $list->width = 450;
 
@@ -339,6 +358,8 @@ class AutoCompletePane
         $win = new UXPopupWindow();
         $win->layout = $ui;
         $win->width = 450;
+        /*$win->style = 'TRANSPARENT';
+        $win->opacity = 0.7;*/
 
         $list->on('click', function () {
             $this->doPick();
@@ -401,13 +422,28 @@ class AutoCompletePane
         $label->textColor = UXColor::of('black');
         $label->style = '-fx-font-weight: bold;';
 
+        $icon = Ide::get()->getImage($item->getIcon(), [16, 16]);
+
         if (!$item->getDescription()) {
-            $cell->graphic = $label;
+            $cell->graphic = $icon ? new UXHBox([$icon, $label]) : $label;
         } else {
             $hintLabel = new UXLabel($item->getDescription() ? ": {$item->getDescription()}" : "");
             $hintLabel->textColor = UXColor::of('gray');
 
-            $cell->graphic = new UXHBox([$label, $hintLabel]);
+            if ($icon) {
+                if ($item->getDescription()) {
+                    $dots = new UXLabel(": ");
+                    $dots->textColor = $hintLabel->textColor;
+                    $hintLabel->text = $item->getDescription();
+                    $hintLabel->paddingLeft = 2;
+
+                    $cell->graphic = new UXHBox([$label, $dots, $icon, $hintLabel]);
+                } else {
+                    $cell->graphic = new UXHBox([$label, $icon]);
+                }
+            } else {
+                $cell->graphic = new UXHBox([$label, $hintLabel]);
+            }
         }
 
         if ($item instanceof VariableAutoCompleteItem) {
@@ -416,8 +452,13 @@ class AutoCompletePane
         }
 
         if ($item instanceof MethodAutoCompleteItem) {
-            $label->text .= '()';
-            $label->textColor = UXColor::of('darkblue');
+            if ($item->isFunction()) {
+                $label->text = "{$label->text}()";
+            } else {
+                $label->text = "->{$label->text}()";
+            }
+
+            $label->textColor = UXColor::of('black');
         }
 
         if ($item instanceof PropertyAutoCompleteItem) {

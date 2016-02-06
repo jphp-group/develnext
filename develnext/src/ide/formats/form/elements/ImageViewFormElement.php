@@ -30,6 +30,11 @@ class ImageViewFormElement extends AbstractFormElement
         return 'Изображение';
     }
 
+    public function getElementClass()
+    {
+        return UXImageArea::class;
+    }
+
     public function getIcon()
     {
         return 'icons/image16.png';

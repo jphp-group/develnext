@@ -29,6 +29,11 @@ class FlatButtonFormElement extends LabeledFormElement
         return 'Плоская кнопка';
     }
 
+    public function getElementClass()
+    {
+        return UXFlatButton::class;
+    }
+
     public function getIcon()
     {
         return 'icons/flatButton16.png';

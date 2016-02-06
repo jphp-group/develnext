@@ -26,6 +26,11 @@ class HBoxFormElement extends AbstractFormElement
         return 'Панели';
     }
 
+    public function getElementClass()
+    {
+        return UXHBox::class;
+    }
+
     public function getName()
     {
         return 'H - Контейнер';

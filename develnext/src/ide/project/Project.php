@@ -328,17 +328,26 @@ class Project
     {
         Logger::info("Save ide config ($name) of project ...");
 
-        $file = $this->getIdeFile("$name");
-
-        if ($file->isDirectory()) {
-            $file->delete();
+        if (File::of($name)->exists()) {
+            // ignore...
+            return;
         }
 
-        if ($file->getParentFile()) {
-            $file->getParentFile()->mkdirs();
-        }
+        try {
+            $file = $this->getIdeFile("$name");
 
-        $configuration->save($file);
+            if ($file->isDirectory()) {
+                $file->delete();
+            }
+
+            if ($file->getParentFile()) {
+                $file->getParentFile()->mkdirs();
+            }
+
+            $configuration->save($file);
+        } catch (IOException $e) {
+            Logger::error("Unable to save ide config $name");
+        }
     }
 
     /**
@@ -749,6 +758,7 @@ class Project
     {
         Logger::info("Close project ...");
 
+
         $this->tickTimer->stop();
 
         $file = $this->getIdeFile("ide.lock");
@@ -756,6 +766,8 @@ class Project
         $file->deleteOnExit();
 
         $this->save();
+
+        $this->ideConfigs = [];
         $this->tree->clear(true);
     }
 

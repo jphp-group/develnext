@@ -30,6 +30,11 @@ class TitledPaneFormElement extends AbstractFormElement
         return 'Панели';
     }
 
+    public function getElementClass()
+    {
+        return UXTitledPane::class;
+    }
+
     public function getName()
     {
         return 'Спойлер';

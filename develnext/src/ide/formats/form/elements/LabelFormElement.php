@@ -23,6 +23,11 @@ class LabelFormElement extends LabeledFormElement
         return 'Текст';
     }
 
+    public function getElementClass()
+    {
+        return UXLabel::class;
+    }
+
     public function getIcon()
     {
         return 'icons/label16.png';

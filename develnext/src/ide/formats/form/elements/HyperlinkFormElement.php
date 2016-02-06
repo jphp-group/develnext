@@ -29,6 +29,11 @@ class HyperlinkFormElement extends LabeledFormElement
         return 'Ссылка';
     }
 
+    public function getElementClass()
+    {
+        return UXHyperlink::class;
+    }
+
     public function getIcon()
     {
         return 'icons/hyperlink16.png';

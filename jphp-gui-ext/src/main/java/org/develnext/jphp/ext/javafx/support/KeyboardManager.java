@@ -10,7 +10,17 @@ import javafx.stage.Window;
 
 import java.util.*;
 
+import static javafx.scene.input.KeyCombination.*;
+
 public class KeyboardManager {
+    private static final KeyCombination.Modifier[] POSSIBLE_MODIFIERS = {
+            SHIFT_DOWN, SHIFT_ANY,
+            CONTROL_DOWN, CONTROL_ANY,
+            ALT_DOWN, ALT_ANY,
+            META_DOWN, META_ANY,
+            SHORTCUT_DOWN, SHORTCUT_ANY
+    };
+
     private final Window window;
     protected boolean altDown = false;
     protected boolean controlDown = false;
@@ -99,21 +109,30 @@ public class KeyboardManager {
             shiftDown = true;
         }
 
+        String name = event.getCode().getName();
+
+        // ctrl, alt, etc.
+        for (final KeyCombination.Modifier modifier: POSSIBLE_MODIFIERS) {
+            if (modifier.toString().equals(name)) {
+                return;
+            }
+        }
+
         keys.put(event.getCode(), event);
     }
 
     protected void triggerUp(KeyEvent event) {
         trigger(false);
 
-        if (event.isAltDown()) {
+        if (event.isAltDown() || event.getCode() == KeyCode.ALT) {
             altDown = false;
         }
 
-        if (event.isControlDown()) {
+        if (event.isControlDown() || event.getCode() == KeyCode.CONTROL) {
             controlDown = false;
         }
 
-        if (event.isShiftDown()) {
+        if (event.isShiftDown() || event.getCode() == KeyCode.SHIFT) {
             shiftDown = false;
         }
 
@@ -124,7 +143,7 @@ public class KeyboardManager {
         List<KeyCombination.Modifier> modifiers = new ArrayList<>();
 
         if (shiftDown) {
-            modifiers.add(KeyCombination.SHIFT_DOWN);
+            modifiers.add(SHIFT_DOWN);
         }
 
         if (controlDown) {
@@ -140,26 +159,36 @@ public class KeyboardManager {
         for (Map.Entry<KeyCode, KeyEvent> entry : keys.entrySet()) {
             KeyCode code = entry.getKey();
 
-            KeyCombination keyCombination = new KeyCodeCombination(code, modifiersArray);
+            KeyCodeCombination keyCombination = new KeyCodeCombination(code, modifiersArray);
+            trigger(keyCombination, down);
 
-            if (down) {
-                if (keyHits.add(keyCombination)) {
-                    trigger(keyCombination, code, downHandlers);
-                }
-
-                if (!keyGlobalHit) {
-                    keyGlobalHit = true;
-                    trigger(null, code, downHandlers);
-                }
-
-                trigger(keyCombination, code, pressHandlers);
-                trigger(null, code, pressHandlers);
-            } else {
-                keyHits.remove(keyCombination);
-
-                trigger(keyCombination, code, upHandlers);
-                trigger(null, code, upHandlers);
+            if (modifiersArray.length > 0) {
+                keyCombination = new KeyCodeCombination(code);
+                trigger(keyCombination, down);
             }
+        }
+    }
+
+    protected void trigger(KeyCodeCombination keyCombination, boolean down) {
+        KeyCode code = keyCombination.getCode();
+
+        if (down) {
+            if (keyHits.add(keyCombination)) {
+                trigger(keyCombination, code, downHandlers);
+            }
+
+            if (!keyGlobalHit) {
+                keyGlobalHit = true;
+                trigger(null, code, downHandlers);
+            }
+
+            trigger(keyCombination, code, pressHandlers);
+            trigger(null, code, pressHandlers);
+        } else {
+            keyHits.remove(keyCombination);
+
+            trigger(keyCombination, code, upHandlers);
+            trigger(null, code, upHandlers);
         }
     }
 

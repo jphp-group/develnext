@@ -19,6 +19,11 @@ class WebViewFormElement extends AbstractFormElement
         return 'Web Браузер';
     }
 
+    public function getElementClass()
+    {
+        return UXWebView::class;
+    }
+
     public function getGroup()
     {
         return 'Дополнительно';

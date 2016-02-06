@@ -31,6 +31,11 @@ class GamePaneFormElement extends AbstractFormElement
         return '2D Игра';
     }
 
+    public function getElementClass()
+    {
+        return UXGamePane::class;
+    }
+
     public function getName()
     {
         return 'Игровая комната';

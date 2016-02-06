@@ -2,6 +2,7 @@
 namespace ide\editors\common;
 
 use ide\formats\form\AbstractFormElement;
+use ide\Ide;
 use php\gui\UXImageView;
 
 class ObjectListEditorItem extends \stdClass
@@ -63,13 +64,7 @@ class ObjectListEditorItem extends \stdClass
 
     public function duplicate()
     {
-        $graphic = $this->graphic ? new UXImageView() : null;
-
-        if ($graphic) {
-            $graphic->image = $this->graphic->image;
-        }
-
-        $item = new ObjectListEditorItem($this->text, $graphic, $this->value, $this->level);
+        $item = new ObjectListEditorItem($this->text, $this->graphic, $this->value, $this->level);
         $item->hint = $this->hint;
         $item->prefix = $this->prefix;
         $item->element = $this->element;

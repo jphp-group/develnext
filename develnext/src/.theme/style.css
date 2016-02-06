@@ -167,3 +167,10 @@
     -fx-border-width: 1px;
     -fx-border-color: silver;
 }
+
+.list-view.hide-hor-scroll .scroll-bar:horizontal .increment-arrow,
+.list-view.hide-hor-scroll .scroll-bar:horizontal .decrement-arrow,
+.list-view.hide-hor-scroll .scroll-bar:horizontal .increment-button,
+.list-view.hide-hor-scroll .scroll-bar:horizontal .decrement-button {
+    -fx-padding:0;
+}

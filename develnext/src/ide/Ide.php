@@ -17,6 +17,7 @@ use ide\project\Project;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
+use ide\ui\LazyLoadingImage;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\gui\framework\Application;
@@ -729,9 +730,10 @@ class Ide extends Application
     /**
      * @param string $path
      *
+     * @param array $size
      * @return UXImageView
      */
-    public function getImage($path)
+    public function getImage($path, array $size = null)
     {
         if ($path === null) {
             return null;
@@ -740,15 +742,30 @@ class Ide extends Application
         if ($path instanceof UXImage) {
             $image = $path;
         } elseif ($path instanceof UXImageView) {
-            return $path;
+            if ($size) {
+                $image = $path->image;
+
+                if ($image == null) {
+                    return null;
+                }
+            } else {
+                return $path;
+            }
         } elseif ($path instanceof Stream) {
             $image = new UXImage($path);
+        } elseif ($path instanceof LazyLoadingImage) {
+            $image = $path->getImage();
         } else {
             $image = new UXImage('res://.data/img/' . $path);
         }
 
         $result = new UXImageView();
         $result->image = $image;
+
+        if ($size) {
+            $result->size = $size;
+            $result->preserveRatio = true;
+        }
 
         return $result;
     }

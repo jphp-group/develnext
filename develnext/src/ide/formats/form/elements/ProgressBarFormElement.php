@@ -15,6 +15,11 @@ class ProgressBarFormElement extends AbstractFormElement
         return 'Прогресс';
     }
 
+    public function getElementClass()
+    {
+        return UXProgressBar::class;
+    }
+
     public function getIcon()
     {
         return 'icons/progressbar16.png';

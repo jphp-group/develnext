@@ -32,61 +32,14 @@ class IdeFormFactory extends AbstractFactory
     {
         $this->factoryName = $formName;
         $this->file = $path;
-        $this->loader = new UXLoader();
 
         parent::__construct($path);
-    }
-
-    protected function makeNode($id)
-    {
-        $element = $this->prototypeElements[$id];
-
-        $node = null;
-        $attrs = $element->getAttributes();
-
-        switch ($element->getTagName()) {
-            case 'SpriteView':
-                $node = new UXSpriteView();
-                $node->size = [$attrs['width'], $attrs['height']];
-                break;
-            case 'ImageViewEx':
-                $node = new UXImageArea();
-                $node->size = [$attrs['width'], $attrs['height']];
-                $node->text = $attrs['text'];
-                $node->textColor = $attrs['textFill'];
-                $node->backgroundColor = $attrs['background'];
-
-                foreach (['autoSize', 'proportional', 'stretch', 'centered', 'mosaic', 'mosaicGap'] as $prop) {
-                    $node->{$prop} = $attrs[$prop] == 'true';
-                }
-                break;
-        }
-
-        if ($node != null) {
-            $node->id = $attrs['id'];
-
-            if (isset($attrs['opacity'])) {
-                $node->opacity = $attrs['opacity'];
-            }
-
-            if (isset($attrs['rotate'])) {
-                $node->rotate = $attrs['rotate'];
-            }
-
-            $node->focusTraversable = $attrs['focusTraversable'] == 'true';
-
-            $node->position = [$attrs['layoutX'], $attrs['layoutY']];
-
-            return $node;
-        }
-
-        return $this->loader->loadFromString($this->prototypes[$id]);
     }
 
     /**
      * @param string $id
      * @return UXNode
-     * @throws Exception
+     * @throws \Exception
      * @throws IllegalArgumentException
      */
     public function create($id)

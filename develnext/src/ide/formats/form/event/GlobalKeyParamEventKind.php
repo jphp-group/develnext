@@ -106,10 +106,10 @@ class GlobalKeyParamEventKind extends KeyEventKind
                 'Pause' => 'Pause',
                 'Print Screen' => 'PrintScreen',
             ],
-            /*'-',
+            '-',
             'Ctrl + ?' => $ctrLetters,
             'Alt + ?' => $altLetters,
-            'Shift + ?' => $shiftLetters,  */
+            'Shift + ?' => $shiftLetters,
         ];
     }
 

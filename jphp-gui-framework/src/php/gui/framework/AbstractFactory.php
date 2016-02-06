@@ -2,11 +2,13 @@
 namespace php\gui\framework;
 
 use behaviour\SetTextBehaviour;
+use php\game\UXSpriteView;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;
 use php\gui\framework\behaviour\custom\FactoryBehaviourManager;
 use php\gui\UXApplication;
 use php\gui\UXData;
+use php\gui\UXImageArea;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
@@ -64,12 +66,18 @@ class AbstractFactory
     protected $factoryName = null;
 
     /**
+     * @var UXLoader
+     */
+    protected $loader;
+
+    /**
      * @param null|string $path
      */
     public function __construct($path = null)
     {
         $this->loadPrototypes($path);
 
+        $this->loader = new UXLoader();
         $this->eventBinder = new EventBinder(null, $this);
         $this->behaviourManager = $behaviourManager = new FactoryBehaviourManager($this);
 
@@ -93,10 +101,56 @@ class AbstractFactory
         return new Instances((array) $instances);
     }
 
+    protected function makeNode($id)
+    {
+        $element = $this->prototypeElements[$id];
+
+        $node = null;
+        $attrs = $element->getAttributes();
+
+        switch ($element->getTagName()) {
+            case 'SpriteView':
+                $node = new UXSpriteView();
+                $node->size = [$attrs['width'], $attrs['height']];
+                break;
+            case 'ImageViewEx':
+                $node = new UXImageArea();
+                $node->size = [$attrs['width'], $attrs['height']];
+                $node->text = $attrs['text'];
+                $node->textColor = $attrs['textFill'];
+                $node->backgroundColor = $attrs['background'];
+
+                foreach (['autoSize', 'proportional', 'stretch', 'centered', 'mosaic', 'mosaicGap'] as $prop) {
+                    $node->{$prop} = $attrs[$prop] == 'true';
+                }
+                break;
+        }
+
+        if ($node != null) {
+            $node->id = $attrs['id'];
+
+            if (isset($attrs['opacity'])) {
+                $node->opacity = $attrs['opacity'];
+            }
+
+            if (isset($attrs['rotate'])) {
+                $node->rotate = $attrs['rotate'];
+            }
+
+            $node->focusTraversable = $attrs['focusTraversable'] == 'true';
+
+            $node->position = [$attrs['layoutX'], $attrs['layoutY']];
+
+            return $node;
+        }
+
+        return $this->loader->loadFromString($this->prototypes[$id]);
+    }
+
     /**
      * @param string $id
      * @return UXNode
-     * @throws Exception
+     * @throws \Exception
      * @throws IllegalArgumentException
      */
     public function create($id)
@@ -110,8 +164,8 @@ class AbstractFactory
                 }
             }
 
-            $loader = new UXLoader();
-            $node = $loader->loadFromString($prototype);
+            $node = $this->makeNode($id);
+
             $node->data('-factory', $this);
             $node->data('-factory-name', $this->factoryName);
             $node->data('-factory-id', $this->factoryName ? $this->factoryName . ".$id" : $id);

@@ -18,6 +18,11 @@ class RectangleFormElement extends AbstractFormElement
         return 'Прямоугольник';
     }
 
+    public function getElementClass()
+    {
+        return UXRectangle::class;
+    }
+
     public function getIcon()
     {
         return 'icons/rectangle16.png';

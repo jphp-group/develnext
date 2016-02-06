@@ -22,6 +22,11 @@ class RhombusFormElement extends AbstractFormElement
         -60, 0,
     ];
 
+    public function getElementClass()
+    {
+        return UXPolygon::class;
+    }
+
     public function getName()
     {
         return 'Ромб';

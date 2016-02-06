@@ -22,7 +22,7 @@ class ObjectListEditorCellRender
         $cell->text = null;
 
         $label = new UXLabel($item->text);
-        $label->graphic = Ide::get()->getImage($item->graphic);
+        $label->graphic = Ide::get()->getImage($item->graphic, [16, 16]);
 
         $label->paddingLeft = $item->level * 10;
 

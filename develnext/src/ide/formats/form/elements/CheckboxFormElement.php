@@ -29,11 +29,15 @@ class CheckboxFormElement extends LabeledFormElement
         return 'Флажок';
     }
 
+    public function getElementClass()
+    {
+        return UXCheckbox::class;
+    }
+
     public function getIcon()
     {
         return 'icons/checkbox16.png';
     }
-
 
     public function getIdPattern()
     {

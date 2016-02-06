@@ -72,14 +72,14 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
     {
         if (in_array($this->kind, ['~any'])) {
             return [
-                new MethodAutoCompleteItem('pre', 'Вывести в сообщение отладочную информацию значения', 'pre('),
-                new MethodAutoCompleteItem('dump', 'Вывести в сообщение подробную отладочную информацию значения', 'dump('),
-                new MethodAutoCompleteItem('alert', 'Всплывающее сообщение', 'alert('),
-                new MethodAutoCompleteItem('execute', 'Выполнить системную команду', 'execute('),
-                new MethodAutoCompleteItem('browse', 'Открыть url страницу', 'browse('),
-                new MethodAutoCompleteItem('open', 'Открыть файл', 'open('),
-                new MethodAutoCompleteItem('wait', 'Пауза в млсек', 'wait('),
-                new MethodAutoCompleteItem('waitAsync', 'Ассинхронная пауза в млсек', 'waitAsync('),
+                MethodAutoCompleteItem::func('pre', 'Вывести в сообщение отладочную информацию значения', 'pre('),
+                MethodAutoCompleteItem::func('dump', 'Вывести в сообщение подробную отладочную информацию значения', 'dump('),
+                MethodAutoCompleteItem::func('alert', 'Всплывающее сообщение', 'alert('),
+                MethodAutoCompleteItem::func('execute', 'Выполнить системную команду', 'execute('),
+                MethodAutoCompleteItem::func('browse', 'Открыть url страницу', 'browse('),
+                MethodAutoCompleteItem::func('open', 'Открыть файл', 'open('),
+                MethodAutoCompleteItem::func('wait', 'Пауза в млсек', 'wait('),
+                MethodAutoCompleteItem::func('waitAsync', 'Ассинхронная пауза в млсек', 'waitAsync('),
             ];
         }
 

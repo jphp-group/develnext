@@ -17,6 +17,11 @@ class CircleFormElement extends AbstractFormElement
         return 'Круг';
     }
 
+    public function getElementClass()
+    {
+        return UXCircle::class;
+    }
+
     public function getIcon()
     {
         return 'icons/circle16.png';

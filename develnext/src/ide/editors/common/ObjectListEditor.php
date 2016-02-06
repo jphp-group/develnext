@@ -292,7 +292,7 @@ class ObjectListEditor
             if (($isModule && !$this->disableModules) || ($isForm && !$this->disableForms)) {
                 $this->addItem(new ObjectListEditorItem(
                     $editor->getTitle(),
-                    Ide::get()->getImage($editor->getIcon()),
+                    Ide::get()->getImage($editor->getIcon(), [16, 16]),
                     ''
                 ));
 
@@ -321,7 +321,7 @@ class ObjectListEditor
                         if ($nodes) {
                             $this->addItem(new ObjectListEditorItem(
                                 "[$module]",
-                                Ide::get()->getImage($moduleEditor->getIcon()),
+                                Ide::get()->getImage($moduleEditor->getIcon(), [16, 16]),
                                 '',
                                 1
                             ));
@@ -342,7 +342,7 @@ class ObjectListEditor
 
                             $this->addItem(new ObjectListEditorItem(
                                 "{$formEditor->getTitle()}",
-                                Ide::get()->getImage($formEditor->getIcon()),
+                                Ide::get()->getImage($formEditor->getIcon(), [16, 16]),
                                 'form',
                                 1
                             ));
@@ -383,7 +383,7 @@ class ObjectListEditor
 
                         $this->addItem(new ObjectListEditorItem(
                             $formEditor->getTitle(),
-                            Ide::get()->getImage($formEditor->getIcon()),
+                            Ide::get()->getImage($formEditor->getIcon(), [16, 16]),
                             $prefix,
                             1
                         ));
@@ -404,7 +404,7 @@ class ObjectListEditor
                 } else {
                     if ($appModule) {
                         $this->addItem(new ObjectListEditorItem(
-                            $appModule->getTitle(), Ide::get()->getImage($appModule->getIcon()), 'appModule()'
+                            $appModule->getTitle(), Ide::get()->getImage($appModule->getIcon(), [16, 16]), 'appModule()'
                         ));
 
                         $this->appendFormEditor($appModule, 1, 'appModule()');
@@ -423,7 +423,7 @@ class ObjectListEditor
 
         if ($list) {
             foreach ($list as $item) {
-                $new = $item->duplicate();
+                $new = $item; //->duplicate();
                 $new->value = $prefix ? ($this->stringValues ? "{$prefix}{$item->text}" : "{$prefix}->{$item->text}") : $item->text;
                 $new->level = $level;
                 $new->prefix = $formEditor->getTitle();

@@ -31,6 +31,11 @@ class PanelFormElement extends AbstractFormElement
         return 'Панели';
     }
 
+    public function getElementClass()
+    {
+        return UXPanel::class;
+    }
+
     public function getName()
     {
         return 'Панель';

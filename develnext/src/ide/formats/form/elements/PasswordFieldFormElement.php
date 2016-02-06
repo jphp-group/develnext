@@ -21,6 +21,11 @@ class PasswordFieldFormElement extends AbstractFormElement
         return 'Поле для пароля';
     }
 
+    public function getElementClass()
+    {
+        return UXPasswordField::class;
+    }
+
     public function getIcon()
     {
         return 'icons/passwordField16.png';

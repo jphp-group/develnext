@@ -470,7 +470,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->actionEditor->save();
         $this->behaviourManager->save();
 
-        if ($this->actionsPane) {
+        if ($this->actionsPane && $this->getIdeConfig()) {
             $this->getIdeConfig()->put($this->actionsPane->getConfig());
         }
 
@@ -682,7 +682,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->prototypeTypePane->resetConfigurable(get_class($this) . "#prototype");
 
             if ($gui) {
-                $this->prototypeTypePane->setElements($gui->getAllPrototypes());
+                $this->prototypeTypePane->setElements($gui->getAllPrototypes($this));
             }
         }
 

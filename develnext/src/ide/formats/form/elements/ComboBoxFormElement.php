@@ -29,6 +29,11 @@ class ComboBoxFormElement extends AbstractFormElement
         return 'Выпадающий список';
     }
 
+    public function getElementClass()
+    {
+        return UXComboBox::class;
+    }
+
     public function getIcon()
     {
         return 'icons/comboBox16.png';

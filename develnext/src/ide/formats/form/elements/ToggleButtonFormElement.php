@@ -29,6 +29,11 @@ class ToggleButtonFormElement extends LabeledFormElement
         return 'Кнопка переключатель';
     }
 
+    public function getElementClass()
+    {
+        return UXToggleButton::class;
+    }
+
     public function getIcon()
     {
         return 'icons/toggleButton16.png';

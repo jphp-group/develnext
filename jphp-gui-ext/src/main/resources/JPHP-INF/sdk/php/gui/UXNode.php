@@ -198,13 +198,6 @@ abstract class UXNode
     }
 
     /**
-     * ...
-     */
-    public function autosize()
-    {
-    }
-
-    /**
      * @return UXImage
      */
     public function snapshot()

@@ -28,6 +28,11 @@ class ButtonFormElement extends LabeledFormElement
         return 'Кнопка';
     }
 
+    public function getElementClass()
+    {
+        return UXButton::class;
+    }
+
     public function getIcon()
     {
         return 'icons/button16.png';

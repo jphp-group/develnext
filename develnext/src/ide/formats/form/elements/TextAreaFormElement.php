@@ -21,6 +21,11 @@ class TextAreaFormElement extends AbstractFormElement
         return 'Многострочное поле';
     }
 
+    public function getElementClass()
+    {
+        return UXTextArea::class;
+    }
+
     public function getIcon()
     {
         return 'icons/textArea16.png';

@@ -23,7 +23,7 @@ class ObjectListEditorButtonRender
         $cell->text = null;
 
         $label = new UXLabel($item->prefix ? $item->prefix . '.' . $item->text : $item->text);
-        $label->graphic = $item->graphic ? new UXImageView(Ide::get()->getImage($item->graphic->image)->image) : null;
+        $label->graphic = Ide::get()->getImage($item->graphic, [16, 16]);
         $label->textColor = UXColor::of('black');
 
         if ($this->hideHint) {

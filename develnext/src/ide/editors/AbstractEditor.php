@@ -49,19 +49,32 @@ abstract class AbstractEditor
      */
     protected function getIdeConfig()
     {
-        $file = Ide::project()->getAbsoluteFile($this->file);
-        $name = str::replace(get_class($this), "\\", "/") . "/" . $file->getRelativePath() . ".conf";
+        if (Ide::project()) {
+            $file = Ide::project()->getAbsoluteFile($this->file);
 
-        return Ide::project()->getIdeConfig($name);
+            if ($file->isInRootDir()) {
+                $name = str::replace(get_class($this), "\\", "/") . "/" . $file->getRelativePath() . ".conf";
+
+                return Ide::project()->getIdeConfig($name);
+            }
+
+            return null;
+        } else {
+            return null;
+        }
     }
-
 
     protected function saveIdeConfig()
     {
-        $file = Ide::project()->getAbsoluteFile($this->file);
-        $name = str::replace(get_class($this), "\\", "/") . "/" . $file->getRelativePath() . ".conf";
+        if (Ide::project()) {
+            $file = Ide::project()->getAbsoluteFile($this->file);
 
-        Ide::project()->saveIdeConfig($name);
+            if ($file->isInRootDir()) {
+                $name = str::replace(get_class($this), "\\", "/") . "/" . $file->getRelativePath() . ".conf";
+
+                Ide::project()->saveIdeConfig($name);
+            }
+        }
     }
 
     /**

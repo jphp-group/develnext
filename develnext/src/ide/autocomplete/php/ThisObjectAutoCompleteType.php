@@ -13,6 +13,7 @@ use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormElement;
 use ide\scripts\AbstractScriptComponent;
 use ide\systems\FileSystem;
+use php\lib\str;
 
 /**
  * Class ThisObjectAutoCompleteType
@@ -98,7 +99,21 @@ class ThisObjectAutoCompleteType extends AutoCompleteType
                 if (!$prop['isCss'] && !$prop['isVirtual']) {
                     $code = $prop['realCode'] ?: $name;
 
-                    $result[$name] = new PropertyAutoCompleteItem($code, $prop['tooltip'] . ' (' . $prop['editor'] . ')');
+                    $result[$name] = new PropertyAutoCompleteItem($code, ($prop['tooltip'] ? $prop['tooltip'] . ' ' : "") . '(' . $prop['editor'] . ')');
+                }
+            }
+
+            $elementClass = $this->element->getElementClass();
+
+            if ($elementClass && class_exists($elementClass)) {
+                $reflection = new \ReflectionClass($elementClass);
+
+                foreach ($reflection->getProperties() as $property) {
+                    $name = $property->getName();
+
+                    if (!$result[$name]) {
+                        $result[$name] = new PropertyAutoCompleteItem($name, 'mixed');
+                    }
                 }
             }
         }
@@ -113,7 +128,27 @@ class ThisObjectAutoCompleteType extends AutoCompleteType
      */
     public function getMethods(AutoComplete $context, AutoCompleteRegion $region)
     {
-        return [];
+        $result = [];
+
+        if ($this->element) {
+            $elementClass = $this->element->getElementClass();
+
+            if ($elementClass && class_exists($elementClass)) {
+                $reflection = new \ReflectionClass($elementClass);
+
+                foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                    if (str::startsWith($method->getName(), '__') || $method->isStatic() || $method->isAbstract()) {
+                        continue;
+                    }
+
+                    $insert = $method->getName() . "(";
+
+                    $result[$method->getName()] = new MethodAutoCompleteItem($method->getName(), '', $insert);
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

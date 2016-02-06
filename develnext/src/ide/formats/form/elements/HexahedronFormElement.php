@@ -24,6 +24,11 @@ class HexahedronFormElement extends AbstractFormElement
         -50, -30
     ];
 
+    public function getElementClass()
+    {
+        return UXPolygon::class;
+    }
+
     public function getName()
     {
         return 'Шестигранник';

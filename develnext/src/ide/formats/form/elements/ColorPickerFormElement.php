@@ -17,6 +17,11 @@ class ColorPickerFormElement extends AbstractFormElement
         return 'Поле для цвета';
     }
 
+    public function getElementClass()
+    {
+        return UXColorPicker::class;
+    }
+
     public function getIcon()
     {
         return 'icons/color16.png';

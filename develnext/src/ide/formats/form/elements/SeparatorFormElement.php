@@ -17,6 +17,11 @@ class SeparatorFormElement extends AbstractFormElement
         return 'Разделитель';
     }
 
+    public function getElementClass()
+    {
+        return UXSeparator::class;
+    }
+
     public function getIcon()
     {
         return 'icons/separator16.png';

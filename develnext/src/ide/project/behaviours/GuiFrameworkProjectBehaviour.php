@@ -49,6 +49,7 @@ use ide\utils\FileUtils;
 use ide\utils\Json;
 use php\gui\framework\Timer;
 use php\gui\layout\UXHBox;
+use php\gui\UXApplication;
 use php\gui\UXLabel;
 use php\gui\UXTreeItem;
 use php\gui\UXTreeView;

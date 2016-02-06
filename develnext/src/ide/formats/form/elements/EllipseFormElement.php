@@ -18,6 +18,11 @@ class EllipseFormElement extends AbstractFormElement
         return 'Овал';
     }
 
+    public function getElementClass()
+    {
+        return UXEllipse::class;
+    }
+
     public function getIcon()
     {
         return 'icons/ellipse16.png';

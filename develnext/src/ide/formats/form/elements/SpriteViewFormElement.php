@@ -28,6 +28,11 @@ class SpriteViewFormElement extends AbstractFormElement
         return '2D Игра';
     }
 
+    public function getElementClass()
+    {
+        return UXSpriteView::class;
+    }
+
     public function getName()
     {
         return 'Игровой объект';

@@ -20,6 +20,11 @@ class TextFieldFormElement extends AbstractFormElement
         return 'Поле ввода';
     }
 
+    public function getElementClass()
+    {
+        return UXTextField::class;
+    }
+
     public function getIcon()
     {
         return 'icons/textField16.png';

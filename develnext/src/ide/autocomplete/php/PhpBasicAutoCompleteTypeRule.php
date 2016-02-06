@@ -88,6 +88,10 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                     return null;
                 }
             }
+
+            if (sizeof($tokens) > 1) {
+                return null;
+            }
         } else {
             return null;
         }

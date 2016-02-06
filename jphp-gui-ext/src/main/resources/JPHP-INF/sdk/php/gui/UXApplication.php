@@ -17,6 +17,13 @@ class UXApplication
     }
 
     /**
+     * @return bool
+     */
+    public static function isUiThread()
+    {
+    }
+
+    /**
      * @return string
      */
     public static function getMacAddress()

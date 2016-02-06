@@ -10,6 +10,7 @@ use ide\systems\Cache;
 use ide\utils\FileUtils;
 use php\format\ProcessorException;
 use php\game\UXSprite;
+use php\gui\UXApplication;
 use php\gui\UXImage;
 use php\io\IOException;
 use php\lib\Str;
@@ -49,6 +50,10 @@ class IdeSpriteManager
 
     public function getSpritePreview($name)
     {
+        if (!UXApplication::isUiThread()) {
+            return new SpritePreviewImage($name);
+        }
+
         $image = $this->getSpriteImage($name);
 
         if (($spec = $this->sprites[$name]) && $image) {

@@ -1,7 +1,9 @@
 <?php
 namespace ide\systems;
 
+use ide\ui\LazyImage;
 use ide\utils\FileUtils;
+use php\gui\UXApplication;
 use php\gui\UXImage;
 use php\io\File;
 
@@ -16,6 +18,7 @@ class Cache
     public static function getImage($file)
     {
         $file = new File($file);
+
         if (!$file->exists()) {
             return null;
         }
@@ -27,6 +30,10 @@ class Cache
 
             if ($image && $time && $time == $file->lastModified()) {
                 return $image;
+            }
+
+            if (!UXApplication::isUiThread()) {
+                return new LazyImage($file);
             }
 
             $image = new UXImage($file);

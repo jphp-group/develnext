@@ -4,6 +4,7 @@ namespace ide\formats\form\elements;
 use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormElement;
 use php\gui\designer\UXDesignProperties;
+use php\gui\framework\AbstractForm;
 use php\gui\UXNode;
 
 /**
@@ -15,6 +16,11 @@ class FormFormElement extends AbstractFormElement
     public function isOrigin($any)
     {
         return $any instanceof FormEditor;
+    }
+
+    public function getElementClass()
+    {
+        return AbstractForm::class;
     }
 
     /**

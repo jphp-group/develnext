@@ -49,7 +49,13 @@ function wait($millis)
 
 function waitAsync($millis, callable $callback)
 {
-    (new AccurateTimer($millis, $callback))->start();
+    $timer = (new AccurateTimer($millis, function (AccurateTimer $timer) use ($callback) {
+        $callback();
+        $timer->free();
+    }));
+
+    $timer->start();
+    return $timer;
 }
 
 function uiLater(callable $callback)
@@ -85,7 +91,7 @@ function uiText($object)
     }
 
     if ($object instanceof TextableBehaviour) {
-        return (string) $object->getObjectText();
+        return (string)$object->getObjectText();
     }
 
     if ($object instanceof UXLabeled || $object instanceof UXTextInputControl || $object instanceof UXTab) {

@@ -29,6 +29,11 @@ class DatePickerFormElement extends AbstractFormElement
         return 'Поле для даты';
     }
 
+    public function getElementClass()
+    {
+        return UXDatePicker::class;
+    }
+
     public function getIcon()
     {
         return 'icons/calendar16.png';

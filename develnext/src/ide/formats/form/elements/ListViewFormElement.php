@@ -16,6 +16,11 @@ class ListViewFormElement extends AbstractFormElement
         return 'Список';
     }
 
+    public function getElementClass()
+    {
+        return UXListView::class;
+    }
+
     public function getIcon()
     {
         return 'icons/listbox16.png';

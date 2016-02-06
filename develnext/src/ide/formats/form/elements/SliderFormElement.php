@@ -18,6 +18,11 @@ class SliderFormElement extends AbstractFormElement
         return 'Ползунок';
     }
 
+    public function getElementClass()
+    {
+        return UXSlider::class;
+    }
+
     public function getIcon()
     {
         return 'icons/slider16.png';

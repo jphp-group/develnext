@@ -25,6 +25,11 @@ use php\gui\UXTextField;
 
 abstract class LabeledFormElement extends AbstractFormElement
 {
+    public function getElementClass()
+    {
+        return UXLabeled::class;
+    }
+
     public function registerNode(UXNode $node)
     {
         parent::registerNode($node);

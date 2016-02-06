@@ -16,6 +16,11 @@ class ProgressIndicatorFormElement extends AbstractFormElement
         return 'Индикатор загрузки';
     }
 
+    public function getElementClass()
+    {
+        return UXProgressIndicator::class;
+    }
+
     public function getGroup()
     {
         return 'Дополнительно';

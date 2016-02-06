@@ -69,7 +69,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
         @Property double translateZ();
 
         @Property boolean cache();
-        @Property boolean disable();
+        //@Property boolean disable();
         @Property boolean disabled();
         @Property boolean focused();
         @Property boolean focusTraversable();
@@ -85,20 +85,11 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
         //@Property(hiddenInDebugInfo = true) @Nullable Object userData();
 
-        void autosize();
         boolean contains(double localX, double localY);
 
         void relocate(double x, double y);
         void resize(double width, double height);
         void startFullDrag();
-
-        double maxHeight(double width);
-        double maxWidth(double height);
-        double minHeight(double width);
-        double minWidth(double height);
-
-        double prefHeight(double width);
-        double prefWidth(double height);
 
         void toBack();
         void toFront();

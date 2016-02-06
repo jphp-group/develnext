@@ -33,6 +33,11 @@ class ScrollPaneFormElement extends AbstractFormElement
         return 'Панели';
     }
 
+    public function getElementClass()
+    {
+        return UXScrollPane::class;
+    }
+
     public function getName()
     {
         return 'Контейнер';

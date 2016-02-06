@@ -10,6 +10,7 @@ use ide\autocomplete\PropertyAutoCompleteItem;
 use ide\autocomplete\StatementAutoCompleteItem;
 use ide\autocomplete\VariableAutoCompleteItem;
 use ide\editors\FormEditor;
+use ide\editors\ScriptModuleEditor;
 use ide\systems\FileSystem;
 
 class ThisAutoCompleteType extends AutoCompleteType
@@ -67,7 +68,7 @@ class ThisAutoCompleteType extends AutoCompleteType
             $list = $editor->getObjectList();
 
             foreach ($list as $one) {
-                $result[$one->text] = new PropertyAutoCompleteItem($one->text, $one->hint);
+                $result[$one->text] = new PropertyAutoCompleteItem($one->text, $one->hint, null, $one->getIcon());
             }
 
             $moduleEditors = $editor->getModuleEditors();
@@ -76,7 +77,27 @@ class ThisAutoCompleteType extends AutoCompleteType
                 $list = $moduleEditor->getObjectList();
 
                 foreach ($list as $one) {
-                    $result[$one->text] = new PropertyAutoCompleteItem($one->text, $one->hint . ' (из ' . $moduleEditor->getTitle() . ')');
+                    $result[$one->text] = new PropertyAutoCompleteItem(
+                        $one->text,
+                        $one->hint . ' (из ' . $moduleEditor->getTitle() . ')',
+                        null,
+                        $one->getIcon()
+                    );
+                }
+            }
+
+            if ($editor instanceof ScriptModuleEditor) {
+                foreach ($editor->getFormEditors() as $formEditor) {
+                    $list = $formEditor->getObjectList();
+
+                    foreach ($list as $one) {
+                        $result[$one->text] = new PropertyAutoCompleteItem(
+                            $one->text,
+                            $one->hint . ' (из ' . $formEditor->getTitle() . ')',
+                            null,
+                            $one->getIcon()
+                        );
+                    }
                 }
             }
         }

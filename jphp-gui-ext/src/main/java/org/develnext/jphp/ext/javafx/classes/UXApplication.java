@@ -95,6 +95,11 @@ public class UXApplication extends BaseWrapper<Application> {
     }
 
     @Signature
+    public static boolean isUiThread() {
+        return Platform.isFxApplicationThread();
+    }
+
+    @Signature
     public static void setTheme(final Memory value) {
         new JFXPanel();
 
