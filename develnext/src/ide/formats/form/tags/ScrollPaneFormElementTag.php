@@ -39,11 +39,17 @@ class ScrollPaneFormElementTag extends AbstractFormElementTag
 
     public function writeAttributes($node, DomElement $element)
     {
-        /** @var UXPanel $node */
+        /** @var UXScrollPane $node */
         $element->setAttribute('prefWidth', $node->size[0]);
         $element->setAttribute('prefHeight', $node->size[1]);
 
         $element->setAttribute('layoutX', $node->x);
         $element->setAttribute('layoutY', $node->y);
+
+        $element->setAttribute('hvalue', $node->scrollX);
+        $element->setAttribute('vvalue', $node->scrollY);
+
+        $element->setAttribute("hbarPolicy", $node->hbarPolicy);
+        $element->setAttribute("vbarPolicy", $node->vbarPolicy);
     }
 }

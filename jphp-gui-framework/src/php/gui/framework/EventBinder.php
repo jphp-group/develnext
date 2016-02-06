@@ -133,18 +133,18 @@ class EventBinder
                         $adapter = null;
                     }
 
-                    if ($adapter == null) {
-                        throw new Exception("Unable to bind '$name'");
-                    }
+                    if ($adapter != null) {
+                        $handler = $adapter->adapt($target, $handler, $eventName[1]);
 
-                    $handler = $adapter->adapt($target, $handler, $eventName[1]);
+                        if (!$handler) {
+                            throw new Exception("Unable to bind '$name'");
+                        }
 
-                    if (!$handler) {
-                        throw new Exception("Unable to bind '$name'");
-                    }
-
-                    if ($handler === true) {
-                        continue;
+                        if ($handler === true) {
+                            continue;
+                        }
+                    } else {
+                        $eventName[0] = $name;
                     }
 
                     $group = $name;

@@ -48,6 +48,11 @@ class GlobalKeyParamEventKind extends KeyEventKind
             'Право' => 'Right',
             'Верх' => 'Up',
             'Низ' => 'Down',
+            '-',
+            'A (left)' => 'A',
+            'D (right)' => 'D',
+            'W (up)' => 'W',
+            'S (down)' => 'S',
         ];
 
         $variants = [
@@ -87,13 +92,11 @@ class GlobalKeyParamEventKind extends KeyEventKind
         }
 
         return [
-            'Любая кнопка' => '',
-            '-',
             'Пробел' => 'Space',
             'Enter' => 'Enter',
             'Escape' => 'Esc',
             '-',
-            'Направление' => $directions,
+            'Направления' => $directions,
             'Цифры' => $digits,
             'Буквы' => $letters,
             'Функциональные' => $funcKeys,

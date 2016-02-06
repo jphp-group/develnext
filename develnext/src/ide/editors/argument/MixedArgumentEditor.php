@@ -97,6 +97,10 @@ class MixedArgumentEditor extends AbstractArgumentEditor
             $this->objectListEditor->disableForms();
         }
 
+        if ($value = $this->options['formMethod']) {
+            $this->objectListEditor->formMethod($value);
+        }
+
         $this->objectListEditor->build();
 
         $this->objectListEditor->getUi()->maxWidth = 9999;

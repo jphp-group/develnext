@@ -25,6 +25,8 @@
     <properties group="extra" title="Дополнительно">
         <property code="form.backgroundColor" realCode="backgroundColor" name="Цвет фона" editor="color" formConfig="1" defaultValue="" />
         <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />
+
+        <property code="size" name="Размеры (W, H)" editor="doubleArray" tooltip="Размеры, ширина (width) + высота (height)" />
     </properties>
 
     <eventTypes>

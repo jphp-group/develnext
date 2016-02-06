@@ -105,7 +105,7 @@ class IfVarActionType extends AbstractSimpleActionType
             $name = Str::sub($name, 1);
         }
 
-        $object = "\$GLOBALS['" . $name . "]";
+        $object = "\$GLOBALS['" . $name . "']";
         $string = $action->get('value');
 
         $not = $action->not ? '!' : '';

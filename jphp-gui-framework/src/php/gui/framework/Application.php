@@ -117,6 +117,7 @@ class Application
     }
 
     private $formCache = [];
+    private $formOriginCache = [];
 
     /**
      * @param $name
@@ -134,11 +135,27 @@ class Application
 
     /**
      * @param $name
-     * @param UXForm $origin
-     * @param bool $loadBehaviours
+     * @param UXForm|null $origin
      * @return AbstractForm
      */
-    public function getNewForm($name, UXForm $origin = null, $loadBehaviours = true)
+    public function getOriginForm($name, UXForm $origin = null)
+    {
+        if ($form = $this->formOriginCache[$name]) {
+            return $form;
+        }
+
+        return $this->getNewForm($name, $origin);
+    }
+
+    /**
+     * @param $name
+     * @param UXForm $origin
+     * @param bool $loadEvents
+     * @param bool $loadBehaviours
+     * @param bool $cache
+     * @return AbstractForm
+     */
+    public function getNewForm($name, UXForm $origin = null, $loadEvents = true, $loadBehaviours = true, $cache = true)
     {
         $class = $name;
 
@@ -146,7 +163,15 @@ class Application
             $class = $this->getNamespace() . "\\forms\\$name";
         }
 
-        $form = new $class($origin, $loadBehaviours);
+        $form = new $class($origin, $loadEvents, $loadBehaviours);
+
+        if (!$cache) {
+            return $form;
+        }
+
+        if (!$this->formOriginCache[$name]) {
+            $this->formOriginCache[$name] = $form;
+        }
 
         return $this->formCache[$name] = $form;
     }

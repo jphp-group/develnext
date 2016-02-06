@@ -16,6 +16,7 @@ use ide\editors\value\TextPropertyEditor;
 use ide\forms\ImagePropertyEditorForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
+use ide\Logger;
 use ide\misc\SimpleSingleCommand;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\Cache;
@@ -499,9 +500,9 @@ class GameSpriteEditor extends AbstractEditor
         UXVBox::setVgrow($framesPane->getPane(), 'ALWAYS');
         $framesPane->getPane()->maxHeight = 9999;
 
-        $ui->add($animationFramesPane->getUi());
         $ui->add($actionPane);
-        $ui->add($framesPane->getPane());;
+        $ui->add($framesPane->getPane());
+        $ui->add($animationFramesPane->getUi());
 
         $this->framesPane = $framesPane;
         $this->framesPane->addMenuCommand(SimpleSingleCommand::makeWithText('Добавить в анимацию', 'icons/plus16.png', function () {
@@ -611,6 +612,8 @@ class GameSpriteEditor extends AbstractEditor
     {
         $files = [];
 
+        Logger::debug("Do Move frames ...");
+
         /** @var UXPane $node */
         foreach ($this->framesPane->getChildren() as $i => $node) {
             $file = File::of($node->data('file'));
@@ -619,7 +622,7 @@ class GameSpriteEditor extends AbstractEditor
                 $newName = $file->getParent() . "/tmp.$i.png";
                 Files::delete($newName);
 
-                $files[] = $newName;
+                $files[] = [$node, $newName];
 
                 $file->renameTo($newName);
             }
@@ -631,7 +634,9 @@ class GameSpriteEditor extends AbstractEditor
             }
         }
 
-        foreach ($files as $i => $name) {
+        foreach ($files as $i => $it) {
+            list($node, $name) = $it;
+
             $file = File::of($name);
 
             $newName = $file->getParent() . "/$i.png";
@@ -639,6 +644,7 @@ class GameSpriteEditor extends AbstractEditor
             Files::delete($newName);
 
             $file->renameTo($newName);
+            $node->data('file', $newName);
         }
 
         $this->animationFramesPane->update();

@@ -182,6 +182,7 @@ class IdeBehaviourPane
         $button->graphic = ico('smallDelete16');
 
         $targetId = $pane->data('--target-id');
+        $targetId = $this->targetId;
 
         $button->on('click', function (UXEvent $e) use ($targetId, $spec, $pane) {
             $msg = new MessageBoxForm('Вы уверены, что хотите удалить поведение "' . $spec->getName() . '"?', ['yes' => 'Да, удалить', 'no' => 'Нет']);

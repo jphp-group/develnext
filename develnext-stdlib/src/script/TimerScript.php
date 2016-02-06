@@ -10,6 +10,7 @@ use php\lang\IllegalStateException;
 use php\lang\InterruptedException;
 use php\lang\Thread;
 use php\xml\DomDocument;
+use timer\AccurateTimer;
 
 /**
  * Class TimerScript
@@ -185,10 +186,10 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
             return null;
         }
 
-        $timer = new TimerScript($checkInterval, true, function (ScriptEvent $e) use ($callback, $condition) {
+        $timer = new AccurateTimer($checkInterval, function () use ($callback, $condition) {
             if ($condition()) {
-                $e->sender->free();
                 $callback();
+                return true;
             }
         });
 

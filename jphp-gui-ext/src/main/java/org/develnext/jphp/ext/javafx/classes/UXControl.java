@@ -79,7 +79,7 @@ public class UXControl<T extends Control> extends UXRegion<Control> {
     @Signature
     @Override
     protected double getWidth() {
-        return getWrappedObject().getWidth();
+        return getWrappedObject().getPrefWidth();
     }
 
     @Signature
@@ -91,7 +91,7 @@ public class UXControl<T extends Control> extends UXRegion<Control> {
     @Signature
     @Override
     protected double getHeight() {
-        return getWrappedObject().getHeight();
+        return getWrappedObject().getPrefHeight();
     }
 
     @Signature

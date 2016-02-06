@@ -561,7 +561,10 @@ class FlowListViewDecorator implements \Countable
                         }
 
                         $this->pane->children->insertAll($index, $nodes);
-                        $this->trigger('move', [$index, $nodes]);
+
+                        uiLater(function () use ($index, $nodes) {
+                            $this->trigger('move', [$index, $nodes]);
+                        });
                     }
                 }
             } else {

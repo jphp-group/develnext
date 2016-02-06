@@ -14,8 +14,9 @@ class UXGamePaneWrapper extends UXNodeWrapper
         $node = $this->node;
 
         $handle = function () use ($node) {
-            $node->content->data('--view-width', $node->width);
-            $node->content->data('--view-height', $node->height);
+            $bounds = $node->boundsInParent;
+            $node->content->data('--view-width', $bounds['width']);
+            $node->content->data('--view-height', $bounds['height']);
         };
 
         $this->node->observer('content')->addListener($handle);

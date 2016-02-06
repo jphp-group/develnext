@@ -5,6 +5,10 @@ use game\Jumping;
 use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionScript;
+use ide\editors\argument\ObjectArgumentEditor;
+use ide\editors\common\ObjectListEditorItem;
+use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\GamePaneFormElement;
 use php\lib\str;
 
 class GameLoadSceneActionType extends AbstractSimpleActionType
@@ -38,7 +42,16 @@ class GameLoadSceneActionType extends AbstractSimpleActionType
     function attributeSettings()
     {
         return [
-            'source' => ['def' => '~senderForm'],
+            'source' => ['def' => '~senderForm', 'editor' => function ($name, $label) {
+                $editor = new ObjectArgumentEditor([
+                    'formMethod'   => 'originForm',
+                    'objectFilter' => function (ObjectListEditorItem $item) {
+                        return $item->element instanceof GamePaneFormElement
+                            || !$item->element;
+                    }
+                ]);
+                return $editor;
+            }],
         ];
     }
 
@@ -54,7 +67,7 @@ class GameLoadSceneActionType extends AbstractSimpleActionType
 
     function getDescription(Action $action = null)
     {
-        return str::format("Загрузить игровую сцену из формы %s", $action ? $action->get('dest') : '');
+        return str::format("Загрузить игровую сцену из формы %s в объект %s", $action ? $action->get('dest') : '', $action ? $action->get('source') : '');
     }
 
     function getIcon(Action $action = null)

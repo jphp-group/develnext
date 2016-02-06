@@ -26,6 +26,7 @@ use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
 use php\gui\UXParent;
 use php\gui\UXProgressIndicator;
+use php\gui\UXScreen;
 use php\gui\UXTooltip;
 use php\gui\UXWindow;
 use php\io\File;
@@ -82,7 +83,7 @@ abstract class AbstractForm extends UXForm
      * @throws Exception
      * @throws IllegalStateException
      */
-    public function __construct(UXForm $origin = null, $loadBehaviours = true)
+    public function __construct(UXForm $origin = null, $loadEvents = true, $loadBehaviours = true)
     {
         parent::__construct($origin);
 
@@ -92,7 +93,10 @@ abstract class AbstractForm extends UXForm
         $this->loadDesign();
 
         $this->eventBinder = new EventBinder(null, $this);
-        $this->loadBindings($this);
+
+        if ($loadEvents) {
+            $this->loadBindings();
+        }
 
         $this->applyConfig();
 
@@ -452,17 +456,21 @@ abstract class AbstractForm extends UXForm
     protected function loadCustomNode(UXCustomNode $node)
     {
         // nop.
-        $instance = $this->create($node->get('type'), $node, $node->get('x'), $node->get('y'));
+        try {
+            $instance = $this->create($node->get('type'), $node, $node->get('x'), $node->get('y'));
 
-        if ($node->get('hidden')) {
-            $instance->visible = false;
+            if ($node->get('hidden')) {
+                $instance->visible = false;
+            }
+
+            if ($node->get('disabled')) {
+                $instance->enabled = false;
+            }
+
+            return $instance;
+        } catch (IllegalArgumentException $e) {
+            return null;
         }
-
-        if ($node->get('disabled')) {
-            $instance->enabled = false;
-        }
-
-        return $instance;
     }
 
     protected function loadDesign()
@@ -530,13 +538,17 @@ abstract class AbstractForm extends UXForm
             });
 
             $tooltip->opacity = 0;
-            $tooltip->show($this, $this->x + $this->width / 2 - $width / 2, $this->y + $this->height / 2 - $height / 2);
+
+            if ($this->visible) {
+                $tooltip->show($this, $this->x + $this->width / 2 - $width / 2, $this->y + $this->height / 2 - $height / 2);
+            } else {
+                $screen = UXScreen::getPrimary();
+                $tooltip->show($this, $screen->visualBounds['width'] / 2 - $width / 2, $screen->visualBounds['height'] / 2 - $height / 2);
+            }
 
             Animation::fadeIn($tooltip, 300);
 
-            (new Thread(function () use ($timeout, $tooltip) {
-                Thread::sleep($timeout);
-
+            waitAsync($timeout, function () use ($timeout, $tooltip) {
                 try {
                     uiLater(function () use ($tooltip) {
                         Animation::fadeOut($tooltip, 300, function () use ($tooltip) {
@@ -546,7 +558,7 @@ abstract class AbstractForm extends UXForm
                 } catch (IllegalStateException $e) {
                     // ..
                 }
-            }))->start();
+            });
         });
     }
 
@@ -569,8 +581,10 @@ abstract class AbstractForm extends UXForm
      * @throws Exception
      * @throws IllegalStateException
      */
-    public function loadBindings($handler)
+    public function loadBindings($handler = null)
     {
+        $handler = $handler ?: $this;
+
         $class = new ReflectionClass($handler);
         $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
 

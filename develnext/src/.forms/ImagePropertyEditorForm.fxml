@@ -10,7 +10,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="250.0" minWidth="350.0" prefHeight="576.0" prefWidth="680.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="250.0" minWidth="350.0" prefHeight="576.0" prefWidth="680.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TabPane layoutX="14.0" layoutY="16.0" prefHeight="462.0" prefWidth="652.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
         <tabs>
@@ -18,7 +18,7 @@
                <content>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <ScrollPane id="imageView" hbarPolicy="NEVER" layoutY="53.0" prefHeight="380.0" prefViewportHeight="416.1458435058594" prefViewportWidth="470.0" prefWidth="652.0" style="-fx-border-style: dashed; -fx-border-color: gray;" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="53.0" />
+                        <AnchorPane id="imageView" prefHeight="200.0" prefWidth="200.0" style="-fx-border-style: dashed; -fx-border-color: gray;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="53.0" />
                         <Button id="loadButton" layoutY="12.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" styleClass="icon-open" text="Загрузить новое">
                            <padding>
                               <Insets left="15.0" right="15.0" />

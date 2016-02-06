@@ -13,6 +13,7 @@ use php\gui\text\UXFont;
 use php\gui\UXButton;
 use php\gui\UXComboBox;
 use php\gui\UXDialog;
+use php\gui\UXLabel;
 use php\gui\UXNode;
 use ide\formats\FormFormat;
 use php\gui\layout\UXScrollPane;
@@ -121,6 +122,12 @@ class FormElementTypePane
         $this->layout->children->clear();
 
         $this->layout->add($head);
+
+        if (!$elements) {
+            $noLabel = new UXLabel("Список пуст.");
+            $noLabel->padding = 10;
+            $this->layout->add($noLabel);
+        }
 
         $groups = [];
 

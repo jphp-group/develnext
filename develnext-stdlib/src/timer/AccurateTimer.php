@@ -90,7 +90,7 @@ class AccurateTimer
         $handler = $this->handler;
 
         if ($handler($this) === true) {
-            $this->stop();
+            $this->free();
         }
     }
 

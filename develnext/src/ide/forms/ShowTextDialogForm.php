@@ -21,8 +21,9 @@ class ShowTextDialogForm extends AbstractIdeForm
      * ShowTextDialogForm constructor.
      * @param string $label
      * @param string $text
+     * @param bool $readOnly
      */
-    public function __construct($label, $text)
+    public function __construct($label, $text, $readOnly = false)
     {
         parent::__construct();
 
@@ -30,6 +31,7 @@ class ShowTextDialogForm extends AbstractIdeForm
 
         $this->label->text = $label;
         $this->field->text = $text;
+        $this->field->editable = !$readOnly;
     }
 
 

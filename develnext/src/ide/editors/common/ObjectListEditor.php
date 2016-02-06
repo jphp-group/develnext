@@ -85,6 +85,16 @@ class ObjectListEditor
     protected $stringValues = false;
 
     /**
+     * @var string
+     */
+    protected $formMethod = 'form';
+
+    /**
+     * @var string
+     */
+    protected $moduleMethod = 'module';
+
+    /**
      * ObjectListEditor constructor.
      * @param AbstractEditor $editor
      * @param array $filters
@@ -143,7 +153,17 @@ class ObjectListEditor
     {
         $this->stringValues = true;
 
-        return;
+        return $this;
+    }
+
+    /**
+     * @param string $formMethod
+     * @return $this
+     */
+    public function formMethod($formMethod)
+    {
+        $this->formMethod = $formMethod;
+        return $this;
     }
 
     public function enableSender($code = '~sender', $target = '~target')
@@ -343,7 +363,7 @@ class ObjectListEditor
                             $this->addItem(new ObjectListEditorItem(
                                 "{$formEditor->getTitle()}",
                                 Ide::get()->getImage($formEditor->getIcon(), [16, 16]),
-                                'form',
+                                $this->formMethod,
                                 1
                             ));
 
@@ -378,7 +398,7 @@ class ObjectListEditor
                         if ($this->stringValues) {
                             $prefix = "{$formEditor->getTitle()}.";
                         } else {
-                            $prefix = "form('{$formEditor->getTitle()}')";
+                            $prefix = "{$this->formMethod}('{$formEditor->getTitle()}')";
                         }
 
                         $this->addItem(new ObjectListEditorItem(

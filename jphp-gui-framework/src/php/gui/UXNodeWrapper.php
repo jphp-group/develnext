@@ -7,6 +7,7 @@ use php\gui\event\UXKeyEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\View;
 use php\lib\str;
+use script\TimerScript;
 
 class UXNodeWrapper
 {
@@ -61,7 +62,7 @@ class UXNodeWrapper
             $manager = $form->data(UXKeyboardManager::class);
 
             if (!$manager) {
-                $manager = new UXKeyboardManager($this->node->form);
+                $manager = new UXKeyboardManager($form);
                 $form->data(UXKeyboardManager::class, $manager);
             }
 
@@ -72,8 +73,15 @@ class UXNodeWrapper
             $param = $param ? $param : null;
 
             $handler = function (UXKeyEvent $e) use ($_handler) {
+                if ($this->node->isFree() || !$this->node->enabled) {
+                    return;
+                }
+
                 $e = new UXKeyEvent($e, $this->node);
-                $_handler($e);
+
+                uiLater(function () use ($_handler, $e) {
+                    $_handler($e);
+                });
             };
 
             switch ($kind) {
@@ -92,6 +100,12 @@ class UXNodeWrapper
                 default:
                     throw new \Exception("Unable to bind '$kind' event with param = '$param'");
             }
+        } else {
+            TimerScript::executeWhile(function () {
+                return $this->node->form;
+            }, function () use ($event, $_handler, $group) {
+                $this->bindGlobalKey($event, $_handler, $group);
+            });
         }
     }
 
@@ -109,7 +123,9 @@ class UXNodeWrapper
             case 'destroy':
                 $this->node->observer('parent')->addListener(function ($old, $new) use ($handler) {
                     if (!$new) {
-                        $handler(UXEvent::makeMock($this->node));
+                        if (!$this->node->isFree()) {
+                            $handler(UXEvent::makeMock($this->node));
+                        }
                     }
                 });
 

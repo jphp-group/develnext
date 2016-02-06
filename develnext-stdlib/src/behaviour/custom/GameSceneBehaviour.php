@@ -5,7 +5,10 @@ use php\game\UXGamePane;
 use php\game\UXGameScene;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXPane;
 use php\gui\layout\UXScrollPane;
+use php\gui\UXForm;
+use php\gui\UXLabel;
 use php\gui\UXWindow;
 
 class GameSceneBehaviour extends AbstractBehaviour
@@ -38,6 +41,11 @@ class GameSceneBehaviour extends AbstractBehaviour
     protected $scene;
 
     /**
+     * @var UXPane
+     */
+    protected $layout;
+
+    /**
      * @param mixed $target
      */
     protected function applyImpl($target)
@@ -49,8 +57,10 @@ class GameSceneBehaviour extends AbstractBehaviour
 
         if ($target instanceof UXWindow) {
             $target->layout->data('--game-scene', $this);
+            $this->layout = $target->layout;
         } elseif ($target instanceof UXScrollPane) {
             $target->content->data('--game-scene', $this);
+            $this->layout = $target->content;
             $scene->setScrollHandler(function ($x, $y) use ($target) {
                 $target->scrollX = $x;
                 $target->scrollY = $y;
@@ -75,7 +85,11 @@ class GameSceneBehaviour extends AbstractBehaviour
         $this->scene->pause();
         $this->scene->clear();
 
-        $form = app()->getNewForm($name, null, false);
+        if ($this->layout) {
+            $this->layout->children->clear();
+        }
+
+        $form = app()->getNewForm($name, null, false, false, true);
 
         $form->layout->data('--game-scene', $this);
 
@@ -84,11 +98,15 @@ class GameSceneBehaviour extends AbstractBehaviour
         if ($this->_target instanceof UXWindow) {
             $form->makeVirtualLayout();
             $this->_target->layout = $layout;
+            $form->loadBindings();
             $form->loadBehaviours();
         } elseif ($this->_target instanceof UXGamePane) {
             $this->_target->loadArea($layout);
+            $form->loadBindings();
             $form->loadBehaviours();
         }
+
+        $this->layout = $layout;
 
         if ($this->autoplay) {
             $this->scene->play();

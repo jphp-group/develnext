@@ -24,6 +24,11 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
      */
     protected $textField;
 
+    public function setReadOnly($value)
+    {
+        $this->textField->editable = !$value;
+    }
+
     public function makeUi()
     {
         $this->textField = new UXTextField();

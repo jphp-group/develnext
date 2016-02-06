@@ -100,22 +100,24 @@ class IdeObjectTreeList
             $selected = null;
 
             $func(function ($target, $targetId, AbstractFormElement $element = null, $level) use (&$selected, $selectedTargetId) {
-                $item = new ObjectListEditorItem(
-                    $targetId,
-                    $element ? Ide::get()->getImage($element->getIcon()) : null,
-                    $targetId,
-                    $level + $this->levelOffset
-                );
+                if ($targetId) {
+                    $item = new ObjectListEditorItem(
+                        $targetId,
+                        $element ? Ide::get()->getImage($element->getIcon()) : null,
+                        $targetId,
+                        $level + $this->levelOffset
+                    );
 
-                if ($element) {
-                    $item->hint = $element->getName();
+                    if ($element) {
+                        $item->hint = $element->getName();
+                    }
+
+                    if ($selectedTargetId && $selectedTargetId == $targetId) {
+                        $selected = $item;
+                    }
+
+                    $this->ui->items->add($item);
                 }
-
-                if ($selectedTargetId && $selectedTargetId == $targetId) {
-                    $selected = $item;
-                }
-
-                $this->ui->items->add($item);
             });
 
             $this->ui->selected = $selected;

@@ -3,6 +3,7 @@ namespace ide\editors;
 
 use ide\action\ActionEditor;
 use ide\behaviour\IdeBehaviourManager;
+use ide\editors\argument\StringArgumentEditor;
 use ide\editors\common\ObjectListEditorItem;
 use ide\editors\form\IdeActionsPane;
 use ide\editors\form\IdeBehaviourPane;
@@ -13,6 +14,9 @@ use ide\editors\form\IdeObjectTreeList;
 use ide\editors\form\IdePropertiesPane;
 use ide\editors\form\IdeTabPane;
 use ide\editors\menu\ContextMenu;
+use ide\editors\value\BooleanPropertyEditor;
+use ide\editors\value\DoubleArrayPropertyEditor;
+use ide\editors\value\SimpleTextPropertyEditor;
 use ide\formats\AbstractFormFormat;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElement;
@@ -658,7 +662,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 $it[1]->add($it[0]);
 
                 $this->registerNode($it[0]);
-                $this->refreshNode($it[0]);
+                //$this->refreshNode($it[0]);
             }
         }
 
@@ -1192,9 +1196,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
                 $nodeId = $this->getNodeId($node);
 
-                if (!$nodeId) {
+                /*if (!$nodeId) {
                     continue;
-                }
+                }*/
 
                 $element = $this->format->getFormElement($node);
 
@@ -1707,6 +1711,23 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->leftPaneUi->hideEventListPane();
 
             $properties = new UXDesignProperties();
+            $properties->addGroup('prototype', 'Клон');
+            $properties->addGroup('general', 'Главное');
+
+            $editor = new SimpleTextPropertyEditor(function () use ($factoryId) {
+                return $factoryId;
+            }, function () {});
+            $editor->setReadOnly(true);
+            $properties->addProperty('prototype', 'factoryId', 'Прототип', $editor);
+            $properties->addProperty('general', 'position', 'Позиция (X, Y)', new DoubleArrayPropertyEditor());
+
+            $editor = new BooleanPropertyEditor();
+            $editor->setAsDataProperty(null, true);
+            $properties->addProperty('general', 'disabled', 'Отключеный', $editor);
+
+            $editor = new BooleanPropertyEditor();
+            $editor->setAsDataProperty(null, true);
+            $properties->addProperty('general', 'hidden', 'Скрытый', $editor);
 
             if ($this->propertiesPane) {
                 $this->propertiesPane->clearProperties();

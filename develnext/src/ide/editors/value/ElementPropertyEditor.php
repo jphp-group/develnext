@@ -166,17 +166,18 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
 
     /**
      * @param null $realCode
+     * @param bool $native
      * @return $this
      */
-    public function setAsDataProperty($realCode = null)
+    public function setAsDataProperty($realCode = null, $native = false)
     {
-        $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode) {
+        $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode, $native) {
             $target = $this->designProperties->target;
 
-            if ($target->id) {
+            if ($target) {
                 $data = DataUtils::get($target);
 
-                if ($data) {
+                if ($data && !$native) {
                     $data->set($editor->code, $value);
                 } else {
                     $target->data($editor->code, $value);
@@ -190,13 +191,13 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             }
         };
 
-        $this->getter = function (ElementPropertyEditor $editor) {
+        $this->getter = function (ElementPropertyEditor $editor) use ($native) {
             $target = $this->designProperties->target;
 
-            if ($target->id) {
+            if ($target) {
                 $data = DataUtils::get($target);
 
-                if ($data) {
+                if ($data && !$native) {
                     return $data->get($editor->code);
                 } else {
                     return $target->data($editor->code);

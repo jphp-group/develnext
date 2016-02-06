@@ -7,6 +7,7 @@ use ide\forms\area\IconSearchPaneArea;
 use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
+use ide\systems\Cache;
 use ide\utils\FileUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
@@ -31,7 +32,7 @@ use php\util\Flow;
  * Class ImagePropertyEditorForm
  * @package ide\forms
  *
- * @property UXScrollPane $imageView
+ * @property UXAnchorPane $imageView
  * @property UXFlowPane $gallery
  * @property UXAnchorPane $onlineSearchPane
  */
@@ -73,18 +74,10 @@ class ImagePropertyEditorForm extends AbstractIdeForm
         $imageArea->centered = true;
         $imageArea->proportional = true;
         $imageArea->stretch = false;
-        $imageArea->width = $this->imageView->width - 6;
-        $imageArea->height = $this->imageView->height - 6;
+        $imageArea->smartStretch = true;
+        UXAnchorPane::setAnchor($imageArea, 0);
 
-        $this->imageView->observer('width')->addListener(function ($old, $new) use ($imageArea) {
-            $imageArea->width = $new - 6;
-        });
-
-        $this->imageView->observer('height')->addListener(function ($old, $new) use ($imageArea) {
-            $imageArea->height = $new - 6;
-        });
-
-        $this->imageView->content = $imageArea;
+        $this->imageView->add($imageArea);
         $this->imageArea = $imageArea;
 
         Ide::accountManager()->on('login', [$this, 'updateOnlineGallery'], __CLASS__);
@@ -118,7 +111,7 @@ class ImagePropertyEditorForm extends AbstractIdeForm
             $ext = str::lower(FileUtils::getExtension($filename));
 
             if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-                $item = new UXImageArea(new UXImage($filename));
+                $item = new UXImageArea(Cache::getImage($filename));
 
                 $item->size = [72, 72];
 
@@ -168,14 +161,12 @@ class ImagePropertyEditorForm extends AbstractIdeForm
             }
 
             if (Files::isFile($file)) {
-                $image = new UXImage($file);
+                $image = Cache::getImage($file);
                 $this->imageArea->image = $image;
             } else {
                 $image = Ide::get()->getImage('dummyImage.png')->image;
                 $this->imageArea->image = $image;
             }
-
-            $this->imageArea->stretch = $image->width > $this->imageArea->width || $image->height > $this->imageArea->height;
 
             $this->pathField->text = $path;
         });

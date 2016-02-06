@@ -36,7 +36,7 @@ class Collision
         } else {
             $lastTrigger = $object->data($lastTriggerKey);
 
-            if ($lastTrigger > Time::millis() - UXAnimationTimer::FRAME_INTERVAL_MS * 3) {
+            if ($lastTrigger > Time::millis() - UXAnimationTimer::FRAME_INTERVAL_MS * 1.5) {
                 return;
             }
 

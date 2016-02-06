@@ -34,6 +34,11 @@ class BehaviourCreateForm extends AbstractIdeForm
     use SavableFormMixin;
 
     /**
+     * @var null
+     */
+    protected static $selectedTabName = null;
+
+    /**
      * @var IdeBehaviourManager
      */
     protected $behaviourManager;
@@ -120,7 +125,19 @@ class BehaviourCreateForm extends AbstractIdeForm
     }
 
     /**
-     * @event show
+     * @event hide
+     */
+    public function doHide()
+    {
+        if ($this->categoryTabPane->selectedTab) {
+            self::$selectedTabName = $this->categoryTabPane->selectedTab->text;
+        } else {
+            self::$selectedTabName = null;
+        }
+    }
+
+    /**
+     * @event showing
      */
     public function doShow()
     {
@@ -140,6 +157,8 @@ class BehaviourCreateForm extends AbstractIdeForm
             $groupedSpecs[$group][] = $spec;
         }
 
+        $selectedTab = null;
+
         foreach ($groupedSpecs as $name => $list) {
             $tab = new UXTab();
             $tab->text = $name;
@@ -147,11 +166,19 @@ class BehaviourCreateForm extends AbstractIdeForm
 
             $this->categoryTabPane->tabs->add($tab);
 
+            if ($name === self::$selectedTabName) {
+                $selectedTab = $tab;
+            }
+
             $tab->on('change', function () {
                 UXApplication::runLater(function () {
                     $this->updateList();
                 });
             });
+        }
+
+        if ($selectedTab) {
+            $this->categoryTabPane->selectedTab = $selectedTab;
         }
 
         UXApplication::runLater(function () {

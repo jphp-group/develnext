@@ -13,4 +13,22 @@ trait ApplicationTrait
     {
         return app()->appModule();
     }
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function form($name)
+    {
+        return app()->getForm($name);
+    }
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function originForm($name)
+    {
+        return app()->getOriginForm($name);
+    }
 }

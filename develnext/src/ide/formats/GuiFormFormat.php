@@ -293,7 +293,11 @@ class GuiFormFormat extends AbstractFormFormat
                             }
                         }
                     }
+                } else {
+                    Logger::info("Unable to rename to $newId, result = $result");
                 }
+
+                return $result;
             }
         });
     }
