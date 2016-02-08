@@ -794,12 +794,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $elements;
     }
 
-    public function getObjectListOfForm($formName)
+    public function getObjectList($fileName)
     {
         $result = [];
         $project = $this->project;
 
-        $index = $project->getIndexer()->get($this->project->getFile("src/.forms/$formName.fxml"), '_objects');
+        $index = $project->getIndexer()->get($this->project->getAbsoluteFile($fileName), '_objects');
 
         foreach ((array) $index as $it) {
             /** @var AbstractFormElement $element */

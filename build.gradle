@@ -134,6 +134,7 @@ project(':develnext') {
         compile project(':jphp-gui-desktop-ext')
         compile project(':jphp-game-ext')
         compile project(':jphp-parser')
+        compile project(':develnext-doc')
         compile project(':develnext-stdlib')
 
         compile "org.develnext:jphp-xml-ext:$jphpVersion"

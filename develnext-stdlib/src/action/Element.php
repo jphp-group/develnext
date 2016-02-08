@@ -179,7 +179,7 @@ class Element
 
     static function loadContent($object, $path)
     {
-        if ($object instanceof ObjectGroup) {
+        if ($object instanceof Instances) {
             $result = false;
 
             foreach ($object->getInstances() as $it) {
@@ -220,7 +220,7 @@ class Element
 
     static function loadContentAsync($object, $path, callable $callback = null)
     {
-        if ($object instanceof ObjectGroup) {
+        if ($object instanceof Instances) {
             foreach ($object->getInstances() as $it) {
                 self::loadContentAsync($it, $path, $callback);
             }

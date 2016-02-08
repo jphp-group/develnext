@@ -297,6 +297,7 @@ class ObjectListEditor
         if ($this->senderCode) {
             $this->addItem(new ObjectListEditorItem('Текущий объект (self)', null, $this->senderCode));
             $this->addItem(new ObjectListEditorItem('Целевой объект (target)', null, $this->targetCode));
+            $this->addItem(new ObjectListEditorItem('Созданный объект ($instance)', null, "~instance"));
 
             if (!$this->disableForms) {
                 $this->addItem(new ObjectListEditorItem('Текущая форма', null, $this->senderCode . "Form"));

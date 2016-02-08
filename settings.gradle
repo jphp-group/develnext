@@ -8,4 +8,5 @@ include 'jphp-gui-ext',
         'develnext',
         'develnext-stdlib';
 
+include 'develnext-doc';
 include 'develnext-control';

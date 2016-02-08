@@ -54,6 +54,11 @@ class UXMenuItem
     public $disable;
 
     /**
+     * @var mixed
+     */
+    public $userData = null;
+
+    /**
      * @param string $text (optional)
      * @param UXNode $graphic
      */

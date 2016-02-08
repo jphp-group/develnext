@@ -55,6 +55,8 @@ class MainForm extends AbstractIdeForm
         Ide::get()->on('start', function () {
             $this->opacity = 1;
         });
+
+        $mainMenu = $this->mainMenu; // FIX!!!!! see FixSkinMenu
     }
 
     /**

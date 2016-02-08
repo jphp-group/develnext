@@ -266,9 +266,6 @@ abstract class AbstractService
                     $message = $response->message();
 
                     if ($message == 'AuthorizationExpired') {
-                        var_dump($response->message());
-                        var_dump($message == 'AuthorizationExpired');
-                        var_dump($message === 'AuthorizationExpired');
                         Logger::info("{$response->message()}, need auth, methodName = {$methodName}, data = {$data}");
 
                         UXApplication::runLater(function () {
@@ -316,19 +313,29 @@ abstract class AbstractService
                     throw new Exception("Last parameter must be callable for method $name()");
                 }
 
+                $result = new ServiceResponseFuture([]);
+                $result->__used = false;
+
                 if (!$this->pool->isShutdown()) {
-                    $this->pool->execute(function () use ($name, $args, $last) {
+                    $this->pool->execute(function () use ($name, $args, $last, $result) {
                         $json = $this->{$name}(...$args);
+                        $result->apply($json);
 
                         if ($last) {
-                            UXApplication::runLater(function () use ($last, $json) {
+                            uiLater(function () use ($last, $json, $result) {
+                                $result();
                                 $last($json);
                             });
                         }
                     });
                 }
 
-                return;
+                uiLater(function () use ($result) {
+                    $result->__used = true;
+                    $result();
+                });
+
+                return $result;
             }
         }
 

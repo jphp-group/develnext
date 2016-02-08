@@ -27,6 +27,11 @@ class ServiceResponse
         return $this->json['message'];
     }
 
+    public function status()
+    {
+        return $this->json['status'];
+    }
+
     public function isFail()
     {
         return $this->json['status'] == 'fail';

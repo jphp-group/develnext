@@ -23,6 +23,12 @@ class ShowFormAndWaitActionType extends AbstractSimpleActionType
         ];
     }
 
+    function getHelpText()
+    {
+        return "Если у выбранной формы будет выставлен флаг 'Модальность', то все остальные окна будут заблокированы, пока форма не закроется.";
+    }
+
+
     function getSubGroup()
     {
         return self::SUB_GROUP_WINDOW;

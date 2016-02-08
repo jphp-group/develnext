@@ -83,6 +83,8 @@ abstract class AbstractSimpleActionType extends AbstractActionType
                     $result = '$event->sender';
                 } else if ($value == '~target') {
                     $result = '$event->target';
+                } else if ($value == '~instance') {
+                    $result = '$instance';
                 } else if ($value == '~senderForm') {
                     $result = "\$this->getContextForm()";
                 } else {

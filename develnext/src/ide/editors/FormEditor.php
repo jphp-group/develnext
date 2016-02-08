@@ -874,7 +874,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
      */
     public function getObjectList()
     {
-        return GuiFrameworkProjectBehaviour::get()->getObjectListOfForm($this->getTitle());
+        return GuiFrameworkProjectBehaviour::get()->getObjectList($this->file);
     }
 
     public function deleteNode($node)

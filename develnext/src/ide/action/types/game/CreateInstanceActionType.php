@@ -105,15 +105,15 @@ class CreateInstanceActionType extends AbstractSimpleActionType
 
         if (!$action->relative) {
             if ($x == 0 && $y == 0) {
-                return "\$this->create({$action->get('id')}, $parent)";
+                return "\$instance = \$this->create({$action->get('id')}, $parent)";
             } else {
-                return "\$this->create({$action->get('id')}, $parent, $x, $y)";
+                return "\$instance = \$this->create({$action->get('id')}, $parent, $x, $y)";
             }
         } else {
             if ($x == 0 && $y == 0) {
-                return "\$this->create({$action->get('id')}, $parent)";
+                return "\$instance = \$this->create({$action->get('id')}, $parent)";
             } else {
-                return "\$this->create({$action->get('id')}, $parent, $x, $y)";
+                return "\$instance = \$this->create({$action->get('id')}, $parent, $x, $y)";
             }
         }
     }

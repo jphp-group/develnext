@@ -9,6 +9,8 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
+import org.develnext.jphp.ext.javafx.support.UserData;
+import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
@@ -25,7 +27,7 @@ public class UXMenuItem extends BaseWrapper<MenuItem> {
         ObservableList<String> styleClass();
 
         @Property @Nullable Node graphic();
-        @Property ContextMenu parentPopup();
+        @Property(hiddenInDebugInfo = true) ContextMenu parentPopup();
 
         @Property boolean disable();
         @Property boolean visible();
@@ -121,6 +123,32 @@ public class UXMenuItem extends BaseWrapper<MenuItem> {
     @Signature
     public boolean isSeparator() {
         return getWrappedObject() instanceof SeparatorMenuItem;
+    }
+
+    @Getter
+    public Memory getUserData(Environment env) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData == null) {
+            return null;
+        }
+
+        if (userData instanceof UserData) {
+            return ((UserData) userData).getValue();
+        }
+
+        return Memory.wrap(env, userData);
+    }
+
+    @Setter
+    public void setUserData(Environment env, @Nullable Object value) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData instanceof UserData) {
+            ((UserData) userData).setValue(Memory.wrap(env, value));
+        } else {
+            getWrappedObject().setUserData(value);
+        }
     }
 
     @Signature

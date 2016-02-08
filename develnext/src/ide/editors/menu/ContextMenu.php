@@ -3,11 +3,16 @@ namespace ide\editors\menu;
 
 use ide\editors\AbstractEditor;
 use ide\misc\AbstractCommand;
+use ide\misc\EventHandlerBehaviour;
+use php\gui\desktop\Mouse;
+use php\gui\event\UXMouseEvent;
 use php\gui\UXContextMenu;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
 use ide\Ide;
+use php\gui\UXNode;
 use php\lang\IllegalArgumentException;
+use php\lib\str;
 
 /**
  * Class ContextMenu
@@ -15,6 +20,8 @@ use php\lang\IllegalArgumentException;
  */
 class ContextMenu
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var UXContextMenu
      */
@@ -169,8 +176,11 @@ class ContextMenu
 
     public function add(AbstractMenuCommand $command, $group = null)
     {
+        $command->setContextMenu($this);
+
         $menuItem = new UXMenuItem($command->getName(), Ide::get()->getImage($command->getIcon()));
         $menuItem->accelerator = $command->getAccelerator();
+        $menuItem->userData = $command;
 
         if ($this->cssClass) {
             $menuItem->classes->add("$this->cssClass-item");
@@ -215,5 +225,41 @@ class ContextMenu
     public function getRoot()
     {
         return $this->root;
+    }
+
+    /**
+     * Link context menu to node.
+     * @param UXNode $node
+     */
+    public function linkTo(UXNode $node)
+    {
+        $node->on('click', function (UXMouseEvent $e) use ($node) {
+            if ($e->button == 'SECONDARY') {
+                if ($this->root->visible) {
+                    $this->root->hide();
+                }
+
+                $this->trigger('showing');
+
+                foreach ($this->root->items as $item) {
+                    if ($item && $item->userData instanceof AbstractMenuCommand) {
+                        $item->userData->onBeforeShow($item, $this->editor);
+                    }
+                }
+
+                foreach ($this->groups as $menu) {
+                    foreach ($menu->items as $item) {
+                        if ($item->userData instanceof AbstractMenuCommand) {
+                            $item->userData->onBeforeShow($item, $this->editor);
+                        }
+                    }
+                }
+
+                uiLater(function () use ($node) {
+                    $this->root->show($node->form, Mouse::x(), Mouse::y());
+                    $this->trigger('show');
+                });
+            }
+        }, str::uuid());
     }
 }
