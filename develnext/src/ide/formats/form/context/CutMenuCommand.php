@@ -2,7 +2,10 @@
 namespace ide\formats\form\context;
 
 use ide\editors\AbstractEditor;
+use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
+use php\gui\UXMenuItem;
+use php\lib\items;
 
 /**
  * Class CutMenuCommand
@@ -32,5 +35,11 @@ class CutMenuCommand extends AbstractMenuCommand
 
         $copyCommand->onExecute($e, $editor, true);
         $deleteCommand->onExecute($e, $editor);
+    }
+
+    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    {
+        /** @var FormEditor $editor */
+        $item->disable = !items::first($editor->getDesigner()->getSelectedNodes());
     }
 }

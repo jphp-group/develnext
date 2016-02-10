@@ -56,6 +56,10 @@ class AddSubCategoryMenuCommand extends AbstractMenuCommand
             } else {
                 $item->text = $this->getName();
             }
+
+            if ($item->visible) {
+                $item->visible = $editor->isAccessCategory();
+            }
         }
     }
 }

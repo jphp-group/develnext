@@ -13,6 +13,7 @@ use ide\utils\Tree;
  * Class DocService
  * @package ide\doc\account\api
  *
+ * @method ServiceResponseFuture accessInfoAsync(callable $callback = null)
  * @method ServiceResponseFuture categoryTreeAsync(callable $callback = null)
  * @method ServiceResponseFuture categoryAsync($id, callable $callback = null)
  * @method ServiceResponseFuture categoriesAsync($parentCategoryId, callable $callback = null)
@@ -29,6 +30,11 @@ use ide\utils\Tree;
  */
 class DocService extends AbstractService
 {
+    public function accessInfo()
+    {
+        return $this->execute('doc/access-info', []);
+    }
+
     /**
      * Return full tree of categories.
      */
@@ -76,7 +82,7 @@ class DocService extends AbstractService
 
     public function allEntries($sort = 'UPDATED_AT', $offset = 0, $limit = 40)
     {
-        return $this->execute('doc/entries', ['categoryId' => $sort, 'offset' => $offset, 'limit' => $limit]);
+        return $this->execute('doc/entries', ['sort' => $sort, 'offset' => $offset, 'limit' => $limit]);
     }
 
     public function saveEntry($data)

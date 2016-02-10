@@ -17,6 +17,7 @@ use php\io\Stream;
 use php\lang\Thread;
 use php\time\Time;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 /**
  * Class SharedProjectDetailForm
@@ -131,7 +132,7 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
                 Notifications::error('Ошибка удаления', 'Мы не смогли удалить ваш проект, возможно сервис временно недоступен, попробуйте позже.');
                 $this->deleteButton->enabled = false;
 
-                TimerScript::executeAfter(2000, function () {
+                AccurateTimer::executeAfter(2000, function () {
                     $this->deleteButton->enabled = true;
                 });
             }

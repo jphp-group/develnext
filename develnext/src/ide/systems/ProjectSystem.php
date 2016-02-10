@@ -17,6 +17,7 @@ use php\io\File;
 use php\lib\Items;
 use php\lib\Str;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 /**
  * Class ProjectSystem
@@ -107,7 +108,7 @@ class ProjectSystem
             $file->renameTo(Items::first($files));
         }
 
-        TimerScript::executeAfter(1000, function () use ($projectDir, $files, $file, $afterOpen) {
+        AccurateTimer::executeAfter(1000, function () use ($projectDir, $files, $file, $afterOpen) {
             ProjectSystem::open($projectDir . "/" . Items::first($files)->getName());
 
             Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива", 3000);

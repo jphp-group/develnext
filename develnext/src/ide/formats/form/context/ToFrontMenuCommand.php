@@ -4,6 +4,8 @@ namespace ide\formats\form\context;
 use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
+use php\gui\UXMenuItem;
+use php\lib\items;
 
 class ToFrontMenuCommand extends AbstractMenuCommand
 {
@@ -30,5 +32,11 @@ class ToFrontMenuCommand extends AbstractMenuCommand
         foreach ($designer->getSelectedNodes() as $node) {
             $node->toFront();
         }
+    }
+
+    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    {
+        /** @var FormEditor $editor */
+        $item->disable = !items::first($editor->getDesigner()->getSelectedNodes());
     }
 }

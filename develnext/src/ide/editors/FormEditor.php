@@ -99,6 +99,7 @@ use php\util\Flow;
 use php\util\Regex;
 use php\util\SharedStack;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 /**
  * Class FormEditor
@@ -478,6 +479,17 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->getIdeConfig()->put($this->actionsPane->getConfig());
         }
 
+        $blockedNodes = [];
+
+        foreach ($this->designer->getNodes() as $node) {
+            if ($this->designer->getNodeLock($node)) {
+                $id = $this->getNodeId($node);
+                $blockedNodes[$id] = $id;
+            }
+        }
+
+        $this->getIdeConfig()->set('blockedNodes', $blockedNodes);
+
         $this->saveIdeConfig();
     }
 
@@ -675,8 +687,21 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->reloadClones();
 
+        $ideConfig = $this->getIdeConfig();
+
         if ($this->actionsPane) {
-            $this->actionsPane->setConfig($this->getIdeConfig()->toArray());
+            $this->actionsPane->setConfig($ideConfig->toArray());
+        }
+
+        $blockedNodes = $ideConfig->getArray('blockedNodes');
+        $blockedNodes = array_combine($blockedNodes, $blockedNodes);
+
+        foreach ($this->designer->getNodes() as $node) {
+            if ($blockedNodes[$this->getNodeId($node)]) {
+                $this->designer->setNodeLock($node, true);
+            } else {
+                $this->designer->setNodeLock($node, false);
+            }
         }
 
         $this->elementTypePane->resetConfigurable(get_class($this));
@@ -1091,7 +1116,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $panel->observer('width')->addListener($func);
             $panel->observer('height')->addListener($func);
 
-            TimerScript::executeAfter(100, function () use ($panel) {
+            AccurateTimer::executeAfter(100, function () use ($panel) {
                 $content = $this->codeEditorUi;
                 UXAnchorPane::setAnchor($content, 0);
 
@@ -1146,7 +1171,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             $this->viewerAndEvents->items->removeByIndex(1);
 
-            TimerScript::executeAfter(100, function () use ($content) {
+            AccurateTimer::executeAfter(100, function () use ($content) {
                 $this->codeTab->content = $content;
             });
         }

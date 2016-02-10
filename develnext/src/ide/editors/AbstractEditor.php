@@ -85,6 +85,11 @@ abstract class AbstractEditor
         return true;
     }
 
+    public function isDraggable()
+    {
+        return true;
+    }
+
     public function getTabStyle()
     {
         return '';

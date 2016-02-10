@@ -5,6 +5,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
@@ -16,6 +17,9 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
@@ -42,7 +46,9 @@ import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseObject;
 import php.runtime.reflection.ClassEntity;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 @Namespace(GuiDesignerExtension.NS)
 public class UXDesigner extends BaseObject {
@@ -440,26 +446,6 @@ public class UXDesigner extends BaseObject {
                     return;
                 }
 
-                if (contextMenu != null && event.getButton() == MouseButton.SECONDARY) {
-                    if (contextMenu.isShowing()) {
-                        contextMenu.hide();
-                    }
-
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            contextMenu.show(area, event.getScreenX(), event.getScreenY());
-                        }
-                    });
-
-                    event.consume();
-                    return;
-                } else {
-                    if (contextMenu != null) {
-                        contextMenu.hide();
-                    }
-                }
-
                 if (selectionEnabled) {
                     selectionRectangle.setX(event.getScreenX());
                     selectionRectangle.setY(event.getScreenY());
@@ -558,6 +544,8 @@ public class UXDesigner extends BaseObject {
                 if (!event.isShiftDown()) {
                     unselectAll();
                 }
+
+                checkContextMenu(event, area);
 
                 if (selectionEnabled) {
                     Point2D fromXY = area.screenToLocal(selectionRectangle.getX(), selectionRectangle.getY());
@@ -865,6 +853,38 @@ public class UXDesigner extends BaseObject {
         return nodes.containsKey(node);
     }
 
+    protected boolean checkContextMenu(final MouseEvent e, Node node) {
+        if (e.getButton() == MouseButton.SECONDARY) {
+            if (contextMenu != null && !(node instanceof Control)) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+
+                        contextMenu.setX(pointerInfo.getLocation().x);
+                        contextMenu.setY(pointerInfo.getLocation().y);
+                    }
+                });
+
+                if (contextMenu.isShowing()) {
+                    contextMenu.hide();
+                }
+
+                PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+
+                contextMenu.show(node.getScene().getWindow(), pointerInfo.getLocation().x, pointerInfo.getLocation().y);
+            }
+
+            return true;
+        } else {
+            if (contextMenu != null) {
+                contextMenu.hide();
+            }
+
+            return false;
+        }
+    }
+
     @Signature
     public void registerNode(final Node node) {
         if (nodes.containsKey(node)) {
@@ -883,7 +903,7 @@ public class UXDesigner extends BaseObject {
 
         EventHandler<MouseEvent> onDragDetected = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
-                if (getNodeLock(node)) {
+                if (getNodeLock(node) || e.getButton() != MouseButton.PRIMARY) {
                     return;
                 }
 
@@ -909,7 +929,7 @@ public class UXDesigner extends BaseObject {
 
         EventHandler<MouseEvent> onMouseDragged = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
-                if (getNodeLock(node)) {
+                if (getNodeLock(node) || e.getButton() != MouseButton.PRIMARY) {
                     return;
                 }
 
@@ -974,22 +994,6 @@ public class UXDesigner extends BaseObject {
                     selection.drag(selection.node.getLayoutX(), selection.node.getLayoutY(), false);
                 }
 
-                if (e.getButton() == MouseButton.SECONDARY) {
-                    if (contextMenu != null && !(node instanceof Control)) {
-                        if (contextMenu.isShowing()) {
-                            contextMenu.setX(e.getSceneX());
-                            contextMenu.setY(e.getSceneY());
-                            return;
-                        } else {
-                            contextMenu.show(node, e.getScreenX(), e.getScreenY());
-                        }
-                    }
-                } else {
-                    if (contextMenu != null) {
-                        contextMenu.hide();
-                    }
-                }
-
                 if (!(node instanceof TitledPane)
                         && !(node instanceof TabPane)
                         && !(node instanceof ScrollPane)
@@ -1032,6 +1036,7 @@ public class UXDesigner extends BaseObject {
                     }
                 }
 
+                checkContextMenu(e, node);
 
                 //if (e.getButton() == MouseButton.PRIMARY) {
                     e.consume();

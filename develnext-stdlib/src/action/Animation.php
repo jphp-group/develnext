@@ -11,6 +11,7 @@ use php\gui\UXNode;
 use php\gui\UXWindow;
 use php\lang\IllegalArgumentException;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 class Animation
 {
@@ -116,7 +117,7 @@ class Animation
         if ($object instanceof UXWindow) {
             if (!$object->visible) {
                 if ($callback) {
-                    TimerScript::executeAfter($duration, $callback);
+                    AccurateTimer::executeAfter($duration, $callback);
                 }
 
                 return null;

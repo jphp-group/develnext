@@ -7,6 +7,7 @@ use php\gui\framework\ScriptEvent;
 use php\gui\UXNode;
 use php\gui\UXWindow;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 class BlinkAnimationBehaviour extends AnimationBehaviour
 {
@@ -66,7 +67,7 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
                 $this->_fadeOutCallback();
             });
         } else {
-            TimerScript::executeAfter($this->duration, function () {
+            AccurateTimer::executeAfter($this->duration, function () {
                 $this->_fadeOutCallback();
             });
         }

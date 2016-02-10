@@ -49,13 +49,7 @@ function wait($millis)
 
 function waitAsync($millis, callable $callback)
 {
-    $timer = (new AccurateTimer($millis, function (AccurateTimer $timer) use ($callback) {
-        $callback();
-        $timer->free();
-    }));
-
-    $timer->start();
-    return $timer;
+    return AccurateTimer::executeAfter($millis, $callback);
 }
 
 function uiLater(callable $callback)

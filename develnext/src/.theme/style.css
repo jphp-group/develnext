@@ -174,3 +174,11 @@
 .list-view.hide-hor-scroll .scroll-bar:horizontal .decrement-button {
     -fx-padding:0;
 }
+
+.dn-web {
+    -fx-background-color: white;
+}
+
+.scroll-pane.dn-web > .viewport {
+    -fx-background-color: transparent;
+}

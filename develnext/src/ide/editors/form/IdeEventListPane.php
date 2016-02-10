@@ -4,6 +4,7 @@ namespace ide\editors\form;
 use ide\action\ActionEditor;
 use ide\editors\AbstractEditor;
 use ide\editors\CodeEditor;
+use ide\editors\menu\AbstractMenuCommand;
 use ide\editors\menu\ContextMenu;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\event\AbstractEventKind;
@@ -14,6 +15,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
+use php\gui\desktop\Mouse;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\Timer;
@@ -35,6 +37,7 @@ use php\gui\UXNode;
 use php\lang\IllegalStateException;
 use php\lib\Items;
 use php\lib\Str;
+use timer\AccurateTimer;
 
 class IdeEventListPane
 {
@@ -54,6 +57,11 @@ class IdeEventListPane
      * @var UXListView
      */
     protected $uiList;
+
+    /**
+     * @var ContextMenu
+     */
+    protected $contextMenu;
 
     /**
      * @var array
@@ -120,6 +128,7 @@ class IdeEventListPane
 
     public function makeUi()
     {
+        $this->makeContextMenu();
         return $this->ui = $this->makeEventTypePane();
     }
 
@@ -339,6 +348,98 @@ class IdeEventListPane
         }
     }
 
+    protected function makeContextMenu()
+    {
+        $this->contextMenu = new ContextMenu();
+        $this->contextMenu->add(new IdeEventListPaneChangeCommand($this));
+        $this->contextMenu->add(new IdeEventListPaneDeleteCommand($this));
+    }
+
+    protected function makeContextMenuForEdit(callable $onAction)
+    {
+        $menu = new UXContextMenu();
+        $prevKind = null;
+
+        foreach ($this->eventTypes as $type) {
+            $menuItem = new UXMenuItem($type['name'], Ide::get()->getImage($type['icon']));
+
+            /** @var AbstractEventKind $kind */
+            $kind = $type['kind'];
+
+            $variants = $kind->getParamVariants($this->contextEditor);
+
+            if (!$variants) {
+                $menuItem->on('action', function () use ($type, $onAction) {
+                    $onAction($type, $type['code']);
+                });
+
+                if ($this->manager->findBind($this->targetId, $type['code'])) {
+                    $menuItem->disable = true;
+                }
+            } else {
+                $menuItem = new UXMenu($menuItem->text, $menuItem->graphic);
+            }
+
+            if ($prevKind && get_class($prevKind) != get_class($type['kind'])) {
+                $menu->items->add(UXMenuItem::createSeparator());
+            }
+
+            $menu->items->add($menuItem);
+
+            if ($type['separator']) {
+                $menu->items->add(UXMenuItem::createSeparator());
+            }
+
+            if ($variants) {
+                $appendVariants = function ($variants, UXMenu $menuItem) use ($type, &$appendVariants, $onAction) {
+                    foreach ($variants as $name => $param) {
+                        if ($param === '-') {
+                            $menuItem->items->add(UXMenuItem::createSeparator());
+                            continue;
+                        }
+
+                        if (is_array($param)) {
+                            $subItem = new UXMenu($name);
+                            $menuItem->items->add($subItem);
+
+                            $appendVariants($param, $subItem);
+                            continue;
+                        }
+
+                        $code = $type['code'];
+
+                        if ($param) {
+                            $code .= "-$param";
+                        }
+
+                        $item = new UXMenuItem($name);
+
+                        if ($param === false) {
+                            $item->disable = true;
+                        }
+
+                        $item->on('action', function () use ($type, $code, $onAction) {
+                            $onAction($type, $code);
+                        });
+
+                        if ($this->manager->findBind($this->targetId, $code)) {
+                            $item->disable = true;
+                        }
+
+                        $menuItem->items->add($item);
+                    }
+                };
+
+                $appendVariants($variants, $menuItem);
+            }
+
+            $prevKind = $type['kind'];
+        }
+
+        return $menu;
+    }
+
+
     protected function makeEventTypePane()
     {
         $addButton = new UXButton("Добавить событие");
@@ -348,127 +449,44 @@ class IdeEventListPane
         $addButton->graphic = Ide::get()->getImage('icons/plus16.png');
 
         $addButton->on('action', function (UXEvent $event) {
-            $menu = new UXContextMenu();
-            $prevKind = null;
+            $menu = $this->makeContextMenuForEdit(function (array $type, $code) {
+                $this->manager->addBind($this->targetId, $code, $type['kind']);
 
-            foreach ($this->eventTypes as $type) {
-                $menuItem = new UXMenuItem($type['name'], Ide::get()->getImage($type['icon']));
+                $this->trigger('add', [$code, $type]);
 
-                /** @var AbstractEventKind $kind */
-                $kind = $type['kind'];
-
-                $variants = $kind->getParamVariants($this->contextEditor);
-
-                if (!$variants) {
-                    $menuItem->on('action', function () use ($type) {
-                        $this->manager->addBind($this->targetId, $type['code'], $type['kind']);
-
-                        Timer::run(100, function () use ($type) {
-                            if ($this->codeEditor) {
-                                $this->codeEditor->load();
-                            }
-
-                            $this->manager->load();
-
-                            $this->update($this->targetId);
-                            $this->openEventSource($type['code']);
-
-                            $this->trigger('add', [$type['code'], $type]);
-                        });
-                    });
-
-                    if ($this->manager->findBind($this->targetId, $type['code'])) {
-                        $menuItem->disable = true;
+                AccurateTimer::executeAfter(100, function () use ($code, $type) {
+                    if ($this->codeEditor) {
+                        $this->codeEditor->load();
                     }
-                } else {
-                    $menuItem = new UXMenu($menuItem->text, $menuItem->graphic);
-                }
 
-                if ($prevKind && get_class($prevKind) != get_class($type['kind'])) {
-                    $menu->items->add(UXMenuItem::createSeparator());
-                }
+                    $this->manager->load();
 
-                $menu->items->add($menuItem);
+                    $this->update($this->targetId);
 
-                if ($type['separator']) {
-                    $menu->items->add(UXMenuItem::createSeparator());
-                }
+                    $this->setSelectedCode($code);
+                    $this->openEventSource($code);
 
-                if ($variants) {
-                    $appendVariants = function ($variants, UXMenu $menuItem) use ($type, &$appendVariants) {
-                        foreach ($variants as $name => $param) {
-                            if ($param === '-') {
-                                $menuItem->items->add(UXMenuItem::createSeparator());
-                                continue;
-                            }
-
-                            if (is_array($param)) {
-                                $subItem = new UXMenu($name);
-                                $menuItem->items->add($subItem);
-
-                                $appendVariants($param, $subItem);
-                                continue;
-                            }
-
-                            $code = $type['code'];
-
-                            if ($param) {
-                                $code .= "-$param";
-                            }
-
-                            $item = new UXMenuItem($name);
-
-                            if ($param === false) {
-                                $item->disable = true;
-                            }
-
-                            $item->on('action', function () use ($type, $code) {
-                                $this->manager->addBind($this->targetId, $code, $type['kind']);
-
-                                $this->trigger('add', [$code, $type]);
-
-                                Timer::run(100, function () use ($code, $type) {
-                                    if ($this->codeEditor) {
-                                        $this->codeEditor->load();
-                                    }
-
-                                    $this->manager->load();
-
-                                    $this->update($this->targetId);
-
-                                    $this->openEventSource($code);
-
-                                    $this->trigger('add', [$code, $type]);
-                                });
-                            });
-
-                            if ($this->manager->findBind($this->targetId, $code)) {
-                                $item->disable = true;
-                            }
-
-                            $menuItem->items->add($item);
-                        }
-                    };
-
-                    $appendVariants($variants, $menuItem);
-                }
-
-                $prevKind = $type['kind'];
-            }
+                    $this->trigger('add', [$code, $type]);
+                });
+            });
 
             /** @var UXButton $target */
             $target = $event->sender;
-            $menu->show(Ide::get()->getMainForm(), $target->screenX + 100, $target->screenY + $target->height);
+            $menu->showByNode($target, $target->boundsInParent['width'] / 2, $target->boundsInParent['height']);
+        });
+
+        $changeButton = new UXButton();
+        $changeButton->size = [25, 25];
+        $changeButton->graphic = Ide::get()->getImage('icons/exchange16.png');
+        $changeButton->tooltipText = 'Поменять событие';
+
+        $changeButton->on('action', function (UXEvent $event) {
+            $this->doChangeEvent($event);
         });
 
         $deleteButton = new UXButton();
         $deleteButton->size = [25, 25];
         $deleteButton->graphic = Ide::get()->getImage('icons/delete16.png');
-
-        $changeButton = new UXButton();
-        $changeButton->size = [25, 25];
-        $changeButton->graphic = Ide::get()->getImage('icons/exchange16.png');
-        $changeButton->enabled = false;
 
         $editButton = new UXButton("Редактировать");
         $editButton->graphic = Ide::get()->getImage('icons/edit16.png');
@@ -496,29 +514,7 @@ class IdeEventListPane
         $list->id = 'list';
 
         $deleteButton->on('action', function () use ($list) {
-            $selected = Items::first($list->selectedItems);
-
-            if ($selected) {
-                if ($bind = $this->manager->removeBind($this->targetId, $selected['eventCode'])) {
-                    if ($this->actionEditor) {
-                        $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
-                    }
-
-                    Timer::run(100, function () use ($selected, $bind) {
-                        if ($this->codeEditor) {
-                            $this->codeEditor->load();
-                        }
-
-                        $this->manager->load();
-
-                        $this->update($this->targetId);
-
-                        $this->trigger('remove', [$selected['eventCode'], $bind]);
-                    });
-                }
-
-                $this->update($this->targetId);
-            }
+            $this->doDeleteEvent();
         });
 
         $editButton->on('action', function () use ($list) {
@@ -550,6 +546,7 @@ class IdeEventListPane
 
         $eventContextMenu = $this->makeEventContextMenu($list);
 
+        $this->contextMenu->linkTo($list);
         $list->setCellFactory(function (UXListCell $cell, $item) use ($list, $deleteButton, $eventContextMenu) {
             if ($item) {
                 /** @var array $eventType */
@@ -674,5 +671,136 @@ class IdeEventListPane
         }
 
         $this->setSelectedCode($selectedCode);
+    }
+
+    public function doDeleteEvent()
+    {
+        $selected = Items::first($this->uiList->selectedItems);
+
+        if ($selected) {
+            if (MessageBoxForm::confirmDelete('событие ' . $selected['type']['name'])) {
+                if ($bind = $this->manager->removeBind($this->targetId, $selected['eventCode'])) {
+                    if ($this->actionEditor) {
+                        $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);
+                    }
+
+                    AccurateTimer::executeAfter(100, function () use ($selected, $bind) {
+                        if ($this->codeEditor) {
+                            $this->codeEditor->load();
+                        }
+
+                        $this->manager->load();
+
+                        $this->update($this->targetId);
+
+                        $this->trigger('remove', [$selected['eventCode'], $bind]);
+                    });
+                }
+
+                $this->update($this->targetId);
+            }
+        }
+    }
+
+    public function doChangeEvent(UXEvent $event = null)
+    {
+        $menu = $this->makeContextMenuForEdit(function (array $type, $code) {
+            $this->manager->changeBind($this->targetId, $this->getSelectedCode(), $code);
+
+            uiLater(function () use ($code) {
+                if ($this->codeEditor) {
+                    $this->codeEditor->load();
+                }
+
+                $this->manager->load();
+                $this->update($this->targetId);
+                $this->setSelectedCode($code);
+            });
+        });
+
+        if ($event) {
+            /** @var UXNode $target */
+            $target = $event->sender;
+            $menu->showByNode($target, $target->boundsInParent['width'], 0);
+        } else {
+            $menu->show($this->ui->form, Mouse::x(), Mouse::y());
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+class IdeEventListPaneChangeCommand extends AbstractMenuCommand
+{
+    /** @var IdeEventListPane */
+    protected $eventPane;
+
+    /**
+     * IdeEventListPaneDeleteCommand constructor.
+     * @param IdeEventListPane $eventPane
+     */
+    public function __construct(IdeEventListPane $eventPane)
+    {
+        $this->eventPane = $eventPane;
+    }
+
+    public function getName()
+    {
+        return 'Поменять событие';
+    }
+
+    public function getIcon()
+    {
+        return 'icons/exchange16.png';
+    }
+
+    public function onExecute($e = null, AbstractEditor $editor = null)
+    {
+        $this->eventPane->doChangeEvent();
+    }
+
+    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    {
+        $item->disable = !$this->eventPane->getSelectedCode();
+    }
+}
+
+class IdeEventListPaneDeleteCommand extends AbstractMenuCommand
+{
+    /** @var IdeEventListPane */
+    protected $eventPane;
+
+    /**
+     * IdeEventListPaneDeleteCommand constructor.
+     * @param IdeEventListPane $eventPane
+     */
+    public function __construct(IdeEventListPane $eventPane)
+    {
+        $this->eventPane = $eventPane;
+    }
+
+    public function getName()
+    {
+        return 'Удалить';
+    }
+
+    public function getIcon()
+    {
+        return 'icons/delete16.png';
+    }
+
+    public function getAccelerator()
+    {
+        return 'delete';
+    }
+
+    public function onExecute($e = null, AbstractEditor $editor = null)
+    {
+        $this->eventPane->doDeleteEvent();
+    }
+
+    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    {
+        $item->disable = !$this->eventPane->getSelectedCode();
     }
 }

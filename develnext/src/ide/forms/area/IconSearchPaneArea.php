@@ -23,6 +23,7 @@ use php\io\Stream;
 use php\lib\str;
 use php\util\SharedStack;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 /**
  * Class IconSearchPaneArea
@@ -250,8 +251,7 @@ class IconSearchPaneArea extends AbstractFormArea
                 $timer->stop();
             }
 
-            $timer = TimerScript::executeAfter(500, function () use (&$timer, $sizes) {
-
+            $timer = AccurateTimer::executeAfter(500, function () use (&$timer, $sizes) {
                 $this->search($this->queryField->text, $sizes);
             });
 

@@ -8,6 +8,7 @@ namespace ide\formats\form\context {
     use php\gui\event\UXKeyEvent;
     use php\gui\framework\DataUtils;
     use php\gui\UXDialog;
+    use php\gui\UXMenuItem;
     use php\lib\Items;
 
     class DeleteMenuCommand extends AbstractMenuCommand
@@ -55,6 +56,11 @@ namespace ide\formats\form\context {
                 $editor->selectForm();
             }
         }
-    }
 
+        public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+        {
+            /** @var FormEditor $editor */
+            $item->disable = !items::first($editor->getDesigner()->getSelectedNodes());
+        }
+    }
 }

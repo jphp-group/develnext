@@ -165,6 +165,59 @@ class SourceEventManager
         return false;
     }
 
+    public function changeBind($id, $oldEvent, $newEvent)
+    {
+        $bind = $this->findBind($id, $oldEvent);
+
+        if ($bind) {
+            $parser = new PhpParser($this->loadContent());
+
+            $regexEvent = Regex::of('\\*[ ]{0,}\\@event[ ]+([\w\d\\_]+)\\.([\w\d\\_\\-]+).*')->with(Regex::CASE_INSENSITIVE);
+            $regexEventSimple = Regex::of('\\*[ ]{0,}\\@event[ ]+([\w\d\\_\\-]+).*')->with(Regex::CASE_INSENSITIVE);
+            $regexMethodName = Regex::of('function[ ]{1,}do'.str::upperFirst($id).'([\w\d\\_]+)')->with(Regex::CASE_INSENSITIVE);
+
+            $parser->processLines($bind['eventLine'], $bind['beginLine'], function ($line) use ($regexEvent, $regexEventSimple, $regexMethodName, $id, $oldEvent, $newEvent) {
+                $regex = $regexEvent->with($line);
+
+                if ($regex->find()) {
+                    $event = $regex->group(2);
+
+                    if ($event == $oldEvent) {
+                        $line = $regex->replaceGroup(2, $newEvent);
+                    }
+
+                    return $line;
+                }
+
+                $regex = $regexEventSimple->with($line);
+
+                if ($regex->find()) {
+                    $event = $regex->group(1);
+
+                    if ($event == $oldEvent) {
+                        $line = $regex->replaceGroup(1, $newEvent);
+                    }
+
+                    return $line;
+                }
+
+                $regex = $regexMethodName->with($line);
+
+                if ($regex->find()) {
+                    $event = $regex->group(1);
+
+                    if (str::equalsIgnoreCase($event, str::replace($oldEvent, '-', ''))) {
+                        return $regex->replaceGroup(1, str::upperFirst(str::replace($newEvent, '-', '')));
+                    }
+                }
+
+                return $line;
+            });
+
+            $this->save($parser->getContent());
+            $this->load();
+        }
+    }
     /**
      * @param string $oldId
      * @param string $newId

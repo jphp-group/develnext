@@ -10,9 +10,7 @@ import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.UserData;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
-import php.runtime.annotation.Reflection.Nullable;
-import php.runtime.annotation.Reflection.Property;
-import php.runtime.annotation.Reflection.Signature;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
@@ -26,15 +24,12 @@ public class UXTab extends BaseWrapper<Tab> {
         @Property boolean disabled();
 
         @Property @Nullable Node content();
-        @Property @Nullable Node graphic();
         @Property String id();
         @Property boolean selected();
         @Property String style();
 
         @Property @Nullable Tooltip tooltip();
         @Property @Nullable ContextMenu contextMenu();
-
-        @Property String text();
 
         @Property Object userData();
     }
@@ -62,6 +57,26 @@ public class UXTab extends BaseWrapper<Tab> {
         __wrappedObject = new Tab(title, content);
     }
 
+
+    @Getter
+    public String getText() {
+        return getWrappedObject().getText();
+    }
+
+    @Setter
+    public void setText(String value) {
+        getWrappedObject().setText(value);
+    }
+
+    @Getter
+    public Node getGraphic() {
+        return getWrappedObject().getGraphic();
+    }
+
+    @Setter
+    public void setGraphic(@Nullable Node node) {
+        getWrappedObject().setGraphic(node);
+    }
     @Signature
     public Memory data(String name) {
         Object userData = getWrappedObject().getUserData();

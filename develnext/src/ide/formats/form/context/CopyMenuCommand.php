@@ -7,7 +7,9 @@ use ide\editors\menu\AbstractMenuCommand;
 use ide\Ide;
 use php\gui\framework\DataUtils;
 use php\gui\UXClipboard;
+use php\gui\UXMenuItem;
 use php\gui\UXNode;
+use php\lib\items;
 use php\xml\XmlProcessor;
 
 /**
@@ -120,5 +122,11 @@ class CopyMenuCommand extends AbstractMenuCommand
 
             UXClipboard::setText($processor->format($document));
         }
+    }
+
+    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    {
+        /** @var FormEditor $editor */
+        $item->disable = !items::first($editor->getDesigner()->getSelectedNodes());
     }
 }

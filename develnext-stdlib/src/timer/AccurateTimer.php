@@ -111,4 +111,22 @@ class AccurateTimer
 
         unset(self::$timers[$this->id]);
     }
+
+    /**
+     * @param $millis
+     * @param callable $callback
+     * @return AccurateTimer
+     */
+    static function executeAfter($millis, callable $callback)
+    {
+        $timer = new AccurateTimer($millis, function (AccurateTimer $timer) use ($callback) {
+            uiLater(function () use ($callback) {
+                $callback();
+            });
+            return true;
+        });
+
+        $timer->start();
+        return $timer;
+    }
 }

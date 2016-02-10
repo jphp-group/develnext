@@ -148,6 +148,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, WebEngine.class, UXWebEngine.class);
         registerWrapperClass(scope, WebView.class, UXWebView.class);
         registerWrapperClass(scope, Tab.class, UXTab.class);
+        registerWrapperClass(scope, DraggableTab.class, UXDraggableTab.class);
         registerWrapperClass(scope, TabPane.class, UXTabPane.class);
         MemoryOperation.registerWrapper(TabPaneEx.class, UXTabPane.class);
         registerWrapperClass(scope, ScrollPane.class, UXScrollPane.class);

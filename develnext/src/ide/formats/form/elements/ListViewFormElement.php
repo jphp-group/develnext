@@ -28,7 +28,7 @@ class ListViewFormElement extends AbstractFormElement
 
     public function getIdPattern()
     {
-        return "list%s";
+        return "listView%s";
     }
 
     /**

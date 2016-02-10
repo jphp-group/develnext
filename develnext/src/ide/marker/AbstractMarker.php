@@ -7,6 +7,7 @@ use php\gui\framework\ScriptEvent;
 use php\gui\event\UXEvent;
 use php\gui\UXNode;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 /**
  * Class AbstractMarker
@@ -82,7 +83,7 @@ abstract class AbstractMarker
             $this->showImpl($node);
 
             if ($this->timeout) {
-                TimerScript::executeAfter($this->timeout, [$this, 'hide']);
+                AccurateTimer::executeAfter($this->timeout, [$this, 'hide']);
             }
         }
     }

@@ -61,6 +61,11 @@ class ProjectEditor extends AbstractEditor
         return false;
     }
 
+    public function isDraggable()
+    {
+        return false;
+    }
+
     public function open()
     {
         parent::open();

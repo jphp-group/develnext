@@ -45,6 +45,7 @@ use php\lib\Str;
 use php\util\Configuration;
 use php\util\Scanner;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 
 /**
@@ -882,7 +883,7 @@ class Ide extends Application
             $this->registerCommand($command);
         }
 
-        /** @var TimerScript $inactiveTimer */
+        /** @var AccurateTimer $inactiveTimer */
         $inactiveTimer = null;
 
         $this->getMainForm()->addEventFilter('mouseMove', function () use (&$inactiveTimer) {
@@ -899,7 +900,7 @@ class Ide extends Application
             $this->idle = false;
 
             // 5 min.
-            $inactiveTimer = TimerScript::executeAfter(5 * 60 * 1000, function () {
+            $inactiveTimer = AccurateTimer::executeAfter(5 * 60 * 1000, function () {
                 if (!$this->idle) {
                     $this->idle = true;
                     Logger::info("IDE is sleeping, idle mode ...");

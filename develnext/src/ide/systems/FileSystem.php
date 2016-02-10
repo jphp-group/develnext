@@ -14,6 +14,7 @@ use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXContextMenu;
 use php\gui\UXDialog;
+use php\gui\UXDraggableTab;
 use php\gui\UXMenu;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
@@ -38,7 +39,7 @@ class FileSystem
     static protected $addTab;
 
     /**
-     * @var UXTab[]
+     * @var UXDraggableTab[]
      */
     static protected $openedTabs = [];
 
@@ -71,7 +72,32 @@ class FileSystem
      */
     static function getOpened()
     {
-        return static::$openedFiles;
+        $result = [];
+
+        foreach (static::getOpenedTabs() as $tab) {
+            if ($tab->userData instanceof AbstractEditor) {
+                $file = "{$tab->userData->getFile()}";
+
+                $result[FileUtils::hashName($file)] = [
+                    'file' => $file,
+                    'mtime' => File::of($file)->lastModified(),
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @return UXDraggableTab[]
+     */
+    private static function getOpenedTabs()
+    {
+        /** @var UXTabPane $fileTabPane */
+        $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+
+        return items::toArray($fileTabPane->tabs);
     }
 
     /**
@@ -187,7 +213,12 @@ class FileSystem
         }
 
         if (!$tab) {
-            $tab = new UXTab();
+            $tab = new UXDraggableTab();
+            $tab->detachable = false;
+            $tab->disableDragFirst = true;
+            $tab->disableDragLast = true;
+            $tab->draggable = $editor->isDraggable();
+
             $tab->text = $editor->getTitle();
             $tab->tooltip = $editor->getTooltip();
             $tab->style = '-fx-cursor: hand; ' . $editor->getTabStyle();
@@ -312,7 +343,8 @@ class FileSystem
         $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
 
         if (!static::$addTab) {
-            $tab = new UXTab();
+            $tab = new UXDraggableTab();
+            $tab->detachable = false;
             $tab->closable = false;
 
             $button = new UXButton();

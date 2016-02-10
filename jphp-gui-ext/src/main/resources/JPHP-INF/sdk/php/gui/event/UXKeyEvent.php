@@ -54,4 +54,12 @@ class UXKeyEvent extends UXEvent
     public function __construct(UXKeyEvent $parent, $sender)
     {
     }
+
+    /**
+     * @param string $accelerator e.g. Control + R
+     * @return bool
+     */
+    public function matches($accelerator)
+    {
+    }
 }

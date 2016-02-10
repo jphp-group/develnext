@@ -29,6 +29,7 @@ class EditCategoryMenuCommand extends AbstractMenuCommand
     {
         if ($editor instanceof DocEditor) {
             $item->disable = !$editor->getSelectedCategory();
+            $item->visible = $editor->isAccessCategory();
         }
     }
 }

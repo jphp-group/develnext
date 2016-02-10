@@ -9,9 +9,12 @@ use ide\doc\editors\commands\DeleteCategoryMenuCommand;
 use ide\doc\editors\commands\EditCategoryMenuCommand;
 use ide\editors\AbstractEditor;
 use ide\editors\menu\ContextMenu;
+use ide\forms\area\DocEntryListArea;
 use ide\Ide;
+use ide\ui\Notifications;
 use ide\utils\Tree;
 use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXScrollPane;
 use php\gui\UXListView;
 use php\gui\UXNode;
 use php\gui\UXTreeItem;
@@ -35,7 +38,7 @@ class DocEditorTreeItem
 
     public function __toString()
     {
-        return (string) $this->data['name'];
+        return (string)$this->data['name'];
     }
 
     /**
@@ -70,7 +73,7 @@ class DocEditor extends AbstractEditor
     protected $uiTreeMenu;
 
     /**
-     * @var UXNode
+     * @var DocEntryListArea
      */
     protected $ui;
 
@@ -84,7 +87,25 @@ class DocEditor extends AbstractEditor
      */
     protected $expandedItems;
 
+    /**
+     * @var bool
+     */
     protected $treeLoaded = false;
+
+    /**
+     * @var null
+     */
+    protected $loadedCategoryId = -1;
+
+    /**
+     * @var bool
+     */
+    protected $accessCategory = false;
+
+    /**
+     * @var bool
+     */
+    protected $accessEntry = false;
 
     /**
      * DocEditor constructor.
@@ -132,9 +153,59 @@ class DocEditor extends AbstractEditor
 
     protected function loadContent()
     {
-        $this->docService->allEntriesAsync('UPDATED_AT', 0, 50, function () {
+        $item = $this->uiTree->focusedItem;
 
+        $this->docService->accessInfoAsync(function (ServiceResponse $response) {
+            if ($response->isSuccess()) {
+                $this->accessCategory = $response->data()['category'];
+                $this->accessEntry = $response->data()['entry'];
+                $this->ui->setAccess($this->accessCategory, $this->accessEntry);
+            }
         });
+
+        $this->ui->setContent([
+            'name' => 'Документация',
+            'description' => 'Добро пожаловать в справочную систему по DevelNext'
+        ], []);
+
+
+        if ($item->value instanceof DocEditorTreeItem) {
+            $category = $item->value->getData();
+            $this->ui->setContent($category, []);
+
+            if ($category['id'] == $this->loadedCategoryId) {
+                return;
+            }
+
+            $this->ui->showPreloader();
+            $this->docService->entriesAsync($category['id'], 0, 40, function (ServiceResponse $response) use ($item, $category) {
+                $this->ui->setAccess($this->accessCategory, $this->accessEntry);
+                if ($response->isSuccess()) {
+                    $this->ui->setContent($item->value->getData(), $response->data());
+                }
+
+                $this->ui->hidePreloader();
+                $this->loadedCategoryId = $category['id'];
+            });
+        } else {
+            if (null == $this->loadedCategoryId) {
+                return;
+            }
+
+            $this->ui->showPreloader();
+            $this->docService->allEntriesAsync('UPDATED_AT', 0, 50, function (ServiceResponse $response) {
+                if ($response->isSuccess()) {
+                    $this->ui->setContent([
+                        'name' => 'Документация',
+                        'description' => 'Добро пожаловать в справочную систему по DevelNext'
+                    ], $response->data());
+                }
+
+                $this->ui->hidePreloader();
+                $this->loadedCategoryId = null;
+                $this->ui->setAccess($this->accessCategory, $this->accessEntry);
+            });
+        }
     }
 
     protected function getTreeExpandedItems()
@@ -196,6 +267,8 @@ class DocEditor extends AbstractEditor
             $this->uiTree->focusedItem = $this->uiTree->root;
             $this->uiTree->selectedItems = [$this->uiTree->root];
         }
+
+        $this->loadContent();
     }
 
     public function open()
@@ -218,17 +291,37 @@ class DocEditor extends AbstractEditor
         Ide::get()->setUserConfigValue(__CLASS__ . '#treeExpandedItems', $this->getTreeExpandedItems());
     }
 
+    public function addEntry($name)
+    {
+        $category = $this->getSelectedCategory();
+
+        $this->docService->saveEntryAsync([
+            'name' => $name,
+            'categoryId' => $category['id'],
+        ], function (ServiceResponse $response) {
+            if ($response->isNotSuccess()) {
+                Notifications::error('Ошибка', $response->message());
+                return;
+            }
+
+            $this->loadContent();
+        });
+    }
+
     /**
      * @return UXNode
      */
     public function makeUi()
     {
-        $list = new UXListView();
-        UXAnchorPane::setAnchor($list, 10);
+        $ui = new DocEntryListArea();
+        $ui->on('addEntry', [$this, 'addEntry']);
+        UXAnchorPane::setAnchor($ui, 0);
 
-        $this->uiList = $list;
-
-        return $list;
+        $this->ui = $ui;
+        $pane = new UXScrollPane($ui);
+        $pane->fitToWidth = true;
+        $pane->classes->add('dn-web');
+        return $pane;
     }
 
     public function makeLeftPaneUi()
@@ -239,6 +332,10 @@ class DocEditor extends AbstractEditor
         $tree->root->expanded = true;
         $tree->root->graphic = Ide::get()->getImage($this->getIcon());
         $tree->multipleSelection = false;
+
+        $tree->on('mouseUp', function () {
+            $this->loadContent();
+        });
 
         UXAnchorPane::setAnchor($tree, 0);
 
@@ -253,5 +350,21 @@ class DocEditor extends AbstractEditor
         $this->uiTreeMenu->linkTo($tree);
 
         return $tree;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isAccessCategory()
+    {
+        return $this->accessCategory;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isAccessEntry()
+    {
+        return $this->accessEntry;
     }
 }

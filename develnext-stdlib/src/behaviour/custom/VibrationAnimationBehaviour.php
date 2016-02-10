@@ -10,6 +10,7 @@ use php\gui\UXNode;
 use php\lang\IllegalArgumentException;
 use php\util\SharedValue;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 class VibrationAnimationBehaviour extends AnimationBehaviour
 {
@@ -39,13 +40,13 @@ class VibrationAnimationBehaviour extends AnimationBehaviour
                 if ($this->enabled) {
                     $this->_reverseAnimation();
                 } else {
-                    TimerScript::executeAfter($this->duration, function () {
+                    AccurateTimer::executeAfter($this->duration, function () {
                         $this->_reverseAnimation();
                     });
                 }
             };
 
-            TimerScript::executeAfter($this->delay, $func);
+            AccurateTimer::executeAfter($this->delay, $func);
         });
     }
 
@@ -56,13 +57,13 @@ class VibrationAnimationBehaviour extends AnimationBehaviour
                 if ($this->enabled) {
                     $this->_startAnimation();
                 } else {
-                    TimerScript::executeAfter($this->duration, function () {
+                    AccurateTimer::executeAfter($this->duration, function () {
                         $this->_startAnimation();
                     });
                 }
             };
 
-            TimerScript::executeAfter($this->delay, $func);
+            AccurateTimer::executeAfter($this->delay, $func);
         });
     }
 

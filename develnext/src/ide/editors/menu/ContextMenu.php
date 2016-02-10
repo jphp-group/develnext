@@ -5,6 +5,7 @@ use ide\editors\AbstractEditor;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\desktop\Mouse;
+use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXContextMenu;
 use php\gui\UXMenu;
@@ -60,6 +61,7 @@ class ContextMenu
     {
         $this->editor = $editor;
         $this->root = new UXContextMenu();
+        $this->root->on('showing', [$this, 'doShowing']);
 
         foreach ($commands as $command) {
             $this->add($command);
@@ -227,39 +229,68 @@ class ContextMenu
         return $this->root;
     }
 
+    public function doShowing()
+    {
+        $this->trigger('showing');
+
+        foreach ($this->root->items as $item) {
+            if ($item && $item->userData instanceof AbstractMenuCommand) {
+                $item->userData->onBeforeShow($item, $this->editor);
+            }
+        }
+
+        foreach ($this->groups as $menu) {
+            foreach ($menu->items as $item) {
+                if ($item->userData instanceof AbstractMenuCommand) {
+                    $item->userData->onBeforeShow($item, $this->editor);
+                }
+            }
+        }
+
+        uiLater(function () {
+            $this->trigger('show');
+        });
+    }
+
     /**
      * Link context menu to node.
      * @param UXNode $node
      */
     public function linkTo(UXNode $node)
     {
-        $node->on('click', function (UXMouseEvent $e) use ($node) {
+        $handle = function (UXMouseEvent $e) use ($node) {
             if ($e->button == 'SECONDARY') {
                 if ($this->root->visible) {
                     $this->root->hide();
                 }
 
-                $this->trigger('showing');
-
-                foreach ($this->root->items as $item) {
-                    if ($item && $item->userData instanceof AbstractMenuCommand) {
-                        $item->userData->onBeforeShow($item, $this->editor);
-                    }
-                }
-
-                foreach ($this->groups as $menu) {
-                    foreach ($menu->items as $item) {
-                        if ($item->userData instanceof AbstractMenuCommand) {
-                            $item->userData->onBeforeShow($item, $this->editor);
-                        }
-                    }
-                }
-
                 uiLater(function () use ($node) {
                     $this->root->show($node->form, Mouse::x(), Mouse::y());
-                    $this->trigger('show');
                 });
             }
-        }, str::uuid());
+        };
+
+        $node->on('keyUp', function (UXKeyEvent $e) {
+            foreach ($this->root->items as $item) {
+                if ($item && $item->userData instanceof AbstractCommand) {
+                    if ($e->matches($item->userData->getAccelerator())) {
+                        $item->userData->onExecute($e, $this->editor);
+                        break;
+                    }
+                }
+            }
+
+            foreach ($this->groups as $menu) {
+                foreach ($menu->items as $item) {
+                    if ($e->matches($item->userData->getAccelerator())) {
+                        $item->userData->onExecute($e, $this->editor);
+                        break;
+                    }
+                }
+            }
+        }, __CLASS__);
+
+
+        $node->on('click', $handle, str::uuid());
     }
 }
