@@ -105,7 +105,13 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     @Signature
     @SuppressWarnings("unchecked")
     public boolean remove(Environment env, Memory object) {
-        return getWrappedObject().remove((T) Memory.unwrap(env, object));
+        if (object.isObject()) {
+            return getWrappedObject().remove((T) Memory.unwrap(env, object));
+        }
+
+        int sizeBefore = getWrappedObject().size();
+        getWrappedObject().remove(object.toInteger());
+        return sizeBefore != getWrappedObject().size();
     }
 
 
