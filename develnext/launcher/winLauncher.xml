@@ -25,16 +25,16 @@
     <maxVersion></maxVersion>
     <jdkPreference>jreOnly</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <initialHeapSize>128</initialHeapSize>
+    <initialHeapSize>256</initialHeapSize>
     <maxHeapSize>2048</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8 -Ddevelnext.launcher=root</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.0.0.0</fileVersion>
+    <fileVersion>4.0.0.0</fileVersion>
     <txtFileVersion>-</txtFileVersion>
-    <fileDescription>RAD Studio for PHP</fileDescription>
+    <fileDescription>DevelNext IDE</fileDescription>
     <copyright>2016, OpenSource</copyright>
-    <productVersion>1.0.0.0</productVersion>
+    <productVersion>4.0.0.0</productVersion>
     <txtProductVersion>-</txtProductVersion>
     <productName>DevelNext</productName>
     <companyName>Dim-S Software</companyName>

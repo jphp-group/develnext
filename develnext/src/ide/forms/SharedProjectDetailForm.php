@@ -76,13 +76,13 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
 
     public function isAuthRequired()
     {
-        return true;
+        return false;
     }
 
     protected function init()
     {
         parent::init();
-       $this->icon->image = ico('flatUpload32')->image;
+        $this->icon->image = ico('flatUpload32')->image;
     }
 
     public function update(array $data)

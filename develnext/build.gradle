@@ -44,28 +44,6 @@ task distPatchZip(type: Zip, dependsOn: ['clean', 'distPatch']) {
     }
 }
 
-task distIdeZip(type: Zip, dependsOn: ['clean', 'distIde']) {
-    def ver = new Date(System.currentTimeMillis()).format("yyyyMMddhh");
-
-    from "$project.buildDir/install/$project.name"
-    archiveName "DevelNext.NigthlyBuild.${ver}.zip"
-
-    doLast {
-        def uploadPath = System.getProperty("uploadPath", "E:/Upload")
-
-        if (new File(uploadPath).isDirectory()) {
-            copy {
-                from distIdeZip.archivePath
-                into "$uploadPath/YandexDisk"
-            }
-
-            copy {
-                from distIdeZip.archivePath
-                into "$uploadPath/mega"
-            }
-        }
-    }
-}
 
 task distPatch(dependsOn: ['clean', 'installDist']) {
     doLast {
@@ -85,6 +63,20 @@ task distPatch(dependsOn: ['clean', 'installDist']) {
             from "$project.rootDir/develnext/misc"
             into "$project.buildDir/install/$project.name"
         }
+    }
+}
+
+
+task distIdeWindows(dependsOn: ['distIde']) {
+    doLast {
+        delete "$project.buildDir/install/$project.name/tools/jreLinux"
+    }
+}
+
+task distIdeLinux(dependsOn: ['distIde']) {
+    doLast {
+        delete "$project.buildDir/install/$project.name/tools/jre"
+        file("$project.buildDir/install/$project.name/tools/jreLinux").renameTo(file("$project.buildDir/install/$project.name/tools/jre"))
     }
 }
 
@@ -114,4 +106,56 @@ task distIde(dependsOn: ['installDist']) {
     }
 }
 
+task distIdeWindowsSetup(dependsOn: ['distIdeWindows']) {
+    doLast {
+        def issFile = "$project.rootDir/develnext/windowsSetup/innosetup.iss".replace("\\", "/")
+        def innoSetupBin = "$project.rootDir/develnext-tools/innoSetup/ISCC.exe".replace("\\", "/")
 
+        exec {
+            commandLine innoSetupBin, '/Qp', issFile
+        }
+
+        def uploadPath = System.getProperty("uploadPath", "E:/Upload")
+
+        if (new File(uploadPath).isDirectory()) {
+            copy {
+                from "$project.buildDir/install/$project.name/DevelNextSetup.exe"
+                into "$uploadPath/YandexDisk"
+            }
+        }
+    }
+}
+
+task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
+    def installDir = "$project.buildDir/install/$project.name"
+
+    compression = Compression.GZIP
+    archiveName "DevelNextLinux.tar.gz"
+
+    from(installDir) {
+        exclude('*.sh')
+        exclude('bin/develnext')
+        exclude('tools/gradle/bin/gradle')
+        exclude('tools/jre/bin/java')
+    }
+
+    from(installDir) {
+        include('*.sh')
+        include('bin/develnext')
+        include('tools/gradle/bin/gradle')
+        include('tools/jre/bin/java')
+
+        fileMode = 0755
+    }
+
+    doLast {
+        def uploadPath = System.getProperty("uploadPath", "E:/Upload")
+
+        if (new File(uploadPath).isDirectory()) {
+            copy {
+                from distIdeLinuxSetup.archivePath
+                into "$uploadPath/YandexDisk"
+            }
+        }
+    }
+}

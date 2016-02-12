@@ -14,6 +14,7 @@ use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
+use ide\protocol\AbstractProtocolHandler;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
@@ -147,6 +148,7 @@ class Ide extends Application
             function () {
                 Logger::reset();
                 Logger::info("Start IDE, mode = $this->mode, os = $this->OS, version = {$this->getVersion()}");
+                Logger::info(str::format("Commands Args = [%s]", str::join($GLOBALS['argv'], ', ')));
 
                 restore_exception_handler();
 
@@ -193,6 +195,15 @@ class Ide extends Application
 
                 if ($this->isDevelopment()) {
                     restore_exception_handler();
+                }
+
+                if ($this->handleArgs($GLOBALS['argv'])) {
+                    Logger::info("Protocol handler is shutdown ide ...");
+
+                    TimerScript::executeAfter(7000, function () {
+                        $this->shutdown();
+                    });
+                    return;
                 }
 
                 $this->splash = $splash = new SplashForm();
@@ -1098,5 +1109,29 @@ class Ide extends Application
         } else {
             return $this->getOwnFile("include/" . $include);
         }
+    }
+
+    protected function handleArgs($argv)
+    {
+        $arg = $argv[1];
+
+        if (str::startsWith($arg, 'develnext://')) {
+            $arg = str::sub($arg, str::length('develnext://'));
+
+            $protocolHandlers = $this->getInternalList('.dn/protocolHandlers');
+
+            foreach ($protocolHandlers as $protocolHandler) {
+                /** @var AbstractProtocolHandler $protocolHandler */
+                $protocolHandler = new $protocolHandler();
+
+                if ($protocolHandler->isValid($arg)) {
+                    if ($protocolHandler->handle($arg)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }
