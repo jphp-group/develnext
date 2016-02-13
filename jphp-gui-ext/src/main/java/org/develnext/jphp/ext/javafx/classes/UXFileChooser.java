@@ -123,22 +123,40 @@ public class UXFileChooser extends BaseWrapper<FileChooser> {
 
     @Signature
     public File execute() {
-        return getWrappedObject().showOpenDialog(null);
+        return showOpenDialog();
     }
 
     @Signature
     public File showOpenDialog(@Nullable Window window) {
-        return getWrappedObject().showOpenDialog(window);
+        File file = getWrappedObject().showOpenDialog(window);
+
+        if (file != null) {
+            getWrappedObject().setInitialDirectory(file.getParentFile());
+        }
+
+        return file;
     }
 
     @Signature
     public File showSaveDialog(@Nullable Window window) {
-        return getWrappedObject().showSaveDialog(window);
+        File file = getWrappedObject().showSaveDialog(window);
+
+        if (file != null) {
+            getWrappedObject().setInitialDirectory(file.getParentFile());
+        }
+
+        return file;
     }
 
     @Signature
     public List<File> showOpenMultipleDialog(@Nullable Window window) {
-        return getWrappedObject().showOpenMultipleDialog(window);
+        List<File> files = getWrappedObject().showOpenMultipleDialog(window);
+
+        if (!files.isEmpty()) {
+            getWrappedObject().setInitialDirectory(files.get(0).getParentFile());
+        }
+
+        return files;
     }
 
     @Signature

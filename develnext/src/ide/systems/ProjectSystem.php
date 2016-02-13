@@ -37,7 +37,9 @@ class ProjectSystem
         Logger::info("Check directory: $path");
 
         if (File::of($path)->find()) {
-            $msg = new MessageBoxForm("Папка $path для проекта должна быть пустой, хотите очистить её, чтобы продолжить?", [
+            $path = File::of($path);
+
+            $msg = new MessageBoxForm("Папка '$path' для проекта должна быть пустой, хотите очистить её, чтобы продолжить?", [
                 'Да, очистить и продолжить',
                 'Нет, выбрать другую',
                 'Отмена'

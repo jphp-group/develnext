@@ -241,7 +241,7 @@ class IdeEventListPane
         return $menu;
     }
 
-    protected function jumpToLine($eventCode)
+    public function jumpToLine($eventCode)
     {
         if ($this->codeEditor) {
             $bind = $this->manager->findBind($this->targetId, $eventCode);
@@ -351,7 +351,10 @@ class IdeEventListPane
     protected function makeContextMenu()
     {
         $this->contextMenu = new ContextMenu();
+        $this->contextMenu->add(new IdeEventListPaneAddCommand($this));
         $this->contextMenu->add(new IdeEventListPaneChangeCommand($this));
+        $this->contextMenu->add(new IdeEventListPaneOpenInConstructorCommand($this));
+        $this->contextMenu->add(new IdeEventListPaneOpenInPhpEditorCommand($this));
         $this->contextMenu->add(new IdeEventListPaneDeleteCommand($this));
     }
 
@@ -449,30 +452,7 @@ class IdeEventListPane
         $addButton->graphic = Ide::get()->getImage('icons/plus16.png');
 
         $addButton->on('action', function (UXEvent $event) {
-            $menu = $this->makeContextMenuForEdit(function (array $type, $code) {
-                $this->manager->addBind($this->targetId, $code, $type['kind']);
-
-                $this->trigger('add', [$code, $type]);
-
-                AccurateTimer::executeAfter(100, function () use ($code, $type) {
-                    if ($this->codeEditor) {
-                        $this->codeEditor->load();
-                    }
-
-                    $this->manager->load();
-
-                    $this->update($this->targetId);
-
-                    $this->setSelectedCode($code);
-                    $this->openEventSource($code);
-
-                    $this->trigger('add', [$code, $type]);
-                });
-            });
-
-            /** @var UXButton $target */
-            $target = $event->sender;
-            $menu->showByNode($target, $target->boundsInParent['width'] / 2, $target->boundsInParent['height']);
+            $this->doAddEvent($event);
         });
 
         $changeButton = new UXButton();
@@ -726,9 +706,149 @@ class IdeEventListPane
             $menu->show($this->ui->form, Mouse::x(), Mouse::y());
         }
     }
+
+    public function doAddEvent(UXEvent $event = null)
+    {
+        $menu = $this->makeContextMenuForEdit(function (array $type, $code) {
+            $this->manager->addBind($this->targetId, $code, $type['kind']);
+
+            $this->trigger('add', [$code, $type]);
+
+            uiLater(function () use ($code, $type) {
+                if ($this->codeEditor) {
+                    $this->codeEditor->load();
+                }
+
+                $this->manager->load();
+
+                $this->update($this->targetId);
+
+                $this->setSelectedCode($code);
+                $this->openEventSource($code);
+
+                $this->trigger('add', [$code, $type]);
+            });
+        });
+
+        if ($event) {
+            /** @var UXButton $target */
+            $target = $event->sender;
+            $menu->showByNode($target, $target->boundsInParent['width'] / 2, $target->boundsInParent['height']);
+        } else {
+            $menu->show($this->ui->form, Mouse::x(), Mouse::y());
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+class IdeEventListPaneOpenInConstructorCommand extends AbstractMenuCommand
+{
+    /** @var IdeEventListPane */
+    protected $eventPane;
+
+    /**
+     * IdeEventListPaneDeleteCommand constructor.
+     * @param IdeEventListPane $eventPane
+     */
+    public function __construct(IdeEventListPane $eventPane)
+    {
+        $this->eventPane = $eventPane;
+    }
+
+    public function getName()
+    {
+        return 'Открыть в конструкторе';
+    }
+
+    public function getIcon()
+    {
+        return 'icons/wizard16.png';
+    }
+
+    public function onExecute($e = null, AbstractEditor $editor = null)
+    {
+        $this->eventPane->openEventSource($this->eventPane->getSelectedCode(), 'constructor');
+        $this->eventPane->trigger('edit', [$this->eventPane->getSelectedCode(), 'constructor']);
+    }
+
+    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    {
+        $item->disable = !$this->eventPane->getSelectedCode();
+    }
+}
+
+
+class IdeEventListPaneOpenInPhpEditorCommand extends AbstractMenuCommand
+{
+    /** @var IdeEventListPane */
+    protected $eventPane;
+
+    /**
+     * IdeEventListPaneDeleteCommand constructor.
+     * @param IdeEventListPane $eventPane
+     */
+    public function __construct(IdeEventListPane $eventPane)
+    {
+        $this->eventPane = $eventPane;
+    }
+
+    public function getName()
+    {
+        return 'Открыть в php-редакторе';
+    }
+
+    public function getIcon()
+    {
+        return 'icons/phpFile16.png';
+    }
+
+    public function onExecute($e = null, AbstractEditor $editor = null)
+    {
+        $this->eventPane->jumpToLine($this->eventPane->getSelectedCode());
+        $this->eventPane->trigger('edit', [$this->eventPane->getSelectedCode(), 'php']);
+    }
+
+    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    {
+        $item->disable = !$this->eventPane->getSelectedCode();
+    }
+
+    public function withSeparator()
+    {
+        return true;
+    }
+}
+
+class IdeEventListPaneAddCommand extends AbstractMenuCommand
+{
+    /** @var IdeEventListPane */
+    protected $eventPane;
+
+    /**
+     * IdeEventListPaneDeleteCommand constructor.
+     * @param IdeEventListPane $eventPane
+     */
+    public function __construct(IdeEventListPane $eventPane)
+    {
+        $this->eventPane = $eventPane;
+    }
+
+    public function getName()
+    {
+        return 'Добавить событие';
+    }
+
+    public function getIcon()
+    {
+        return 'icons/plus16.png';
+    }
+
+    public function onExecute($e = null, AbstractEditor $editor = null)
+    {
+        $this->eventPane->doAddEvent();
+    }
+}
 
 class IdeEventListPaneChangeCommand extends AbstractMenuCommand
 {
@@ -762,6 +882,11 @@ class IdeEventListPaneChangeCommand extends AbstractMenuCommand
     public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
     {
         $item->disable = !$this->eventPane->getSelectedCode();
+    }
+
+    public function withSeparator()
+    {
+        return true;
     }
 }
 

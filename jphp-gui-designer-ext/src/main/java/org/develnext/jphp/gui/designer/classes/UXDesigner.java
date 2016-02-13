@@ -407,7 +407,7 @@ public class UXDesigner extends BaseObject {
             public void handle(KeyEvent event) {
                 if (contextMenu != null) {
                     for (MenuItem menuItem : contextMenu.getItems()) {
-                        if (menuItem != null && !menuItem.isDisable()
+                        if (menuItem != null /*&& !menuItem.isDisable() */
                                 && menuItem.getAccelerator() != null && menuItem.getAccelerator().match(event)) {
                             menuItem.getOnAction().handle(new ActionEvent(menuItem, null));
 

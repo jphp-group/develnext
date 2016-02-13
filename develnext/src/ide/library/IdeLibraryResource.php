@@ -1,10 +1,12 @@
 <?php
 namespace ide\library;
 use Files;
+use ide\Ide;
 use ide\Logger;
 use php\io\File;
 use php\io\IOException;
 use php\lang\IllegalStateException;
+use php\lib\str;
 use php\util\Configuration;
 use ide\utils\FileUtils;
 
@@ -154,6 +156,14 @@ abstract class IdeLibraryResource
         if (!Files::delete("{$this->getPath()}.resource")) {
             Logger::error("Unable to delete {$this->getPath()}.resource");
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmbedded()
+    {
+        return str::startsWith(FileUtils::hashName($this->path), FileUtils::hashName(Ide::get()->getOwnFile('')));
     }
 
     public function onRegister(IdeLibrary $library)

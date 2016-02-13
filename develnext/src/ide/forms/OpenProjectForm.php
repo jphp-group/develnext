@@ -5,14 +5,17 @@ use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\library\IdeLibraryProjectResource;
+use ide\library\IdeLibraryResource;
 use ide\project\Project;
 use ide\project\ProjectConfig;
+use ide\systems\DialogSystem;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\ui\FlowListViewDecorator;
 use ide\ui\ImageBox;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
+use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
@@ -23,6 +26,7 @@ use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;
 use php\gui\UXFileChooser;
+use php\gui\UXForm;
 use php\gui\UXHyperlink;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
@@ -41,6 +45,7 @@ use php\lib\Str;
  * @property UXButton $openButton
  * @property UXTabPane $tabPane
  * @property UXListView $libraryList
+ * @property UXListView $embeddedLibraryList
  *
  * Class OpenProjectForm
  * @package ide\forms
@@ -50,22 +55,35 @@ class OpenProjectForm extends AbstractIdeForm
     use DialogFormMixin;
     use SavableFormMixin;
 
-    /** @var UXDirectoryChooser */
-    protected $directoryChooser;
-
-    /** @var UXFileChooser */
-    protected static $fileChooser;
-
     /**
      * @var FlowListViewDecorator
      */
     protected $projectListHelper;
 
+    /**
+     * @param null $tab
+     */
+    public function __construct($tab = null)
+    {
+        parent::__construct();
+
+        if ($tab) {
+            switch ($tab) {
+                case 'library':
+                    $this->tabPane->selectedIndex = 2;
+                    break;
+                case 'embeddedLibrary':
+                    $this->tabPane->selectedIndex = 1;
+                    break;
+            }
+        }
+    }
+
     public function init()
     {
         parent::init();
 
-        $this->libraryList->setCellFactory(function (UXListCell $cell, IdeLibraryProjectResource $resource) {
+        $cellFactory = function (UXListCell $cell, IdeLibraryProjectResource $resource) {
             $titleName = new UXLabel($resource->getName());
             $titleName->style = '-fx-font-weight: bold;';
 
@@ -80,16 +98,16 @@ class OpenProjectForm extends AbstractIdeForm
             $actions->spacing = 7;
 
             $openLink = new UXHyperlink('Открыть');
-            $openLink->on('click', function () use ($resource) {
-                $this->libraryList->selectedIndex = $this->libraryList->items->indexOf($resource);
-                $this->doCreate();
+            $openLink->on('click', function () use ($resource, $cell) {
+                $cell->listView->selectedIndex = $cell->listView->items->indexOf($resource);
+                $this->doCreate(UXEvent::makeMock($cell->listView));
             });
             $actions->add($openLink);
 
             $deleteLink = new UXHyperlink('Удалить');
-            $deleteLink->on('click', function () use ($resource) {
-                $this->libraryList->selectedIndex = $this->libraryList->items->indexOf($resource);
-                $this->doDelete();
+            $deleteLink->on('click', function () use ($resource, $cell) {
+                $cell->listView->selectedIndex = $cell->listView->items->indexOf($resource);
+                $this->doDelete(UXEvent::makeMock($cell->listView));
             });
             $actions->add($deleteLink);
 
@@ -104,7 +122,9 @@ class OpenProjectForm extends AbstractIdeForm
             $cell->text = null;
             $cell->graphic = $line;
             $cell->style = '';
-        });
+        };
+        $this->embeddedLibraryList->setCellFactory($cellFactory);
+        $this->libraryList->setCellFactory($cellFactory);
 
         $this->projectListHelper = new FlowListViewDecorator($this->projectList->content);
         $this->projectListHelper->setEmptyListText('Список проектов пуст.');
@@ -126,16 +146,6 @@ class OpenProjectForm extends AbstractIdeForm
 
             return false;
         });
-
-        $this->directoryChooser = new UXDirectoryChooser();
-
-        if (!self::$fileChooser) {
-            self::$fileChooser = new UXFileChooser();
-            self::$fileChooser->extensionFilters = [
-                ['description' => 'DevelNext проекты и архивы', 'extensions' => ['*.dnproject', '*.zip']]
-            ];
-            //self::$fileChooser->initialDirectory = Ide::get()->getUserConfigValue('projectDirectory');
-        }
 
         $this->icon->image = Ide::get()->getImage('icons/open32.png')->image;
         $this->modality = 'APPLICATION_MODAL';
@@ -197,10 +207,19 @@ class OpenProjectForm extends AbstractIdeForm
     public function updateLibrary()
     {
         $this->libraryList->items->clear();
+        $this->embeddedLibraryList->items->clear();
 
         $libraryResources = Ide::get()->getLibrary()->getResources('projects');
 
-        $this->libraryList->items->addAll($libraryResources);
+        foreach ($libraryResources as $resource) {
+            if (!$resource->isEmbedded()) {
+                $this->libraryList->items->add($resource);
+            } else {
+                $this->embeddedLibraryList->items->add($resource);
+            }
+        }
+
+        $this->embeddedLibraryList->selectedIndex = 0;
         $this->libraryList->selectedIndex = 0;
     }
 
@@ -211,10 +230,6 @@ class OpenProjectForm extends AbstractIdeForm
     {
         $this->update();
         $this->updateLibrary();
-
-        if ($this->projectListHelper->count() == 0) {
-            $this->tabPane->selectedIndex = 1;
-        }
     }
 
     /**
@@ -222,7 +237,7 @@ class OpenProjectForm extends AbstractIdeForm
      */
     public function doOpenButtonClick()
     {
-        if ($file = self::$fileChooser->execute()) {
+        if ($file = DialogSystem::getOpenProject()->execute()) {
             $this->hide();
 
             UXApplication::runLater(function () use ($file) {
@@ -283,7 +298,7 @@ class OpenProjectForm extends AbstractIdeForm
      */
     public function doChoosePath()
     {
-        $path = $this->directoryChooser->execute();
+        $path = DialogSystem::getProjectsDirectory()->execute();
 
         if ($path !== null) {
             $this->pathField->text = $path;
@@ -294,12 +309,17 @@ class OpenProjectForm extends AbstractIdeForm
     }
 
     /**
+     * @event embeddedLibraryList.click-2x
      * @event libraryList.click-2x
+     * @param UXEvent $e
      */
-    public function doCreate()
+    public function doCreate(UXEvent $e)
     {
+        /** @var UXListView $listView */
+        $listView = $e->sender;
+
         /** @var IdeLibraryProjectResource $selected */
-        $selected = $this->libraryList->selectedItem;
+        $selected = $listView->selectedItem;
 
         if ($selected) {
             $path = File::of($this->pathField->text);
@@ -317,16 +337,31 @@ class OpenProjectForm extends AbstractIdeForm
         }
     }
 
-    public function doDelete()
+    public function doDelete(UXEvent $e)
     {
+        /** @var UXListView $listView */
+        $listView = $e->sender;
+
         /** @var IdeLibraryProjectResource $selected */
-        $selected = $this->libraryList->selectedItem;
+        $selected = $listView->selectedItem;
 
         if ($selected) {
             if (MessageBoxForm::confirmDelete($selected->getName())) {
                 Ide::get()->getLibrary()->delete($selected);
                 $this->updateLibrary();
-                $this->libraryList->selectedIndex = -1;
+                $listView->selectedIndex = -1;
+            }
+        }
+    }
+
+    public function selectLibraryResource(IdeLibraryResource $resource)
+    {
+        foreach ([$this->libraryList, $this->embeddedLibraryList] as $list) {
+            foreach ($list->items as $i => $it) {
+                if (FileUtils::equalNames($resource->getPath(), $it->getPath())) {
+                    $list->selectedIndex = $i;
+                    return;
+                }
             }
         }
     }

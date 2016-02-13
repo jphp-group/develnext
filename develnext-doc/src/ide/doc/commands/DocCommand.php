@@ -2,8 +2,10 @@
 namespace ide\doc\commands;
 
 use ide\editors\AbstractEditor;
+use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\systems\FileSystem;
+use ide\ui\Notifications;
 use php\gui\UXSeparator;
 
 class DocCommand extends AbstractCommand
@@ -28,16 +30,20 @@ class DocCommand extends AbstractCommand
         return 'icons/help16.png';
     }
 
-    /*public function makeUiForHead()
+    public function makeUiForRightHead()
     {
-        $button = parent::makeGlyphButton();
-        $button->text = 'Документация';
+        $button = $this->makeGlyphButton();
+        $button->text = $this->getName();
 
-        return [$button, new UXSeparator('VERTICAL')];
-    } */
+        return $button;
+    }
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        FileSystem::open('~doc');
+        if (Ide::get()->isDevelopment()) {
+            FileSystem::open('~doc');
+        } else {
+            Notifications::show('В разработке', 'Данная функция находится в разработке...', 'INFORMATION');
+        }
     }
 }

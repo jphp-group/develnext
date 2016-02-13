@@ -146,10 +146,13 @@ public class UXDesignPane extends UXAnchorPane {
             }
         });
 
-        getWrappedObject().setOnMouseReleased(new EventHandler<MouseEvent>() {
+        getWrappedObject().addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                resizing = false;
+                if (resizing) {
+                    resizing = false;
+                    event.consume();
+                }
             }
         });
     }

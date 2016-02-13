@@ -3,6 +3,7 @@ namespace ide\forms;
 
 
 use ide\forms\mixins\DialogFormMixin;
+use ide\library\IdeLibraryResource;
 use ide\project\Project;
 use php\gui\framework\AbstractForm;
 use php\gui\UXImageView;
@@ -21,6 +22,21 @@ class SaveProjectForLibraryForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 
+
+    /**
+     * SaveProjectForLibraryForm constructor.
+     * @param IdeLibraryResource $resource
+     */
+    public function __construct(IdeLibraryResource $resource = null)
+    {
+        parent::__construct();
+
+        if ($resource) {
+            $this->nameField->text = $resource->getName();
+            $this->descriptionField->text = $resource->getDescription();
+        }
+    }
+
     protected function init()
     {
         parent::init();
@@ -37,7 +53,9 @@ class SaveProjectForLibraryForm extends AbstractIdeForm
         /** @var Project $result */
         $result = $this->getResult();
 
-        $this->nameField->text = $result->getName();
+        if (!$this->nameField->text) {
+            $this->nameField->text = $result->getName();
+        }
     }
 
     /**

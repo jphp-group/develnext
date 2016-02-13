@@ -102,6 +102,11 @@ abstract class AbstractCommand
         return null;
     }
 
+    public function makeUiForRightHead()
+    {
+        return null;
+    }
+
     /**
      * @param mixed $target
      */

@@ -299,6 +299,11 @@ class Project
         return $this->getIdeConfig('project.ws');
     }
 
+    public function getIdeLibraryConfig()
+    {
+        return $this->getIdeConfig('library.conf');
+    }
+
     /**
      * @param $name
      * @return Configuration
@@ -537,6 +542,7 @@ class Project
         $exporter->addDirectory($this->getIdeDir());
         $exporter->addFile($this->getProjectFile());
         $exporter->removeFile($this->indexer->getIndexFile());
+        $exporter->removeFile($this->getIdeLibraryConfig());
         $exporter->removeFile($this->getIdeFile("ide.lock"));
 
         $this->trigger('export', $exporter);

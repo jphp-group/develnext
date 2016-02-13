@@ -583,6 +583,16 @@ class Ide extends Application
             }
         }
 
+        if ($data['headRightUi']) {
+            if (is_array($data['headRightUi'])) {
+                foreach ($data['headRightUi'] as $ui) {
+                    $mainForm->getHeadRightPane()->remove($ui);
+                }
+            } else {
+                $mainForm->getHeadRightPane()->remove($data['headRightUi']);
+            }
+        }
+
         if ($data['menuItem']) {
             /** @var UXMenu $menu */
             $menu = $mainForm->{'menu' . Str::upperFirst($command->getCategory())};
@@ -677,7 +687,33 @@ class Ide extends Application
                         $ui->paddingRight = 2;
                     }
 
-                    $mainForm->getHeadPane()->add($ui);
+                    $mainForm->getHeadPane()->children->insert($mainForm->getHeadPane()->children->count - 1, $ui);
+                }
+            });
+        }
+
+        $headRightUi = $command->makeUiForRightHead();
+
+        if ($headRightUi) {
+            $data['headRightUi'] = $headRightUi;
+
+            $this->afterShow(function () use ($headRightUi) {
+                /** @var MainForm $mainForm */
+                $mainForm = $this->getMainForm();
+
+                if (!is_array($headRightUi)) {
+                    $headRightUi = [$headRightUi];
+                }
+
+                foreach ($headRightUi as $ui) {
+                    if ($ui instanceof UXButton) {
+                        $ui->padding = 8;
+                    } else if ($ui instanceof UXSeparator) {
+                        $ui->paddingLeft = 4;
+                        $ui->paddingRight = 2;
+                    }
+
+                    $mainForm->getHeadRightPane()->add($ui);
                 }
             });
         }
@@ -1088,7 +1124,7 @@ class Ide extends Application
             while ($scanner->hasNextLine()) {
                 $line = Str::trim($scanner->nextLine());
 
-                if ($line) {
+                if ($line && !str::startsWith($line, '#')) {
                     $result[] = $line;
                 }
             }

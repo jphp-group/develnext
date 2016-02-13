@@ -39,15 +39,24 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab text="Библиотека проектов">
+          <Tab text="Демо-проекты">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <ListView id="libraryList" layoutX="26.0" layoutY="35.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
+                        <ListView id="embeddedLibraryList" layoutX="26.0" layoutY="35.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
                      </children>
                   </AnchorPane>
             </content>
           </Tab>
+            <Tab text="Библиотека проектов">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ListView id="libraryList" layoutX="26.0" layoutY="35.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
         </tabs>
       </TabPane>
       <HBox alignment="CENTER_LEFT" layoutX="32.0" layoutY="76.0" prefHeight="28.0" prefWidth="617.0" spacing="10.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="32.0">

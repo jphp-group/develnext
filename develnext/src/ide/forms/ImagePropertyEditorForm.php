@@ -8,6 +8,7 @@ use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\systems\Cache;
+use ide\systems\DialogSystem;
 use ide\utils\FileUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
@@ -63,11 +64,7 @@ class ImagePropertyEditorForm extends AbstractIdeForm
             $this->hide();
         });
 
-        $dialog = new UXFileChooser();
-        $dialog->extensionFilters = [
-            ['description' => 'Изображения (jpg, png, gif)', 'extensions' => ['*.jpg', '*.jpeg', '*.png', '*.gif']]
-        ];
-
+        $dialog = DialogSystem::getImage();
         $this->dialog = $dialog;
 
         $imageArea = new UXImageArea();

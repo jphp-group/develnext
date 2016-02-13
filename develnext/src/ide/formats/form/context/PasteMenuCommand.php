@@ -7,6 +7,7 @@ use ide\editors\form\IdeTabPane;
 use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\formats\form\AbstractFormElement;
+use ide\ui\Notifications;
 use php\format\ProcessorException;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\DataUtils;
@@ -15,6 +16,7 @@ use php\gui\UXClipboard;
 use php\gui\UXCustomNode;
 use php\gui\UXDialog;
 use php\gui\UXLoader;
+use php\gui\UXMenuItem;
 use php\gui\UXNode;
 use php\io\MemoryStream;
 use php\io\Stream;
@@ -172,8 +174,11 @@ class PasteMenuCommand extends AbstractMenuCommand
 
                 UXClipboard::setText($processor->format($document));
             } catch (ProcessorException $e) {
+                Notifications::warning('Невозможно вставить', 'Невозможно вставить скопированную информацию как объекты DevelNext!');
                 return;
             }
+        } else {
+            Notifications::warning('Невозможно вставить', 'Ваш буфер обмена пуст, нет скопированной информации для вставки объектов!');
         }
     }
 

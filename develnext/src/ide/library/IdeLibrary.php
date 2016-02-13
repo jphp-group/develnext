@@ -51,7 +51,7 @@ class IdeLibrary
     protected $directories = [];
 
     /**
-     * @var array
+     * @var IdeLibraryResource[]
      */
     protected $resources = [];
 
@@ -111,6 +111,23 @@ class IdeLibrary
                 });
             }
         }
+    }
+
+    /**
+     * @param $category
+     * @param $path
+     * @return IdeLibraryResource|null
+     */
+    public function findResource($category, $path)
+    {
+        /** @var IdeLibraryResource $resource */
+        foreach ((array) $this->resources[$category] as $resource) {
+            if (FileUtils::equalNames($resource->getPath(), $path)) {
+                return $resource;
+            }
+        }
+
+        return null;
     }
 
     /**

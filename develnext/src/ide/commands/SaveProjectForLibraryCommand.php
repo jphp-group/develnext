@@ -4,6 +4,7 @@ namespace ide\commands;
 use ide\editors\AbstractEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\forms\MessageBoxForm;
+use ide\forms\OpenProjectForm;
 use ide\forms\SaveProjectForLibraryForm;
 use ide\Ide;
 use ide\library\IdeLibraryProjectResource;
@@ -15,7 +16,7 @@ class SaveProjectForLibraryCommand extends AbstractProjectCommand
 {
     public function getName()
     {
-        return 'Сохранить проект в библиотеке';
+        return 'Добавить проект в библиотеку';
     }
 
     public function getIcon()
@@ -38,13 +39,25 @@ class SaveProjectForLibraryCommand extends AbstractProjectCommand
         $project = Ide::project();
 
         if ($project) {
-            $dialog = new SaveProjectForLibraryForm();
+            $resource = $oldResource = null;
+
+            $oldResourcePath = $project->getIdeLibraryConfig()->get('resource');
+            if (\Files::isFile($oldResourcePath)) {
+                $resource = Ide::get()->getLibrary()->findResource('projects', $oldResourcePath);
+                $oldResource = $resource;
+            }
+
+            $dialog = new SaveProjectForLibraryForm($resource);
 
             retry:
             $dialog->setResult($project);
 
             if ($dialog->showDialog()) {
                 $result = $dialog->getResult();
+
+                if ($oldResource) {
+                    Ide::get()->getLibrary()->delete($oldResource);
+                }
 
                 /** @var IdeLibraryProjectResource $resource */
                 $resource = Ide::get()->getLibrary()->makeResource('projects', $result['name'] . ".zip");
@@ -62,14 +75,22 @@ class SaveProjectForLibraryCommand extends AbstractProjectCommand
                 }
 
                 if ($resource) {
+                    uiLater(function () use ($resource) {
+                        $openDialog = new OpenProjectForm('library');
+                        $openDialog->show();
+                        $openDialog->selectLibraryResource($resource);
+                        $openDialog->toast('Проект был успешно сохранен в библиотеке');
+                    });
+
+                    $project->getIdeLibraryConfig()->set('resource', $resource->getPath());
+
                     $resource->setName($result['name']);
                     $resource->setDescription($result['description']);
                     $project->export($resource->getPath());
                     $resource->save();
+                    $project->save();
 
                     Ide::get()->getLibrary()->update();
-
-                    Ide::toast('Проект был успешно сохранен в библиотеке');
                 } else {
                     Ide::toast('Ошибка, невозможно сохранить проект в библиотеке!');
                 }

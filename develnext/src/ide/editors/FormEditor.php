@@ -1295,7 +1295,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $viewer = new UXScrollPane($area);
 
-        $viewer->on('click', function ($e) {
+        $viewer->on('mouseUp', function ($e) {
             $this->selectForm();
         });
 

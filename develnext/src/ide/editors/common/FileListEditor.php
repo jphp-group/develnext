@@ -3,6 +3,7 @@ namespace ide\editors\common;
 use Dialog;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
+use ide\systems\DialogSystem;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\gui\layout\UXVBox;
@@ -101,7 +102,7 @@ class FileListEditor extends UXVBox
         $this->uiRemoveButton->on('action', [$this, 'doRemove']);
         $this->uiCombobox->on('action', [$this, 'doSelect']);
 
-        $this->uiDialog = new UXFileChooser();
+        $this->uiDialog = DialogSystem::getAnyFile();
 
         $this->update();
     }

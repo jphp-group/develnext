@@ -41,6 +41,7 @@ use script\TimerScript;
  * @property UXVBox $properties
  * @property UXTreeView $projectTree
  * @property UXHBox $headPane
+ * @property UXHBox $headRightPane
  * @property UXSplitPane $contentSplitPane
  * @property UXMenuBar $mainMenu
  */
@@ -226,6 +227,14 @@ class MainForm extends AbstractIdeForm
     public function getHeadPane()
     {
         return $this->headPane;
+    }
+
+    /**
+     * @return UXHBox
+     */
+    public function getHeadRightPane()
+    {
+        return $this->headRightPane;
     }
 
     /**
