@@ -4,6 +4,7 @@ namespace action;
 use php\gui\animation\UXAnimationTimer;
 use php\gui\animation\UXFadeAnimation;
 use php\gui\animation\UXPathAnimation;
+use php\gui\framework\behaviour\PositionableBehaviour;
 use php\gui\framework\Instances;
 use php\gui\framework\ObjectGroup;
 use php\gui\framework\ScriptEvent;
@@ -124,7 +125,7 @@ class Animation
             }
         }
 
-        if ($object instanceof UXNode || $object instanceof UXWindow) {
+        if ($object instanceof UXNode || $object instanceof UXWindow || $object instanceof PositionableBehaviour) {
             $xOffset = $x - $object->x;
             $yOffset = $y - $object->y;
 

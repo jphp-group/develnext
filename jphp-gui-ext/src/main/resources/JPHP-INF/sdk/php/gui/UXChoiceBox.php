@@ -21,4 +21,11 @@ class UXChoiceBox extends UXControl
      * @var int
      */
     public $selectedIndex = -1;
+
+    /**
+     * ...
+     */
+    public function update()
+    {
+    }
 }

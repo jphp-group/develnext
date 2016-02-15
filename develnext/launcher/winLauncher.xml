@@ -26,7 +26,7 @@
     <jdkPreference>jreOnly</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
     <initialHeapSize>256</initialHeapSize>
-    <maxHeapSize>2048</maxHeapSize>
+    <maxHeapSize>1536</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8 -Ddevelnext.launcher=root</opt>
   </jre>
   <versionInfo>

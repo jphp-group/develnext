@@ -3,7 +3,6 @@ namespace ide\editors\form;
 
 use ide\Ide;
 use php\gui\event\UXEvent;
-use php\gui\framework\Timer;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXApplication;
 use php\gui\UXImageView;

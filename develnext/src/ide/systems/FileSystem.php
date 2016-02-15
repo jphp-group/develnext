@@ -9,7 +9,6 @@ use ide\Logger;
 use ide\utils\FileUtils;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
-use php\gui\framework\Timer;
 use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXContextMenu;

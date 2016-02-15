@@ -22,7 +22,6 @@ use ide\ui\LazyLoadingImage;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\gui\framework\Application;
-use php\gui\framework\Timer;
 use php\gui\JSException;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;

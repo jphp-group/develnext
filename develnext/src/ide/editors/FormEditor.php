@@ -48,7 +48,6 @@ use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractFactory;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\DataUtils;
-use php\gui\framework\Timer;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXPane;
@@ -488,9 +487,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
         }
 
-        $this->getIdeConfig()->set('blockedNodes', $blockedNodes);
+        if ($this->getIdeConfig()) {
+            $this->getIdeConfig()->set('blockedNodes', $blockedNodes);
 
-        $this->saveIdeConfig();
+            $this->saveIdeConfig();
+        }
     }
 
     public function save()
@@ -920,7 +921,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $nodeId = $this->getNodeId($node);
 
-        if ($nodeId) {
+        if ($nodeId && $node->parent) {
             DataUtils::remove($node);
         }
 
@@ -963,7 +964,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if ($node) {
             $this->designer->selectNode($node);
 
-            Timer::run(50, function () use ($node) {
+            waitAsync(50, function () use ($node) {
                 $this->updateProperties($node);
             });
         }
@@ -1575,7 +1576,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $this->eventManager->addUseImports($imports);
 
-        Timer::run(100, function () {
+        waitAsync(100, function () {
             $this->codeEditor->load();
         });
     }
@@ -1584,7 +1585,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $this->eventManager->insertCodeToMethod($class, $method, $code);
 
-        Timer::run(100, function () {
+        waitAsync(100, function () {
             $this->codeEditor->load();
         });
     }
@@ -1802,7 +1803,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if ($coord) {
             $this->switchToSmallSource();
 
-            Timer::run(100, function () use ($coord) {
+            waitAsync(100, function () use ($coord) {
                 $this->codeEditor->jumpToLine($coord['line'], $coord['pos']);
             });
         }
@@ -1817,7 +1818,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if ($bind) {
             $this->switchToSmallSource();
 
-            Timer::run(100, function () use ($bind) {
+            waitAsync(100, function () use ($bind) {
                 $this->codeEditor->jumpToLine($bind['beginLine'], $bind['beginPosition']);
             });
         }

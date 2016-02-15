@@ -4,6 +4,7 @@ namespace ide\formats\form\tags;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\AbstractFormElementTag;
+use php\gui\framework\DataUtils;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXDialog;
 use php\gui\UXTab;
@@ -34,9 +35,12 @@ class TabPaneFormElementTag extends AbstractFormElementTag
 
             $element->appendChild($domTabs);
 
+            $data = DataUtils::get($node);
+
             /** @var UXTab $tab */
-            foreach ($node->tabs as $tab) {
+            foreach ($node->tabs as $i => $tab) {
                 $domTab = $document->createElement('Tab');
+
                 $domTabs->appendChild($domTab);
 
                 $domTab->setAttribute('text', $tab->text);

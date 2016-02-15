@@ -16,6 +16,7 @@ use ide\scripts\elements\FileScriptComponent;
 use ide\scripts\elements\MacroScriptComponent;
 use ide\scripts\elements\MediaPlayerScriptComponent;
 use ide\scripts\elements\ModuleScriptComponent;
+use ide\scripts\elements\RobotScriptComponent;
 use ide\scripts\elements\TimerScriptComponent;
 use ide\scripts\ScriptComponentContainer;
 use ide\systems\FileSystem;
@@ -44,6 +45,7 @@ class ScriptModuleFormat extends AbstractFormFormat
         $this->register(new FileChooserScriptComponent());
         $this->register(new DirectoryChooserScriptComponent());
         $this->register(new MediaPlayerScriptComponent());
+        $this->register(new RobotScriptComponent());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());

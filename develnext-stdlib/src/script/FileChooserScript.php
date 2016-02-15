@@ -14,6 +14,7 @@ use php\io\File;
 use php\lang\InterruptedException;
 use php\lang\Thread;
 use php\lib\Items;
+use php\lib\str;
 use php\xml\DomDocument;
 use script\support\ScriptHelpers;
 
@@ -39,6 +40,21 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour, Set
      * @var File[]
      */
     public $files;
+
+    /**
+     * @var null
+     */
+    public $filterExtensions = null;
+
+    /**
+     * @var null
+     */
+    public $filterName = null;
+
+    /**
+     * @var bool
+     */
+    public $filterAny = true;
 
     /**
      * @var string
@@ -67,6 +83,34 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour, Set
 
     public function execute()
     {
+        $anyFilter = false;
+
+        if ($this->filterExtensions || $this->filterName) {
+            $extensions = null;
+
+            if ($this->filterExtensions) {
+                $extensions = str::split($this->filterExtensions, ',');
+                $extensions = flow($extensions)->map([str::class, 'trim'])->toArray();
+            }
+
+            $extensions = $extensions ?: ['*.*'];
+
+            if ($extensions == ['*.*']) {
+                $anyFilter = true;
+            }
+
+            $this->_dialog->extensionFilters = [
+                ['description' => $this->filterName ?: $this->filterExtensions, 'extensions' => $extensions]
+            ];
+        }
+
+        if (!$anyFilter && $this->filterAny) {
+            $this->_dialog->extensionFilters[] = [
+                'description' => 'All files (*.*)',
+                'extensions'  => ['*.*']
+            ];
+        }
+
         if ($this->multiple) {
             $file = $this->saveDialog ? $this->_dialog->showSaveDialog() : $this->_dialog->showOpenMultipleDialog();
         } else {

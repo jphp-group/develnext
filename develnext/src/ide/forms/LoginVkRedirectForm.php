@@ -8,7 +8,6 @@ use ide\Ide;
 use php\gui\framework\ScriptEvent;
 use php\gui\UXDesktop;
 use php\gui\framework\AbstractForm;
-use php\gui\framework\Timer;
 use php\gui\UXButton;
 use php\gui\UXClipboard;
 use php\gui\UXDialog;
@@ -56,7 +55,7 @@ class LoginVkRedirectForm extends AbstractIdeForm
 
         $timer->start();
 
-        Timer::run($i * 1000, function () {
+        waitAsync($i * 1000, function () {
             $desktop = new UXDesktop();
             $desktop->browse($this->urlLink->text);
         });

@@ -16,7 +16,6 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\Thread;
 use php\lang\ThreadPool;
-use php\gui\framework\Timer;
 
 /**
  * @property UXLabel $version
@@ -60,7 +59,7 @@ class SplashForm extends AbstractIdeForm
             }
         }
 
-        Timer::run(7000, function() {
+        waitAsync(7000, function() {
             if ($this->_app->getMainForm()->visible) {
                 $this->hide();
             }

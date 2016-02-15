@@ -9,7 +9,6 @@ use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\project\ProjectImporter;
 use ide\utils\FileUtils;
-use php\gui\framework\Timer;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;

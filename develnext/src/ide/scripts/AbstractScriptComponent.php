@@ -23,6 +23,14 @@ abstract class AbstractScriptComponent extends AbstractFormElement
     abstract public function getType();
 
     /**
+     * @return string
+     */
+    final public function getElementClass()
+    {
+        return $this->getType();
+    }
+
+    /**
      * @param GradleBuildConfig $gradleBuild
      *
      * @return array

@@ -32,10 +32,8 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
         return $this->editorForm;
     }
 
-    public function makeUi()
+    protected function makeDialogButtonUi()
     {
-        parent::makeUi();
-
         $this->dialogButton = new UXButton();
         $this->dialogButton->text = '...';
         $this->dialogButton->padding = [2, 4];
@@ -45,6 +43,13 @@ class TextPropertyEditor extends SimpleTextPropertyEditor
         $this->dialogButton->on('click', function (UXMouseEvent $e) {
             $this->showDialog($e->screenX, $e->screenY);
         });
+    }
+
+    public function makeUi()
+    {
+        parent::makeUi();
+
+        $this->makeDialogButtonUi();
 
         return new UXHBox([$this->textField, $this->dialogButton]);
     }

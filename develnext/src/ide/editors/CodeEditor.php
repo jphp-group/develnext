@@ -15,9 +15,6 @@ use php\format\JsonProcessor;
 use php\gui\designer\UXSyntaxAutoCompletion;
 use php\gui\designer\UXSyntaxTextArea;
 use php\gui\event\UXKeyEvent;
-use php\gui\event\UXWebErrorEvent;
-use php\gui\event\UXWebEvent;
-use php\gui\framework\Timer;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\UXApplication;
@@ -142,7 +139,7 @@ class CodeEditor extends AbstractEditor
     {
         $i = ++$this->__eventUpdates;
 
-        Timer::run(1000, function () use ($i) {
+        waitAsync(1000, function () use ($i) {
             if ($i == $this->__eventUpdates) {
                 $this->trigger('update', []);
             }

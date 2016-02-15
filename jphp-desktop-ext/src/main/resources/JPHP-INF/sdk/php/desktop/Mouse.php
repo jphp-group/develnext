@@ -1,9 +1,10 @@
 <?php
-namespace php\gui\desktop;
+
+namespace php\desktop;
 
 /**
  * Class Mouse
- * @package php\gui\desktop
+ * @package php\desktop
  */
 class Mouse
 {

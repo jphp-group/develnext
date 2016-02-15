@@ -7,10 +7,7 @@ use ide\build\OneJarBuildType;
 use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
 use ide\commands\BuildProjectCommand;
-use ide\commands\CreateFactoryProjectCommand;
 use ide\commands\CreateFormProjectCommand;
-use ide\commands\CreateGameObjectPrototypeProjectCommand;
-use ide\commands\CreateGameSceneProjectCommand;
 use ide\commands\CreateGameSpriteProjectCommand;
 use ide\commands\CreateScriptModuleProjectCommand;
 use ide\commands\ExecuteProjectCommand;
@@ -21,11 +18,9 @@ use ide\editors\FactoryEditor;
 use ide\editors\FormEditor;
 use ide\editors\ProjectEditor;
 use ide\editors\ScriptModuleEditor;
-use ide\formats\factory\FactoryProjectTreeNavigation;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\FormProjectTreeNavigation;
 use ide\formats\module\ModuleProjectTreeNavigation;
-use ide\formats\ScriptFormat;
 use ide\formats\sprite\IdeSpriteManager;
 use ide\formats\sprite\SpriteProjectTreeNavigation;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
@@ -40,19 +35,13 @@ use ide\project\ProjectExporter;
 use ide\project\ProjectFile;
 use ide\project\ProjectIndexer;
 use ide\project\ProjectTree;
-use ide\project\ProjectTreeItem;
-use ide\scripts\elements\TimerScriptComponent;
 use ide\scripts\ScriptComponentManager;
 use ide\systems\FileSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
-use php\gui\framework\Timer;
 use php\gui\layout\UXHBox;
-use php\gui\UXApplication;
 use php\gui\UXLabel;
-use php\gui\UXTreeItem;
-use php\gui\UXTreeView;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
@@ -234,15 +223,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function doExport(ProjectExporter $exporter)
     {
         $exporter->addDirectory($this->project->getFile('src/'));
-
         $exporter->removeFile($this->project->getFile('src/.debug'));
-
-        // remove .php files if .source exists
-        /*FileUtils::scan($this->project->getFile('src'), function ($filename) use ($exporter) {
-            if (Str::endsWith($filename, '.php') && Files::exists($filename . '.source')) {
-                $exporter->removeFile($filename);
-            }
-        });*/
     }
 
     public function doCompile($environment, callable $log = null) {
@@ -262,12 +243,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $buildConfig->setDependency('jphp-json-ext');
         $buildConfig->setDependency('jphp-xml-ext');
         $buildConfig->setDependency('jphp-gui-ext');
-        $buildConfig->setDependency('jphp-gui-desktop-ext');
+        $buildConfig->setDependency('jphp-desktop-ext');
         $buildConfig->setDependency('jphp-game-ext');
         $buildConfig->setDependency('dyn4j');
         $buildConfig->setDependency('jphp-zend-ext');
         $buildConfig->setDependency('jphp-gui-framework');
         $buildConfig->setDependency('develnext-stdlib');
+
+        $buildConfig->removeDependency('jphp-gui-desktop-ext');
 
         foreach ($this->scriptComponentManager->getComponents() as $component) {
             $component->getType()->adaptForGradleBuild($buildConfig);
@@ -352,34 +335,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $tree = $this->project->getTree();
 
         $tree->register(new FormProjectTreeNavigation(self::FORMS_DIRECTORY));
-        //$tree->register(new FactoryProjectTreeNavigation(self::FACTORY_DIRECTORY));
         $tree->register(new ModuleProjectTreeNavigation(self::SCRIPTS_DIRECTORY));
         $tree->register(new SpriteProjectTreeNavigation(self::GAME_DIRECTORY . '/sprites'));
 
         $tree->getRoot()->root->children->add( $tree->createItemForFile($this->project->getFile('src/.theme/style.css'))->getOrigin() );
-
-        /*$formsItem = $tree->getOrCreateItem('forms', 'Формы', 'icons/folder16.png', $this->project->getFile(self::FORMS_DIRECTORY));
-        $formsItem->setExpanded(true);
-        $formsItem->setDisableDelete(true);
-
-        $formsItem->onUpdate(function () {
-            $this->updateFormsInTree();
-        });
-
-        WatcherSystem::addPathRecursive($this->project->getFile(self::FORMS_DIRECTORY));
-        $tree->addIgnoreRule('^src\\/\\.forms\\/.*\\.conf$');
-        $tree->addIgnoreRule('^src\\/\\.scripts\\/.*\\.json');
-
-        $projectTreeItem = $tree->getOrCreateItem(
-            'scripts', 'Модули', 'icons/folder16.png', $this->project->getFile(self::SCRIPTS_DIRECTORY)
-        );
-        $projectTreeItem->setExpanded(true);
-        $projectTreeItem->setDisableDelete(true);
-
-        $projectTreeItem->onUpdate(function () {
-            $this->updateScriptsInTree();
-        });
-        WatcherSystem::addPathRecursive($this->project->getFile(self::SCRIPTS_DIRECTORY));  */
 
         /** @var GradleProjectBehaviour $gradleBehavior */
         $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
@@ -421,13 +380,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->defineFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
     }
 
-    /*public function updateFormsInTree()
-    {
-        $tree = $this->project->getTree();
-
-        $tree->updateDirectory('forms', $this->project->getFile(self::FORMS_DIRECTORY));
-    } */
-
     public function updateScriptManager()
     {
         $this->scriptComponentManager->removeAll();
@@ -438,13 +390,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     {
         $this->spriteManager->reloadAll();
     }
-
-    /*public function updateScriptsInTree()
-    {
-        $tree = $this->project->getTree();
-
-        $tree->updateDirectory('scripts', $this->project->getFile(self::SCRIPTS_DIRECTORY));
-    } */
 
     public function recoveryFactory($filename)
     {
@@ -857,12 +802,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->getFile(self::FORMS_DIRECTORY)->scan(function ($name, File $file) {
             if ($file->isFile() && Str::endsWith($name, '.fxml')) {
                 $this->recoveryForm($file);
-            }
-        });
-
-        $this->project->getFile(self::FACTORY_DIRECTORY)->scan(function ($name, File $file) {
-            if ($file->isFile() && Str::endsWith($name, '.factory')) {
-                $this->recoveryFactory($file);
             }
         });
 

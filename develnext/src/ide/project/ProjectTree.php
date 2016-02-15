@@ -9,7 +9,6 @@ use ide\misc\SimpleSingleCommand;
 use ide\project\tree\AbstractProjectTreeNavigation;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
-use php\gui\framework\Timer;
 use php\gui\UXDesktop;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXApplication;
@@ -244,7 +243,7 @@ class ProjectTree
                                 return;
                             }
 
-                            Timer::run(1000, function () use ($format, $file) {
+                            waitAsync(1000, function () use ($format, $file) {
                                 $format->delete($file);
 
                                 if (Ide::project()) {

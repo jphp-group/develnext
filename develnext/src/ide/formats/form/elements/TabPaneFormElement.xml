@@ -16,6 +16,15 @@
                 <variant value="UNAVAILABLE">Отключить</variant>
             </variants>
         </property>
+        <property code="draggable" name="Перетаскивание" editor="enum" virtual="1">
+            <variants>
+                <variant value="NONE">Нет</variant>
+                <variant value="ALL">Все табы</variant>
+                <variant value="ALL_EXCLUDE_FIRST">Все табы, кроме первого</variant>
+                <variant value="ALL_EXCLUDE_LAST">Все табы, кроме последнего</variant>
+                <variant value="ALL_EXCLUDE_FIRST_LAST">Все табы, кроме первого и последнего</variant>
+            </variants>
+        </property>
     </properties>
 
     <eventTypes>

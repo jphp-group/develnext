@@ -8,7 +8,6 @@ use ide\misc\AbstractCommand;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\FileSystem;
-use php\gui\framework\Timer;
 use php\gui\UXDialog;
 use php\lang\Process;
 use php\lib\Str;

@@ -1,7 +1,6 @@
 <?php
 namespace ide;
 
-use php\gui\framework\Timer;
 use php\io\Stream;
 use php\lang\Environment;
 use php\lang\IllegalArgumentException;

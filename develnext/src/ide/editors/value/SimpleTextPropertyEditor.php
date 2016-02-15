@@ -49,14 +49,13 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
     {
         parent::setTooltip($tooltip);
 
-        if ($this->tooltip) {
+        if ($this->tooltip && $this->textField) {
             $tooltip = new UXTooltip();
             $tooltip->text = $this->tooltip;
 
             $this->textField->tooltip = $tooltip;
         }
     }
-
 
     /**
      * @param $value
@@ -66,7 +65,7 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
     {
         parent::updateUi($value);
 
-        if ($setText) {
+        if ($setText && $this->textField) {
             $this->textField->text = $value;
         }
     }

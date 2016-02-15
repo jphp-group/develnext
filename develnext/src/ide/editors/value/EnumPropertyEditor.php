@@ -1,5 +1,6 @@
 <?php
 namespace ide\editors\value;
+use php\gui\UXButton;
 use php\gui\UXChoiceBox;
 use php\lib\Items;
 use php\gui\layout\UXHBox;
@@ -11,7 +12,7 @@ use php\xml\DomElement;
  * Class EnumPropertyEditor
  * @package ide\editors\value
  */
-class EnumPropertyEditor extends ElementPropertyEditor
+class EnumPropertyEditor extends TextPropertyEditor
 {
     /**
      * @var UXChoiceBox
@@ -29,11 +30,28 @@ class EnumPropertyEditor extends ElementPropertyEditor
     protected $variantKeys;
 
     /**
-     * @param $variants
+     * @var UXButton
      */
-    public function __construct(array $variants = [])
+    protected $dialogButton;
+
+    /**
+     * @var bool
+     */
+    private $editable;
+
+    /**
+     * @var bool
+     */
+    public $existsCustomValue;
+
+    /**
+     * @param array $variants
+     * @param bool $editable
+     */
+    public function __construct(array $variants = [], $editable = false)
     {
         $this->setVariants($variants);
+        $this->editable = $editable;
 
         parent::__construct();
     }
@@ -62,11 +80,27 @@ class EnumPropertyEditor extends ElementPropertyEditor
         $this->choiceBox->style = "-fx-background-insets: 0; -fx-background-radius: 0; -fx-background-color: -fx-control-inner-background;";
 
         $this->choiceBox->on('action', function () {
-            $value = $this->variantKeys[$this->choiceBox->selectedIndex];
+            if ($this->existsCustomValue) {
+                if ($this->choiceBox->selectedIndex == 0) {
+                    $value = $this->choiceBox->items[0];
+                } else {
+                    $value = $this->variantKeys[$this->choiceBox->selectedIndex - 1];
+                }
+            } else {
+                $value = $this->variantKeys[$this->choiceBox->selectedIndex];
+            }
+
             $this->applyValue($value, false);
         });
 
-        return new UXHBox([$this->choiceBox]);
+        $ui = new UXHBox([$this->choiceBox]);
+
+        if ($this->editable) {
+            $this->makeDialogButtonUi();
+            $ui->add($this->dialogButton);
+        }
+
+        return $ui;
     }
 
     public function setTooltip($tooltip)
@@ -84,7 +118,7 @@ class EnumPropertyEditor extends ElementPropertyEditor
             }
         }
 
-        if (!$this->variants[$value]) {
+        if (!$this->variants[$value] && !$this->editable) {
             return Items::firstKey($this->variants);
         }
 
@@ -104,10 +138,25 @@ class EnumPropertyEditor extends ElementPropertyEditor
         foreach ($this->variants as $code => $name) {
             if ("$value" == "$code") {
                 $this->choiceBox->selectedIndex = $i;
-                break;
+                return;
             }
 
             $i++;
+        }
+
+        if ($this->editable) {
+            $this->existsCustomValue = true;
+
+            if (items::first($this->variants) == $this->choiceBox->items[0]) {
+                $this->choiceBox->items->insert(0, $value);
+            } elseif ($this->choiceBox->items->count < 1) {
+                $this->choiceBox->items->add($value);
+            } else {
+                $this->choiceBox->items->removeByIndex(0);
+                $this->choiceBox->items->insert(0, $value);
+            }
+
+            $this->choiceBox->selectedIndex = 0;
         }
     }
 
@@ -130,7 +179,7 @@ class EnumPropertyEditor extends ElementPropertyEditor
             $variants[$el->getAttribute('value')] = $el->getTextContent();
         }
 
-        $editor = new static($variants);
+        $editor = new static($variants, $element->getAttribute('editable'));
         return $editor;
     }
 }

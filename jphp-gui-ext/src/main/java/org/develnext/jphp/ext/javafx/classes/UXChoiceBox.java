@@ -44,6 +44,15 @@ public class UXChoiceBox extends UXControl<ChoiceBox> {
         getWrappedObject().getSelectionModel().select(value);
     }
 
+    @Signature
+    @SuppressWarnings("unchecked")
+    public void update() {
+        ObservableList items = getWrappedObject().getItems();
+
+        getWrappedObject().setItems(null);
+        getWrappedObject().setItems(items);
+    }
+
     public static class WrapChoiceBox extends ChoiceBox {
         protected ChangeListener changeListener;
 

@@ -20,12 +20,12 @@ public class Mouse extends BaseObject {
     }
 
     @Signature
-    public static long x() {
-        return java.awt.MouseInfo.getPointerInfo().getLocation().x;
+    public static int x() {
+        return MouseInfo.getPointerInfo().getLocation().x;
     }
 
     @Signature
-    public static long y() {
+    public static int y() {
         return MouseInfo.getPointerInfo().getLocation().y;
     }
 }

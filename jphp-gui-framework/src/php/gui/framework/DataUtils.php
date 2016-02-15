@@ -28,7 +28,9 @@ class DataUtils
             if ($node instanceof UXNode) {
                 $data = $node->id ? self::get($node, $layout, false) : null;
                 $callback($data, $node);
-            } else if ($node instanceof UXTitledPane || $node instanceof UXScrollPane) {
+            }
+
+            if ($node instanceof UXTitledPane || $node instanceof UXScrollPane) {
                 if ($node->content instanceof UXParent) {
                     self::scan($node->content, $callback);
                 }

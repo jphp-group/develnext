@@ -4,13 +4,9 @@ namespace ide\editors\common;
 use ide\utils\Json;
 use php\format\JsonProcessor;
 use php\gui\designer\UXSyntaxTextArea;
-use php\gui\event\UXKeyEvent;
-use php\gui\event\UXWebEvent;
-use php\gui\framework\Timer;
 use php\gui\UXApplication;
 use php\gui\UXClipboard;
 use php\gui\UXDialog;
-use php\gui\UXWebView;
 use php\io\ResourceStream;
 use php\lib\Str;
 

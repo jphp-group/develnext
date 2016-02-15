@@ -6,7 +6,6 @@ use ide\misc\EventHandlerBehaviour;
 use ide\systems\FileSystem;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\framework\DataUtils;
-use php\gui\framework\Timer;
 use php\gui\text\UXFont;
 use php\gui\UXApplication;
 use php\gui\UXNode;
@@ -77,7 +76,7 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
      */
     public function updateUi($value)
     {
-        Timer::run(100, function () {
+        waitAsync(100, function () {
             $editor = FileSystem::getSelectedEditor();
 
             if ($editor instanceof FormEditor) {

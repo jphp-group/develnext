@@ -6,7 +6,6 @@ use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
-use php\gui\framework\Timer;
 use php\gui\UXButton;
 use php\gui\UXClipboard;
 use php\gui\UXTextArea;
@@ -48,7 +47,7 @@ class TextPropertyEditorForm extends AbstractIdeForm
         $toast->text = "Свойство '$this->title' успешно скопировано";
         $toast->show(Ide::get()->getMainForm(), $e->target->screenX, $e->target->screenY - 100);
 
-        Timer::run(2000, function () use ($toast) {
+        waitAsync(2000, function () use ($toast) {
             $toast->hide();
         });
     }

@@ -107,7 +107,7 @@ project(':jphp-game-ext') {
     }
 }
 
-project(':jphp-gui-desktop-ext') {
+project(':jphp-desktop-ext') {
     dependencies {
         compile project(':jphp-gui-ext')
         compile "org.develnext:jphp-runtime:$jphpVersion"
@@ -131,7 +131,7 @@ project(':develnext') {
     dependencies {
         compile project(':jphp-gui-designer-ext')
         compile project(':jphp-gui-framework')
-        compile project(':jphp-gui-desktop-ext')
+        compile project(':jphp-desktop-ext')
         compile project(':jphp-game-ext')
         compile project(':jphp-parser')
         compile project(':develnext-doc')

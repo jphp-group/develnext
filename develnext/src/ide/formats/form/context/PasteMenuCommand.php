@@ -11,7 +11,6 @@ use ide\ui\Notifications;
 use php\format\ProcessorException;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\DataUtils;
-use php\gui\framework\Timer;
 use php\gui\UXClipboard;
 use php\gui\UXCustomNode;
 use php\gui\UXDialog;
@@ -147,7 +146,7 @@ class PasteMenuCommand extends AbstractMenuCommand
 
                     $type->refreshNode($uiNode);
 
-                    Timer::run(100, function () use ($editor, $uiNode, $one, $data) {
+                    waitAsync(100, function () use ($editor, $uiNode, $one, $data) {
                         $editor->getDesigner()->selectNode($uiNode);
                     });
 

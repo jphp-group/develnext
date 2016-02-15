@@ -1,8 +1,7 @@
 <?php
 namespace php\gui\framework\behaviour\custom;
 use php\gui\animation\UXAnimationTimer;
-use php\gui\framework\Timer;
-use script\TimerScript;
+
 
 /**
  * Class AnimationBehaviour
