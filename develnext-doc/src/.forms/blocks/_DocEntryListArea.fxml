@@ -7,10 +7,9 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="dn-web" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" styleClass="dn-web" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox id="content" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" styleClass="dn-web" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <padding>
             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
          </padding>
@@ -55,7 +54,7 @@
                   </Button>
                </children>
             </HBox>
-            <VBox id="categoryContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="70.0" VBox.vgrow="ALWAYS" />
+            <VBox id="categoryContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="70.0" spacing="7.0" styleClass="doc-entries" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
    </children>

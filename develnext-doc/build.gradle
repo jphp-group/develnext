@@ -9,7 +9,4 @@ sourceSets {
     main.resources.srcDirs = ['src']
 }
 
-dependencies {
-
-}
 

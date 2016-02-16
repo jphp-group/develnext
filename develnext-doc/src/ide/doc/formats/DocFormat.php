@@ -19,11 +19,7 @@ class DocFormat extends AbstractFormat
      */
     public function createEditor($file)
     {
-        if ($file == "~doc") {
-            return new DocEditor($file);
-        } else {
-            return new DocEntryEditor($file);
-        }
+        return new DocEditor($file);
     }
 
     public function getTitle($path)

@@ -11,6 +11,7 @@ use ide\editors\AbstractEditor;
 use ide\editors\menu\ContextMenu;
 use ide\forms\area\DocEntryListArea;
 use ide\Ide;
+use ide\systems\FileSystem;
 use ide\ui\Notifications;
 use ide\utils\Tree;
 use php\gui\layout\UXAnchorPane;
@@ -151,7 +152,7 @@ class DocEditor extends AbstractEditor
         });
     }
 
-    protected function loadContent()
+    protected function loadContent($force = false)
     {
         $item = $this->uiTree->focusedItem;
 
@@ -160,20 +161,28 @@ class DocEditor extends AbstractEditor
                 $this->accessCategory = $response->data()['category'];
                 $this->accessEntry = $response->data()['entry'];
                 $this->ui->setAccess($this->accessCategory, $this->accessEntry);
+            } else {
+                $this->ui->setAccess(false, false);
+
+                if ($response->isConnectionFailed()) {
+                    Notifications::warning('Документация недоступна', 'Доступ к документации возможен только при подключении к интернету.');
+                } else {
+                    Notifications::warning('Сервис временно недоступен', 'Сервис документации временно недоступен, попробуйте позже.');
+                }
             }
         });
 
         $this->ui->setContent([
             'name' => 'Документация',
             'description' => 'Добро пожаловать в справочную систему по DevelNext'
-        ], []);
+        ]);
 
 
         if ($item->value instanceof DocEditorTreeItem) {
             $category = $item->value->getData();
-            $this->ui->setContent($category, []);
+            $this->ui->setContent($category);
 
-            if ($category['id'] == $this->loadedCategoryId) {
+            if ($category['id'] == $this->loadedCategoryId && !$force) {
                 return;
             }
 
@@ -304,8 +313,35 @@ class DocEditor extends AbstractEditor
                 return;
             }
 
-            $this->loadContent();
+            $this->loadContent(true);
         });
+    }
+
+    public function deleteEntry(array $entry)
+    {
+        $this->docService->deleteEntryAsync($entry['id'], function (ServiceResponse $response) {
+            if ($response->isSuccess()) {
+                Notifications::success('Успешно', 'Удаление прошло успешно');
+                $this->loadContent(true);
+            } else {
+                Notifications::error('Ошибка', $response->message());
+            }
+        });
+    }
+
+    public function editEntry(array $entry)
+    {
+
+    }
+
+    public function openCategory(array $category)
+    {
+        $this->setSelectedCategory($category);
+    }
+
+    public function openEntry(array $entry)
+    {
+        dump($entry);
     }
 
     /**
@@ -315,6 +351,12 @@ class DocEditor extends AbstractEditor
     {
         $ui = new DocEntryListArea();
         $ui->on('addEntry', [$this, 'addEntry']);
+        $ui->on('deleteEntry', [$this, 'deleteEntry']);
+        $ui->on('editEntry', [$this, 'editEntry']);
+
+        $ui->on('openCategory', [$this, 'openCategory']);
+        $ui->on('openEntry', [$this, 'openEntry']);
+
         UXAnchorPane::setAnchor($ui, 0);
 
         $this->ui = $ui;

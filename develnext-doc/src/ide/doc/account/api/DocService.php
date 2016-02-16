@@ -23,7 +23,7 @@ use ide\utils\Tree;
  * @method ServiceResponseFuture allEntriesAsync($sort, $offset, $limit, callable $callback = null)
  * @method ServiceResponseFuture saveEntryAsync($data, callable $callback = null)
  * @method ServiceResponseFuture saveCategoryAsync($data, callable $callback = null)
- * @method ServiceResponseFuture deletedEntryAsync($id, callable $callback = null)
+ * @method ServiceResponseFuture deleteEntryAsync($id, callable $callback = null)
  * @method ServiceResponseFuture restoreEntryAsync($id, callable $callback = null)
  * @method ServiceResponseFuture deleteCategoryAsync($id, callable $callback = null)
  * @method ServiceResponseFuture restoreCategoryAsync($id, callable $callback = null)

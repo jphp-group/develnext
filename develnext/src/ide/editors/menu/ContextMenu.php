@@ -4,7 +4,7 @@ namespace ide\editors\menu;
 use ide\editors\AbstractEditor;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
-use php\gui\desktop\Mouse;
+use php\desktop\Mouse;
 use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXContextMenu;

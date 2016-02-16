@@ -30,6 +30,11 @@ class Notifications
         return self::show($title, $message, 'WARNING');
     }
 
+    static function success($title, $message)
+    {
+        return self::show($title, $message, 'SUCCESS');
+    }
+
     static function showAccountWelcome()
     {
         static::show('Приветствие', 'Добро пожаловать в социальную сеть DevelNext для разработчиков', 'INFORMATION');

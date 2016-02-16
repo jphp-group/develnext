@@ -15,7 +15,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
-use php\gui\desktop\Mouse;
+use php\desktop\Mouse;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXAnchorPane;

@@ -2,7 +2,7 @@
 namespace behaviour\custom;
 
 use php\gui\animation\UXAnimationTimer;
-use php\gui\desktop\Mouse;
+use php\desktop\Mouse;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\UXNode;

@@ -9,8 +9,7 @@ import php.runtime.reflection.ClassEntity;
 
 import java.awt.*;
 
-@Reflection.Name("Mouse")
-@Reflection.Namespace("php\\gui\\desktop")
+@Reflection.Name("php\\gui\\desktop\\Mouse")
 public class MouseEx extends Mouse {
     public MouseEx(Environment env, ClassEntity clazz) {
         super(env, clazz);
