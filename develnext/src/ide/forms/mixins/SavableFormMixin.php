@@ -2,6 +2,7 @@
 namespace ide\forms\mixins;
 
 use ide\Ide;
+use ide\Logger;
 use php\gui\framework\AbstractForm;
 use php\gui\UXScreen;
 
@@ -21,7 +22,11 @@ trait SavableFormMixin
         $this->y = $config->get("y", $this->y);
         $this->width = $config->get("width", $this->width);
         $this->height = $config->get("height", $this->height);
+        $this->layout->size = $this->size;
+
         $this->maximized = $config->get("maximized", $this->maximized);
+
+        Logger::debug("Init window $class, size = [$this->width, $this->height], position = [$this->x, $this->y]");
 
         uiLater(function () use ($config) {
             /** @var $this AbstractForm */

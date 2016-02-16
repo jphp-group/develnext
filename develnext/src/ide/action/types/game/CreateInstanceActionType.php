@@ -103,6 +103,8 @@ class CreateInstanceActionType extends AbstractSimpleActionType
         $y = $action->get('y');
         $parent = $action->parent ? $action->get('parent') : ($action->relative ? '$event->sender' : 'null');
 
+        $actionScript->addLocalVariable('instance');
+
         if (!$action->relative) {
             if ($x == 0 && $y == 0) {
                 return "\$instance = \$this->create({$action->get('id')}, $parent)";

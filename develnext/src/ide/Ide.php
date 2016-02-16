@@ -147,7 +147,7 @@ class Ide extends Application
             function () {
                 Logger::reset();
                 Logger::info("Start IDE, mode = $this->mode, os = $this->OS, version = {$this->getVersion()}");
-                Logger::info(str::format("Commands Args = [%s]", str::join($GLOBALS['argv'], ', ')));
+                Logger::info(str::format("Commands Args = [%s]", str::join((array)$GLOBALS['argv'], ', ')));
 
                 restore_exception_handler();
 

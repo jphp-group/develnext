@@ -73,7 +73,7 @@ class SetVarActionType extends AbstractSimpleActionType
     {
         $name = $action->get('name');
 
-        $actionScript->addLocalVariable($name);
+        //$actionScript->addLocalVariable($name);
 
         if ($name[0] == '$') {
             $name = Str::sub($name, 1);

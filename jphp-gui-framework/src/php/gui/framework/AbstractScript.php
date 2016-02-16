@@ -18,6 +18,11 @@ class ScriptEvent extends \stdClass
     public $sender;
 
     /**
+     * @var AbstractScript|mixed
+     */
+    public $target;
+
+    /**
      * @var int
      */
     public $usage = 0;
@@ -25,10 +30,12 @@ class ScriptEvent extends \stdClass
     /**
      * ScriptEvent constructor.
      * @param AbstractScript $sender
+     * @param null $target
      */
-    public function __construct(AbstractScript $sender = null)
+    public function __construct(AbstractScript $sender = null, $target = null)
     {
         $this->sender = $sender;
+        $this->target = $target ?: $sender;
     }
 
 
@@ -148,8 +155,7 @@ abstract class AbstractScript
             return null;
         }
 
-        $e = new ScriptEvent();
-        $e->sender = $this;
+        $e = new ScriptEvent($this, $this->_context);
         $e->sender->form = $this->_context instanceof UXForm ? $this->_context : null;
 
         foreach ($args as $name => $code) {

@@ -31,7 +31,7 @@ use php\gui\UXTextField;
  */
 class LoginForm extends AbstractOnlineIdeForm
 {
-    use SavableFormMixin;
+    //use SavableFormMixin;
 
     protected function init()
     {
