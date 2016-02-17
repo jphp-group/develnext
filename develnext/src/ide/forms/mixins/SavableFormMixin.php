@@ -20,9 +20,12 @@ trait SavableFormMixin
 
         $this->x = $config->get("x", $this->x);
         $this->y = $config->get("y", $this->y);
-        $this->width = $config->get("width", $this->width);
-        $this->height = $config->get("height", $this->height);
-        $this->layout->size = $this->size;
+
+        if ($config->has('width') && $config->has('height')) {
+            $this->width = $config->get("width", $this->width);
+            $this->height = $config->get("height", $this->height);
+            $this->layout->size = $this->size;
+        }
 
         $this->maximized = $config->get("maximized", $this->maximized);
 

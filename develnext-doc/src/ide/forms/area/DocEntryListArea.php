@@ -94,7 +94,7 @@ class DocEntryListArea extends AbstractFormArea
         $ui->classes->add('doc-entry');
         $ui->spacing = 0;
 
-        $nameLabel = new UXHyperlink($entry['name']);
+        $nameLabel = new UXHyperlink($entry['name'] ?: 'Unknown');
         $nameLabel->font = UXFont::of($nameLabel->font, '13', 'BOLD');
 
         $nameLabel->on('action', function () use ($entry) {

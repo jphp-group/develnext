@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.web.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" styleClass="dn-web" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox id="content" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" styleClass="dn-web" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+         <children>
+            <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="600.0" spacing="10.0">
+               <children>
+                  <ImageView id="entryIcon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
+                  <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label id="entryNameLabel" text="EntryName">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Label id="entryDescriptionLabel" text="EntryDescription" textFill="#909090" />
+                     </children>
+                  </VBox>
+                  <HBox prefHeight="40.0" prefWidth="311.0" spacing="8.0" />
+               </children>
+            </HBox>
+            <Separator maxWidth="1.7976931348623157E308" prefHeight="2.0" prefWidth="419.0" />
+            <HBox spacing="5.0">
+               <children>
+                  <Label text="Категория:" />
+                  <Hyperlink id="categoryLink" text="Hyperlink">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Hyperlink>
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="2.0" />
+               </padding>
+            </HBox>
+            <Separator maxWidth="1.7976931348623157E308" prefHeight="2.0" prefWidth="600.0" />
+            <VBox id="categoryContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="70.0" spacing="7.0" styleClass="doc-entries" VBox.vgrow="ALWAYS">
+               <children>
+                  <WebView id="entryContent" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+               </children></VBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

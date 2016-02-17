@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="601.0" prefWidth="836.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="66.0" layoutY="41.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+               <children>
+                  <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="90.0" text="Название:" />
+                  <TextField id="nameField" prefHeight="25.0" prefWidth="335.0" promptText="введите название статьи" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="5.0">
+               <children>
+                  <Label alignment="CENTER_RIGHT" prefWidth="90.0" text="Код:" />
+                  <TextField id="codeField" prefHeight="25.0" prefWidth="335.0" promptText="код статьи" HBox.hgrow="ALWAYS" />
+                  <Label text="Категория:" />
+                  <ComboBox id="categorySelect" prefHeight="25.0" prefWidth="252.0" HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <Label text="Контент:" />
+            <AnchorPane id="contentArea" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <TextArea id="contentField" layoutX="320.0" layoutY="55.0" promptText="Контент статьи в формате Markdown" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font name="Courier New" size="12.0" />
+                     </font>
+                  </TextArea>
+               </children>
+            </AnchorPane>
+            <Label text="Описание:" />
+            <TextArea id="descriptionField" prefHeight="47.0" prefWidth="816.0" promptText="короткое описание статьи">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </TextArea>
+            <Separator prefHeight="19.0" prefWidth="806.0" />
+            <HBox prefHeight="35.0" prefWidth="816.0" spacing="10.0">
+               <children>
+                  <Button id="saveButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-ok" text="Сохранить">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
+                  <Button id="applyButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Применить">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                     <HBox.margin>
+                        <Insets right="25.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button id="cancelButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Отменить">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>
