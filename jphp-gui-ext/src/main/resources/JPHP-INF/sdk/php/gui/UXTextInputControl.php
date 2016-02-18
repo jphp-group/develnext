@@ -30,7 +30,6 @@ abstract class UXTextInputControl extends UXControl
     public $selectedText;
 
     /**
-     * @readonly
      * @var string
      */
     public $promptText;

@@ -21,6 +21,7 @@ namespace ide\forms {
      * @property UXComboBox $categorySelect
      * @property UXAnchorPane $contentArea
      * @property UXTextArea $contentField
+     * @property UXTextField $weightField
      */
     class DocEntryEditForm extends AbstractIdeForm
     {
@@ -65,6 +66,7 @@ namespace ide\forms {
             $this->result['code'] = $this->codeField->text;
             $this->result['description'] = $this->descriptionField->text;
             $this->result['content'] = $this->contentField->text;
+            $this->result['weight'] = $this->weightField->text;
 
             $this->events->trigger('save', [$this->result]);
         }
@@ -75,6 +77,7 @@ namespace ide\forms {
             $this->nameField->text = $this->result['name'];
             $this->descriptionField->text = $this->result['description'];
             $this->contentField->text = $this->result['content'];
+            $this->weightField->text = $this->result['weight'];
         }
     }
 }

@@ -19,6 +19,7 @@ use php\gui\UXLabel;
 use php\gui\UXMenuItem;
 use php\gui\UXTextField;
 use php\gui\UXWebView;
+use php\io\Stream;
 use php\time\Time;
 use php\time\TimeZone;
 

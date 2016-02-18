@@ -77,7 +77,7 @@ class DocEditor extends AbstractEditor
     protected $uiTreeMenu;
 
     /**
-     * @var UXAnchorPane
+     * @var UXScrollPane
      */
     protected $ui;
 
@@ -190,8 +190,7 @@ class DocEditor extends AbstractEditor
     {
         $item = $this->uiTree->focusedItem;
 
-        $this->ui->children->clear();
-        $this->ui->add($this->uiSection);
+        $this->ui->content = $this->uiSection;
 
         $this->openedEntry = null;
 
@@ -372,26 +371,35 @@ class DocEditor extends AbstractEditor
 
     public function editEntry(array $entry)
     {
-        $dialog = new DocEntryEditForm();
-        $dialog->setResult($entry);
+        $this->docService->entryAsync($entry['id'], function (ServiceResponse $response) {
+            if ($response->isSuccess()) {
+                $entry = $response->data();
+                $dialog = new DocEntryEditForm();
+                $dialog->setResult($entry);
 
-        $this->openEntry($entry);
+                $dialog->events->on('save', function ($entry) {
+                    $this->uiPage->showPreloader();
 
-        $dialog->events->on('save', function ($entry) {
-            $this->uiPage->showPreloader();
+                    $this->docService->saveEntryAsync($entry, function (ServiceResponse $response) {
+                        $this->uiPage->hidePreloader();
 
-            $this->docService->saveEntryAsync($entry, function (ServiceResponse $response) {
-                $this->uiPage->hidePreloader();
+                        if ($response->isSuccess()) {
+                            if ($this->openedEntry) {
+                                $this->openEntry($response->data());
+                            } else {
+                                $this->loadContent(true);
+                            }
+                        } else {
+                            Notifications::error('Ошибка сохранения', $response->message());
+                        }
+                    });
+                });
 
-                if ($response->isSuccess()) {
-                    $this->openEntry($response->data());
-                } else {
-                    Notifications::error('Ошибка сохранения', $response->message());
-                }
-            });
+                $dialog->showDialog();
+            } else {
+                Notifications::error('Ошибка', $response->message());
+            }
         });
-
-        $dialog->showDialog();
     }
 
     public function openCategory(array $category)
@@ -401,8 +409,7 @@ class DocEditor extends AbstractEditor
 
     public function openEntry(array $entry)
     {
-        $this->ui->children->clear();
-        $this->ui->add($this->uiPage);
+        $this->ui->content = $this->uiPage;
 
         $this->openedEntry = $entry;
 
@@ -436,18 +443,16 @@ class DocEditor extends AbstractEditor
 
         UXAnchorPane::setAnchor($uiSection, 0);
 
-        $pane = new UXScrollPane($uiSection);
-        $pane->fitToWidth = true;
-        $pane->classes->add('dn-web');
-
         $uiPage = new DocEntryPageArea();
         $this->uiPage = $uiPage;
         $uiPage->on('openCategory', [$this, 'openCategory']);
 
-        $ui = new UXAnchorPane();
-        $ui->add($uiSection);
+        $pane = new UXScrollPane($uiSection);
+        $pane->fitToWidth = true;
+        $pane->fitToHeight = true;
+        $pane->classes->add('dn-web');
 
-        return $this->ui = $ui;
+        return $this->ui = $pane;
     }
 
     public function makeLeftPaneUi()
