@@ -19,6 +19,7 @@ use ide\utils\Tree;
  * @method ServiceResponseFuture categoriesAsync($parentCategoryId, callable $callback = null)
  * @method ServiceResponseFuture allCategoriesAsync(callable $callback = null)
  * @method ServiceResponseFuture entryAsync($id, callable $callback = null)
+ * @method ServiceResponseFuture searchAsync($query, $offset, $limit, callable $callback = null)
  * @method ServiceResponseFuture entriesAsync($categoryId, $offset, $limit, callable $callback = null)
  * @method ServiceResponseFuture allEntriesAsync($sort, $offset, $limit, callable $callback = null)
  * @method ServiceResponseFuture saveEntryAsync($data, callable $callback = null)
@@ -73,6 +74,11 @@ class DocService extends AbstractService
     public function entry($id)
     {
         return $this->execute('doc/entry', ['id' => $id]);
+    }
+
+    public function search($query, $offset = 0, $limit = 20)
+    {
+        return $this->execute('doc/search', ['query' => $query, 'offset' => $offset, 'limit' => $limit]);
     }
 
     public function entries($categoryId, $offset = 0, $limit = 40)

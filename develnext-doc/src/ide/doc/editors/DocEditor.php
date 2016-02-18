@@ -13,6 +13,7 @@ use ide\forms\area\DocEntryListArea;
 use ide\forms\area\DocEntryPageArea;
 use ide\forms\DocEntryEditForm;
 use ide\Ide;
+use ide\misc\EventHandlerBehaviour;
 use ide\systems\FileSystem;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
@@ -56,6 +57,8 @@ class DocEditorTreeItem
 
 class DocEditor extends AbstractEditor
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var DocService
      */
@@ -322,8 +325,12 @@ class DocEditor extends AbstractEditor
     {
         parent::open();
 
-        $this->refreshTree();
-        $this->loadContent();
+        if ($this->openedEntry) {
+
+        } else {
+            $this->refreshTree();
+            $this->loadContent();
+        }
     }
 
     public function load()
@@ -371,6 +378,8 @@ class DocEditor extends AbstractEditor
 
     public function editEntry(array $entry)
     {
+        $this->openEntry($entry);
+
         $this->docService->entryAsync($entry['id'], function (ServiceResponse $response) {
             if ($response->isSuccess()) {
                 $entry = $response->data();
@@ -423,6 +432,29 @@ class DocEditor extends AbstractEditor
                 $this->uiPage->setContent($response->data());
             } else {
                 Notifications::error('Ошибка', 'Произошла непредвиденная ошибка');
+            }
+        });
+    }
+
+    public function search($query)
+    {
+        $searchSection = [
+            'name' => 'Поиск',
+            'description' => 'Полнотекстовый поиск по всей документации',
+        ];
+
+        $this->loadContent();
+
+        $this->uiSection->setContent($searchSection);
+        $this->uiSection->showPreloader("Поиск '$query' ...");
+
+        $this->docService->searchAsync($query, 0, 20, function (ServiceResponse $response) use ($searchSection) {
+            $this->uiSection->hidePreloader();
+
+            if ($response->isSuccess()) {
+                $this->uiSection->setContent($searchSection, $response->data());
+            } else {
+                Notifications::error('Ошибка', 'Возникла ошибка при попытке сделать поиск. Возможно сервис временно недоступен.');
             }
         });
     }

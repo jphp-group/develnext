@@ -31,7 +31,6 @@ use php\time\TimeZone;
  * @property UXVBox $categoryContent
  * @property UXVBox $content
  * @property UXHBox $moderPane
- * @property UXTextField $searchField;
  */
 class DocEntryListArea extends AbstractFormArea
 {
@@ -117,6 +116,14 @@ class DocEntryListArea extends AbstractFormArea
         $hints->spacing = 7;
         $hints->style = '-fx-font-size: 0.9em;';
 
+        if ($entry['categoryId']) {
+            $entry['category']['id'] = $entry['categoryId'];
+        }
+
+        if ($entry['categoryName']) {
+            $entry['category']['name'] = $entry['categoryName'];
+        }
+
         if ($entry['category'] && $this->category['id'] != $entry['category']['id']) {
             $categoryLink = new UXHyperlink($entry['category']['name']);
             $category = new UXHBox([new UXLabel('Категория: '), $categoryLink]);
@@ -185,19 +192,6 @@ class DocEntryListArea extends AbstractFormArea
 
         if ($text) {
             $this->trigger('addEntry', [$text]);
-        }
-    }
-
-    /**
-     * @event searchField.keyDown-Enter
-     * @event searchButton.action
-     */
-    public function doSearch()
-    {
-        $text = $this->searchField->text;
-
-        if ($text) {
-            $this->trigger('search', [$text]);
         }
     }
 

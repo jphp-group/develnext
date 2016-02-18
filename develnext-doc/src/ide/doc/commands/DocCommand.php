@@ -1,6 +1,7 @@
 <?php
 namespace ide\doc\commands;
 
+use ide\doc\editors\DocEditor;
 use ide\editors\AbstractEditor;
 use ide\Ide;
 use ide\misc\AbstractCommand;
@@ -59,7 +60,15 @@ class DocCommand extends AbstractCommand
         $searchButton->maxHeight = 999;
         $searchButton->width = 35;
 
-        $ui = new UXHBox([$searchButton, $this->makeSearchInputUi(), $button]);
+        $input = $this->makeSearchInputUi();
+
+        $searchButton->on('action', function () use ($input) {
+            /** @var DocEditor $editor */
+            $editor = FileSystem::open('~doc');
+            $editor->search($input->text);
+        });
+
+        $ui = new UXHBox([$searchButton, $input, $button]);
         $ui->spacing = 5;
         $ui->fillHeight = true;
 
@@ -68,10 +77,6 @@ class DocCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        if (Ide::get()->isDevelopment()) {
-            FileSystem::open('~doc');
-        } else {
-            Notifications::show('В разработке', 'Данная функция находится в разработке...', 'INFORMATION');
-        }
+        FileSystem::open('~doc');
     }
 }

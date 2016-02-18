@@ -18,6 +18,7 @@ use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXMenuItem;
 use php\gui\UXTextField;
+use php\gui\UXWebEngine;
 use php\gui\UXWebView;
 use php\io\Stream;
 use php\time\Time;
@@ -72,6 +73,18 @@ class DocEntryPageArea extends AbstractFormArea
         $endpoint = Ide::service()->getEndpoint();
 
         $this->entryContent->engine->loadContent('...');
+
+        $this->showPreloader();
+
+        $this->entryContent->engine->watchState(function (UXWebEngine $self, $old, $new) {
+            if ($new == 'SUCCEEDED') {
+                uiLater(function () {
+                    $this->hidePreloader();
+                });
+            }
+        });
         $this->entryContent->engine->load("{$endpoint}{$this->entry['contentUrl']}");
+
+
     }
 }
