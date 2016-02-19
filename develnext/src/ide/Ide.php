@@ -501,8 +501,6 @@ class Ide extends Application
             }
         }
 
-        System::getProperty()
-
         $tempDir->mkdirs();
 
         $file = File::createTemp(Str::random(5), Str::random(10) . $suffix, $tempDir);

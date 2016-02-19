@@ -7,6 +7,7 @@ use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\systems\FileSystem;
 use ide\ui\Notifications;
+use php\gui\event\UXKeyEvent;
 use php\gui\layout\UXHBox;
 use php\gui\text\UXFont;
 use php\gui\UXButton;
@@ -62,11 +63,27 @@ class DocCommand extends AbstractCommand
 
         $input = $this->makeSearchInputUi();
 
-        $searchButton->on('action', function () use ($input) {
-            /** @var DocEditor $editor */
-            $editor = FileSystem::open('~doc');
-            $editor->search($input->text);
+        $input->observer('text')->addListener(function ($old, $new) use ($input) {
+            if ($new) {
+                $input->width = 250;
+            } else {
+                $input->width = 170;
+            }
         });
+
+        $searchHandle = function () use ($input) {
+            /** @var DocEditor $editor */
+            $editor = FileSystem::open('~doc:silent');
+            $editor->search($input->text);
+        };
+
+        $input->on('keyDown', function (UXKeyEvent $e) use ($searchHandle) {
+            if ($e->codeName == 'Enter') {
+                $searchHandle();
+            }
+        });
+
+        $searchButton->on('action', $searchHandle);
 
         $ui = new UXHBox([$searchButton, $input, $button]);
         $ui->spacing = 5;

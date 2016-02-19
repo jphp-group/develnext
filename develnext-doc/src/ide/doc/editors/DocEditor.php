@@ -13,6 +13,7 @@ use ide\forms\area\DocEntryListArea;
 use ide\forms\area\DocEntryPageArea;
 use ide\forms\DocEntryEditForm;
 use ide\Ide;
+use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
 use ide\systems\FileSystem;
 use ide\ui\Notifications;
@@ -24,6 +25,9 @@ use php\gui\UXListView;
 use php\gui\UXNode;
 use php\gui\UXTreeItem;
 use php\gui\UXTreeView;
+use php\io\Stream;
+use php\lib\str;
+use script\TimerScript;
 
 class DocEditorTreeItem
 {
@@ -130,6 +134,11 @@ class DocEditor extends AbstractEditor
     protected $openedEntry = null;
 
     /**
+     * @var bool
+     */
+    protected $anotherPage = false;
+
+    /**
      * DocEditor constructor.
      * @param string $file
      */
@@ -148,9 +157,9 @@ class DocEditor extends AbstractEditor
         return $this->docService;
     }
 
-    public function refreshTree()
+    public function refreshTree($loadContent = true)
     {
-        $this->docService->categoryTreeAsync(function (ServiceResponse $response) {
+        $this->docService->categoryTreeAsync(function (ServiceResponse $response) use ($loadContent) {
             if ($response->isSuccess()) {
                 /** @var Tree $tree */
                 $tree = $response->data();
@@ -174,7 +183,7 @@ class DocEditor extends AbstractEditor
 
                 $this->updateTree($tree, null, null, $this->expandedItems);
 
-                $this->setSelectedCategory($selected);
+                $this->setSelectedCategory($selected, false, $loadContent);
 
                 if (!$this->treeLoaded) {
                     $id = Ide::get()->getUserConfigValue(get_class($this) . '#openedEntry');
@@ -191,11 +200,17 @@ class DocEditor extends AbstractEditor
 
     protected function loadContent($force = false)
     {
+        if ($this->anotherPage) {
+            $force = true;
+        }
+
         $item = $this->uiTree->focusedItem;
 
         $this->ui->content = $this->uiSection;
 
         $this->openedEntry = null;
+
+        Logger::info("Load category list");
 
         $this->docService->accessInfoAsync(function (ServiceResponse $response) {
             if ($response->isSuccess()) {
@@ -218,6 +233,8 @@ class DocEditor extends AbstractEditor
             'description' => 'Добро пожаловать в справочную систему по DevelNext'
         ]);
 
+        $this->anotherPage = false;
+
 
         if ($item->value instanceof DocEditorTreeItem) {
             $category = $item->value->getData();
@@ -236,6 +253,7 @@ class DocEditor extends AbstractEditor
 
                 $this->uiSection->hidePreloader();
                 $this->loadedCategoryId = $category['id'];
+                $this->loaded = true;
             });
         } else {
             if (null == $this->loadedCategoryId) {
@@ -308,7 +326,7 @@ class DocEditor extends AbstractEditor
         return null;
     }
 
-    public function setSelectedCategory(array $data = null, $force = false)
+    public function setSelectedCategory(array $data = null, $force = false, $loadContent = true)
     {
         if ($data && $one = $this->uiTreeItemById[$data['id']]) {
             $this->uiTree->focusedItem = $one;
@@ -318,12 +336,20 @@ class DocEditor extends AbstractEditor
             $this->uiTree->selectedItems = [$this->uiTree->root];
         }
 
-        $this->loadContent($force);
+        if ($loadContent) {
+            $this->loadContent($force);
+        }
     }
 
     public function open()
     {
         parent::open();
+
+        if ($this->file == "~doc:silent") {
+            $this->refreshTree(false);
+            $this->file = '~doc';
+            return;
+        }
 
         if ($this->openedEntry) {
 
@@ -439,11 +465,13 @@ class DocEditor extends AbstractEditor
     public function search($query)
     {
         $searchSection = [
-            'name' => 'Поиск',
+            'name' => "Поиск '$query'",
             'description' => 'Полнотекстовый поиск по всей документации',
         ];
 
         $this->loadContent();
+
+        $this->anotherPage = true;
 
         $this->uiSection->setContent($searchSection);
         $this->uiSection->showPreloader("Поиск '$query' ...");
@@ -508,7 +536,7 @@ class DocEditor extends AbstractEditor
             new AddCategoryMenuCommand(),
             new AddSubCategoryMenuCommand(),
             new DeleteCategoryMenuCommand(),
-            new EditCategoryMenuCommand(),
+            new EditCategoryMenuCommand($this),
         ]);
         $this->uiTreeMenu->linkTo($tree);
 

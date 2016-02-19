@@ -9,36 +9,23 @@ class Tree
     public function __construct(array $plainTree, $idProperty = 'id', $parentProperty = 'parentId')
     {
         $tree = [];
-        $list = [];
 
         foreach ($plainTree as $it) {
+            $this->list[$it[$idProperty]] = $it;
+        }
+
+        foreach ($this->list as &$it) {
             $id = $it[$idProperty];
             $parentId = $it[$parentProperty];
 
             if ($parentId) {
-                if (!$list[$parentId])  {
-                    $list[$parentId] = [];
-                }
-
-                $parent =& $list[$parentId];
-
-                if ($list[$id]) {
-                    $sub = $list[$id];
-                    $list[$id] = $it;
-                    $list[$id]['~sub'] = $sub;
-                } else {
-                    $list[$id] = $it;
-                }
-
-                $parent['~sub'][] =& $list[$id];
+                $this->list[$parentId]['~sub'][] =& $it;
             } else {
-                $tree[$id] = $it;
-                $list[$id] =& $tree[$id];
+                $tree[$id] =& $it;
             }
         }
 
         $this->tree = $tree;
-        $this->list = $list;
     }
 
     /**
@@ -55,7 +42,13 @@ class Tree
             return $this->getRoot();
         }
 
-        return (array) $this->list[$parentId]['~sub'];
+        $sub = (array) $this->list[$parentId]['~sub'];
+
+        /*foreach ($sub as &$one) {
+            $one = $this->list[$one];
+        }
+               */
+        return $sub;
     }
 
     public function getRoot()

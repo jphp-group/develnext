@@ -7,42 +7,28 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="601.0" prefWidth="836.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="241.0" prefWidth="635.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox layoutX="66.0" layoutY="41.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox layoutX="66.0" layoutY="41.0" prefWidth="90.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox alignment="CENTER_LEFT" spacing="5.0">
                <children>
                   <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="90.0" text="Название:" />
-                  <TextField id="nameField" prefHeight="25.0" prefWidth="335.0" promptText="введите название статьи" HBox.hgrow="ALWAYS" />
+                  <TextField id="nameField" prefHeight="25.0" prefWidth="335.0" promptText="введите название категории" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
             <HBox alignment="CENTER_LEFT" spacing="5.0">
                <children>
-                  <Label alignment="CENTER_RIGHT" prefWidth="90.0" text="Код:" />
-                  <TextField id="codeField" prefHeight="25.0" prefWidth="282.0" promptText="код статьи" HBox.hgrow="ALWAYS" />
-                  <Label text="Вес:" />
+                  <Label alignment="CENTER_RIGHT" prefWidth="90.0" text="Вес:" />
                   <TextField id="weightField" prefHeight="25.0" prefWidth="60.0" />
-                  <Label text="Категория:" />
-                  <ComboBox id="categorySelect" prefHeight="25.0" prefWidth="203.0" HBox.hgrow="ALWAYS" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" />
                </VBox.margin>
             </HBox>
             <Separator prefWidth="200.0" />
-            <Label text="Контент:" />
-            <AnchorPane id="contentArea" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-               <children>
-                  <TextArea id="contentField" layoutX="320.0" layoutY="55.0" promptText="Контент статьи в формате Markdown" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <font>
-                        <Font name="Courier New" size="12.0" />
-                     </font>
-                  </TextArea>
-               </children>
-            </AnchorPane>
             <Label text="Описание:" />
-            <TextArea id="descriptionField" prefHeight="47.0" prefWidth="816.0" promptText="короткое описание статьи">
+            <TextArea id="descriptionField" prefHeight="47.0" prefWidth="816.0" promptText="короткое описание категории">
                <VBox.margin>
                   <Insets bottom="5.0" />
                </VBox.margin>
