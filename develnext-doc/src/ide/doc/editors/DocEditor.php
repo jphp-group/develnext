@@ -139,6 +139,11 @@ class DocEditor extends AbstractEditor
     protected $anotherPage = false;
 
     /**
+     * @var null
+     */
+    protected $currentParam = null;
+
+    /**
      * DocEditor constructor.
      * @param string $file
      */
@@ -209,6 +214,7 @@ class DocEditor extends AbstractEditor
         $this->ui->content = $this->uiSection;
 
         $this->openedEntry = null;
+        $this->currentParam = null;
 
         Logger::info("Load category list");
 
@@ -240,7 +246,7 @@ class DocEditor extends AbstractEditor
             $category = $item->value->getData();
             $this->uiSection->setContent($category);
 
-            if ($category['id'] == $this->loadedCategoryId && !$force) {
+            if (($category['id'] == $this->loadedCategoryId && $this->loadedCategoryId !== null) && !$force) {
                 return;
             }
 
@@ -256,16 +262,16 @@ class DocEditor extends AbstractEditor
                 $this->loaded = true;
             });
         } else {
-            if (null == $this->loadedCategoryId) {
+            /*if (null == $this->loadedCategoryId) {
                 return;
-            }
+            }   */
 
             $this->uiSection->showPreloader();
             $this->docService->allEntriesAsync('UPDATED_AT', 0, 50, function (ServiceResponse $response) {
                 if ($response->isSuccess()) {
                     $this->uiSection->setContent([
-                        'name' => 'Документация',
-                        'description' => 'Добро пожаловать в справочную систему по DevelNext'
+                        'name' => 'Документация (последнее)',
+                        'description' => 'Последние добавленные статьи в документацию'
                     ], $response->data());
                 }
 
@@ -341,14 +347,17 @@ class DocEditor extends AbstractEditor
         }
     }
 
-    public function open()
+    public function open($param = null)
     {
         parent::open();
 
-        if ($this->file == "~doc:silent") {
-            $this->refreshTree(false);
-            $this->file = '~doc';
-            return;
+        if ($param && $this->currentParam != $param) {
+            $this->currentParam = $param;
+
+            if ($param['search']) {
+                $this->search($param['search']);
+                return;
+            }
         }
 
         if ($this->openedEntry) {
@@ -402,9 +411,11 @@ class DocEditor extends AbstractEditor
         });
     }
 
-    public function editEntry(array $entry)
+    public function editEntry(array $entry, $fastEdit = false)
     {
-        $this->openEntry($entry);
+        if (!$fastEdit) {
+            $this->openEntry($entry);
+        }
 
         $this->docService->entryAsync($entry['id'], function (ServiceResponse $response) {
             if ($response->isSuccess()) {
@@ -466,7 +477,8 @@ class DocEditor extends AbstractEditor
     {
         $searchSection = [
             'name' => "Поиск '$query'",
-            'description' => 'Полнотекстовый поиск по всей документации',
+            'description' => "Поисковая фраза '$query'",
+            'icon' => ico('searchEx32'),
         ];
 
         $this->loadContent();
@@ -476,13 +488,14 @@ class DocEditor extends AbstractEditor
         $this->uiSection->setContent($searchSection);
         $this->uiSection->showPreloader("Поиск '$query' ...");
 
-        $this->docService->searchAsync($query, 0, 20, function (ServiceResponse $response) use ($searchSection) {
+        $this->docService->searchAsync($query, 0, 20, function (ServiceResponse $response) use ($searchSection, $query) {
             $this->uiSection->hidePreloader();
 
             if ($response->isSuccess()) {
                 $this->uiSection->setContent($searchSection, $response->data());
             } else {
-                Notifications::error('Ошибка', 'Возникла ошибка при попытке сделать поиск. Возможно сервис временно недоступен.');
+                Notifications::error('Ошибка поиска', 'Возникла ошибка при попытке сделать поиск. Возможно сервис временно недоступен.');
+                Logger::error("Unable to search " . json_encode($query) . ", message = {$response->message()}");
             }
         });
     }
@@ -497,6 +510,9 @@ class DocEditor extends AbstractEditor
         $uiSection->on('addEntry', [$this, 'addEntry']);
         $uiSection->on('deleteEntry', [$this, 'deleteEntry']);
         $uiSection->on('editEntry', [$this, 'editEntry']);
+        $uiSection->on('fastEditEntry', function ($entry) {
+            $this->editEntry($entry, true);
+        });
 
         $uiSection->on('openCategory', [$this, 'openCategory']);
         $uiSection->on('openEntry', [$this, 'openEntry']);

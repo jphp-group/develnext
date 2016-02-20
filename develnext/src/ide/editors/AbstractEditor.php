@@ -142,7 +142,7 @@ abstract class AbstractEditor
         $this->reindex();
     }
 
-    public function open()
+    public function open($param = null)
     {
         Logger::info("Open editor for: $this->file");
         $this->reindex();

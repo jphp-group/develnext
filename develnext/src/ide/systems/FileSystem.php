@@ -190,9 +190,11 @@ class FileSystem
     /**
      * @param $path
      * @param bool $switchToTab
+     * @param null $param
      * @return AbstractEditor|null
+     * @throws \php\lang\IllegalStateException
      */
-    static function open($path, $switchToTab = true)
+    static function open($path, $switchToTab = true, $param = null)
     {
         $hash = FileUtils::hashName($path);
 
@@ -243,16 +245,19 @@ class FileSystem
                 static::close($path, false);
             });
 
-            $tab->on('change', function (UXEvent $e) use ($mainForm, $path) {
+            $tab->on('change', function (UXEvent $e) use ($mainForm, $path, $param) {
                 /** @var UXTabPane $fileTabPane */
                 $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
 
                 if ($e->sender === $fileTabPane->selectedTab) {
+                    if ($param) {
+                        $fileTabPane->selectedTab->userData->open($param);
+                    }
+
                     return;
                 }
 
-                uiLater(function () use ($mainForm, $path, $fileTabPane) {
-
+                uiLater(function () use ($mainForm, $path, $fileTabPane, $param) {
                     $tab = $fileTabPane->selectedTab;
 
                     Logger::info("Opening selected tab '$tab->text'");
@@ -268,7 +273,7 @@ class FileSystem
                             $mainForm->setLeftPane($tab->userData->getLeftPaneUi());
                         }
 
-                        $tab->userData->open();
+                        $tab->userData->open($param);
 
                         static::$previousEditor = $tab->userData;
                     } else {
@@ -284,6 +289,10 @@ class FileSystem
             });
 
             static::addTab($tab);
+        } else {
+            if ($param) {
+                $tab->userData->open($param);
+            }
         }
 
         if ($switchToTab) {

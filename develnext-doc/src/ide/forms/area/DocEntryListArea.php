@@ -53,6 +53,7 @@ class DocEntryListArea extends AbstractFormArea
 
         $this->contextMenu = new ContextMenu(null, [
             new DocEntryListAreaEditEntryCommand($this),
+            new DocEntryListAreaFastEditEntryCommand($this),
             new DocEntryListAreaDeleteEntryCommand($this),
         ]);
     }
@@ -70,7 +71,15 @@ class DocEntryListArea extends AbstractFormArea
 
     public function updateUi()
     {
-        Ide::service()->media()->loadImage($this->category['icon'], $this->categoryIcon, 'icons/help32.png');
+        if ($icon = $this->category['icon']) {
+            if ($icon instanceof UXImageView) {
+                $this->categoryIcon->image = $icon->image;
+            } else {
+                Ide::service()->media()->loadImage($icon, $this->categoryIcon, 'icons/help32.png');
+            }
+        } else {
+            $this->categoryIcon->image = ico('help32')->image;
+        }
 
         $this->categoryNameLabel->text = $this->category['name'] ?: 'Неизвестная категория';
         $this->categoryDescriptionLabel->text = $this->category['description'] ?: 'Описание отсутствует ...';
@@ -139,9 +148,13 @@ class DocEntryListArea extends AbstractFormArea
             $time = new Time($entry['updatedAt']);
             $updatedAtValue = new UXLabel($time->toString('dd.MM.yyyy'));
             $updatedAtValue->style = '-fx-font-weight: bold;';
-            $updatedAt = new UXHBox([new UXLabel('Дата: '), $updatedAtValue]);
+            $updatedAt = new UXHBox([new UXLabel('Обновлено: '), $updatedAtValue]);
 
             $hints->add($updatedAt);
+        }
+
+        if ($this->accessEntry) {
+            $hints->add(new UXHBox([new UXLabel('Вес: '), new UXLabel($entry['weight'])]));
         }
 
         if ($hints->children->count()) {
@@ -250,6 +263,31 @@ class DocEntryListAreaEditEntryCommand extends DocEntryListAreaMenuCommand
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $this->area->trigger('editEntry', [$this->area->getSelectEntry()]);
+    }
+
+    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    {
+        $item->visible = ($this->area->isAccessCategory());
+        $item->disable = !$this->area->getSelectEntry();
+    }
+}
+
+
+class DocEntryListAreaFastEditEntryCommand extends DocEntryListAreaMenuCommand
+{
+    public function getIcon()
+    {
+        return 'icons/edit16.png';
+    }
+
+    public function getName()
+    {
+        return 'Редактировать (быстро)';
+    }
+
+    public function onExecute($e = null, AbstractEditor $editor = null)
+    {
+        $this->area->trigger('fastEditEntry', [$this->area->getSelectEntry()]);
     }
 
     public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)

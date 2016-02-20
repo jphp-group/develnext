@@ -73,8 +73,7 @@ class DocCommand extends AbstractCommand
 
         $searchHandle = function () use ($input) {
             /** @var DocEditor $editor */
-            $editor = FileSystem::open('~doc:silent');
-            $editor->search($input->text);
+            FileSystem::open('~doc', true, ['search' => $input->text]);
         };
 
         $input->on('keyDown', function (UXKeyEvent $e) use ($searchHandle) {
