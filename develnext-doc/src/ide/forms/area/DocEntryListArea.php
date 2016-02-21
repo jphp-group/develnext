@@ -56,6 +56,8 @@ class DocEntryListArea extends AbstractFormArea
             new DocEntryListAreaFastEditEntryCommand($this),
             new DocEntryListAreaDeleteEntryCommand($this),
         ]);
+
+        $this->categoryContent->spacing = 15;
     }
 
     public function setContent(array $category, array $entries = null)
@@ -103,7 +105,7 @@ class DocEntryListArea extends AbstractFormArea
         $ui->spacing = 0;
 
         $nameLabel = new UXHyperlink($entry['name'] ?: 'Unknown');
-        $nameLabel->font = UXFont::of($nameLabel->font, '13', 'BOLD');
+        $nameLabel->font = UXFont::of('Tahoma', '12', 'BOLD');
 
         $nameLabel->on('action', function () use ($entry) {
             $this->trigger('openEntry', [$entry]);
@@ -112,7 +114,7 @@ class DocEntryListArea extends AbstractFormArea
         $ui->add($nameLabel);
 
         $descriptionLabel = new UXLabel($entry['description']);
-        $descriptionLabel->textColor = 'gray';
+        $descriptionLabel->classes->add('description');
 
         if (!$descriptionLabel->text) {
             $descriptionLabel->text = 'Данная статья без короткого описания, все ясно из её заголовка ...';
@@ -131,6 +133,12 @@ class DocEntryListArea extends AbstractFormArea
 
         if ($entry['categoryName']) {
             $entry['category']['name'] = $entry['categoryName'];
+        }
+
+        if ($entry['id']) {
+            $idLabel = new UXLabel($entry['id']);
+            $idLabel->style = '-fx-font-weight: bold;';
+            $hints->add(new UXHBox([new UXLabel('ID: '), $idLabel]));
         }
 
         if ($entry['category'] && $this->category['id'] != $entry['category']['id']) {

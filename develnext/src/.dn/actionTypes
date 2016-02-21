@@ -3,6 +3,7 @@ ide\action\types\ShowFormActionType
 ide\action\types\ShowFormAndWaitActionType
 ide\action\types\ShowNewFormActionType
 ide\action\types\HideFormActionType
+ide\action\types\MinimizeFormActionType
 ide\action\types\MessageActionType
 ide\action\types\ToastActionType
 ide\action\types\ShowPreloaderActionType

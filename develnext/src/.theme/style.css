@@ -186,5 +186,12 @@
 .doc-entry {
     -fx-padding: 5px 10px;
     -fx-background-color: #fafafa;
-    -fx-effect: dropshadow(three-pass-box, rgba(129, 129, 129, 0.8), 4, 0, 0, 0);
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: silver;
+}
+
+.doc-entry .description {
+    -fx-text-fill: gray;
+    -fx-font-size: 12px;
+    -fx-font-style: italic !important;
 }

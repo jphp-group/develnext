@@ -1,6 +1,7 @@
 <?php
 namespace php\gui;
 
+use php\gui\animation\UXAnimationTimer;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyboardManager;
 use php\gui\event\UXKeyEvent;
@@ -131,8 +132,33 @@ class UXNodeWrapper
 
                 return;
 
+            case 'step':
+                $stepTimer = new UXAnimationTimer(function () use ($handler) {
+                    if (!$this->node->isFree() && $this->node->enabled) {
+                        $handler(UXEvent::makeMock($this->node));
+                    }
+                });
+
+                if (!$this->node->isFree()) {
+                    $stepTimer->start();
+                }
+
+                $this->node->observer('parent')->addListener(function ($old, $new) use ($stepTimer) {
+                    if ($new) {
+                        $stepTimer->start();
+                    } else {
+                        $stepTimer->stop();
+                    }
+                });
+
+                return;
+
             case 'outside-partly':
                 $listener = function () use ($handler) {
+                    if (!$this->node->enabled) {
+                        return;
+                    }
+
                     $handle = function () use ($handler) {
                         uiLater(function () use ($handler) {
                             $handler(UXEvent::makeMock($this->node));
@@ -163,6 +189,10 @@ class UXNodeWrapper
 
             case 'outside':
                 $listener = function () use ($handler) {
+                    if (!$this->node->enabled) {
+                        return;
+                    }
+
                     $handle = function () use ($handler) {
                         uiLater(function () use ($handler) {
                             $handler(UXEvent::makeMock($this->node));

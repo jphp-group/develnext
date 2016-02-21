@@ -8,6 +8,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import org.fife.rsta.ui.search.*;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextAreaDefaultInputMap;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.fife.ui.rtextarea.SearchContext;
@@ -70,6 +71,8 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
         content.setCloseCurlyBraces(true);
         content.setClearWhitespaceLinesEnabled(true);
         content.setHighlightSecondaryLanguages(false);
+
+        SwingUtilities.replaceUIInputMap(content, JComponent.WHEN_FOCUSED, new SyntaxTextAreaInputMap());
 
         content.addKeyListener(new KeyAdapter() {
             @Override

@@ -69,11 +69,16 @@ class DocCommand extends AbstractCommand
             } else {
                 $input->width = 170;
             }
+
+            Ide::get()->setUserConfigValue(__CLASS__ . '.searchQuery', $input);
         });
+
+        $input->text = Ide::get()->getUserConfigValue(__CLASS__ . '.searchQuery', '');
 
         $searchHandle = function () use ($input) {
             /** @var DocEditor $editor */
-            FileSystem::open('~doc', true, ['search' => $input->text]);
+            $param = ['search' => $input->text];
+            FileSystem::openOrRefresh('~doc', $param);
         };
 
         $input->on('keyDown', function (UXKeyEvent $e) use ($searchHandle) {

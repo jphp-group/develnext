@@ -7,6 +7,7 @@ use ide\Logger;
 use ide\project\Project;
 use ide\project\ProjectIndexer;
 use ide\systems\FileSystem;
+use ide\utils\Json;
 use php\gui\layout\UXPane;
 use php\gui\UXNode;
 use php\lang\IllegalStateException;
@@ -144,7 +145,7 @@ abstract class AbstractEditor
 
     public function open($param = null)
     {
-        Logger::info("Open editor for: $this->file");
+        Logger::info("Open editor for: $this->file, param = " . json_encode($param));
         $this->reindex();
     }
 

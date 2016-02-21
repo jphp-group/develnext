@@ -7,6 +7,7 @@ use ide\forms\MainForm;
 use ide\Ide;
 use ide\Logger;
 use ide\utils\FileUtils;
+use ide\utils\Json;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXApplication;
@@ -54,15 +55,35 @@ class FileSystem
 
     /**
      * @param $path
+     * @param null $param
      */
-    static function refresh($path)
+    static function refresh($path, $param = null)
     {
         $hash = FileUtils::hashName($path);
         $info = static::$openedFiles[$hash];
 
         if (!$info) {
-            static::open($path, false);
+            static::open($path, false, $param);
             return;
+        }
+    }
+
+    /**
+     * @param $path
+     * @param null $param
+     * @return AbstractEditor|null
+     */
+    static function openOrRefresh($path, $param = null)
+    {
+        $hash = FileUtils::hashName($path);
+        $info = static::$openedFiles[$hash];
+
+        if (!$info) {
+            return static::open($path, true, $param);
+        } else {
+            $editor = static::getOpenedEditor($path);
+            $editor->open($param);
+            return $editor;
         }
     }
 
@@ -87,6 +108,14 @@ class FileSystem
         return $result;
     }
 
+    /**
+     * @param $file
+     * @return AbstractEditor
+     */
+    static function getOpenedEditor($file)
+    {
+        return static::$openedEditors[FileUtils::hashName($file)];
+    }
 
     /**
      * @return UXDraggableTab[]
@@ -245,15 +274,11 @@ class FileSystem
                 static::close($path, false);
             });
 
-            $tab->on('change', function (UXEvent $e) use ($mainForm, $path, $param) {
+            $changeHandler = function (UXEvent $e = null, $param = null) use ($mainForm, $path) {
                 /** @var UXTabPane $fileTabPane */
                 $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
 
-                if ($e->sender === $fileTabPane->selectedTab) {
-                    if ($param) {
-                        $fileTabPane->selectedTab->userData->open($param);
-                    }
-
+                if ($e && $e->sender === $fileTabPane->selectedTab) {
                     return;
                 }
 
@@ -286,13 +311,17 @@ class FileSystem
                         $project->update();
                     }
                 });
+            };
+
+            uiLater(function () use ($tab, $changeHandler) {
+                $tab->on('change', $changeHandler);
             });
 
-            static::addTab($tab);
-        } else {
-            if ($param) {
-                $tab->userData->open($param);
+            if ($switchToTab) {
+                $changeHandler(null, $param);
             }
+
+            static::addTab($tab);
         }
 
         if ($switchToTab) {

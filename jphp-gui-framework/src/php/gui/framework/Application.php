@@ -116,8 +116,35 @@ class Application
         return $this->config;
     }
 
+    /** @var AbstractForm[] */
     private $formCache = [];
     private $formOriginCache = [];
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function minimizeForm($name)
+    {
+        if ($form = $this->formCache[$name]) {
+            $form->iconified = true;
+        }
+
+        return $form;
+    }
+
+    /**
+     * @param $name
+     * @return AbstractForm
+     */
+    public function restoreForm($name)
+    {
+        if ($form = $this->formCache[$name]) {
+            $form->iconified = false;
+        }
+
+        return $form;
+    }
 
     /**
      * @param $name

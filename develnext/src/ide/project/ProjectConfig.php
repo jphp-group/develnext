@@ -2,14 +2,17 @@
 namespace ide\project;
 use Exception;
 use ide\Ide;
+use ide\Logger;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use php\format\ProcessorException;
+use php\io\FileStream;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\System;
 use php\lib\Str;
 use php\time\Time;
+use php\util\Scanner;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 use php\xml\XmlProcessor;
@@ -97,6 +100,37 @@ class ProjectConfig
         Stream::tryAccess($this->configPath, function (Stream $stream) {
             $this->processor->formatTo($this->document, $stream);
         }, 'w+');
+
+        $configFile = File::of($this->configPath);
+        $newConfigFile = File::of($this->configPath . '.tmp');
+
+
+        Stream::tryAccess($this->configPath, function (Stream $stream) use ($newConfigFile) {
+            try {
+                $newConfig = new FileStream($newConfigFile, 'w+');
+
+                $scanner = new Scanner($stream, 'UTF-8');
+
+                while ($scanner->hasNextLine()) {
+                    $line = $scanner->nextLine();
+
+                    if (str::trim($line)) {
+                        $newConfig->write($line . "\r\n");
+                    }
+                }
+
+                $newConfig->close();
+            } catch (IOException $e) {
+                Logger::warn("Unable to trim project config, {$e->getMessage()}");
+            }
+        });
+
+        if ($configFile->delete()) {
+            $newConfigFile->renameTo($configFile);
+        } else {
+            Logger::warn("Unable to trim project config, cannot rename tmp file to origin");
+            $configFile->delete();
+        }
     }
 
     public function reload()
@@ -374,6 +408,7 @@ class ProjectConfig
         }
 
         $project->setAttribute('ideVersion', Ide::get()->getVersion());
+        $project->setAttribute('ideVersionHash', Ide::get()->getConfig()->get('app.hash'));
         $project->setAttribute('ideName', Ide::get()->getName());
         $project->setAttribute('updatedAt', Time::millis());
 

@@ -193,7 +193,7 @@ class DocEditor extends AbstractEditor
                 if (!$this->treeLoaded) {
                     $id = Ide::get()->getUserConfigValue(get_class($this) . '#openedEntry');
 
-                    if ($id) {
+                    if ($id && $loadContent) {
                         $this->openEntry(['id' => $id]);
                     }
                 }
@@ -349,9 +349,9 @@ class DocEditor extends AbstractEditor
 
     public function open($param = null)
     {
-        parent::open();
+        parent::open($param);
 
-        if ($param && $this->currentParam != $param) {
+        if ($param) {
             $this->currentParam = $param;
 
             if ($param['search']) {
@@ -481,7 +481,8 @@ class DocEditor extends AbstractEditor
             'icon' => ico('searchEx32'),
         ];
 
-        $this->loadContent();
+        $this->refreshTree(false);
+        $this->ui->content = $this->uiSection;
 
         $this->anotherPage = true;
 

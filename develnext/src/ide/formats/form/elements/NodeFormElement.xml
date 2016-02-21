@@ -58,6 +58,8 @@
         <eventType code="scroll" name="Прокрутка" kind="ScrollParamEvent" icon="icons/scroll16.png" />
 
         <eventType code="create" name="Клонирование" kind="ActionEvent" icon="icons/idea16.png" />
+        <eventType code="step" name="Каждый кадр" kind="ActionEvent" icon="icons/step16.png" />
+
         <eventType code="outside" name="Выход за пределы" kind="ActionEvent" icon="icons/out16.png">
             <variants>
                 <variant value="">Полностью</variant>
