@@ -110,7 +110,7 @@ task distIdeWindowsSetup(dependsOn: ['distIdeWindows']) {
 
         if (new File(uploadPath).isDirectory()) {
             copy {
-                from "$project.buildDir/install/$project.name/DevelNextSetup.exe"
+                from "$project.buildDir/distributions/DevelNextSetup.exe"
                 into "$uploadPath/YandexDisk"
             }
         }

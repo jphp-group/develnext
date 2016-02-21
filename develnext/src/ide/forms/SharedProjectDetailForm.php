@@ -76,7 +76,7 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
 
     public function isAuthRequired()
     {
-        return false;
+        return $this->forUpload;
     }
 
     protected function init()
@@ -234,11 +234,11 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
      */
     public function doShow()
     {
-        if (!Ide::accountManager()->isAuthorized()) {
-            return;
-        }
-
         if ($this->reuploadButton) {
+            if (!Ide::accountManager()->isAuthorized()) {
+                return;
+            }
+
             $this->reuploadButton->enabled = true;
         }
 

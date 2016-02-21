@@ -34,6 +34,10 @@ class OpenProjectProtocolHandler extends AbstractProtocolHandler
     {
         $uid = str::sub($query, str::length('project:'));
 
+        if (str::endsWith($uid, '/')) {
+            $uid = str::sub($uid, 0, str::length($uid) - 1);
+        }
+
         uiLater(function () use ($uid) {
             Ide::service()->projectArchive()->getAsync($uid, function (ServiceResponse $response) use ($uid) {
                 if ($response->isSuccess()) {
