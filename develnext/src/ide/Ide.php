@@ -345,7 +345,7 @@ class Ide extends Application
     {
         $path = $this->getToolPath();
 
-        if ($this->isWindows()) {
+        if ($this->isWindows() || $this->isLinux()) {
             $jrePath = new File($path, '/jre');
         } else {
             $jrePath = null;
