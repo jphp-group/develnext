@@ -1,6 +1,8 @@
 <?php
 namespace ide\editors\value;
 
+use php\gui\layout\UXHBox;
+use php\gui\UXSpinner;
 use php\lib\String;
 
 /**
@@ -12,11 +14,6 @@ class IntegerPropertyEditor extends SimpleTextPropertyEditor
     public function getNormalizedValue($value)
     {
         return (int) $value;
-    }
-
-    public function makeUi()
-    {
-        return parent::makeUi();
     }
 
     public function getCode()

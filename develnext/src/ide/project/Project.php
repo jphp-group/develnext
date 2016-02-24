@@ -33,6 +33,7 @@ use script\TimerScript;
  */
 class Project
 {
+    const ENV_ALL  = 'all';
     const ENV_DEV  = 'dev';
     const ENV_PROD = 'prod';
     const ENV_TEST = 'test';
@@ -481,6 +482,12 @@ class Project
 
         $this->tree->clear();
 
+        if ($this->getTemplate()) {
+            $this->getTemplate()->recoveryProject($this);
+        } else {
+            throw new InvalidProjectFormatException("Unable to fetch template project");
+        }
+
         $this->trigger(__FUNCTION__);
 
         $this->tree->update();
@@ -628,6 +635,17 @@ class Project
     }
 
     /**
+     * @param $environment
+     * @param callable|null $log
+     */
+    public function preCompile($environment, callable $log = null)
+    {
+        Logger::info("Precompile project: env = $environment");
+
+        $this->trigger(__FUNCTION__, $environment, $log);
+    }
+
+    /**
      * @param string $environment dev, prod, test, etc.
      * @param callable $log
      */
@@ -760,10 +778,9 @@ class Project
         return $this->template;
     }
 
-    public function close()
+    public function close($save = true)
     {
         Logger::info("Close project ...");
-
 
         $this->tickTimer->stop();
 
@@ -771,7 +788,9 @@ class Project
         $file->delete();
         $file->deleteOnExit();
 
-        $this->save();
+        if ($save) {
+            $this->save();
+        }
 
         $this->ideConfigs = [];
         $this->tree->clear(true);

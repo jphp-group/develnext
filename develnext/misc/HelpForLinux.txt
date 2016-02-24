@@ -1,18 +1,12 @@
 
 To run IDE on Linux you must:
 
-1. Install Oracle JRE 8u60+ or greater
-2. Make file "DevelNext.sh" as executable via command "chmod +x DevelNext.sh" or go to properties dialog of the file.
-3. Make file "./tools/gradle/bin/gradle" as executable
-4. Run ide, "./DevelNext.sh" in your console
+1. Run ide, "./DevelNext.sh" in your console
 
 ---
 
 Чтобы запустить IDE на линуксе вы должны:
 
-1. Установить Oracle JRE 8u60+ или выше
-2. Сделать файл "DevelNext.sh" исполняемым через консольную команду "chmod +x DevelNext.sh" или можете сделать это в свойствах файла.
-3. Сделать файл "./tools/gradle/bin/gradle" исполняемым
-4. И запустить IDE через консольную команду "./DevelNext.sh"
+1. И запустить IDE через консольную команду "./DevelNext.sh"
 
 Из под Linux доступна только сборка JAR файлов.

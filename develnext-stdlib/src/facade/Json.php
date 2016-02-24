@@ -1,24 +1,24 @@
 <?php
-namespace ide\utils;
+namespace facade;
 
 use php\format\JsonProcessor;
-use php\format\ProcessorException;
 
 /**
  * Class Json
- * @package ide\utils
  */
-class Json
+abstract class Json
 {
     /**
-     * @param $object
+     * @param $data
+     *
+     * @param bool $prettyPrint
      *
      * @return string
      */
-    static function encode($object)
+    static function encode($data, $prettyPrint = true)
     {
-        $processor = new JsonProcessor();
-        return $processor->format($object);
+        $json = new JsonProcessor($prettyPrint ? JsonProcessor::SERIALIZE_PRETTY_PRINT : 0);
+        return $json->format($data);
     }
 
     /**
@@ -38,7 +38,7 @@ class Json
      */
     static function toFile($filename, $data)
     {
-        FileUtils::put($filename, self::encode($data));
+        \Files::put($filename, self::encode($data));
     }
 
     /**
@@ -49,7 +49,7 @@ class Json
     static function fromFile($filename)
     {
         try {
-            return self::decode(FileUtils::get($filename));
+            return self::decode(\Files::get($filename));
         } catch (ProcessorException $e) {
             return null;
         }

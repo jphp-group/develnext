@@ -6,13 +6,17 @@ use ide\forms\OpenProjectForm;
 use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectTemplate;
+use ide\project\InvalidProjectFormatException;
 use ide\project\Project;
 use ide\project\ProjectImporter;
+use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;
 use php\io\File;
+use php\io\IOException;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use script\TimerScript;
@@ -162,46 +166,52 @@ class ProjectSystem
     {
         Logger::info("Start opening project: $fileName");
 
-        Ide::get()->getMainForm()->showPreloader('Открытие проекта ...');
+        try {
+            Ide::get()->getMainForm()->showPreloader('Открытие проекта ...');
 
-        static::clear();
-        static::close();
+            static::clear();
+            static::close();
 
-        $file = File::of($fileName);
+            $file = File::of($fileName);
 
-        $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
+            $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
 
-        if ($project->isOpenedInOtherIde()) {
-            if ($showDialogAlreadyOpened) {
-                $msg = new MessageBoxForm('Данный проект уже открыт в другом экземпляре среды!', ['ОК, открыть другой проект', 'Выход']);
-                $msg->showDialog();
+            if ($project->isOpenedInOtherIde()) {
+                if ($showDialogAlreadyOpened) {
+                    $msg = new MessageBoxForm('Данный проект уже открыт в другом экземпляре среды!', ['ОК, открыть другой проект', 'Выход']);
+                    $msg->showDialog();
 
-                if ($msg->getResultIndex() == 0) {
-                    uiLater(function () {
-                        $dialog = new OpenProjectForm();
-                        $dialog->showDialog();
-                    });
+                    if ($msg->getResultIndex() == 0) {
+                        uiLater(function () {
+                            $dialog = new OpenProjectForm();
+                            $dialog->showDialog();
+                        });
+                    }
                 }
+
+                FileSystem::open('~welcome');
+                Ide::get()->getMainForm()->hidePreloader();
+                return;
             }
 
-            FileSystem::open('~welcome');
+            Ide::get()->setOpenedProject($project);
+
+            FileSystem::open('~project');
+
+            $project->load();
+            $project->recover();
+            $project->open();
+
             Ide::get()->getMainForm()->hidePreloader();
-            return;
+
+            Ide::get()->trigger('openProject', [$project]);
+
+            Logger::info("Finish opening project.");
+        } catch (InvalidProjectFormatException $e) {
+            Ide::get()->getMainForm()->hidePreloader();
+            ProjectSystem::closeWithWelcome(false);
+            Notifications::error('Поврежденный проект', 'Проект "' . fs::nameNoExt($fileName) . '" невозможно открыть, он поврежден или создан в новой версии DevelNext.');
         }
-
-        Ide::get()->setOpenedProject($project);
-
-        FileSystem::open('~project');
-
-        $project->load();
-        $project->recover();
-        $project->open();
-
-        Ide::get()->getMainForm()->hidePreloader();
-
-        Ide::get()->trigger('openProject', [$project]);
-
-        Logger::info("Finish opening project.");
     }
 
     /**
@@ -218,16 +228,17 @@ class ProjectSystem
         $project->save();
     }
 
-    static function closeWithWelcome()
+    static function closeWithWelcome($save = true)
     {
-        self::close();
+        self::close($save);
         FileSystem::open('~welcome');
     }
 
     /**
      * Закрывает проект с открытми файлами проекта.
+     * @param bool $save
      */
-    static function close()
+    static function close($save = true)
     {
         $project = Ide::get()->getOpenedProject();
 
@@ -236,7 +247,7 @@ class ProjectSystem
         }
 
         if ($project) {
-            $project->close();
+            $project->close($save);
         }
 
         /** @var MainForm $mainForm */
@@ -249,7 +260,7 @@ class ProjectSystem
 
         foreach (FileSystem::getOpened() as $hash => $info) {
             //if ($project && $project->isContainsFile($info['file'])) {
-                FileSystem::close($info['file']);
+            FileSystem::close($info['file'], $save);
             //}
         }
 

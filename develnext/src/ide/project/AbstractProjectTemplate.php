@@ -15,4 +15,10 @@ abstract class AbstractProjectTemplate
      * @return Project
      */
     abstract public function makeProject(Project $project);
+
+    /**
+     * @param Project $project
+     * @return mixed
+     */
+    abstract public function recoveryProject(Project $project);
 }

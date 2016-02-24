@@ -6,6 +6,8 @@ use ide\action\ActionManager;
 use ide\build\OneJarBuildType;
 use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
+use ide\bundle\std\JPHPDesktopDebugBundle;
+use ide\bundle\std\JPHPGuiDesktopBundle;
 use ide\commands\BuildProjectCommand;
 use ide\commands\CreateFormProjectCommand;
 use ide\commands\CreateGameSpriteProjectCommand;
@@ -226,43 +228,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $exporter->removeFile($this->project->getFile('src/.debug'));
     }
 
-    public function doCompile($environment, callable $log = null) {
-        /** @var GradleProjectBehaviour $gradleBehavior */
-        $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
-
-        $buildConfig = $gradleBehavior->getConfig();
-
-        $buildConfig->addRepository('jcenter');
-        $buildConfig->addRepository('mavenCentral');
-        $buildConfig->addRepository('local', new File("lib/"));
-
-        $buildConfig->setDependency('asm-all');
-        $buildConfig->setDependency('jphp-runtime');
-        $buildConfig->setDependency('jphp-core');
-        $buildConfig->setDependency('gson');
-        $buildConfig->setDependency('jphp-json-ext');
-        $buildConfig->setDependency('jphp-xml-ext');
-        $buildConfig->setDependency('jphp-gui-ext');
-        $buildConfig->setDependency('jphp-desktop-ext');
-        $buildConfig->setDependency('jphp-game-ext');
-        $buildConfig->setDependency('dyn4j');
-        $buildConfig->setDependency('jphp-zend-ext');
-        $buildConfig->setDependency('jphp-gui-framework');
-        $buildConfig->setDependency('develnext-stdlib');
-
-        $buildConfig->removeDependency('jphp-gui-desktop-ext');
-
-        foreach ($this->scriptComponentManager->getComponents() as $component) {
-            $component->getType()->adaptForGradleBuild($buildConfig);
-        }
-
-        $buildConfig->save();
-
-        if ($log) {
-            $log(':dn-synchronize-dependencies');
-        }
-
-        $this->synchronizeDependencies();
+    public function doCompile($environment, callable $log = null)
+    {
         $this->updateScriptManager();
 
         if ($log) {
@@ -287,14 +254,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         Json::toFile($this->project->getFile('src/.system/modules.json'), [
             'modules' => $values
         ]);
-
-        if ($environment == Project::ENV_DEV) {
-            if ($log) {
-                $log(':dn-synchronize-debug-files');
-            }
-
-            $this->synchronizeDebugFiles();
-        }
     }
 
     public function getScriptModules()
@@ -374,6 +333,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $this->project->register(new GradleProjectBehaviour());
         }
 
+        if (!$this->project->hasBehaviour(BundleProjectBehaviour::class)) {
+            $this->project->register(new BundleProjectBehaviour());
+        }
+
+        $gradle = BundleProjectBehaviour::get();
+        $gradle->addBundle(Project::ENV_ALL, JPHPGuiDesktopBundle::class);
+        $gradle->addBundle(Project::ENV_DEV, JPHPDesktopDebugBundle::class);
+
         $this->_recoverDirectories();
 
         $this->project->defineFile('src/JPHP-INF/.bootstrap.php', new GuiBootstrapFileTemplate());
@@ -389,26 +356,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function updateSpriteManager()
     {
         $this->spriteManager->reloadAll();
-    }
-
-    public function recoveryFactory($filename)
-    {
-        $file = $this->project->getAbsoluteFile($filename);
-
-        $sources = $file->findLinkByExtension('php');
-
-        $rel = FileUtils::relativePath($this->project->getFile(self::FACTORY_DIRECTORY), $filename);
-        $rel = Str::sub($rel, 0, Str::length($rel) - 8);
-        $rel = Str::replace($rel, '\\', '/');
-
-        if (!$sources) {
-            $sources = $this->project->getFile("src/app/factories/$rel.php");
-            $file->addLink($sources);
-        }
-
-        if (!$sources->exists() && !Files::exists("$sources.source")) {
-            $this->createFactory($rel);
-        }
     }
 
     public function recoveryModule($filename)
@@ -612,51 +559,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $file;
     }
 
-    public function createPrototype($name)
-    {
-        Logger::info("Creating prototype '$name' ...");
-
-        $template = new PhpClassFileTemplate($name, 'GameObject');
-        $template->setNamespace("app\\prototypes");
-        $template->setImports([
-            'game\\GameObject'
-        ]);
-
-        $prototype = $this->project->createFile(self::PROTOTYPES_DIRECTORY . "/$name.php", $template);
-
-        Logger::info("Finish creating prototype '$name'");
-        return $prototype;
-    }
-
-    public function createFactory($name)
-    {
-        Logger::info("Creating factory '$name' ...'");
-
-        $factory = $this->project->createFile(self::FACTORY_DIRECTORY . "/$name.factory", new GuiFormFileTemplate());
-
-        $template = new PhpClassFileTemplate($name, 'AbstractFactory');
-        $template->setNamespace('app\\factories');
-        $template->setImports([
-            'php\\gui\\framework\\AbstractFactory'
-        ]);
-
-        $sources = $factory->findLinkByExtension('php');
-
-        if (!$sources) {
-            $sources = $this->project->createFile("src/app/factories/$name.php", $template);
-            $factory->addLink($sources);
-        } else {
-            if (!$sources->exists()) {
-                $sources->applyTemplate($template);
-                $sources->updateTemplate(true);
-            }
-        }
-
-        Logger::info("Finish creating factory '$name'");
-
-        return $factory;
-    }
-
     public function hasForm($name)
     {
         return $this->project->getFile("src/.forms/$name.fxml")->isFile();
@@ -812,88 +714,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         });
     }
 
-    public function synchronizeDependencies()
-    {
-        Logger::info("synchronizeDependencies ...");
-
-        /** @var GradleProjectBehaviour $gradleBehavior */
-        $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
-
-        $buildConfig = $gradleBehavior->getConfig();
-
-        $libPath = $this->project->getFile('lib/');
-        $libPath->mkdirs();
-
-        foreach ($buildConfig->getDependencies() as $dep) {
-            if (!$dep[0] && !$dep[2]) {
-                $libFile = $this->findLibFile($dep[1]);
-
-                if ($libFile) {
-                    FileUtils::copyFile($libFile, "$libPath/$dep[1].jar");
-                }
-            }
-        }
-    }
-
-    public function synchronizeDebugFiles()
-    {
-        Logger::info("synchronizeDebugFiles ...");
-
-        $debugDir = Ide::get()->getOwnFile('debug/gui');
-
-        if (!$debugDir->isDirectory() && Ide::get()->isDevelopment()) {
-            $debugDir = Ide::get()->getOwnFile('misc/debug/gui');
-        }
-
-        if ($debugDir->isDirectory()) {
-            FileUtils::scan($debugDir, function ($file) use ($debugDir) {
-                $name = FileUtils::relativePath($debugDir, $file);
-
-                FileUtils::copyFile($file, $this->project->getFile('src/.debug/' . $name));
-            });
-        }
-    }
-
     /**
      * @return ScriptComponentManager
      */
     public function getScriptComponentManager()
     {
         return $this->scriptComponentManager;
-    }
-
-    private function findLibFile($name)
-    {
-        /** @var File[] $libPaths */
-        $libPaths = [Ide::get()->getOwnFile('lib/')];
-
-        if (Ide::get()->isDevelopment()) {
-            $ownFile = Ide::get()->getOwnFile('build/install/develnext/lib');
-            $libPaths[] = $ownFile;
-        }
-
-        $regex = Regex::of('(\.[0-9]|\-[0-9])');
-
-        $name = $regex->with($name)->replace('');
-
-        foreach ($libPaths as $libPath) {
-            foreach ($libPath->findFiles() as $file) {
-                $filename = $regex->with($file->getName())->replace('');
-
-                if (Str::endsWith($filename, '.jar') || Str::endsWith($filename, '-SNAPSHOT.jar')) {
-                    $filename = Str::sub($filename, 0, Str::length($filename) - 4);
-
-                    if (Str::endsWith($filename, '-SNAPSHOT')) {
-                        $filename = Str::sub($filename, 0, Str::length($filename) - 9);
-                    }
-
-                    if ($filename == $name) {
-                        return $file;
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 }

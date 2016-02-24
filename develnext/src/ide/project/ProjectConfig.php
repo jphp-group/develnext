@@ -365,8 +365,8 @@ class ProjectConfig
 
     /**
      * @param Project $project
-     *
      * @return AbstractProjectBehaviour[]
+     * @throws InvalidProjectFormatException
      */
     public function createBehaviours(Project $project)
     {
@@ -376,13 +376,17 @@ class ProjectConfig
         foreach ($this->document->findAll('/project/behaviours/behaviour') as $domBehaviour) {
             $class = $domBehaviour->getAttribute('class');
 
-            $behaviour = new $class();
+            if (class_exists($class)) {
+                $behaviour = new $class();
 
-            if ($behaviour instanceof AbstractProjectBehaviour) {
-                $behaviour = $project->register($behaviour);
-                $behaviour->unserialize($domBehaviour);
+                if ($behaviour instanceof AbstractProjectBehaviour) {
+                    $behaviour = $project->register($behaviour);
+                    $behaviour->unserialize($domBehaviour);
 
-                $behaviours[get_class($behaviour)] = $behaviour;
+                    $behaviours[get_class($behaviour)] = $behaviour;
+                }
+            } else {
+                throw new InvalidProjectFormatException("Class behaviour '$class' is not exists.");
             }
         }
 

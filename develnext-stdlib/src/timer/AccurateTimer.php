@@ -37,6 +37,11 @@ class AccurateTimer
     protected $active = false;
 
     /**
+     * @var bool
+     */
+    protected $free = false;
+
+    /**
      * @var int
      */
     public $_lastTick;
@@ -58,11 +63,24 @@ class AccurateTimer
     {
         $now = Time::millis();
 
-        foreach (self::$timers as $timer) {
+        $deleted = [];
+
+        $accurateTimers = self::$timers;
+
+        foreach ($accurateTimers as $key => $timer) {
+            if ($timer->free) {
+                $deleted[] = $key;
+                continue;
+            }
+
             if ($now - $timer->_lastTick > $timer->interval) {
                 $timer->_lastTick = $now;
                 $timer->trigger();
             }
+        }
+
+        foreach ($deleted as $id) {
+            unset(self::$timers[$id]);
         }
     }
 
@@ -109,7 +127,7 @@ class AccurateTimer
     {
         $this->stop();
 
-        unset(self::$timers[$this->id]);
+        $this->free = true;
     }
 
     /**

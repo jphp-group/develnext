@@ -8,7 +8,7 @@ use php\gui\UXNode;
 
 class WrapScreenBehaviour extends AbstractBehaviour
 {
-    const GAP = 2;
+    const GAP = 1;
 
     /**
      * @var bool

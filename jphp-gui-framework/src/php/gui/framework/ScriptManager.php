@@ -1,6 +1,6 @@
 <?php
 namespace php\gui\framework;
-use Json;
+use facade\Json;
 use php\format\ProcessorException;
 use php\gui\UXApplication;
 use php\gui\UXDialog;

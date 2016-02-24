@@ -2,6 +2,7 @@
 namespace ide\forms;
 
 use ide\editors\form\IdeTabPane;
+use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\IdeException;
 use ide\Logger;
@@ -120,13 +121,19 @@ class MainForm extends AbstractIdeForm
         $this->width  = Ide::get()->getUserConfigValue(get_class($this) . '.width', $screen->bounds['width'] * 0.75);
         $this->height = Ide::get()->getUserConfigValue(get_class($this) . '.height', $screen->bounds['height'] * 0.75);
 
+        if ($this->width < 300 || $this->height < 200) {
+            $this->width = $screen->bounds['width'] * 0.75;
+            $this->height = $screen->bounds['height'] * 0.75;
+        }
+
         $this->centerOnScreen();
 
         $this->x = Ide::get()->getUserConfigValue(get_class($this) . '.x', 0);
         $this->y = Ide::get()->getUserConfigValue(get_class($this) . '.y', 0);
 
-        if ($this->x > $screen->visualBounds['width'] - 10 || $this->y > $screen->visualBounds['height'] - 10) {
-            $this->x = $this->y = 0;
+        if ($this->x > $screen->visualBounds['width'] - 10 || $this->y > $screen->visualBounds['height'] - 10 ||
+            $this->x < -999 || $this->y < -999) {
+            $this->x = $this->y = 50;
         }
 
         $this->maximized = Ide::get()->getUserConfigValue(get_class($this) . '.maximized', true);
@@ -141,6 +148,10 @@ class MainForm extends AbstractIdeForm
 
         foreach (['width', 'height', 'x', 'y'] as $prop) {
             $this->observer($prop)->addListener(function ($old, $new) use ($prop) {
+                if ($this->iconified) {
+                    return;
+                }
+
                 if (!$this->maximized) {
                     Ide::get()->setUserConfigValue(get_class($this) . '.' . $prop, $new);
                 }

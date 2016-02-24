@@ -30,16 +30,6 @@ abstract class AbstractScriptComponent extends AbstractFormElement
         return $this->getType();
     }
 
-    /**
-     * @param GradleBuildConfig $gradleBuild
-     *
-     * @return array
-     */
-    public function adaptForGradleBuild(GradleBuildConfig $gradleBuild)
-    {
-        $gradleBuild->setDependency('develnext-stdlib');
-    }
-
     public function applyProperties(UXDesignProperties $properties)
     {
         if ($this->config) {

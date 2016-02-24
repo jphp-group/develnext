@@ -124,6 +124,14 @@ abstract class AbstractBehaviourSpec
     }
 
     /**
+     * @return AbstractBehaviourSpec[]
+     */
+    public function getDependencies()
+    {
+        return [];
+    }
+
+    /**
      * @return string
      */
     abstract public function getDescription();

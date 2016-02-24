@@ -231,6 +231,16 @@ class IdeBehaviourPane
 
                 $behaviour = $result->createBehaviour();
                 $this->behaviourManager->apply($targetId, $behaviour);
+
+                if ($dependencies = $result->getDependencies()) {
+                    foreach ($dependencies as $dep) {
+                        if (!$this->behaviourManager->hasBehaviour($targetId, $dep->getType())) {
+                            $one = $dep->createBehaviour();
+                            $this->behaviourManager->apply($targetId, $one);
+                        }
+                    }
+                }
+
                 $this->behaviourManager->save();
 
                 $this->makeUi($targetId, $this->lastUi);

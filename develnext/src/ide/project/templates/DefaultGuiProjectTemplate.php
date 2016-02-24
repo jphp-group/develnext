@@ -2,6 +2,7 @@
 namespace ide\project\templates;
 
 use ide\project\AbstractProjectTemplate;
+use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\Project;
@@ -32,6 +33,21 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
         return 'icons/programEx32.png';
     }
 
+    public function recoveryProject(Project $project)
+    {
+        if (!$project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
+            $project->register(new GuiFrameworkProjectBehaviour());
+        }
+
+        if (!$project->hasBehaviour(PhpProjectBehaviour::class)) {
+            $project->register(new PhpProjectBehaviour());
+        }
+
+        if (!$project->hasBehaviour(BundleProjectBehaviour::class)) {
+            $project->register(new BundleProjectBehaviour());
+        }
+    }
+
     /**
      * @param Project $project
      *
@@ -41,6 +57,7 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
     {
         $project->register(new GuiFrameworkProjectBehaviour());
         $project->register(new PhpProjectBehaviour());
+        $project->register(new BundleProjectBehaviour());
 
         $project->setIgnoreRules([
             '*.log', '*.tmp'

@@ -114,10 +114,31 @@ class BehaviourCreateForm extends AbstractIdeForm
 
             $line = new UXHBox($list);
 
+            if ($dependencies = $spec->getDependencies()) {
+                $depBox = new UXHBox();
+                $depBox->spacing = 4;
+                $label = new UXLabel('Зависимости: ');
+                $label->style = '-fx-text-fill: gray;';
+                $depBox->add($label);
+
+                foreach ($dependencies as $i => $dep) {
+                    $label = new UXLabel($dep->getName());
+                    $label->tooltipText = $dep->getDescription();
+                    $label->style = '-fx-text-fill: gray; -fx-font-weight: bold;';
+
+                    $depBox->add($label);
+
+                    if ($i != sizeof($dependencies) - 1) {
+                        $depBox->add(new UXLabel(', '));
+                    }
+                }
+
+                $title->add($depBox);
+            }
+
             $line->spacing = 7;
             $line->padding = 5;
             $line->alignment = 'CENTER_LEFT';
-
 
             $cell->text = null;
             $cell->graphic = $line;

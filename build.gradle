@@ -99,7 +99,6 @@ project(':jphp-gui-ext') {
 
 project(':jphp-game-ext') {
     dependencies {
-        compile 'org.jbox2d:jbox2d-library:2.2.1.1'
         compile 'org.dyn4j:dyn4j:3.2.1'
 
         compile project(':jphp-gui-ext')
@@ -142,6 +141,7 @@ project(':develnext') {
         compile "org.develnext:jphp-jsoup-ext:$jphpVersion"
         compile "org.develnext:jphp-zend-ext:$jphpVersion"
         compile "org.develnext:jphp-sql-ext:$jphpVersion"
+        compile "org.develnext:jphp-compress-ext:$jphpVersion"
         compile "org.develnext:jphp-compress-ext:$jphpVersion"
         compile "org.develnext:jphp-debugger:$jphpVersion"
     }

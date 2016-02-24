@@ -173,6 +173,10 @@ class ExecuteProjectCommand extends AbstractCommand
             $dialog->addConsoleLine('Gradle Command = "' . Ide::get()->getGradleProgram() . '"', 'silver');
             $dialog->addConsoleLine('Java Home = "' . Ide::get()->getJrePath() . '"', 'silver');
 
+            $project->preCompile(Project::ENV_DEV, function ($log) use ($dialog) {
+                $dialog->addConsoleLine($log, 'gray');
+            });
+
             $dialog->addConsoleLine('> gradle run', 'green');
             $dialog->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
 

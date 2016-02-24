@@ -9,7 +9,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="603.0" prefWidth="664.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ListView id="list" fixedCellSize="42.0" focusTraversable="false" layoutX="46.0" layoutY="73.0" prefHeight="477.0" prefWidth="603.0" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="46.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="73.0" />
+      <ListView id="list" focusTraversable="false" layoutX="46.0" layoutY="73.0" prefHeight="477.0" prefWidth="603.0" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="46.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="73.0" />
       <TabPane id="categoryTabPane" layoutX="14.0" layoutY="73.0" prefHeight="477.0" prefWidth="32.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="73.0" />
       <HBox layoutX="14.0" layoutY="557.0" prefHeight="32.0" prefWidth="636.0" spacing="7.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
          <children>

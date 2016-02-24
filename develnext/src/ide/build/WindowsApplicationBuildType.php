@@ -201,6 +201,7 @@ class WindowsApplicationBuildType extends AbstractBuildType
 
         $commands[] = 'installDist';
 
+        $project->preCompile(Project::ENV_PROD);
         $process = new Process($commands, $project->getRootDir(), $ide->makeEnvironment());
         $project->compile(Project::ENV_PROD);
 

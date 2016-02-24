@@ -136,6 +136,16 @@ class IdeBehaviourManager extends BehaviourManager
 
     /**
      * @param $targetId
+     * @param $type
+     * @return bool
+     */
+    public function hasBehaviour($targetId, $type)
+    {
+        return !!$this->behaviours["$targetId"][$type];
+    }
+
+    /**
+     * @param $targetId
      */
     public function removeBehaviours($targetId)
     {

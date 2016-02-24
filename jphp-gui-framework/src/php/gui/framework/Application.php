@@ -3,7 +3,7 @@ namespace php\gui\framework;
 
 use BaseException;
 use Exception;
-use Json;
+use facade\Json;
 use php\format\JsonProcessor;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;

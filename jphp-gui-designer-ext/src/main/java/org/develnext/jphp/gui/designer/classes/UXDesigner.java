@@ -1168,6 +1168,7 @@ public class UXDesigner extends BaseObject {
             border.setFill(Color.TRANSPARENT);
             border.setStroke(Color.BLACK);
             border.getStrokeDashArray().addAll(2d);
+            border.setBlendMode(BlendMode.MULTIPLY);
 
             area.getChildren().addAll(border);
 

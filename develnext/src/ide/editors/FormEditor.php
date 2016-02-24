@@ -509,7 +509,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
-    public function close()
+    public function close($save = true)
     {
         parent::close();
 

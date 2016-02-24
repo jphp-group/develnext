@@ -4,6 +4,7 @@ namespace ide\project\behaviours;
 use ide\misc\GradleBuildConfig;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\ProjectExporter;
+use php\io\File;
 
 /**
  * Class GradleProjectBehaviour
@@ -36,6 +37,41 @@ class GradleProjectBehaviour extends AbstractProjectBehaviour
     {
         $this->config->setProjectName($this->project->getName());
         $this->config->save();
+    }
+
+    public function addDependency($artifactId, $group = null, $version = null)
+    {
+        $this->config->setDependency($artifactId, $group, $version);
+    }
+
+    public function removeDependency($artifactId, $group = null)
+    {
+        $this->config->removeDependency($artifactId, $group);
+    }
+
+    public function addRepository($name, $value = null)
+    {
+        $this->config->addRepository($name, $value);
+    }
+
+    public function addJcenterRepository()
+    {
+        $this->addRepository('jcenter');
+    }
+
+    public function addMavenCentralRepository()
+    {
+        $this->addRepository('mavenCentral');
+    }
+
+    public function addMavenLocalRepository()
+    {
+        $this->addRepository('mavenLocal');
+    }
+
+    public function addLocalLibRepository()
+    {
+        $this->addRepository('local', new File("lib/"));
     }
 
     /**

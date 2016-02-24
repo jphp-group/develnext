@@ -335,7 +335,7 @@ class FileSystem
         return $editor;
     }
 
-    static function close($path, $removeTab = true)
+    static function close($path, $removeTab = true, $save = true)
     {
         $hash = FileUtils::hashName($path);
 
@@ -346,7 +346,7 @@ class FileSystem
         unset(static::$openedTabs[$hash], static::$openedEditors[$hash], static::$openedFiles[$hash], static::$cachedEditors[$hash]);
 
         if ($editor) {
-            $editor->close();
+            $editor->close($save);
         }
 
         if ($removeTab && $tab) {

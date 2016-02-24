@@ -1,6 +1,7 @@
 <?php
 namespace ide\project;
 use ide\Ide;
+use ide\VendorContainer;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\xml\DomElement;
 use php\xml\DomDocument;
@@ -11,6 +12,8 @@ use php\xml\DomDocument;
  */
 abstract class AbstractProjectBehaviour
 {
+    use VendorContainer;
+
     /**
      * @var Project
      */

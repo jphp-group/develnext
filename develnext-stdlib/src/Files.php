@@ -5,6 +5,7 @@ use php\io\Stream;
 use php\lib\Str;
 
 /**
+ * @deprecated
  * Class Files
  */
 abstract class Files

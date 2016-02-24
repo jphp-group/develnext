@@ -193,7 +193,7 @@ class AutoCompletePane
 
     public function show($x, $y) {
         if ($this->showTimer) {
-            $this->showTimer->stop();
+            $this->showTimer->free();
         }
 
         $this->showTimer = waitAsync(300, function () use ($x, $y) {

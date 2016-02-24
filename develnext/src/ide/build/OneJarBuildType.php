@@ -118,6 +118,8 @@ class OneJarBuildType extends AbstractBuildType
 
         $config = $this->getConfig();
 
+        $project->preCompile(Project::ENV_PROD);
+
         $process = new Process([$ide->getGradleProgram(), 'clean', 'splitConfig', 'jar'], $project->getRootDir(), $ide->makeEnvironment());
         $project->compile(Project::ENV_PROD);
 

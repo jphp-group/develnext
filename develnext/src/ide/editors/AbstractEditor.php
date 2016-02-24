@@ -137,10 +137,15 @@ abstract class AbstractEditor
     abstract public function load();
     abstract public function save();
 
-    public function close()
+    /**
+     * @param bool|true $save
+     */
+    public function close($save = true)
     {
-        $this->save();
-        $this->reindex();
+        if ($save) {
+            $this->save();
+            $this->reindex();
+        }
     }
 
     public function open($param = null)

@@ -133,6 +133,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, TextArea.class, UXTextArea.class);
         registerWrapperClass(scope, TextField.class, UXTextField.class);
         registerWrapperClass(scope, PasswordField.class, UXPasswordField.class);
+        registerWrapperClass(scope, Spinner.class, UXSpinner.class);
         registerWrapperClass(scope, Label.class, UXLabel.class);
         registerWrapperClass(scope, LabelEx.class, UXLabelEx.class);
         registerWrapperClass(scope, Hyperlink.class, UXHyperlink.class);
