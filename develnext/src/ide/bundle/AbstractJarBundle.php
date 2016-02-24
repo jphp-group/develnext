@@ -3,6 +3,7 @@ namespace ide\bundle;
 
 use ide\Ide;
 use ide\project\behaviours\GradleProjectBehaviour;
+use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\Project;
 use ide\utils\FileUtils;
 use php\io\File;
@@ -42,7 +43,14 @@ abstract class AbstractJarBundle extends AbstractBundle
                 $jarFile = $this->findLibFile($dep);
 
                 if ($jarFile) {
-                    FileUtils::copyFile($jarFile, "$libPath/$dep.jar");
+                    $file = "$libPath/$dep.jar";
+                    FileUtils::copyFile($jarFile, $file);
+
+                    $php = PhpProjectBehaviour::get();
+
+                    if ($php) {
+                        $php->addExternalJarLibrary($file);
+                    }
                 }
             }
         }
