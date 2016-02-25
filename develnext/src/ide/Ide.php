@@ -138,6 +138,9 @@ class Ide extends Application
             $this->mode = $env['DEVELNEXT_MODE'];
         }
 
+        $loader = new IdeClassLoader();
+        $loader->register(true);
+
         $this->library = new IdeLibrary($this);
     }
 
@@ -474,7 +477,7 @@ class Ide extends Application
      *
      * @return File
      */
-    public function getFile($path)
+    public static function getFile($path)
     {
         $home = System::getProperty('user.home');
 
