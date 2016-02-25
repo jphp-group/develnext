@@ -16,6 +16,7 @@ use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\protocol\AbstractProtocolHandler;
 use ide\systems\FileSystem;
+use ide\systems\IdeSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
 use ide\ui\LazyLoadingImage;
@@ -40,6 +41,7 @@ use php\io\ResourceStream;
 use php\io\Stream;
 use php\lang\System;
 use php\lang\Thread;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Configuration;
@@ -130,16 +132,8 @@ class Ide extends Application
     {
         parent::__construct($configPath);
 
-        $this->OS = Str::lower(System::getProperty('os.name'));
-
-        $env = System::getEnv();
-
-        if (isset($env['DEVELNEXT_MODE'])) {
-            $this->mode = $env['DEVELNEXT_MODE'];
-        }
-
-        $loader = new IdeClassLoader();
-        $loader->register(true);
+        $this->OS = IdeSystem::getOs();
+        $this->mode = IdeSystem::getMode();
 
         $this->library = new IdeLibrary($this);
     }
@@ -370,7 +364,7 @@ class Ide extends Application
      */
     public function isDevelopment()
     {
-        return Str::equalsIgnoreCase($this->mode, 'dev');
+        return IdeSystem::isDevelopment();
     }
 
     /**
@@ -465,7 +459,7 @@ class Ide extends Application
      *
      * @return File
      */
-    public function getOwnFile($path)
+    public static function getOwnFile($path)
     {
         $home = "./";
 
@@ -477,17 +471,9 @@ class Ide extends Application
      *
      * @return File
      */
-    public static function getFile($path)
+    public function getFile($path)
     {
-        $home = System::getProperty('user.home');
-
-        $ideHome = File::of("$home/.DevelNext");
-
-        if (!$ideHome->isDirectory()) {
-            $ideHome->mkdirs();
-        }
-
-        return File::of("$ideHome/$path");
+        return IdeSystem::getFile($path);
     }
 
     /**

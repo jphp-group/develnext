@@ -85,7 +85,9 @@ abstract class AbstractForm extends UXForm
      */
     public function __construct(UXForm $origin = null, $loadEvents = true, $loadBehaviours = true)
     {
+        echo get_class($this) . " init \n";
         parent::__construct($origin);
+        echo get_class($this) . " post init \n";
 
         $this->_app = Application::get();
         $this->loadConfig(null, false);

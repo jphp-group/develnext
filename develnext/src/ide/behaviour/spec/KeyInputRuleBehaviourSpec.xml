@@ -1,7 +1,7 @@
 <behaviour extends="BehaviourSpec">
     <properties>
         <property name="Разрешенные символы" code="allowedSymbols" editor="text" tooltip="Список символов, рашрешенных к вводу. Пустота означает все сивмолы разрешены!" />
-        <property name="Максимум сиволов" code="maxLength" editor="integer" tooltip="Максимум возможных символов, 0 означает без ограничений на длину" />
+        <property name="Максимум символов" code="maxLength" editor="integer" tooltip="Максимум возможных символов, 0 означает без ограничений на длину" />
         <property name="Учитывать регистр" code="matchCase" editor="boolean" tooltip="Учитывать регистр символов" />
     </properties>
 </behaviour>

@@ -4,7 +4,13 @@ use ide\editors\FormEditor;
 use ide\formats\FormFormat;
 use ide\Ide;
 use ide\IdeClassLoader;
+use ide\systems\IdeSystem;
 use php\gui\UXDialog;
+
+
+$loader = new IdeClassLoader(true, IdeSystem::getOwnLibVersion());
+$loader->register(true);
+
 
 $app = new Ide();
 $app->launch();

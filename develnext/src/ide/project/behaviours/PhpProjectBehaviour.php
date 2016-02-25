@@ -55,7 +55,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 $imports[] = [$import];
             }
 
-            $scope = new Environment(null);
+            $scope = new Environment(null, Environment::HOT_RELOAD);
             $jarLibraries = $this->externalJarLibraries;
 
             $sourceDir = $this->project->getFile('src/');
