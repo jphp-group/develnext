@@ -203,6 +203,8 @@ class BuildProgressForm extends AbstractIdeForm
         $this->consoleList->selectedIndexes = [$index];
         $this->consoleList->focusedIndex = $index;
         $this->consoleList->scrollTo($index);
+
+        $this->layout->requestLayout();
     }
 
     /**

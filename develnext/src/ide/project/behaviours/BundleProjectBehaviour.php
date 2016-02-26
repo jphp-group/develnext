@@ -2,6 +2,7 @@
 namespace ide\project\behaviours;
 
 use ide\bundle\AbstractBundle;
+use ide\bundle\AbstractJarBundle;
 use ide\editors\ProjectEditor;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\Project;
@@ -197,6 +198,27 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
             $this->bundles[$env][$class] = new $class();
         }
+    }
+
+    /**
+     * @param $name
+     * @return null
+     */
+    public function findClassByShortName($name)
+    {
+        foreach ($this->fetchAllBundles(Project::ENV_ALL) as $one) {
+            if ($one instanceof AbstractJarBundle) {
+                foreach ($one->getUseImports() as $import) {
+                    $_name = fs::name($import);
+
+                    if (str::equalsIgnoreCase($name, $_name)) {
+                        return $import;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

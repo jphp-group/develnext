@@ -98,21 +98,27 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
             FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) use ($imports, $log, $scope) {
                 if (str::endsWith($filename, '.php')) {
-                    $phpParser = new PhpParser(FileUtils::get($filename));
+                    /*$phpParser = new PhpParser(FileUtils::get($filename));
 
                     $phpParser->addUseImports($imports);
 
                     if ($log) {
                         $filename = fs::normalize($filename);
-                        $log(":import use '$filename'");
+                        $file = $this->project->getAbsoluteFile($filename);
+
+                        if (!$file->exists()) {
+                            return;
+                        }
+
+                        $log(":import use '{$file->getRelativePath()}'");
                     }
 
-                    FileUtils::put($filename, $phpParser->getContent());
+                    FileUtils::put($filename, $phpParser->getContent());     */
 
-                    $scope->execute(function () use ($filename) {
+                    /*$scope->execute(function () use ($filename) {
                         $module = new Module($filename, false, true);
                         $module->dump(fs::parent($filename) . '/' . fs::nameNoExt($filename) . '.phb', true);
-                    });
+                    });  */
                 }
             });
         }

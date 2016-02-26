@@ -1,9 +1,11 @@
 <?php
 namespace ide\utils;
 
+use php\lang\SourceMap;
 use php\lib\Char;
 use php\lib\Str;
 use php\util\Flow;
+use php\util\SharedValue;
 use phpx\parser\SourceToken;
 use phpx\parser\SourceTokenizer;
 use php\io\MemoryStream;
@@ -21,9 +23,15 @@ class PhpParser
      */
     protected $content = '';
 
+    /**
+     * @var SourceMap
+     */
+    protected $sourceMap;
+
     public function __construct($content)
     {
         $this->content = $content;
+        $this->sourceMap = new SourceMap(null);
     }
 
     /**
@@ -32,6 +40,14 @@ class PhpParser
     public function getContent()
     {
         return $this->content;
+    }
+
+    /**
+     * @return SourceMap
+     */
+    public function getSourceMap()
+    {
+        return $this->sourceMap;
     }
 
     /**
@@ -203,11 +219,25 @@ class PhpParser
 
         $i = 0;
         $inserted = false;
+        $insertedLines = new SharedValue(0);
 
-        while ($scanner->hasNext()) {
-            $content .= $scanner->nextLine() . "\n";
+        while ($scanner->hasNextLine()) {
+            $line = $scanner->nextLine();
+            $content .= $line . "\n";
+
+            if ($insertedLines->get()) {
+                $originI  = $this->sourceMap->getSourceLine($i + 1);
+
+                if ($originI == -1) {
+                    $this->sourceMap->addLine($i + 1, $i + $insertedLines->get() + 1);
+                } else {
+                    $this->sourceMap->addLine($originI, $originI + $insertedLines->get());
+                }
+            }
 
             if ($i == $lineNumber) {
+                $insertedLines->set(StrUtils::lineCount($text, true));
+
                 $content .= $text . "\n";
                 $inserted = true;
             }

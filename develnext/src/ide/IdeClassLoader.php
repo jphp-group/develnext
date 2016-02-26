@@ -64,7 +64,9 @@ class IdeClassLoader extends ClassLoader
         $this->version = $version;
 
 
-        echo "LOADER cached version = $cacheVersion\n\nLOADER new version    = $version", "\n";
+        if ($this->cache) {
+            echo "LOADER cached version = $cacheVersion\n\nLOADER new version    = $version", "\n";
+        }
 
         if ($this->version != $cacheVersion || !$cacheVersion) {
             $this->reloadCache = true;

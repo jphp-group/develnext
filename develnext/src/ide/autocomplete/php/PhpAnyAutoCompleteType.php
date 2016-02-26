@@ -9,6 +9,11 @@ use ide\autocomplete\MethodAutoCompleteItem;
 use ide\autocomplete\PropertyAutoCompleteItem;
 use ide\autocomplete\StatementAutoCompleteItem;
 use ide\autocomplete\VariableAutoCompleteItem;
+use ide\bundle\AbstractJarBundle;
+use ide\Ide;
+use ide\project\behaviours\BundleProjectBehaviour;
+use ide\project\Project;
+use php\lib\fs;
 
 /**
  * Class PhpAnyAutoCompleteType
@@ -37,6 +42,26 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
         $result = [];
 
         if (in_array($this->kind, ['~any'])) {
+            $bundle = BundleProjectBehaviour::get();
+
+            if ($bundle) {
+                foreach ($bundle->fetchAllBundles(Project::ENV_ALL) as $one) {
+                    if ($one instanceof AbstractJarBundle) {
+                        foreach ($one->getUseImports() as $import) {
+                            $name = fs::name($import);
+
+                            $result[$name] = new ConstantAutoCompleteItem($name, $import);
+                        }
+                    }
+                }
+            }
+
+            foreach ($context->getGlobalRegion()->getValues('use') as $one) {
+                $name = fs::name($one['name']);
+
+                $result[$name] = new ConstantAutoCompleteItem($name, "use {$one['name']}");
+            }
+
             foreach ($context->getGlobalRegion()->getValues('class') as $one) {
                 $result[$one['name']] = new ConstantAutoCompleteItem($one['name'], 'Класс ' . $one['namespace'] . "\\" . $one['name']);
             }

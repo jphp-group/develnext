@@ -96,6 +96,7 @@ class OneJarBuildType extends AbstractBuildType
 
             exclude('.debug/**')
             exclude('**/*.source')
+            exclude('**/*.sourcemap')
 
             $code
         }\n");

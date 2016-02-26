@@ -8,7 +8,7 @@ use ide\systems\IdeSystem;
 use php\gui\UXDialog;
 
 
-$loader = new IdeClassLoader(true, IdeSystem::getOwnLibVersion());
+$loader = new IdeClassLoader(!IdeSystem::isDevelopment(), IdeSystem::getOwnLibVersion());
 $loader->register(true);
 
 

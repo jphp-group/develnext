@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use facade\Async;
 use ide\editors\AbstractEditor;
 use ide\forms\BuildProgressForm;
 use ide\Ide;
@@ -17,6 +18,8 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
 use php\lang\Process;
+use php\lang\Thread;
+use php\lang\ThreadPool;
 use php\lib\number;
 use php\lib\Str;
 use php\time\Time;
@@ -151,6 +154,32 @@ class ExecuteProjectCommand extends AbstractCommand
         }
     }
 
+    public function prepareExecute(Project $project, BuildProgressForm $dialog, callable $callback)
+    {
+        $th = new Thread(function () use ($project, $dialog, $callback) {
+            $project->preCompile(Project::ENV_DEV, function ($log) use ($dialog) {
+                uiLater(function () use ($dialog, $log) {
+                    $dialog->addConsoleLine($log, 'gray');
+                });
+            });
+
+            uiLater(function () use ($dialog, $project) {
+                $dialog->addConsoleLine('> gradle run', 'green');
+                $dialog->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
+            });
+
+            $project->compile(Project::ENV_DEV, function ($log) use ($dialog) {
+                uiLater(function () use ($dialog, $log) {
+                    $dialog->addConsoleLine($log, 'blue');
+                });
+            });
+
+            uiLater($callback);
+        });
+
+        $th->start();
+    }
+
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $ide = Ide::get();
@@ -169,48 +198,37 @@ class ExecuteProjectCommand extends AbstractCommand
 
         if ($project) {
             $this->processDialog = $dialog = new BuildProgressForm();
+            $dialog->show();
 
-            $dialog->addConsoleLine('Gradle Command = "' . Ide::get()->getGradleProgram() . '"', 'silver');
-            $dialog->addConsoleLine('Java Home = "' . Ide::get()->getJrePath() . '"', 'silver');
-
-            $project->preCompile(Project::ENV_DEV, function ($log) use ($dialog) {
-                $dialog->addConsoleLine($log, 'gray');
-            });
-
-            $dialog->addConsoleLine('> gradle run', 'green');
-            $dialog->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
-
-            $project->compile(Project::ENV_DEV, function ($log) use ($dialog) {
-                $dialog->addConsoleLine($log, 'blue');
-            });
-
-            $this->stopButton->enabled = true;
             $this->startButton->enabled = false;
+            $this->stopButton->enabled = true;
 
-            try {
-                $this->process = $this->process->start();
+            $this->prepareExecute($project, $dialog, function () use ($dialog) {
+                try {
+                    $this->process = $this->process->start();
+                    $dialog->watchProcess($this->process);
 
-                $dialog->show($this->process);
+                    $dialog->setStopProcedure(function () use ($dialog) {
+                        $this->onStopExecute();
+                        $dialog->hide();
+                    });
 
-                $dialog->setStopProcedure(function () use ($dialog) {
-                    $this->onStopExecute();
-                    $dialog->hide();
-                });
-                $dialog->setOnExitProcess(function () {
+                    $dialog->setOnExitProcess(function () {
+                        $this->stopButton->enabled = false;
+                        $this->startButton->enabled = true;
+                    });
+
+                } catch (IOException $e) {
                     $this->stopButton->enabled = false;
                     $this->startButton->enabled = true;
-                });
 
-            } catch (IOException $e) {
-                $this->stopButton->enabled = false;
-                $this->startButton->enabled = true;
+                    if (!$dialog->visible) {
+                        $dialog->show();
+                    }
 
-                if (!$dialog->visible) {
-                    $dialog->show();
+                    $dialog->stopWithException($e);
                 }
-
-                $dialog->stopWithException($e);
-            }
+            });
         } else {
             $this->process = null;
             UXDialog::show('Ошибка запуска', 'ERROR');

@@ -4,6 +4,7 @@ namespace ide\action;
 use Files;
 use ide\Ide;
 use ide\utils\FileUtils;
+use php\lib\fs;
 use php\lib\Str;
 use php\xml\DomElement;
 
@@ -49,7 +50,7 @@ class ActionManager
 
                 FileUtils::copyFile($filename, $phpFile);
 
-                if (Files::exists($actionFile)) {
+                if (fs::exists($actionFile)) {
                     $script = new ActionScript(null, $this);
                     $script->load($actionFile);
                     $script->compile($filename, $phpFile);

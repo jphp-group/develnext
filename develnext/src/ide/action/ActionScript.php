@@ -1,6 +1,7 @@
 <?php
 namespace ide\action;
 use ide\utils\FileUtils;
+use ide\utils\Json;
 use ide\utils\PhpParser;
 use php\format\ProcessorException;
 use php\lib\Items;
@@ -266,5 +267,6 @@ class ActionScript
         }
 
         FileUtils::put($outputFile, $phpParser->getContent());
+        Json::toFile($outputFile . '.sourcemap', $phpParser->getSourceMap()->toArray());
     }
 }

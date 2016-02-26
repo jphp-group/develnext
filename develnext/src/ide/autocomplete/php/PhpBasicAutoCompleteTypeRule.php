@@ -4,7 +4,9 @@ namespace ide\autocomplete\php;
 use ide\autocomplete\AutoCompleteRegion;
 use ide\autocomplete\AutoCompleteTypeRule;
 use ide\Logger;
+use php\lib\arr;
 use php\lib\Items;
+use php\lib\num;
 use php\lib\Str;
 use php\util\Flow;
 use phpx\parser\SourceToken;
@@ -12,6 +14,97 @@ use phpx\parser\SourceTokenizer;
 
 class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 {
+    protected function tryGetVariable(SourceToken $last, array &$tokens)
+    {
+        switch ($last->type) {
+            case 'DollarExpr':
+            case 'VariableExpr':
+                return '~variable';
+        }
+
+        return null;
+    }
+
+    protected function tryGetDynamicAccess(SourceToken $last, array &$tokens)
+    {
+        $dynamic = $last->type == 'DynamicAccessExpr';
+
+        if (!$dynamic) {
+            if ($last = arr::peak($tokens)) {
+                $dynamic = $last->type == 'DynamicAccessExpr';
+
+                if ($dynamic) {
+                    arr::pop($tokens);
+                }
+            }
+        }
+
+        if ($dynamic) {
+            $last = arr::peak($tokens);
+
+            if ($last) {
+                arr::pop($tokens);
+
+                if ($last->word == '$this') {
+                    return '~this';
+                }
+
+                if ($last->word == '$event') {
+                    return '~event';
+                }
+
+                if ($last->type == 'Name') {
+                    $name = $last->word;
+
+                    if ($last = arr::peak($tokens)) {
+                        if ($last->type == 'DynamicAccessExpr') {
+                            arr::pop($tokens);
+
+                            if ($last = Items::peak($tokens)) {
+                                arr::pop($tokens);
+
+                                if ($last->word == '$this') {
+                                    return "~this $name";
+                                }
+
+                                return "~dynamic $name";
+                            }
+                        }
+                    }
+                }
+
+                return "~dynamic";
+            }
+        }
+
+        return null;
+    }
+
+    protected function tryGetStaticAccess(SourceToken $last, array &$tokens)
+    {
+        $static = $last->type == 'StaticAccessExpr';
+
+        if (!$static) {
+            if ($last = arr::peak($tokens)) {
+                $static = $last->type == 'StaticAccessExpr';
+
+                if ($static) {
+                    arr::pop($tokens);
+                }
+            }
+        }
+
+        if ($static) {
+            $class = arr::peak($tokens);
+
+            if (arr::has(['Name', 'FulledName'], $class->type)) {
+                return "~static " . $class->word;
+            }
+        }
+
+        return null;
+    }
+
     public function identifyType($string)
     {
         /** @var PhpAutoComplete $complete */
@@ -41,51 +134,20 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                     case ')':
                     case ']':
                     case ';':
+                    case '=':
                         return null;
                 }
 
-                switch ($last->type) {
-                    case 'DollarExpr':
-                    case 'VariableExpr':
-                        return '~variable';
+                if ($ret = $this->tryGetVariable($last, $tokens)) {
+                    return $ret;
                 }
 
-                $dynamic = $last->type == 'DynamicAccessExpr';
-
-                if (!$dynamic) {
-                    if ($last = Items::pop($tokens)) {
-                        $dynamic = $last->type == 'DynamicAccessExpr';
-                    }
+                if ($ret = $this->tryGetDynamicAccess($last, $tokens)) {
+                    return $ret;
                 }
 
-                if ($dynamic) {
-                    $last = Items::pop($tokens);
-
-                    if ($last) {
-                        if ($last->word == '$this') {
-                            return '~this';
-                        }
-
-                        if ($last->word == '$event') {
-                            return '~event';
-                        }
-
-                        if ($last->type == 'Name') {
-                            $name = $last->word;
-
-                            if ($last = Items::pop($tokens)) {
-                                if ($last->type == 'DynamicAccessExpr') {
-                                    if ($last = Items::pop($tokens)) {
-                                        if ($last->word == '$this') {
-                                            return "~this $name";
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    return null;
+                if ($ret = $this->tryGetStaticAccess($last, $tokens)) {
+                    return $ret;
                 }
             }
 
@@ -99,9 +161,11 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
         return '~any';
     }
 
+    protected $classExists;
+
     public function updateStart()
     {
-
+        $this->classExists = false;
     }
 
     public function update(SourceTokenizer $tokenizer, SourceToken $token, SourceToken $previousToken = null)
@@ -115,9 +179,26 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                 }
                 break;
 
+            case 'NamespaceUseStmt':
+                if ($tk = $tokenizer->next()) {
+                    if ($tk->isNamedToken()) {
+                        if ($this->classExists) {
+                            // todo trait.
+                        } else {
+                            $this->complete->setValueOfRegion([
+                                'name' => $tk->word,
+                            ], 'use');
+                        }
+                    }
+                }
+
+                break;
+
             case 'ClassStmt':
                 if ($tk = $tokenizer->next()) {
                     if ($tk->isNamedToken()) {
+                        $this->classExists = true;
+
                         $this->complete->setValueOfRegion([
                             'name' => $tk->word,
                             'namespace' => $this->complete->getGlobalRegion()->getLastValue('namespace')

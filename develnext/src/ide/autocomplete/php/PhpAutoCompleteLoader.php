@@ -42,8 +42,12 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
                 return $this->eventType;
 
             default:
-                if (Str::startsWith($name, '~this ')) {
+                if (str::startsWith($name, '~this ')) {
                     return new ThisObjectAutoCompleteType(Str::sub($name, 6));
+                }
+
+                if (str::startsWith($name, '~static ')) {
+                    return new StaticAccessAutoCompleteType(str::sub($name, 8));
                 }
         }
 
