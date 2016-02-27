@@ -10,6 +10,7 @@ use php\io\FileStream;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\System;
+use php\lib\arr;
 use php\lib\Str;
 use php\time\Time;
 use php\util\Scanner;
@@ -380,14 +381,30 @@ class ProjectConfig
                 $behaviour = new $class();
 
                 if ($behaviour instanceof AbstractProjectBehaviour) {
-                    $behaviour = $project->register($behaviour);
-                    $behaviour->unserialize($domBehaviour);
-
                     $behaviours[get_class($behaviour)] = $behaviour;
                 }
             } else {
-                throw new InvalidProjectFormatException("Class behaviour '$class' is not exists.");
+                Logger::error("Unable add project behaviour, class '$class' is not found.");
             }
+        }
+
+        $behaviours = arr::sort($behaviours, function (AbstractProjectBehaviour $a, AbstractProjectBehaviour $b) {
+            if ($a->getPriority() > $b->getPriority()) {
+                return 1;
+            } else {
+                if ($a->getPriority() < $b->getPriority()) {
+                    return -1;
+                }
+
+                return 0;
+            }
+        }, true);
+
+        foreach ($behaviours as $class => $behaviour) {
+            $behaviour = $project->register($behaviour);
+            $behaviour->unserialize($domBehaviour);
+
+            $behaviours[$class] = $behaviour;
         }
 
         return $behaviours;

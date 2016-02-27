@@ -4,6 +4,7 @@ use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\utils\PhpParser;
 use php\format\ProcessorException;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Flow;
@@ -224,13 +225,19 @@ class ActionScript
         return $imports->withKeys()->toArray();
     }
 
-    public function compile($file, $outputFile = null)
+    public function compile($file, $outputFile = null, $withSourceMap = false)
     {
         if (!$outputFile) {
             $outputFile = $file;
         }
 
-        $phpParser = new PhpParser(FileUtils::get($file));
+        $count = 0;
+
+        $phpParser = PhpParser::ofFile(fs::exists($outputFile) ? $outputFile : $file, $withSourceMap);
+
+        if ($withSourceMap) {
+            $phpParser->applySourceMapFile($outputFile . '.sourcemap');
+        }
 
         $imports = Flow::of([]);
 
@@ -245,6 +252,8 @@ class ActionScript
                 $actions = [];
 
                 foreach ($domMethod->findAll('*') as $domAction) {
+                    $count += 1;
+
                     $action = $this->manager->buildAction($domAction);
                     $action->setContextClass($className);
                     $action->setContextMethod($methodName);
@@ -266,7 +275,7 @@ class ActionScript
             $phpParser->addUseImports($imports);
         }
 
-        FileUtils::put($outputFile, $phpParser->getContent());
-        Json::toFile($outputFile . '.sourcemap', $phpParser->getSourceMap()->toArray());
+        $phpParser->saveContent($outputFile, $withSourceMap);
+        return $count;
     }
 }

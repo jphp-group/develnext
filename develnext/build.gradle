@@ -12,23 +12,73 @@ sourceSets {
     main.resources.srcDirs = ['src']
 }
 
-mainClassName = 'php.runtime.launcher.Launcher'
+run {
+    mainClassName = 'php.runtime.launcher.Launcher'
+    jvmArgs += ["-Dfile.encoding=UTF-8", "-Xms256m", "-Xms1280m"]
+}
+
 jar.archiveName = 'DevelNext.jar'
 
 manifest {
     attributes 'Main-Class': 'php.runtime.launcher.Launcher'
 }
 
-task distPatchZip(type: Zip, dependsOn: ['clean', 'distPatch']) {
+task distWindowsPatch(type: Zip, dependsOn: ['clean', 'distPatch']) {
     from "$project.buildDir/install/$project.name"
-    archiveName "DevelNext.Patch.zip"
+    archiveName "DevelNext.WindowsPatch.zip"
+
+    doLast {
+        def issFile = "$project.rootDir/develnext/windowsSetup/innopatchsetup.iss".replace("\\", "/")
+        def innoSetupBin = "$project.rootDir/develnext-tools/innoSetup/ISCC.exe".replace("\\", "/")
+
+        exec {
+            commandLine innoSetupBin, '/Qp', issFile
+        }
+
+        def uploadPath = System.getProperty("uploadPath", "E:/Upload")
+
+        if (new File(uploadPath).isDirectory()) {
+            copy {
+                from "$project.buildDir/distributions/DevelNext.WindowsPatch.exe"
+                into "$uploadPath/YandexDisk"
+            }
+
+            copy {
+                from distWindowsPatch.archivePath
+                into "$uploadPath/YandexDisk"
+            }
+        }
+    }
+}
+
+task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
+    def installDir = "$project.buildDir/install/$project.name"
+
+    compression = Compression.GZIP
+    archiveName "DevelNext.LinuxPatch.tar.gz"
+
+    from(installDir) {
+        exclude('*.sh')
+        exclude('bin/develnext')
+        exclude('tools/gradle/bin/gradle')
+        exclude('tools/jre/bin/java')
+    }
+
+    from(installDir) {
+        include('*.sh')
+        include('bin/develnext')
+        include('tools/gradle/bin/gradle')
+        include('tools/jre/bin/java')
+
+        fileMode = 0755
+    }
 
     doLast {
         def uploadPath = System.getProperty("uploadPath", "E:/Upload")
 
         if (new File(uploadPath).isDirectory()) {
             copy {
-                from distPatchZip.archivePath
+                from distLinuxPatch.archivePath
                 into "$uploadPath/YandexDisk"
             }
         }

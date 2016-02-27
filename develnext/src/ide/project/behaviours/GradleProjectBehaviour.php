@@ -81,4 +81,13 @@ class GradleProjectBehaviour extends AbstractProjectBehaviour
     {
         return $this->config;
     }
+
+    /**
+     * see PRIORITY_* constants
+     * @return int
+     */
+    public function getPriority()
+    {
+        return self::PRIORITY_COMPONENT;
+    }
 }

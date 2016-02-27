@@ -1,11 +1,18 @@
 <?php
 namespace ide\project\behaviours;
+
+use ide\editors\ProjectEditor;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\Project;
 use ide\project\ProjectFile;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
+use php\gui\layout\UXHBox;
+use php\gui\layout\UXVBox;
+use php\gui\UXCheckbox;
+use php\gui\UXLabel;
 use php\io\File;
 use php\io\IOException;
 use php\lang\Environment;
@@ -21,6 +28,8 @@ use php\util\LauncherClassLoader;
  */
 class PhpProjectBehaviour extends AbstractProjectBehaviour
 {
+    const OPT_COMPILE_BYTE_CODE = 'compileByteCode';
+
     const SOURCES_DIRECTORY = 'src/app';
 
     /**
@@ -34,27 +43,66 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     protected $externalJarLibraries = [];
 
     /**
+     * @var UXVBox
+     */
+    protected $uiSettings;
+
+    /**
+     * @var UXCheckbox
+     */
+    protected $uiByteCodeCheckbox;
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return self::PRIORITY_CORE;
+    }
+
+    /**
      * ...
      */
     public function inject()
     {
         $this->project->on('open', [$this, 'doOpen']);
+        $this->project->on('save', [$this, 'doSave']);
+        $this->project->on('preCompile', [$this, 'doPreCompile']);
         $this->project->on('compile', [$this, 'doCompile']);
+
+        $this->project->on('makeSettings', [$this, 'doMakeSettings']);
+        $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
     }
 
     public function doOpen()
     {
     }
 
-    public function doCompile($env, callable $log = null)
+    public function doSave()
     {
-        if ($this->globalUseImports) {
-            $imports = [];
+        if ($this->uiSettings) {
+            $this->setIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, $this->uiByteCodeCheckbox->selected);
+        }
+    }
 
-            foreach ($this->globalUseImports as $import) {
-                $imports[] = [$import];
+    public function doPreCompile()
+    {
+        FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) {
+            if (str::endsWith($filename, '.php.sourcemap')) {
+                fs::delete($filename);
             }
 
+            if (fs::ext($filename) == '.phb') {
+                fs::delete($filename);
+            }
+        });
+    }
+
+    public function doCompile($env, callable $log = null)
+    {
+        $useByteCode = Project::ENV_PROD == $env;
+
+        if ($useByteCode && $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE)) {
             $scope = new Environment(null, Environment::HOT_RELOAD);
             $jarLibraries = $this->externalJarLibraries;
 
@@ -65,12 +113,15 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
                 spl_autoload_register(function ($name) use ($jarLibraries, $sourceDir) {
                     foreach ($jarLibraries as $file) {
+                        if (!fs::exists($file)) {
+                            echo "SKIP $file, is not exists.\n";
+                            continue;
+                        }
+
                         try {
                             $name = str::replace($name, '\\', '/');
 
                             $url = new URL("jar:file:/$file!/$name.php");
-
-                            echo "Search in class in ", $file, "\n";
 
                             $conn = $url->openConnection();
                             $stream = $conn->getInputStream();
@@ -79,6 +130,8 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                             $module->call();
 
                             $stream->close();
+
+                            echo "Find class '$name' in ", $file, "\n";
 
                             $compiled = new File($sourceDir, $name . ".phb");
 
@@ -96,46 +149,52 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 });
             });
 
-            FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) use ($imports, $log, $scope) {
+            FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) use ($log, $scope, $useByteCode) {
                 if (str::endsWith($filename, '.php')) {
-                    /*$phpParser = new PhpParser(FileUtils::get($filename));
-
-                    $phpParser->addUseImports($imports);
+                    $filename = fs::normalize($filename);
 
                     if ($log) {
-                        $filename = fs::normalize($filename);
-                        $file = $this->project->getAbsoluteFile($filename);
-
-                        if (!$file->exists()) {
-                            return;
-                        }
-
-                        $log(":import use '{$file->getRelativePath()}'");
+                        $log(":compile $filename");
                     }
 
-                    FileUtils::put($filename, $phpParser->getContent());     */
-
-                    /*$scope->execute(function () use ($filename) {
+                    $scope->execute(function () use ($filename) {
                         $module = new Module($filename, false, true);
                         $module->dump(fs::parent($filename) . '/' . fs::nameNoExt($filename) . '.phb', true);
-                    });  */
+                    });
                 }
             });
         }
     }
 
-    public function clearGlobalUseImports()
-    {
-        $this->globalUseImports = [];
-    }
-
-    public function addGlobalUseImport($class)
-    {
-        $this->globalUseImports[$class] = $class;
-    }
-
     public function addExternalJarLibrary($file)
     {
         $this->externalJarLibraries[FileUtils::hashName($file)] = $file;
+    }
+
+
+    public function doUpdateSettings(ProjectEditor $editor = null)
+    {
+        if ($this->uiSettings) {
+            $this->uiByteCodeCheckbox->selected = $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, false);
+        }
+    }
+
+    public function doMakeSettings(ProjectEditor $editor)
+    {
+        $title = new UXLabel('Исходный код:');
+        $title->font = $title->font->withBold();
+
+        $opts = new UXHBox();
+        $opts->spacing = 5;
+
+        $this->uiByteCodeCheckbox = $byteCodeCheckbox = new UXCheckbox('Компилировать в байткод');
+        $byteCodeCheckbox->tooltipText = 'Компиляция будет происходить только во время итоговой сборки проекта.';
+        $opts->add($byteCodeCheckbox);
+
+        $ui = new UXVBox([$title, $opts]);
+        $ui->spacing = 5;
+        $this->uiSettings = $ui;
+
+        $editor->addSettingsPane($ui);
     }
 }

@@ -3,6 +3,7 @@ namespace ide\forms;
 
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
+use ide\project\ProjectConsoleOutput;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\event\UXWindowEvent;
@@ -32,7 +33,7 @@ use php\util\SharedQueue;
  * Class BuildProgressForm
  * @package ide\forms
  */
-class BuildProgressForm extends AbstractIdeForm
+class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 {
     use SavableFormMixin;
 

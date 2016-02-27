@@ -285,8 +285,8 @@ class OpenProjectForm extends AbstractIdeForm
             $file = $node ? $node->data('file') : null;
 
             if ($file && $file->exists()) {
-                ProjectSystem::open($file);
                 $this->hide();
+                ProjectSystem::open($file);
             } else {
                 UXDialog::show('Ошибка открытия проекта', 'ERROR');
             }
@@ -333,6 +333,7 @@ class OpenProjectForm extends AbstractIdeForm
 
             $name = FileUtils::stripExtension(File::of($selected->getPath())->getName());
 
+            $this->hide();
             ProjectSystem::import($selected->getPath(), "$path/$name", $name, [$this, 'hide']);
         }
     }

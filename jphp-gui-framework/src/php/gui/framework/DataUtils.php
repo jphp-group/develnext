@@ -4,6 +4,7 @@ namespace php\gui\framework;
 use ide\Logger;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXScrollPane;
+use php\gui\UXApplication;
 use php\gui\UXData;
 use php\gui\UXNode;
 use php\gui\UXParent;
@@ -83,19 +84,21 @@ class DataUtils
      */
     public static function cleanup(UXParent $parent)
     {
-        foreach ($parent->childrenUnmodifiable as $node) {
-            if ($node instanceof UXData) {
-                $nd = static::getNode($parent, $node);
+        if (UXApplication::isUiThread()) {
+            foreach ($parent->childrenUnmodifiable as $node) {
+                if ($node instanceof UXData) {
+                    $nd = static::getNode($parent, $node);
 
-                if (!$nd) {
-                    $parent->children->remove($node);
+                    if (!$nd) {
+                        $parent->children->remove($node);
+                    }
+                } else if ($node instanceof UXTitledPane) {
+                    if ($node->content instanceof UXParent) {
+                        static::cleanup($node->content);
+                    }
+                } else if ($node instanceof UXParent) {
+                    static::cleanup($node);
                 }
-            } else if ($node instanceof UXTitledPane) {
-                if ($node->content instanceof UXParent) {
-                    static::cleanup($node->content);
-                }
-            } else if ($node instanceof UXParent) {
-                static::cleanup($node);
             }
         }
     }

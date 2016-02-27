@@ -8,6 +8,7 @@ use ide\Logger;
 use ide\misc\GradleBuildConfig;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\Project;
+use ide\systems\ProjectSystem;
 use ide\ui\Notifications;
 use php\gui\UXApplication;
 use php\io\File;
@@ -97,6 +98,8 @@ class OneJarBuildType extends AbstractBuildType
             exclude('.debug/**')
             exclude('**/*.source')
             exclude('**/*.sourcemap')
+            exclude('**/*.axml')
+            exclude('JPHP-INF/sdk/**')
 
             $code
         }\n");
@@ -119,23 +122,21 @@ class OneJarBuildType extends AbstractBuildType
 
         $config = $this->getConfig();
 
-        $project->preCompile(Project::ENV_PROD);
-
-        $process = new Process([$ide->getGradleProgram(), 'clean', 'splitConfig', 'jar'], $project->getRootDir(), $ide->makeEnvironment());
-        $project->compile(Project::ENV_PROD);
-
-        /** @var GradleProjectBehaviour $gradle */
-        $gradle = $project->getBehaviour(GradleProjectBehaviour::class);
-
-        self::appendJarTasks($gradle->getConfig());
-
         $dialog = new BuildProgressForm();
-        $dialog->addConsoleLine('> gradle jar', 'green');
-        $dialog->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
+        $dialog->show();
 
-        $process = $process->start();
+        ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'gradle jar', function () use ($ide, $project, $dialog) {
+            $process = new Process([$ide->getGradleProgram(), 'clean', 'splitConfig', 'jar'], $project->getRootDir(), $ide->makeEnvironment());
 
-        $dialog->show($process);
+            /** @var GradleProjectBehaviour $gradle */
+            $gradle = $project->getBehaviour(GradleProjectBehaviour::class);
+
+            self::appendJarTasks($gradle->getConfig());
+
+            $process = $process->start();
+
+            $dialog->watchProcess($process);
+        });
 
         $dialog->setOnExitProcess(function ($exitValue) use ($project, $dialog, $finished, $config) {
             Logger::info("Finish executing: exitValue = $exitValue");

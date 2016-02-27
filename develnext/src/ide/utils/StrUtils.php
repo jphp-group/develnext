@@ -2,6 +2,7 @@
 namespace ide\utils;
 
 
+use php\lib\str;
 use php\util\Scanner;
 
 class StrUtils
@@ -16,6 +17,10 @@ class StrUtils
             $scanner->nextLine();
 
             $result++;
+        }
+
+        if (str::endsWith($text, "\n") || str::endsWith($text, "\r")) {
+            $result += 1;
         }
 
         if ($emptyIsLine && $result == 0 && !$text) {

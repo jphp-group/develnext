@@ -1,3 +1,3 @@
 #!/bin/sh
 
-tools/jre/bin/java -Dfile.encoding=UTF-8 -Ddevelnext.launcher=root -cp "./lib/*" php.runtime.launcher.Launcher $*
+tools/jre/bin/java -Dfile.encoding=UTF-8 -Ddevelnext.launcher=root -Xms256m -Xmx1280m -cp "./lib/*" php.runtime.launcher.Launcher $*

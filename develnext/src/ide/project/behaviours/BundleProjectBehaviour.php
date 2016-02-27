@@ -6,7 +6,12 @@ use ide\bundle\AbstractJarBundle;
 use ide\editors\ProjectEditor;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\Project;
+use ide\utils\FileUtils;
+use ide\utils\PhpParser;
 use php\gui\layout\UXHBox;
+use php\gui\layout\UXVBox;
+use php\gui\UXButton;
+use php\gui\UXCheckbox;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\lib\fs;
@@ -27,6 +32,11 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     protected $uiSettings;
 
     /**
+     * @var UXHBox
+     */
+    protected $uiPackages;
+
+    /**
      * @var AbstractBundle[]
      */
     protected $bundles = [];
@@ -35,6 +45,19 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
      * @var Configuration[]
      */
     protected $bundleConfigs = [];
+
+    /**
+     * @var UXCheckbox
+     */
+    protected $uiUseImportCheckbox;
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return self::PRIORITY_SYSTEM;
+    }
 
     /**
      * ...
@@ -60,6 +83,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
                 $bundle->onSave($this->project, $config);
             }
+        }
+
+        if ($this->uiSettings) {
+            $this->setIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, $this->uiUseImportCheckbox->selected);
         }
     }
 
@@ -87,8 +114,53 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
+    protected function doPreCompileUseImports($env, callable $log = null)
+    {
+        if ($this->getIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, true)) {
+            $withSourceMap = Project::ENV_DEV == $env;
+            $imports = [];
+
+            $allBundles = $this->fetchAllBundles($env);
+
+            foreach ($allBundles as $bundle) {
+                foreach ($bundle->getUseImports() as $useImport) {
+                    $imports[$useImport] = [$useImport];
+                }
+            }
+
+            if ($imports) {
+                FileUtils::scan($this->project->getFile('src/app'), function ($filename) use ($imports, $log, $withSourceMap) {
+                    if (str::endsWith($filename, '.php')) {
+                        $phpParser = PhpParser::ofFile($filename, $withSourceMap);
+
+                        $phpParser->addUseImports($imports);
+
+                        if ($log) {
+                            $filename = fs::normalize($filename);
+                            $file = $this->project->getAbsoluteFile($filename);
+
+                            if (!$file->exists()) {
+                                return;
+                            }
+
+                            $log(":import use '{$file->getRelativePath()}'");
+                        }
+
+                        $phpParser->saveContent($filename, $withSourceMap);
+                    }
+                });
+            }
+        }
+    }
+
     public function doPreCompile($env, callable $log = null)
     {
+        FileUtils::scan($this->project->getFile('src/'), function ($filename) {
+            if (str::endsWith($filename, '.php.source')) {
+                FileUtils::copyFile($filename, FileUtils::stripExtension($filename)); // rewrite from origin.
+            }
+        });
+
         $gradle = GradleProjectBehaviour::get();
         $allBundles = $this->fetchAllBundles($env);
 
@@ -112,21 +184,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             }
         }
 
-        $php = PhpProjectBehaviour::get();
-
-        if ($php) {
-            $php->clearGlobalUseImports();
-
-            foreach ($allBundles as $bundle) {
-                $config = $this->getBundleConfig($bundle);
-
-                //if (!$config || $config->get(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, true)) {
-                    foreach ($bundle->getUseImports() as $useImport) {
-                        $php->addGlobalUseImport($useImport);
-                    }
-               // }
-            }
-        }
+        $this->doPreCompileUseImports($env, $log);
     }
 
     /**
@@ -147,10 +205,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             }
         };
 
-        $groups = [(array) $this->bundles[$env]];
+        $groups = [(array)$this->bundles[$env]];
 
         if ($env != Project::ENV_ALL) {
-            $groups[] = (array) $this->bundles[Project::ENV_ALL];
+            $groups[] = (array)$this->bundles[Project::ENV_ALL];
         }
 
         /** @var AbstractBundle $bundle */
@@ -233,13 +291,45 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     public function doUpdateSettings(ProjectEditor $editor = null)
     {
         if ($this->uiSettings) {
+            $this->uiPackages->children->clear();
 
+            foreach ($this->bundles as $env => $group) {
+                /** @var AbstractBundle $bundle */
+                foreach ($group as $bundle) {
+                    $uiItem = new UXButton($bundle->getName() . " [$env]");
+                    $uiItem->tooltipText = $bundle->getDescription();
+
+                    $this->uiPackages->add($uiItem);
+                }
+            }
+
+            $addButton = new UXButton();
+            $addButton->graphic = ico('plus16');
+            $addButton->on('action', function () {
+                alert('В разработке ...');
+            });
+            $this->uiPackages->add($addButton);
+
+            $this->uiUseImportCheckbox->selected = $this->getIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, true);
         }
     }
 
     public function doMakeSettings(ProjectEditor $editor)
     {
-        $ui = new UXHBox([new UXLabel('Пакеты: ')]);
+        $title = new UXLabel('Пакеты:');
+        $title->font = $title->font->withBold();
+
+        $packages = new UXHBox();
+        $packages->spacing = 5;
+        $this->uiPackages = $packages;
+
+        $this->uiUseImportCheckbox = $useImportCheckbox = new UXCheckbox("Добавлять use импорты классов");
+        $useImportCheckbox->tooltipText = 'Добавлять во все исходники подключение классов через use из всех пакетов';
+
+        $ui = new UXVBox([$title, $packages, $useImportCheckbox]);
+        $ui->spacing = 5;
+
+        $this->uiSettings = $ui;
 
         $editor->addSettingsPane($ui);
     }

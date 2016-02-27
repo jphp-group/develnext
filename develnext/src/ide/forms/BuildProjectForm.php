@@ -126,6 +126,7 @@ class BuildProjectForm extends AbstractIdeForm
 
         if ($buildType) {
             if ($buildType->fetchConfig()) {
+                $this->hide();
                 $buildType->onExecute(Ide::get()->getOpenedProject());
             }
         } else {

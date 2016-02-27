@@ -12,7 +12,13 @@ use php\xml\DomDocument;
  */
 abstract class AbstractProjectBehaviour
 {
+    const PRIORITY_SYSTEM = 1;
+    const PRIORITY_CORE = 100;
+    const PRIORITY_LIBRARY = 1000;
+    const PRIORITY_COMPONENT = 10000;
+
     use VendorContainer;
+    use ProjectIdeConfigurable;
 
     /**
      * @var Project
@@ -23,6 +29,12 @@ abstract class AbstractProjectBehaviour
      * ...
      */
     abstract public function inject();
+
+    /**
+     * see PRIORITY_* constants
+     * @return int
+     */
+    abstract public function getPriority();
 
     /**
      * @param DomElement $domBehavior

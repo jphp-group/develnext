@@ -8,6 +8,7 @@ use ide\Logger;
 use ide\project\AbstractProjectTemplate;
 use ide\project\InvalidProjectFormatException;
 use ide\project\Project;
+use ide\project\ProjectConsoleOutput;
 use ide\project\ProjectImporter;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
@@ -16,6 +17,7 @@ use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;
 use php\io\File;
 use php\io\IOException;
+use php\lang\Thread;
 use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
@@ -34,6 +36,47 @@ class ProjectSystem
         WatcherSystem::clearListeners();
         Ide::get()->unregisterCommands();
     }
+
+    /**
+     * Compile full project.
+     *
+     * @param string $env
+     * @param ProjectConsoleOutput $consoleOutput
+     * @param string $hintCommand
+     * @param callable $callback
+     */
+    static function compileAll($env, ProjectConsoleOutput $consoleOutput, $hintCommand, callable $callback)
+    {
+        $project = Ide::project();
+
+        if (!$project) {
+            return;
+        }
+
+        $th = new Thread(function () use ($project, $consoleOutput, $callback, $env, $hintCommand) {
+            $project->preCompile($env, function ($log) use ($consoleOutput) {
+                uiLater(function () use ($consoleOutput, $log) {
+                    $consoleOutput->addConsoleLine($log, 'gray');
+                });
+            });
+
+            $project->compile($env, function ($log) use ($consoleOutput) {
+                uiLater(function () use ($consoleOutput, $log) {
+                    $consoleOutput->addConsoleLine($log, 'blue');
+                });
+            });
+
+            uiLater(function () use ($consoleOutput, $project, $hintCommand) {
+                $consoleOutput->addConsoleLine('> ' . $hintCommand, 'green');
+                $consoleOutput->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
+            });
+
+            uiLater($callback);
+        });
+
+        $th->start();
+    }
+
 
     static public function checkDirectory($path)
     {
@@ -87,6 +130,7 @@ class ProjectSystem
 
         if (!($projectDir = self::checkDirectory($projectDir))) {
             Ide::get()->getMainForm()->hidePreloader();
+            ProjectSystem::closeWithWelcome();
             return;
         }
 

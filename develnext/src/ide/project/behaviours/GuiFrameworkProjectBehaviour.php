@@ -43,6 +43,7 @@ use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use php\gui\layout\UXHBox;
+use php\gui\layout\UXVBox;
 use php\gui\UXLabel;
 use php\io\File;
 use php\io\IOException;
@@ -92,6 +93,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     protected $applicationConfig;
 
     /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return self::PRIORITY_LIBRARY;
+    }
+
+    /**
      * ...
      */
     public function inject()
@@ -102,6 +111,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('create', [$this, 'doCreate']);
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('updateTree', [$this, 'doUpdateTree']);
+        $this->project->on('preCompile', [$this, 'doPreCompile']);
         $this->project->on('compile', [$this, 'doCompile']);
         $this->project->on('export', [$this, 'doExport']);
         $this->project->on('reindex', [$this, 'doReindex']);
@@ -116,8 +126,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $buildProjectCommand->register(new SetupWindowsApplicationBuildType());
         $buildProjectCommand->register(new OneJarBuildType());
 
-        Ide::get()->registerCommand($buildProjectCommand);
         Ide::get()->registerCommand(new ExecuteProjectCommand());
+        Ide::get()->registerCommand($buildProjectCommand);
+
         Ide::get()->registerCommand(new CreateFormProjectCommand());
         Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
         //Ide::get()->registerCommand(new CreateFactoryProjectCommand());
@@ -208,7 +219,13 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->settingsMainFormCombobox = $formListEditor;
 
-        $editor->addSettingsPane($ui);
+        $title = new UXLabel('Интерфейс:');
+        $title->font = $title->font->withBold();
+
+        $wrap = new UXVBox([$title, $ui]);
+        $wrap->spacing = 5;
+
+        $editor->addSettingsPane($wrap);
     }
 
     public function doReindex(ProjectIndexer $indexer)
@@ -228,20 +245,22 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $exporter->removeFile($this->project->getFile('src/.debug'));
     }
 
-    public function doCompile($environment, callable $log = null)
+    public function doPreCompile($env, callable $log = null)
     {
-        $this->updateScriptManager();
-
-        if ($log) {
-            $log(':dn-compile-actions');
-        }
+        $withSourceMap = $env == Project::ENV_DEV;
 
         $this->actionManager->compile($this->project->getFile('src/'), function ($filename) use ($log) {
             $name = $this->project->getAbsoluteFile($filename)->getRelativePath();
+
             if ($log) {
-                $log(':compile "' . $name . '"');
+                $log(':apply actions "' . $name . '"');
             }
-        });
+        }, $withSourceMap);
+    }
+
+    public function doCompile($environment, callable $log = null)
+    {
+        $this->updateScriptManager();
 
         $modules = $this->scriptComponentManager->getModules();
         $values = [];

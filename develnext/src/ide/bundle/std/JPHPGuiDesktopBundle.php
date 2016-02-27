@@ -85,7 +85,7 @@ class JPHPGuiDesktopBundle extends AbstractJarBundle
 {
     function getName()
     {
-        return "JPHP Gui Desktop";
+        return "JPHP UI Desktop";
     }
 
     public function getDependencies()

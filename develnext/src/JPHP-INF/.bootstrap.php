@@ -7,8 +7,11 @@ use ide\IdeClassLoader;
 use ide\systems\IdeSystem;
 use php\gui\UXDialog;
 
+$cache = !IdeSystem::isDevelopment();
 
-$loader = new IdeClassLoader(!IdeSystem::isDevelopment(), IdeSystem::getOwnLibVersion());
+$cache = false; //  TODO delete it.
+
+$loader = new IdeClassLoader($cache, IdeSystem::getOwnLibVersion());
 $loader->register(true);
 
 

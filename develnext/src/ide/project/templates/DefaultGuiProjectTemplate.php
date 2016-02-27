@@ -35,16 +35,16 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
     public function recoveryProject(Project $project)
     {
-        if (!$project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
-            $project->register(new GuiFrameworkProjectBehaviour());
+        if (!$project->hasBehaviour(BundleProjectBehaviour::class)) {
+            $project->register(new BundleProjectBehaviour());
         }
 
         if (!$project->hasBehaviour(PhpProjectBehaviour::class)) {
             $project->register(new PhpProjectBehaviour());
         }
 
-        if (!$project->hasBehaviour(BundleProjectBehaviour::class)) {
-            $project->register(new BundleProjectBehaviour());
+        if (!$project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
+            $project->register(new GuiFrameworkProjectBehaviour());
         }
     }
 
@@ -55,9 +55,9 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
      */
     public function makeProject(Project $project)
     {
-        $project->register(new GuiFrameworkProjectBehaviour());
-        $project->register(new PhpProjectBehaviour());
         $project->register(new BundleProjectBehaviour());
+        $project->register(new PhpProjectBehaviour());
+        $project->register(new GuiFrameworkProjectBehaviour());
 
         $project->setIgnoreRules([
             '*.log', '*.tmp'

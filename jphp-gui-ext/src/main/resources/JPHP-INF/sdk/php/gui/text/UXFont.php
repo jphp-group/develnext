@@ -44,6 +44,58 @@ class UXFont
     }
 
     /**
+     * @param $name
+     * @return UXFont
+     */
+    public function withName($name)
+    {
+    }
+
+    /**
+     * @param $size
+     * @return UXFont
+     */
+    public function withSize($size)
+    {
+    }
+
+    /**
+     * @param $name
+     * @param $size
+     */
+    public function withNameAndSize($name, $size)
+    {
+    }
+
+    /**
+     * @return UXFont
+     */
+    public function withBold()
+    {
+    }
+
+    /**
+     * @return UXFont
+     */
+    public function withThin()
+    {
+    }
+
+    /**
+     * @return UXFont
+     */
+    public function withItalic()
+    {
+    }
+
+    /**
+     * @return UXFont
+     */
+    public function withRegular()
+    {
+    }
+
+    /**
      * @param string $text
      * @return float
      */

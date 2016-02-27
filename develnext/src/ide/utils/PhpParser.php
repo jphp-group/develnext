@@ -1,8 +1,10 @@
 <?php
 namespace ide\utils;
 
+use ide\Logger;
 use php\lang\SourceMap;
 use php\lib\Char;
+use php\lib\fs;
 use php\lib\Str;
 use php\util\Flow;
 use php\util\SharedValue;
@@ -24,14 +26,42 @@ class PhpParser
     protected $content = '';
 
     /**
+     * @var int
+     */
+    protected $contentLineCount = 0;
+
+    /**
+     * @var array
+     */
+    protected $sourceMapInserts = [];
+
+    /**
      * @var SourceMap
      */
     protected $sourceMap;
 
-    public function __construct($content)
+    /**
+     * @var string
+     */
+    protected $sourceMapFile;
+
+    public function __construct($content, $sourceMapFile = null)
     {
-        $this->content = $content;
-        $this->sourceMap = new SourceMap(null);
+        $this->setContent($content);
+
+        if ($sourceMapFile) {
+            $this->applySourceMapFile($sourceMapFile);
+        }
+    }
+
+    /**
+     * @param $file
+     * @param bool $withSourceMap
+     * @return PhpParser
+     */
+    static function ofFile($file, $withSourceMap = false)
+    {
+        return new PhpParser(FileUtils::get($file), $withSourceMap ? $file . '.sourcemap' : null);
     }
 
     /**
@@ -43,11 +73,66 @@ class PhpParser
     }
 
     /**
+     * @param string $sourceMapFile json source map
+     */
+    public function applySourceMapFile($sourceMapFile)
+    {
+        $this->sourceMapFile = $sourceMapFile;
+
+        if (fs::isFile($sourceMapFile)) {
+            $map = (array) Json::fromFile($sourceMapFile);
+
+            if ($map) {
+                $this->sourceMap = new SourceMap(null);
+
+                foreach ($map as $cLine => $sLine) {
+                    $this->sourceMap->addLine($sLine, $cLine);
+                }
+            }
+        }
+    }
+
+    /**
      * @return SourceMap
      */
     public function getSourceMap()
     {
-        return $this->sourceMap;
+        $sourceMap = new SourceMap(null);
+
+        if ($this->sourceMap) {
+            foreach ($this->sourceMap->toArray() as $cLine => $sLine) {
+                $sourceMap->addLine($sLine, $cLine);
+            }
+        }
+
+        $sourceMap->insertLines($this->sourceMapInserts, $this->contentLineCount);
+
+        return $sourceMap;
+    }
+
+    /**
+     * @param string $toFile
+     * @param bool $saveSourceMap
+     */
+    public function saveContent($toFile, $saveSourceMap = false)
+    {
+        FileUtils::put($toFile, $this->getContent());
+
+        if ($saveSourceMap) {
+            $this->saveSourceMap($toFile . '.sourcemap');
+        }
+    }
+
+    /**
+     * @param $file
+     */
+    public function saveSourceMap($file = null)
+    {
+        if (!$file) {
+            $file = $this->sourceMapFile;
+        }
+
+        Json::toFile($file, $this->getSourceMap()->toArray());
     }
 
     /**
@@ -56,6 +141,8 @@ class PhpParser
     public function setContent($content)
     {
         $this->content = $content;
+        $this->sourceMapInserts = [];
+        $this->contentLineCount = StrUtils::lineCount($content);
     }
 
     /**
@@ -219,24 +306,13 @@ class PhpParser
 
         $i = 0;
         $inserted = false;
-        $insertedLines = new SharedValue(0);
 
         while ($scanner->hasNextLine()) {
             $line = $scanner->nextLine();
             $content .= $line . "\n";
 
-            if ($insertedLines->get()) {
-                $originI  = $this->sourceMap->getSourceLine($i + 1);
-
-                if ($originI == -1) {
-                    $this->sourceMap->addLine($i + 1, $i + $insertedLines->get() + 1);
-                } else {
-                    $this->sourceMap->addLine($originI, $originI + $insertedLines->get());
-                }
-            }
-
             if ($i == $lineNumber) {
-                $insertedLines->set(StrUtils::lineCount($text, true));
+                $this->sourceMapInserts[] = [$lineNumber + 1, StrUtils::lineCount($text, true)];
 
                 $content .= $text . "\n";
                 $inserted = true;

@@ -83,7 +83,7 @@ class MessageBoxForm extends AbstractIdeForm
     }
 
     /**
-     * @event show
+     * @event showing
      */
     public function doOpen()
     {
@@ -120,9 +120,8 @@ class MessageBoxForm extends AbstractIdeForm
             $this->buttonBox->add($ui);
         }
 
-        UXApplication::runLater(function () {
-            $this->centerOnScreen();
-        });
+        $this->layout->requestLayout();
+        $this->centerOnScreen();
     }
 
     static function confirmDelete($what)

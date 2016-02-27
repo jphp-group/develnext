@@ -63,6 +63,58 @@ public class UXFont extends BaseWrapper<Font> {
     }
 
     @Signature
+    public Font withItalic() {
+        return withNameAndSize(getWrappedObject().getName(), getWrappedObject().getSize(), null, true);
+    }
+
+    @Signature
+    public Font withRegular() {
+        return withNameAndSize(getWrappedObject().getName(), getWrappedObject().getSize(), null, false);
+    }
+
+    @Signature
+    public Font withBold() {
+        return withNameAndSize(getWrappedObject().getName(), getWrappedObject().getSize(), true, null);
+    }
+
+    @Signature
+    public Font withThin() {
+        return withNameAndSize(getWrappedObject().getName(), getWrappedObject().getSize(), false, null);
+    }
+
+    @Signature
+    public Font withName(String name) {
+        return withNameAndSize(name, getWrappedObject().getSize());
+    }
+
+    @Signature
+    public Font withSize(int size) {
+        return withNameAndSize(getWrappedObject().getName(), size);
+    }
+
+    @Signature
+    public Font withNameAndSize(String name, double size) {
+        return withNameAndSize(name, size, null, null);
+    }
+
+    protected Font withNameAndSize(String name, double size, Boolean bold, Boolean italic) {
+        Font font = getWrappedObject();
+
+        FontWeight weight = bold != null && bold ? FontWeight.BOLD : FontWeight.THIN;
+        FontPosture posture = italic != null && italic ? FontPosture.ITALIC : FontPosture.REGULAR;
+
+        if (font.getStyle().toUpperCase().contains("BOLD")) {
+            weight = FontWeight.BOLD;
+        }
+
+        if (font.getStyle().toUpperCase().contains("ITALIC")) {
+            posture = FontPosture.ITALIC;
+        }
+
+        return Font.font(name, weight, posture, size);
+    }
+
+    @Signature
     public static Font of(String family, int size) {
         return Font.font(family, size);
     }

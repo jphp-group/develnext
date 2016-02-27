@@ -8,6 +8,8 @@ use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
+use ide\project\ProjectConsoleOutput;
+use ide\systems\ProjectSystem;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\gui\event\UXEvent;
@@ -154,32 +156,6 @@ class ExecuteProjectCommand extends AbstractCommand
         }
     }
 
-    public function prepareExecute(Project $project, BuildProgressForm $dialog, callable $callback)
-    {
-        $th = new Thread(function () use ($project, $dialog, $callback) {
-            $project->preCompile(Project::ENV_DEV, function ($log) use ($dialog) {
-                uiLater(function () use ($dialog, $log) {
-                    $dialog->addConsoleLine($log, 'gray');
-                });
-            });
-
-            uiLater(function () use ($dialog, $project) {
-                $dialog->addConsoleLine('> gradle run', 'green');
-                $dialog->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
-            });
-
-            $project->compile(Project::ENV_DEV, function ($log) use ($dialog) {
-                uiLater(function () use ($dialog, $log) {
-                    $dialog->addConsoleLine($log, 'blue');
-                });
-            });
-
-            uiLater($callback);
-        });
-
-        $th->start();
-    }
-
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $ide = Ide::get();
@@ -203,7 +179,7 @@ class ExecuteProjectCommand extends AbstractCommand
             $this->startButton->enabled = false;
             $this->stopButton->enabled = true;
 
-            $this->prepareExecute($project, $dialog, function () use ($dialog) {
+            ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'gradle run', function () use ($dialog) {
                 try {
                     $this->process = $this->process->start();
                     $dialog->watchProcess($this->process);
