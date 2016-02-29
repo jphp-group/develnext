@@ -45,6 +45,8 @@ use script\TimerScript;
  * @property UXHBox $headRightPane
  * @property UXSplitPane $contentSplitPane
  * @property UXMenuBar $mainMenu
+ * @property UXAnchorPane $bottomSpoiler
+ * @property UXTabPane $bottomSpoilerTabPane
  */
 class MainForm extends AbstractIdeForm
 {
@@ -59,6 +61,8 @@ class MainForm extends AbstractIdeForm
         });
 
         $mainMenu = $this->mainMenu; // FIX!!!!! see FixSkinMenu
+
+        $this->contentSplit->items->removeByIndex(1); // TODO implement bottom slider.
     }
 
     /**
@@ -263,5 +267,24 @@ class MainForm extends AbstractIdeForm
     public function getProjectTree()
     {
         return $this->projectTree;
+    }
+
+    public function hideBottom()
+    {
+        $this->contentSplit->dividerPositions = [1, 0];
+    }
+
+    public function showBottom(UXNode $content)
+    {
+        UXAnchorPane::setAnchor($content, 0);
+
+        $height = $this->layout->height;
+
+        $this->bottomSpoiler->children->clear();
+        $this->bottomSpoiler->add($content);
+
+        $percent = ($content->height * 100 / $height) / 100;
+
+        $this->contentSplit->dividerPositions = [1 - $percent, $percent];
     }
 }

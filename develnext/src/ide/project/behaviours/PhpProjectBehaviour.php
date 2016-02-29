@@ -9,6 +9,7 @@ use ide\project\ProjectFile;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
+use ide\zip\JarArchive;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXCheckbox;
@@ -31,6 +32,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     const OPT_COMPILE_BYTE_CODE = 'compileByteCode';
 
     const SOURCES_DIRECTORY = 'src/app';
+    const GENERATED_DIRECTORY = 'src_generated';
 
     /**
      * @var array
@@ -76,6 +78,12 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     public function doOpen()
     {
+        $gradle = GradleProjectBehaviour::get();
+
+        if ($gradle) {
+            $config = $gradle->getConfig();
+            $config->addSourceSet('main.resources.srcDirs', self::GENERATED_DIRECTORY);
+        }
     }
 
     public function doSave()
@@ -87,12 +95,17 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     public function doPreCompile()
     {
+        $generatedDirectory = $this->project->getFile(self::GENERATED_DIRECTORY);
+
+        FileUtils::deleteDirectory($generatedDirectory);
+        $generatedDirectory->mkdirs();
+
         FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) {
             if (str::endsWith($filename, '.php.sourcemap')) {
                 fs::delete($filename);
             }
 
-            if (fs::ext($filename) == '.phb') {
+            if (fs::ext($filename) == 'phb') {
                 fs::delete($filename);
             }
         });
@@ -104,14 +117,16 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
         if ($useByteCode && $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE)) {
             $scope = new Environment(null, Environment::HOT_RELOAD);
+
             $jarLibraries = $this->externalJarLibraries;
 
             $sourceDir = $this->project->getFile('src/');
+            $generatedDirectory = $this->project->getFile(self::GENERATED_DIRECTORY);
 
-            $scope->execute(function () use ($jarLibraries, $sourceDir) {
+            $scope->execute(function () use ($jarLibraries, $sourceDir, $generatedDirectory) {
                 ob_implicit_flush(true);
 
-                spl_autoload_register(function ($name) use ($jarLibraries, $sourceDir) {
+                spl_autoload_register(function ($name) use ($jarLibraries, $sourceDir, $generatedDirectory) {
                     foreach ($jarLibraries as $file) {
                         if (!fs::exists($file)) {
                             echo "SKIP $file, is not exists.\n";
@@ -133,7 +148,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
                             echo "Find class '$name' in ", $file, "\n";
 
-                            $compiled = new File($sourceDir, $name . ".phb");
+                            $compiled = new File($generatedDirectory, $name . ".phb");
 
                             if ($compiled->getParentFile() && !$compiled->getParentFile()->isDirectory()) {
                                 $compiled->getParentFile()->mkdirs();
@@ -149,7 +164,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 });
             });
 
-            FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) use ($log, $scope, $useByteCode) {
+            FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory) {
                 if (str::endsWith($filename, '.php')) {
                     $filename = fs::normalize($filename);
 
@@ -157,12 +172,66 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                         $log(":compile $filename");
                     }
 
-                    $scope->execute(function () use ($filename) {
+                    $file = $this->project->getAbsoluteFile($filename);
+                    $relativePath = $file->getRelativePath('src');
+                    $compiledFile = new File($generatedDirectory, '/' . FileUtils::stripExtension($relativePath) . '.phb');
+
+                    if ($compiledFile->getParentFile() && !$compiledFile->getParentFile()->isDirectory()) {
+                        $compiledFile->getParentFile()->mkdirs();
+                    }
+
+                    $scope->execute(function () use ($filename, $compiledFile) {
                         $module = new Module($filename, false, true);
-                        $module->dump(fs::parent($filename) . '/' . fs::nameNoExt($filename) . '.phb', true);
+                        $module->dump($compiledFile, true);
                     });
                 }
             });
+
+            foreach ($this->externalJarLibraries as $library) {
+                if (!fs::exists($library)) {
+                    continue;
+                }
+
+                $jar = new JarArchive($library);
+
+                foreach ($jar->getEntries() as $entry) {
+                    if (str::startsWith($entry->getName(), 'JPHP-INF/')) {
+                        continue;
+                    }
+
+                    if (fs::ext($entry->getName()) == 'php') {
+                        $compiled = new File($generatedDirectory, '/' . FileUtils::stripExtension($entry->getName()) . ".phb");
+
+                        if (!$compiled->exists()) {
+                            if ($compiled->getParentFile() && !$compiled->getParentFile()->isDirectory()) {
+                                $compiled->getParentFile()->mkdirs();
+                            }
+
+                            $stream = $jar->getEntryStream($entry->getName());
+                            $className = FileUtils::stripExtension($entry->getName());
+                            $className = str::replace($className, '/', '\\');
+
+                            try {
+                                $done = $scope->execute(function () use ($stream, $compiled, $className) {
+                                    if (!class_exists($className, false)) {
+                                        $module = new Module($stream, false);
+                                        $module->dump($compiled, true);
+                                        return true;
+                                    }
+
+                                    return false;
+                                });
+
+                                if ($log && $done) {
+                                    $log(":compile {$entry->getName()}");
+                                }
+                            } finally {
+                                $stream->close();
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -188,12 +257,14 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $opts->spacing = 5;
 
         $this->uiByteCodeCheckbox = $byteCodeCheckbox = new UXCheckbox('Компилировать в байткод');
+        $this->uiByteCodeCheckbox->on('mouseUp', [$this, 'doSave']);
         $byteCodeCheckbox->tooltipText = 'Компиляция будет происходить только во время итоговой сборки проекта.';
         $opts->add($byteCodeCheckbox);
 
         $ui = new UXVBox([$title, $opts]);
         $ui->spacing = 5;
         $this->uiSettings = $ui;
+
 
         $editor->addSettingsPane($ui);
     }

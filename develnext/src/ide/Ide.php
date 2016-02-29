@@ -15,6 +15,7 @@ use ide\misc\EventHandlerBehaviour;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\protocol\AbstractProtocolHandler;
+use ide\protocol\handlers\FileOpenProjectProtocolHandler;
 use ide\systems\FileSystem;
 use ide\systems\IdeSystem;
 use ide\systems\ProjectSystem;
@@ -1152,6 +1153,13 @@ class Ide extends Application
                     if ($protocolHandler->handle($arg)) {
                         return true;
                     }
+                }
+            }
+        } else {
+            if (fs::isFile($arg)) {
+                $defProtocolHandler = new FileOpenProjectProtocolHandler();
+                if ($defProtocolHandler->handle($arg)) {
+                    return true;
                 }
             }
         }

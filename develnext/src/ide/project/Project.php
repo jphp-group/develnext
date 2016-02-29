@@ -20,6 +20,7 @@ use php\io\File;
 use php\io\FileStream;
 use php\io\IOException;
 use php\io\Stream;
+use php\lib\arr;
 use php\lib\Items;
 use php\lib\Str;
 use php\time\Time;
@@ -482,12 +483,6 @@ class Project
 
         $this->tree->clear();
 
-        if ($this->getTemplate()) {
-            $this->getTemplate()->recoveryProject($this);
-        } else {
-            throw new InvalidProjectFormatException("Unable to fetch template project");
-        }
-
         $this->trigger(__FUNCTION__);
 
         $this->tree->update();
@@ -581,8 +576,31 @@ class Project
         }
 
         $this->filesData  = $this->config->createFiles($this);
-        $this->behaviours = $this->config->createBehaviours($this);
         $this->template   = $this->config->getTemplate();
+
+        $this->config->createBehaviours($this);
+
+        if ($this->template) {
+            $this->template->recoveryProject($this);
+        } else {
+            throw new InvalidProjectFormatException("Unable to fetch template project");
+        }
+
+        $this->behaviours = arr::sort($this->behaviours, function (AbstractProjectBehaviour $a, AbstractProjectBehaviour $b) {
+            if ($a->getPriority() > $b->getPriority()) {
+                return 1;
+            } else {
+                if ($a->getPriority() < $b->getPriority()) {
+                    return -1;
+                }
+
+                return 0;
+            }
+        }, true);
+
+        foreach ($this->behaviours as $behaviour) {
+            $behaviour->inject();
+        }
 
         $this->tree->clear();
 
@@ -735,12 +753,13 @@ class Project
     /**
      * @param $any
      *
+     * @param bool $inject
      * @return AbstractProjectBehaviour
      */
-    public function register($any)
+    public function register($any, $inject = true)
     {
         if ($any instanceof AbstractProjectBehaviour) {
-            return $this->behaviours[get_class($any)] = $any->forProject($this);
+            return $this->behaviours[get_class($any)] = $any->forProject($this, $inject);
         } else {
             throw new \InvalidArgumentException("Unable to register an instance of class " . get_class($any));
         }

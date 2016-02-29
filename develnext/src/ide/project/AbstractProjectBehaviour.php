@@ -56,14 +56,17 @@ abstract class AbstractProjectBehaviour
     /**
      * @param Project $project
      *
+     * @param bool $inject
      * @return AbstractProjectBehaviour
      */
-    public function forProject(Project $project)
+    public function forProject(Project $project, $inject = true)
     {
         $behavior = clone $this;
         $behavior->project = $project;
 
-        $behavior->inject();
+        if ($inject) {
+            $behavior->inject();
+        }
 
         return $behavior;
     }

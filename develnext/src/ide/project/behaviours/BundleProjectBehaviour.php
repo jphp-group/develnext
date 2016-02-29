@@ -324,6 +324,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         $this->uiPackages = $packages;
 
         $this->uiUseImportCheckbox = $useImportCheckbox = new UXCheckbox("Добавлять use импорты классов");
+        $this->uiUseImportCheckbox->on('mouseUp', [$this, 'doSave']);
         $useImportCheckbox->tooltipText = 'Добавлять во все исходники подключение классов через use из всех пакетов';
 
         $ui = new UXVBox([$title, $packages, $useImportCheckbox]);

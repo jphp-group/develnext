@@ -16,6 +16,7 @@ use php\gui\event\UXEvent;
 use php\gui\framework\ScriptEvent;
 use php\gui\UXButton;
 use php\gui\UXDialog;
+use php\gui\UXRichTextArea;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
@@ -156,6 +157,16 @@ class ExecuteProjectCommand extends AbstractCommand
         }
     }
 
+    /*public function tryShowConsole()
+    {
+        $console = new UXRichTextArea();
+        $console->height = 150;
+
+        $console->appendText("Hi, I'm robot \n", '-fx-font-weight: bold; -fx-fill: green; -fx-font-family: "Courier New"; -fx-font-size: 12px;');
+
+        Ide::get()->getMainForm()->showBottom($console);
+    }*/
+
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
         $ide = Ide::get();
@@ -165,6 +176,8 @@ class ExecuteProjectCommand extends AbstractCommand
 
         $appPidFile = $project->getFile("application.pid");
         $appPidFile->delete();
+
+        //$this->tryShowConsole();
 
         $this->process = new Process(
             [$ide->getGradleProgram(), 'run', '-Dfile.encoding=UTF-8', '--daemon'],

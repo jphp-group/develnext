@@ -8,6 +8,7 @@ use php\lang\ClassLoader;
 use php\lang\Environment;
 use php\lang\SourceMap;
 use php\lib\str;
+use php\time\Time;
 
 define('DEVELNEXT_PROJECT_DEBUG', true);
 
@@ -19,6 +20,11 @@ try {
 
 class DebugClassLoader extends ClassLoader
 {
+    /**
+     * @var int
+     */
+    protected $allTime = 0;
+
     public function loadClass($name)
     {
         $name = str::replace($name, '\\', '/');
@@ -26,7 +32,12 @@ class DebugClassLoader extends ClassLoader
         $filename = "res://$name.php";
 
         if (Stream::exists($filename)) {
+            $t = Time::millis();
             require $filename;
+            $t = Time::millis() - $t;
+            $this->allTime += $t;
+
+            //echo "require '$filename', $t ms ($this->allTime ms)\n";
 
             $this->tryLoadSourceMap($filename);
         }

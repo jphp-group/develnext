@@ -89,7 +89,6 @@ class ProjectConfig
         return new ProjectConfig($file->getParent(), $name);
     }
 
-
     public function save()
     {
         $parentFile = File::of($this->configPath)->getParentFile();
@@ -388,20 +387,8 @@ class ProjectConfig
             }
         }
 
-        $behaviours = arr::sort($behaviours, function (AbstractProjectBehaviour $a, AbstractProjectBehaviour $b) {
-            if ($a->getPriority() > $b->getPriority()) {
-                return 1;
-            } else {
-                if ($a->getPriority() < $b->getPriority()) {
-                    return -1;
-                }
-
-                return 0;
-            }
-        }, true);
-
         foreach ($behaviours as $class => $behaviour) {
-            $behaviour = $project->register($behaviour);
+            $behaviour = $project->register($behaviour, false);
             $behaviour->unserialize($domBehaviour);
 
             $behaviours[$class] = $behaviour;

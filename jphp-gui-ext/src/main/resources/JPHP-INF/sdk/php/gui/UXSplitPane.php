@@ -36,4 +36,12 @@ class UXSplitPane extends UXControl
     public function setDividerPosition($index, $position)
     {
     }
+
+    /**
+     * @param UXNode $node
+     * @param bool $value
+     */
+    public static function setResizeWithParent(UXNode $node, $value)
+    {
+    }
 }

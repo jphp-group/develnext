@@ -21,6 +21,8 @@ use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\event\UXWebEvent;
 use php\gui\event\UXWindowEvent;
+use php\gui\framework\AbstractForm;
+use php\gui\framework\AbstractModule;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXHBox;
@@ -188,6 +190,9 @@ class JPHPGuiDesktopBundle extends AbstractJarBundle
             UXMouseEvent::class,
             UXWebEvent::class,
             UXWindowEvent::class,
+
+            AbstractForm::class,
+            AbstractModule::class,
 
             Animation::class,
             Collision::class,

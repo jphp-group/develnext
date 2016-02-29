@@ -40,4 +40,9 @@ public class UXSplitPane extends UXControl<SplitPane> {
     public void __construct(List<Node> children) {
         __wrappedObject = new SplitPane(children.toArray(new Node[children.size()]));
     }
+
+    @Signature
+    public static void setResizeWithParent(Node node, boolean value) {
+        SplitPane.setResizableWithParent(node, value);
+    }
 }

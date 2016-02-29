@@ -17,10 +17,13 @@ use php\gui\UXDialog;
 use php\gui\UXImageView;
 use php\gui\UXListCell;
 use php\gui\UXListView;
+use php\gui\UXRichTextArea;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\Process;
 use php\lang\ThreadPool;
+use php\lib\str;
+use php\util\Regex;
 use php\util\Scanner;
 use php\util\SharedQueue;
 
@@ -29,6 +32,7 @@ use php\util\SharedQueue;
  * @property UXListView $consoleList
  * @property UXCheckbox $closeAfterDoneCheckbox
  * @property UXButton $closeButton
+ * @property UXRichTextArea $consoleArea
  *
  * Class BuildProgressForm
  * @package ide\forms
@@ -65,6 +69,16 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
     {
         $this->threadPool = ThreadPool::createFixed(3);
         $this->icon->image = ico('wait32')->image;
+
+        $consoleArea = new UXRichTextArea();
+        $consoleArea->style = '-fx-border-width: 1px; -fx-border-color: silver;';
+        $consoleArea->id = 'consoleArea';
+        $consoleArea->position = $this->consoleList->position;
+        $consoleArea->size = $this->consoleList->size;
+        $consoleArea->anchors = $this->consoleList->anchors;
+
+        $this->consoleList->hide();
+        $this->add($consoleArea);
 
         $this->consoleList->setCellFactory(function (UXListCell $cell, $item, $empty) {
             $cell->font = UXFont::of('Courier New', 12);
@@ -197,15 +211,27 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
      */
     public function addConsoleLine($line, $color = '#333333')
     {
-        $this->consoleList->items->add([$line, $color]);
+        $this->addConsoleText("$line\n", $color);
+    }
 
-        $index = $this->consoleList->items->count() - 1;
+    public function addConsoleText($text, $color = null)
+    {
+        if (!$color) {
+            $color = '#333333';
+        }
 
-        $this->consoleList->selectedIndexes = [$index];
-        $this->consoleList->focusedIndex = $index;
-        $this->consoleList->scrollTo($index);
+        if ($this->consoleArea) {
+            $this->consoleArea->appendText($text, "-fx-font-family: 'Courier New'; -fx-font-size: 14px; -fx-fill: $color");
+            $this->consoleArea->caretPosition = str::length($this->consoleArea->text) - 1;
+        } else {
+            $this->consoleList->items->add([$text, $color]);
 
-        $this->layout->requestLayout();
+            $index = $this->consoleList->items->count() - 1;
+
+            $this->consoleList->selectedIndexes = [$index];
+            $this->consoleList->focusedIndex = $index;
+            $this->consoleList->scrollTo($index);
+        }
     }
 
     /**
@@ -229,13 +255,15 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
     public function doProgress(Process $process, callable $onExit = null)
     {
         $self = $this;
+        $input = $process->getInput();
+
         $scanner = new Scanner($process->getInput());
 
-        while ($scanner->hasNextLine()) {
-            $line = $scanner->nextLine();
+        while (($ch = $input->read(1)) !== false) {
+            if ($ch == "\r") continue;
 
-            UXApplication::runLater(function() use ($line) {
-                $this->addConsoleLine($line);
+            uiLater(function() use ($ch) {
+                $this->addConsoleText($ch);
             });
         }
 

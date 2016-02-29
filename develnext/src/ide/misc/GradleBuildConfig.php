@@ -2,9 +2,11 @@
 namespace ide\misc;
 
 use ide\utils\FileUtils;
+use ide\utils\StrUtils;
 use php\format\ProcessorException;
 use php\io\File;
 use php\io\Stream;
+use php\lib\arr;
 use php\lib\Str;
 use php\xml\DomDocument;
 use php\xml\DomElement;
@@ -153,6 +155,10 @@ class GradleBuildConfig
         foreach ($domSourceSets->findAll('sourceSet') as $domSourceSet) { $domSourceSets->removeChild($domSourceSet); }
 
         foreach ($this->sourceSets as $name => $sourceSet) {
+            if (is_array($sourceSet)) {
+                $sourceSet = arr::combine($sourceSet, $sourceSet);
+            }
+
             $domSourceSet = $this->document->createElement('sourceSet', [
                 '@name' => $name,
                 'value' => is_array($sourceSet) ? $sourceSet : [$sourceSet],
@@ -187,7 +193,7 @@ class GradleBuildConfig
         }
 
         try {
-            FileUtils::put($this->documentFile, $this->processor->format($this->document));
+            FileUtils::put($this->documentFile, StrUtils::removeEmptyLines($this->processor->format($this->document)));
             $stream = Stream::of($this->file, 'w+');
 
             $this->writePlugins($stream);
@@ -260,7 +266,13 @@ class GradleBuildConfig
         foreach ($this->document->findAll('/build/sourceSets/sourceSet') as $domSourceSet) {
             $model = $domSourceSet->toModel();
 
-            $this->sourceSets[$model['@name']] = $model['value'];
+            $value = $model['value'];
+
+            if (is_array($value)) {
+                $value = arr::combine($value, $value);
+            }
+
+            $this->sourceSets[$model['@name']] = $value;
         }
     }
 
@@ -305,6 +317,21 @@ class GradleBuildConfig
     public function setSourceSet($name, $value)
     {
         $this->sourceSets[$name] = $value;
+    }
+
+    public function addSourceSet($name, $value)
+    {
+        if (isset($this->sourceSets[$name])) {
+            if (!is_array($this->sourceSets[$name])) {
+                $value = $this->sourceSets[$name];
+
+                $this->sourceSets[$name] = [$value => $value];
+            }
+        } else {
+            $this->sourceSets[$name] = [];
+        }
+
+        $this->sourceSets[$name][$value] = $value;
     }
 
     public function removeDependency($artifactId, $group = null)
@@ -380,9 +407,9 @@ class GradleBuildConfig
                 list($id, $version) = Str::split($plugin, ':');
 
                 if ($version) {
-                    $stream->write("id '$id' version '$version'\n");
+                    $stream->write("\tid '$id' version '$version'\n");
                 } else {
-                    $stream->write("id '$id'\n");
+                    $stream->write("\tid '$id'\n");
                 }
             }
             $stream->write("}\n");

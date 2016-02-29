@@ -36,7 +36,7 @@ use php\util\Configuration;
 use php\util\Flow;
 use php\util\Locale;
 use php\util\Regex;
-use sdk\php\lib\num;
+use php\lib\num;
 
 class JPHPRuntimeBundle extends AbstractJarBundle
 {

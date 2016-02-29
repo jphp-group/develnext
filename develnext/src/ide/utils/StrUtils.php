@@ -29,4 +29,27 @@ class StrUtils
 
         return $result;
     }
+
+    static function removeEmptyLines($text)
+    {
+        $scanner = new Scanner($text, 'UTF-8');
+
+        $result = [];
+        $hasLines = false;
+
+        while ($scanner->hasNextLine()) {
+            $hasLines = true;
+            $line = $scanner->nextLine();
+
+            if (str::trim($line)) {
+                $result[] = $line;
+            }
+        }
+
+        if (!$hasLines && str::trim($text)) {
+            $result[] = $text;
+        }
+
+        return str::join($result, "\n");
+    }
 }

@@ -2,6 +2,8 @@ def javaVersion    = '1.7';
 def projectVersion = '0.7.2';
 def jphpVersion    = projectVersion + "-SNAPSHOT";
 
+rootProject.ext.jphpVersion = jphpVersion;
+
 if (Boolean.getBoolean("release")) {
     jphpVersion = projectVersion
 }
@@ -37,6 +39,14 @@ allprojects {
     task sourcesJar(type: Jar, dependsOn: 'classes') {
         classifier = 'sources'
         from sourceSets.main.allSource
+    }
+
+    configurations {
+        provided
+    }
+
+    sourceSets {
+        main { compileClasspath += configurations.provided }
     }
 }
 
@@ -129,6 +139,7 @@ project(':jphp-gui-framework') {
 project(':develnext') {
     dependencies {
         compile project(':jphp-gui-designer-ext')
+        compile project(':jphp-gui-richtext-ext')
         compile project(':jphp-gui-framework')
         compile project(':jphp-desktop-ext')
         compile project(':jphp-game-ext')

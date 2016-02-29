@@ -36,15 +36,15 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
     public function recoveryProject(Project $project)
     {
         if (!$project->hasBehaviour(BundleProjectBehaviour::class)) {
-            $project->register(new BundleProjectBehaviour());
+            $project->register(new BundleProjectBehaviour(), false);
         }
 
         if (!$project->hasBehaviour(PhpProjectBehaviour::class)) {
-            $project->register(new PhpProjectBehaviour());
+            $project->register(new PhpProjectBehaviour(), false);
         }
 
         if (!$project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
-            $project->register(new GuiFrameworkProjectBehaviour());
+            $project->register(new GuiFrameworkProjectBehaviour(), false);
         }
     }
 

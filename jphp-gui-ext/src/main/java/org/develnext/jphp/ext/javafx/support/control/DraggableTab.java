@@ -15,6 +15,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -84,6 +85,10 @@ public class DraggableTab extends Tab {
                     return;
                 }
 
+                if (t.getButton() != MouseButton.PRIMARY) {
+                    return;
+                }
+
                 dragStage.setWidth(nameLabel.getWidth() + 10);
                 dragStage.setHeight(nameLabel.getHeight() + 10);
                 dragStage.setX(t.getScreenX());
@@ -127,6 +132,7 @@ public class DraggableTab extends Tab {
                 }
             }
         });
+
         nameLabel.setOnMouseReleased(new EventHandler<MouseEvent>() {
 
             @Override

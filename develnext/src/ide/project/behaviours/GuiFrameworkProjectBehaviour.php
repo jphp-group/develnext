@@ -325,7 +325,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $buildConfig->addPlugin('application');
         $buildConfig->setDefine('mainClassName', '"php.runtime.launcher.Launcher"');
-        $buildConfig->setSourceSet('main.resources.srcDirs', 'src');
+        $buildConfig->addSourceSet('main.resources.srcDirs', 'src');
 
         $buildConfig->setDefine('jar.archiveName', '"dn-compiled-module.jar"');
 
