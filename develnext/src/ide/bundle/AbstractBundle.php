@@ -17,6 +17,16 @@ abstract class AbstractBundle
     abstract function getName();
     abstract function getDescription();
 
+    public function getIcon()
+    {
+        return null;
+    }
+
+    public function getVersion()
+    {
+        return null;
+    }
+
     /**
      * @return array
      */
@@ -46,6 +56,27 @@ abstract class AbstractBundle
      * @param GradleProjectBehaviour $gradle
      */
     public function applyForGradle(GradleProjectBehaviour $gradle)
+    {
+    }
+
+    /**
+     * On register in ide globally.
+     */
+    public function onRegister()
+    {
+    }
+
+    /**
+     * @param Project $project
+     */
+    public function onAdd(Project $project)
+    {
+    }
+
+    /**
+     * @param Project $project
+     */
+    public function onRemove(Project $project)
     {
     }
 

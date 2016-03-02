@@ -1,6 +1,7 @@
 <?php
 namespace ide\project\behaviours;
 
+use develnext\bundle\orientdb\OrientDbBundle;
 use Files;
 use ide\action\ActionManager;
 use ide\build\OneJarBuildType;
@@ -359,6 +360,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $gradle = BundleProjectBehaviour::get();
         $gradle->addBundle(Project::ENV_ALL, JPHPGuiDesktopBundle::class);
         $gradle->addBundle(Project::ENV_DEV, JPHPDesktopDebugBundle::class);
+        $gradle->addBundle(Project::ENV_ALL, OrientDbBundle::class);
 
         $this->_recoverDirectories();
 

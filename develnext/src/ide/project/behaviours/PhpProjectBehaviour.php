@@ -67,6 +67,9 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
      */
     public function inject()
     {
+        $this->project->setSrcDirectory('src');
+        $this->project->setSrcGeneratedDirectory(self::GENERATED_DIRECTORY);
+
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('save', [$this, 'doSave']);
         $this->project->on('preCompile', [$this, 'doPreCompile']);

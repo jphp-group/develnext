@@ -12,3 +12,6 @@ include 'develnext-doc';
 include 'develnext-control';
 
 include 'jphp-gui-richtext-ext';
+
+
+include 'develnext-bundles/dn-orientdb-bundle'

@@ -87,7 +87,7 @@ abstract class AbstractJarBundle extends AbstractBundle
             $libPaths[] = $ownFile;
         }
 
-        $regex = Regex::of('(\.[0-9]|\-[0-9])');
+        $regex = Regex::of('(\.[0-9]+|\-[0-9]+)');
 
         $name = $regex->with($name)->replace('');
 

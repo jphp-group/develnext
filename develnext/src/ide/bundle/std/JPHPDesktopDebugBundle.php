@@ -22,10 +22,8 @@ class JPHPDesktopDebugBundle extends AbstractBundle
     public function onPreCompile(Project $project, $env, callable $log = null)
     {
         if ($env == Project::ENV_DEV) {
-            FileUtils::deleteDirectory($project->getFile('src/.debug'));
-
-            $this->copyVendorResourceToFile('bootstrap.php', $project->getFile('src/.debug/bootstrap.php'));
-            $this->copyVendorResourceToFile('preloader.php', $project->getFile('src/.debug/preloader.php'));
+            $this->copyVendorResourceToProject('bootstrap.php', '.debug/bootstrap.php');
+            $this->copyVendorResourceToProject('preloader.php', '.debug/preloader.php');
         }
     }
 }

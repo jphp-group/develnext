@@ -110,6 +110,21 @@ class Project
     protected $tickTimer;
 
     /**
+     * @var string
+     */
+    protected $srcDirectory = null;
+
+    /**
+     * @var string
+     */
+    protected $srcGeneratedDirectory = null;
+
+    /**
+     * @var string
+     */
+    protected $resDirectory = null;
+
+    /**
      * Project constructor.
      *
      * @param string $rootDir
@@ -189,6 +204,54 @@ class Project
     }
 
     /**
+     * @return string
+     */
+    public function getSrcDirectory()
+    {
+        return $this->srcDirectory;
+    }
+
+    /**
+     * @param string $srcDirectory
+     */
+    public function setSrcDirectory($srcDirectory)
+    {
+        $this->srcDirectory = $srcDirectory;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSrcGeneratedDirectory()
+    {
+        return $this->srcGeneratedDirectory;
+    }
+
+    /**
+     * @param string $srcGeneratedDirectory
+     */
+    public function setSrcGeneratedDirectory($srcGeneratedDirectory)
+    {
+        $this->srcGeneratedDirectory = $srcGeneratedDirectory;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResDirectory()
+    {
+        return $this->resDirectory;
+    }
+
+    /**
+     * @param string $resDirectory
+     */
+    public function setResDirectory($resDirectory)
+    {
+        $this->resDirectory = $resDirectory;
+    }
+
+    /**
      * @param string $path
      *
      * @return bool
@@ -241,6 +304,23 @@ class Project
     public function getFile($file)
     {
         return $this->fetchFile("$this->rootDir/$file");
+    }
+
+    /**
+     * @param string $file
+     * @param bool $generated
+     * @return ProjectFile|File
+     * @throws Exception
+     */
+    public function getSrcFile($file, $generated = false)
+    {
+        $srcDirectory = $generated ? $this->srcGeneratedDirectory : $this->srcDirectory;
+
+        if ($srcDirectory === null) {
+            throw new Exception(($generated ? "srcGeneratedDirectory" : "srcDirectory") . " is not set");
+        }
+
+        return $srcDirectory ? $this->getFile("$srcDirectory/$file") : $this->getFile($file);
     }
 
     /**
