@@ -1,8 +1,7 @@
 <?php
 namespace ide\account\api;
 
-
-use ide\utils\Json;
+use facade\Json;
 
 class ServiceResponse
 {
@@ -64,6 +63,6 @@ class ServiceResponse
 
     public function toLog()
     {
-        return "{message: {$this->message()}, data = " . \Json::encode($this->data(), false) . "}";
+        return "{message: {$this->message()}, data = " . Json::encode($this->data(), false) . "}";
     }
 }
