@@ -7,6 +7,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\misc\GradleBuildConfig;
 use ide\project\behaviours\GradleProjectBehaviour;
+use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\Project;
 use ide\systems\ProjectSystem;
 use ide\ui\Notifications;
@@ -55,7 +56,17 @@ class OneJarBuildType extends AbstractBuildType
         $code = '';
 
         if ($oneJar) {
-            $code = "
+            $code=  "";
+
+            $php = PhpProjectBehaviour::get();
+
+            if ($php && $php->isByteCodeEnabled()) {
+                $code .= "
+                    exclude('**/*.php')
+                ";
+            }
+
+            $code .= "
                 from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
                     exclude('JPHP-INF/extensions.list')
                     exclude('META-INF/services/php.runtime.ext.support.Extension')
@@ -86,7 +97,7 @@ class OneJarBuildType extends AbstractBuildType
                 }
              }
 
-             def file = new File(\"src/META-INF/services/php.runtime.ext.support.Extension\");
+             def file = new File(\"src_generated/META-INF/services/php.runtime.ext.support.Extension\");
              file.getParentFile().mkdirs();
 
              file << list.toString();

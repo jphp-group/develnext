@@ -126,8 +126,8 @@ class BuildProjectForm extends AbstractIdeForm
 
         if ($buildType) {
             if ($buildType->fetchConfig()) {
-                $this->hide();
                 $buildType->onExecute(Ide::get()->getOpenedProject());
+                $this->hide();
             }
         } else {
             UXDialog::show('Данная функция находится в разработке.', 'INFORMATION');

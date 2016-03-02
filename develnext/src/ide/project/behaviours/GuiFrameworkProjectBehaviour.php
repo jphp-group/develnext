@@ -29,6 +29,7 @@ use ide\formats\sprite\SpriteProjectTreeNavigation;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
 use ide\formats\templates\GuiBootstrapFileTemplate;
 use ide\formats\templates\GuiFormFileTemplate;
+use ide\formats\templates\GuiLauncherConfFileTemplate;
 use ide\formats\templates\PhpClassFileTemplate;
 use ide\Ide;
 use ide\Logger;
@@ -360,11 +361,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $gradle = BundleProjectBehaviour::get();
         $gradle->addBundle(Project::ENV_ALL, JPHPGuiDesktopBundle::class);
         $gradle->addBundle(Project::ENV_DEV, JPHPDesktopDebugBundle::class);
-        $gradle->addBundle(Project::ENV_ALL, OrientDbBundle::class);
+        //$gradle->addBundle(Project::ENV_ALL, OrientDbBundle::class);
 
         $this->_recoverDirectories();
 
-        $this->project->defineFile('src/JPHP-INF/.bootstrap.php', new GuiBootstrapFileTemplate());
+        $this->project->defineFile('src/JPHP-INF/.bootstrap', new GuiBootstrapFileTemplate());
+        $this->project->defineFile('src/JPHP-INF/launcher.conf', new GuiLauncherConfFileTemplate());
         $this->project->defineFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
     }
 

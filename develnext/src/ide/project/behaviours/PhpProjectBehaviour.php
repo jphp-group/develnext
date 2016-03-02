@@ -114,11 +114,15 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         });
     }
 
+    public function isByteCodeEnabled() {
+        return $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE);
+    }
+
     public function doCompile($env, callable $log = null)
     {
         $useByteCode = Project::ENV_PROD == $env;
 
-        if ($useByteCode && $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE)) {
+        if ($useByteCode && $this->isByteCodeEnabled()) {
             $scope = new Environment(null, Environment::HOT_RELOAD);
 
             $jarLibraries = $this->externalJarLibraries;

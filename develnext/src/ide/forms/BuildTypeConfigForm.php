@@ -71,17 +71,6 @@ class BuildTypeConfigForm extends AbstractIdeForm
 
         $this->configLayout = $node;
         $this->add($node);
-
-        UXApplication::runLater(function () use ($node) {
-            $this->size = [$node->width + 28 + 40, $node->height + 165];
-            $this->minHeight = $this->height;
-
-            $node->position = [20, 53];
-
-            $node->rightAnchor = $node->leftAnchor = 20;
-            $node->topAnchor = 63;
-            $node->bottomAnchor = 60;
-        });
     }
 
     /**
@@ -105,7 +94,22 @@ class BuildTypeConfigForm extends AbstractIdeForm
      */
     public function doShow()
     {
+        $node = $this->configLayout;
+
+        $this->size = [$node->width + 28 + 40, $node->height + 165];
+        $this->layout->size = $this->size;
+        $this->minHeight = $this->height;
+
+        $node->position = [20, 53];
+
+        $node->rightAnchor = $node->leftAnchor = 20;
+        $node->topAnchor = 63;
+        $node->bottomAnchor = 60;
+
         $this->showConfigCheckbox->selected = AbstractBuildType::isShowConfig();
+
+        $this->centerOnScreen();
+        $this->requestFocus();
 
         UXApplication::runLater(function () {
             $this->centerOnScreen();

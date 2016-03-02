@@ -25,6 +25,8 @@ use php\io\File;
 use php\io\FileStream;
 use php\io\Stream;
 use php\lang\Process;
+use php\lib\arr;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use php\xml\XmlProcessor;
@@ -100,6 +102,18 @@ class WindowsApplicationBuildType extends AbstractBuildType
         }
     }
 
+    protected function copyJre($project, $cut = true)
+    {
+        $jreHome = Ide::get()->getJrePath();
+
+        $newJreHome = $this->getBuildPath($project) . '/jre';
+        FileUtils::copyDirectory($jreHome, $newJreHome);
+
+        if ($cut) {
+            fs::clean("$newJreHome/bin/server");
+        }
+    }
+
     /**
      * @param Project $project
      *
@@ -122,7 +136,7 @@ class WindowsApplicationBuildType extends AbstractBuildType
             $alert = new UXAlert('INFORMATION');
             $alert->contentText = 'Копируем Java VM, это может занять некоторое время ...';
             $alert->show();
-            FileUtils::copyDirectory($jreHome, $this->getBuildPath($project) . '/jre');
+            $this->copyJre($project);
             $alert->hide();
         }
 

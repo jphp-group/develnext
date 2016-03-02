@@ -5,11 +5,71 @@ use ide\ui\LazyImage;
 use ide\utils\FileUtils;
 use php\gui\UXApplication;
 use php\gui\UXImage;
+use php\gui\UXImageView;
 use php\io\File;
+use php\lib\str;
+use php\time\Time;
 
 class Cache
 {
     protected static $cacheImage = [];
+    protected static $cacheImageView = [];
+
+    /**
+     * @param $path
+     * @param array|null $size
+     * @return UXImageView
+     */
+    public static function getResourceImageView($path, array $size = null)
+    {
+        $key = $path;
+
+        if ($size) {
+            $key .= '_' . str::join($size, '_');
+        }
+
+        if ($view = self::$cacheImageView[$key]) {
+            return $view;
+        }
+
+        $image = self::getResourceImage($path);
+        $view = new UXImageView();
+        $view->image = $image;
+
+        if ($size) {
+            $view->size = $size;
+            $view->preserveRatio = true;
+        }
+
+        self::$cacheImageView[$key] = $view;
+        return $view;
+    }
+
+    /**
+     * @param $path
+     * @return LazyImage|UXImage
+     */
+    public static function getResourceImage($path)
+    {
+        if (!str::startsWith($path, 'res://')) {
+            $path = "res://$path";
+        }
+
+        list($image, $time) = self::$cacheImage[$path];
+
+        if ($image) {
+            return $image;
+        }
+
+        if (!UXApplication::isUiThread()) {
+            return new LazyImage($path);
+        }
+
+        $image = new UXImage($path);
+        self::$cacheImage[$path] = [$image, Time::millis()];
+
+        return $image;
+    }
 
     /**
      * @param string $file

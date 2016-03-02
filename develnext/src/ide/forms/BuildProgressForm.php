@@ -77,8 +77,8 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
         $consoleArea->size = $this->consoleList->size;
         $consoleArea->anchors = $this->consoleList->anchors;
 
-        $this->consoleList->hide();
-        $this->add($consoleArea);
+        /*$this->consoleList->hide();
+        $this->add($consoleArea); */
 
         $this->consoleList->setCellFactory(function (UXListCell $cell, $item, $empty) {
             $cell->font = UXFont::of('Courier New', 12);
@@ -259,11 +259,11 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
         $scanner = new Scanner($process->getInput());
 
-        while (($ch = $input->read(1)) !== false) {
-            if ($ch == "\r") continue;
+        while ($scanner->hasNextLine()) {
+            $line = $scanner->nextLine();
 
-            uiLater(function() use ($ch) {
-                $this->addConsoleText($ch);
+            uiLater(function() use ($line) {
+                $this->addConsoleLine($line);
             });
         }
 

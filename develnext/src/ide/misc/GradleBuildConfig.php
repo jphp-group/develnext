@@ -21,14 +21,11 @@ class GradleBuildConfig
     /** @var File */
     protected $file;
 
-    /** @var File */
+    /**
+     * @deprecated
+     * @var File
+     */
     protected $documentFile;
-
-    /** @var DomDocument */
-    protected $document;
-
-    /** @var XmlProcessor */
-    protected $processor;
 
     /**
      * @var string[]
@@ -78,122 +75,14 @@ class GradleBuildConfig
             $this->file = new File($this->documentFile->getParent(), "/build.gradle");
         }
 
-        $this->processor = new XmlProcessor();
-
-        $this->load();
-        $this->update();
+        //$this->load();
+       // $this->update();
     }
 
     public function save()
     {
-        /** @var DomElement $domBuild */
-        $domBuild = $this->document->find('/build');
-
-        $domBuild->setAttribute('projectName', $this->projectName);
-
-        // -- defines
-        $domDefines = $this->document->find('/build/defines');
-
-        if (!$domDefines) {
-            $domBuild->appendChild($domDefines = $this->document->createElement('defines'));
-        }
-
-        foreach ($domDefines->findAll('define') as $domDefine) { $domDefines->removeChild($domDefine); }
-
-        foreach ($this->defines as $name => $value) {
-            $domDefine = $this->document->createElement('define');
-            $domDefine->setAttribute('name', $name);
-            $domDefine->setAttribute('value', $value);
-
-            $domDefines->appendChild($domDefine);
-        }
-
-        // -- repositories
-        $domRepositories = $this->document->find('/build/repositories');
-
-        if (!$domRepositories) {
-            $domBuild->appendChild($domRepositories = $this->document->createElement('repositories'));
-        }
-
-        foreach ($domRepositories->findAll('repository') as $domRepository) { $domRepositories->removeChild($domRepository); }
-
-        foreach ($this->repositories as $name => $repository) {
-            $domRepository = $this->document->createElement('repository');
-            $domRepository->setAttribute('name', $name);
-            $domRepository->setAttribute('url', $repository);
-
-            if ($repository instanceof File) {
-                $domRepository->setAttribute('flatDir', true);
-            }
-
-            $domRepositories->appendChild($domRepository);
-        }
-
-        // -- plugins
-        $domPlugins = $this->document->find('/build/plugins');
-
-        if (!$domPlugins) {
-            $domBuild->appendChild($domPlugins = $this->document->createElement('plugins'));
-        }
-
-        foreach ($domPlugins->findAll('plugin') as $domPlugin) { $domPlugins->removeChild($domPlugin); }
-
-        foreach ($this->plugins as $plugin) {
-            $domPlugin = $this->document->createElement('plugin');
-            $domPlugin->setAttribute('name', $plugin);
-
-            $domPlugins->appendChild($domPlugin);
-        }
-
-        // -- sourceSets
-        $domSourceSets = $this->document->find('/build/sourceSets');
-
-        if (!$domSourceSets) {
-            $domBuild->appendChild($domSourceSets = $this->document->createElement('sourceSets'));
-        }
-
-        foreach ($domSourceSets->findAll('sourceSet') as $domSourceSet) { $domSourceSets->removeChild($domSourceSet); }
-
-        foreach ($this->sourceSets as $name => $sourceSet) {
-            if (is_array($sourceSet)) {
-                $sourceSet = arr::combine($sourceSet, $sourceSet);
-            }
-
-            $domSourceSet = $this->document->createElement('sourceSet', [
-                '@name' => $name,
-                'value' => is_array($sourceSet) ? $sourceSet : [$sourceSet],
-            ]);
-
-            $domSourceSets->appendChild($domSourceSet);
-        }
-
-        // -- dependencies
-        $domDependencies = $this->document->find('/build/dependencies');
-
-        if (!$domDependencies) {
-            $domBuild->appendChild($domDependencies = $this->document->createElement('dependencies'));
-        }
-
-        foreach ($domDependencies->findAll('dependency') as $domDependency) { $domDependencies->removeChild($domDependency); }
-
-        foreach ($this->dependencies as $hash => $dep) {
-            $domDependency = $this->document->createElement('dependency', [
-                '@artifactId' => $dep[1]
-            ]);
-
-            if ($dep[0]) {
-                $domDependency->setAttribute('groupId', $dep[0]);
-            }
-
-            if ($dep[2]) {
-                $domDependency->setAttribute('version', $dep[2]);
-            }
-
-            $domDependencies->appendChild($domDependency);
-        }
-
         try {
-            FileUtils::put($this->documentFile, StrUtils::removeEmptyLines($this->processor->format($this->document)));
+            //FileUtils::put($this->documentFile, StrUtils::removeEmptyLines($this->processor->format($this->document)));
             $stream = Stream::of($this->file, 'w+');
 
             $this->writePlugins($stream);
@@ -216,64 +105,6 @@ class GradleBuildConfig
 
     public function load()
     {
-        if ($this->documentFile->isFile()) {
-            try {
-                $this->document = $this->processor->parse(Stream::getContents($this->documentFile));
-                $this->validate();
-            } catch (ProcessorException $e) {
-                $this->document = $this->processor->createDocument();
-            }
-        } else {
-            $this->document = $this->processor->createDocument();
-        }
-
-        // -- plugins
-        /** @var DomElement $domPlugin */
-        foreach ($this->document->findAll('/build/plugins/plugin') as $domPlugin) {
-            $this->addPlugin($domPlugin->getAttribute('name'));
-        }
-
-        // -- dependencies
-        /** @var DomElement $domDependency */
-        foreach ($this->document->findAll('/build/dependencies/dependency') as $domDependency) {
-            $artifactId = $domDependency->getAttribute('artifactId');
-            $groupId = $domDependency->hasAttribute('groupId') ? $domDependency->getAttribute('groupId') : null;
-            $version = $domDependency->hasAttribute('version') ? $domDependency->getAttribute('version') : null;
-
-            $this->setDependency($artifactId, $groupId, $version);
-        }
-
-        // -- defines
-        /** @var DomElement $domDefine */
-        foreach ($this->document->findAll('/build/defines/define') as $domDefine) {
-            $this->setDefine($domDefine->getAttribute('name'), $domDefine->getAttribute('value'));
-        }
-
-        // -- repositories
-        /** @var DomElement $domRepository */
-        foreach ($this->document->findAll("/build/repositories/repository") as $domRepository) {
-            $value = $domRepository->getAttribute('url');
-
-            if ($domRepository->getAttribute('flatDir')) {
-                $value = File::of($value);
-            }
-
-            $this->repositories[$domRepository->getAttribute('name')] = $value;
-        }
-
-        // -- sourceSets
-        /** @var DomElement $domSourceSet */
-        foreach ($this->document->findAll('/build/sourceSets/sourceSet') as $domSourceSet) {
-            $model = $domSourceSet->toModel();
-
-            $value = $model['value'];
-
-            if (is_array($value)) {
-                $value = arr::combine($value, $value);
-            }
-
-            $this->sourceSets[$model['@name']] = $value;
-        }
     }
 
     /**
@@ -358,14 +189,7 @@ class GradleBuildConfig
         return $this->dependencies;
     }
 
-    protected function validate()
-    {
-        if (!$this->document->find('/build')) {
-            throw new ProcessorException("Invalid project configuration!");
-        }
-    }
-
-    protected function update()
+    /*protected function update()
     {
         $build = $this->document->find('/build');
 
@@ -381,7 +205,7 @@ class GradleBuildConfig
         if ($isNew) {
             $this->save();
         }
-    }
+    } */
 
     protected function writeDefines(Stream $stream)
     {

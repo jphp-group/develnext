@@ -16,6 +16,7 @@ use php\gui\UXWindow;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
+use php\lang\Module;
 use php\lib\str;
 use php\util\Configuration;
 
@@ -73,7 +74,14 @@ class Application
             $configPath = 'res://.system/application.conf';
         }
 
-        include_once "res://php/gui/framework/functions.php";
+        $functions = "res://php/gui/framework/functions";
+
+        if (Stream::exists($functions . ".phb")) {
+            $module = new Module("$functions.phb", true);
+            $module->call();
+        } else {
+            include_once "$functions.php";
+        }
 
         try {
             $this->loadConfig($configPath);

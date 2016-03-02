@@ -18,13 +18,21 @@ trait SavableFormMixin
 
         $config = Ide::get()->getUserConfig($class);
 
-        $this->x = $config->get("x", $this->x);
-        $this->y = $config->get("y", $this->y);
+        if ($config->has('x') && $config->has('y')) {
+            $this->x = $config->get("x", $this->x);
+            $this->y = $config->get("y", $this->y);
+        } else {
+            $this->centerOnScreen();
+            uiLater(function() {
+                /** @var $this AbstractForm */
+                $this->centerOnScreen();
+            });
+        }
 
         if ($config->has('width') && $config->has('height')) {
             $this->width = $config->get("width", $this->width);
             $this->height = $config->get("height", $this->height);
-            $this->layout->size = $this->size;
+           // $this->layout->size = $this->size;
         }
 
         $this->maximized = $config->get("maximized", $this->maximized);

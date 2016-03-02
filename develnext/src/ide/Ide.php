@@ -16,6 +16,7 @@ use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\protocol\AbstractProtocolHandler;
 use ide\protocol\handlers\FileOpenProjectProtocolHandler;
+use ide\systems\Cache;
 use ide\systems\FileSystem;
 use ide\systems\IdeSystem;
 use ide\systems\ProjectSystem;
@@ -768,9 +769,10 @@ class Ide extends Application
      * @param string $path
      *
      * @param array $size
+     * @param bool $cache
      * @return UXImageView
      */
-    public function getImage($path, array $size = null)
+    public function getImage($path, array $size = null, $cache = true)
     {
         if ($path === null) {
             return null;
@@ -793,7 +795,11 @@ class Ide extends Application
         } elseif ($path instanceof LazyLoadingImage) {
             $image = $path->getImage();
         } else {
-            $image = new UXImage('res://.data/img/' . $path);
+            if ($cache) {
+                $image = Cache::getResourceImage("res://.data/img/" . $path);
+            } else {
+                $image = new UXImage('res://.data/img/' . $path);
+            }
         }
 
         $result = new UXImageView();
