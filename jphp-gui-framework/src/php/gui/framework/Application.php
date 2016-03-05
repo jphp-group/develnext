@@ -17,6 +17,8 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
 use php\lang\Module;
+use php\lang\System;
+use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
 
@@ -103,6 +105,18 @@ class Application
     /**
      * @return string
      */
+    public function getUuid()
+    {
+        if (!$this->config->has('app.uuid')) {
+            $this->config->set('app.uuid', str::uuid());
+        }
+
+        return $this->config->get('app.uuid');
+    }
+
+    /**
+     * @return string
+     */
     public function getVersion()
     {
         return $this->config->get('app.version');
@@ -122,6 +136,28 @@ class Application
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * Returns user home directory of this app.
+     * @return string
+     */
+    public function getUserHome()
+    {
+        $name = $this->getName();
+        $uuid = $this->getUuid();
+
+        $home = System::getProperty('user.home');
+
+        $result = fs::normalize("$home/.$name/$uuid");
+
+        if (!fs::isDir($result)) {
+            if (!fs::makeDir($result)) {
+                return null;
+            }
+        }
+
+        return $result;
     }
 
     /** @var AbstractForm[] */

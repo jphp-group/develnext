@@ -69,5 +69,7 @@
         <eventType code="destroy" name="Уничтожение" kind="ActionEvent" icon="icons/trash16.gif" />
 
         <eventType code="collision" name="Столкновение" kind="CollisionParamEvent" idParameter="1" icon="icons/collision16.gif" />
+
+        <eventType code="load" name="Загрузка компонента" kind="ActionEvent" icon="icons/loadingEvent16.png" />
     </eventTypes>
 </element>

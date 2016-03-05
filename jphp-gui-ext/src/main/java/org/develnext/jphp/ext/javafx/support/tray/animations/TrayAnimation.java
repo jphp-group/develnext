@@ -13,10 +13,6 @@ public interface TrayAnimation {
      */
     AnimationType getAnimationType();
 
-    /**
-     * ...
-     * @param onFinished
-     */
     void setOnFinished(EventHandler<ActionEvent> onFinished);
 
     /**

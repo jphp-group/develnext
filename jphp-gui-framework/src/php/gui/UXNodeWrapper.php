@@ -118,6 +118,12 @@ class UXNodeWrapper
     public function bind($event, callable $handler, $group)
     {
         switch ($event) {
+            case 'load':
+                uiLater(function () use ($handler) {
+                    $handler(UXEvent::makeMock($this->node));
+                });
+                return;
+
             case 'create':
                 return;
 

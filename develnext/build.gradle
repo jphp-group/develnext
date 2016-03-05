@@ -23,6 +23,19 @@ manifest {
     attributes 'Main-Class': 'php.runtime.launcher.Launcher'
 }
 
+installDist.doLast {
+    fileTree("$project.buildDir/install/$project.name/lib").visit { FileVisitDetails el ->
+        def name = el.getName()
+        name = name.replaceAll(/(-[0-9]+|\.[0-9]+|-SNAPSHOT)/, "");
+
+        if (!name.equals(el.getName())) {
+            println "Rename '" + el.file.parent + "/" + name + "' file"
+
+            el.file.renameTo(file(el.file.parent + "/" + name));
+        }
+    }
+}
+
 task distWindowsPatch(type: Zip, dependsOn: ['clean', 'distPatch']) {
     from "$project.buildDir/install/$project.name"
     archiveName "DevelNext.WindowsPatch.zip"

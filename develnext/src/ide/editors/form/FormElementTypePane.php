@@ -17,6 +17,7 @@ use php\gui\UXLabel;
 use php\gui\UXNode;
 use ide\formats\FormFormat;
 use php\gui\layout\UXScrollPane;
+use php\gui\UXSplitPane;
 use php\gui\UXTitledPane;
 use php\gui\UXToggleButton;
 use php\gui\UXToggleGroup;

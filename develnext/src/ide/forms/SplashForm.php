@@ -83,7 +83,7 @@ class SplashForm extends AbstractIdeForm
     public function doShow()
     {
         if (Ide::get()->isDevelopment()) {
-            $this->opacity = 0.15;
+            $this->opacity = 0.05;
         }
     }
 

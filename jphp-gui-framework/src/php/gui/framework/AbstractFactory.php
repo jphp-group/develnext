@@ -177,6 +177,7 @@ class AbstractFactory
             $this->behaviourManager->applyForInstance($id, $node);
 
             uiLater(function () use ($node, $id) {
+                $this->eventBinder->trigger($node, $id, 'loading');
                 $this->eventBinder->trigger($node, $id, 'create');
             });
 

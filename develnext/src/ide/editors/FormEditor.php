@@ -1396,6 +1396,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $scrollPane = $typePanes;
         }
 
+        UXSplitPane::setResizeWithParent($scrollPane, false);
+
         $actions = $this->makeActionsUi();
 
         if ($actions) {

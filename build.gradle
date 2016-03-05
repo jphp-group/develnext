@@ -148,7 +148,7 @@ project(':develnext') {
         compile project(':develnext-stdlib')
 
         // bundles.
-        compile project(':develnext-bundles/dn-orientdb-bundle')
+        //compile project(':develnext-bundles/dn-orientdb-bundle')
 
         compile "org.develnext:jphp-xml-ext:$jphpVersion"
         compile "org.develnext:jphp-json-ext:$jphpVersion"
