@@ -94,12 +94,32 @@ abstract class AbstractFormFormat extends AbstractFormat
     public function register($any)
     {
         if ($any instanceof AbstractFormElement) {
-            $this->formElements[] = $any;
+            $this->formElements[get_class($any)] = $any;
             //FormEditor::initializeElement($any);
         } else if ($any instanceof AbstractMenuCommand) {
-            $this->contextCommands[] = $any;
+            $this->contextCommands[get_class($any)] = $any;
         } else if ($any instanceof AbstractFormElementTag) {
             $this->formElementTags[$any->getElementClass()] = $any;
+        } else {
+            throw new IllegalArgumentException("Cannot register $any");
+        }
+    }
+
+    /**
+     * @param $any
+     * @throws IllegalArgumentException
+     */
+    public function unregister($any)
+    {
+        if ($any instanceof AbstractFormElement) {
+            $element = $this->formElements[get_class($any)];
+            $element->unregister();
+
+            unset($this->formElements[get_class($any)]);
+        } elseif ($any instanceof AbstractMenuCommand) {
+            unset($this->contextCommands[get_class($any)]);
+        } elseif ($any instanceof AbstractFormElementTag) {
+            unset($this->formElementTags[$any->getElementClass()]);
         } else {
             throw new IllegalArgumentException("Cannot register $any");
         }

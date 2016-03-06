@@ -65,7 +65,13 @@ class ScriptComponentContainer
      */
     public function getProperties()
     {
-        return $this->data;
+        $result = [];
+
+        foreach ($this->type->getProperties() as $code => $prop) {
+            $result[$code] = $this->data[$code];
+        }
+
+        return $result;
     }
 
     public function __set($name, $value)

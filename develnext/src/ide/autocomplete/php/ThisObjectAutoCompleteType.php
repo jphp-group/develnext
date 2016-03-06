@@ -13,6 +13,7 @@ use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormElement;
 use ide\scripts\AbstractScriptComponent;
 use ide\systems\FileSystem;
+use php\gui\framework\AbstractScript;
 use php\lib\str;
 
 /**
@@ -115,6 +116,22 @@ class ThisObjectAutoCompleteType extends AutoCompleteType
                         $result[$name] = new PropertyAutoCompleteItem($name, 'mixed');
                     }
                 }
+
+                if ($reflection->isSubclassOf(AbstractScript::class)) {
+                    foreach ($reflection->getMethods() as $method) {
+                        $name = $method->getName();
+
+                        if (str::startsWith($name, 'get') && $name != 'get') {
+                            if (($method->isPublic() || $method->isProtected()) && !$method->isStatic()) {
+                                $name = str::lowerFirst(str::sub($name, 3));
+
+                                if (!$result[$name]) {
+                                    $result[$name] = new PropertyAutoCompleteItem($name, 'mixed');
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -137,13 +154,24 @@ class ThisObjectAutoCompleteType extends AutoCompleteType
                 $reflection = new \ReflectionClass($elementClass);
 
                 foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-                    if (str::startsWith($method->getName(), '__') || $method->isStatic() || $method->isAbstract()) {
+                    $name = $method->getName();
+
+                    if (str::startsWith($name, '__') || $method->isStatic() || $method->isAbstract()) {
                         continue;
                     }
 
-                    $insert = $method->getName() . "(";
+                    if ($reflection->isSubclassOf(AbstractScript::class)) {
+                        // skip setters and getters.
+                        if ($name != 'get' && $name != 'set') {
+                            if (str::startsWith($name, 'get') || str::startsWith($name, 'set')) {
+                                continue;
+                            }
+                        }
+                    }
 
-                    $result[$method->getName()] = new MethodAutoCompleteItem($method->getName(), '', $insert);
+                    $insert = $name . "(";
+
+                    $result[$name] = new MethodAutoCompleteItem($name, '', $insert);
                 }
             }
         }

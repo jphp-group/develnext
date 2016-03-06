@@ -706,6 +706,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $this->elementTypePane->resetConfigurable(get_class($this));
+        $this->elementTypePane->setElements($this->format->getFormElements());
 
         if ($this->prototypeTypePane) {
             $gui = GuiFrameworkProjectBehaviour::get();
@@ -1211,8 +1212,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     /**
      * @param callable $callback (UXNode $node, AbstractFormElement $element, int $level)
+     * @param array $children
      */
-    public function eachNode(callable $callback)
+    public function eachNode(callable $callback, array $children = null)
     {
         $func = function ($nodes, $level = 0) use ($callback, &$func) {
             foreach ($nodes as $node) {
@@ -1236,7 +1238,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
         };
 
-        $func($this->layout->children);
+        $func($children !== null ? $children : $this->layout->children);
     }
 
     protected function findNodesToRegister($nodes)

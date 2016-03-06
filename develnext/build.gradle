@@ -72,6 +72,7 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
 
     from(installDir) {
         exclude('*.sh')
+        exclude('DevelNext')
         exclude('bin/develnext')
         exclude('tools/gradle/bin/gradle')
         exclude('tools/jre/bin/java')
@@ -79,6 +80,7 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
 
     from(installDir) {
         include('*.sh')
+        include('DevelNext')
         include('bin/develnext')
         include('tools/gradle/bin/gradle')
         include('tools/jre/bin/java')
@@ -188,6 +190,7 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
 
     from(installDir) {
         exclude('*.sh')
+        exclude('DevelNext')
         exclude('bin/develnext')
         exclude('tools/gradle/bin/gradle')
         exclude('tools/jre/bin/java')

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox spacing="10.0">
+               <children>
+                  <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Выберите пакеты">
+                           <font>
+                              <Font name="Tahoma Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label text="Выберите нужные нужные вам пакеты расширений в проекте" textFill="#5e5e5e" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <ListView id="list" prefHeight="299.0" prefWidth="560.0" styleClass="dn-simple-list" VBox.vgrow="ALWAYS" />
+            <Separator prefWidth="200.0" />
+            <HBox prefHeight="35.0" prefWidth="560.0" spacing="10.0">
+               <children>
+                  <Button id="saveButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-ok" text="Сохранить">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+                  <Button id="cancelButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Отмена">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>

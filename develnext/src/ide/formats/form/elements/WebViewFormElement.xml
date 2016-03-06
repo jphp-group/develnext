@@ -2,6 +2,7 @@
     <properties>
         <property code="url" name="URL" editor="text" virtual="1" />
         <property code="contextMenuEnabled" name="Контекстное меню" editor="boolean" virtual="1" />
+        <property code="style" name="CSS стиль" editor="none" />
     </properties>
 
     <eventTypes>

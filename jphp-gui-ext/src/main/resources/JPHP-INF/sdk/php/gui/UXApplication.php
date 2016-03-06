@@ -52,6 +52,20 @@ class UXApplication
     }
 
     /**
+     * @param bool $value
+     */
+    public static function setImplicitExit($value)
+    {
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isImplicitExit()
+    {
+    }
+
+    /**
      * @param callable $onStart (UXStage $stage)
      */
     public static function launch(callable $onStart)

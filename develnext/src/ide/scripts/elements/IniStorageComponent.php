@@ -19,7 +19,7 @@ class IniStorageComponent extends AbstractScriptComponent
 
     public function getGroup()
     {
-        return 'Хранилище данных';
+        return 'Данные';
     }
 
     public function getDescription()

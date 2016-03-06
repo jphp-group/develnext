@@ -101,18 +101,28 @@ class ProjectEditor extends AbstractEditor
 
     /**
      * @param UXNode $node
+     * @param bool $prepend
      */
-    public function addSettingsPane(UXNode $node)
+    public function addSettingsPane(UXNode $node, $prepend = true)
     {
         Logger::info("Add settings pane ...");
 
-        $pane = new UXVBox();
-        $pane->add($node);
-        $pane->padding = 10;
+        if (property_exists($node, 'padding')) {
+            $node->padding = 10;
+            $pane = $node;
+        } else {
+            $pane = new UXVBox();
+            $pane->add($node);
+            $pane->padding = 10;
+        }
 
-        $this->content->add($pane);
-
-        $this->content->add(new UXSeparator());
+        if ($prepend) {
+            $this->content->children->insert(2, $pane);
+            $this->content->children->insert(2, new UXSeparator());
+        } else {
+            $this->content->add($pane);
+            $this->content->add(new UXSeparator());
+        }
     }
 
     /**

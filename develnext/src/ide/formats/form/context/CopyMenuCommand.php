@@ -4,6 +4,8 @@ namespace ide\formats\form\context;
 use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
+use ide\formats\AbstractFormFormat;
+use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use php\gui\framework\DataUtils;
 use php\gui\UXClipboard;
@@ -39,6 +41,9 @@ class CopyMenuCommand extends AbstractMenuCommand
         $designer = $editor->getDesigner();
         $nodes = $designer->getSelectedNodes();
 
+        /** @var AbstractFormFormat $format */
+        $format = $editor->getFormat();
+
         if ($nodes) {
             $needNodes = [];
 
@@ -72,16 +77,29 @@ class CopyMenuCommand extends AbstractMenuCommand
             $document = $processor->createDocument();
 
             $rootElement = $document->createElement('copies');
+            $dataElement = $document->createElement('data');
+            $rootElement->appendChild($dataElement);
 
             $targetIds = [];
 
-            foreach ($nodes as $node) {
+
+            $editor->eachNode(function (UXNode $node) use (&$targetIds, $editor, $document, $dataElement) {
                 $id = $editor->getNodeId($node);
 
                 if ($id) {
+                    $oneElement = $document->createElement('one');
+                    $data = DataUtils::get($node);
+
+                    if ($data) {
+                        $oneElement->setAttributes($data->toArray());
+                        $oneElement->setAttribute('id', $id);
+
+                        $dataElement->appendChild($oneElement);
+                    }
+
                     $targetIds[] = $id;
                 }
-            }
+            }, $nodes);
 
             if ($targetIds) {
                 $behaviourElement = $editor->getBehaviourManager()->dump($document, $targetIds);
@@ -112,7 +130,7 @@ class CopyMenuCommand extends AbstractMenuCommand
 
                     $wrapElement->appendChild($nodeElement);
 
-                    $wrapElement->setAttributes(DataUtils::get($node)->toArray());
+                    //$wrapElement->setAttributes(DataUtils::get($node)->toArray());
 
                     $rootElement->appendChild($wrapElement);
                 }

@@ -7,6 +7,8 @@ use ide\project\Project;
 use ide\project\ProjectFile;
 use php\io\File;
 use php\lang\IllegalStateException;
+use php\lang\NotImplementedException;
+use php\lib\fs;
 
 /**
  * Class AbstractFormat
@@ -47,7 +49,11 @@ abstract class AbstractFormat
 
     public function delete($path, $silent = false)
     {
-        \Files::delete($path);
+        if (fs::isDir($path)) {
+            fs::clean($path);
+        }
+
+        fs::delete($path);
     }
 
     /**
@@ -95,4 +101,13 @@ abstract class AbstractFormat
      * @return mixed
      */
     abstract public function register($any);
+
+    /**
+     * @param $any
+     * @throws NotImplementedException
+     */
+    public function unregister($any)
+    {
+        throw new NotImplementedException();
+    }
 }

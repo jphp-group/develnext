@@ -1,0 +1,46 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="url" value="http://develnext.org/" />
+        <property code="timeout" value="15000" />
+        <property code="method" value="GET" />
+        <property code="followRedirects" value="1" />
+        <property code="userAgent" value="Simple Bot v1.0" />
+        <property code="autoParse" value="1" />
+    </init>
+
+    <properties group="general">
+        <property code="url" name="URL (ссылка)" editor="text" tooltip="Путь к html ресурсу (ссылки, сайты и т.п.)" />
+        <property code="method" name="Метод" editor="enum" tooltip="Метод http запроса">
+            <variants>
+                <variant value="GET">GET</variant>
+                <variant value="POST">POST</variant>
+                <variant value="PUT">PUT</variant>
+                <variant value="PATCH">PATCH</variant>
+                <variant value="DELETE">DELETE</variant>
+                <variant value="OPTIONS">OPTIONS</variant>
+                <variant value="TRACE">TRACE</variant>
+                <variant value="CONNECT">CONNECT</variant>
+                <variant value="HEAD">HEAD</variant>
+            </variants>
+        </property>
+        <property code="timeout" name="Таймаут" editor="integer" tooltip="Максимальное время ожидания отклика по ссылке в млсек." />
+        <property code="followRedirects" name="Следовать редиректам" editor="boolean" tooltip="Следовать за редиректами" />
+        <property code="referrer" name="Реферер" editor="text" tooltip="Реферальная ссылка, с которой был переход" />
+        <property code="ignoreHttpErrors" name="Игнор. http ошибки" editor="boolean" tooltip="Обрабатывать ли данные даже при http ответах, говорящих об ошибках" />
+        <property code="ignoreContentTypes" name="Игнор. тип контента" editor="boolean" tooltip="Обрабатывать ли данные даже при http ответах, говорящих об ошибках" />
+        <property code="autoParse" name="Автопарсинг" editor="boolean" tooltip="Автоматически запускать парсинг при смене URL" />
+    </properties>
+
+    <properties group="data" title="Данные запроса" sort="1500">
+        <property code="userAgent" name="UserAgent" editor="text" tooltip="UserAgent значение" />
+        <property code="cookies" name="Куки (Cookies)" editor="text" tooltip="Список кук, каждая кука на отдельной строке, формат как name=value" />
+        <property code="headers" name="Заголовки (Headers)" editor="text" tooltip="Список заголовков, каждый заголовок на отдельной строке, формат как name=value" />
+        <property code="data" name="Данные" editor="text" tooltip="Список form значений, каждое значение на отдельной строке, формат как name=value" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="parsing" name="До обработки" kind="ObjectEvent" />
+        <eventType code="parse" name="После обработки" kind="ObjectEvent" />
+        <eventType code="error" name="Ошибка чтения" kind="ObjectEvent" icon="icons/error16.png" />
+    </eventTypes>
+</element>

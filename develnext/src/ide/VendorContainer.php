@@ -18,14 +18,14 @@ trait VendorContainer
         FileUtils::copyFile($vendorResource, $file);
     }
 
-    function copyVendorResourceToProject($name, $projectPath = null)
+    function copyVendorResourceToProject($name, $projectPath = null, $toGenerated = false)
     {
         if (Ide::project()) {
             if ($projectPath === null) {
                 $projectPath = $name;
             }
 
-            $this->copyVendorResourceToFile($name, Ide::project()->getSrcFile($projectPath));
+            $this->copyVendorResourceToFile($name, Ide::project()->getSrcFile($projectPath, $toGenerated));
         }
     }
 }

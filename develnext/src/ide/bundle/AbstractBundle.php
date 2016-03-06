@@ -17,6 +17,15 @@ abstract class AbstractBundle
     abstract function getName();
     abstract function getDescription();
 
+    /**
+     * @param Project $project
+     * @return bool
+     */
+    public function isAvailable(Project $project)
+    {
+        return true;
+    }
+
     public function getIcon()
     {
         return null;

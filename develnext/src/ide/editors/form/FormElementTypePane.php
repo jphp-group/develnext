@@ -273,6 +273,10 @@ class FormElementTypePane
 
     protected function createGroupUi($group, $elements)
     {
+        if (!$elements) {
+            return;
+        }
+
         $vbox = new UXVBox();
         $vbox->spacing = 1;
         $vbox->padding = 2;
@@ -298,8 +302,11 @@ class FormElementTypePane
             $button->userData = $element;
 
             $button->graphic = Ide::get()->getImage($element->getIcon());
-            $button->graphic->size = [16, 16];
-            $button->graphic->preserveRatio = true;
+
+            if ($button->graphic) {
+                $button->graphic->size = [16, 16];
+                $button->graphic->preserveRatio = true;
+            }
 
             $button->tooltipText = $element->getName();
 
@@ -311,8 +318,11 @@ class FormElementTypePane
             $smallButton->size = [25, 30];
             $smallButton->userData = $element;
             $smallButton->graphic = Ide::get()->getImage($element->getIcon());
-            $smallButton->graphic->size = [16, 16];
-            $smallButton->graphic->preserveRatio = true;
+
+            if ($smallButton->graphic) {
+                $smallButton->graphic->size = [16, 16];
+                $smallButton->graphic->preserveRatio = true;
+            }
 
             $smallButton->tooltipText = $element->getName();
 

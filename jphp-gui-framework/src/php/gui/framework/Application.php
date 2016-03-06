@@ -391,6 +391,10 @@ class Application
         if ($this->config->get('app.mainForm')) {
             $this->setMainFormClass($this->config->get('app.mainForm'));
         }
+
+        if ($this->config->has('app.implicitExit')) {
+            UXApplication::setImplicitExit($this->config->get('app.implicitExit'));
+        }
     }
 
     /**

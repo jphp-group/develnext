@@ -149,6 +149,8 @@ project(':develnext') {
 
         // bundles.
         //compile project(':develnext-bundles/dn-orientdb-bundle')
+        compile project(':develnext-bundles/dn-jsoup-bundle')
+        compile project(':develnext-bundles/dn-mail-bundle')
 
         compile "org.develnext:jphp-xml-ext:$jphpVersion"
         compile "org.develnext:jphp-json-ext:$jphpVersion"

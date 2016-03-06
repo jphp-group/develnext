@@ -1,6 +1,7 @@
 # MAIN CONFIGURATION
 
 app.name = #PROJECT_NAME#
+app.uuid = #APP_UUID#
 app.version = 1
 
 # APP

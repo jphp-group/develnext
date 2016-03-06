@@ -67,9 +67,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
      */
     public function inject()
     {
-        $this->project->setSrcDirectory('src');
-        $this->project->setSrcGeneratedDirectory(self::GENERATED_DIRECTORY);
-
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('save', [$this, 'doSave']);
         $this->project->on('preCompile', [$this, 'doPreCompile']);
@@ -98,11 +95,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     public function doPreCompile()
     {
-        $generatedDirectory = $this->project->getFile(self::GENERATED_DIRECTORY);
-
-        FileUtils::deleteDirectory($generatedDirectory);
-        $generatedDirectory->mkdirs();
-
         FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) {
             if (str::endsWith($filename, '.php.sourcemap')) {
                 fs::delete($filename);
@@ -127,13 +119,12 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
             $jarLibraries = $this->externalJarLibraries;
 
-            $sourceDir = $this->project->getFile('src/');
-            $generatedDirectory = $this->project->getFile(self::GENERATED_DIRECTORY);
+            $generatedDirectory = $this->project->getSrcFile('', true);
 
-            $scope->execute(function () use ($jarLibraries, $sourceDir, $generatedDirectory) {
+            $scope->execute(function () use ($jarLibraries, $generatedDirectory) {
                 ob_implicit_flush(true);
 
-                spl_autoload_register(function ($name) use ($jarLibraries, $sourceDir, $generatedDirectory) {
+                spl_autoload_register(function ($name) use ($jarLibraries, $generatedDirectory) {
                     foreach ($jarLibraries as $file) {
                         if (!fs::exists($file)) {
                             echo "SKIP $file, is not exists.\n";
@@ -171,7 +162,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 });
             });
 
-            FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory) {
+            FileUtils::scan($this->project->getSrcFile(''), function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory) {
                 if (str::endsWith($filename, '.php')) {
                     $filename = fs::normalize($filename);
 
@@ -180,7 +171,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                     }
 
                     $file = $this->project->getAbsoluteFile($filename);
-                    $relativePath = $file->getRelativePath('src');
+                    $relativePath = $file->getSrcRelativePath();
                     $compiledFile = new File($generatedDirectory, '/' . FileUtils::stripExtension($relativePath) . '.phb');
 
                     if ($compiledFile->getParentFile() && !$compiledFile->getParentFile()->isDirectory()) {
@@ -191,6 +182,23 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                         $module = new Module($filename, false, true);
                         $module->dump($compiledFile, true);
                     });
+                }
+            });
+
+            FileUtils::scan($generatedDirectory, function ($filename) use ($log, $scope, $useByteCode) {
+                if (fs::ext($filename) == 'php') {
+                    $filename = fs::normalize($filename);
+
+                    if ($log) $log(":compile $filename");
+
+                    $compiledFile = fs::pathNoExt($filename) . '.phb';
+
+                    $scope->execute(function () use ($filename, $compiledFile) {
+                        $module = new Module($filename, false, true);
+                        $module->dump($compiledFile);
+                    });
+
+                    fs::delete($filename);
                 }
             });
 
@@ -257,7 +265,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     public function doMakeSettings(ProjectEditor $editor)
     {
-        $title = new UXLabel('Исходный код:');
+        $title = new UXLabel('Исходный php код:');
         $title->font = $title->font->withBold();
 
         $opts = new UXHBox();

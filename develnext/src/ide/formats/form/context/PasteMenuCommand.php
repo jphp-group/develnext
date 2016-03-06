@@ -69,18 +69,40 @@ class PasteMenuCommand extends AbstractMenuCommand
                 /** @var DomElement $behaviours */
                 $behaviours = $document->find('/copies/behaviours');
 
-                $addLayout = function (UXNode $uiNode) use ($editor, &$addLayout) {
+                $addLayout = function (UXNode $uiNode) use ($editor, &$addLayout, $document, $behaviours) {
+                    /** @var AbstractFormElement $type */
                     $type = $editor->getFormat()->getFormElement($uiNode);
 
                     if ($type) {
-                        $uiNode->id = $editor->generateNodeId($type);
+                        $oldId = $editor->getNodeId($uiNode);
+                        $id = $editor->generateNodeId($type);
+                        $uiNode->id = $id;
+
+                        /** @var DomElement $oneDataElement */
+                        $oneDataElement = $document->find("/copies/data/one[@id='$oldId']");
+
+                        // Paste virtual properties
+                        if ($oneDataElement) {
+                            $data = DataUtils::get($uiNode);
+
+                            foreach ($oneDataElement->getAttributes() as $name => $value) {
+                                if ($name == "id") continue;
+
+                                $data->set($name, $value);
+                            }
+                        }
 
                         if ($type->isLayout()) {
                             foreach ($type->getLayoutChildren($uiNode) as $sub) {
                                 $editor->registerNode($sub);
-
                                 $addLayout($sub);
                             }
+                        }
+
+                        $type->refreshNode($uiNode);
+
+                        if ($behaviours && $id) {
+                            BehaviourLoader::loadOne($oldId, $behaviours, $editor->getBehaviourManager(), $id);
                         }
                     }
                 };
@@ -136,23 +158,9 @@ class PasteMenuCommand extends AbstractMenuCommand
                     $editor->registerNode($uiNode);
                     $addLayout($uiNode);
 
-                    // Paste virtual properties
-                    $data = DataUtils::get($uiNode);
-                    foreach ($one->getAttributes() as $name => $value) {
-                        if ($name == "id") continue;
-
-                        $data->set($name, $value);
-                    }
-
-                    $type->refreshNode($uiNode);
-
-                    waitAsync(100, function () use ($editor, $uiNode, $one, $data) {
+                    waitAsync(100, function () use ($editor, $uiNode) {
                         $editor->getDesigner()->selectNode($uiNode);
                     });
-
-                    if ($behaviours && $targetId) {
-                        BehaviourLoader::loadOne($targetId, $behaviours, $editor->getBehaviourManager(), $editor->getNodeId($uiNode));
-                    }
                 }
 
                 $editor->getDesigner()->update();

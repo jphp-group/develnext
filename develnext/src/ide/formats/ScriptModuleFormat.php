@@ -1,7 +1,6 @@
 <?php
 namespace ide\formats;
 
-use Files;
 use ide\editors\AbstractEditor;
 use ide\editors\form\FormNamedBlock;
 use ide\editors\ScriptModuleEditor;
@@ -24,6 +23,7 @@ use ide\systems\FileSystem;
 use ide\systems\RefactorSystem;
 use ide\utils\FileUtils;
 use php\io\File;
+use php\lib\fs;
 use php\lib\Str;
 
 /**
@@ -100,7 +100,7 @@ class ScriptModuleFormat extends AbstractFormFormat
         if ($project) {
             $path = $project->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY);
             return Str::startsWith(File::of($file)->getPath(), $path->getPath())
-                && Files::isDir($file)
+                && fs::isDir($file)
                 && File::of($file)->getPath() != $path->getPath();
         }
 

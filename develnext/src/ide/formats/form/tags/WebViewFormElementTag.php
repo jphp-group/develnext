@@ -26,5 +26,7 @@ class WebViewFormElementTag extends AbstractFormElementTag
         if (!$node->contextMenuEnabled) {
            // $element->setAttribute('contextMenuEnabled', "false");
         }
+
+        $element->removeAttribute('style');
     }
 }

@@ -318,9 +318,9 @@ class Ide extends Application
             $path = $this->getOwnFile('../develnext-tools/');
         }
 
-        $file = $path && $path->exists() ? $path->getAbsoluteFile() : null;
+        $file = $path && $path->exists() ? fs::abs($path) : null;
 
-        Logger::info("Detect tool path: '$file', mode = {$this->mode}");
+        Logger::info("Detect tool path: '$file', mode = {$this->mode}, launcher = {$launcher}");
 
         return $file;
     }
@@ -463,7 +463,9 @@ class Ide extends Application
      */
     public static function getOwnFile($path)
     {
-        $home = "./";
+        $homePath = System::getProperty('develnext.path', "./");
+
+        $home = $homePath;
 
         return File::of("$home/$path");
     }

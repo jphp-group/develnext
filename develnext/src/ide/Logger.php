@@ -1,6 +1,7 @@
 <?php
 namespace ide;
 
+use ide\systems\IdeSystem;
 use php\io\Stream;
 use php\lang\Environment;
 use php\lang\IllegalArgumentException;
@@ -57,8 +58,10 @@ class Logger
 
             $line = static::getLogName($level) . " [" . $class . "] ($time) " . $message . "\r\n";
 
-            $out = Stream::of('php://stdout');
-            $out->write($line);
+            if (IdeSystem::isDevelopment()) {
+                $out = Stream::of('php://stdout');
+                $out->write($line);
+            }
 
             if (Ide::isCreated()) {
                 Stream::putContents($file, $line, 'a+');

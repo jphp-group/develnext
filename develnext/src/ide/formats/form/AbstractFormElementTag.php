@@ -42,7 +42,7 @@ abstract class AbstractFormElementTag
         /** @var UXNode $node */
         $font = $node->font;
 
-        if ($font && ($font->family !== 'System' || $font->size != 12 || $font->style !== 'Regular')) {
+        if ($font /*&& ($font->family !== 'System' || $font->size != 12 || $font->style !== 'Regular')*/) {  // always write font.
             $domFontProperty = $document->createElement('font');
 
             $domFont = $document->createElement('Font');

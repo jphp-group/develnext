@@ -234,4 +234,9 @@ abstract class AbstractFormElement
 
         return null;
     }
+
+    public function unregister()
+    {
+        // nop.
+    }
 }

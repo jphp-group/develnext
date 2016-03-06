@@ -244,7 +244,7 @@ class FlowListViewDecorator implements \Countable
     }
 
     /**
-     * @return UXFlowPane
+     * @return UXScrollPane
      */
     public function getPane()
     {

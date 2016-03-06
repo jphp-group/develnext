@@ -285,8 +285,16 @@ class OpenProjectForm extends AbstractIdeForm
             $file = $node ? $node->data('file') : null;
 
             if ($file && $file->exists()) {
-                $this->hide();
-                ProjectSystem::open($file);
+                $this->showPreloader('Подождите ...');
+
+                waitAsync(100, function () use ($file) {
+                    try {
+                        ProjectSystem::open($file);
+                        $this->hide();
+                    } finally {
+                        $this->hidePreloader();
+                    }
+                });
             } else {
                 UXDialog::show('Ошибка открытия проекта', 'ERROR');
             }
@@ -333,8 +341,16 @@ class OpenProjectForm extends AbstractIdeForm
 
             $name = FileUtils::stripExtension(File::of($selected->getPath())->getName());
 
-            $this->hide();
-            ProjectSystem::import($selected->getPath(), "$path/$name", $name, [$this, 'hide']);
+            $this->showPreloader('Подождите ...');
+
+            waitAsync(100, function () use ($path, $name, $selected) {
+                try {
+                    ProjectSystem::import($selected->getPath(), "$path/$name", $name, [$this, 'hide']);
+                    $this->hide();
+                } finally {
+                    $this->hidePreloader();
+                }
+            });
         }
     }
 

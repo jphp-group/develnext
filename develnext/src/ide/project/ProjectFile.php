@@ -77,6 +77,18 @@ class ProjectFile extends File
     }
 
     /**
+     * @param bool|false $generated
+     * @return string
+     * @throws \Exception
+     */
+    public function getSrcRelativePath($generated = false)
+    {
+        $rootDir = $this->project->getSrcFile('', $generated);
+
+        return FileUtils::relativePath($rootDir, parent::getPath());
+    }
+
+    /**
      * @return bool
      */
     public function isInRootDir()

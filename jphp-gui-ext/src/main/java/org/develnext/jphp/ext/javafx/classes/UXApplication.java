@@ -56,6 +56,16 @@ public class UXApplication extends BaseWrapper<Application> {
     }
 
     @Signature
+    public static void setImplicitExit(boolean value) {
+        Platform.setImplicitExit(value);
+    }
+
+    @Signature
+    public static boolean isImplicitExit() {
+        return Platform.isImplicitExit();
+    }
+
+    @Signature
     public static String getMacAddress() {
         InetAddress ip;
 

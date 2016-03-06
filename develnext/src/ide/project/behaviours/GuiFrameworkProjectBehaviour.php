@@ -1,6 +1,7 @@
 <?php
 namespace ide\project\behaviours;
 
+use develnext\bundle\jsoup\JsoupBundle;
 use develnext\bundle\orientdb\OrientDbBundle;
 use Files;
 use ide\action\ActionManager;
@@ -47,6 +48,7 @@ use ide\utils\Json;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXLabel;
+use php\gui\UXTextField;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
@@ -93,6 +95,16 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
      * @var Configuration
      */
     protected $applicationConfig;
+
+    /**
+     * @var UXTextField
+     */
+    protected $uiUuidInput;
+
+    /**
+     * @var string app.uuid from application.conf
+     */
+    protected $appUuid;
 
     /**
      * @return int
@@ -143,6 +155,32 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->spriteManager = new IdeSpriteManager($this->project);
     }
 
+    public function makeApplicationConf()
+    {
+        $this->project->createFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppUuid()
+    {
+        return $this->appUuid;
+    }
+
+    /**
+     * @param string $appUuid
+     */
+    public function setAppUuid($appUuid, $trigger = true)
+    {
+        $this->appUuid = $appUuid;
+        $this->makeApplicationConf();
+
+        if ($trigger) {
+            $this->project->trigger('updateSettings');
+        }
+    }
+
     public function getMainForm()
     {
         return $this->mainForm;
@@ -150,10 +188,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function setMainForm($form, $trigger = true)
     {
-        Logger::info("Set main form, old = $this->mainForm, new = $form");
+        //Logger::info("Set main form, old = $this->mainForm, new = $form");
         $this->mainForm = $form;
 
-        $this->project->createFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
+        $this->makeApplicationConf();
 
         if ($trigger) {
             $this->project->trigger('updateSettings');
@@ -170,6 +208,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doCreate()
     {
+        $this->setAppUuid(str::uuid());
+
         $appModule = $this->createModule('AppModule');
         FileSystem::open($appModule);
 
@@ -178,7 +218,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $mainForm = $this->createForm($this->mainForm);
         FileSystem::open($mainForm);
-
     }
 
     public function doUpdate()
@@ -197,6 +236,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
             $this->setMainForm($mainForm, false);
             $this->settingsMainFormCombobox->setSelected($mainForm);
+        }
+
+        if ($this->uiUuidInput) {
+            $this->uiUuidInput->text = $this->getAppUuid();
         }
     }
 
@@ -221,10 +264,22 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->settingsMainFormCombobox = $formListEditor;
 
-        $title = new UXLabel('Интерфейс:');
+        $title = new UXLabel('Десктопное приложение:');
         $title->font = $title->font->withBold();
 
-        $wrap = new UXVBox([$title, $ui]);
+        $uiUuidInput = new UXTextField();
+        $uiUuidInput->width = 250;
+        $uiUuidInput->editable = false;
+        $uiUuidInput->tooltipText = 'В коде можно получить через app()->getUuid(), используется для индетификации приложения в системе.';
+
+        $uiUuid = new UXHBox([new UXLabel('ID приложения'), $uiUuidInput]);
+        $uiUuid->spacing = 10;
+        $uiUuid->alignment = 'CENTER_LEFT';
+
+        $this->uiUuidInput = $uiUuidInput;
+        $uiUuidInput->observer('text')->addListener(function ($old, $new) { $this->setAppUuid($new, false); });
+
+        $wrap = new UXVBox([$title, $uiUuid, $ui]);
         $wrap->spacing = 5;
 
         $editor->addSettingsPane($wrap);
@@ -341,6 +396,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $this->mainForm = $this->applicationConfig->get('app.mainForm', 'MainForm');
+        $this->appUuid = $this->applicationConfig->get('app.uuid', str::uuid());
     }
 
     public function doUpdateTree(ProjectTree $tree, $path)
@@ -358,10 +414,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $this->project->register(new BundleProjectBehaviour());
         }
 
-        $gradle = BundleProjectBehaviour::get();
-        $gradle->addBundle(Project::ENV_ALL, JPHPGuiDesktopBundle::class);
-        $gradle->addBundle(Project::ENV_DEV, JPHPDesktopDebugBundle::class);
-        //$gradle->addBundle(Project::ENV_ALL, OrientDbBundle::class);
+        $bundle = BundleProjectBehaviour::get();
+        $bundle->addBundle(Project::ENV_ALL, JPHPGuiDesktopBundle::class, false);
+        $bundle->addBundle(Project::ENV_DEV, JPHPDesktopDebugBundle::class, false);
 
         $this->_recoverDirectories();
 

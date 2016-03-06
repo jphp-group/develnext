@@ -4,17 +4,23 @@ namespace ide\project\behaviours;
 use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
 use ide\editors\ProjectEditor;
+use ide\forms\BundleCheckListForm;
+use ide\Ide;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\Project;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
+use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXHBox;
+use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
 use php\gui\UXButton;
 use php\gui\UXCheckbox;
 use php\gui\UXLabel;
 use php\gui\UXNode;
+use php\lib\arr;
 use php\lib\fs;
+use php\lib\reflect;
 use php\lib\str;
 use php\util\Configuration;
 
@@ -25,6 +31,8 @@ use php\util\Configuration;
 class BundleProjectBehaviour extends AbstractProjectBehaviour
 {
     const CONFIG_BUNDLE_KEY_USE_IMPORTS = 'useImports';
+
+    const GENERATED_DIRECTORY = 'src_generated';
 
     /**
      * @var UXNode
@@ -40,6 +48,11 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
      * @var AbstractBundle[]
      */
     protected $bundles = [];
+
+    /**
+     * @var array
+     */
+    protected $bundlesCannotBeRemoved = [];
 
     /**
      * @var Configuration[]
@@ -64,14 +77,34 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
      */
     public function inject()
     {
+        $this->project->setSrcDirectory('src');
+        $this->project->setSrcGeneratedDirectory(self::GENERATED_DIRECTORY);
+
         $this->project->on('save', [$this, 'doSave']);
+        $this->project->on('open', [$this, 'doLoad']);
         $this->project->on('preCompile', [$this, 'doPreCompile']);
         $this->project->on('makeSettings', [$this, 'doMakeSettings']);
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
+        $this->project->on('create', [$this, 'doCreate']);
+    }
+
+    public function doCreate()
+    {
+        uiLater(function () {
+            $this->showBundleCheckListDialog();
+        });
     }
 
     public function doSave()
     {
+        fs::clean($this->project->getIdeFile('bundles/'), function ($filename) {
+            if (fs::ext($filename) == 'conf') {
+                return true;
+            }
+
+            return false;
+        });
+
         foreach ($this->bundles as $env => $group) {
             /** @var AbstractBundle $bundle */
             foreach ($group as $bundle) {
@@ -82,6 +115,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 $config->set('env', $env);
 
                 $bundle->onSave($this->project, $config);
+                $this->project->saveIdeConfig("bundles/$type.conf");
             }
         }
 
@@ -95,7 +129,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         $files = $this->project->getIdeFile("bundles/")->findFiles();
 
         foreach ($files as $file) {
-            if (fs::ext($file) == '.conf' && fs::isFile($file)) {
+            if (fs::ext($file) == 'conf' && fs::isFile($file)) {
                 $config = $this->project->getIdeConfig("bundles/" . fs::name($file));
 
                 $class = str::replace(fs::nameNoExt($file), '.', '\\');
@@ -107,7 +141,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                         $this->bundleConfigs[get_class($bundle)] = $config;
 
                         $bundle->onLoad($this->project, $config);
-                        $this->addBundle($config->get('env') ?: Project::ENV_ALL, $bundle);
+                        $this->addBundle($config->get('env') ?: Project::ENV_ALL, $class);
                     }
                 }
             }
@@ -155,7 +189,11 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     public function doPreCompile($env, callable $log = null)
     {
-        FileUtils::scan($this->project->getFile('src/'), function ($filename) {
+        $generatedDirectory = $this->project->getSrcFile('', true);
+        fs::clean($generatedDirectory);
+        fs::makeDir($generatedDirectory);
+
+        FileUtils::scan($this->project->getSrcFile(''), function ($filename) {
             if (str::endsWith($filename, '.php.source')) {
                 FileUtils::copyFile($filename, FileUtils::stripExtension($filename)); // rewrite from origin.
             }
@@ -246,16 +284,127 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
+     * @param $env
+     * @param $class
+     * @return bool
+     */
+    public function hasBundle($env, $class)
+    {
+        if ($bundle = $this->bundles[$env][$class]) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return \ide\bundle\AbstractBundle[]
+     */
+    public function getBundles()
+    {
+        return $this->bundles;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPublicBundles()
+    {
+        $result = [];
+
+        foreach (Ide::get()->getInternalList('.dn/bundles') as $bundle) {
+            $result[$bundle] = new $bundle();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string[] $classes
+     */
+    public function setBundles(array $classes)
+    {
+        $classes = arr::combine($classes, $classes);
+
+        $removed = [];
+
+        foreach ($this->bundles as $bundles) {
+            foreach ($bundles as $class => $bundle) {
+                if (!$classes[$class]) {
+                    $removed[] = $class;
+                }
+            }
+        }
+
+        foreach ($removed as $class) {
+            $this->removeBundle($class);
+        }
+
+        foreach ($classes as $class) {
+            $this->addBundle(Project::ENV_ALL, $class);
+        }
+    }
+
+    /**
      * @param string $env
      * @param string $class
+     * @param bool $canRemove
      */
-    public function addBundle($env, $class)
+    public function addBundle($env, $class, $canRemove = true)
     {
         if (!$this->bundles[$env][$class]) {
             unset($this->bundles[Project::ENV_ALL][$class]);
 
-            $this->bundles[$env][$class] = new $class();
+            /** @var AbstractBundle $bundle */
+            $bundle = new $class();
+            $this->bundles[$env][$class] = $bundle;
+
+            $bundle->onAdd($this->project);
         }
+
+        if (!$canRemove) {
+            $this->bundlesCannotBeRemoved[$class] = $class;
+        }
+    }
+
+    /**
+     * @param $class
+     * @param bool $force true to remove that cannot be removed.
+     */
+    public function removeBundle($class, $force = false)
+    {
+        $removed = false;
+
+        if (!$force && $this->bundlesCannotBeRemoved[$class]) {
+            return;
+        }
+
+        foreach ($this->bundles as $env => $bundles) {
+            /** @var AbstractBundle $bundle */
+            if ($bundle = $bundles[$class]) {
+                if (!$removed) {
+                    $bundle->onRemove($this->project);
+                }
+
+                $this->bundles[$env][$class] = null;
+
+                $removed = true;
+            }
+        }
+
+        $newBundles = [];
+
+        foreach ($this->bundles as $env => $bundles) {
+            $newBundles[$env] = [];
+
+            foreach ($bundles as $class => $bundle) {
+                if ($bundle != null) {
+                    $newBundles[$env][$class] = $bundle;
+                }
+            }
+        }
+
+        $this->bundles = $newBundles;
     }
 
     /**
@@ -288,25 +437,40 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         return $this->bundleConfigs[get_class($bundle)];
     }
 
+    public function showBundleCheckListDialog()
+    {
+        $dialog = new BundleCheckListForm($this);
+
+        if ($dialog->showDialog() && $dialog->getResult() !== null) {
+            $classes = arr::keys($dialog->getResult());
+            $this->setBundles($classes);
+
+            $this->doUpdateSettings();
+            $this->doSave();
+        }
+    }
+
     public function doUpdateSettings(ProjectEditor $editor = null)
     {
         if ($this->uiSettings) {
             $this->uiPackages->children->clear();
 
-            foreach ($this->bundles as $env => $group) {
-                /** @var AbstractBundle $bundle */
-                foreach ($group as $bundle) {
-                    $uiItem = new UXButton($bundle->getName() . " [$env]");
+            $bundles = $this->bundles[Project::ENV_ALL];
+
+            /** @var AbstractBundle $bundle */
+            foreach ($bundles as $bundle) {
+                    $uiItem = new UXButton($bundle->getName());
+                    $uiItem->graphic = ico('bundle16');
+                    $uiItem->classes->add('dn-simple-button');
                     $uiItem->tooltipText = $bundle->getDescription();
 
                     $this->uiPackages->add($uiItem);
-                }
             }
 
             $addButton = new UXButton();
-            $addButton->graphic = ico('plus16');
+            $addButton->graphic = ico('edit16');
             $addButton->on('action', function () {
-                alert('В разработке ...');
+                $this->showBundleCheckListDialog();
             });
             $this->uiPackages->add($addButton);
 
@@ -319,8 +483,8 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         $title = new UXLabel('Пакеты:');
         $title->font = $title->font->withBold();
 
-        $packages = new UXHBox();
-        $packages->spacing = 5;
+        $packages = new UXFlowPane();
+        $packages->hgap = $packages->vgap = 5;
         $this->uiPackages = $packages;
 
         $this->uiUseImportCheckbox = $useImportCheckbox = new UXCheckbox("Добавлять use импорты классов");

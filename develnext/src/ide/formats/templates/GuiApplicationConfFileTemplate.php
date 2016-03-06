@@ -43,6 +43,7 @@ class GuiApplicationConfFileTemplate extends AbstractFileTemplate
         return [
             'PROJECT_NAME' => $this->project->getName(),
             'MAIN_FORM'    => $this->behaviour->getMainForm(),
+            'APP_UUID'         => $this->behaviour->getAppUuid(),
         ];
     }
 }

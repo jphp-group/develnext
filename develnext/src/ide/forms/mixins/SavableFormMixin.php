@@ -32,10 +32,20 @@ trait SavableFormMixin
         if ($config->has('width') && $config->has('height')) {
             $this->width = $config->get("width", $this->width);
             $this->height = $config->get("height", $this->height);
-           // $this->layout->size = $this->size;
+
+            if ($this->width < 10) {
+                $this->width = 500;
+            }
+
+            if ($this->height < 10) {
+                $this->height = 400;
+            }
         }
 
-        $this->maximized = $config->get("maximized", $this->maximized);
+        uiLater(function () use ($config) {
+            /** @var $this AbstractForm */
+            $this->maximized = $config->get("maximized", $this->maximized);
+        });
 
         Logger::debug("Init window $class, size = [$this->width, $this->height], position = [$this->x, $this->y]");
 
