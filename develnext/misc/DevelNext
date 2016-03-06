@@ -14,12 +14,9 @@ JAVA_BIN="$JAVA_HOME/bin/java"
 JVM_OPTS=" -Xms256M -Xmx768M -XX:ReservedCodeCacheSize=150m -XX:+UseConcMarkSweepGC"
 JVM_OPTS="$JVM_OPTS -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true"
 JVM_OPTS="$JVM_OPTS -Dfile.encoding=UTF-8 -Ddevelnext.launcher=root"
-JVM_OPTS="$JVM_OPTS -Ddevelnext.path=$APP_HOME"
-
-echo "Jvm Opts = $JVM_OPTS"
 echo "-----------------------" 
 
 
 cd "$APP_HOME"
 
-exec "$JAVA_BIN" $JVM_OPTS -cp "./lib/*" php.runtime.launcher.Launcher $*
+exec "$JAVA_BIN" $JVM_OPTS "-Ddevelnext.path=$APP_HOME" -cp "./lib/*" php.runtime.launcher.Launcher $*
