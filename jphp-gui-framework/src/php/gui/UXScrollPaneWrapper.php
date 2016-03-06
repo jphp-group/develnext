@@ -1,5 +1,5 @@
 <?php
-namespace php\game;
+namespace php\gui;
 
 use php\gui\layout\UXScrollPane;
 use php\gui\UXData;
