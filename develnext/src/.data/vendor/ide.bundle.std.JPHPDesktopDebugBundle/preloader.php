@@ -32,14 +32,14 @@ class DebugClassLoader extends ClassLoader
         $filename = "res://$name.php";
 
         if (Stream::exists($filename)) {
+            $this->tryLoadSourceMap($filename);
+
             $t = Time::millis();
             require $filename;
             $t = Time::millis() - $t;
             $this->allTime += $t;
 
             //echo "require '$filename', $t ms ($this->allTime ms)\n";
-
-            $this->tryLoadSourceMap($filename);
         }
     }
 

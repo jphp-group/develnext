@@ -420,7 +420,7 @@ class ObjectListEditor
             if ($gui) {
                 $appModule = $gui->getModuleEditor('AppModule');
 
-                if ($editor && FileUtils::equalNames($appModule->getFile(), $editor->getFile())) {
+                if ($editor && ($appModule && $editor && FileUtils::equalNames($appModule->getFile(), $editor->getFile()))) {
                     // ...
                 } else {
                     if ($appModule) {

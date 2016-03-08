@@ -20,11 +20,11 @@
             <HBox alignment="CENTER_LEFT" spacing="5.0">
                <children>
                   <Label alignment="CENTER_RIGHT" prefWidth="90.0" text="Код:" />
-                  <TextField id="codeField" prefHeight="25.0" prefWidth="282.0" promptText="код статьи" HBox.hgrow="ALWAYS" />
+                  <TextField id="codeField" prefHeight="25.0" prefWidth="294.0" promptText="код статьи" HBox.hgrow="ALWAYS" />
                   <Label text="Вес:" />
                   <TextField id="weightField" prefHeight="25.0" prefWidth="60.0" />
-                  <Label text="Категория:" />
-                  <ComboBox id="categorySelect" prefHeight="25.0" prefWidth="203.0" HBox.hgrow="ALWAYS" />
+                  <Label text="Совместимость:" />
+                  <ComboBox id="capabilitySelect" editable="true" prefHeight="25.0" prefWidth="203.0" promptText="мин. версия DN" visibleRowCount="30" HBox.hgrow="ALWAYS" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" />

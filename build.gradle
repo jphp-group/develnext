@@ -147,6 +147,10 @@ project(':develnext') {
         compile project(':develnext-doc')
         compile project(':develnext-stdlib')
 
+        if (new File("./develnext-control/build.gradle").exists()) {
+            compile project(':develnext-control')
+        }
+
         // bundles.
         //compile project(':develnext-bundles/dn-orientdb-bundle')
         compile project(':develnext-bundles/dn-jsoup-bundle')

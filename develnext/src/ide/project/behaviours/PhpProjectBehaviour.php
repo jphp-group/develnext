@@ -96,10 +96,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     public function doPreCompile()
     {
         FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) {
-            if (str::endsWith($filename, '.php.sourcemap')) {
-                fs::delete($filename);
-            }
-
             if (fs::ext($filename) == 'phb') {
                 fs::delete($filename);
             }

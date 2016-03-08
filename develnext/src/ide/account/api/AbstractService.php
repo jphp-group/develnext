@@ -344,11 +344,7 @@ abstract class AbstractService
 
     protected function makeUrl($url)
     {
-        if (Ide::get()->isDevelopment()) {
-            return ("http://localhost:8080/a/" . $url);
-        } else {
-            return (Ide::service()->getEndpoint() .  "a/" . $url);
-        }
+        return (Ide::service()->getEndpoint() .  "a/" . $url);
     }
 
     protected function buildUrlConnection($url)

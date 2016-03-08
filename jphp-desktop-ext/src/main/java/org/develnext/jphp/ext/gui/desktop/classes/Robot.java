@@ -6,6 +6,7 @@ import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Setter;
 import php.runtime.annotation.Reflection.Signature;
+import php.runtime.common.StringUtils;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseObject;
 import php.runtime.lang.BaseWrapper;
@@ -16,6 +17,10 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static java.awt.event.KeyEvent.*;
 
@@ -137,5 +142,58 @@ public class Robot extends BaseWrapper<java.awt.Robot> {
         getWrappedObject().keyPress(KeyEvent.VK_V);
         getWrappedObject().keyRelease(KeyEvent.VK_V);
         getWrappedObject().keyRelease(KeyEvent.VK_CONTROL);
+    }
+
+    protected List<Integer> keyCodes(String keys) {
+        String[] strings = StringUtils.split(keys, '+');
+
+        List<Integer> codes = new ArrayList<>();
+
+        for (String string : strings) {
+            string = string.trim().replace(' ', '_').replace('-', '_').toUpperCase();
+
+            try {
+                Field field = KeyEvent.class.getField("VK_" + string);
+                int code = field.getInt(null);
+                codes.add(code);
+            } catch (NoSuchFieldException|IllegalAccessException e) {
+                throw new IllegalArgumentException("Unknown key - " + string);
+            }
+        }
+
+        if (codes.isEmpty()) {
+            throw new IllegalArgumentException("Key combination cannot be empty");
+        }
+
+        return codes;
+    }
+
+    @Signature
+    public void keyDown(String keys) {
+        for (Integer code : keyCodes(keys)) {
+            getWrappedObject().keyPress(code);
+        }
+    }
+
+    @Signature
+    public void keyUp(String keys) {
+        for (Integer code : keyCodes(keys)) {
+            getWrappedObject().keyRelease(code);
+        }
+    }
+
+    @Signature
+    public void keyPress(String keys) {
+        List<Integer> codes = keyCodes(keys);
+
+        for (Integer code : codes) {
+            getWrappedObject().keyPress(code);
+        }
+
+        Collections.reverse(codes);
+
+        for (Integer code : codes) {
+            getWrappedObject().keyRelease(code);
+        }
     }
 }

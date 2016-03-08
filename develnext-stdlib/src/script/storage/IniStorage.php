@@ -2,6 +2,7 @@
 namespace script\storage;
 use php\io\IOException;
 use php\io\Stream;
+use php\lib\arr;
 use php\lib\str;
 use php\util\Scanner;
 
@@ -51,16 +52,16 @@ class IniStorage extends AbstractStorage
 
     /**
      * @param $key
-     * @param string $group
+     * @param string $section
      * @return mixed
      */
-    public function get($key, $group = '')
+    public function get($key, $section = '')
     {
         if ($this->disabled) {
             return null;
         }
 
-        $value = $this->data["$group"][$key];
+        $value = $this->data["$section"][$key];
 
         if (str::contains($value, '|')) {
             $value = str::split($value, '|');
@@ -70,26 +71,42 @@ class IniStorage extends AbstractStorage
     }
 
     /**
-     * @param string $group
+     * @param string $name
      * @return array
      */
-    public function group($group = '')
+    public function section($name = '')
     {
-        return (array) $this->data["$group"];
+        return (array) $this->data["$name"];
+    }
+
+    /**
+     * @return array
+     */
+    public function sections()
+    {
+        $keys = [];
+
+        foreach (arr::keys($this->data) as $key) {
+            if ($key) {
+                $keys[] = $key;
+            }
+        }
+
+        return $keys;
     }
 
     /**
      * @param array $values
-     * @param string $group
+     * @param string $section
      */
-    public function put(array $values, $group = '')
+    public function put(array $values, $section = '')
     {
         if ($this->disabled) {
             return;
         }
 
         foreach ($values as $key => $value) {
-            $this->set($key, $value, $group, false);
+            $this->set($key, $value, $section, false);
         }
 
         if ($this->autoSave) {
@@ -100,16 +117,16 @@ class IniStorage extends AbstractStorage
     /**
      * @param $key
      * @param $value
-     * @param string $group
+     * @param string $section
      * @param bool $checkAutoSave
      */
-    public function set($key, $value, $group = '', $checkAutoSave = true)
+    public function set($key, $value, $section = '', $checkAutoSave = true)
     {
         if ($this->disabled) {
             return;
         }
 
-        $this->data["$group"][$key] = is_array($value) ? str::join($value, '|') : $value;
+        $this->data["$section"][$key] = is_array($value) ? str::join($value, '|') : $value;
 
         if ($checkAutoSave && $this->autoSave) {
             $this->save();
@@ -118,15 +135,27 @@ class IniStorage extends AbstractStorage
 
     /**
      * @param string $key
-     * @param string $group
+     * @param string $section
      */
-    public function remove($key, $group = '')
+    public function remove($key, $section = '')
     {
         if ($this->disabled) {
             return;
         }
 
-        unset($this->data["$group"][$key]);
+        unset($this->data["$section"][$key]);
+
+        if ($this->autoSave) {
+            $this->save();
+        }
+    }
+
+    /**
+     * @param string $section
+     */
+    public function removeSection($section)
+    {
+        unset($this->data["$section"]);
 
         if ($this->autoSave) {
             $this->save();
@@ -145,7 +174,7 @@ class IniStorage extends AbstractStorage
                 $scanner = new Scanner($stream, 'UTF-8');
 
                 $this->data = [];
-                $group = '';
+                $section = '';
 
                 while ($scanner->hasNextLine()) {
                     $line = $scanner->nextLine();
@@ -158,8 +187,8 @@ class IniStorage extends AbstractStorage
                     if (str::startsWith($tline, '[') && str::endsWith($tline, ']')) {
                         $key = null;
 
-                        $group = str::sub($tline, 1, str::length($tline) - 2);
-                        $this->data["$group"] = [];
+                        $section = str::sub($tline, 1, str::length($tline) - 1);
+                        $this->data["$section"] = [];
                         continue;
                     }
 
@@ -177,7 +206,7 @@ class IniStorage extends AbstractStorage
                         $value = str::replace($value, '\\n', "\n");
                     }
 
-                    $this->data["$group"][$key] = $this->trimValues ? str::trim($value) : $value;
+                    $this->data["$section"][$key] = $this->trimValues ? str::trim($value) : $value;
                  };
 
                 return true;
@@ -202,13 +231,13 @@ class IniStorage extends AbstractStorage
             $stream = Stream::of($this->_path, 'w+');
 
             try {
-                foreach ($this->data as $group => $values) {
+                foreach ($this->data as $section => $values) {
                     if (!$values) {
                         continue;
                     }
 
-                    if ($group) {
-                        $stream->write("[$group]$br");
+                    if ($section) {
+                        $stream->write("[$section]$br");
                     }
 
                     foreach ($values as $key => $value) {

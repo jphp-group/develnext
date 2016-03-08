@@ -202,7 +202,7 @@ class Ide extends Application
                 });
 
                 if ($this->isDevelopment()) {
-                    //restore_exception_handler();
+                    restore_exception_handler();
                 }
 
                 if ($this->handleArgs($GLOBALS['argv'])) {

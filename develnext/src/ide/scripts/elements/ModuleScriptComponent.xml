@@ -1,10 +1,12 @@
 <element>
     <init>
+        <property code="singleton" value="1" />
         <property code="applyToApplication" value="0" />
         <property code="version" value="1.0" />
     </init>
 
     <properties group="general" title="Модуль">
+        <property code="singleton" name="Одиночка (Singleton)" editor="boolean" tooltip="Singleton модуль, для каждой формы будет использован один и тот же экземпляр" />
         <property code="disabled" name="Отключить" editor="boolean" tooltip="При отключении модуль не будет выполнять все свои скрипты" />
     </properties>
 

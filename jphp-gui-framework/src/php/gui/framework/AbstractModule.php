@@ -31,6 +31,11 @@ abstract class AbstractModule extends AbstractScript
     public $applyToApplication = false;
 
     /**
+     * @var bool
+     */
+    public $singleton = false;
+
+    /**
      * @var string
      */
     public $author = '';
@@ -79,8 +84,6 @@ abstract class AbstractModule extends AbstractScript
 
         $this->behaviourManager = new ModuleBehaviourManager($this);
         BehaviourLoader::load("res://$name.behaviour", $this->behaviourManager);
-
-        $this->trigger('load');
     }
 
     public function behaviour($target, $class)

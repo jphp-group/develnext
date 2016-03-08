@@ -194,6 +194,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         fs::makeDir($generatedDirectory);
 
         FileUtils::scan($this->project->getSrcFile(''), function ($filename) {
+            if (str::endsWith($filename, '.php.sourcemap')) {
+                fs::delete($filename);
+            }
+
             if (str::endsWith($filename, '.php.source')) {
                 FileUtils::copyFile($filename, FileUtils::stripExtension($filename)); // rewrite from origin.
             }

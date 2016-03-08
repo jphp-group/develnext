@@ -4,6 +4,7 @@ namespace ide\autocomplete\php;
 use ide\autocomplete\AutoCompleteRegion;
 use ide\autocomplete\AutoCompleteTypeRule;
 use ide\Logger;
+use php\gui\framework\Application;
 use php\lib\arr;
 use php\lib\Items;
 use php\lib\num;
@@ -27,6 +28,12 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
     protected function tryGetDynamicAccess(SourceToken $last, array &$tokens)
     {
+        $string = '';
+
+        foreach ($tokens as $token) {
+            $string .= $token->word;
+        }
+
         $dynamic = $last->type == 'DynamicAccessExpr';
 
         if (!$dynamic) {
@@ -71,6 +78,10 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                             }
                         }
                     }
+                }
+
+                if (str::startsWith($string, 'app()')) {
+                    return "~dynamic " . Application::class;
                 }
 
                 return "~dynamic";

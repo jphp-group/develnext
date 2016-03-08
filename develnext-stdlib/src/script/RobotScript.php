@@ -95,6 +95,21 @@ class RobotScript extends AbstractScript implements PositionableBehaviour, SetTe
         if ($this->robot) $this->robot->type($text);
     }
 
+    public function keyDown($keyCombination)
+    {
+        if ($this->robot) $this->robot->keyDown($keyCombination);
+    }
+
+    public function keyUp($keyCombination)
+    {
+        if ($this->robot) $this->robot->keyUp($keyCombination);
+    }
+
+    public function keyPress($keyCombination)
+    {
+        if ($this->robot) $this->robot->keyPress($keyCombination);
+    }
+
     function setTextBehaviour($text)
     {
         $this->type($text);

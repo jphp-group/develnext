@@ -59,4 +59,25 @@ class Robot
     public function type($chars)
     {
     }
+
+    /**
+     * @param string $keyCombination example Alt + Tab, Alt + Ctrl + Space, Ctrl + S
+     */
+    public function keyDown($keyCombination)
+    {
+    }
+
+    /**
+     * @param string $keyCombination example Alt + Tab, Alt + Ctrl + Space, Ctrl + S
+     */
+    public function keyUp($keyCombination)
+    {
+    }
+
+    /**
+     * @param string $keyCombination example Alt + Tab, Alt + Ctrl + Space, Ctrl + S
+     */
+    public function keyPress($keyCombination)
+    {
+    }
 }

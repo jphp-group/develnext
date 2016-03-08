@@ -428,7 +428,12 @@ abstract class AbstractForm extends UXForm
             }
 
             $module = new $type();
-            $this->_modules[$module->id] = $module;
+
+            if ($module->singleton) {
+                $this->_modules[$module->id] = app()->module($module->id);
+            } else {
+                $this->_modules[$module->id] = $module;
+            }
         }
 
         foreach ($this->_modules as $module) {
@@ -709,5 +714,20 @@ abstract class AbstractForm extends UXForm
         }
 
         return parent::__isset($name);
+    }
+
+    public function __call($name, array $args)
+    {
+        foreach ($this->_modules as $module) {
+            if ($module->disabled) {
+                continue;
+            }
+
+            if (method_exists($module, $name)) {
+                return $module->{$name}(...$args);
+            }
+        }
+
+        throw new \EngineException("Unable to call " . get_class($this) . "::" . $name . "() method");
     }
 }

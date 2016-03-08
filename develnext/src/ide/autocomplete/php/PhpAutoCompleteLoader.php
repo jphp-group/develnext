@@ -49,6 +49,10 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
                 if (str::startsWith($name, '~static ')) {
                     return new StaticAccessAutoCompleteType(str::sub($name, 8));
                 }
+
+                if (str::startsWith($name, '~dynamic ')) {
+                    return new DynamicAccessAutoCompleteType(str::sub($name, 9));
+                }
         }
 
         return null;

@@ -12,6 +12,8 @@ use ide\autocomplete\VariableAutoCompleteItem;
 use ide\editors\FormEditor;
 use ide\editors\ScriptModuleEditor;
 use ide\systems\FileSystem;
+use php\gui\framework\AbstractForm;
+use php\lib\str;
 
 class ThisAutoCompleteType extends AutoCompleteType
 {
@@ -118,7 +120,21 @@ class ThisAutoCompleteType extends AutoCompleteType
 
         if ($class && $class['methods']) {
             foreach ($class['methods'] as $one) {
-                $result[] = new MethodAutoCompleteItem($one['name'], 'Метод класса ' . $class['name'], $one['name'] . '(');
+                $result[$one['name']] = new MethodAutoCompleteItem($one['name'], 'Метод класса ' . $class['name'], $one['name'] . '(');
+            }
+
+            $reflection = new \ReflectionClass(AbstractForm::class);
+
+            foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                if ($method->isStatic() || $method->isAbstract()) {
+                    continue;
+                }
+
+                if (str::startsWith($method->getName(), '__')) {
+                    continue;
+                }
+
+                $result[$method->getName()] = PhpCompleteUtils::methodAutoComplete($method);
             }
         }
 

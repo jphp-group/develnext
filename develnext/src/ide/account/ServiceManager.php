@@ -16,6 +16,7 @@ use ide\misc\EventHandlerBehaviour;
 use ide\ui\Notifications;
 use ide\utils\Json;
 use php\lang\IllegalArgumentException;
+use php\lang\System;
 use script\TimerScript;
 
 /**
@@ -166,8 +167,8 @@ class ServiceManager
      */
     public function getEndpoint()
     {
-        if (Ide::get()->isDevelopment()) {
-            return "http://localhost:8080/";
+        if ($sysEndpoint = System::getProperty('develnext.endpoint')) {
+            return $sysEndpoint;
         }
 
         return $this->endpoint;
@@ -208,7 +209,7 @@ class ServiceManager
                 return;
             }
 
-            Logger::info("Update status ...");
+            Logger::info("Update status, endpoint = {$this->getEndpoint()} ...");
 
             $this->ideService->statusAsync(function (ServiceResponse $response) {
                 Logger::info("Update status response = {message: {$response->message()}, data: " . Json::encode($response->data()) . "}");
