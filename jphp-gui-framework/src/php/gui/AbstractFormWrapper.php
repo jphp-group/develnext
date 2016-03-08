@@ -1,6 +1,7 @@
 <?php
 namespace php\gui;
 
+use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
 
 class AbstractFormWrapper
@@ -35,6 +36,14 @@ class AbstractFormWrapper
      */
     public function bind($event, callable $handler, $group)
     {
+        switch ($event) {
+            case 'construct':
+                uiLater(function () use ($handler) {
+                    $handler(UXEvent::makeMock($this->form));
+                });
+                return;
+        }
+
         $this->form->on($event, $handler, $group);
     }
 }

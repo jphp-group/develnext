@@ -6,6 +6,7 @@
         <property code="followRedirects" value="1" />
         <property code="userAgent" value="Simple Bot v1.0" />
         <property code="autoParse" value="1" />
+        <property code="autoCookies" value="0" />
     </init>
 
     <properties group="general">
@@ -29,6 +30,7 @@
         <property code="ignoreHttpErrors" name="Игнор. http ошибки" editor="boolean" tooltip="Обрабатывать ли данные даже при http ответах, говорящих об ошибках" />
         <property code="ignoreContentTypes" name="Игнор. тип контента" editor="boolean" tooltip="Обрабатывать ли данные даже при http ответах, говорящих об ошибках" />
         <property code="autoParse" name="Автопарсинг" editor="boolean" tooltip="Автоматически запускать парсинг при смене URL" />
+        <property code="autoCookies" name="Сохранять куки" editor="boolean" tooltip="Сохранять переданные сайтом cookies для последующих запросов" />
     </properties>
 
     <properties group="data" title="Данные запроса" sort="1500">

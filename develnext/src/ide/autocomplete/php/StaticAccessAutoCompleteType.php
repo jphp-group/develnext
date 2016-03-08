@@ -90,31 +90,11 @@ class StaticAccessAutoCompleteType extends AutoCompleteType
 
         if ($reflection = $this->reflection) {
             foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-                $params = [];
-
                 if (!$method->isStatic()) {
                     continue;
                 }
 
-                foreach ($method->getParameters() as $one) {
-                    $params[] = "\${$one->getName()}";
-                }
-
-                $insert = $method->getName() . '(';
-
-                if (!$params) {
-                    $insert .= ')';
-                }
-
-                if ($params) {
-                    $description = '(' . str::join($params, ', ') . ')';
-                } else {
-                    $description = '';
-                }
-
-                $result[$method->getName()] = MethodAutoCompleteItem::func(
-                    $method->getName(), $description, $insert
-                );
+                $result[$method->getName()] = PhpCompleteUtils::methodAutoComplete($method);
             }
         }
 

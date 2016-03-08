@@ -27,6 +27,7 @@ use php\lib\number;
 use php\lib\Str;
 use php\time\Time;
 use script\TimerScript;
+use timer\AccurateTimer;
 
 class ExecuteProjectCommand extends AbstractCommand
 {
@@ -145,13 +146,15 @@ class ExecuteProjectCommand extends AbstractCommand
         } else {
             $time = 0;
 
-            $timer = new TimerScript(100, true, function (ScriptEvent $e) use ($appPidFile, $proc, &$time) {
+            $timer = new AccurateTimer(100, function (ScriptEvent $e) use ($appPidFile, $proc, &$time) {
                 $time += $e->sender->interval;
 
                 if ($appPidFile->exists() || $time > 1000 * 25) {
                     $proc();
-                    $e->sender->free();
+                    return true;
                 }
+
+                return false;
             });
             $timer->start();
         }

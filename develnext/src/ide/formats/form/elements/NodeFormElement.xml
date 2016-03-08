@@ -70,6 +70,6 @@
 
         <eventType code="collision" name="Столкновение" kind="CollisionParamEvent" idParameter="1" icon="icons/collision16.gif" />
 
-        <eventType code="load" name="Загрузка компонента" kind="ActionEvent" icon="icons/loadingEvent16.png" />
+        <eventType code="construct" name="Загрузка компонента" kind="ActionEvent" icon="icons/loadingEvent16.png" />
     </eventTypes>
 </element>

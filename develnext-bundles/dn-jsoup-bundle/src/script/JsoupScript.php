@@ -11,6 +11,7 @@ use php\jsoup\Document;
 use php\jsoup\Jsoup;
 use php\lang\Thread;
 use php\lib\str;
+use php\util\Flow;
 use php\util\Scanner;
 
 class JsoupScript extends AbstractScript
@@ -46,19 +47,19 @@ class JsoupScript extends AbstractScript
     public $referrer = null;
 
     /**
-     * @var string
+     * @var array
      */
-    public $data = '';
+    public $data = [];
 
     /**
-     * @var string
+     * @var array
      */
-    public $cookies = '';
+    public $cookies = [];
 
     /**
-     * @var string
+     * @var array
      */
-    public $headers = '';
+    public $headers = [];
 
     /**
      * @var int
@@ -81,6 +82,11 @@ class JsoupScript extends AbstractScript
     public $autoParse;
 
     /**
+     * @var bool
+     */
+    public $autoCookies;
+
+    /**
      * @var null|Document
      */
     protected $_document = null;
@@ -100,6 +106,18 @@ class JsoupScript extends AbstractScript
     {
         if ($this->autoParse) {
             $this->parseAsync();
+        }
+
+        if (!is_array($this->cookies)) {
+            $this->cookies = self::textToArray($this->cookies);
+        }
+
+        if (!is_array($this->headers)) {
+            $this->headers = self::textToArray($this->headers);
+        }
+
+        if (!is_array($this->data)) {
+            $this->data = self::textToArray($this->data);
         }
 
         $this->_loaded = true;
@@ -133,15 +151,17 @@ class JsoupScript extends AbstractScript
         $connection->ignoreContentType($this->ignoreContentType);
 
         if ($this->cookies) {
-            $connection->cookies(self::textToArray($this->cookies));
+            $connection->cookies((array)$this->cookies);
         }
 
         if ($this->headers) {
-            $connection->headers(self::textToArray($this->headers));
+            foreach ((array)$this->headers as $key => $value) {
+                $connection->header($key, $value);
+            }
         }
 
         if ($this->data) {
-            $connection->data(self::textToArray($this->headers));
+            $connection->data((array) $this->data);
         }
     }
 
@@ -163,7 +183,14 @@ class JsoupScript extends AbstractScript
             $connection = Jsoup::connect($path);
             $this->prepareConnection($connection);
 
-            $this->_response = $connection->method($this->method)->execute();
+            $this->_response = $response = $connection->method($this->method)->execute();
+
+            $cookies = $response->cookies();
+
+            if ($this->autoCookies) {
+                $this->cookies = Flow::of((array)$this->cookies)->append($cookies)->withKeys()->toArray();
+            }
+
             $this->_document = $this->_response->parse();
 
             uiLater(function () use ($result, $path) {
@@ -209,6 +236,16 @@ class JsoupScript extends AbstractScript
     public function getReady()
     {
         return $this->isReady();
+    }
+
+    public function getResponseCookies()
+    {
+        return $this->_response->cookies();
+    }
+
+    public function getResponseHeaders()
+    {
+        return $this->_response->headers();
     }
 
     /**

@@ -56,6 +56,24 @@ class AccurateTimer
         if (!self::$animTimer) {
             self::$animTimer = new UXAnimationTimer([AccurateTimer::class, '__tick']);
             self::$animTimer->start();
+
+           /* uiLater(function () {
+                $timer = new AccurateTimer(5000, function () {
+                    $count = sizeof(self::$timers);
+
+                    $timers = self::$timers;
+
+                    $freeCount = $stopCount = 0;
+
+                    foreach ($timers as $timer) {
+                        if ($timer->free) $freeCount++;
+                        else if (!$timer->active) $stopCount++;
+                    }
+
+                    echo "AccurateTimer all count = $count, stopped = $stopCount, free = $freeCount\n";
+                });
+                $timer->start();
+            }); */
         }
     }
 
@@ -68,7 +86,7 @@ class AccurateTimer
         $accurateTimers = self::$timers;
 
         foreach ($accurateTimers as $key => $timer) {
-            if ($timer->free) {
+            if (!$timer->active) {
                 $deleted[] = $key;
                 continue;
             }
@@ -95,20 +113,14 @@ class AccurateTimer
         $this->interval = $interval;
         $this->handler = $callback;
         $this->id = str::uuid();
-
-        self::$timers[$this->id] = $this;
     }
 
     public function trigger()
     {
-        if (!$this->active) {
-            return;
-        }
-
         $handler = $this->handler;
 
         if ($handler($this) === true) {
-            $this->free();
+            $this->stop();
         }
     }
 
@@ -119,15 +131,20 @@ class AccurateTimer
 
     public function start()
     {
+        self::$timers[$this->id] = $this;
+
         $this->_lastTick = Time::millis();
         $this->active = true;
+    }
+
+    public function reset()
+    {
+        $this->_lastTick = Time::millis();
     }
 
     public function free()
     {
         $this->stop();
-
-        $this->free = true;
     }
 
     /**

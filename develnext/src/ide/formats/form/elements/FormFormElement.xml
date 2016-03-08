@@ -50,5 +50,7 @@
         <eventType code="keyPress" name="Клавиатура" kind="KeyEvent" icon="icons/keyboard16.png" />
 
         <eventType code="scroll" name="Прокрутка" kind="ScrollParamEvent" icon="icons/scroll16.png" />
+
+        <eventType code="construct" name="Загрузка формы" kind="ActionEvent"  icon="icons/loadingEvent16.png" />
     </eventTypes>
 </element>

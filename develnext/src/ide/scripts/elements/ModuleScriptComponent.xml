@@ -16,5 +16,6 @@
 
     <eventTypes>
         <eventType code="action" name="Подключение" kind="ObjectEvent" icon="icons/ok16.png" />
+        <eventType code="construct" name="Загрузка модуля" kind="ObjectEvent" icon="icons/loadingEvent16.png" />
     </eventTypes>
 </element>

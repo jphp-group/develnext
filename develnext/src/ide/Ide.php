@@ -185,6 +185,16 @@ class Ide extends Application
                             }
                         });
 
+                        if (Ide::service()->canPrivate() && Ide::accountManager()->isAuthorized()) {
+                            try {
+                                Ide::service()->ide()->sendErrorAsync($e, function () {
+
+                                });
+                            } catch (\Exception $e) {
+                                echo "Unable to send error, exception = {$e->getMessage()}\n";
+                            }
+                        }
+
                         $notify->on('hide', function () use (&$showError) {
                             $showError = false;
                         });
@@ -192,7 +202,7 @@ class Ide extends Application
                 });
 
                 if ($this->isDevelopment()) {
-                    restore_exception_handler();
+                    //restore_exception_handler();
                 }
 
                 if ($this->handleArgs($GLOBALS['argv'])) {
@@ -928,12 +938,16 @@ class Ide extends Application
         }
 
         /** @var AccurateTimer $inactiveTimer */
-        $inactiveTimer = null;
+        $inactiveTimer = new AccurateTimer(5 * 60 * 1000, function () {
+            $this->idle = true;
+            Logger::info("IDE is sleeping, idle mode ...");
+            $this->trigger('idleOn');
+        });
+        $inactiveTimer->start();
 
         $this->getMainForm()->addEventFilter('mouseMove', function () use (&$inactiveTimer) {
             if ($inactiveTimer) {
-                $inactiveTimer->stop();
-                $inactiveTimer = null;
+                $inactiveTimer->reset();
             }
 
             if ($this->idle) {
@@ -942,15 +956,6 @@ class Ide extends Application
             }
 
             $this->idle = false;
-
-            // 5 min.
-            $inactiveTimer = AccurateTimer::executeAfter(5 * 60 * 1000, function () {
-                if (!$this->idle) {
-                    $this->idle = true;
-                    Logger::info("IDE is sleeping, idle mode ...");
-                    $this->trigger('idleOn');
-                }
-            });
         });
 
         $ideConfig = $this->getUserConfig('ide');

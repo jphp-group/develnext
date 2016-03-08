@@ -8,6 +8,7 @@ use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
 use php\lang\IllegalArgumentException;
+use php\lang\IllegalStateException;
 
 class BuildProjectCommand extends AbstractCommand
 {
@@ -37,6 +38,8 @@ class BuildProjectCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
+        throw new IllegalStateException("Unable to build project");
+
         /** @var ExecuteProjectCommand $command */
         $command = Ide::get()->getRegisteredCommand(ExecuteProjectCommand::class);
 

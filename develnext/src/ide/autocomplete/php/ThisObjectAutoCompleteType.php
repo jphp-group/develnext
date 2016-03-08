@@ -169,9 +169,7 @@ class ThisObjectAutoCompleteType extends AutoCompleteType
                         }
                     }
 
-                    $insert = $name . "(";
-
-                    $result[$name] = new MethodAutoCompleteItem($name, '', $insert);
+                    $result[$name] = PhpCompleteUtils::methodAutoComplete($method);
                 }
             }
         }

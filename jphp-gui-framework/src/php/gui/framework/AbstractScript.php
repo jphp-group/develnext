@@ -104,6 +104,10 @@ abstract class AbstractScript
 
         if (!$this->disabled) {
             $this->applyImpl($target);
+
+            uiLater(function () {
+                $this->trigger('construct');
+            });
         }
     }
 

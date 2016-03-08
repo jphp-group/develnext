@@ -21,6 +21,7 @@ use php\gui\UXRichTextArea;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\Process;
+use php\lang\Thread;
 use php\lang\ThreadPool;
 use php\lib\str;
 use php\util\Regex;
@@ -47,11 +48,6 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
     protected $process;
 
     /**
-     * @var ThreadPool
-     */
-    protected $threadPool;
-
-    /**
      * @var bool
      */
     protected $processDone = false;
@@ -67,7 +63,6 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
     protected function init()
     {
-        $this->threadPool = ThreadPool::createFixed(3);
         $this->icon->image = ico('wait32')->image;
 
         $consoleArea = new UXRichTextArea();
@@ -137,9 +132,11 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
     public function watchProcess(Process $process, callable $onExit = null)
     {
-        $this->threadPool->execute(function () use ($process, $onExit) {
+        $thread = new Thread(function () use ($process, $onExit) {
             $this->doProgress($process, $onExit);
         });
+        $thread->setName('thread-build-process-' . str::random());
+        $thread->start();
     }
 
     /**
@@ -191,7 +188,6 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
             }
         }
 
-        $this->threadPool->shutdown();
         $this->hide();
     }
 

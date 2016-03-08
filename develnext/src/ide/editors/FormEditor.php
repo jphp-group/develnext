@@ -1325,7 +1325,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->designer = new UXDesigner($this->layout);
         $this->designer->onAreaMouseUp(function ($e) { $this->_onAreaMouseUp($e); } );
-        $this->designer->onNodeClick([$this, '_onNodeClick']);
+        $this->designer->onNodeClick(function ($e) {
+            $this->_onNodeClick($e);
+        });
         $this->designer->onNodePick(function () {
             $this->_onNodePick();
         });
@@ -1516,27 +1518,31 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if (!$isClone) {
             $data = DataUtils::get($node);
 
-            foreach ($element->getInitProperties() as $key => $property) {
-                if ($property['virtual']) {
-                    $data->set($key, $property['value']);
-                } else if ($key !== 'width' && $key !== 'height') {
-                    $node->{$key} = $property['value'];
-                }
-            }
-
-            $initialBehaviours = $element->getInitialBehaviours();
-
-            if ($initialBehaviours) {
-                foreach ($initialBehaviours as $spec) {
-                    $behaviour = $spec->createBehaviour();
-                    $this->behaviourManager->apply($node->id, $behaviour);
+            if ($element) {
+                foreach ($element->getInitProperties() as $key => $property) {
+                    if ($property['virtual']) {
+                        $data->set($key, $property['value']);
+                    } else if ($key !== 'width' && $key !== 'height') {
+                        $node->{$key} = $property['value'];
+                    }
                 }
 
-                $this->behaviourManager->save();
+                $initialBehaviours = $element->getInitialBehaviours();
+
+                if ($initialBehaviours) {
+                    foreach ($initialBehaviours as $spec) {
+                        $behaviour = $spec->createBehaviour();
+                        $this->behaviourManager->apply($node->id, $behaviour);
+                    }
+
+                    $this->behaviourManager->save();
+                }
             }
         }
 
-        $element->refreshNode($node);
+        if ($element) {
+            $element->refreshNode($node);
+        }
 
         if (!$isClone) {
             $this->reindex();

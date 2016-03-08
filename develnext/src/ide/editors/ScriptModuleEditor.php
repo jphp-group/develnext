@@ -356,7 +356,73 @@ class ScriptModuleEditor extends FormEditor
         return $forms;
     }
 
-    protected function _onAreaMouseUp(UXMouseEvent $e)
+    /**
+     * @param AbstractScriptComponent $element
+     * @param $screenX
+     * @param $screenY
+     * @param null $parent
+     * @return mixed|UXNode
+     * @throws \php\lang\IllegalArgumentException
+     */
+    protected function createElement($element, $screenX, $screenY, $parent = null)
+    {
+        $selected = $element;
+
+        $node = $selected->createElement();
+
+        $container = new ScriptComponentContainer($selected, $this->makeId($selected->getIdPattern()));
+        $container->setIdeNode($node);
+
+        $container->setConfigPath("{$this->file}/{$container->id}.json");
+        $node->setTitle($container->id);
+
+        $node->userData = $container;
+
+        $this->manager->add($container);
+
+        $size = $node->size;
+
+        $node->observer('layoutX')->addListener(function () use ($container, $node) {
+            $container->setX($node->x);
+        });
+
+        $node->observer('layoutY')->addListener(function () use ($container, $node) {
+            $container->setY($node->y);
+        });
+
+        $position = $this->layout->screenToLocal($screenX, $screenY);
+
+        $snapSizeX = $this->designer->snapSizeX;
+        $snapSizeY = $this->designer->snapSizeY;
+
+        if ($this->designer->snapEnabled) {
+            $size[0] = floor($size[0] / $snapSizeX) * $snapSizeX;
+            $size[1] = floor($size[1] / $snapSizeY) * $snapSizeY;
+
+            $position[0] = floor($position[0] / $snapSizeX) * $snapSizeX;
+            $position[1] = floor($position[1] / $snapSizeY) * $snapSizeY;
+        }
+
+        $node->position = $position;
+
+        $this->layout->add($node);
+        $this->designer->registerNode($node);
+
+        foreach ($selected->getInitProperties() as $key => $property) {
+            $container->{$key} = $property['value'];
+        }
+
+        $this->manager->add($container);
+        $this->designer->requestFocus();
+
+        $this->reindex();
+        $this->leftPaneUi->refreshObjectTreeList($this->getNodeId($node));
+        $this->save();
+
+        return $node;
+    }
+
+    protected function ___onAreaMouseUp(UXMouseEvent $e)
     {
         $selected = $this->elementTypePane->getSelected();
 

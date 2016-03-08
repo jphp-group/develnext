@@ -5,7 +5,10 @@ use ide\account\api\AbstractService;
 use ide\account\api\ServiceResponse;
 use ide\Ide;
 use ide\utils\Json;
+use php\desktop\Runtime;
+use php\gui\UXScreen;
 use php\lang\System;
+use php\lib\str;
 
 /**
  * Class IdeService
@@ -14,7 +17,7 @@ use php\lang\System;
  * @method ServiceResponse statusAsync($callback = null)
  * @method ServiceResponse startAsync($callback = null)
  * @method ServiceResponse shutdownAsync($callback)
- * @method ServiceResponse sendErrorAsync(\Exception $e, $callback)
+ * @method ServiceResponse sendErrorAsync(\Exception $e, $callback = null)
  * @method ServiceResponse getLastUpdateAsync($channel, $callback)
  * @method ServiceResponse noticesAsync(callable $callback)
  */
@@ -53,7 +56,24 @@ class IdeService extends AbstractService
     {
         $winSize = Ide::get()->getMainForm()->size;
 
+        $ide = Ide::get();
         $project = Ide::get()->getOpenedProject();
+
+        $data = [];
+
+        $screen = UXScreen::getPrimary();
+
+        $freeMemory = round(Runtime::freeMemory() / 1024 / 1024);
+        $maxMemory = round(Runtime::maxMemory() / 1024 / 1024);
+        $totalMemory = round(Runtime::totalMemory() / 1024 / 1024);
+
+        $data[] = "runtime (processors=" . Runtime::availableProcessors() . ", free=$freeMemory, allocated=$totalMemory, max=$maxMemory)";
+        $data[] = "screen (dpi={$screen->dpi}, size={$screen->visualBounds['width']}x{$screen->visualBounds['height']})";
+        $data[] = "ide (hash={$ide->getConfig()->get('app.hash')}, idle=" . ($ide->isIdle() ? 'true' : 'false') . ", toolPath={$ide->getToolPath()})";
+
+        if ($project) {
+            $data[] = "project (name={$project->getName()}, path={$project->getFile('')})";
+        }
 
         return $this->execute('ide/send-error', [
             'ideVersion' => Ide::get()->getName() . ' / ' . Ide::get()->getVersion(),
@@ -69,6 +89,8 @@ class IdeService extends AbstractService
             'exceptionLine' => $e->getLine(),
             'exceptionPosition' => $e->getPosition(),
             'exceptionStackTrace' => $e->getTraceAsString(),
+
+            'data' => str::join($data, "\n"),
 
             'projectPath' => $project ? $project->getFile('/')->getCanonicalPath() : null,
         ]);

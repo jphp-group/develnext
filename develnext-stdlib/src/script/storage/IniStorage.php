@@ -70,11 +70,40 @@ class IniStorage extends AbstractStorage
     }
 
     /**
+     * @param string $group
+     * @return array
+     */
+    public function group($group = '')
+    {
+        return (array) $this->data["$group"];
+    }
+
+    /**
+     * @param array $values
+     * @param string $group
+     */
+    public function put(array $values, $group = '')
+    {
+        if ($this->disabled) {
+            return;
+        }
+
+        foreach ($values as $key => $value) {
+            $this->set($key, $value, $group, false);
+        }
+
+        if ($this->autoSave) {
+            $this->save();
+        }
+    }
+
+    /**
      * @param $key
      * @param $value
      * @param string $group
+     * @param bool $checkAutoSave
      */
-    public function set($key, $value, $group = '')
+    public function set($key, $value, $group = '', $checkAutoSave = true)
     {
         if ($this->disabled) {
             return;
@@ -82,7 +111,7 @@ class IniStorage extends AbstractStorage
 
         $this->data["$group"][$key] = is_array($value) ? str::join($value, '|') : $value;
 
-        if ($this->autoSave) {
+        if ($checkAutoSave && $this->autoSave) {
             $this->save();
         }
     }
