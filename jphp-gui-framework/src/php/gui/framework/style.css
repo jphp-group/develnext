@@ -68,3 +68,26 @@
 .scroll-pane.without-focus .corner {
     -fx-background-insets: 0;
 }
+
+.nav {
+    -fx-hgap: 5;
+}
+
+.nav .nav-item {
+    -fx-padding: 5px 10px;
+}
+
+.nav .nav-item.selected {
+    -fx-font-weight: bold;
+    -fx-background-color: white;
+}
+
+.nav .nav-hint-text {
+    -fx-text-fill: gray;
+    -fx-padding:  0 0 0 10;
+}
+
+.nav .nav-hint-total {
+    -fx-text-fill: gray;
+    -fx-font-weight: bold;
+}

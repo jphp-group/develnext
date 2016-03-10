@@ -7,7 +7,6 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="646.0" prefWidth="600.0" spacing="15.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -60,50 +59,22 @@
          </padding>
       </Button>
       <Separator prefWidth="200.0" />
-      <GridPane alignment="CENTER_RIGHT">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
+      <HBox alignment="CENTER_LEFT">
          <children>
-            <Label text="Name1:" GridPane.halignment="RIGHT">
+            <Label alignment="CENTER_RIGHT" prefWidth="160.0" text="Id:">
                <font>
                   <Font name="System Bold" size="12.0" />
                </font>
-               <GridPane.margin>
+               <padding>
                   <Insets right="10.0" />
-               </GridPane.margin>
+               </padding>
             </Label>
-            <Label text="Value1" GridPane.columnIndex="1">
-               <GridPane.margin>
-                  <Insets />
-               </GridPane.margin>
-            </Label>
-            <Label text="Name2:" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets right="10.0" />
-               </GridPane.margin>
-            </Label>
-            <Label text="Value2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Label text="Name3:" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets right="10.0" />
-               </GridPane.margin>
-            </Label>
-            <Label text="Value3" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Value" />
          </children>
-      </GridPane>
+         <padding>
+            <Insets bottom="5.0" top="5.0" />
+         </padding>
+      </HBox>
       <Separator prefWidth="200.0" />
    </children>
 </VBox>

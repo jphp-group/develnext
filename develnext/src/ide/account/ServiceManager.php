@@ -301,6 +301,16 @@ class ServiceManager
         return $this->iconService;
     }
 
+    public function userAgent()
+    {
+        $ide = Ide::get();
+
+        $userAgent = $ide->getName() . ", " . $ide->getVersion() . ", " . $ide->getConfig()->get('app.hash')
+            . " (" . System::getProperty('os.name') . ' ' . System::getProperty('os.version') . ")";
+
+        return $userAgent;
+    }
+
     public function shutdown()
     {
         $class = new \ReflectionClass($this);

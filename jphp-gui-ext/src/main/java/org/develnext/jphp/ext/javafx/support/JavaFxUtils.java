@@ -14,13 +14,18 @@ final public class JavaFxUtils {
         Class<?> aClass = object.getClass();
 
         try {
-            Method method = aClass.getMethod(name);
+            Method method;
+            try {
+                method = aClass.getMethod(name);
+            } catch (NoSuchMethodException e) {
+                method = aClass.getDeclaredMethod(name);
+            }
 
             ReadOnlyProperty bindProperty = (ReadOnlyProperty) method.invoke(object);
 
             return bindProperty;
         } catch (NoSuchMethodException | ClassCastException | InvocationTargetException | IllegalAccessException e) {
-            throw new IllegalArgumentException("Unable to find the '" + property + "' property for watching");
+            throw new IllegalArgumentException("Unable to find the '" + property + "' property for watching, "  + e.getClass().getSimpleName() + " " + e.getMessage());
         }
     }
 }

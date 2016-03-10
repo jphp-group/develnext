@@ -52,6 +52,7 @@ import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.ImageViewEx;
 import org.develnext.jphp.ext.javafx.support.KeyboardManager;
 import org.develnext.jphp.ext.javafx.support.control.*;
+import org.develnext.jphp.ext.javafx.support.control.Pagination;
 import org.develnext.jphp.ext.javafx.support.event.*;
 import org.develnext.jphp.ext.javafx.support.tray.notification.TrayNotification;
 import php.runtime.env.CompileScope;
@@ -173,6 +174,8 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, ListCell.class, UXListCell.class);
         MemoryOperation.registerWrapper(TableColumn.class, UXTableColumn.class);
         MemoryOperation.registerWrapper(IndexedCell.class, UXCell.class);
+
+        registerWrapperClass(scope, Pagination.class, UXPagination.class);
 
         registerWrapperClass(scope, Dragboard.class, UXDragboard.class);
 

@@ -13,6 +13,7 @@ use php\gui\UXTrayNotification;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
+use php\lang\System;
 use php\lang\ThreadPool;
 use php\lib\Items;
 use php\lib\Str;
@@ -357,6 +358,8 @@ abstract class AbstractService
         $connection->followRedirects = true;
 
         $connection->setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+        $connection->setRequestProperty("User-Agent", Ide::service()->userAgent());
 
         if (Ide::service()->getSession()) {
             $connection->setRequestProperty('Cookie', "JSESSIONID=" . Ide::service()->getSession() . ";");

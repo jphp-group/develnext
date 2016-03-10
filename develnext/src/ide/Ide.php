@@ -45,6 +45,7 @@ use php\lang\System;
 use php\lang\Thread;
 use php\lib\fs;
 use php\lib\Items;
+use php\lib\reflect;
 use php\lib\Str;
 use php\util\Configuration;
 use php\util\Scanner;
@@ -89,6 +90,11 @@ class Ide extends Application
      * @var AbstractCommand[]
      */
     protected $commands = [];
+
+    /**
+     * @var AbstractNavigation[]
+     */
+    protected $navigation = [];
 
     /**
      * @var callable
@@ -557,6 +563,22 @@ class Ide extends Application
         }
     }
 
+    /***
+     * @param AbstractNavigation $nav
+     */
+    public function registerNavigation(AbstractNavigation $nav)
+    {
+        $this->navigation[reflect::typeOf($nav)] = $nav;
+    }
+
+    /**
+     * @param $class
+     */
+    public function unregisterNavigation($class)
+    {
+        unset($this->navigation[$class]);
+    }
+
     public function unregisterCommand($commandClass, $ignoreAlways = true)
     {
         /** @var MainForm $mainForm */
@@ -865,6 +887,34 @@ class Ide extends Application
     }
 
     /**
+     * @param string $query
+     * @return bool
+     */
+    public function navigate($query)
+    {
+        foreach ($this->navigation as $nav) {
+            if ($nav->accept($query)) {
+                $nav->navigate($query);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $query
+     * @return callable
+     */
+    public function nav($query)
+    {
+        return function () use ($query) {
+            $this->navigate($query);
+        };
+    }
+
+    /**
      * @param $path
      *
      * @return AbstractEditor
@@ -922,6 +972,11 @@ class Ide extends Application
         $formats = $this->getInternalList('.dn/formats');
         foreach ($formats as $format) {
             $this->registerFormat(new $format());
+        }
+
+        $navs = $this->getInternalList('.dn/navigation');
+        foreach ($navs as $nav) {
+            $this->registerNavigation(new $nav());
         }
 
         $projectTemplates = $this->getInternalList('.dn/projectTemplates');

@@ -77,6 +77,7 @@ public class UXTab extends BaseWrapper<Tab> {
     public void setGraphic(@Nullable Node node) {
         getWrappedObject().setGraphic(node);
     }
+
     @Signature
     public Memory data(String name) {
         Object userData = getWrappedObject().getUserData();

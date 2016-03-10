@@ -13,7 +13,7 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Reflection.Name(JavaFXExtension.NS + "layout\\UXFlowPane")
-public class UXFlowPane extends UXPane<FlowPane> {
+public class UXFlowPane<T extends FlowPane> extends UXPane<FlowPane> {
     interface WrappedInterface {
         @Property VPos rowValignment();
         @Property HPos columnHalignment();
@@ -28,7 +28,7 @@ public class UXFlowPane extends UXPane<FlowPane> {
         @Property Orientation orientation();
     }
 
-    public UXFlowPane(Environment env, FlowPane wrappedObject) {
+    public UXFlowPane(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 

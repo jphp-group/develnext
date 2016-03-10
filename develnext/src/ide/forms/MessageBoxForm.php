@@ -124,6 +124,13 @@ class MessageBoxForm extends AbstractIdeForm
         $this->centerOnScreen();
     }
 
+    static function confirm($message)
+    {
+        $dialog = new static($message, ['Да', 'Нет, отмена']);
+
+        return $dialog->showDialog() && $dialog->getResultIndex() == 0;
+    }
+
     static function confirmDelete($what)
     {
         if (is_array($what)) {

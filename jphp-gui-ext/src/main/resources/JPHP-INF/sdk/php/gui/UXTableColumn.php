@@ -75,6 +75,14 @@ class UXTableColumn
     }
 
     /**
+     * @param $name
+     * @param mixed $value (optional)
+     */
+    public function data($name, $value)
+    {
+    }
+
+    /**
      * @param callable|null $factory ($value, UXTableColumn $column): mixed
      */
     public function setCellValueFactory($factory)

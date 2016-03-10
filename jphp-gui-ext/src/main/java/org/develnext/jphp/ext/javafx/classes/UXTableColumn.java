@@ -8,11 +8,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.util.Callback;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.support.UserData;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
-import php.runtime.annotation.Reflection.Nullable;
-import php.runtime.annotation.Reflection.Property;
-import php.runtime.annotation.Reflection.Signature;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
@@ -23,38 +22,14 @@ import php.runtime.reflection.support.ReflectionUtils;
 @Reflection.Name(JavaFXExtension.NS + "UXTableColumn")
 public class UXTableColumn extends BaseWrapper<TableColumnBase> {
     interface WrappedInterface {
-        @Property
-        int width();
-
-        @Property
-        int maxWidth();
-
-        @Property
-        int minWidth();
-
-        @Property
-        boolean editable();
-
-        @Property
-        boolean resizable();
-
-        @Property
-        boolean sortable();
-
-        @Property
-        String text();
-
-        @Property
-        String style();
-
-        @Property
-        String id();
-
-        @Property
-        Node graphic();
-
-        @Property
-        boolean visible();
+        @Property boolean editable();
+        @Property boolean resizable();
+        @Property boolean sortable();
+        @Property String text();
+        @Property String style();
+        @Property String id();
+        @Property Node graphic();
+        @Property boolean visible();
     }
 
     public UXTableColumn(Environment env, TableColumn wrappedObject) {
@@ -72,6 +47,58 @@ public class UXTableColumn extends BaseWrapper<TableColumnBase> {
     @Signature
     public void __construct() {
         __wrappedObject = new TableColumn();
+    }
+
+    @Signature
+    public Memory data(String name) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData instanceof UserData) {
+            return ((UserData) userData).get(name);
+        }
+
+        return Memory.NULL;
+    }
+
+    @Setter
+    public void setWidth(double width) {
+        getWrappedObject().setPrefWidth(width);
+    }
+
+    @Getter
+    public double getWidth() {
+        return getWrappedObject().getWidth();
+    }
+
+    @Setter
+    public void setMaxWidth(double width) {
+        getWrappedObject().setMaxWidth(width);
+    }
+
+    @Getter
+    public double getMaxWidth() {
+        return getWrappedObject().getMaxWidth();
+    }
+
+    @Setter
+    public void setMinWidth(double width) {
+        getWrappedObject().setMinWidth(width);
+    }
+
+    @Getter
+    public double getMinWidth() {
+        return getWrappedObject().getMinWidth();
+    }
+
+    @Signature
+    public Memory data(Environment env, String name, Memory value) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (!(userData instanceof UserData)) {
+            getWrappedObject().setUserData(userData = new UserData(Memory.wrap(env, userData)));
+        }
+
+        return ((UserData) userData).set(name, value);
     }
 
     @Signature

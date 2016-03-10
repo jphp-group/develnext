@@ -72,6 +72,7 @@ class DocEntryPageArea extends AbstractFormArea
 
         $endpoint = Ide::service()->getEndpoint();
 
+        $this->entryContent->engine->userAgent = Ide::service()->userAgent();
         $this->entryContent->engine->loadContent('...');
 
         $this->showPreloader();
@@ -83,8 +84,7 @@ class DocEntryPageArea extends AbstractFormArea
                 });
             }
         });
+
         $this->entryContent->engine->load("{$endpoint}{$this->entry['contentUrl']}");
-
-
     }
 }

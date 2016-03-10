@@ -13,12 +13,57 @@ class UXTableView extends UXControl
     public $editable = false;
 
     /**
-     * @var UXList
+     * @var UXList <UXTableColumn>
      */
     public $columns;
 
     /**
-     * @var UXList
+     * @var UXList <mixed>
      */
     public $items;
+
+    /**
+     * @var bool
+     */
+    public $multipleSelection = false;
+
+    /**
+     * @var int[]
+     */
+    public $selectedIndexes = [];
+
+    /**
+     * @var int
+     */
+    public $selectedIndex = -1;
+
+    /**
+     * @var int
+     */
+    public $focusedIndex = -1;
+
+    /**
+     * @readonly
+     * @var mixed[]
+     */
+    public $selectedItems = [];
+
+    /**
+     * @readonly
+     * @var mixed
+     */
+    public $selectedItem = null;
+
+    /**
+     * @readonly
+     * @var mixed
+     */
+    public $focusedItem = null;
+
+    /**
+     * ...
+     */
+    public function update()
+    {
+    }
 }
