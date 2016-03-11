@@ -55,7 +55,7 @@ abstract class AbstractActionType
         return false;
     }
 
-    function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode)
+    function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode = null)
     {
         return new UXVBox($descriptionNode ? [$titleNode, $descriptionNode] : [$titleNode]);
     }

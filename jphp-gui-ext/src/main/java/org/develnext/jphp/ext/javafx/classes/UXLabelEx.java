@@ -13,6 +13,7 @@ import php.runtime.reflection.ClassEntity;
 public class UXLabelEx extends UXLabel<LabelEx> {
     interface WrappedInterface {
         @Property boolean autoSize();
+        @Property LabelEx.AutoSizeType autoSizeType();
     }
 
     public UXLabelEx(Environment env, LabelEx wrappedObject) {

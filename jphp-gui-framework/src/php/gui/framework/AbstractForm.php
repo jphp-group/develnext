@@ -645,7 +645,7 @@ abstract class AbstractForm extends UXForm
         }
 
         if (!$node) {
-            throw new Exception("Unable to bind '$event'");
+            throw new Exception("Unable to bind '$event', cannot find '$id' component");
         }
 
         $eventName = Str::split($eventName, '-', 2);

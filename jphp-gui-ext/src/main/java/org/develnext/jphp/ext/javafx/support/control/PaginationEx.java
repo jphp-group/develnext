@@ -1,9 +1,7 @@
 package org.develnext.jphp.ext.javafx.support.control;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -14,15 +12,21 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Pagination extends FlowPane {
+public class PaginationEx extends FlowPane {
+    protected ObjectProperty<Font> font = new SimpleObjectProperty<>(Font.getDefault());
+    protected ObjectProperty<Color> textColor = new SimpleObjectProperty<>(Color.BLACK);
+
     protected SimpleIntegerProperty total = new SimpleIntegerProperty(0);
-    protected SimpleIntegerProperty pageSize = new SimpleIntegerProperty(20);
+    protected SimpleIntegerProperty pageSize;
     protected SimpleIntegerProperty selectedPage = new SimpleIntegerProperty(0);
     protected SimpleIntegerProperty maxPageCount = new SimpleIntegerProperty(9);
+    protected BooleanProperty showPrevNext = new SimpleBooleanProperty(true);
 
     protected Button previousButton = new Button("<");
     protected Button nextButton = new Button(">");
@@ -31,45 +35,27 @@ public class Pagination extends FlowPane {
     protected SimpleStringProperty hintText = new SimpleStringProperty("");
     protected SimpleBooleanProperty showTotal = new SimpleBooleanProperty(false);
 
-    public Pagination() {
+    public PaginationEx() {
         getStyleClass().addAll("nav");
         previousButton.getStyleClass().addAll("nav-item", "nav-item-prev");
         nextButton.getStyleClass().addAll("nav-item", "nav-item-next");
 
-        total.addListener(new ChangeListener<Number>() {
+        ChangeListener changeListener = new ChangeListener() {
             @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
                 updateUi();
             }
-        });
+        };
 
-        pageSize.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateUi();
-            }
-        });
-
-        maxPageCount.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateUi();
-            }
-        });
-
-        selectedPage.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateSelected();
-            }
-        });
-
-        hintText.addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                updateUi();
-            }
-        });
+        total.addListener(changeListener);
+        pageSizeProperty().addListener(changeListener);
+        maxPageCount.addListener(changeListener);
+        selectedPage.addListener(changeListener);
+        showTotal.addListener(changeListener);
+        hintText.addListener(changeListener);
+        font.addListener(changeListener);
+        textColor.addListener(changeListener);
+        showPrevNext.addListener(changeListener);
 
         previousButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -90,6 +76,42 @@ public class Pagination extends FlowPane {
         });
     }
 
+    public Font getFont() {
+        return font.get();
+    }
+
+    public ObjectProperty<Font> fontProperty() {
+        return font;
+    }
+
+    public void setFont(Font font) {
+        this.font.set(font);
+    }
+
+    public Color getTextColor() {
+        return textColor.get();
+    }
+
+    public ObjectProperty<Color> textColorProperty() {
+        return textColor;
+    }
+
+    public void setTextColor(Color textColor) {
+        this.textColor.set(textColor);
+    }
+
+    public boolean getShowPrevNext() {
+        return showPrevNext.get();
+    }
+
+    public BooleanProperty showPrevNextProperty() {
+        return showPrevNext;
+    }
+
+    public void setShowPrevNext(boolean showPrevNext) {
+        this.showPrevNext.set(showPrevNext);
+    }
+
     public int getTotal() {
         return total.get();
     }
@@ -107,6 +129,10 @@ public class Pagination extends FlowPane {
     }
 
     public SimpleIntegerProperty pageSizeProperty() {
+        if (pageSize == null) {
+            pageSize = new SimpleIntegerProperty(this, "pageSize", 20);
+        }
+
         return pageSize;
     }
 
@@ -188,15 +214,17 @@ public class Pagination extends FlowPane {
         int selectedPage = getSelectedPage();
         final int pages = getPageCount();
 
-        children.add(previousButton);
+        if (getShowPrevNext()) {
+            children.add(previousButton);
+        }
 
         boolean firstSkip = selectedPage > maxPageCount.get() / 2;
-        boolean lastSkip = pages - selectedPage > maxPageCount.get() / 2;
 
         if (firstSkip) {
             Button button = new Button(String.valueOf(1));
             button.getStyleClass().addAll("nav-item", "nav-item-first");
-
+            button.setFont(getFont());
+            button.setTextFill(getTextColor());
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
@@ -208,6 +236,7 @@ public class Pagination extends FlowPane {
             children.add(button);
 
             Label label = new Label("...");
+            label.setFont(getFont());
             label.getStyleClass().addAll("nav-item-skip");
             children.add(label);
         }
@@ -224,9 +253,13 @@ public class Pagination extends FlowPane {
             if (from < 0) from = 0;
         }
 
+        boolean lastSkip = to < pages;
+
         for (int i = from; i < to; i++) {
             Button button = new Button(String.valueOf(i + 1));
             button.getStyleClass().addAll("nav-item");
+            button.setFont(getFont());
+            button.setTextFill(getTextColor());
 
             if (selectedPage == i) {
                 button.getStyleClass().addAll("selected");
@@ -247,10 +280,13 @@ public class Pagination extends FlowPane {
         if (lastSkip) {
             Label label = new Label("...");
             label.getStyleClass().addAll("nav-item-skip");
+            label.setFont(getFont());
             children.add(label);
 
             Button button = new Button(String.valueOf(pages));
             button.getStyleClass().addAll("nav-item", "nav-item-last");
+            button.setFont(getFont());
+            button.setTextFill(getTextColor());
 
             button.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -263,7 +299,15 @@ public class Pagination extends FlowPane {
             children.add(button);
         }
 
-        children.add(nextButton);
+        if (getShowPrevNext()) {
+            children.add(nextButton);
+        }
+
+        previousButton.setFont(getFont());
+        previousButton.setTextFill(getTextColor());
+
+        nextButton.setFont(getFont());
+        nextButton.setTextFill(getTextColor());
 
         previousButton.setDisable(selectedPage == 0);
         nextButton.setDisable(selectedPage == getPageCount() - 1);
@@ -271,6 +315,7 @@ public class Pagination extends FlowPane {
         if (hintText.get() != null && !hintText.get().isEmpty()) {
             Label label = new Label(hintText.get());
             label.getStyleClass().add("nav-hint-text");
+            label.setFont(getFont());
 
             children.add(label);
         }
@@ -278,6 +323,7 @@ public class Pagination extends FlowPane {
         if (showTotal.get()) {
             Label label = new Label(String.valueOf(total.get()));
             label.getStyleClass().addAll("nav-hint-total");
+            label.setFont(getFont());
 
             children.add(label);
         }

@@ -83,6 +83,13 @@ class UXTableColumn
     }
 
     /**
+     * Set cell value factory for array value
+     */
+    public function setCellValueFactoryForArrays()
+    {
+    }
+
+    /**
      * @param callable|null $factory ($value, UXTableColumn $column): mixed
      */
     public function setCellValueFactory($factory)

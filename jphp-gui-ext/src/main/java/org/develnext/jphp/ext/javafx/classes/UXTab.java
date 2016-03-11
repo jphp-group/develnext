@@ -7,6 +7,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
+import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.UserData;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
@@ -80,24 +81,12 @@ public class UXTab extends BaseWrapper<Tab> {
 
     @Signature
     public Memory data(String name) {
-        Object userData = getWrappedObject().getUserData();
-
-        if (userData instanceof UserData) {
-            return ((UserData) userData).get(name);
-        }
-
-        return Memory.NULL;
+        return JavaFxUtils.data(getWrappedObject(), name);
     }
 
     @Signature
     public Memory data(Environment env, String name, Memory value) {
-        Object userData = getWrappedObject().getUserData();
-
-        if (!(userData instanceof UserData)) {
-            getWrappedObject().setUserData(userData = new UserData(Memory.wrap(env, userData)));
-        }
-
-        return ((UserData) userData).set(name, value);
+        return JavaFxUtils.data(env, getWrappedObject(), name, value);
     }
 
     @Signature

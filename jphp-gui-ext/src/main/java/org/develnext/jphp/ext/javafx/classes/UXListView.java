@@ -213,7 +213,12 @@ public class UXListView extends UXControl<ListView> {
                     SnapshotParameters snapParams = new SnapshotParameters();
                     snapParams.setFill(Color.TRANSPARENT);
 
-                    imageView.setImage(DragListCell.this.getGraphic().snapshot(snapParams, null));
+                    if (DragListCell.this.getGraphic() != null) {
+                        imageView.setImage(DragListCell.this.getGraphic().snapshot(snapParams, null));
+                    } else {
+                        imageView.setImage(DragListCell.this.snapshot(snapParams, null));
+                    }
+
                     imageView.setStyle("-fx-border-color: silver; -fx-border-width: 1px;");
 
                     event.consume();

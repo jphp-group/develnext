@@ -23,5 +23,9 @@ class LabelFormElementTag extends AbstractFormElementTag
     {
         /** @var UXLabelEx $node */
         $element->setAttribute('autoSize', $node->autoSize ? 'true' : 'false');
+
+        if ($node->autoSizeType != 'ALL') {
+            $element->setAttribute('autoSizeType', $node->autoSizeType);
+        }
     }
 }

@@ -2,6 +2,8 @@
 namespace php\gui;
 
 use php\gui\layout\UXFlowPane;
+use php\gui\paint\UXColor;
+use php\gui\text\UXFont;
 
 /**
  * Class UXPagination
@@ -44,6 +46,21 @@ class UXPagination extends UXFlowPane
      * @var bool
      */
     public $showTotal = false;
+
+    /**
+     * @var UXFont
+     */
+    public $font;
+
+    /**
+     * @var UXColor
+     */
+    public $textColor;
+
+    /**
+     * @var bool
+     */
+    public $showPrevNext = true;
 
     /**
      * @readonly

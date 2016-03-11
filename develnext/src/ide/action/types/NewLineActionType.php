@@ -54,7 +54,7 @@ class NewLineActionType extends AbstractSimpleActionType
         return $action ? 'icons/arrowDot16.png' : 'icons/break16.png';
     }
 
-    function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode)
+    function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode = null)
     {
         $descriptionNode = new UXSeparator();
         $descriptionNode->height = 3;

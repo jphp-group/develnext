@@ -6,9 +6,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
-import php.runtime.annotation.Reflection.Name;
-import php.runtime.annotation.Reflection.Property;
-import php.runtime.annotation.Reflection.Signature;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
@@ -21,6 +19,8 @@ public class UXTableView extends UXControl<TableView> {
         @Property boolean editable();
         @Property ObservableList items();
         @Property ObservableList<TableColumn> columns();
+        @Property double fixedCellSize();
+        @Property boolean tableMenuButtonVisible();
     }
 
     public UXTableView(Environment env, TableView wrappedObject) {
@@ -42,24 +42,36 @@ public class UXTableView extends UXControl<TableView> {
 
         getWrappedObject().setItems(null);
         getWrappedObject().setItems(items);
+
+        getWrappedObject().setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    @Reflection.Getter
+    @Getter
+    public boolean getConstrainedResizePolicy() {
+        return getWrappedObject().getColumnResizePolicy() == TableView.CONSTRAINED_RESIZE_POLICY;
+    }
+
+    @Setter
+    public void setConstrainedResizePolicy(boolean value) {
+        getWrappedObject().setColumnResizePolicy(value ? TableView.CONSTRAINED_RESIZE_POLICY : TableView.UNCONSTRAINED_RESIZE_POLICY);
+    }
+
+    @Getter
     public boolean getMultipleSelection() {
         return getWrappedObject().getSelectionModel().getSelectionMode() == SelectionMode.MULTIPLE;
     }
 
-    @Reflection.Setter
+    @Setter
     public void setMultipleSelection(boolean value) {
         getWrappedObject().getSelectionModel().setSelectionMode(value ? SelectionMode.MULTIPLE : SelectionMode.SINGLE);
     }
 
-    @Reflection.Getter
+    @Getter
     public List<Integer> getSelectedIndexes() {
         return getWrappedObject().getSelectionModel().getSelectedIndices();
     }
 
-    @Reflection.Setter
+    @Setter
     public void setSelectedIndexes(int[] indexes) {
         MultipleSelectionModel selectionModel = getWrappedObject().getSelectionModel();
 
@@ -70,12 +82,12 @@ public class UXTableView extends UXControl<TableView> {
         }
     }
 
-    @Reflection.Getter
+    @Getter
     public int getSelectedIndex() {
         return getWrappedObject().getSelectionModel().getSelectedIndex();
     }
 
-    @Reflection.Setter
+    @Setter
     public void setSelectedIndex(int index) {
         MultipleSelectionModel selectionModel = getWrappedObject().getSelectionModel();
 
@@ -83,28 +95,28 @@ public class UXTableView extends UXControl<TableView> {
         selectionModel.select(index);
     }
 
-    @Reflection.Getter
+    @Getter
     public Object getFocusedItem() {
         return getWrappedObject().getFocusModel().getFocusedItem();
     }
 
-    @Reflection.Getter
+    @Getter
     public List<Object> getSelectedItems() {
         return getWrappedObject().getSelectionModel().getSelectedItems();
     }
 
-    @Reflection.Getter
+    @Getter
     public Object getSelectedItem() {
         ObservableList selectedItems = getWrappedObject().getSelectionModel().getSelectedItems();
         return selectedItems.isEmpty() ? null : selectedItems.get(0);
     }
 
-    @Reflection.Getter
+    @Getter
     public Object getFocusedIndex() {
         return getWrappedObject().getFocusModel().getFocusedIndex();
     }
 
-    @Reflection.Setter
+    @Setter
     public void setFocusedIndex(int index) {
         getWrappedObject().getFocusModel().focus(index);
     }

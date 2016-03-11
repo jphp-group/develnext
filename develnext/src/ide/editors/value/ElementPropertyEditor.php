@@ -211,18 +211,22 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
 
     /**
      * @param callable $getter
+     * @return $this
      */
     public function setGetter(callable $getter)
     {
         $this->getter = $getter;
+        return $this;
     }
 
     /**
      * @param callable $setter
+     * @return $this
      */
     public function setSetter(callable $setter)
     {
         $this->setter = $setter;
+        return $this;
     }
 
     /**

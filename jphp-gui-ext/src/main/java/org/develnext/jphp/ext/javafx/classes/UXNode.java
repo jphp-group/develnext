@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.classes.support.Eventable;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.StyleManager;
@@ -46,7 +47,7 @@ import java.util.TreeSet;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXNode")
-public class UXNode<T extends Node> extends BaseWrapper<Node> {
+public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventable {
     interface WrappedInterface {
         @Property double baselineOffset();
         @Property BlendMode blendMode();
@@ -462,24 +463,12 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
 
     @Signature
     public Memory data(String name) {
-        Object userData = getWrappedObject().getUserData();
-
-        if (userData instanceof UserData) {
-            return ((UserData) userData).get(name);
-        }
-
-        return Memory.NULL;
+        return JavaFxUtils.data(getWrappedObject(), name);
     }
 
     @Signature
     public Memory data(Environment env, String name, Memory value) {
-        Object userData = getWrappedObject().getUserData();
-
-        if (!(userData instanceof UserData)) {
-            getWrappedObject().setUserData(userData = new UserData(Memory.wrap(env, userData)));
-        }
-
-        return ((UserData) userData).set(name, value);
+        return JavaFxUtils.data(env, getWrappedObject(), name, value);
     }
 
     @Signature
@@ -599,18 +588,6 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Signature
-    @SuppressWarnings("unchecked")
-    public void on(String event, Invoker invoker, String group) {
-        EventProvider eventProvider = EventProvider.get(getWrappedObject(), event);
-
-        if (eventProvider != null) {
-            eventProvider.on(getWrappedObject(), event, group, invoker);
-        } else {
-            throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
-        }
-    }
-
-    @Signature
     public ObservableValue observer(String property) {
         return JavaFxUtils.findObservable(this.getWrappedObject(), property);
     }
@@ -638,36 +615,29 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> {
     }
 
     @Signature
-    public void on(String event, Invoker invoker) {
-        on(event, invoker, "general");
+    @SuppressWarnings("unchecked")
+    public void on(String event, Invoker invoker, String group) {
+        JavaFxUtils.on(getWrappedObject(), event, invoker, group);
     }
 
     @Signature
-    @SuppressWarnings("unchecked")
-    public void off(String event, @Nullable String group) {
-        EventProvider eventProvider = EventProvider.get(getWrappedObject(), event);
+    public void on(String event, Invoker invoker) {
+        JavaFxUtils.on(getWrappedObject(), event, invoker, "general");
+    }
 
-        if (eventProvider != null) {
-            eventProvider.off(getWrappedObject(), event, group);
-        } else {
-            throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
-        }
+    @Signature
+    public void off(String event, @Nullable String group) {
+        JavaFxUtils.off(getWrappedObject(), event, group);
     }
 
     @Signature
     public void off(String event) {
-        off(event, null);
+        JavaFxUtils.off(getWrappedObject(), event);
     }
 
     @Signature
     public void trigger(String event, @Nullable Event e) {
-        EventProvider eventProvider = EventProvider.get(getWrappedObject(), event);
-
-        if (eventProvider != null) {
-            eventProvider.trigger(getWrappedObject(), event, e);
-        } else {
-            throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
-        }
+        JavaFxUtils.trigger(getWrappedObject(), event, e);
     }
 
     @Signature

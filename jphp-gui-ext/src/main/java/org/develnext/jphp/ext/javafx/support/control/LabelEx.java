@@ -2,7 +2,9 @@ package org.develnext.jphp.ext.javafx.support.control;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
@@ -11,7 +13,10 @@ import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 
 public class LabelEx extends Label {
+    public enum AutoSizeType { ALL, HORIZONTAL, VERTICAL }
+
     protected BooleanProperty autoSize;
+    protected ObjectProperty<AutoSizeType> autoSizeType = new SimpleObjectProperty<>(this, "autoSizeType", AutoSizeType.ALL);
 
     public LabelEx() {
         this("");
@@ -60,6 +65,25 @@ public class LabelEx extends Label {
                 LabelEx.this.updateAutoSize();
             }
         });
+
+        autoSizeTypeProperty().addListener(new ChangeListener<AutoSizeType>() {
+            @Override
+            public void changed(ObservableValue<? extends AutoSizeType> observable, AutoSizeType oldValue, AutoSizeType newValue) {
+                updateAutoSize();
+            }
+        });
+    }
+
+    public AutoSizeType getAutoSizeType() {
+        return autoSizeType.get();
+    }
+
+    public ObjectProperty<AutoSizeType> autoSizeTypeProperty() {
+        return autoSizeType;
+    }
+
+    public void setAutoSizeType(AutoSizeType autoSizeType) {
+        this.autoSizeType.set(autoSizeType);
     }
 
     void updateAutoSize() {
@@ -69,17 +93,22 @@ public class LabelEx extends Label {
                 public void run() {
                     Node graphic = getGraphic();
 
-                    double width = UXFont.calculateTextWidth(getText(), LabelEx.this.getFont());
+                    if (getAutoSizeType() == AutoSizeType.ALL || getAutoSizeType() == AutoSizeType.HORIZONTAL) {
+                        double width = UXFont.calculateTextWidth(getText(), LabelEx.this.getFont());
 
-                    if (graphic != null) {
-                        width += graphic.getLayoutBounds().getWidth() + getGraphicTextGap();
+                        if (graphic != null) {
+                            width += graphic.getLayoutBounds().getWidth() + getGraphicTextGap();
+                        }
+
+                        setPrefWidth(width);
                     }
 
-                    setPrefWidth(width);
-                    setPrefHeight(Math.max(
-                            UXFont.getLineHeight(LabelEx.this.getFont()),
-                            graphic == null ? 0 : graphic.getLayoutBounds().getHeight()
-                    ));
+                    if (getAutoSizeType() == AutoSizeType.ALL || getAutoSizeType() == AutoSizeType.VERTICAL) {
+                        setPrefHeight(Math.max(
+                                UXFont.getLineHeight(LabelEx.this.getFont()),
+                                graphic == null ? 0 : graphic.getLayoutBounds().getHeight()
+                        ));
+                    }
                 }
             });
         }

@@ -70,7 +70,7 @@
 }
 
 .nav {
-    -fx-hgap: 5;
+   /* -fx-hgap: 5;     */
 }
 
 .nav .nav-item {
@@ -80,6 +80,8 @@
 .nav .nav-item.selected {
     -fx-font-weight: bold;
     -fx-background-color: white;
+    -fx-border-color: silver;
+    -fx-border-radius: 3px;
 }
 
 .nav .nav-hint-text {

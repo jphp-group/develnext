@@ -8,12 +8,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.util.Callback;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.UserData;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
+import php.runtime.invoke.ObjectInvokeHelper;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.memory.ObjectMemory;
 import php.runtime.reflection.ClassEntity;
@@ -47,17 +49,17 @@ public class UXTableColumn extends BaseWrapper<TableColumnBase> {
     @Signature
     public void __construct() {
         __wrappedObject = new TableColumn();
+        setCellValueFactoryForArrays();
     }
 
     @Signature
     public Memory data(String name) {
-        Object userData = getWrappedObject().getUserData();
+        return JavaFxUtils.data(getWrappedObject(), name);
+    }
 
-        if (userData instanceof UserData) {
-            return ((UserData) userData).get(name);
-        }
-
-        return Memory.NULL;
+    @Signature
+    public Memory data(Environment env, String name, Memory value) {
+        return JavaFxUtils.data(env, getWrappedObject(), name, value);
     }
 
     @Setter
@@ -91,14 +93,21 @@ public class UXTableColumn extends BaseWrapper<TableColumnBase> {
     }
 
     @Signature
-    public Memory data(Environment env, String name, Memory value) {
-        Object userData = getWrappedObject().getUserData();
+    public void setCellValueFactoryForArrays() {
+        ((TableColumn) getWrappedObject()).setCellValueFactory(new Callback<TableColumn.CellDataFeatures, ObservableValue>() {
+            @Override
+            public ObservableValue call(TableColumn.CellDataFeatures param) {
+                Object value = param.getValue();
 
-        if (!(userData instanceof UserData)) {
-            getWrappedObject().setUserData(userData = new UserData(Memory.wrap(env, userData)));
-        }
+                if (value instanceof Memory) {
+                    Memory memory = (Memory) value;
 
-        return ((UserData) userData).set(name, value);
+                    return new SimpleStringProperty(memory.valueOfIndex(getWrappedObject().getId()).toString());
+                }
+
+                return new SimpleStringProperty("");
+            }
+        });
     }
 
     @Signature

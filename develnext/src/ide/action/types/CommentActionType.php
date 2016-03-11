@@ -56,7 +56,7 @@ class CommentActionType extends AbstractSimpleActionType
         return $action ? 'icons/arrowDot16.png' : 'icons/help16.png';
     }
 
-    function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode)
+    function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode = null)
     {
         $descriptionNode->text = "// $action->text";
         $descriptionNode->style .= '; -fx-font-style: italic;';

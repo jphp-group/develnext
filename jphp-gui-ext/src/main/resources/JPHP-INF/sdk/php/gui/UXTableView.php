@@ -13,6 +13,16 @@ class UXTableView extends UXControl
     public $editable = false;
 
     /**
+     * @var int
+     */
+    public $fixedCellSize = -1;
+
+    /**
+     * @var bool
+     */
+    public $tableMenuButtonVisible = false;
+
+    /**
      * @var UXList <UXTableColumn>
      */
     public $columns;
@@ -21,6 +31,11 @@ class UXTableView extends UXControl
      * @var UXList <mixed>
      */
     public $items;
+
+    /**
+     * @var bool
+     */
+    public $constrainedResizePolicy = false;
 
     /**
      * @var bool

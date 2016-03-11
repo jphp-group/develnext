@@ -32,6 +32,7 @@ use ide\formats\form\elements\HyperlinkFormElement;
 use ide\formats\form\elements\ImageViewFormElement;
 use ide\formats\form\elements\LabelFormElement;
 use ide\formats\form\elements\ListViewFormElement;
+use ide\formats\form\elements\PaginationFormElement;
 use ide\formats\form\elements\PanelFormElement;
 use ide\formats\form\elements\PasswordFieldFormElement;
 use ide\formats\form\elements\ProgressBarFormElement;
@@ -42,6 +43,7 @@ use ide\formats\form\elements\ScrollPaneFormElement;
 use ide\formats\form\elements\SeparatorFormElement;
 use ide\formats\form\elements\SliderFormElement;
 use ide\formats\form\elements\SpriteViewFormElement;
+use ide\formats\form\elements\TableViewFormElement;
 use ide\formats\form\elements\TabPaneFormElement;
 use ide\formats\form\elements\TextAreaFormElement;
 use ide\formats\form\elements\TextFieldFormElement;
@@ -66,6 +68,7 @@ use ide\formats\form\tags\LabeledFormElementTag;
 use ide\formats\form\tags\LabelFormElementTag;
 use ide\formats\form\tags\ListViewFormElementTag;
 use ide\formats\form\tags\NodeFormElementTag;
+use ide\formats\form\tags\PaginationFormElementTag;
 use ide\formats\form\tags\PanelFormElementTag;
 use ide\formats\form\tags\PasswordFieldFormElementTag;
 use ide\formats\form\tags\PolygonFormElementTag;
@@ -77,6 +80,7 @@ use ide\formats\form\tags\SeparatorFormElementTag;
 use ide\formats\form\tags\ShapeFormElementTag;
 use ide\formats\form\tags\SliderFormElementTag;
 use ide\formats\form\tags\SpriteViewFormElementTag;
+use ide\formats\form\tags\TableViewFormElementTag;
 use ide\formats\form\tags\TabPaneFormElementTag;
 use ide\formats\form\tags\TextAreaFormElementTag;
 use ide\formats\form\tags\TextFieldFormElementTag;
@@ -128,6 +132,8 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new ProgressIndicatorFormElement());
         $this->register(new SeparatorFormElement());
         $this->register(new WebViewFormElement());
+        $this->register(new TableViewFormElement());
+        $this->register(new PaginationFormElement());
 
         $this->register(new PanelFormElement());
         $this->register(new TitledPaneFormElement());
@@ -180,6 +186,8 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new SpriteViewFormElementTag());
         $this->register(new ScrollPaneFormElementTag());
         $this->register(new GamePaneFormElementTag());
+        $this->register(new PaginationFormElementTag());
+        $this->register(new TableViewFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());

@@ -16,10 +16,12 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.classes.support.Eventable;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.UserData;
 import php.runtime.Memory;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
@@ -102,24 +104,12 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
 
     @Signature
     public Memory data(String name) {
-        Object userData = getWrappedObject().getUserData();
-
-        if (userData instanceof UserData) {
-            return ((UserData) userData).get(name);
-        }
-
-        return Memory.NULL;
+        return JavaFxUtils.data(getWrappedObject(), name);
     }
 
     @Signature
     public Memory data(Environment env, String name, Memory value) {
-        Object userData = getWrappedObject().getUserData();
-
-        if (!(userData instanceof UserData)) {
-            getWrappedObject().setUserData(userData = new UserData(Memory.wrap(env, userData)));
-        }
-
-        return ((UserData) userData).set(name, value);
+        return JavaFxUtils.data(env, getWrappedObject(), name, value);
     }
 
     @Getter

@@ -29,7 +29,7 @@ trait SavableFormMixin
             });
         }
 
-        if ($config->has('width') && $config->has('height')) {
+        if ($config->has('width') && $config->has('height') && $this->resizable) {
             $this->width = $config->get("width", $this->width);
             $this->height = $config->get("height", $this->height);
 
@@ -49,11 +49,13 @@ trait SavableFormMixin
 
         Logger::debug("Init window $class, size = [$this->width, $this->height], position = [$this->x, $this->y]");
 
-        uiLater(function () use ($config) {
-            /** @var $this AbstractForm */
-            $this->width = $config->get("width", $this->width);
-            $this->height = $config->get("height", $this->height);
-        });
+        if ($this->resizable) {
+            uiLater(function () use ($config) {
+                /** @var $this AbstractForm */
+                $this->width = $config->get("width", $this->width);
+                $this->height = $config->get("height", $this->height);
+            });
+        }
 
         $screen = UXScreen::getPrimary();
 

@@ -52,7 +52,7 @@ class CloseBlockActionType extends AbstractSimpleActionType
         return 'icons/down16.png';
     }
 
-    function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode)
+    function makeUi(Action $action, UXNode $titleNode, UXNode $descriptionNode = null)
     {
         $descriptionNode = new UXSeparator();
         $descriptionNode->height = 3;

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox id="dialogContainer" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <children>
+            <HBox prefHeight="225.0" prefWidth="400.0" spacing="10.0">
+               <children>
+                  <ListView id="list" prefWidth="130.0" />
+                  <VBox id="content" prefHeight="40.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <HBox prefHeight="30.0" prefWidth="260.0" spacing="5.0">
+                           <children>
+                              <Button id="addButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-plus" text="Добавить">
+                                 <padding>
+                                    <Insets left="15.0" right="15.0" />
+                                 </padding>
+                              </Button>
+                              <Button id="removeButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Удалить">
+                                 <padding>
+                                    <Insets left="15.0" right="15.0" />
+                                 </padding>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <HBox prefHeight="30.0" prefWidth="260.0" spacing="5.0">
+               <children>
+                  <Button id="closeButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-ok" text="Закрыть">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
+                  <Button id="clearButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Удалить все">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
