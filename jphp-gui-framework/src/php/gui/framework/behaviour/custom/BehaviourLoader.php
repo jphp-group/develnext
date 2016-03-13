@@ -1,9 +1,11 @@
 <?php
 namespace php\gui\framework\behaviour\custom;
 
+use ParseException;
 use php\format\ProcessorException;
 use php\io\IOException;
 use php\io\Stream;
+use php\lib\fs;
 use php\lib\str;
 use php\xml\DomDocument;
 use php\xml\DomElement;
@@ -83,14 +85,30 @@ class BehaviourLoader
         try {
             if (!$cached || !($document = static::$documents[$file])) {
                 $xml = new XmlProcessor();
-                $document = $xml->parse(Stream::getContents($file));
+                $content = Stream::getContents($file);
+
+                if ($content) {
+                    $document = $xml->parse($content);
+                } else {
+                    $document = new DomDocument();
+                }
 
                 static::$documents[$file] = $document;
             }
 
             static::loadFromDocument($document, $manager);
+
+            return true;
         } catch (IOException $e) {
+            if (fs::exists($file)) {
+                return false;
+            }
+
+            return true;
+        } catch (ProcessorException $e) {
             ;
         }
+
+        return false;
     }
 }

@@ -13,7 +13,7 @@ JAVA_BIN="$JAVA_HOME/bin/java"
 
 JVM_OPTS=" -Xms256M -Xmx768M -XX:ReservedCodeCacheSize=150m -XX:+UseConcMarkSweepGC"
 JVM_OPTS="$JVM_OPTS -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true"
-JVM_OPTS="$JVM_OPTS -Dfile.encoding=UTF-8 -Ddevelnext.launcher=root"
+JVM_OPTS="$JVM_OPTS -Dfile.encoding=UTF-8 -Ddevelnext.launcher=root -Dprism.order=sw -Dprism.verbose=true"
 echo "-----------------------" 
 
 

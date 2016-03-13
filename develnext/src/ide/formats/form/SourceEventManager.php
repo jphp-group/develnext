@@ -10,6 +10,7 @@ use php\io\File;
 use php\io\IOException;
 use php\io\MemoryStream;
 use php\io\Stream;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Regex;
@@ -132,7 +133,7 @@ class SourceEventManager
 
     public function loadContent()
     {
-        if (\Files::exists("$this->file.source")) {
+        if (fs::exists("$this->file.source")) {
             return FileUtils::get("$this->file.source");
         }
 

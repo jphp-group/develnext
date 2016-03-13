@@ -38,6 +38,7 @@ use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\ProjectFile;
 use ide\project\ProjectIndexer;
 use ide\systems\FileSystem;
+use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use ide\utils\UiUtils;
 use php\gui\designer\UXDesigner;
@@ -429,7 +430,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     protected function loadOthers()
     {
         $this->actionEditor->load();
-        $this->behaviourManager->load();
+
+        if (!$this->behaviourManager->load()) {
+            Notifications::warningFileOccurs($this->behaviourManager->getFile());
+        }
 
         if (File::of($this->codeFile)->exists()) {
             $this->codeEditor->load();

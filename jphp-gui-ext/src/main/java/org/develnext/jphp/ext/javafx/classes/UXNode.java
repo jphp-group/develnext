@@ -678,6 +678,10 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     }
 
     public static Node __globalLookup(Node parent, String select) {
+        if (parent == null) { // fix null pointer exceptio
+            return null;
+        }
+
         Node node = parent.lookup(select);
 
         if (node != null) {

@@ -1,6 +1,8 @@
 <?php
 namespace ide\ui;
 
+use ide\Ide;
+use ide\project\Project;
 use php\gui\UXTrayNotification;
 
 class Notifications
@@ -78,5 +80,17 @@ class Notifications
     public static function errorCopyFile($file)
     {
         static::error('Ошибка копирования', "Файл '$file' невозможно скопировать в данный момент, возможно недоступен файл или целевая папка.");
+    }
+
+    public static function warningFileOccurs($file)
+    {
+        $project = Ide::project();
+
+        if ($project) {
+            $file = $project->getAbsoluteFile($file);
+            $file = $file->getRelativePath();
+        }
+
+        static::warning('Поврежденный файл', "$file поврежден, возможно некоторые данные утеряны.");
     }
 }

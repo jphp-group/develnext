@@ -135,22 +135,18 @@ public class UXApplication extends BaseWrapper<Application> {
 
     @Signature
     public static void runLater(final Invoker callback) {
+        if (isShutdown()) {
+            return;
+        }
+
         new JFXPanel();
 
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if (!Platform.isFxApplicationThread()) {
-                    return;
-                }
-
                 try {
                     callback.callNoThrow();
                 } catch (Exception e) {
-                    if (e instanceof IllegalStateException && "java.lang.IllegalStateException: Platform.exit has been called".equals(e.getMessage())) {
-                        return;
-                    }
-
                     callback.getEnvironment().catchUncaught(e);
                 }
             }

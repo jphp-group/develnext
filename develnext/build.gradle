@@ -202,6 +202,7 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
 
     from(installDir) {
         include('*.sh')
+        include('DevelNext')
         include('bin/develnext')
         include('tools/gradle/bin/gradle')
         include('tools/jre/bin/java')
