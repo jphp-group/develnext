@@ -187,11 +187,11 @@ class IdeBehaviourManager extends BehaviourManager
 
     public function load()
     {
-        if (!$this->file) return;
+        if (!$this->file) return true;
 
         $this->behaviours = [];
 
-        BehaviourLoader::load($this->file, $this);
+        return BehaviourLoader::load($this->file, $this);
     }
 
     public function dump(DomDocument $document, array $targetIds = [])
@@ -326,5 +326,13 @@ class IdeBehaviourManager extends BehaviourManager
     public function getBehaviour($target, $type)
     {
         throw new NotImplementedException();
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->file;
     }
 }
