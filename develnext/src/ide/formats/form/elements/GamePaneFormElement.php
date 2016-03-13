@@ -53,34 +53,7 @@ class GamePaneFormElement extends AbstractFormElement
 
     public function isLayout()
     {
-        return true;
-    }
-
-    public function addToLayout($self, $node, $screenX, $screenY)
-    {
-        Notifications::show('Извините, но...', 'В игоровую комнату теперь можно загружать только сцены из других форм!', 'WARNING');
-
-        return;
-        /** @var UXScrollPane $self */
-        $content = $self->content;
-
-        if ($content instanceof UXPane) {
-            $node->position = $content->screenToLocal($screenX, $screenY);
-            $content->add($node);
-        }
-    }
-
-    public function getLayoutChildren($layout)
-    {
-        $result = [];
-
-        if ($layout->content) {
-            foreach ($layout->content->children as $node) {
-                $result[] = $node;
-            }
-        }
-
-        return $result;
+        return false;
     }
 
     public function canBePrototype()
