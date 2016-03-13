@@ -576,8 +576,11 @@ class PhpParser
         }
 
         $memory = Stream::of('php://memory', 'w+');
-        $memory->write($this->content);
-        $memory->seek(0);
+
+        // if content is empty, will be exception
+        if ($memory->write($this->content)) {
+            $memory->seek(0);
+        }
 
         return new SourceTokenizer($memory, '', 'UTF-8');
     }

@@ -97,9 +97,13 @@ class GuiFormDumper extends AbstractFormDumper
 
         $this->appendImports($this->designer->getNodes(), $document);
 
+        $stream = null;
+
         try {
             $stream = Stream::of($editor->getFile(), 'w');
             $this->processor->formatTo($document, $stream);
+        } catch (IOException $e) {
+            Logger::warn("Unable to save file: {$e->getFile()}");
         } finally {
             if ($stream) $stream->close();
         }
