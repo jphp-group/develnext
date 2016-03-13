@@ -31,8 +31,6 @@ public class UXTab extends BaseWrapper<Tab> {
 
         @Property @Nullable Tooltip tooltip();
         @Property @Nullable ContextMenu contextMenu();
-
-        @Property Object userData();
     }
 
     public UXTab(Environment env, Tab wrappedObject) {
@@ -58,7 +56,6 @@ public class UXTab extends BaseWrapper<Tab> {
         __wrappedObject = new Tab(title, content);
     }
 
-
     @Getter
     public String getText() {
         return getWrappedObject().getText();
@@ -77,6 +74,22 @@ public class UXTab extends BaseWrapper<Tab> {
     @Setter
     public void setGraphic(@Nullable Node node) {
         getWrappedObject().setGraphic(node);
+    }
+
+    @Getter
+    public Memory getUserData(Environment env) {
+        return JavaFxUtils.userData(env, getWrappedObject().getUserData());
+    }
+
+    @Setter
+    public void setUserData(Environment env, @Nullable Object value) {
+        Object userData = getWrappedObject().getUserData();
+
+        if (userData instanceof UserData) {
+            ((UserData) userData).setValue(Memory.wrap(env, value));
+        } else {
+            getWrappedObject().setUserData(value);
+        }
     }
 
     @Signature

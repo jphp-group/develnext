@@ -54,6 +54,11 @@ class FileSystem
     static protected $previousEditor = null;
 
     /**
+     * @var bool
+     */
+    static protected $freeze = false;
+
+    /**
      * @param $path
      * @param null $param
      */
@@ -82,7 +87,23 @@ class FileSystem
             return static::open($path, true, $param);
         } else {
             $editor = static::getOpenedEditor($path);
-            $editor->open($param);
+
+            if (self::getSelectedEditor() !== $editor) {
+                $tab = null;
+
+                foreach (self::getOpenedTabs() as $tab) {
+                    if ($tab->userData === $editor) {
+                        self::$freeze = true;
+                        Ide::get()->getMainForm()->{'fileTabPane'}->selectTab($tab);
+                        self::$freeze = false;
+
+                        break;
+                    }
+                }
+            }
+
+            static::_openEditor($editor, $param);
+
             return $editor;
         }
     }
@@ -216,6 +237,36 @@ class FileSystem
         return $editor;
     }
 
+    static public function _openEditor($editor, $param = null)
+    {
+        /** @var MainForm $mainForm */
+        $mainForm = Ide::get()->getMainForm();
+
+        if ($editor instanceof AbstractEditor && $editor !== static::$previousEditor) {
+            if (static::$previousEditor) {
+                static::$previousEditor->hide();
+            }
+
+            $mainForm->clearLeftPane();
+
+            if ($editor->getLeftPaneUi()) {
+                $mainForm->setLeftPane($editor->getLeftPaneUi());
+            }
+
+            $editor->open($param);
+
+            static::$previousEditor = $editor;
+        } else {
+            $previousEditor = null;
+        }
+
+        $project = Ide::project();
+
+        if ($project) {
+            $project->update();
+        }
+    }
+
     /**
      * @param $path
      * @param bool $switchToTab
@@ -282,38 +333,21 @@ class FileSystem
                     return;
                 }
 
+                if (static::$freeze) {
+                    return;
+                }
+
                 uiLater(function () use ($mainForm, $path, $fileTabPane, $param) {
                     $tab = $fileTabPane->selectedTab;
 
                     Logger::info("Opening selected tab '$tab->text'");
 
-                    if ($tab->userData instanceof AbstractEditor && $tab->userData !== static::$previousEditor) {
-                        if (static::$previousEditor) {
-                            static::$previousEditor->hide();
-                        }
-
-                        $mainForm->clearLeftPane();
-
-                        if ($tab->userData->getLeftPaneUi()) {
-                            $mainForm->setLeftPane($tab->userData->getLeftPaneUi());
-                        }
-
-                        $tab->userData->open($param);
-
-                        static::$previousEditor = $tab->userData;
-                    } else {
-                        $previousEditor = null;
-                    }
-
-                    $project = Ide::project();
-
-                    if ($project) {
-                        $project->update();
-                    }
+                    static::_openEditor($tab->userData, $param);
                 });
             };
 
             uiLater(function () use ($tab, $changeHandler) {
+                $tab->data('change-handler', $changeHandler);
                 $tab->on('change', $changeHandler);
             });
 

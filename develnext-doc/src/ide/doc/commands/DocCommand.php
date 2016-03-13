@@ -98,6 +98,6 @@ class DocCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        FileSystem::open('~doc');
+        FileSystem::openOrRefresh('~doc');
     }
 }

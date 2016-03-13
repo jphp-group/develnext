@@ -144,4 +144,16 @@ final public class JavaFxUtils {
 
         return ((UserData) userData).set(name, value);
     }
+
+    public static Memory userData(Environment env, Object userData) {
+        if (userData == null) {
+            return null;
+        }
+
+        if (userData instanceof UserData) {
+            return ((UserData) userData).getValue();
+        }
+
+        return Memory.wrap(env, userData);
+    }
 }
