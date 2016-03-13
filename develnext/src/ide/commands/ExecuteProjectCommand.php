@@ -146,8 +146,8 @@ class ExecuteProjectCommand extends AbstractCommand
         } else {
             $time = 0;
 
-            $timer = new AccurateTimer(100, function (ScriptEvent $e) use ($appPidFile, $proc, &$time) {
-                $time += $e->sender->interval;
+            $timer = new AccurateTimer(100, function () use ($appPidFile, $proc, &$time) {
+                $time += 100;
 
                 if ($appPidFile->exists() || $time > 1000 * 25) {
                     $proc();
