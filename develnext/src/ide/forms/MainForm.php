@@ -63,6 +63,19 @@ class MainForm extends AbstractIdeForm
         $mainMenu = $this->mainMenu; // FIX!!!!! see FixSkinMenu
 
         $this->contentSplit->items->removeByIndex(1); // TODO implement bottom slider.
+
+        $pane = UXTabPane::createDefaultDnDPane();
+
+        $parent = $this->fileTabPane->parent;
+        $this->fileTabPane->free();
+
+        /** @var UXTabPane $tabPane */
+        $tabPane = $pane->children[0];
+        $tabPane->id = 'fileTabPane';
+        $tabPane->tabClosingPolicy = 'ALL_TABS';
+
+        UXAnchorPane::setAnchor($pane, 0);
+        $parent->add($pane);
     }
 
     /**

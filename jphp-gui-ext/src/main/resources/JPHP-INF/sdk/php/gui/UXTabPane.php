@@ -1,5 +1,6 @@
 <?php
 namespace php\gui;
+use php\gui\layout\UXPane;
 
 /**
  * Class UXTabPane
@@ -31,6 +32,13 @@ class UXTabPane extends UXControl
      * @var string
      */
     public $side = 'TOP';
+
+    /**
+     * @return UXPane
+     */
+    public static function createDefaultDnDPane()
+    {
+    }
 
     /**
      * @param UXTab $tab

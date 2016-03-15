@@ -1,7 +1,12 @@
 package org.develnext.jphp.ext.javafx.support;
 
 import com.sun.javafx.scene.control.skin.*;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.Tab;
 
 import java.lang.reflect.Field;
 

@@ -65,6 +65,11 @@ class UXTab
     public $userData;
 
     /**
+     * @var bool
+     */
+    public $draggable;
+
+    /**
      * @param string $event
      * @param callable $handler
      * @param string $group

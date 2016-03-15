@@ -3,7 +3,14 @@ package org.develnext.jphp.ext.javafx.support.control;
 import java.util.HashSet;
 import java.util.Set;
 
+import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -11,10 +18,14 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -24,6 +35,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import org.develnext.jphp.ext.javafx.classes.UXImage;
+import org.develnext.jphp.ext.javafx.support.ImageViewEx;
 
 
 public class DraggableTab extends Tab {
@@ -40,6 +53,8 @@ public class DraggableTab extends Tab {
     private boolean disableDragFirst;
     private boolean disableDragLast;
 
+    private ImageViewEx nameLabelSnapshot = new ImageViewEx();
+
     static {
         markerStage = new Stage();
         markerStage.initStyle(StageStyle.UNDECORATED);
@@ -51,7 +66,30 @@ public class DraggableTab extends Tab {
 
     public DraggableTab(String text) {
         nameLabel = new Label(text);
-        setGraphic(nameLabel);
+        updateGraphic();
+
+        tabPaneProperty().addListener(new ChangeListener<TabPane>() {
+            @Override
+            public void changed(ObservableValue<? extends TabPane> observable, TabPane oldValue, final TabPane newValue) {
+                if (newValue == null) {
+                    return;
+                }
+
+                newValue.getTabs().addListener(new ListChangeListener<Tab>() {
+                    @Override
+                    public void onChanged(Change<? extends Tab> c) {
+                        ObservableList<Tab> tabs = newValue.getTabs();
+
+                        for (Tab tab : tabs) {
+                            if (tab instanceof DraggableTab) {
+                                ((DraggableTab) tab).updateGraphic();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
         detachable = true;
         dragStage = new Stage();
         dragStage.initStyle(StageStyle.UNDECORATED);
@@ -61,7 +99,7 @@ public class DraggableTab extends Tab {
         StackPane.setAlignment(dragText, Pos.CENTER);
         dragStagePane.getChildren().add(dragText);
         dragStage.setScene(new Scene(dragStagePane));
-        nameLabel.setOnMouseDragged(new EventHandler<MouseEvent>() {
+        nameLabelSnapshot.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
 
             @Override
             public void handle(MouseEvent t) {
@@ -73,8 +111,8 @@ public class DraggableTab extends Tab {
                     return;
                 }
 
-                dragStage.setWidth(nameLabel.getWidth() + 10);
-                dragStage.setHeight(nameLabel.getHeight() + 10);
+                dragStage.setWidth(nameLabelSnapshot.getWidth() + 10);
+                dragStage.setHeight(nameLabelSnapshot.getHeight() + 10);
                 dragStage.setX(t.getScreenX());
                 dragStage.setY(t.getScreenY());
                 dragStage.show();
@@ -117,7 +155,7 @@ public class DraggableTab extends Tab {
             }
         });
 
-        nameLabel.setOnMouseReleased(new EventHandler<MouseEvent>() {
+        nameLabelSnapshot.addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
 
             @Override
             public void handle(MouseEvent t) {
@@ -237,13 +275,34 @@ public class DraggableTab extends Tab {
         return detachable;
     }
 
+    public void updateGraphic() {
+        setGraphic(nameLabel);
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                SnapshotParameters snapParams = new SnapshotParameters();
+                snapParams.setFill(Color.TRANSPARENT);
+
+                WritableImage snapshot = nameLabel.snapshot(snapParams, null);
+
+                nameLabelSnapshot.setAutoSize(true);
+                nameLabelSnapshot.setImage(snapshot);
+
+                setGraphic(nameLabelSnapshot);
+            }
+        });
+    }
+
     public void setLabelText(String text) {
         nameLabel.setText(text);
         dragText.setText(text);
+        updateGraphic();
     }
 
     public void setLabelGraphic(Node node) {
         nameLabel.setGraphic(node);
+        updateGraphic();
     }
 
     public String getLabelText() {
@@ -337,8 +396,15 @@ public class DraggableTab extends Tab {
                 node.getHeight());
     }
 
+    private Rectangle2D getAbsoluteRect(Canvas node) {
+        return new Rectangle2D(node.localToScene(node.getLayoutBounds().getMinX(), node.getLayoutBounds().getMinY()).getX() + node.getScene().getWindow().getX(),
+                node.localToScene(node.getLayoutBounds().getMinX(), node.getLayoutBounds().getMinY()).getY() + node.getScene().getWindow().getY(),
+                node.getWidth(),
+                node.getHeight());
+    }
+
     private Rectangle2D getAbsoluteRect(Tab tab) {
-        Control node = ((DraggableTab) tab).getLabel();
+        Canvas node = ((DraggableTab) tab).nameLabelSnapshot;
         return getAbsoluteRect(node);
     }
 

@@ -14,9 +14,8 @@ use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXContextMenu;
 use php\gui\UXDialog;
-use php\gui\UXDraggableTab;
-use php\gui\UXMenu;
 use php\gui\UXTab;
+use php\gui\UXMenu;
 use php\gui\UXTabPane;
 use php\io\File;
 use php\lib\Items;
@@ -39,7 +38,7 @@ class FileSystem
     static protected $addTab;
 
     /**
-     * @var UXDraggableTab[]
+     * @var UXTab[]
      */
     static protected $openedTabs = [];
 
@@ -139,7 +138,7 @@ class FileSystem
     }
 
     /**
-     * @return UXDraggableTab[]
+     * @return UXTab[]
      */
     private static function getOpenedTabs()
     {
@@ -294,11 +293,10 @@ class FileSystem
         }
 
         if (!$tab) {
-            $tab = new UXDraggableTab();
-            $tab->detachable = false;
+            $tab = new UXTab();
+            /*$tab->detachable = false;
             $tab->disableDragFirst = true;
-            $tab->disableDragLast = true;
-            $tab->draggable = $editor->isDraggable();
+            $tab->disableDragLast = true;*/
 
             $tab->text = $editor->getTitle();
             $tab->tooltip = $editor->getTooltip();
@@ -356,6 +354,7 @@ class FileSystem
             }
 
             static::addTab($tab);
+            $tab->draggable = $editor->isDraggable();
         }
 
         if ($switchToTab) {
@@ -414,32 +413,43 @@ class FileSystem
         $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
 
         if (!static::$addTab) {
-            $tab = new UXDraggableTab();
-            $tab->detachable = false;
+            $tab = new UXTab();
+            $tab->draggable = false;
             $tab->closable = false;
+            $tab->style = '-fx-cursor: hand;';
+            $tab->graphic = Ide::get()->getImage('icons/plus16.png');
 
             $button = new UXButton();
             $tab->graphic = $button;
 
             $button->graphic = Ide::get()->getImage('icons/plus16.png');
+            $button->classes->add('dn-add-tab-button');
             $tab->style = '-fx-cursor: hand; -fx-padding: 1px 0px;';
 
-            $button->on('click', function (UXMouseEvent $e) {
+            $showMenu = function () use ($button) {
                 $contextMenu = new UXContextMenu();
 
-                /** @var UXMenu $menu */
+                // @var UXMenu $menu
                 $menu = Ide::get()->getMainForm()->{'menuCreate'};
 
                 foreach ($menu->items as $item) {
                     $contextMenu->items->add($item);
                 }
 
-                $contextMenu->show(Ide::get()->getMainForm(), $e->screenX, $e->screenY);
+                $contextMenu->showByNode($button, 24, 24);
+            };
+            $button->on('click', $showMenu);
+
+            $tab->on('change', function () use ($showMenu) {
+                uiLater(function () use ($showMenu) {
+                    $showMenu();
+                });
             });
 
             static::$addTab = $tab;
         }
 
         $fileTabPane->tabs->add(static::$addTab);
+        static::$addTab->draggable = false;
     }
 }

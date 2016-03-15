@@ -63,6 +63,9 @@
     -fx-cursor: hand;
 }
 
+.dn-add-tab-button {
+}
+
 .list-view .list-cell:filled:selected:focused, .list-view .list-cell:filled:selected {
     -fx-background-color: silver;
     -fx-cursor: hand;
