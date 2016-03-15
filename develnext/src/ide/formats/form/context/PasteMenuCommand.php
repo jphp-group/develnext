@@ -69,14 +69,17 @@ class PasteMenuCommand extends AbstractMenuCommand
                 /** @var DomElement $behaviours */
                 $behaviours = $document->find('/copies/behaviours');
 
-                $addLayout = function (UXNode $uiNode) use ($editor, &$addLayout, $document, $behaviours) {
+                $addLayout = function (UXNode $uiNode, $factoryId) use ($editor, &$addLayout, $document, $behaviours) {
                     /** @var AbstractFormElement $type */
                     $type = $editor->getFormat()->getFormElement($uiNode);
 
                     if ($type) {
                         $oldId = $editor->getNodeId($uiNode);
                         $id = $editor->generateNodeId($type);
-                        $uiNode->id = $id;
+
+                        if (!$factoryId) {
+                            $uiNode->id = $id;
+                        }
 
                         /** @var DomElement $oneDataElement */
                         $oneDataElement = $document->find("/copies/data/one[@id='$oldId']");
@@ -95,13 +98,13 @@ class PasteMenuCommand extends AbstractMenuCommand
                         if ($type->isLayout()) {
                             foreach ($type->getLayoutChildren($uiNode) as $sub) {
                                 $editor->registerNode($sub);
-                                $addLayout($sub);
+                                $addLayout($sub, $factoryId);
                             }
                         }
 
                         $type->refreshNode($uiNode);
 
-                        if ($behaviours && $id) {
+                        if ($behaviours && !$factoryId) {
                             BehaviourLoader::loadOne($oldId, $behaviours, $editor->getBehaviourManager(), $id);
                         }
                     }
@@ -156,7 +159,7 @@ class PasteMenuCommand extends AbstractMenuCommand
                     }
 
                     $editor->registerNode($uiNode);
-                    $addLayout($uiNode);
+                    $addLayout($uiNode, $factoryId);
 
                     waitAsync(100, function () use ($editor, $uiNode) {
                         $editor->getDesigner()->selectNode($uiNode);

@@ -756,6 +756,10 @@ public class UXDesigner extends BaseObject {
             throw new RuntimeException("Node is not registered");
         }
 
+        if (node.getParent() == null) {
+            throw new IllegalArgumentException("Node.parent must not be null");
+        }
+
         Selection selection = selections.get(node);
 
         if (selection == null) {
@@ -1200,7 +1204,7 @@ public class UXDesigner extends BaseObject {
         public void update() {
             Bounds bounds = node.getLayoutBounds();
 
-            Point2D point2D = parent.localToScreen(node.getLayoutX(), node.getLayoutY());
+            Point2D point2D = parent == null ? null : parent.localToScreen(node.getLayoutX(), node.getLayoutY());
 
             if (point2D != null) {
                 update(point2D.getX(), point2D.getY(), bounds);

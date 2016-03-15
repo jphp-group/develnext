@@ -93,7 +93,7 @@ function uiText($object)
     }
 
     if ($object instanceof UXComboBoxBase) {
-        return $object->value;
+        return $object->editable ? $object->text : $object->value;
     }
 
     if ($object instanceof UXListView) {
