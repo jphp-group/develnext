@@ -82,6 +82,23 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
 
     @Signature
     public void addAll(Environment env, ForeachIterator iterator) throws Throwable {
+        if (iterator == null) {
+            return;
+        }
+
+        while (iterator.next()) {
+            env.invokeMethod(this, "add", iterator.getValue());
+        }
+    }
+
+    @Signature
+    public void setAll(Environment env, ForeachIterator iterator) throws Throwable {
+        if (iterator == null) {
+            return;
+        }
+
+        env.invokeMethod(this, "clear");
+
         while (iterator.next()) {
             env.invokeMethod(this, "add", iterator.getValue());
         }

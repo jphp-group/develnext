@@ -218,7 +218,20 @@ public class PaginationEx extends FlowPane {
             children.add(previousButton);
         }
 
-        boolean firstSkip = selectedPage > maxPageCount.get() / 2;
+        int from = selectedPage - maxPageCount.get() / 2;
+        if (from < 0) from = 0;
+
+        int to   = from + maxPageCount.get();
+        if (to > pages - 1) to = pages;
+
+        if (to - from < maxPageCount.get()) {
+            from -= maxPageCount.get() - (to - from);
+
+            if (from < 0) from = 0;
+        }
+
+        boolean lastSkip = to < pages;
+        boolean firstSkip = from > 0;
 
         if (firstSkip) {
             Button button = new Button(String.valueOf(1));
@@ -241,28 +254,21 @@ public class PaginationEx extends FlowPane {
             children.add(label);
         }
 
-        int from = selectedPage - maxPageCount.get() / 2;
-        if (from < 0) from = 0;
-
-        int to   = from + maxPageCount.get();
-        if (to > pages - 1) to = pages;
-
-        if (to - from < maxPageCount.get()) {
-            from -= maxPageCount.get() - (to - from);
-
-            if (from < 0) from = 0;
-        }
-
-        boolean lastSkip = to < pages;
-
         for (int i = from; i < to; i++) {
-            Button button = new Button(String.valueOf(i + 1));
+            final Button button = new Button(String.valueOf(i + 1));
             button.getStyleClass().addAll("nav-item");
             button.setFont(getFont());
             button.setTextFill(getTextColor());
 
             if (selectedPage == i) {
                 button.getStyleClass().addAll("selected");
+
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        button.requestFocus();
+                    }
+                });
             }
 
             final int page = i;
