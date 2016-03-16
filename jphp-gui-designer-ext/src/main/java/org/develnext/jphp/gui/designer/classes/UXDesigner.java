@@ -27,6 +27,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -917,12 +918,12 @@ public class UXDesigner extends BaseObject {
                     SnapshotParameters snapParams = new SnapshotParameters();
                     snapParams.setFill(Color.TRANSPARENT);
 
-                    selection.dragImageView.setImage(selection.node.snapshot(snapParams, null));
-                    selection.dragImageView.setStyle("-fx-opacity: 0.7; -fx-border-width: 1px; -fx-border-color: gray; -fx-border-style: dashed");
+                    selection.dragView.getChildren().setAll(new ImageView(selection.node.snapshot(snapParams, null)));
+                    selection.dragView.setStyle("-fx-opacity: 0.7; -fx-border-width: 1px; -fx-border-color: black; -fx-border-style: dashed; -fx-background-color: transparent");
 
-                    selection.parent.getChildren().add(selection.dragImageView);
+                    selection.parent.getChildren().add(selection.dragView);
 
-                    selection.dragImageView.startFullDrag();
+                    selection.dragView.startFullDrag();
                 }
 
                 e.consume();
@@ -994,7 +995,7 @@ public class UXDesigner extends BaseObject {
                 startPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
                 for (Selection selection : selections.values()) {
-                    selection.dragImageView.setMouseTransparent(true);
+                    selection.dragView.setMouseTransparent(true);
                     selection.drag(selection.node.getLayoutX(), selection.node.getLayoutY(), false);
                 }
 
@@ -1019,12 +1020,12 @@ public class UXDesigner extends BaseObject {
                         selection.node.setMouseTransparent(false);
                         selection.node.setCursor(Cursor.DEFAULT);
 
-                        selection.drag(selection.dragImageView.getLayoutX(), selection.dragImageView.getLayoutY(), false);
-                        relocateNode(selection.node, selection.dragImageView.getLayoutX(), selection.dragImageView.getLayoutY());
+                        selection.drag(selection.dragView.getLayoutX(), selection.dragView.getLayoutY(), false);
+                        relocateNode(selection.node, selection.dragView.getLayoutX(), selection.dragView.getLayoutY());
 
                         selection.update();
 
-                        selection.parent.getChildren().remove(selection.dragImageView);
+                        selection.parent.getChildren().remove(selection.dragView);
                     }
 
                     if (onChanged != null) {
@@ -1093,7 +1094,8 @@ public class UXDesigner extends BaseObject {
     public class Selection {
         public static final int POINT_SIZE = 6;
 
-        public final ImageView dragImageView = new ImageView();
+        //public final ImageView dragImageView = new ImageView();
+        public final HBox dragView = new HBox();
 
         protected boolean locked = false;
         protected boolean dots = false;
@@ -1569,7 +1571,7 @@ public class UXDesigner extends BaseObject {
         }
 
         public void drag(double x, double y, boolean updateUi) {
-            dragImageView.relocate(x - getCenterX(node), y - getCenterY(node));
+            dragView.relocate(x - getCenterX(node), y - getCenterY(node));
 
             if (updateUi) {
                 sizeText.setVisible(dragged && helpersEnabled);
