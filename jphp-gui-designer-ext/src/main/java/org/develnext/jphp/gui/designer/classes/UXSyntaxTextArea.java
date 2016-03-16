@@ -26,7 +26,6 @@ public class UXSyntaxTextArea extends UXNode<SyntaxTextArea> {
         void jumpToLine(int line, int pos);
         void showFindDialog();
         void showReplaceDialog();
-        void insertToCaret(String text);
 
         void redo();
         void undo();
@@ -59,6 +58,19 @@ public class UXSyntaxTextArea extends UXNode<SyntaxTextArea> {
         }
 
         return new double[] { point2D.getX(), point2D.getY() };
+    }
+
+    @Signature
+    public void insertToCaret(String text) {
+        if (text == null) {
+            return;
+        }
+
+        try {
+            getWrappedObject().insertToCaret(text);
+        } catch (NullPointerException e) {
+            // nop. fix bug.
+        }
     }
 
     public static class EventProvider extends org.develnext.jphp.ext.javafx.support.EventProvider<SyntaxTextArea> {
