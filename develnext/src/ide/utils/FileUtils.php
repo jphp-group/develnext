@@ -5,6 +5,7 @@ use php\io\File;
 use php\io\FileStream;
 use php\io\Stream;
 use php\lang\System;
+use php\lib\fs;
 use php\lib\Str;
 
 /**
@@ -186,11 +187,7 @@ class FileUtils
 
     public static function put($filename, $content, $encoding = 'UTF-8')
     {
-        $parent = File::of($filename)->getParentFile();
-
-        if ($parent && !$parent->isDirectory()) {
-            $parent->mkdirs();
-        }
+        fs::ensureParent($filename);
 
         Stream::putContents($filename, Str::encode($content, $encoding));
     }

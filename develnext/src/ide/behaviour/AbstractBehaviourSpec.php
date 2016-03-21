@@ -21,6 +21,7 @@ abstract class AbstractBehaviourSpec
     const GROUP_MAIN = 'Главное';
     const GROUP_INPUT = 'Управление';
     const GROUP_ANIMATION = 'Анимация';
+    const GROUP_EFFECT = 'Эффекты';
     const GROUP_LOGIC = 'Логика';
     const GROUP_GAME = 'Игровое';
 
@@ -172,8 +173,25 @@ abstract class AbstractBehaviourSpec
 
     /**
      * @param UXNode $node
+     * @param AbstractBehaviour $behaviour
      */
-    public function refreshNode(UXNode $node)
+    public function refreshNode(UXNode $node, AbstractBehaviour $behaviour)
+    {
+    }
+
+    /**
+     * @param UXNode $node
+     * @param AbstractBehaviour $behaviour
+     */
+    public function deleteNode(UXNode $node, AbstractBehaviour $behaviour)
+    {
+    }
+
+    /**
+     * @param UXNode $node
+     * @param AbstractBehaviour $behaviour
+     */
+    public function deleteSelf(UXNode $node, AbstractBehaviour $behaviour)
     {
     }
 }

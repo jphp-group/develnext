@@ -18,3 +18,7 @@ ide\behaviour\spec\GameSceneBehaviourSpec
 ide\behaviour\spec\GameEntityBehaviourSpec
 ide\behaviour\spec\WrapScreenBehaviourSpec
 ide\behaviour\spec\LimitedMovementBehaviourSpec
+
+ide\behaviour\spec\DropShadowEffectBehaviourSpec
+ide\behaviour\spec\InnerShadowEffectBehaviourSpec
+ide\behaviour\spec\ReflectionEffectBehaviourSpec

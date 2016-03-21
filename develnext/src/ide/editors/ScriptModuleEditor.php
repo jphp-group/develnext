@@ -39,6 +39,7 @@ use php\gui\UXSplitPane;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\io\File;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use stdClass;
@@ -492,15 +493,15 @@ class ScriptModuleEditor extends FormEditor
     {
         $id = Str::format($idPattern, '');
 
-        if (Files::exists($this->file . "/" . $id . '.json')) {
+        if (fs::exists($this->file . "/" . $id . '.json')) {
             $id = Str::format($idPattern, 'Alt');
 
-            if (Files::exists($this->file . "/$id.json")) {
+            if (fs::exists($this->file . "/$id.json")) {
                 $n = 3;
 
                 do {
                     $id = Str::format($idPattern, $n++);
-                } while (Files::exists($this->file . "/$id.json"));
+                } while (fs::exists($this->file . "/$id.json"));
             }
         }
 

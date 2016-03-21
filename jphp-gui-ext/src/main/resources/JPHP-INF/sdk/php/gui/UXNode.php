@@ -1,6 +1,8 @@
 <?php
 namespace php\gui;
 
+use php\gui\effect\UXEffect;
+use php\gui\effect\UXEffectPipeline;
 use php\gui\event\UXEvent;
 use php\lang\IllegalArgumentException;
 
@@ -24,6 +26,16 @@ abstract class UXNode
      * @var UXParent
      */
     public $parent;
+
+    /**
+     * @var UXEffectPipeline
+     */
+    public $effects;
+
+    /**
+     * @var UXNode
+     */
+    public $clip = null;
 
     /**
      * @var UXScene

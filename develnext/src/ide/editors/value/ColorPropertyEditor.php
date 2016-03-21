@@ -47,6 +47,11 @@ class ColorPropertyEditor extends ElementPropertyEditor
 
         $this->colorPicker->on('action', function () {
             $this->applyValue($this->colorPicker->value, false);
+
+            uiLater(function () {
+                $value = $this->getNormalizedValue($this->colorPicker->value);
+                $this->updateUi($value);
+            });
         });
 
         $this->dialogButton = new UXButton();

@@ -7,6 +7,7 @@ use php\format\ProcessorException;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;
+use php\gui\paint\UXColor;
 use php\lang\NotImplementedException;
 use php\lib\Str;
 use php\xml\DomDocument;
@@ -128,6 +129,16 @@ class IdeBehaviourManager extends BehaviourManager
     /**
      * @param $targetId
      * @param $type
+     * @return AbstractBehaviour|null
+     */
+    public function getBehaviourByTargetId($targetId, $type)
+    {
+        return $this->behaviours["$targetId"][$type];
+    }
+
+    /**
+     * @param $targetId
+     * @param $type
      */
     public function removeBehaviour($targetId, $type)
     {
@@ -221,6 +232,8 @@ class IdeBehaviourManager extends BehaviourManager
                     foreach ($attributes as $name => &$value) {
                         if (is_array($value)) {
                             $value = "[" . str::join($value, ',') . "]";
+                        } elseif ($value instanceof UXColor) {
+                            $value = $value->webValue;
                         }
                     }
 
@@ -270,6 +283,8 @@ class IdeBehaviourManager extends BehaviourManager
                 foreach ($attributes as &$value) {
                     if (is_array($value)) {
                         $value = "[" . str::join($value, ',') . "]";
+                    } elseif ($value instanceof UXColor) {
+                        $value = $value->webValue;
                     }
                 }
 
@@ -279,7 +294,11 @@ class IdeBehaviourManager extends BehaviourManager
             }
         }
 
-        FileUtils::put($this->file, $xml->format($document));
+        $format = $xml->format($document);
+
+        if ($format) {
+            FileUtils::put($this->file, $format);
+        }
     }
 
     /**

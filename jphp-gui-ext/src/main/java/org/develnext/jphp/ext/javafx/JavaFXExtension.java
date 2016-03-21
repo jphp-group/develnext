@@ -22,6 +22,10 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Effect;
+import javafx.scene.effect.InnerShadow;
+import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -43,6 +47,7 @@ import org.develnext.jphp.ext.javafx.classes.*;
 import org.develnext.jphp.ext.javafx.classes.animation.*;
 import org.develnext.jphp.ext.javafx.classes.data.CustomNode;
 import org.develnext.jphp.ext.javafx.classes.data.Data;
+import org.develnext.jphp.ext.javafx.classes.effect.*;
 import org.develnext.jphp.ext.javafx.classes.event.*;
 import org.develnext.jphp.ext.javafx.classes.layout.*;
 import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
@@ -54,6 +59,7 @@ import org.develnext.jphp.ext.javafx.support.KeyboardManager;
 import org.develnext.jphp.ext.javafx.support.control.*;
 import org.develnext.jphp.ext.javafx.support.control.PaginationEx;
 import org.develnext.jphp.ext.javafx.support.control.tabpane.DndTabPane;
+import org.develnext.jphp.ext.javafx.support.effect.EffectPipeline;
 import org.develnext.jphp.ext.javafx.support.event.*;
 import org.develnext.jphp.ext.javafx.support.tray.notification.TrayNotification;
 import php.runtime.env.CompileScope;
@@ -221,8 +227,18 @@ public class JavaFXExtension extends Extension {
 
         registerJavaException(scope, WrapJSException.class, JSException.class);
 
+        registerEffectPackage(scope);
         registerAnimationPackage(scope);
+
         registerEvents(scope);
+    }
+
+    protected void registerEffectPackage(CompileScope scope) {
+        registerWrapperClass(scope, Effect.class, UXEffect.class);
+        registerWrapperClass(scope, EffectPipeline.class, UXEffectPipeline.class);
+        registerWrapperClass(scope, DropShadow.class, UXDropShadowEffect.class);
+        registerWrapperClass(scope, InnerShadow.class, UXInnerShadowEffect.class);
+        registerWrapperClass(scope, Reflection.class, UXReflectionEffect.class);
     }
 
     protected void registerAnimationPackage(CompileScope scope) {

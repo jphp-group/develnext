@@ -1,0 +1,7 @@
+<behaviour extends="EffectBehaviourSpec">
+    <properties>
+        <property name="Верх. смещение" code="topOffset" editor="float" />
+        <property name="Верх. прозрачность" code="topOpacity" editor="float" />
+        <property name="Ниж. прозрачность" code="bottomOpacity" editor="float" />
+    </properties>
+</behaviour>

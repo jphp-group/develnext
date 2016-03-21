@@ -5,6 +5,7 @@ use ide\editors\FormEditor;
 use ide\misc\EventHandlerBehaviour;
 use ide\systems\FileSystem;
 use php\gui\designer\UXDesignPropertyEditor;
+use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\DataUtils;
 use php\gui\text\UXFont;
 use php\gui\UXApplication;
@@ -12,6 +13,7 @@ use php\gui\UXNode;
 use php\gui\UXTableCell;
 use php\lang\IllegalArgumentException;
 use php\lang\JavaException;
+use php\lib\arr;
 use php\xml\DomElement;
 
 /**
@@ -82,10 +84,21 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             if ($editor instanceof FormEditor) {
                 $editor->getDesigner()->update();
 
-                if ($this->designProperties->target instanceof UXNode) {
-                    UXApplication::runLater(function () use ($editor) {
+                $target = $this->designProperties->target;
+
+                if ($target instanceof UXNode) {
+                    uiLater(function () use ($editor) {
                         $editor->refreshNode($this->designProperties->target);
                         $editor->getDesigner()->update();
+                    });
+                } else {
+                    uiLater(function () use ($editor) {
+                        $node = arr::first($editor->getDesigner()->getSelectedNodes());
+
+                        if ($node) {
+                            $editor->refreshNode($node);
+                            $editor->getDesigner()->update();
+                        }
                     });
                 }
             }

@@ -439,13 +439,6 @@ class FileSystem
                 $contextMenu->showByNode($button, 24, 24);
             };
             $button->on('click', $showMenu);
-
-            $tab->on('change', function () use ($showMenu) {
-                uiLater(function () use ($showMenu) {
-                    $showMenu();
-                });
-            });
-
             static::$addTab = $tab;
         }
 

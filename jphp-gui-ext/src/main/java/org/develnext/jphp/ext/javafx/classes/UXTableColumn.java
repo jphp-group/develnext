@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
@@ -17,6 +18,7 @@ import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
 import php.runtime.invoke.ObjectInvokeHelper;
 import php.runtime.lang.BaseWrapper;
+import php.runtime.lang.IObject;
 import php.runtime.memory.ObjectMemory;
 import php.runtime.reflection.ClassEntity;
 import php.runtime.reflection.support.ReflectionUtils;

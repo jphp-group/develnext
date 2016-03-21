@@ -2,6 +2,7 @@
 namespace ide\editors;
 
 use ide\action\ActionEditor;
+use ide\behaviour\AbstractBehaviourSpec;
 use ide\behaviour\IdeBehaviourManager;
 use ide\editors\argument\StringArgumentEditor;
 use ide\editors\common\ObjectListEditorItem;
@@ -48,6 +49,7 @@ use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractFactory;
 use php\gui\framework\AbstractForm;
+use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\DataUtils;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
@@ -765,11 +767,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if ($targetId) {
             $behaviours = $this->behaviourManager->getBehaviours($targetId);
 
-            foreach ($behaviours as $behaviour) {
-                $spec = $this->behaviourManager->getBehaviourSpec($behaviour);
+            foreach ($behaviours as $one) {
+                $spec = $this->behaviourManager->getBehaviourSpec($one);
 
                 if ($spec) {
-                    $spec->refreshNode($node);
+                    $spec->refreshNode($node, $one);
                 }
             }
         }
@@ -781,7 +783,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->eachNode(function (UXNode $node, $nodeId, AbstractFormElement $element = null) {
             if ($element) {
-                $element->refreshNode($node);
+                $this->refreshNode($node);
             }
         });
 
@@ -957,6 +959,14 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             if ($this->eventManager->removeBinds($nodeId)) {
                 $this->codeEditor->load();
+            }
+
+            foreach ($this->behaviourManager->getBehaviours($nodeId) as $one) {
+                $spec = $this->behaviourManager->getBehaviourSpec($one);
+
+                if ($spec) {
+                    $spec->deleteNode($node, $one);
+                }
             }
 
             $this->behaviourManager->removeBehaviours($nodeId);
@@ -1558,9 +1568,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
         }
 
-        if ($element) {
-            $element->refreshNode($node);
-        }
+        $this->refreshNode($node);
 
         if (!$isClone) {
             $this->reindex();
@@ -1730,6 +1738,22 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $ui->addEventListPane($this->eventListPane);
 
         $this->behaviourPane = new IdeBehaviourPane($this->behaviourManager);
+        $this->behaviourPane->on('remove', function ($targetId, AbstractBehaviourSpec $spec) {
+            $node = $this->layout->lookup("#$targetId");
+
+            if ($node instanceof UXNode) {
+                $behaviour = $this->behaviourManager->getBehaviourByTargetId($targetId, $spec->getType());
+
+                if ($behaviour) {
+                    $spec->deleteSelf($node, $behaviour);
+                } else {
+                    Logger::warn("Unable to call deleteSelf() of behaviour spec class, behaviour not found");
+                }
+            } else {
+                Logger::warn("Unable to call deleteSelf() of behaviour spec class, node not found, targetId = $targetId");
+            }
+        });
+
         $ui->addBehaviourPane($this->behaviourPane);
 
         $ui->on('change', function ($targetId) {

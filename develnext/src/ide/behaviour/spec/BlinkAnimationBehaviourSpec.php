@@ -4,6 +4,8 @@ namespace ide\behaviour\spec;
 use behaviour\custom\BlinkAnimationBehaviour;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\scripts\AbstractScriptComponent;
+use php\gui\effect\UXDropShadowEffect;
+use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\UXNode;
 
 /**
@@ -53,5 +55,10 @@ class BlinkAnimationBehaviourSpec extends AbstractBehaviourSpec
     public function isAllowedFor($target)
     {
         return !($target instanceof AbstractScriptComponent);
+    }
+
+    public function refreshNode(UXNode $node, AbstractBehaviour $behaviour)
+    {
+        $node->effect = new UXDropShadowEffect(10, 'gray');
     }
 }

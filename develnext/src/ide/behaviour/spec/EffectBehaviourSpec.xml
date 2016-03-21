@@ -1,0 +1,11 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property name="Событие" code="when" editor="enum" tooltip="Когда применять эффект">
+            <variants>
+                <variant value="ALWAYS">Всегда</variant>
+                <variant value="HOVER">При наведении</variant>
+                <variant value="CLICK">При клике</variant>
+            </variants>
+        </property>
+    </properties>
+</behaviour>

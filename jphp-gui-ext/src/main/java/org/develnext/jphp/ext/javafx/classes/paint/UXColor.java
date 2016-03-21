@@ -4,6 +4,7 @@ import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
@@ -85,6 +86,11 @@ public class UXColor extends BaseWrapper<Color> {
         i = i << 8;
 
         return i;
+    }
+
+    @Getter("webValue")
+    public String getWebValueX() {
+        return getWebValue();
     }
 
     @Signature

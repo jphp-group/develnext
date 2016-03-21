@@ -1,10 +1,13 @@
 <?php
 namespace php\gui\framework\behaviour\custom;
+use ide\Logger;
 use php\gui\framework\ScriptEvent;
 use php\gui\UXNode;
+use php\io\IOException;
 use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\gui\UXDialog;
+use php\lib\str;
 use ReflectionClass;
 use ReflectionProperty;
 use script\TimerScript;
@@ -65,7 +68,11 @@ abstract class AbstractBehaviour
         foreach ($properties as $name => $value) {
             if ($name[0] == '_') continue;
 
-            $this->{$name} = $value;
+            try {
+                $this->{$name} = $value;
+            } catch (\Exception $e) {
+
+            }
         }
     }
 
@@ -84,6 +91,28 @@ abstract class AbstractBehaviour
             if ($name[0] == '_') continue;
 
             $result[$name] = $property->getValue($this);
+        }
+
+        foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            $name = $method->getName();
+
+            if ($method->isStatic()) continue;
+
+            if ($method->getDeclaringClass()->getName() === AbstractBehaviour::class) {
+                continue;
+            }
+
+            if (str::startsWith($name, 'set')) {
+                $name = str::sub($name, 3);
+
+                if (method_exists($this, 'get' . $name)) {
+                    try {
+                        $result[str::lowerFirst($name)] = $this->{"get$name"}();
+                    } catch (\Exception $e) {
+                        Logger::error("Unable to get behaviour property '$name', getter throws exception = " . $e->getMessage());
+                    }
+                }
+            }
         }
 
         return $result;
@@ -169,6 +198,34 @@ abstract class AbstractBehaviour
     public function __clone()
     {
         $this->_target = null;
+    }
+
+    public function __set($name, $value)
+    {
+        if (method_exists($this, "set$name")) {
+            $this->{"set$name"}($value);
+            return;
+        }
+
+        throw new \Exception("Unable to set the '$name' property");
+    }
+
+    public function __get($name)
+    {
+        if (method_exists($this, "get$name")) {
+            return $this->{"get$name"}();
+        }
+
+        throw new \Exception("Unable to get the '$name' property");
+    }
+
+    public function __isset($name)
+    {
+        if (method_exists($this, "get$name")) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

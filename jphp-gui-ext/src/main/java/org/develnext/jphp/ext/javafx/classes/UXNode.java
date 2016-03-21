@@ -11,6 +11,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -20,11 +21,13 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.classes.effect.UXEffectPipeline;
 import org.develnext.jphp.ext.javafx.classes.support.Eventable;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.StyleManager;
 import org.develnext.jphp.ext.javafx.support.UserData;
+import org.develnext.jphp.ext.javafx.support.effect.EffectPipeline;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -51,6 +54,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     interface WrappedInterface {
         @Property double baselineOffset();
         @Property BlendMode blendMode();
+        @Property @Nullable Effect effect();
         @Property(hiddenInDebugInfo = true) @Nullable Node clip();
         @Property(hiddenInDebugInfo = true) Orientation contentBias();
         @Property(hiddenInDebugInfo = true) DepthTest depthTest();
@@ -123,6 +127,19 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
                     .newInstance(getEnvironment(), getWrappedObject());
         } else {
             return this;
+        }
+    }
+
+    @Getter
+    public Memory getEffects(Environment env) {
+        Memory effects = data("--effects");
+
+        if (effects.instanceOf(UXEffectPipeline.class)) {
+            return effects;
+        } else {
+            effects = ObjectMemory.valueOf(new UXEffectPipeline(env, this.getWrappedObject()));
+            data(env, "--effects", effects);
+            return effects;
         }
     }
 

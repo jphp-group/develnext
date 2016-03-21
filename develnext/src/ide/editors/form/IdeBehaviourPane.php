@@ -93,6 +93,7 @@ class IdeBehaviourPane
     public function makeUi($targetId, UXVBox $box = null)
     {
         $this->targetId = $targetId;
+
         if ($this->pane) {
             $pane = $this->pane;
         } else {
@@ -181,10 +182,11 @@ class IdeBehaviourPane
         $button->text = null;
         $button->graphic = ico('smallDelete16');
 
-        $targetId = $pane->data('--target-id');
-        $targetId = $this->targetId;
+        //$targetId = $pane->data('--target-id');
 
-        $button->on('click', function (UXEvent $e) use ($targetId, $spec, $pane) {
+        $button->on('click', function (UXEvent $e) use ($spec, $pane) {
+            $targetId = $this->targetId;
+
             $msg = new MessageBoxForm('Вы уверены, что хотите удалить поведение "' . $spec->getName() . '"?', ['yes' => 'Да, удалить', 'no' => 'Нет']);
 
             uiLater(function () use ($pane) {
@@ -193,12 +195,12 @@ class IdeBehaviourPane
 
             if ($msg->showDialog()) {
                 if ($msg->getResult() == 'yes') {
+                    $this->trigger('remove', [$targetId, $spec]);
+
                     $this->behaviourManager->removeBehaviour($targetId, $spec->getType());
                     $this->behaviourManager->save();
 
                     $this->makeUi($targetId, $this->lastUi);
-
-                    $this->trigger('remove', [$spec->getType()]);
                 }
             }
         });
