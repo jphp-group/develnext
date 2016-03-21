@@ -23,7 +23,7 @@ public class UXSyntaxTextArea extends UXNode<SyntaxTextArea> {
         @Property int caretLine();
         @Property boolean editable();
 
-        void jumpToLine(int line, int pos);
+        boolean jumpToLine(int line, int pos);
         void showFindDialog();
         void showReplaceDialog();
 

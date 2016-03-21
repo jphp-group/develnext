@@ -197,9 +197,14 @@ public class SyntaxTextArea extends SwingNode implements SearchListener {
         return new Font(content.getFont().getName(), content.getFont().getSize());
     }
 
-    public void jumpToLine(int line, int pos) throws BadLocationException {
-        int offset = content.getLineStartOffset(line);
-        content.setCaretPosition(offset + pos);
+    public boolean jumpToLine(int line, int pos) throws BadLocationException {
+        try {
+            int offset = content.getLineStartOffset(line);
+            content.setCaretPosition(offset + pos);
+            return true;
+        } catch (BadLocationException e) {
+            return false;
+        }
     }
 
     public void copy() {

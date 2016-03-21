@@ -759,6 +759,20 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if ($element) {
             $element->refreshNode($node);
         }
+
+        $targetId = $this->getNodeId($node);
+
+        if ($targetId) {
+            $behaviours = $this->behaviourManager->getBehaviours($targetId);
+
+            foreach ($behaviours as $behaviour) {
+                $spec = $this->behaviourManager->getBehaviourSpec($behaviour);
+
+                if ($spec) {
+                    $spec->refreshNode($node);
+                }
+            }
+        }
     }
 
     public function refresh()

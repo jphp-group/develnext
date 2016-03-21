@@ -19,6 +19,7 @@ use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\io\IOException;
 use php\io\Stream;
+use php\lib\fs;
 use php\xml\DomDocument;
 use php\xml\XmlProcessor;
 use ReflectionClass;
@@ -100,6 +101,7 @@ class GuiFormDumper extends AbstractFormDumper
         $stream = null;
 
         try {
+            fs::ensureParent($editor->getFile());
             $stream = Stream::of($editor->getFile(), 'w');
             $this->processor->formatTo($document, $stream);
         } catch (IOException $e) {

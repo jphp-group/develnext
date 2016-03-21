@@ -9,6 +9,7 @@ use php\gui\UXData;
 use php\gui\UXImageArea;
 use php\gui\UXLoader;
 use php\gui\UXNode;
+use php\io\IOException;
 use php\lang\IllegalArgumentException;
 use php\time\Time;
 
@@ -92,6 +93,10 @@ class IdeFormFactory extends AbstractFactory
 
     public function reload()
     {
-        $this->loadPrototypes($this->file);
+        try {
+            $this->loadPrototypes($this->file);
+        } catch (IOException $e) {
+            Logger::error("Unable to load prototypes from $this->file, error = {$e->getMessage()}");
+        }
     }
 }

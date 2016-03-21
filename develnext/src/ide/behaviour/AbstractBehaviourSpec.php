@@ -6,6 +6,7 @@ use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\utils\FileUtils;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
+use php\gui\UXNode;
 use php\io\IOException;
 use php\lib\Str;
 use php\xml\DomElement;
@@ -167,5 +168,12 @@ abstract class AbstractBehaviourSpec
 
         $behaviour = new $class();
         return $behaviour;
+    }
+
+    /**
+     * @param UXNode $node
+     */
+    public function refreshNode(UXNode $node)
+    {
     }
 }

@@ -131,7 +131,11 @@ public class UXFileChooser extends BaseWrapper<FileChooser> {
         File file = getWrappedObject().showOpenDialog(window);
 
         if (file != null) {
-            getWrappedObject().setInitialDirectory(file.getParentFile());
+            File parentFile = file.getParentFile();
+
+            if (parentFile != null) {
+                getWrappedObject().setInitialDirectory(parentFile);
+            }
         }
 
         return file;
