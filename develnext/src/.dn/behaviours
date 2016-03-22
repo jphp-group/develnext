@@ -22,3 +22,4 @@ ide\behaviour\spec\LimitedMovementBehaviourSpec
 ide\behaviour\spec\DropShadowEffectBehaviourSpec
 ide\behaviour\spec\InnerShadowEffectBehaviourSpec
 ide\behaviour\spec\ReflectionEffectBehaviourSpec
+ide\behaviour\spec\BloomEffectBehaviourSpec

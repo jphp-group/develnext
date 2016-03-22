@@ -1,0 +1,5 @@
+<behaviour extends="EffectBehaviourSpec">
+    <properties>
+        <property name="Уровень" code="threshold" editor="float" tooltip="Уровень свечения"/>
+    </properties>
+</behaviour>

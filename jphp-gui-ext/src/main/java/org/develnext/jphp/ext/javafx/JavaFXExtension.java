@@ -22,10 +22,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Effect;
-import javafx.scene.effect.InnerShadow;
-import javafx.scene.effect.Reflection;
+import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
@@ -239,6 +236,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, DropShadow.class, UXDropShadowEffect.class);
         registerWrapperClass(scope, InnerShadow.class, UXInnerShadowEffect.class);
         registerWrapperClass(scope, Reflection.class, UXReflectionEffect.class);
+        registerWrapperClass(scope, Bloom.class, UXBloomEffect.class);
     }
 
     protected void registerAnimationPackage(CompileScope scope) {

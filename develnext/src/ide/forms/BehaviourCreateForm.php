@@ -17,6 +17,7 @@ use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
+use php\lib\arr;
 use php\lib\Items;
 use php\util\SharedValue;
 
@@ -184,6 +185,14 @@ class BehaviourCreateForm extends AbstractIdeForm
             $tab = new UXTab();
             $tab->text = $name;
             $tab->userData = new SharedValue($list);
+
+            /** @var AbstractBehaviourSpec $spec */
+            foreach ($list as $spec) {
+                if ($spec->getIcon()) {
+                    $tab->graphic = Ide::get()->getImage($spec->getIcon());
+                    break;
+                }
+            }
 
             $this->categoryTabPane->tabs->add($tab);
 
