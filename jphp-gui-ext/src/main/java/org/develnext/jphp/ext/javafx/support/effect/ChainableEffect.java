@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 
 public class ChainableEffect {
         private final Effect effect;
-        private final Method inputMethod;
+        private Method inputMethod;
         private final BooleanProperty disabled = new SimpleBooleanProperty(
                 false
         );
@@ -27,7 +27,11 @@ public class ChainableEffect {
                         Effect.class
                 );
             } catch (NoSuchMethodException e) {
-                throw new IllegalArgumentException("Effect for chaining must implement the setInput method", e);
+                try {
+                    inputMethod = effect.getClass().getMethod("setContentInput", Effect.class);
+                } catch (NoSuchMethodException e1) {
+                    throw new IllegalArgumentException("Effect for chaining must implement the setInput method", e);
+                }
             } catch (SecurityException e) {
                 throw new IllegalStateException("Creating chainable effects requires a reflection capable security environment", e);
             }

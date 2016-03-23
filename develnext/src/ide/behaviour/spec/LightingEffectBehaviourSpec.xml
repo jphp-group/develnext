@@ -1,0 +1,8 @@
+<behaviour extends="EffectBehaviourSpec">
+    <properties>
+        <property name="Диффузная константа" code="diffuseConstant" editor="float" />
+        <property name="Зеркальная константа" code="specularConstant" editor="float" />
+        <property name="Зеркальная экспонента" code="specularExponent" editor="float" />
+        <property name="Масштаб поверхности" code="surfaceScale" editor="float" />
+    </properties>
+</behaviour>

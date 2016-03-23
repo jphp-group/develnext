@@ -237,6 +237,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, InnerShadow.class, UXInnerShadowEffect.class);
         registerWrapperClass(scope, Reflection.class, UXReflectionEffect.class);
         registerWrapperClass(scope, Bloom.class, UXBloomEffect.class);
+        registerWrapperClass(scope, Lighting.class, UXLightingEffect.class);
     }
 
     protected void registerAnimationPackage(CompileScope scope) {

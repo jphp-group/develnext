@@ -2,6 +2,7 @@
 namespace php\gui\framework;
 
 use php\gui\framework\behaviour\custom\BehaviourManager;
+use php\gui\UXLoader;
 
 /**
  * Class StandaloneFactory
@@ -19,6 +20,8 @@ class StandaloneFactory extends AbstractFactory
     public function __construct(AbstractForm $form, $fxmlFile, BehaviourManager $manager, EventBinder $eventBinder)
     {
         $this->factoryName = $form->getName();
+
+        $this->loader = new UXLoader();
 
         $this->eventBinder = $eventBinder;
         $this->behaviourManager = $manager;

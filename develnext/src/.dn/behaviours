@@ -1,3 +1,9 @@
+ide\behaviour\spec\DropShadowEffectBehaviourSpec
+ide\behaviour\spec\InnerShadowEffectBehaviourSpec
+ide\behaviour\spec\ReflectionEffectBehaviourSpec
+ide\behaviour\spec\BloomEffectBehaviourSpec
+ide\behaviour\spec\LightingEffectBehaviourSpec
+
 ide\behaviour\spec\DraggingFormBehaviourSpec
 ide\behaviour\spec\DraggingBehaviourSpec
 ide\behaviour\spec\EscapeShutdownBehaviourSpec
@@ -18,8 +24,3 @@ ide\behaviour\spec\GameSceneBehaviourSpec
 ide\behaviour\spec\GameEntityBehaviourSpec
 ide\behaviour\spec\WrapScreenBehaviourSpec
 ide\behaviour\spec\LimitedMovementBehaviourSpec
-
-ide\behaviour\spec\DropShadowEffectBehaviourSpec
-ide\behaviour\spec\InnerShadowEffectBehaviourSpec
-ide\behaviour\spec\ReflectionEffectBehaviourSpec
-ide\behaviour\spec\BloomEffectBehaviourSpec
