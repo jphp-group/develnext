@@ -22,6 +22,11 @@ abstract class AbstractCommand
 
     abstract public function onExecute($e = null, AbstractEditor $editor = null);
 
+    public function getUniqueId()
+    {
+        return get_class($this);
+    }
+
     public function withBeforeSeparator()
     {
         return false;

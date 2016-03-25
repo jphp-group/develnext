@@ -74,6 +74,7 @@ class PanelFormElement extends AbstractFormElement
     public function createElement()
     {
         $button = new UXPanel();
+        $button->backgroundColor = 'white';
         return $button;
     }
 

@@ -224,10 +224,15 @@ public class JavaFXExtension extends Extension {
 
         registerJavaException(scope, WrapJSException.class, JSException.class);
 
+        registerCustomControls(scope);
         registerEffectPackage(scope);
         registerAnimationPackage(scope);
 
         registerEvents(scope);
+    }
+
+    protected void registerCustomControls(CompileScope scope) {
+        registerWrapperClass(scope, RadioGroupPane.class, UXRadioGroupPane.class);
     }
 
     protected void registerEffectPackage(CompileScope scope) {
@@ -238,6 +243,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Reflection.class, UXReflectionEffect.class);
         registerWrapperClass(scope, Bloom.class, UXBloomEffect.class);
         registerWrapperClass(scope, Lighting.class, UXLightingEffect.class);
+        registerWrapperClass(scope, GaussianBlur.class, UXGaussianBlurEffect.class);
     }
 
     protected void registerAnimationPackage(CompileScope scope) {
@@ -264,6 +270,7 @@ public class JavaFXExtension extends Extension {
         registerEventProvider(new TabEventProvider());
         registerEventProvider(new TabPaneEventProvider());
         registerEventProvider(new ListViewEventProvider());
+        registerEventProvider(new RadioGroupPaneEventProvider());
 
         registerEventProvider(new AnimationEventProvider());
         registerEventProvider(new TrayNotificationEventProvider());

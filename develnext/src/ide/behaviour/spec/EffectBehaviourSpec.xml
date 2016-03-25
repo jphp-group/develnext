@@ -2,9 +2,11 @@
     <properties>
         <property name="Событие" code="when" editor="enum" tooltip="Когда применять эффект">
             <variants>
-                <variant value="ALWAYS">Всегда</variant>
-                <variant value="HOVER">При наведении</variant>
-                <variant value="CLICK">При клике</variant>
+                <variant value="ALWAYS">[Нет]</variant>
+                <variant value="HOVER">Наведение</variant>
+                <variant value="HOVER_INVERT">Наведение (наоборот)</variant>
+                <variant value="CLICK">Клик</variant>
+                <variant value="CLICK_INVERT">Клик (наоборот)</variant>
             </variants>
         </property>
     </properties>

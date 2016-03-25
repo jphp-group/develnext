@@ -6,6 +6,7 @@ use ide\bundle\AbstractJarBundle;
 use ide\editors\ProjectEditor;
 use ide\forms\BundleCheckListForm;
 use ide\Ide;
+use ide\IdeConfiguration;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\Project;
 use ide\utils\FileUtils;
@@ -77,6 +78,13 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
      */
     public function inject()
     {
+        // Do not save bundles conf via project.
+        $this->project->addIdeConfigConfigurer(__CLASS__, function (IdeConfiguration $conf) {
+            if (str::startsWith($conf->getShortName(), "bundles/")) {
+                $conf->setAutoSave(false);
+            }
+        });
+
         $this->project->setSrcDirectory('src');
         $this->project->setSrcGeneratedDirectory(self::GENERATED_DIRECTORY);
 
@@ -105,6 +113,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             return false;
         });
 
+
         foreach ($this->bundles as $env => $group) {
             /** @var AbstractBundle $bundle */
             foreach ($group as $bundle) {
@@ -115,7 +124,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 $config->set('env', $env);
 
                 $bundle->onSave($this->project, $config);
-                $this->project->saveIdeConfig("bundles/$type.conf");
+                $config->save();
             }
         }
 

@@ -6,6 +6,7 @@ use ide\formats\AbstractFileTemplate;
 use ide\forms\MainForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
+use ide\IdeConfiguration;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\systems\FileSystem;
@@ -80,7 +81,7 @@ class Project
     protected $config;
 
     /**
-     * @var Configuration[]
+     * @var IdeConfiguration[]
      */
     protected $ideConfigs = [];
 
@@ -123,6 +124,11 @@ class Project
      * @var string
      */
     protected $resDirectory = null;
+
+    /**
+     * @var callable[] (IdeConfiguration $config)
+     */
+    protected $configConfigurers = [];
 
     /**
      * Project constructor.
@@ -374,7 +380,7 @@ class Project
     }
 
     /**
-     * @return Configuration
+     * @return IdeConfiguration
      */
     public function getIdeServiceConfig()
     {
@@ -387,8 +393,24 @@ class Project
     }
 
     /**
+     * @param callable $handler
+     */
+    public function addIdeConfigConfigurer($id, callable $handler)
+    {
+        $this->configConfigurers[$id] = $handler;
+    }
+
+    /**
+     * @param $id
+     */
+    public function removeIdeConfigConfigurer($id)
+    {
+        unset($this->configConfigurers[$id]);
+    }
+
+    /**
      * @param $name
-     * @return Configuration
+     * @return IdeConfiguration
      */
     public function getIdeConfig($name)
     {
@@ -396,45 +418,13 @@ class Project
             return $configuration;
         }
 
-        $configuration = new Configuration();
+        $configuration = new IdeConfiguration($this->getIdeDir() . "/$name", str::replace($name, "\\", "/"));
 
-        try {
-            $configuration->load($this->getIdeDir() . "/$name");
-        } catch (IOException $e) {
-            ;
+        foreach ($this->configConfigurers as $handler) {
+            $handler($configuration);
         }
 
         return $this->ideConfigs[$name] = $configuration;
-    }
-
-    /**
-     * @param $name
-     * @param Configuration $configuration
-     */
-    public function setIdeConfig($name, Configuration $configuration)
-    {
-        Logger::info("Save ide config ($name) of project ...");
-
-        if (File::of($name)->exists()) {
-            // ignore...
-            return;
-        }
-
-        try {
-            $file = $this->getIdeFile("$name");
-
-            if ($file->isDirectory()) {
-                $file->delete();
-            }
-
-            if ($file->getParentFile()) {
-                $file->getParentFile()->mkdirs();
-            }
-
-            $configuration->save($file);
-        } catch (IOException $e) {
-            Logger::error("Unable to save ide config $name");
-        }
     }
 
     /**
@@ -687,12 +677,16 @@ class Project
         $this->trigger(__FUNCTION__);
     }
 
+    /**
+     * @deprecated
+     * @param $name
+     */
     public function saveIdeConfig($name)
     {
         $config = $this->ideConfigs[$name];
 
         if ($config) {
-            $this->setIdeConfig($name, $config);
+            $config->save();
         }
     }
 
@@ -708,7 +702,9 @@ class Project
         FileSystem::saveAll();
 
         foreach ($this->ideConfigs as $name => $config) {
-            $this->setIdeConfig($name, $config);
+            if ($config->isAutoSave()) {
+                $config->save();
+            }
         }
 
         $files = Flow::of(FileSystem::getOpened())->map(function ($e) { return $this->getAbsoluteFile($e['file']); })->toArray();

@@ -15,7 +15,7 @@ import php.runtime.reflection.ClassEntity;
 import java.util.List;
 
 @Reflection.Name(JavaFXExtension.NS + "layout\\UXVBox")
-public class UXVBox extends UXPane<VBox> {
+public class UXVBox<T extends VBox> extends UXPane<VBox> {
     interface WrappedInterface {
         @Property double spacing();
         @Property Pos alignment();
@@ -24,7 +24,7 @@ public class UXVBox extends UXPane<VBox> {
         void requestLayout();
     }
 
-    public UXVBox(Environment env, VBox wrappedObject) {
+    public UXVBox(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 

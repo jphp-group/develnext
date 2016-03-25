@@ -19,7 +19,7 @@
         <property code="alignment" name="Выравнивание" editor="position" />
 
         <property code="graphic" name="Иконка" editor="image" virtual="1" />
-        <property code="graphicTextGap" name="Отступ иконки" editor="float" />
+        <property code="graphicTextGap" name="Отступ иконки" editor="floatSlider" min="0" max="100" />
         <property code="contentDisplay" name="Отображение иконки" editor="enum" defaultValue="LEFT">
             <variants>
                 <variant value="TOP">Сверху</variant>

@@ -1,5 +1,7 @@
 package org.develnext.jphp.ext.javafx.classes.effect;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.effect.Effect;
@@ -49,10 +51,16 @@ public class UXEffectPipeline extends BaseWrapper<EffectPipeline> implements Cou
         super(env, clazz);
     }
 
-    public UXEffectPipeline(Environment env, Node node) {
+    public UXEffectPipeline(Environment env, final Node node) {
         super(env, new EffectPipeline());
         this.node = node;
-        this.node.effectProperty().bind(getWrappedObject().chainedEffectProperty());
+
+        getWrappedObject().chainedEffectProperty().addListener(new ChangeListener<Effect>() {
+            @Override
+            public void changed(ObservableValue<? extends Effect> observable, Effect oldValue, Effect newValue) {
+                node.setEffect(newValue);
+            }
+        });
     }
 
     @Getter

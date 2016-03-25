@@ -1,9 +1,9 @@
 <behaviour extends="EffectBehaviourSpec">
     <properties>
         <property name="Цвет" code="color" editor="color" tooltip="Цвет тени"/>
-        <property name="Радиус" code="radius" editor="float" tooltip="Размер отбрасываемой тени"/>
-        <property name="Интенсивность" code="spread" editor="float" tooltip="От 0 до 1 (процент)"/>
-        <property name="Смещение X" code="offsetX" editor="float"/>
-        <property name="Смещение Y" code="offsetY" editor="float"/>
+        <property name="Радиус" code="radius" editor="floatSlider" min="0" max="40" tooltip="Размер отбрасываемой тени"/>
+        <property name="Интенсивность" code="spread" editor="floatSlider" min="0" max="1" tooltip="От 0 до 1 (процент)"/>
+        <property name="Смещение X" code="offsetX" editor="floatSlider" min="-50" max="50" />
+        <property name="Смещение Y" code="offsetY" editor="floatSlider" min="-50" max="50" />
     </properties>
 </behaviour>

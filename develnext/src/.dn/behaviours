@@ -3,11 +3,11 @@ ide\behaviour\spec\InnerShadowEffectBehaviourSpec
 ide\behaviour\spec\ReflectionEffectBehaviourSpec
 ide\behaviour\spec\BloomEffectBehaviourSpec
 ide\behaviour\spec\LightingEffectBehaviourSpec
+ide\behaviour\spec\GaussianBlurEffectBehaviourSpec
 
 ide\behaviour\spec\DraggingFormBehaviourSpec
 ide\behaviour\spec\DraggingBehaviourSpec
 ide\behaviour\spec\EscapeShutdownBehaviourSpec
-ide\behaviour\spec\GridMovementBehaviourSpec
 ide\behaviour\spec\KeyInputRuleBehaviourSpec
 
 ide\behaviour\spec\CursorBindBehaviourSpec
@@ -22,5 +22,6 @@ ide\behaviour\spec\VibrationAnimationBehaviourSpec
 
 ide\behaviour\spec\GameSceneBehaviourSpec
 ide\behaviour\spec\GameEntityBehaviourSpec
+ide\behaviour\spec\GridMovementBehaviourSpec
 ide\behaviour\spec\WrapScreenBehaviourSpec
 ide\behaviour\spec\LimitedMovementBehaviourSpec

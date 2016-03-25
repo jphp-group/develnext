@@ -21,6 +21,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
@@ -53,7 +54,7 @@ import java.util.List;
 
 @Namespace(GuiDesignerExtension.NS)
 public class UXDesigner extends BaseObject {
-    public enum SnapType { DOTS, GRID }
+    public enum SnapType {DOTS, GRID}
 
     private Pane area;
 
@@ -275,7 +276,17 @@ public class UXDesigner extends BaseObject {
 
     @Getter
     public Node getPickedNode() {
-        return picked;
+        if (selections.containsKey(picked)) {
+            return picked;
+        } else {
+            Iterator<Node> iterator = selections.keySet().iterator();
+
+            if (iterator.hasNext()) {
+                return iterator.next();
+            }
+
+            return null;
+        }
     }
 
     @Getter
@@ -914,12 +925,17 @@ public class UXDesigner extends BaseObject {
 
                 dragged = true;
 
-                for (Selection selection : selections.values()) {
+                for (final Selection selection : selections.values()) {
                     SnapshotParameters snapParams = new SnapshotParameters();
                     snapParams.setFill(Color.TRANSPARENT);
 
+                    final Effect effect = selection.node.getEffect();
+                    selection.node.setEffect(null);
+
                     selection.dragView.getChildren().setAll(new ImageView(selection.node.snapshot(snapParams, null)));
                     selection.dragView.setStyle("-fx-opacity: 0.7; -fx-border-width: 1px; -fx-border-color: black; -fx-border-style: dashed; -fx-background-color: transparent");
+
+                    selection.node.setEffect(effect);
 
                     selection.parent.getChildren().add(selection.dragView);
 
@@ -1033,7 +1049,7 @@ public class UXDesigner extends BaseObject {
                     }
 
                     //if (e.getButton() == MouseButton.PRIMARY) {
-                        e.consume();
+                    e.consume();
                     //}
                 } else {
                     for (Selection selection : selections.values()) {
@@ -1044,7 +1060,7 @@ public class UXDesigner extends BaseObject {
                 checkContextMenu(e, node);
 
                 //if (e.getButton() == MouseButton.PRIMARY) {
-                    e.consume();
+                e.consume();
                 //}
 
                 tmpLock = true;
@@ -1226,8 +1242,8 @@ public class UXDesigner extends BaseObject {
         }
 
         /**
-         * @param x screen x
-         * @param y screen y
+         * @param x      screen x
+         * @param y      screen y
          * @param bounds
          */
         public void update(double x, double y, Bounds bounds) {

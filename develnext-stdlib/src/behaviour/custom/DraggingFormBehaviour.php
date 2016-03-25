@@ -35,6 +35,10 @@ class DraggingFormBehaviour extends AbstractBehaviour
             $pos = new SharedValue(null);
 
             $target->on('mouseDown', function (UXMouseEvent $e) use ($pos) {
+                if (!$this->enabled) {
+                    return;
+                }
+
                 if ($e->button == 'PRIMARY') {
                     if ($this->opacityEnabled) {
                         if ($this->animated) {

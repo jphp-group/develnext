@@ -60,6 +60,7 @@ class WrapScreenBehaviourSpec extends AbstractBehaviourSpec
      */
     public function isAllowedFor($target)
     {
-        return !($target instanceof AbstractScriptComponent);
+        return !($target instanceof AbstractScriptComponent)
+            && !($target instanceof FormFormElement);
     }
 }

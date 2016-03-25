@@ -19,6 +19,11 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
     protected $eventType;
 
     /**
+     * @var array
+     */
+    protected $reflectionTypes = [];
+
+    /**
      * PhpAutoCompleteLoader constructor.
      */
     public function __construct()
@@ -52,6 +57,14 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
 
                 if (str::startsWith($name, '~dynamic ')) {
                     return new DynamicAccessAutoCompleteType(str::sub($name, 9));
+                }
+
+                if (class_exists($name)) {
+                    if ($type = $this->reflectionTypes[$name]) {
+                        return $type;
+                    }
+
+                    return $this->reflectionTypes[$name] = new ReflectionClassAutoCompleteType($name);
                 }
         }
 

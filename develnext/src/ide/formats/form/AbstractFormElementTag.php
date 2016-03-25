@@ -1,7 +1,9 @@
 <?php
 namespace ide\formats\form;
 
+use php\gui\UXList;
 use php\gui\UXNode;
+use php\gui\UXRadioGroupPane;
 use php\lib\str;
 use php\xml\DomDocument;
 use php\xml\DomElement;
@@ -53,6 +55,26 @@ abstract class AbstractFormElementTag
 
             $element->appendChild($domFontProperty);
         }
+    }
+
+    public function writeListForContent(UXList $items, $property, DomElement $element, DomDocument $document)
+    {
+        $itemsDom = $document->createElement($property);
+        $itemsDom->setAttribute('xmlns:fx', "http://javafx.com/fxml");
+
+        $collectionDom = $document->createElement('FXCollections');
+        $collectionDom->setAttribute('fx:factory', 'observableArrayList');
+
+        $itemsDom->appendChild($collectionDom);
+
+        foreach ($items as $el) {
+            $itemDom = $document->createElement('String');
+            $itemDom->setAttribute('fx:value', $el);
+
+            $collectionDom->appendChild($itemDom);
+        }
+
+        $element->appendChild($itemsDom);
     }
 
     static function escapeText($text)

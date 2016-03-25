@@ -56,7 +56,7 @@ class DraggingBehaviour extends AbstractBehaviour
             $pos = new SharedValue(null);
 
             $target->on('mouseDown', function (UXMouseEvent $e) use ($pos) {
-                if ($e->button == 'PRIMARY') {
+                if ($this->enabled && $e->button == 'PRIMARY') {
                     if ($this->opacityEnabled) {
                         if ($this->animated) {
                             Animation::fadeTo($this->_target, 300, $this->opacity);

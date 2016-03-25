@@ -65,7 +65,7 @@ class ProjectService extends AbstractService
         ]);
 
         $config->set('projectId', $result->data()['id']);
-        $project->setIdeConfig('project.ws', $config);
+        $config->save();
 
         return $result;
     }

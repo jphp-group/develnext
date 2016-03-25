@@ -52,7 +52,7 @@ trait ProjectIdeConfigurable
             $file = get_class($this);
             $name = str::replace(get_class($this), "\\", "/") . ".conf";
 
-            Ide::project()->saveIdeConfig($name);
+            Ide::project()->getIdeConfig($name)->save();
         }
     }
 }

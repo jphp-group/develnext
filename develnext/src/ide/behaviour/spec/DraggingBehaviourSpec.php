@@ -7,6 +7,7 @@ use behaviour\custom\DraggingBehaviour;
 use behaviour\custom\DraggingFormBehaviour;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\formats\form\AbstractFormElement;
+use ide\formats\form\elements\FormFormElement;
 use ide\scripts\AbstractScriptComponent;
 use php\gui\UXNode;
 
@@ -52,6 +53,7 @@ class DraggingBehaviourSpec extends AbstractBehaviourSpec
      */
     public function isAllowedFor($target)
     {
-        return !($target instanceof AbstractScriptComponent);
+        return !($target instanceof AbstractScriptComponent)
+            && !($target instanceof FormFormElement);
     }
 }

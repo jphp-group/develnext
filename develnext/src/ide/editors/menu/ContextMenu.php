@@ -161,10 +161,10 @@ class ContextMenu
             $menuItem->style .= ';' . $this->style;
         }
 
-        $menuItem->on('action', function ($e) use ($command) {
+        $menuItem->on('action', function ($e) use ($command, $menuItem) {
             $filter = $this->filter;
 
-            if (!$filter || $filter($command)) {
+            if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
                 $command->onExecute($e, $this->editor);
             }
         });
@@ -196,10 +196,10 @@ class ContextMenu
             $menuItem->visible = false;
         }
 
-        $menuItem->on('action', function ($e) use ($command) {
+        $menuItem->on('action', function ($e) use ($command, $menuItem) {
             $filter = $this->filter;
 
-            if (!$filter || $filter($command)) {
+            if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
                 $command->onExecute($e, $this->editor);
             }
         });

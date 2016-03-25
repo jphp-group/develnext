@@ -11,7 +11,7 @@
         <property name="Сетка Y" code="gridY" editor="integer" tooltip="Выравнивание по сетке Y (вертик.)" />
         <property name="Ограничить" code="limitedByParent" editor="boolean" tooltip="Ограничить перемещение - только в рамках панели, где находится объект" />
         <property name="Полупрозрачность" code="opacityEnabled" editor="boolean" tooltip="При перемещении делать объект полупрозрачным" />
-        <property name="Уровень прозрачности" code="opacity" editor="float" tooltip="Уровень прозрачности объекта при ее перемещении" />
+        <property name="Уровень прозрачности" code="opacity" editor="floatSlider" min="0" max="1" tooltip="Уровень прозрачности объекта при ее перемещении" />
         <property name="Анимировать" code="animated" editor="boolean" tooltip="Анимировать изменение уровня прозрачности объекта" />
     </properties>
 </behaviour>

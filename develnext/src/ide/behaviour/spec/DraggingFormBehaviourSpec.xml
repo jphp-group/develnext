@@ -1,7 +1,7 @@
 <behaviour extends="BehaviourSpec">
     <properties>
         <property name="Полупрозрачность" code="opacityEnabled" editor="boolean" tooltip="При перемещении делать форму полупрозрачной" />
-        <property name="Уровень прозрачности" code="opacity" editor="float" tooltip="Уровень прозрачности формы при ее перемещении" />
+        <property name="Уровень прозрачности" code="opacity" editor="floatSlider" min="0" max="1" tooltip="Уровень прозрачности формы при ее перемещении" />
         <property name="Анимировать" code="animated" editor="boolean" tooltip="Анимировать изменение уровня прозрачности формы" />
     </properties>
 </behaviour>

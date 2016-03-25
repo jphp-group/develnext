@@ -28,7 +28,9 @@ abstract class EffectBehaviour extends AbstractBehaviour
         $types = $this->getWhenEventTypes();
 
         if ($types && $target instanceof UXNode) {
-            $this->disable();
+            if (!$types[2]) {
+                $this->disable();
+            }
 
             $target->on($types[0], function () {
                 $this->enable();
@@ -69,8 +71,12 @@ abstract class EffectBehaviour extends AbstractBehaviour
         switch ($this->when) {
             case 'HOVER':
                 return ['mouseEnter', 'mouseExit'];
+            case 'HOVER_INVERT':
+                return ['mouseExit', 'mouseEnter', true];
             case 'CLICK':
                 return ['mouseDown', 'mouseUp'];
+            case 'CLICK_INVERT':
+                return ['mouseUp', 'mouseDown', true];
         }
 
         return null;

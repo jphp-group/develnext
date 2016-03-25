@@ -3,6 +3,7 @@ namespace ide\editors;
 use ide\editors\form\IdeTabPane;
 use ide\formats\AbstractFormat;
 use ide\Ide;
+use ide\IdeConfiguration;
 use ide\Logger;
 use ide\project\Project;
 use ide\project\ProjectIndexer;
@@ -46,7 +47,7 @@ abstract class AbstractEditor
     }
 
     /**
-     * @return \php\util\Configuration
+     * @return IdeConfiguration
      */
     protected function getIdeConfig()
     {
@@ -73,7 +74,7 @@ abstract class AbstractEditor
             if ($file->isInRootDir()) {
                 $name = str::replace(get_class($this), "\\", "/") . "/" . $file->getRelativePath() . ".conf";
 
-                Ide::project()->saveIdeConfig($name);
+                Ide::project()->getIdeConfig($name)->save();
             }
         }
     }

@@ -13,7 +13,6 @@ use ide\formats\form\context\RelocationMenuCommand;
 use ide\formats\form\context\SelectAllMenuCommand;
 use ide\formats\form\context\ToBackMenuCommand;
 use ide\formats\form\context\ToFrontMenuCommand;
-use ide\formats\form\context\UpMenuCommand;
 use ide\formats\form\elements\AnchorPaneFormElement;
 use ide\formats\form\elements\ButtonFormElement;
 use ide\formats\form\elements\CheckboxFormElement;
@@ -37,6 +36,7 @@ use ide\formats\form\elements\PanelFormElement;
 use ide\formats\form\elements\PasswordFieldFormElement;
 use ide\formats\form\elements\ProgressBarFormElement;
 use ide\formats\form\elements\ProgressIndicatorFormElement;
+use ide\formats\form\elements\RadioGroupPaneFormElement;
 use ide\formats\form\elements\RectangleFormElement;
 use ide\formats\form\elements\RhombusFormElement;
 use ide\formats\form\elements\ScrollPaneFormElement;
@@ -74,6 +74,7 @@ use ide\formats\form\tags\PasswordFieldFormElementTag;
 use ide\formats\form\tags\PolygonFormElementTag;
 use ide\formats\form\tags\ProgressBarFormElementTag;
 use ide\formats\form\tags\ProgressIndicatorFormElementTag;
+use ide\formats\form\tags\RadioGroupPaneFormElementTag;
 use ide\formats\form\tags\RectangleFormElementTag;
 use ide\formats\form\tags\ScrollPaneFormElementTag;
 use ide\formats\form\tags\SeparatorFormElementTag;
@@ -97,6 +98,7 @@ use ide\systems\RefactorSystem;
 use ide\utils\FileUtils;
 use php\gui\UXNode;
 use php\io\File;
+use php\lib\fs;
 
 class GuiFormFormat extends AbstractFormFormat
 {
@@ -134,6 +136,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new WebViewFormElement());
         $this->register(new TableViewFormElement());
         $this->register(new PaginationFormElement());
+        $this->register(new RadioGroupPaneFormElement());
 
         $this->register(new PanelFormElement());
         $this->register(new TitledPaneFormElement());
@@ -188,6 +191,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new GamePaneFormElementTag());
         $this->register(new PaginationFormElementTag());
         $this->register(new TableViewFormElementTag());
+        $this->register(new RadioGroupPaneFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());
@@ -217,20 +221,20 @@ class GuiFormFormat extends AbstractFormFormat
 
     protected function registerRelocationCommands()
     {
-        $this->register(new RelocationMenuCommand('Up', function (UXNode $node, $size) {
-            $node->y -= $size;
+        $this->register(new RelocationMenuCommand('Up', function (UXNode $node, $sizeX, $sizeY) {
+            $node->y -= $sizeY;
         }));
 
-        $this->register(new RelocationMenuCommand('Down', function (UXNode $node, $size) {
-            $node->y += $size;
+        $this->register(new RelocationMenuCommand('Down', function (UXNode $node, $sizeX, $sizeY) {
+            $node->y += $sizeY;
         }));
 
-        $this->register(new RelocationMenuCommand('Left', function (UXNode $node, $size) {
-            $node->x -= $size;
+        $this->register(new RelocationMenuCommand('Left', function (UXNode $node, $sizeX) {
+            $node->x -= $sizeX;
         }));
 
-        $this->register(new RelocationMenuCommand('Right', function (UXNode $node, $size) {
-            $node->x += $size;
+        $this->register(new RelocationMenuCommand('Right', function (UXNode $node, $sizeX) {
+            $node->x += $sizeX;
         }));
     }
 
@@ -256,12 +260,12 @@ class GuiFormFormat extends AbstractFormFormat
 
         $path = $parent . '/../app/forms/';
 
-        Files::delete("$parent/$name.conf");
+        fs::delete("$parent/$name.conf");
 
-        Files::delete("$path/$name.php");
-        Files::delete("$path/$name.php.source");
-        Files::delete("$path/$name.php.axml");
-        Files::delete("$path/$name.behaviour");
+        fs::delete("$path/$name.php");
+        fs::delete("$path/$name.php.source");
+        fs::delete("$path/$name.php.axml");
+        fs::delete("$path/$name.behaviour");
     }
 
 

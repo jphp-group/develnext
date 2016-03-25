@@ -1,0 +1,19 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="orientation" name="Ориентация" editor="enum">
+            <variants>
+                <variant value="HORIZONTAL">Горизонтальная</variant>
+                <variant value="VERTICAL">Вертикальная</variant>
+            </variants>
+        </property>
+        <property code="font" name="Шрифт" editor="font" />
+        <property code="textColor" name="Цвет текста" editor="color" />
+        <property code="spacing" name="Разрыв" editor="floatSlider" min="0" max="100" />
+        <property code="items" name="Список" editor="stringList" />
+        <property code="selectedIndex" name="Выделенный элемент" editor="integer" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="action" name="Выбор элемента" kind="ActionEvent" icon="icons/ok16.png" />
+    </eventTypes>
+</element>

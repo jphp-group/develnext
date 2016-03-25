@@ -17,7 +17,7 @@ abstract class UXLabeled extends UXControl
     /**
      * @var string
      */
-    public $textAlignment = 'LEFT';
+    public  $textAlignment = 'LEFT';
 
     /**
      * @var bool

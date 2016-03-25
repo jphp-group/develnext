@@ -9,10 +9,10 @@
     <properties group="general" title="Главное">
         <property code="loop" name="Цикличность" editor="boolean" tooltip="Зацикленное воспроизведение аудио ресурса" />
         <property code="autoplay" name="Автоплей" editor="boolean" tooltip="Автоматически воспроизводить при открытии аудио ресурса" />
-        <property code="volume" name="Громкость" editor="float" tooltip="Уровень громкости от 0.0 до 1.0"  />
-        <property code="balance" name="Баланс" editor="float" tooltip="Баланс от -1.0 до 1.0" />
+        <property code="volume" name="Громкость" editor="floatSlider" min="0" max="1" tooltip="Уровень громкости от 0.0 до 1.0"  />
+        <property code="balance" name="Баланс" editor="floatSlider" min="-1" max="1" tooltip="Баланс от -1.0 до 1.0" />
 
-        <property code="rate" name="Скорость" editor="float" tooltip="Скорость воспроизведения от 0.0 до 8.0" />
+        <property code="rate" name="Скорость" editor="floatSlider" min="0" max="8" tooltip="Скорость воспроизведения от 0.0 до 8.0" />
     </properties>
 
     <eventTypes>

@@ -97,7 +97,7 @@ abstract class AbstractFormFormat extends AbstractFormat
             $this->formElements[get_class($any)] = $any;
             //FormEditor::initializeElement($any);
         } else if ($any instanceof AbstractMenuCommand) {
-            $this->contextCommands[get_class($any)] = $any;
+            $this->contextCommands[$any->getUniqueId()] = $any;
         } else if ($any instanceof AbstractFormElementTag) {
             $this->formElementTags[$any->getElementClass()] = $any;
         } else {
@@ -117,7 +117,7 @@ abstract class AbstractFormFormat extends AbstractFormat
 
             unset($this->formElements[get_class($any)]);
         } elseif ($any instanceof AbstractMenuCommand) {
-            unset($this->contextCommands[get_class($any)]);
+            unset($this->contextCommands[$any->getUniqueId()]);
         } elseif ($any instanceof AbstractFormElementTag) {
             unset($this->formElementTags[$any->getElementClass()]);
         } else {

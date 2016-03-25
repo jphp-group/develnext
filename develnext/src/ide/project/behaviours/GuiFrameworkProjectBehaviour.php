@@ -695,6 +695,42 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
+     * @param $id
+     * @return array [element => AbstractFormElement, behaviours => [[value, spec], ...]]
+     */
+    public function getPrototype($id)
+    {
+        list($group, $id) = str::split($id, '.', 2);
+
+        if ($editor = $this->getFormEditor($group)) {
+            $result = [];
+
+            $objects = $this->getObjectList($editor);
+
+            foreach ($objects as $one) {
+                if ($one->text == $id) {
+                    $result['version'] = $one->version;
+                    $result['element'] = $one->element;
+                    break;
+                }
+            }
+
+            $result['behaviours'] = [];
+
+            foreach ($editor->getBehaviourManager()->getBehaviours($id) as $one) {
+                $result['behaviours'][] = [
+                    'value' => $one,
+                    'spec'  => $editor->getBehaviourManager()->getBehaviourSpec($one),
+                ];
+            }
+
+            return $result;
+        }
+
+        return null;
+    }
+
+    /**
      * @param AbstractEditor|null $contextEditor
      * @return array
      */
@@ -719,6 +755,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $elements;
     }
 
+    /**
+     * @param $fileName
+     * @return ObjectListEditorItem[]
+     */
     public function getObjectList($fileName)
     {
         $result = [];

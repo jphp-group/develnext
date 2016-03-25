@@ -1,0 +1,5 @@
+<behaviour extends="EffectBehaviourSpec">
+    <properties>
+        <property name="Радиус" code="radius" editor="floatSlider" min="0" max="63" tooltip="Радиус размытия от 0 до 63"/>
+    </properties>
+</behaviour>

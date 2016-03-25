@@ -92,6 +92,7 @@ use php\io\File;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
+use php\lib\arr;
 use php\lib\Items;
 use php\lib\Str;
 use php\lib\String;
@@ -669,6 +670,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                                 $this->designer->unregisterNode($node);
 
                                 $clones[] = [$clone, $node->parent];
+                            } else {
+                                $this->getDesigner()->unselectNode($node);
                             }
                         }
                     }
@@ -772,6 +775,25 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
                 if ($spec) {
                     $spec->refreshNode($node, $one);
+                }
+            }
+        } else {
+            if ($factoryId = $node->data('-factory-id')) {
+                $gui = GuiFrameworkProjectBehaviour::get();
+
+                if ($gui) {
+                    $prototype = $gui->getPrototype($factoryId);
+
+                    if ($prototype) {
+                        foreach ($prototype['behaviours'] as $one) {
+                            /** @var AbstractBehaviourSpec $spec */
+                            $spec = $one['spec'];
+
+                            if ($spec instanceof AbstractBehaviourSpec) {
+                                $spec->refreshNode($node, $one['value']);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1578,7 +1600,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return $node;
     }
 
-    protected function _onAreaMouseUp(UXMouseEvent $e)
+    protected function _onAreaMouseUp(UXMouseEvent $e = null)
     {
         $selected = $this->elementTypePane->getSelected();
 
@@ -1589,7 +1611,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             $node = $this->createElement($selected, $selectionRectangle->x, $selectionRectangle->y, null, !$e->controlDown);
 
-            if (!$e->controlDown) {
+            if ($e && !$e->controlDown) {
                 $this->elementTypePane->clearSelected();
             }
 
@@ -1878,7 +1900,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     public function getNodeId($node)
     {
-        return $node->id;
+        return $node ? $node->id : null;
     }
 
     public function setDefaultEventEditor($editor)

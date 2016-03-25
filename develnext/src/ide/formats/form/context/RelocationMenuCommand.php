@@ -5,6 +5,7 @@ use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use php\lang\Invoker;
+use php\lib\str;
 
 class RelocationMenuCommand extends AbstractMenuCommand
 {
@@ -18,6 +19,8 @@ class RelocationMenuCommand extends AbstractMenuCommand
      */
     private $relocateHandler;
 
+    private $id;
+
     /**
      * RelocationMenuCommand constructor.
      *
@@ -28,6 +31,12 @@ class RelocationMenuCommand extends AbstractMenuCommand
     {
         $this->accelerator = $accelerator;
         $this->relocateHandler = Invoker::of($relocateHandler);
+        $this->id = str::uuid();
+    }
+
+    public function getUniqueId()
+    {
+        return parent::getUniqueId() . $this->id;
     }
 
     public function isHidden()
@@ -50,14 +59,15 @@ class RelocationMenuCommand extends AbstractMenuCommand
         /** @var FormEditor $editor */
         $designer = $editor->getDesigner();
 
-        $size = $designer->snapEnabled ? $designer->snapSize : 1;
+        $sizeX = $designer->snapEnabled ? $designer->snapSizeX : 1;
+        $sizeY = $designer->snapEnabled ? $designer->snapSizeY : 1;
 
         foreach ($designer->getSelectedNodes() as $node) {
             if ($designer->getNodeLock($node)) {
                 continue;
             }
 
-            $this->relocateHandler->call($node, $size);
+            $this->relocateHandler->call($node, $sizeX, $sizeY);
         }
 
         $designer->update();

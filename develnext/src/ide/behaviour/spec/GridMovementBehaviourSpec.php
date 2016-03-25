@@ -22,12 +22,12 @@ class GridMovementBehaviourSpec extends AbstractBehaviourSpec
 
     public function getGroup()
     {
-        return self::GROUP_INPUT;
+        return self::GROUP_GAME;
     }
 
     public function getIcon()
     {
-        return "icons/input16.png";
+        return "icons/gameMonitor16.png";
     }
 
     /**
