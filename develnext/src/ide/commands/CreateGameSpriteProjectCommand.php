@@ -10,6 +10,7 @@ use ide\misc\AbstractCommand;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\FileSystem;
+use ide\utils\FileUtils;
 use php\gui\UXDialog;
 use php\io\File;
 use php\lang\Process;
@@ -42,13 +43,19 @@ class CreateGameSpriteProjectCommand extends AbstractCommand
             $name = UXDialog::input('Придумайте название для спрайта');
 
             if ($name !== null) {
+                $name = str::trim($name);
+
+                if (!FileUtils::validate($name)) {
+                    return null;
+                }
+
                 /** @var GuiFrameworkProjectBehaviour $guiBehaviour */
                 $guiBehaviour = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
 
                 if ($guiBehaviour->getSpriteManager()->get($name)) {
                     Dialog::error('Спрайт с таким названием уже существует в проекте');
                     $this->onExecute();
-                    return;
+                    return null;
                 }
 
                 $file = $guiBehaviour->createSprite($name);

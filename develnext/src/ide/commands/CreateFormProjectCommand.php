@@ -9,8 +9,10 @@ use ide\misc\AbstractCommand;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\FileSystem;
+use ide\utils\FileUtils;
 use php\gui\UXDialog;
 use php\lang\Process;
+use php\lib\fs;
 use php\lib\Str;
 use php\time\Time;
 
@@ -43,6 +45,12 @@ class CreateFormProjectCommand extends AbstractCommand
             $name = UXDialog::input('Придумайте название для формы');
 
             if ($name !== null) {
+                $name = str::trim($name);
+
+                if (!FileUtils::validate($name)) {
+                    return;
+                }
+
                 if ($guiBehaviour->hasForm($name)) {
                     $dialog = new MessageBoxForm("Форма '$name' уже существует, хотите её пересоздать?", ['Нет, оставить', 'Да, пересоздать']);
                     if ($dialog->showDialog() && $dialog->getResultIndex() == 0) {

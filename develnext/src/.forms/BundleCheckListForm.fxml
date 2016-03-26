@@ -7,7 +7,6 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -22,7 +21,7 @@
                               <Font name="Tahoma Bold" size="12.0" />
                            </font>
                         </Label>
-                        <Label text="Выберите нужные нужные вам пакеты расширений в проекте" textFill="#5e5e5e" />
+                        <Label text="Выберите нужные вам пакеты расширений в проекте" textFill="#5e5e5e" />
                      </children>
                   </VBox>
                </children>

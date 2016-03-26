@@ -156,6 +156,15 @@ class FloatSliderPropertyEditor extends ElementPropertyEditor
         return $ui;
     }
 
+    public function setTooltip($tooltip)
+    {
+        parent::setTooltip($tooltip);
+
+        $this->slider->tooltipText = $tooltip;
+        $this->textField->tooltipText = $tooltip;
+    }
+
+
     public function getCode()
     {
         return 'floatSlider';

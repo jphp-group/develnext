@@ -7,7 +7,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="632.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="509.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label layoutX="54.0" layoutY="14.0" prefHeight="32.0" prefWidth="533.0" text="Новый проект" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="13.0">
          <font>
@@ -16,10 +16,10 @@
       </Label>
       <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
       <Separator layoutX="14.0" layoutY="46.0" prefHeight="32.0" prefWidth="573.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="13.0" />
-      <Label layoutX="27.0" layoutY="129.0" prefHeight="24.0" prefWidth="221.0" text="Выберите шаблон:" />
-      <ListView id="templateList" layoutX="27.0" layoutY="153.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="162.0" AnchorPane.leftAnchor="27.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="153.0" />
+      <Label layoutX="26.0" layoutY="135.0" prefHeight="24.0" prefWidth="221.0" text="Выберите шаблон:" />
+      <ListView id="templateList" layoutX="27.0" layoutY="159.0" prefHeight="188.0" prefWidth="548.0" AnchorPane.bottomAnchor="162.0" AnchorPane.leftAnchor="27.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="159.0" />
       <Separator layoutX="14.0" layoutY="306.0" prefHeight="32.0" prefWidth="573.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="13.0" />
-      <Button id="createButton" layoutX="22.0" layoutY="344.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="111.0" text="Создать" AnchorPane.bottomAnchor="24.0">
+      <Button id="createButton" layoutX="22.0" layoutY="344.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="111.0" styleClass="icon-ok" text="Создать" AnchorPane.bottomAnchor="24.0">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -27,7 +27,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button id="cancelButton" layoutX="145.0" layoutY="344.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="111.0" text="Отмена" AnchorPane.bottomAnchor="24.0">
+      <Button id="cancelButton" layoutX="145.0" layoutY="344.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="111.0" text="Отмена" AnchorPane.bottomAnchor="24.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
@@ -37,7 +37,13 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Label layoutX="26.0" layoutY="72.0" prefHeight="24.0" prefWidth="221.0" text="Название проекта:" />
-      <TextField id="nameField" layoutX="26.0" layoutY="96.0" prefHeight="25.0" prefWidth="548.0" AnchorPane.leftAnchor="26.0" AnchorPane.rightAnchor="26.0" />
+      <Label layoutX="26.0" layoutY="72.0" prefHeight="24.0" prefWidth="221.0" text="Название проекта:">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Label>
+      <TextField id="nameField" layoutX="26.0" layoutY="96.0" prefHeight="25.0" prefWidth="548.0" AnchorPane.leftAnchor="26.0" AnchorPane.rightAnchor="26.0">
+         <font>
+            <Font size="15.0" />
+         </font></TextField>
    </children>
 </AnchorPane>

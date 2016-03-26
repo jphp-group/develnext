@@ -24,8 +24,10 @@ use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\gui\UXTextField;
 use php\io\File;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
+use php\util\Regex;
 
 /**
  *
@@ -171,6 +173,7 @@ class NewProjectForm extends AbstractIdeForm
     }
 
     /**
+     * @event nameField.keyDown-Enter
      * @event createButton.action
      */
     public function doCreate()
@@ -191,7 +194,7 @@ class NewProjectForm extends AbstractIdeForm
             }
         }
 
-        $name = $this->nameField->text;
+        $name = str::trim($this->nameField->text);
 
         if (!$name) {
             UXDialog::show('Введите название для нового проекта', 'ERROR');

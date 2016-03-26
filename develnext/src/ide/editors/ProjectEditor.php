@@ -3,6 +3,7 @@ namespace ide\editors;
 
 use ide\Ide;
 use ide\Logger;
+use ide\utils\FileUtils;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\EventBinder;
 use php\gui\layout\UXAnchorPane;
@@ -171,7 +172,13 @@ class ProjectEditor extends AbstractEditor
             $input = UXDialog::input('Введите новое название для проекта', Ide::project()->getName());
 
             if ($input) {
-                if (!Ide::project()->setName($input)) {
+                if (!FileUtils::validate($input)) {
+                    return;
+                }
+
+                $success = Ide::project()->setName($input);
+
+                if (!$success) {
                     UXDialog::showAndWait("Невозможно дать проекту введенное имя '$input', попробуйте другое.");
                 } else {
                     $this->projectNameLabel->text = $input;

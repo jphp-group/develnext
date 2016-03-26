@@ -1,6 +1,7 @@
 <?php
 namespace ide\utils;
 
+use php\gui\UXDialog;
 use php\io\File;
 use php\io\FileStream;
 use php\io\Stream;
@@ -14,6 +15,20 @@ use php\lib\Str;
  */
 class FileUtils
 {
+    /**
+     * @param $name
+     * @return bool
+     */
+    public static function validate($name)
+    {
+        if (!fs::valid($name)) {
+            UXDialog::show('Некорректное название, присутствуют системные символы, которые нельзя использовать в названии файлов.', 'ERROR');
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @param string $path
      * @param callable $handle

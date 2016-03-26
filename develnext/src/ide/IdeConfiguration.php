@@ -59,11 +59,13 @@ class IdeConfiguration extends Configuration
     public function save()
     {
         try {
+            fs::ensureParent($this->fileName);
+
             parent::save($this->fileName);
 
             Logger::info("Save [autoSave={$this->autoSave}] '$this->fileName'");
         } catch (IOException $e) {
-            Logger::warn("Unable to save $this->fileName");
+            Logger::warn("Unable to save $this->fileName, {$e->getMessage()}");
         }
     }
 

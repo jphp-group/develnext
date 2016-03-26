@@ -11,6 +11,7 @@ use ide\misc\AbstractCommand;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\FileSystem;
+use ide\utils\FileUtils;
 use php\gui\UXDialog;
 use php\io\File;
 use php\lang\Process;
@@ -43,13 +44,19 @@ class CreateScriptModuleProjectCommand extends AbstractCommand
             $name = UXDialog::input('Придумайте название для модуля скриптов');
 
             if ($name !== null) {
+                $name = str::trim($name);
+
+                if (!FileUtils::validate($name)) {
+                    return null;
+                }
+
                 /** @var GuiFrameworkProjectBehaviour $guiBehaviour */
                 $guiBehaviour = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
 
                 if ($guiBehaviour->hasModule($name)) {
                     $dialog = new MessageBoxForm("Модуль '$name' уже существует, хотите его пересоздать?", ['Нет, оставить', 'Да, пересоздать']);
                     if ($dialog->showDialog() && $dialog->getResultIndex() == 0) {
-                        return;
+                        return null;
                     }
                 }
 
