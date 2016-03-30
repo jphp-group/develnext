@@ -30,4 +30,6 @@ public class UXPanel extends UXAnchorPane<Panel> {
     public void __construct() {
         __wrappedObject = new Panel();
     }
+
+
 }

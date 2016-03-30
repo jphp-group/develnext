@@ -38,8 +38,10 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
         $this->textField->style = "-fx-background-insets: 0; -fx-background-color: -fx-control-inner-background; -fx-background-radius: 0;";
 
         $this->textField->on('keyUp', function () {
-            $this->updateUi($this->textField->text, false);
-            $this->applyValue($this->textField->text, false);
+            if ($this->textField->editable) {
+                $this->updateUi($this->textField->text, false);
+                $this->applyValue($this->textField->text, false);
+            }
         });
 
         return $this->textField;

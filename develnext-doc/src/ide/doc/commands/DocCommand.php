@@ -70,7 +70,7 @@ class DocCommand extends AbstractCommand
                 $input->width = 170;
             }
 
-            Ide::get()->setUserConfigValue(__CLASS__ . '.searchQuery', $input);
+            Ide::get()->setUserConfigValue(__CLASS__ . '.searchQuery', $input->text);
         });
 
         $input->text = Ide::get()->getUserConfigValue(__CLASS__ . '.searchQuery', '');

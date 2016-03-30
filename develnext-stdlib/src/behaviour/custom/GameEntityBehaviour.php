@@ -37,6 +37,11 @@ class GameEntityBehaviour extends AbstractBehaviour
     public $startVelocity = [0, 0];
 
     /**
+     * @var array
+     */
+    //public $physSize = [1, 1];
+
+    /**
      * @var UXGameEntity
      */
     protected $entity;

@@ -38,6 +38,7 @@ use php\io\Stream;
 use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\lib\Char;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Mirror;
 use php\lib\Str;
@@ -189,10 +190,14 @@ class CodeEditor extends AbstractEditor
             return;
         }
 
-        $sourceFile = "$this->file.source";
+        if ($this->mode == 'php') {
+            $sourceFile = "$this->file.source";
 
-        if (Files::exists($sourceFile)) {
-            $file = $sourceFile;
+            if (fs::exists($sourceFile)) {
+                $file = $sourceFile;
+            } else {
+                $file = $this->file;
+            }
         } else {
             $file = $this->file;
         }
@@ -221,11 +226,15 @@ class CodeEditor extends AbstractEditor
 
         $value = $this->getValue();
 
-        if (!Files::exists($this->file)) {
+        if (!fs::exists($this->file)) {
             FileUtils::put($this->file, $value);
         }
 
-        FileUtils::put("$this->file.source", $value);
+        if ($this->mode == 'php') {
+            FileUtils::put("$this->file.source", $value);
+        } else {
+            FileUtils::put($this->file, $value);
+        }
 
         Logger::info("Finish save file $this->file.");
     }

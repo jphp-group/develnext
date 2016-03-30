@@ -21,6 +21,8 @@ use ide\misc\SimpleSingleCommand;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\Cache;
 use ide\ui\FlowListViewDecorator;
+use ide\ui\LazyImage;
+use ide\ui\LazyLoadingImage;
 use ide\utils\FileUtils;
 use ParseException;
 use php\format\ProcessorException;
@@ -50,6 +52,7 @@ use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\io\File;
 use php\io\IOException;
+use php\lang\IllegalStateException;
 use php\lang\Thread;
 use php\lib\Items;
 use php\lib\Str;
@@ -213,6 +216,11 @@ class GameSpriteEditor extends AbstractEditor
 
     public function save()
     {
+        if (!UXApplication::isUiThread()) {
+            // throw new IllegalStateException("Saving in non-ui thread");
+            return;
+        }
+
         $files = $this->findFrameFiles();
 
         $canvas = new UXCanvas();

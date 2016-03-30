@@ -8,7 +8,6 @@ use php\xml\DomElement;
 
 class FlatButtonFormElementTag extends AbstractFormElementTag
 {
-    
     public function getTagName()
     {
         return 'FlatButton';

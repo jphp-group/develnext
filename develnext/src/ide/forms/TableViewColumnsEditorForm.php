@@ -170,17 +170,19 @@ class TableViewColumnsEditorForm extends AbstractIdeForm
         $this->properties->addProperty('general', 'maxWidth', 'Макс. ширина', $editor);
         $this->properties->addProperty('general', 'resizable', 'Изменяемые размеры', new BooleanPropertyEditor());
         $this->properties->addProperty('general', 'alignment', 'Выравнивание', (new PositionPropertyEditor())->setSetter(function (ElementPropertyEditor $editor, $value) {
-            $value = str::replace(str::lower($value), '_', '-');
+            if (!($this->properties->target instanceof \stdClass)) {
+                $value = str::replace(str::lower($value), '_', '-');
 
-            $regex = Regex::of('-fx-alignment\\:[- a-zA-Z]{1,}(;)?')->with($this->properties->target->style);
+                $regex = Regex::of('-fx-alignment\\:[- a-zA-Z]{1,}(;)?')->with($this->properties->target->style);
 
-            if ($regex->find()) {
-                $this->properties->target->style = $regex->replace("-fx-alignment: $value;");
-            } else {
-                $this->properties->target->style = "-fx-alignment: $value; {$this->properties->target->style}";
+                if ($regex->find()) {
+                    $this->properties->target->style = $regex->replace("-fx-alignment: $value;");
+                } else {
+                    $this->properties->target->style = "-fx-alignment: $value; {$this->properties->target->style}";
+                }
+
+                $this->properties->update();
             }
-
-            $this->properties->update();
         })->setGetter(function () {
             $target = $this->properties->target;
 

@@ -6,6 +6,7 @@ use php\gui\event\UXMouseEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\UXDialog;
 use php\gui\UXNode;
+use php\gui\UXWindow;
 use php\util\SharedValue;
 use script\TimerScript;
 
@@ -31,10 +32,14 @@ class DraggingFormBehaviour extends AbstractBehaviour
      */
     protected function applyImpl($target)
     {
+        if ($target instanceof UXWindow)  {
+            $target = $target->layout;
+        }
+
         if ($target instanceof UXNode) {
             $pos = new SharedValue(null);
 
-            $target->on('mouseDown', function (UXMouseEvent $e) use ($pos) {
+            $target->on('mouseDown', function (UXMouseEvent $e) use ($pos, $target) {
                 if (!$this->enabled) {
                     return;
                 }
@@ -42,34 +47,34 @@ class DraggingFormBehaviour extends AbstractBehaviour
                 if ($e->button == 'PRIMARY') {
                     if ($this->opacityEnabled) {
                         if ($this->animated) {
-                            Animation::fadeTo($this->_target->form, 300, $this->opacity);
+                            Animation::fadeTo($target->form, 300, $this->opacity);
                         } else {
-                            $this->_target->form->opacity = $this->opacity;
+                            $target->form->opacity = $this->opacity;
                         }
                     }
 
-                    $pos->set([$e->screenX - $this->_target->form->x, $e->screenY - $this->_target->form->y]);
+                    $pos->set([$e->screenX - $target->form->x, $e->screenY - $target->form->y]);
                 }
             }, __CLASS__);
 
-            $move = function (UXMouseEvent $e)use ($pos) {
+            $move = function (UXMouseEvent $e)use ($pos, $target) {
                 if ($pos->get()) {
-                    $this->_target->form->x = $e->screenX - $pos->get()[0];
-                    $this->_target->form->y = $e->screenY - $pos->get()[1];
+                    $target->form->x = $e->screenX - $pos->get()[0];
+                    $target->form->y = $e->screenY - $pos->get()[1];
                 }
             };
 
             $target->on('mouseDrag', $move, __CLASS__);
 
-            $target->on('mouseUp', function (UXMouseEvent $e) use ($pos) {
+            $target->on('mouseUp', function (UXMouseEvent $e) use ($pos, $target) {
                 if ($e->button == 'PRIMARY') {
                     $pos->remove();
 
                     if ($this->opacityEnabled) {
                         if ($this->animated) {
-                            Animation::fadeTo($this->_target->form, 300, 1);
+                            Animation::fadeTo($target->form, 300, 1);
                         } else {
-                            $this->_target->form->opacity = 1;
+                            $target->form->opacity = 1;
                         }
                     }
                 }

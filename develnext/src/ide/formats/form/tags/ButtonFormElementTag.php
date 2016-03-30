@@ -7,7 +7,6 @@ use php\xml\DomElement;
 
 class ButtonFormElementTag extends AbstractFormElementTag
 {
-    
     public function getTagName()
     {
         return 'Button';

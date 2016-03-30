@@ -209,12 +209,14 @@ public class GameEntity2D implements EventTarget {
 
     public double getWidth() {
         Bounds bounds = node.getBoundsInParent();
-        return bounds.getWidth();
+        double width = bounds.getWidth();
+        return width <= 0 ? 1 : width;
     }
 
     public double getHeight() {
         Bounds bounds = node.getBoundsInParent();
-        return bounds.getHeight();
+        double height = bounds.getHeight();
+        return height <= 0 ? 1 : height;
     }
 
     void update(float dt, GameScene2D scene) {
