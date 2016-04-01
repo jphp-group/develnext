@@ -270,6 +270,8 @@ abstract class AbstractService
                         Logger::info("{$response->message()}, need auth, methodName = {$methodName}, data = {$data}");
 
                         UXApplication::runLater(function () {
+                            Ide::accountManager()->setAccessToken(null);
+
                             if (Ide::accountManager()->authorize(true)) {
                                 Notifications::showAccountAuthorizationExpired();
                             }

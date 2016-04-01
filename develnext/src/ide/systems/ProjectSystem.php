@@ -73,6 +73,7 @@ class ProjectSystem
 
             uiLater($callback);
         });
+        $th->setName("ProjectSystem.compileAll #" . str::random());
 
         $th->start();
     }

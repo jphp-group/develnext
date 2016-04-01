@@ -6,12 +6,17 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox id="content" layoutX="200.0" layoutY="105.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox alignment="BOTTOM_LEFT" spacing="10.0">
                <children>
+                  <Button id="changeNameButton" mnemonicParsing="false" prefHeight="25.0" styleClass="icon-edit">
+                     <padding>
+                        <Insets left="5.0" right="5.0" />
+                     </padding>
+                  </Button>
                   <VBox>
                      <children>
                         <Label text="Имя проекта:" textFill="#a8a8a8" />
@@ -22,11 +27,6 @@
                         </Label>
                      </children>
                   </VBox>
-                  <Button id="changeNameButton" mnemonicParsing="false" prefHeight="25.0" styleClass="icon-edit">
-                     <padding>
-                        <Insets left="5.0" right="5.0" />
-                     </padding>
-                  </Button>
                </children>
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -39,7 +39,7 @@
                         <Insets left="5.0" right="5.0" />
                      </padding>
                   </Button>
-                  <Label id="projectDirLabel" prefHeight="26.0" text="ProjectRootDirectory" textFill="#a8a8a8" />
+                  <Label id="projectDirLabel" prefHeight="26.0" text="ProjectRootDirectory" textFill="#686868" />
                </children>
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" />

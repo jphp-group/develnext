@@ -79,10 +79,10 @@ class ScriptModuleFormat extends AbstractFormFormat
 
     public function getTitle($path)
     {
-        $name = FileUtils::stripExtension(File::of($path)->getName());
+        $name = fs::nameNoExt($path);
 
         if ($name == 'AppModule') {
-            return "AppModule [Загрузчик]";
+            return "Загрузчик";
         }
 
         return parent::getTitle($path);

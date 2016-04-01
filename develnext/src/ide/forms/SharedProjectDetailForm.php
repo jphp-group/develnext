@@ -295,7 +295,7 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
         if ($this->data['shareUrl']) {
             $this->showPreloader('Загрузка файла проекта ...');
 
-            (new Thread(function () {
+            $thread = (new Thread(function () {
                 $name = $this->data['name'] ?: 'Unknown';
                 $path = Ide::get()->getUserConfigValue('projectDirectory') . "/$name.zip";
 
@@ -331,7 +331,9 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
                     });
                 }
 
-            }))->start();
+            }));
+            $thread->setName("SharedProjectDetailOpen");
+            $thread->start();
         } else {
             Notifications::error('Ошибка загрузки', 'Данный проект невозможно загрузить, что-то пошло не так.');
         }

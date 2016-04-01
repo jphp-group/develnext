@@ -13,6 +13,8 @@ use php\game\UXSprite;
 use php\gui\UXApplication;
 use php\gui\UXImage;
 use php\io\IOException;
+use php\lib\arr;
+use php\lib\fs;
 use php\lib\Str;
 use php\xml\XmlProcessor;
 
@@ -64,6 +66,10 @@ class IdeSpriteManager
             if ($sprite->frameCount > 0) {
                 return $sprite->getFrameImage(0);
             }
+        } else {
+            if (!$spec) {
+                Logger::warn("Unable to find '$name' sprite in ide manager");
+            }
         }
 
         return null;
@@ -74,6 +80,10 @@ class IdeSpriteManager
         if ($spec = $this->sprites[$name]) {
             if ($spec->file) {
                 $file = $this->project->getFile("src/{$spec->file}");
+
+                if (!$file->isFile()) {
+                    Logger::error("Unable to load sprite image, $file not exists");
+                }
 
                 return $file->exists() ? Cache::getImage($file) : null;
             } else {
@@ -128,6 +138,7 @@ class IdeSpriteManager
 
     /**
      * @param $name
+     * @return SpriteSpec
      */
     public function reloadSprite($name)
     {
@@ -138,10 +149,13 @@ class IdeSpriteManager
             $sprite = $document->find('/sprite');
 
             $this->sprites[$name] = $spec = new SpriteSpec($name, $sprite);
+            $spec->schemaFile = $file;
 
             if (!$spec->file) {
                 Logger::warn("Sprite with empty file: '$name'");
             }
+
+            return $spec;
         } catch (IOException $e) {
             Logger::exception("Cannot reload sprite '$name'", $e);
         } catch (ProcessorException $e) {
@@ -163,9 +177,9 @@ class IdeSpriteManager
         FileUtils::scan($this->project->getFile(self::SPRITE_PATH), function ($filename) {
             if (Str::endsWith($filename, ".sprite")) {
                 $name = $this->project->getAbsoluteFile($filename);
-                $name = FileUtils::stripExtension($name->getRelativePath(self::SPRITE_PATH));
+                $name = fs::pathNoExt($name->getRelativePath(self::SPRITE_PATH));
 
-                $this->reloadSprite($name);
+                $spec = $this->reloadSprite($name);
             }
         });
     }

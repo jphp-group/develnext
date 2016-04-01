@@ -18,6 +18,7 @@ use php\gui\UXTab;
 use php\gui\UXMenu;
 use php\gui\UXTabPane;
 use php\io\File;
+use php\lib\fs;
 use php\lib\Items;
 
 class FileSystem
@@ -226,6 +227,10 @@ class FileSystem
         $editor = Ide::get()->createEditor($path);
 
         if (!$editor) {
+            if (!fs::exists($path)) {
+                Logger::error("Unable fetch editor, $path is not found");
+            }
+
             return null;
         }
 
@@ -275,6 +280,10 @@ class FileSystem
      */
     static function open($path, $switchToTab = true, $param = null)
     {
+        if ($path instanceof AbstractEditor) {
+            $path = $path->getFile();
+        }
+
         $hash = FileUtils::hashName($path);
 
         $editor = static::$openedEditors[$hash];
@@ -320,6 +329,12 @@ class FileSystem
             }
 
             $tab->on('closeRequest', function (UXEvent $e) use ($path, $editor) {
+                if (static::$previousEditor === $e->sender->userData) {
+                    uiLater(function () {
+                        FileSystem::open('~project');
+                    });
+                }
+
                 static::close($path, false);
             });
 

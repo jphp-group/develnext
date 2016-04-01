@@ -1,5 +1,7 @@
 package org.develnext.jphp.ext.gui.desktop.classes;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.*;
 import javafx.scene.input.MouseButton;
 import org.develnext.jphp.ext.gui.desktop.GuiDesktopExtension;
 import php.runtime.annotation.Reflection;
@@ -17,6 +19,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -196,4 +199,14 @@ public class Robot extends BaseWrapper<java.awt.Robot> {
             getWrappedObject().keyRelease(code);
         }
     }
+
+    /*@Signature
+    public javafx.scene.image.Image snapshot() {
+        BufferedImage capture = getWrappedObject().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+
+        WritableImage wimg = new WritableImage(capture.getWidth(), capture.getHeight());
+        SwingFXUtils.toFXImage(capture, wimg);
+
+        return wimg;
+    }*/
 }

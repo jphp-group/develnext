@@ -4,6 +4,7 @@ namespace ide\project\behaviours;
 use ide\editors\ProjectEditor;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
 use ide\project\ProjectFile;
 use ide\systems\WatcherSystem;
@@ -252,14 +253,14 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     }
 
 
-    public function doUpdateSettings(ProjectEditor $editor = null)
+    public function doUpdateSettings(CommonProjectControlPane $editor = null)
     {
         if ($this->uiSettings) {
             $this->uiByteCodeCheckbox->selected = $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, false);
         }
     }
 
-    public function doMakeSettings(ProjectEditor $editor)
+    public function doMakeSettings(CommonProjectControlPane $editor)
     {
         $title = new UXLabel('Исходный php код:');
         $title->font = $title->font->withBold();

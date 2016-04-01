@@ -54,6 +54,7 @@ use php\io\File;
 use php\io\IOException;
 use php\lang\IllegalStateException;
 use php\lang\Thread;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Regex;
@@ -118,13 +119,21 @@ class GameSpriteEditor extends AbstractEditor
     protected $tabPane;
 
     /**
+     * @return SpriteSpec
+     */
+    public function getSpec()
+    {
+        return $this->spec;
+    }
+
+    /**
      * @return File[]
      */
     protected function findFrameFiles()
     {
         $i = 0;
 
-        $name = FileUtils::stripExtension($this->file);
+        $name = fs::pathNoExt($this->file);
 
         $files = [];
 
@@ -147,7 +156,7 @@ class GameSpriteEditor extends AbstractEditor
     {
         $i = 0;
 
-        $name = FileUtils::stripExtension($this->file);
+        $name = fs::pathNoExt($this->file);
 
         $files = [];
 
@@ -186,16 +195,18 @@ class GameSpriteEditor extends AbstractEditor
     {
         $xml = new XmlProcessor();
 
-        UXApplication::runLater(function () {
-            $this->designProperties->target = $this->spec;
-            $this->designProperties->update();
+        uiLater(function () {
+            if ($this->designProperties) {
+                $this->designProperties->target = $this->spec;
+                $this->designProperties->update();
 
-            $this->updateUi();
+                $this->updateUi();
+            }
         });
 
         try {
             $document = $xml->parse(FileUtils::get($this->file));
-            $this->spec = new SpriteSpec($this->file, $document->find("/sprite"));
+            $this->spec = new SpriteSpec(fs::nameNoExt($this->file), $document->find("/sprite"));
 
             return;
         } catch (IOException $e) {
@@ -285,7 +296,7 @@ class GameSpriteEditor extends AbstractEditor
             );
         }
 
-        $name = FileUtils::stripExtension($this->file);
+        $name = fs::pathNoExt($this->file);
 
         $canvas->writeImageAsync("png", "$name.png", null, function ($success) use ($name) {
             if (!$success) {
@@ -628,7 +639,7 @@ class GameSpriteEditor extends AbstractEditor
 
             if ($file->exists()) {
                 $newName = $file->getParent() . "/tmp.$i.png";
-                Files::delete($newName);
+                fs::delete($newName);
 
                 $files[] = [$node, $newName];
 
@@ -690,10 +701,10 @@ class GameSpriteEditor extends AbstractEditor
                     }
                 }
 
-                $fileName = FileUtils::stripExtension($this->file);
+                $fileName = fs::pathNoExt($this->file);
 
                 if (!$multiple) {
-                    $dir = FileUtils::stripExtension($this->file);
+                    $dir = fs::pathNoExt($this->file);
 
                     $file = $project->copyFile($result, $project->getAbsoluteFile($dir)->getRelativePath());
 
@@ -746,7 +757,7 @@ class GameSpriteEditor extends AbstractEditor
 
                     Ide::get()->getMainForm()->showPreloader('Импортируем кадры ...');
 
-                    Files::makeDirs($fileName);
+                    fs::makeDir($fileName);
 
                     foreach ($canvasFrames as $i => $canvas) {
                         $canvas->writeImageAsync('png', $fileName . "/" . ($i + $offset) . ".png", $transparentColor, function () use (&$done) {

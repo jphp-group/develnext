@@ -27,6 +27,11 @@ class SpriteSpec
     public $file;
 
     /**
+     * @var string
+     */
+    public $schemaFile = null;
+
+    /**
      * @var int
      */
     public $frameWidth;

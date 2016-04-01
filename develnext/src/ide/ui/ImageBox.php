@@ -66,9 +66,10 @@ class ImageBox extends UXVBox implements StreamLoadableBehaviour
         return $this->imageArea->image;
     }
 
-    public function setTitle($title)
+    public function setTitle($title, $style = '')
     {
         $this->titleLabel->text = $title;
+        $this->titleLabel->style .= $style;
         $this->titleLabel->tooltipText = $title;
     }
 

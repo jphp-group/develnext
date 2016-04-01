@@ -1103,10 +1103,13 @@ class Ide extends Application
 
     public function shutdown()
     {
-        (new Thread(function () {
-            sleep(15);
+        $shutdownTh = (new Thread(function () {
+            Logger::warn("System halt 0\n");
+            sleep(40);
             System::halt(0);
-        }))->start();
+        }));
+        $shutdownTh->setName("DevelNext Shutdown");
+        $shutdownTh->start();
 
         Logger::info("Start IDE shutdown ...");
 
@@ -1148,10 +1151,6 @@ class Ide extends Application
             } finally {
                 if ($stream) $stream->close();
             }
-        }
-
-        if ($this->accountManager->isAuthorized()) {
-            //Ide::service()->ide()->shutdownAsync(null);
         }
 
         Logger::info("Finish IDE shutdown");

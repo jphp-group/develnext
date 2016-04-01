@@ -40,7 +40,13 @@ public class UXHBox extends UXPane<HBox> {
 
     @Signature
     public void __construct(List<Node> children) {
+        __construct(children, 0);
+    }
+
+    @Signature
+    public void __construct(List<Node> children, double spacing) {
         __wrappedObject = new HBox(children.toArray(new Node[children.size()]));
+        getWrappedObject().setSpacing(spacing);
     }
 
     @Signature

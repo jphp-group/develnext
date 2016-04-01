@@ -2,11 +2,13 @@
 namespace ide\bundle;
 
 use ide\Ide;
+use ide\Logger;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\Project;
 use ide\utils\FileUtils;
 use php\io\File;
+use php\lib\fs;
 use php\lib\str;
 use php\util\Regex;
 
@@ -44,7 +46,19 @@ abstract class AbstractJarBundle extends AbstractBundle
 
                 if ($jarFile) {
                     $file = "$libPath/$dep.jar";
-                    FileUtils::copyFile($jarFile, $file);
+
+                    if (fs::isFile($jarFile)) {
+                        $size1 = fs::size($jarFile);
+                        $size2 = fs::size($file);
+
+                        if ($size1 != $size2 || !fs::isFile($file)) {
+                            if (FileUtils::copyFile($jarFile, $file) <= 0) {
+                                Logger::error("Unable to copy $jarFile to $file");
+                            }
+                        }
+                    } else {
+                        Logger::error("Unable to copy $jarFile");
+                    }
 
                     $php = PhpProjectBehaviour::get();
 

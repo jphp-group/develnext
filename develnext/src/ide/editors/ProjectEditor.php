@@ -3,6 +3,8 @@ namespace ide\editors;
 
 use ide\Ide;
 use ide\Logger;
+use ide\project\control\AbstractProjectControlPane;
+use ide\ui\ListMenu;
 use ide\utils\FileUtils;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\EventBinder;
@@ -12,40 +14,63 @@ use php\gui\UXApplication;
 use php\gui\UXDesktop;
 use php\gui\UXDialog;
 use php\gui\UXLabel;
+use php\gui\UXListCell;
+use php\gui\UXListView;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXSeparator;
 use php\io\File;
 use php\io\ResourceStream;
 use php\io\Stream;
+use php\lib\arr;
+use php\lib\reflect;
 use php\lib\str;
 
 class ProjectEditor extends AbstractEditor
 {
-    /**
-     * @var UXAnchorPane
-     */
-    protected $ui;
-
-    /**
-     * @var UXVBox
-     */
-    protected $content;
-
-    /**
-     * @var UXLabel
-     */
-    protected $projectNameLabel;
-
     /**
      * @var bool
      */
     protected $init = false;
 
     /**
-     * @var UXLabel
+     * @var AbstractProjectControlPane[]
      */
-    protected $projectDirLabel;
+    protected $controlPanes = [];
+
+    /**
+     * @var UXAnchorPane
+     */
+    protected $contentPane;
+
+    /**
+     * @var ListMenu
+     */
+    protected $menu;
+
+    /**
+     * ProjectEditor constructor.
+     * @param string $file
+     */
+    public function __construct($file)
+    {
+        parent::__construct($file);
+
+        foreach (Ide::get()->getInternalList('.dn/projectControlPanes') as $one) {
+            if (class_exists($one)) {
+                $pane = new $one();
+
+                if ($pane instanceof AbstractProjectControlPane) {
+                    $this->controlPanes[$one] = $pane;
+                } else {
+                    Logger::error("Unable to register $one control pane, class is not instance of AbstractProjectControlPane");
+                }
+            } else {
+                Logger::error("Unable to register $one control pane, class not found.");
+            }
+        }
+    }
+
 
     public function getTitle()
     {
@@ -71,22 +96,10 @@ class ProjectEditor extends AbstractEditor
     {
         parent::open();
 
-        $project = Ide::project();
+        $this->menu->refresh();
 
-        if ($project) {
-            if ($project && !$this->init) {
-                $this->init = true;
-                UXApplication::runLater(function () use ($project) {
-                    $project->trigger('makeSettings', $this);
-                });
-            }
-
-            $this->projectNameLabel->text = $project->getName();
-            $this->projectDirLabel->text = File::of($project->getRootDir());
-
-            UXApplication::runLater(function () use ($project) {
-                $project->trigger('updateSettings', $this);
-            });
+        if (!$this->getOpenedPane()) {
+            $this->navigate(arr::firstKey($this->controlPanes));
         }
     }
 
@@ -101,99 +114,60 @@ class ProjectEditor extends AbstractEditor
     }
 
     /**
-     * @param UXNode $node
-     * @param bool $prepend
+     * @return AbstractProjectControlPane|null
      */
-    public function addSettingsPane(UXNode $node, $prepend = true)
+    public function getOpenedPane()
     {
-        Logger::info("Add settings pane ...");
-
-        if (property_exists($node, 'padding')) {
-            $node->padding = 10;
-            $pane = $node;
-        } else {
-            $pane = new UXVBox();
-            $pane->add($node);
-            $pane->padding = 10;
-        }
-
-        if ($prepend) {
-            $this->content->children->insert(2, $pane);
-            $this->content->children->insert(2, new UXSeparator());
-        } else {
-            $this->content->add($pane);
-            $this->content->add(new UXSeparator());
-        }
+        return $this->menu->selectedItem;
     }
 
+    public function navigate($paneClass, $setMenu = true)
+    {
+        if ($pane = $this->controlPanes[$paneClass]) {
+            $ui = $pane->getUi();
+            $pane->refresh();
+
+            UXAnchorPane::setAnchor($ui, 0);
+            $this->contentPane->children->setAll([$ui]);
+
+            if ($setMenu) {
+                $this->menu->selectedIndex = $this->menu->items->indexOf($pane);
+            }
+
+            return $pane;
+        }
+
+        return null;
+    }
     /**
      * @return UXNode
      */
     public function makeUi()
     {
-        $loader = new UXLoader();
-        $ui = $loader->load(Stream::of(AbstractForm::DEFAULT_PATH . 'blocks/_ProjectTab.fxml'));
-
         $pane = new UXAnchorPane();
-        $pane->add($ui);
+        $pane->padding = 15;
 
-        UXAnchorPane::setAnchor($ui, 10);
-        $binder = new EventBinder($ui, $this);
-        $binder->setLookup(function (UXNode $context, $id) {
-            return $context->lookup("#$id");
-        });
-
-        $binder->load();
-
-        $this->ui = $ui;
-
-        $this->content = $ui->lookup('#content');
-        $this->projectNameLabel = $ui->lookup('#projectNameLabel');
-        $this->projectDirLabel = $ui->lookup('#projectDirLabel');
-
-        return $pane;
+        return $this->contentPane = $pane;
     }
 
     public function makeLeftPaneUi()
     {
-        $ui = Ide::project()->getTree()->getRoot();
-        $ui->focusTraversable = false;
+        $ui = new ListMenu();
+        $ui->items->setAll($this->controlPanes);
         UXAnchorPane::setAnchor($ui, 0);
 
+        $ui->on('action', function () {
+            uiLater(function () {
+                $this->navigate(reflect::typeOf($this->menu->selectedItem), false);
+            });
+        });
+
+        $this->menu = $ui;
+
+        /*$ui = Ide::project()->getTree()->getRoot();
+        $ui->focusTraversable = false;
+        UXAnchorPane::setAnchor($ui, 0);*/
+
         return $ui;
-    }
-
-    /**
-     * @event changeNameButton.action
-     */
-    public function doChangeProjectName()
-    {
-        if (Ide::project()) {
-            $input = UXDialog::input('Введите новое название для проекта', Ide::project()->getName());
-
-            if ($input) {
-                if (!FileUtils::validate($input)) {
-                    return;
-                }
-
-                $success = Ide::project()->setName($input);
-
-                if (!$success) {
-                    UXDialog::showAndWait("Невозможно дать проекту введенное имя '$input', попробуйте другое.");
-                } else {
-                    $this->projectNameLabel->text = $input;
-                    Ide::get()->setOpenedProject(Ide::project());
-                }
-            }
-        }
-    }
-
-    /**
-     * @event openProjectDirButton.action
-     */
-    public function doOpenProjectDir()
-    {
-        $desktop = new UXDesktop();
-        $desktop->open(Ide::project()->getRootDir());
     }
 }

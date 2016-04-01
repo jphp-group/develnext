@@ -1,14 +1,8 @@
 .root {
-
 }
 
-.flat-button {
-    -fx-background-color: white;
-}
-
-.flat-button:hover {
-    -fx-background-color: #ececec;
-}
+.flat-button { -fx-background-color: white; }
+.flat-button:hover { -fx-background-color: #ececec; }
 
 /* icons .. */
 .icon-flat-edit { -fx-graphic: url("/.data/img/icons/flatEdit16.png"); }
@@ -59,9 +53,7 @@
 .icon-new { -fx-graphic: url("/.data/img/icons/new16.png"); }
 .icon-new32 { -fx-graphic: url("/.data/img/icons/new32.png"); }
 
-.button {
-    -fx-cursor: hand;
-}
+.button { -fx-cursor: hand; }
 
 .dn-add-tab-button {
 }
@@ -82,82 +74,32 @@
 }
 
 
-.small-checkbox {
-    -fx-label-padding: 0.0em 0.0em 0.0em 0.0em;
-}
+.small-checkbox { -fx-label-padding: 0.0em 0.0em 0.0em 0.0em; }
+.small-checkbox .mark { -fx-padding: 0.26em; -fx-background-radius: 0, 0, 0, 0; }
 
-.small-checkbox .mark {
-    -fx-padding: 0.26em;
-    -fx-background-radius: 0, 0, 0, 0;
-}
+.dn-list-item { -fx-border-color: silver; -fx-cursor: hand; -fx-background-color: white; }
+.dn-list-item:hover { -fx-border-color: red; }
 
-.dn-list-item {
-    -fx-border-color: silver;
-    -fx-cursor: hand;
-    -fx-background-color: white;
-}
+.dn-list-menu { -fx-background-insets: 0; -fx-focus-color: -fx-control-inner-background; -fx-faint-focus-color: -fx-control-inner-background; }
+.dn-list-menu-title { -fx-font-weight: bold; -fx-padding: 0; -fx-text-fill: #131313; }
+.dn-list-menu-description { -fx-text-fill: gray; }
+.dn-list-menu-count { -fx-background-color: gray; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2px 5px; -fx-background-radius: 3px; }
 
-.dn-list-item:hover {
-    -fx-border-color: red;
-}
+.flow-list-view { -fx-background-color: white; }
+.flow-list-view .list-cell { -fx-cursor: hand; -fx-border-width: 1px; -fx-border-color: transparent; }
+.flow-list-view .list-cell.selected { -fx-background-color: #dcdcdc; }
+.flow-list-view .list-cell.hovered { -fx-border-color: gray; }
+.flow-list-view .list-cell.dragged { -fx-border-color: red; -fx-border-style: dotted; }
 
-.flow-list-view {
-    -fx-background-color: white;
-}
+.dn-list-hint { -fx-text-fill: silver; -fx-font-style: italic; -fx-font-size: 1.6em; -fx-padding: 20px; }
 
-.flow-list-view .list-cell {
-    -fx-cursor: hand;
-    -fx-border-width: 1px;
-    -fx-border-color: transparent;
-}
+.dn-title { -fx-font-style: italic; -fx-font-size: 1.6em; -fx-padding: 20px; }
 
-.flow-list-view .list-cell.selected {
-    -fx-background-color: #dcdcdc;
-}
+.dn-simple-toggle-button:hover { -fx-background-color: #cce6fe; -fx-border-color: #5a71a7; }
+.dn-simple-toggle-button:selected { -fx-background-color: silver; -fx-border-color: gray; }
+.dn-simple-toggle-button, .dn-simple-button { -fx-background-color: white; -fx-border-color: silver; -fx-border-width: 1px; -fx-cursor: hand; }
 
-.flow-list-view .list-cell.hovered {
-    -fx-border-color: gray;
-}
-
-.flow-list-view .list-cell.dragged {
-    -fx-border-color: red;
-    -fx-border-style: dotted;
-}
-
-.dn-list-hint {
-    -fx-text-fill: silver;
-    -fx-font-style: italic;
-    -fx-font-size: 1.6em;
-
-    -fx-padding: 20px;
-}
-
-.dn-title {
-    -fx-font-style: italic;
-    -fx-font-size: 1.6em;
-    -fx-padding: 20px;
-}
-
-.dn-simple-toggle-button:hover {
-    -fx-background-color: #cce6fe;
-    -fx-border-color: #5a71a7;
-}
-
-.dn-simple-toggle-button:selected {
-    -fx-background-color: silver;
-    -fx-border-color: gray;
-}
-
-.dn-simple-toggle-button, .dn-simple-button {
-    -fx-background-color: white;
-    -fx-border-color: silver;
-    -fx-border-width: 1px;
-    -fx-cursor: hand;
-}
-
-.dn-simple-button {
-    -fx-border-radius: 3px;
-}
+.dn-simple-button { -fx-border-radius: 3px; }
 
 .account-menu {
     -fx-padding: 5px;

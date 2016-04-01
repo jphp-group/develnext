@@ -8,6 +8,7 @@ use ide\forms\BundleCheckListForm;
 use ide\Ide;
 use ide\IdeConfiguration;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
@@ -463,7 +464,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
-    public function doUpdateSettings(ProjectEditor $editor = null)
+    public function doUpdateSettings(CommonProjectControlPane $editor = null)
     {
         if ($this->uiSettings) {
             $this->uiPackages->children->clear();
@@ -491,7 +492,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
-    public function doMakeSettings(ProjectEditor $editor)
+    public function doMakeSettings(CommonProjectControlPane $editor)
     {
         $title = new UXLabel('Пакеты:');
         $title->font = $title->font->withBold();

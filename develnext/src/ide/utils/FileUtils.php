@@ -4,6 +4,7 @@ namespace ide\utils;
 use php\gui\UXDialog;
 use php\io\File;
 use php\io\FileStream;
+use php\io\IOException;
 use php\io\Stream;
 use php\lang\System;
 use php\lib\fs;
@@ -30,27 +31,26 @@ class FileUtils
     }
 
     /**
+     * @deprecated
      * @param string $path
      * @param callable $handle
      */
     public static function scan($path, callable $handle)
     {
-        File::of($path)->find(function($dir, $name) use ($handle) {
-            if ($name !== '.' && $name !== '..') {
-                $filename = $dir . '/' . $name;
-
-                $handle($filename);
-
-                if (File::of($filename)->isDirectory()) {
-                    FileUtils::scan($filename, $handle);
-                }
-            }
+        fs::scan($path, function (File $file, $depth) use ($handle) {
+            $handle($file->getPath(), $depth);
         });
     }
 
+    /**
+     * @deprecated
+     * @param $file
+     * @return string
+     */
     public static function hash($file)
     {
-        return File::of($file)->hash('SHA-256');
+        return fs::hash($file, 'SHA-256');
+        //return File::of($file)->hash('SHA-256');
        // throw new \Exception("Not implemented");
     }
 
@@ -118,26 +118,24 @@ class FileUtils
         return $path;
     }
 
+    /**
+     * @deprecated
+     * @param $name
+     * @return string
+     */
     public static function getExtension($name)
     {
-        $pos = Str::lastPos($name, '.');
-
-        if ($pos > -1) {
-            return Str::sub($name, $pos + 1);
-        }
-
-        return null;
+        return fs::ext($name);
     }
 
+    /**
+     * @deprecated
+     * @param $name
+     * @return string
+     */
     public static function stripExtension($name)
     {
-        $pos = Str::lastPos($name, '.');
-
-        if ($pos > -1) {
-            $name = Str::sub($name, 0, $pos);
-        }
-
-        return $name;
+        return fs::pathNoExt($name);
     }
 
     public static function copyDirectory($directory, $newDirectory)
@@ -159,45 +157,27 @@ class FileUtils
         });
     }
 
+    /**
+     * @param $origin
+     * @param $dest
+     * @return int
+     */
     public static function copyFile($origin, $dest)
     {
         try {
-            $in = Stream::of($origin);
-
-            $parent = File::of($dest)->getParentFile();
-
-            if ($parent && !$parent->isDirectory()) {
-                $parent->mkdirs();
-            }
-
-            $out = new FileStream($dest, 'w+');
-            return $out->write($in->readFully());
-        } finally {
-            if ($out) $out->close();
-            if ($in) $in->close();
+            fs::ensureParent($dest);
+            return fs::copy($origin, $dest);
+        } catch (IOException $e) {
+            return -1;
         }
-
-        return -1;
     }
 
     public static function deleteDirectory($directory)
     {
-        self::scan($directory, function ($filename) {
-            $file = File::of($filename);
+        fs::clean($directory);
+        fs::delete($directory);
 
-            if (!$file->isDirectory()) {
-                $file->delete();
-            }
-        });
-
-        self::scan($directory, function ($filename) {
-            File::of($filename)->delete();
-        });
-
-        $directory = File::of($directory);
-        $directory->delete();
-
-        return ($directory->exists());
+        return !fs::exists($directory);
     }
 
     public static function put($filename, $content, $encoding = 'UTF-8')

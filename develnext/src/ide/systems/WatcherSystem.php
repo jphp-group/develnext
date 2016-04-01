@@ -12,6 +12,7 @@ use php\io\IOException;
 use php\lang\IllegalStateException;
 use php\lang\InterruptedException;
 use php\lang\Thread;
+use php\lib\str;
 
 class WatcherSystem
 {
@@ -150,7 +151,7 @@ class WatcherSystem
 
             static::removePath($path, false);
         });
-
+        $thread->setName("WatcherPath[$path] #" . str::random());
 
         static::$threads[$hashName] = $thread;
 

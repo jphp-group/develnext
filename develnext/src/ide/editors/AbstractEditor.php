@@ -8,11 +8,13 @@ use ide\Logger;
 use ide\project\Project;
 use ide\project\ProjectIndexer;
 use ide\systems\FileSystem;
+use ide\utils\FileUtils;
 use ide\utils\Json;
 use php\gui\layout\UXPane;
 use php\gui\UXNode;
 use php\lang\IllegalStateException;
 use php\lang\Thread;
+use php\lib\reflect;
 use php\lib\str;
 
 /**
@@ -219,5 +221,11 @@ abstract class AbstractEditor
         FileSystem::close($this->file);
 
         $this->getFormat()->delete($this->file, $silent);
+    }
+
+    public function equals($what)
+    {
+        return $what instanceof AbstractEditor && reflect::typeOf($what) == reflect::typeOf($this)
+            && FileUtils::equalNames($this->getFile(), $what->getFile());
     }
 }

@@ -20,6 +20,7 @@ use ide\editors\common\FormListEditor;
 use ide\editors\common\ObjectListEditorItem;
 use ide\editors\FactoryEditor;
 use ide\editors\FormEditor;
+use ide\editors\GameSpriteEditor;
 use ide\editors\ProjectEditor;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\form\AbstractFormElement;
@@ -35,6 +36,7 @@ use ide\formats\templates\PhpClassFileTemplate;
 use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
 use ide\project\ProjectExporter;
 use ide\project\ProjectFile;
@@ -186,16 +188,17 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $this->mainForm;
     }
 
-    public function setMainForm($form, $trigger = true)
+    public function isMainForm(FormEditor $editor)
+    {
+        return $this->getMainForm() == $editor->getTitle();
+    }
+
+    public function setMainForm($form)
     {
         //Logger::info("Set main form, old = $this->mainForm, new = $form");
         $this->mainForm = $form;
 
         $this->makeApplicationConf();
-
-        if ($trigger) {
-            $this->project->trigger('updateSettings');
-        }
     }
 
     /**
@@ -218,6 +221,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $mainForm = $this->createForm($this->mainForm);
         FileSystem::open($mainForm);
+
+        FileSystem::open('~project');
     }
 
     public function doUpdate()
@@ -227,43 +232,15 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
-    public function doUpdateSettings(ProjectEditor $editor = null)
+    public function doUpdateSettings(CommonProjectControlPane $editor = null)
     {
-        if ($this->settingsMainFormCombobox) {
-            $mainForm = $this->getMainForm();
-
-            $this->settingsMainFormCombobox->updateUi();
-
-            $this->setMainForm($mainForm, false);
-            $this->settingsMainFormCombobox->setSelected($mainForm);
-        }
-
         if ($this->uiUuidInput) {
             $this->uiUuidInput->text = $this->getAppUuid();
         }
     }
 
-    public function doMakeSettings(ProjectEditor $editor)
+    public function doMakeSettings(CommonProjectControlPane $editor)
     {
-        $formListEditor = new FormListEditor();
-        $formListEditor->setEmptyItemText('[Нет]');
-        $formListEditor->build();
-
-        $formListEditor->onChange(function ($value) {
-            $this->setMainForm($value, false);
-        });
-
-        $formListEditor->getUi()->width = 250;
-
-        $ui = new UXHBox([
-            new UXLabel('Главная форма'),
-            $formListEditor->getUi()
-        ]);
-        $ui->spacing = 10;
-        $ui->alignment = 'CENTER_LEFT';
-
-        $this->settingsMainFormCombobox = $formListEditor;
-
         $title = new UXLabel('Десктопное приложение:');
         $title->font = $title->font->withBold();
 
@@ -279,7 +256,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->uiUuidInput = $uiUuidInput;
         $uiUuidInput->observer('text')->addListener(function ($old, $new) { $this->setAppUuid($new, false); });
 
-        $wrap = new UXVBox([$title, $uiUuid, $ui]);
+        $wrap = new UXVBox([$title, $uiUuid]);
         $wrap->spacing = 5;
 
         $editor->addSettingsPane($wrap);
@@ -560,6 +537,27 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         foreach ($this->getScriptModules() as $file) {
             $editor = FileSystem::fetchEditor($this->project->getFile(self::SCRIPTS_DIRECTORY . '/' . $file), true);
             $editors[FileUtils::hashName($file)] = $editor;
+        }
+
+        return $editors;
+    }
+
+    /**
+     * @return GameSpriteEditor[]
+     */
+    public function getSpriteEditors()
+    {
+        $editors = [];
+
+        foreach ($this->spriteManager->getSprites() as $spec) {
+            $file = $spec->schemaFile;
+            $editor = FileSystem::fetchEditor($file, true);
+
+            if ($editor) {
+                $editors[FileUtils::hashName($spec->file)] = $editor;
+            } else {
+                Logger::error("Unable to find sprite editor for $file");
+            }
         }
 
         return $editors;

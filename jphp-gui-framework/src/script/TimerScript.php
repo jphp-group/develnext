@@ -9,6 +9,7 @@ use php\gui\UXDialog;
 use php\lang\IllegalStateException;
 use php\lang\InterruptedException;
 use php\lang\Thread;
+use php\lib\str;
 use php\xml\DomDocument;
 use timer\AccurateTimer;
 
@@ -94,6 +95,7 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
                 }
             }
         }));
+        $this->th->setName("TimerScript[interval=$this->interval] #" . str::random());
 
         $this->th->start();
     }

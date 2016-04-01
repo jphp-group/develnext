@@ -45,7 +45,7 @@ class ActionManager
     public function compile($directory, callable $log = null, $withSourceMap = false)
     {
         FileUtils::scan($directory, function ($filename) use ($log, $withSourceMap) {
-            if (Str::equalsIgnoreCase(FileUtils::getExtension($filename), 'source')) {
+            if (Str::equalsIgnoreCase(fs::ext($filename), 'source')) {
                 $phpFile = FileUtils::stripExtension($filename);
                 $actionFile = $phpFile . '.axml';
 

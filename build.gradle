@@ -145,7 +145,6 @@ project(':develnext') {
         compile project(':jphp-game-ext')
         compile project(':jphp-parser')
         compile project(':develnext-doc')
-        compile project(':develnext-stdlib')
 
         if (new File("./develnext-control/build.gradle").exists()) {
             compile project(':develnext-control')

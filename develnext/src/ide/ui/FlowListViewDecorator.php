@@ -74,8 +74,12 @@ class FlowListViewDecorator implements \Countable
      */
     protected $selection;
 
-    public function __construct(UXFlowPane $pane)
+    public function __construct(UXFlowPane $pane = null)
     {
+        if ($pane == null) {
+            $pane = new UXFlowPane();
+        }
+
         $this->scrollPane = new UXScrollPane();
         $this->scrollPane->content = $pane;
         $this->scrollPane->fitToWidth = true;
@@ -153,7 +157,9 @@ class FlowListViewDecorator implements \Countable
         }, __CLASS__);
 
         $pane->on('mouseUp', function (UXMouseEvent $e) {
-            if (!$this->selection->visible) return;
+            if (!$this->selection->visible) {
+                return;
+            }
 
             if (!$e->controlDown) {
                 $this->clearSelections();
@@ -161,6 +167,8 @@ class FlowListViewDecorator implements \Countable
 
             list($x, $y) = $this->pane->screenToLocal($this->selection->x, $this->selection->y);
             list($w, $h) = $this->selection->size;
+
+            $selectedNodes = [];
 
             foreach ($this->pane->children as $node) {
                 $nx = $node->x;
@@ -179,9 +187,11 @@ class FlowListViewDecorator implements \Countable
                 $checkH = $_h < ($h / 2 + $nh / 2);
 
                 if ($checkW && $checkH) {
-                    $this->addSelectionNode($node);
+                    $selectedNodes[] = $node;
                 }
             }
+
+            $this->setSelectionNodes($selectedNodes);
 
             $this->selection->hide();
             $this->selection->size = [1, 1];
@@ -224,6 +234,10 @@ class FlowListViewDecorator implements \Countable
 
     public function addMenuCommand(AbstractCommand $command)
     {
+        $last = $this->menu->items[$this->menu->items->count - 1];
+
+        $this->menu->items->removeByIndex($this->menu->items->count - 1);
+
         if ($command->withBeforeSeparator()) {
             $this->menu->items->add(UXMenuItem::createSeparator());
         }
@@ -233,6 +247,8 @@ class FlowListViewDecorator implements \Countable
         if ($command->withAfterSeparator()) {
             $this->menu->items->add(UXMenuItem::createSeparator());
         }
+
+        $this->menu->items->add($last);
     }
 
     /**
@@ -255,6 +271,8 @@ class FlowListViewDecorator implements \Countable
     {
         if (!$node->classes->has('selected')) {
             $node->classes->add('selected');
+
+            $this->trigger('select', [$this->getSelectionNodes()]);
         }
     }
 
@@ -265,6 +283,8 @@ class FlowListViewDecorator implements \Countable
         } else {
             $node->classes->remove('selected');
         }
+
+        $this->trigger('select', [$this->getSelectionNodes()]);
     }
 
     public function setSelectionNodes(array $nodes)
@@ -274,6 +294,8 @@ class FlowListViewDecorator implements \Countable
         foreach ($nodes as $node) {
             $node->classes->add('selected');
         }
+
+        $this->trigger('select', [$nodes]);
     }
 
     public function getSelectionIndexes()
@@ -320,6 +342,8 @@ class FlowListViewDecorator implements \Countable
         foreach ($this->pane->children as $node) {
             $node->classes->remove('selected');
         }
+
+        $this->trigger('select', [[]]);
     }
 
     /**
@@ -381,6 +405,7 @@ class FlowListViewDecorator implements \Countable
 
             if ($e->button == 'SECONDARY') {
                 $this->addSelectionNode($e->sender);
+
                 $this->menu->show($e->sender->form, $e->screenX, $e->screenY);
             } else {
                 $this->toggleSelectionNode($e->sender);
