@@ -1,57 +1,83 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?import javafx.scene.*?><?import javafx.collections.*?><?import javafx.scene.layout.*?><?import javafx.scene.control.*?><?import javafx.scene.text.*?><?import javafx.scene.image.*?><?import javafx.scene.shape.*?><?import javafx.scene.web.*?><?import java.lang.*?><?import org.develnext.jphp.ext.javafx.classes.data.*?><?import org.develnext.jphp.ext.javafx.support.*?><?import org.develnext.jphp.ext.javafx.support.control.*?><?import org.develnext.jphp.ext.game.support.*?><AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" focusTraversable="false" id="" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="503" prefWidth="601" style="-fx-background-color: white;">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="503.0" prefWidth="601.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <children>
-    <TextField alignment="CENTER_LEFT" editable="true" focusTraversable="true" id="emailField" layoutX="177" layoutY="142" prefColumnCount="12" prefHeight="39" prefWidth="397" promptText="name@example.com" styleClass="text-input text-field " text="">
+    <ImageView id="icon" fitHeight="112.0" fitWidth="104.0" layoutX="23.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true" smooth="false" />
+    <Label layoutX="153.0" layoutY="39.0" prefHeight="35.0" prefWidth="414.0" text="Регистрация" textFill="#486aa8">
       <font>
-        <Font name="System Regular" size="18"/>
+        <Font name="Tahoma" size="28.0" />
+      </font>
+    </Label>
+    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="17.0" layoutY="148.0" prefHeight="27.0" prefWidth="149.0" text="Email *:">
+      <font>
+        <Font size="18.0" />
+      </font>
+    </Label>
+    <TextField id="emailField" layoutX="177.0" layoutY="142.0" prefHeight="39.0" prefWidth="397.0" promptText="name@example.com">
+      <font>
+        <Font size="18.0" />
       </font>
     </TextField>
-    <TextField alignment="CENTER_LEFT" editable="true" focusTraversable="true" id="nameField" layoutX="177" layoutY="192" prefColumnCount="12" prefHeight="39" prefWidth="397" promptText="вымышленное имя, ник, и т.д." styleClass="text-input text-field " text="">
+    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="8.0" layoutY="198.0" prefHeight="27.0" prefWidth="158.0" text="Ваш псевдоним *:">
       <font>
-        <Font name="System Regular" size="18"/>
+        <Font size="18.0" />
+      </font>
+    </Label>
+    <TextField id="nameField" layoutX="177.0" layoutY="192.0" prefHeight="39.0" prefWidth="397.0" promptText="вымышленное имя, ник, и т.д.">
+      <font>
+        <Font size="18.0" />
       </font>
     </TextField>
-    <PasswordField alignment="CENTER_LEFT" editable="true" focusTraversable="true" id="passwordField" layoutX="176" layoutY="267" prefColumnCount="12" prefHeight="39" prefWidth="397" promptText="минимум 5 символов" styleClass="text-input text-field password-field " text="">
+    <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="16.0" layoutY="273.0" prefHeight="27.0" prefWidth="149.0" text="Пароль *:">
       <font>
-        <Font name="System Regular" size="18"/>
+        <Font size="18.0" />
+      </font>
+    </Label>
+    <PasswordField id="passwordField" layoutX="176.0" layoutY="267.0" prefHeight="39.0" prefWidth="397.0" promptText="минимум 5 символов">
+      <font>
+        <Font size="18.0" />
       </font>
     </PasswordField>
-    <TextField AnchorPane.bottomAnchor="104" AnchorPane.rightAnchor="28" alignment="CENTER_LEFT" editable="true" focusTraversable="true" id="captchaField" layoutX="316" layoutY="360" prefColumnCount="12" prefHeight="39" prefWidth="257" promptText="код с картинки" styleClass="text-input text-field " text="">
+    <Label layoutX="153.0" layoutY="74.0" prefHeight="21.0" prefWidth="414.0" text="Для разработчиков на DevelNext" textFill="#979797">
       <font>
-        <Font name="System Regular" size="18"/>
+        <Font name="Tahoma" size="17.0" />
+      </font>
+    </Label>
+    <Label layoutX="38.0" layoutY="314.0" text="* Необходимо будет подтвердить ваш email" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="38.0" />
+    <Label layoutX="316.0" layoutY="257.0" prefHeight="27.0" prefWidth="257.0" text="Проверочный код *:" AnchorPane.bottomAnchor="152.0" AnchorPane.rightAnchor="28.0">
+      <font>
+        <Font size="18.0" />
+      </font>
+    </Label>
+    <TextField id="captchaField" layoutX="316.0" layoutY="293.0" prefHeight="39.0" prefWidth="257.0" promptText="код с картинки" AnchorPane.bottomAnchor="104.0" AnchorPane.rightAnchor="28.0">
+      <font>
+        <Font size="18.0" />
       </font>
     </TextField>
-    <Button AnchorPane.bottomAnchor="22" AnchorPane.rightAnchor="27" alignment="CENTER" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="7" id="nextButton" layoutX="470" layoutY="442" prefHeight="39" prefWidth="104" styleClass="button icon-ok " text="Далее" textAlignment="LEFT" textFill="#333333" underline="false" wrapText="false">
+    <Button id="nextButton" graphicTextGap="7.0" layoutX="470.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="104.0" styleClass="icon-ok" text="Далее" AnchorPane.bottomAnchor="22.0" AnchorPane.rightAnchor="27.0">
       <font>
-        <Font name="System Bold" size="15"/>
+        <Font name="System Bold" size="15.0" />
       </font>
     </Button>
-    <Button AnchorPane.bottomAnchor="22" AnchorPane.rightAnchor="143" alignment="CENTER" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="7" id="cancelButton" layoutX="354" layoutY="442" prefHeight="39" prefWidth="104" styleClass="button " text="Отмена" textAlignment="LEFT" textFill="#333333" underline="false" wrapText="false">
+    <Button id="cancelButton" graphicTextGap="7.0" layoutX="354.0" layoutY="303.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="104.0" text="Отмена" AnchorPane.bottomAnchor="22.0" AnchorPane.rightAnchor="143.0">
       <font>
-        <Font name="System Regular" size="15"/>
+        <Font size="15.0" />
       </font>
     </Button>
-    <Hyperlink AnchorPane.bottomAnchor="101" AnchorPane.leftAnchor="174" alignment="CENTER_LEFT" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="4" id="refreshCaptcha" layoutX="174" layoutY="379" prefHeight="23" prefWidth="113" styleClass="hyperlink " text="Обновить" textAlignment="LEFT" wrapText="false">
-      <font>
-        <Font name="System Regular" size="12"/>
-      </font>
-    </Hyperlink>
-    <Hyperlink AnchorPane.bottomAnchor="49" AnchorPane.leftAnchor="91" alignment="CENTER_LEFT" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="4" id="confirmLink" layoutX="91" layoutY="431" prefHeight="23" prefWidth="190" styleClass="hyperlink " text="У меня есть код подтверждения" textAlignment="LEFT" wrapText="false">
-      <font>
-        <Font name="System Regular" size="12"/>
-      </font>
-    </Hyperlink>
-    <ImageViewEx autoSize="false" centered="false" focusTraversable="false" height="112" id="icon" layoutX="23" layoutY="22" mosaic="false" mosaicGap="0" proportional="true" stretch="false" textFill="#000000" width="104">
-      <font>
-        <Font name="System Regular" size="12"/>
-      </font>
-    </ImageViewEx>
-    <Data cursor="DEFAULT" id="data-icon"/>
-    <Data id="data-nextButton"/>
-    <Data id="data-cancelButton"/>
-    <Data id="data-refreshCaptcha"/>
-    <Data id="data-confirmLink"/>
-    <Data cursor="DEFAULT" id="data-emailField"/>
-    <Data cursor="DEFAULT" id="data-nameField"/>
+    <Pane layoutX="174.0" layoutY="259.0" AnchorPane.bottomAnchor="127.0" AnchorPane.leftAnchor="174.0">
+      <children>
+        <ProgressIndicator layoutX="41.0" layoutY="8.0" prefHeight="35.0" prefWidth="40.0" />
+        <ImageView id="captcha" fitHeight="50.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" />
+      </children>
+    </Pane>
+    <Hyperlink id="refreshCaptcha" layoutX="174.0" layoutY="312.0" prefHeight="23.0" prefWidth="113.0" text="Обновить" AnchorPane.bottomAnchor="101.0" AnchorPane.leftAnchor="174.0" />
+    <Hyperlink id="confirmLink" layoutX="91.0" layoutY="364.0" prefHeight="23.0" prefWidth="190.0" text="У меня есть код подтверждения" AnchorPane.bottomAnchor="49.0" AnchorPane.leftAnchor="91.0" />
+    <Label layoutX="177.0" layoutY="231.0" prefHeight="23.0" prefWidth="312.0" text="* Отображаемое имя для всех остальных пользователей" textFill="#a1a1a1" />
   </children>
 </AnchorPane>
