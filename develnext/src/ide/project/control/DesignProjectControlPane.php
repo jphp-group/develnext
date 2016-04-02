@@ -71,7 +71,13 @@ class DesignProjectControlPane extends AbstractProjectControlPane
      */
     public function refresh()
     {
-        $this->editor->requestFocus();
+        if ($this->ui) {
+            $this->ui->requestFocus();
+
+            uiLater(function () {
+                $this->editor->requestFocus();
+            });
+        }
         // nop.
     }
 }
