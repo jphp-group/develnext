@@ -113,7 +113,7 @@ class JPHPGuiDesktopBundle extends AbstractJarBundle
     function getJarDependencies()
     {
         return [
-            'jphp-gui-ext', 'jphp-desktop-ext', 'jphp-game-ext', 'dyn4j', 'jphp-zend-ext', 'jphp-gui-framework',
+            'jphp-gui-ext', 'jphp-desktop-ext', 'jphp-game-ext', 'dyn4j', 'jphp-zend-ext', 'jphp-app-framework',
         ];
     }
 

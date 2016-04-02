@@ -54,7 +54,7 @@ configure([
         project(':jphp-gui-ext'),
         project(':jphp-game-ext'),
         project(':jphp-gui-designer-ext'),
-        project(':jphp-gui-framework')
+        project(':jphp-app-framework')
 ]) {
     apply plugin: 'maven'
     apply plugin: 'java'
@@ -129,7 +129,7 @@ project(':jphp-parser') {
     }
 }
 
-project(':jphp-gui-framework') {
+project(':jphp-app-framework') {
     dependencies {
         compile project(':jphp-gui-ext')
         compile "org.develnext:jphp-core:$jphpVersion"
@@ -140,7 +140,7 @@ project(':develnext') {
     dependencies {
         compile project(':jphp-gui-designer-ext')
         compile project(':jphp-gui-richtext-ext')
-        compile project(':jphp-gui-framework')
+        compile project(':jphp-app-framework')
         compile project(':jphp-desktop-ext')
         compile project(':jphp-game-ext')
         compile project(':jphp-parser')

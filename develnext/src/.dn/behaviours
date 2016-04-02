@@ -19,6 +19,7 @@ ide\behaviour\spec\ChatterAnimationBehaviourSpec
 ide\behaviour\spec\RotateAnimationBehaviourSpec
 ide\behaviour\spec\RandomMovementAnimationBehaviourSpec
 ide\behaviour\spec\VibrationAnimationBehaviourSpec
+ide\behaviour\spec\FadeAnimationBehaviourSpec
 
 ide\behaviour\spec\GameSceneBehaviourSpec
 ide\behaviour\spec\GameEntityBehaviourSpec

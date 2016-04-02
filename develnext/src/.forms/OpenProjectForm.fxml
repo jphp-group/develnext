@@ -26,7 +26,7 @@
       <TextField id="pathField" disable="true" editable="false" layoutX="54.0" layoutY="467.0" prefHeight="25.0" prefWidth="533.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="27.0" />
       <TabPane id="tabPane" layoutX="31.0" layoutY="116.0" prefHeight="344.0" prefWidth="617.0" styleClass="dn-style" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="81.0" AnchorPane.leftAnchor="31.0" AnchorPane.rightAnchor="33.0" AnchorPane.topAnchor="116.0">
         <tabs>
-          <Tab text="Избранные проекты">
+          <Tab text="Избранное">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -39,23 +39,32 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab text="Демо-проекты">
+          <Tab text="Демо и примеры">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <ListView id="embeddedLibraryList" layoutX="26.0" layoutY="35.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
+                        <ListView id="embeddedLibraryList" fixedCellSize="64.0" layoutX="26.0" layoutY="35.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
                      </children>
                   </AnchorPane>
             </content>
           </Tab>
-            <Tab text="Библиотека проектов">
+            <Tab styleClass="icon-library" text="Библиотека">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <ListView id="libraryList" layoutX="26.0" layoutY="35.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
+                        <ListView id="libraryList" fixedCellSize="64.0" layoutX="26.0" layoutY="35.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
                      </children>
                   </AnchorPane>
                </content>
+            </Tab>
+            <Tab text="Публичное">
+              <content>
+                <AnchorPane id="sharedPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <ListView id="sharedList" fixedCellSize="64.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
+                        <Label layoutX="3.0" layoutY="289.0" prefHeight="24.0" prefWidth="610.0" text="* Ваши опубликованные проекты на сайте develnext.org" textFill="#a4a4a4" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" />
+                     </children></AnchorPane>
+              </content>
             </Tab>
         </tabs>
       </TabPane>

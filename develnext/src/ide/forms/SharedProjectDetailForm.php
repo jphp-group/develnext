@@ -1,6 +1,7 @@
 <?php
 namespace ide\forms;
 use ide\commands\ShareProjectCommand;
+use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
 use ide\account\api\ServiceResponse;
 use ide\Logger;
@@ -35,6 +36,8 @@ use timer\AccurateTimer;
  */
 class SharedProjectDetailForm extends AbstractOnlineIdeForm
 {
+    use DialogFormMixin;
+
     /**
      * @var string
      */
@@ -125,11 +128,12 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
 
                 Ide::project()->getIdeServiceConfig()->set('projectArchive.uid', null);
 
-                Notifications::show('Проект удален', 'Ваш проект был успешно удален из общего доступа, при желании вы можете снова им поделиться.', 'SUCCESS');
+                Notifications::showProjectIsDeleted();
             } else {
                 Logger::warn("Unable to delete project with uid = {$this->data['uid']}, {$response->toLog()}");
 
-                Notifications::error('Ошибка удаления', 'Мы не смогли удалить ваш проект, возможно сервис временно недоступен, попробуйте позже.');
+                Notifications::showProjectIsDeletedFail();
+
                 $this->deleteButton->enabled = false;
 
                 AccurateTimer::executeAfter(2000, function () {
@@ -234,6 +238,8 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
      */
     public function doShow()
     {
+        $this->setResult(null);
+
         if ($this->reuploadButton) {
             if (!Ide::accountManager()->isAuthorized()) {
                 return;
@@ -302,6 +308,8 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
                 try {
                     if (Ide::service()->projectArchive()->downloadToFile($this->data['shareUrl'], $path)) {
                         UXApplication::runLater(function () use ($path) {
+                            $this->setResult(true);
+
                             $this->hide();
 
                             UXApplication::runLater(function () use ($path) {

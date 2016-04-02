@@ -1104,8 +1104,8 @@ class Ide extends Application
     public function shutdown()
     {
         $shutdownTh = (new Thread(function () {
-            Logger::warn("System halt 0\n");
             sleep(40);
+            Logger::warn("System halt 0\n");
             System::halt(0);
         }));
         $shutdownTh->setName("DevelNext Shutdown");

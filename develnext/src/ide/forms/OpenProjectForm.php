@@ -1,6 +1,8 @@
 <?php
 namespace ide\forms;
 
+use ide\account\api\ServiceResponse;
+use ide\account\ui\NeedAuthPane;
 use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
@@ -18,6 +20,8 @@ use ide\utils\FileUtils;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\framework\Preloader;
+use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
@@ -34,8 +38,10 @@ use php\gui\UXListView;
 use php\gui\UXTabPane;
 use php\gui\UXTextField;
 use php\io\File;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
+use php\time\Time;
 
 /**
  *
@@ -45,7 +51,9 @@ use php\lib\Str;
  * @property UXButton $openButton
  * @property UXTabPane $tabPane
  * @property UXListView $libraryList
+ * @property UXListView $sharedList
  * @property UXListView $embeddedLibraryList
+ * @property UXAnchorPane $sharedPane
  *
  * Class OpenProjectForm
  * @package ide\forms
@@ -59,6 +67,8 @@ class OpenProjectForm extends AbstractIdeForm
      * @var FlowListViewDecorator
      */
     protected $projectListHelper;
+
+    protected $_sharedList;
 
     /**
      * @param null $tab
@@ -74,6 +84,9 @@ class OpenProjectForm extends AbstractIdeForm
                     break;
                 case 'embeddedLibrary':
                     $this->tabPane->selectedIndex = 1;
+                    break;
+                case 'shared':
+                    $this->tabPane->selectedIndex = 3;
                     break;
             }
         }
@@ -126,6 +139,18 @@ class OpenProjectForm extends AbstractIdeForm
         $this->embeddedLibraryList->setCellFactory($cellFactory);
         $this->libraryList->setCellFactory($cellFactory);
 
+        $this->sharedList->setCellFactory(function (UXListCell $cell, $item) {
+            if ($item instanceof ServiceResponse) {
+                if ($item->isNotSuccess()) {
+                    $cell->text = 'Ошибка, список проектов недоступен.';
+                    $cell->textColor = 'gray';
+                }
+            } else {
+                $cell->text = null;
+                $cell->graphic = $this->sharedCellFactory($item);
+            }
+        });
+
         $this->projectListHelper = new FlowListViewDecorator($this->projectList->content);
         $this->projectListHelper->setEmptyListText('Список проектов пуст.');
         $this->projectListHelper->setMultipleSelection(true);
@@ -150,6 +175,66 @@ class OpenProjectForm extends AbstractIdeForm
         $this->icon->image = Ide::get()->getImage('icons/open32.png')->image;
         $this->modality = 'APPLICATION_MODAL';
         $this->title = 'Открыть проект';
+
+        Ide::accountManager()->on('login', [$this, 'updateShared']);
+        Ide::accountManager()->on('logout', [$this, 'updateShared']);
+    }
+
+    protected function sharedCellFactory(array $item)
+    {
+        $name = $item['name'] ?: 'Неизвестный проект';
+
+        $titleName = new UXLabel($name);
+        $titleName->style = '-fx-font-weight: bold;';
+
+        $titleDescription = new UXLabel("Обновлено: " . (new Time($item['updatedAt']))->toString('dd.MM.yyyy HH:mm'));
+        $titleDescription->style = '-fx-text-fill: gray;';
+
+        $actions = new UXHBox();
+        $actions->spacing = 7;
+
+        $openLink = new UXHyperlink('Открыть');
+        $openLink->on('click', function () use ($item) {
+            $this->showPreloader('Подождите ...');
+            $form = new SharedProjectDetailForm($item['uid']);
+
+            if ($form->showDialog()) {
+                $this->hide();
+            }
+
+            $this->hidePreloader();
+        });
+        $actions->add($openLink);
+
+        $deleteLink = new UXHyperlink('Удалить');
+        $deleteLink->on('click', function () use ($item, $name) {
+            if (MessageBoxForm::confirmDelete($name)) {
+                $response = Ide::service()->projectArchive()->delete($item['id']);
+
+                if ($response->isSuccess()) {
+                    Notifications::showProjectIsDeleted();
+                    $this->updateShared();
+                } else {
+                    Logger::warn("Unable to delete project with uid = {$item['uid']}, {$response->toLog()}");
+                    Notifications::showProjectIsDeletedFail();
+                }
+            }
+        });
+        $actions->add($deleteLink);
+
+        $actions->add(new UXLabel("Просмотров: {$item['viewCount']}"));
+        $actions->add(new UXLabel("Скачиваний: {$item['downloadCount']}"));
+        $actions->add(new UXLabel("Клонирований: {$item['cloneCount']}"));
+
+        $title = new UXVBox([$titleName, $titleDescription, $actions]);
+        $title->spacing = 0;
+
+        $line = new UXHBox([ico('package32'), $title]);
+        $line->alignment = 'CENTER_LEFT';
+        $line->spacing = 12;
+        $line->padding = 5;
+
+        return $line;
     }
 
     public function update()
@@ -187,8 +272,8 @@ class OpenProjectForm extends AbstractIdeForm
 
             $one = new ImageBox(72, 48);
             $one->data('file', $project);
-            $one->data('name', FileUtils::stripExtension($project->getName()));
-            $one->setTitle(FileUtils::stripExtension($project->getName()));
+            $one->data('name', fs::pathNoExt($project->getName()));
+            $one->setTitle(fs::pathNoExt($project->getName()));
             $one->setImage(Ide::get()->getImage($template ? $template->getIcon32() : 'icons/question32.png')->image);
 
             $one->on('click', function (UXMouseEvent $e) {
@@ -223,6 +308,39 @@ class OpenProjectForm extends AbstractIdeForm
         $this->libraryList->selectedIndex = 0;
     }
 
+    public function updateShared()
+    {
+        if (Ide::accountManager()->isAuthorized()) {
+            if ($pane = $this->sharedPane->lookup('#need_auth')) {
+                $pane->free();
+            }
+
+            $this->sharedList->items->clear();
+
+            $preloader = new Preloader($this->sharedPane);
+            $preloader->show();
+
+            Ide::service()->projectArchive()->getListAsync(0, 100, function (ServiceResponse $response) use ($preloader) {
+                $preloader->hide();
+
+                if ($response->isSuccess()) {
+                    $this->sharedList->items->setAll($response->data());
+                } else {
+                    $this->sharedList->items->setAll([$response]);
+                }
+            });
+        } else {
+            if (!$this->sharedPane->lookup('#need_auth')) {
+                $pane = new NeedAuthPane();
+                $pane->id = 'need_auth';
+
+                UXAnchorPane::setAnchor($pane, 3);
+
+                $this->sharedPane->add($pane);
+            }
+        }
+    }
+
     /**
      * @event show
      */
@@ -230,6 +348,7 @@ class OpenProjectForm extends AbstractIdeForm
     {
         $this->update();
         $this->updateLibrary();
+        $this->updateShared();
     }
 
     /**

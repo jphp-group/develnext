@@ -93,4 +93,14 @@ class Notifications
 
         static::warning('Поврежденный файл', "$file поврежден, возможно некоторые данные утеряны.");
     }
+
+    public static function showProjectIsDeleted()
+    {
+        Notifications::show('Проект удален', 'Ваш проект был успешно удален из общего доступа, при желании вы можете снова им поделиться.', 'SUCCESS');
+    }
+
+    public static function showProjectIsDeletedFail()
+    {
+        Notifications::error('Ошибка удаления', 'Мы не смогли удалить ваш проект, возможно сервис временно недоступен, попробуйте позже.');
+    }
 }

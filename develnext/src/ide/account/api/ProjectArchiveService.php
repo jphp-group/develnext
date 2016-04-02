@@ -16,6 +16,7 @@ use php\io\FileStream;
  * @method getAsync($uid, callable $callback = null)
  * @method deleteAsync($id, $absolutely, callable $callback = null)
  * @method getDownloadUrlAsync($url, callable $callback = null)
+ * @method getListAsync($offset, $limit, callable $callback = null)
  */
 class ProjectArchiveService extends AbstractService
 {
@@ -130,6 +131,16 @@ class ProjectArchiveService extends AbstractService
         return $this->upload('project-archive/upload', [
             'file' => $file
         ]);
+    }
+
+    /**
+     * @param int $offset
+     * @param int $limit
+     * @return ServiceResponse
+     */
+    public function getList($offset, $limit = 101)
+    {
+        return $this->execute('project-archive/list', ['offset' => $offset, 'limit' => $limit]);
     }
 
     /**

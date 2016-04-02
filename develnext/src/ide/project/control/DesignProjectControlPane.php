@@ -1,5 +1,8 @@
 <?php
 namespace ide\project\control;
+use ide\editors\CodeEditor;
+use ide\Ide;
+use ide\utils\FileUtils;
 use php\gui\UXNode;
 use php\gui\layout\UXAnchorPane;
 
@@ -8,6 +11,11 @@ use php\gui\layout\UXAnchorPane;
  */
 class DesignProjectControlPane extends AbstractProjectControlPane
 {
+    /**
+     * @var CodeEditor
+     */
+    protected $editor;
+
     public function getName()
     {
         return "Внешний вид";
@@ -15,7 +23,7 @@ class DesignProjectControlPane extends AbstractProjectControlPane
 
     public function getDescription()
     {
-        return "Стили и дизайн проекта";
+        return "CSS стиль и дизайн проекта";
     }
 
     public function getIcon()
@@ -23,12 +31,39 @@ class DesignProjectControlPane extends AbstractProjectControlPane
         return 'icons/design16.png';
     }
 
+    public function save()
+    {
+        if ($this->editor) {
+            $this->editor->save();
+        }
+    }
+
+    public function load()
+    {
+        if ($this->editor) {
+            $this->editor->load();
+        }
+    }
+
     /**
      * @return UXNode
      */
     protected function makeUi()
     {
-        return new UXAnchorPane();
+        $file = Ide::project()->getSrcFile('.theme/style.css');
+
+        if (!$file->exists()) {
+            FileUtils::put($file, "/* JavaFX CSS Style with -fx- prefix */\n");
+        }
+
+        $editor = new CodeEditor($file, 'css');
+        $editor->registerDefaultCommands();
+
+        $editor->load();
+
+        $this->editor = $editor;
+
+        return $editor->makeUi();
     }
 
     /**
@@ -36,6 +71,7 @@ class DesignProjectControlPane extends AbstractProjectControlPane
      */
     public function refresh()
     {
-        // TODO: Implement refresh() method.
+        $this->editor->requestFocus();
+        // nop.
     }
 }

@@ -105,12 +105,16 @@ class ProjectEditor extends AbstractEditor
 
     public function load()
     {
-        // nop.
+        foreach ($this->controlPanes as $pane) {
+            $pane->load();
+        }
     }
 
     public function save()
     {
-        // nop.
+        foreach ($this->controlPanes as $pane) {
+            $pane->save();
+        }
     }
 
     /**

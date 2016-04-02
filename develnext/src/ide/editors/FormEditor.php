@@ -887,6 +887,21 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             return 'busy';
         }
 
+        //  TODO Refactor it.
+        $class = new \ReflectionClass(AbstractForm::class);
+
+        $props = [];
+        foreach ($class->getProperties() as $prop) {
+            if (!$prop->isStatic()) {
+                $props[str::lower($prop->getName())] = $prop;
+            }
+        }
+
+        if ($props[str::lower($newId)]) {
+            return 'busy';
+        }
+        // -----------------
+
         $element = $this->format->getFormElement($node);
         $eventsWithIdParam = [];
 

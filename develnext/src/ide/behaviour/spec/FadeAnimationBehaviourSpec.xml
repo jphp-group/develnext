@@ -1,0 +1,5 @@
+<behaviour extends="AnimationBehaviourSpec">
+    <properties>
+        <property name="Прозрачность" code="opacity" editor="floatSlider" min="0" max="1" tooltip="Уровень прозрачности от 0 до 1" />
+    </properties>
+</behaviour>

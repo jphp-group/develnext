@@ -56,9 +56,4 @@ class BlinkAnimationBehaviourSpec extends AbstractBehaviourSpec
     {
         return !($target instanceof AbstractScriptComponent);
     }
-
-    public function refreshNode(UXNode $node, AbstractBehaviour $behaviour)
-    {
-        $node->effect = new UXDropShadowEffect(10, 'gray');
-    }
 }
