@@ -32,7 +32,9 @@ class ModulesProjectControlPane extends AbstractEditorsProjectControlPane
      */
     protected function getItems()
     {
-        return GuiFrameworkProjectBehaviour::get()->getModuleEditors();
+        $gui = GuiFrameworkProjectBehaviour::get();
+
+        return $gui ? $gui->getModuleEditors() : [];
     }
 
     /**

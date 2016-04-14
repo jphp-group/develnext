@@ -194,18 +194,24 @@ class ImagePropertyEditorForm extends AbstractIdeForm
      */
     public function actionAddToGallery()
     {
-        if ($file = $this->dialog->execute()) {
+        if ($files = $this->dialog->showOpenMultipleDialog()) {
             $project = Ide::get()->getOpenedProject();
 
-            $files = $project->findDuplicatedFiles($file);
+            $showed = false;
 
-            if ($files) {
-                $this->toast('Данное изображение уже есть в проекте');
-            } else {
-                $file = $project->copyFile($file, 'src/.data/img/');
-                $this->setResult($file->getRelativePath('src/'));
-                $this->updateGallery();
+            foreach ($files as $file) {
+                if ($project->findDuplicatedFiles($file)) {
+                    if (!$showed) {
+                        $this->toast('Изображение уже есть в проекте');
+                        $showed = true;
+                    }
+                } else {
+                    $file = $project->copyFile($file, 'src/.data/img/');
+                    $this->setResult($file->getRelativePath('src/'));
+                }
             }
+
+            $this->updateGallery();
         }
     }
 

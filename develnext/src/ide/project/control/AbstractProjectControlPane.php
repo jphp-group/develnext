@@ -1,11 +1,14 @@
 <?php
 namespace ide\project\control;
 
+use ide\misc\EventHandlerBehaviour;
 use ide\ui\MenuViewable;
 use php\gui\UXNode;
 
 abstract class AbstractProjectControlPane implements MenuViewable
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var UXNode
      */

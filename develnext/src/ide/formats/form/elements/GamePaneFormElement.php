@@ -38,7 +38,7 @@ class GamePaneFormElement extends AbstractFormElement
 
     public function getName()
     {
-        return 'Игровая комната';
+        return 'Игровой мир';
     }
 
     public function getIcon()

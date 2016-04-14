@@ -14,6 +14,7 @@ use ide\scripts\AbstractScriptComponent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\behaviour\custom\EffectBehaviour;
 use php\gui\UXNode;
+use php\lang\IllegalStateException;
 use php\lib\arr;
 use php\lib\reflect;
 
@@ -55,17 +56,21 @@ abstract class AbstractEffectBehaviourSpec extends AbstractBehaviourSpec
     public function deleteSelf(UXNode $node, AbstractBehaviour $behaviour)
     {
         if ($behaviour instanceof EffectBehaviour) {
-            $removed = [];
-            $testEffect = $behaviour->makeEffect();
+            try {
+                $removed = [];
+                $testEffect = $behaviour->makeEffect();
 
-            foreach ($node->effects as $effect) {
-                if (get_class($effect) == get_class($testEffect)) {
-                    $removed[] = $effect;
+                foreach ($node->effects as $effect) {
+                    if (get_class($effect) == get_class($testEffect)) {
+                        $removed[] = $effect;
+                    }
                 }
-            }
 
-            foreach ($removed as $one) {
-                $node->effects->remove($one);
+                foreach ($removed as $one) {
+                    $node->effects->remove($one);
+                }
+            } catch (IllegalStateException $e) {
+                throw new IllegalStateException("Unable delete " . reflect::typeOf($behaviour) . ", message = {$e->getMessage()}");
             }
         }
     }

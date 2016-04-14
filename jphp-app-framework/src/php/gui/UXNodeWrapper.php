@@ -181,9 +181,9 @@ class UXNodeWrapper
                             $handle();
                         } elseif ($y < $bounds['y']) {
                             $handle();
-                        } elseif ($x > $bounds['width'] - $this->node->width) {
+                        } elseif ($x > $bounds['width'] - $this->node->width  + $bounds['x']) {
                             $handle();
-                        } elseif ($y > $bounds['height'] - $this->node->height) {
+                        } elseif ($y > $bounds['height'] - $this->node->height  + $bounds['y']) {
                             $handle();
                         }
                     }
@@ -215,9 +215,9 @@ class UXNodeWrapper
                             $handle();
                         } elseif ($y + $this->node->height < $bounds['y']) {
                             $handle();
-                        } elseif ($x > $bounds['width']) {
+                        } elseif ($x > $bounds['width'] + $bounds['x']) {
                             $handle();
-                        } elseif ($y > $bounds['height']) {
+                        } elseif ($y > $bounds['height'] + $bounds['y']) {
                             $handle();
                         }
                     }

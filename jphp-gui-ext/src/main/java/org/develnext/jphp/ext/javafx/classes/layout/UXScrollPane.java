@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes.layout;
 
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
@@ -16,12 +17,18 @@ import php.runtime.reflection.ClassEntity;
 public class UXScrollPane<T extends ScrollPane> extends UXControl<ScrollPane> {
     interface WrappedInterface {
         @Property Node content();
+        @Property Bounds viewportBounds();
 
         @Property boolean fitToWidth();
         @Property boolean fitToHeight();
 
         @Property ScrollPane.ScrollBarPolicy vbarPolicy();
         @Property ScrollPane.ScrollBarPolicy hbarPolicy();
+
+        @Property("scrollMaxX") double hmax();
+        @Property("scrollMaxY") double vmax();
+        @Property("scrollMinX") double hmin();
+        @Property("scrollMinY") double vmin();
     }
 
     public UXScrollPane(Environment env, T wrappedObject) {
@@ -69,6 +76,26 @@ public class UXScrollPane<T extends ScrollPane> extends UXControl<ScrollPane> {
 
     @Signature
     public void scrollToNode(Node node) {
+        T scrollPane = getWrappedObject();
+
+        // total content height
+        double h = scrollPane.getContent().getBoundsInLocal().getHeight();
+        double w = scrollPane.getContent().getBoundsInLocal().getWidth();
+
+        // center y of content
+        double y = (node.getBoundsInParent().getMaxY() +  node.getBoundsInParent().getMinY()) / 2.0;
+        double x = (node.getBoundsInParent().getMaxX() +  node.getBoundsInParent().getMinX()) / 2.0;
+
+        // height of viewPort
+        double viewHeight = scrollPane.getViewportBounds().getHeight();
+        double viewWidth = scrollPane.getViewportBounds().getWidth();
+
+        scrollPane.setVvalue(scrollPane.getVmax() * ((y - 0.5 * viewHeight) / (h - viewHeight)));
+        scrollPane.setHvalue(scrollPane.getVmax() * ((x - 0.5 * viewWidth) / (w - viewWidth)));
+    }
+
+    /*@Signature
+    public void scrollToNode(Node node) {
         double width = getWrappedObject().getContent().getBoundsInLocal().getWidth();
         double height = getWrappedObject().getContent().getBoundsInLocal().getHeight();
 
@@ -78,5 +105,5 @@ public class UXScrollPane<T extends ScrollPane> extends UXControl<ScrollPane> {
         // scrolling values range from 0 to 1
         getWrappedObject().setVvalue(y / height);
         getWrappedObject().setHvalue(x/width);
-    }
+    } */
 }

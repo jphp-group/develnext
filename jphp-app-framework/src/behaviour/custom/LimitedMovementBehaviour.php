@@ -13,13 +13,18 @@ class LimitedMovementBehaviour extends AbstractBehaviour
     public $direction = 'ALL';
 
     /**
+     * @var string VIEW, PARENT
+     */
+    public $where = 'VIEW';
+
+    /**
      * @param mixed $target
      */
     protected function applyImpl($target)
     {
         if ($target instanceof UXNode) {
             $listener = function ()  use ($target) {
-                if (!$this->enabled) {
+                if (!$this->enabled || !$target->parent) {
                     return;
                 }
 
@@ -31,15 +36,32 @@ class LimitedMovementBehaviour extends AbstractBehaviour
 
                     $dir = $this->direction;
 
+                    $stopX = $stopY = false;
+
+                    $this->enabled = false;
+
                     if (in_array($dir, ['ALL', 'LEFT_RIGHT']) && $x < $bounds['x']) {
                         $target->x = $bounds['x'];
+                        $stopX = true;
                     } elseif (in_array($dir, ['ALL', 'TOP_BOTTOM']) && $y < $bounds['y']) {
                         $target->y = $bounds['y'];
-                    } elseif (in_array($dir, ['ALL', 'LEFT_RIGHT']) && $x > $bounds['width'] - $target->width) {
-                        $target->x = $bounds['width'] - $target->width;
-                    } elseif (in_array($dir, ['ALL', 'TOP_BOTTOM']) && $y > $bounds['height'] - $target->height) {
-                        $target->y = $bounds['height'] - $target->height;
+                        $stopY = true;
+                    } elseif (in_array($dir, ['ALL', 'LEFT_RIGHT']) && $x > $bounds['width'] - $target->width + $bounds['x']) {
+                        $target->x = $bounds['width'] - $target->width + $bounds['x'];
+                        $stopX = true;
+                    } elseif (in_array($dir, ['ALL', 'TOP_BOTTOM']) && $y > $bounds['height'] - $target->height + $bounds['y']) {
+                        $target->y = $bounds['height'] - $target->height + $bounds['y'];
+                        $stopY = true;
                     }
+
+                    if ($stopX || $stopY) {
+                        if ($entity = GameEntityBehaviour::get($target)) {
+                            if ($stopX) $entity->hspeed = 0;
+                            if ($stopY) $entity->vspeed = 0;
+                        }
+                    }
+
+                    $this->enabled = true;
                 }
             };
 

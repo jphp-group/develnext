@@ -9,6 +9,7 @@ use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use php\gui\UXNode;
 use php\gui\layout\UXAnchorPane;
 use php\lib\fs;
+use php\lib\reflect;
 
 /**
  * @package ide\project\control
@@ -44,7 +45,8 @@ class SpritesProjectControlPane extends AbstractEditorsProjectControlPane
      */
     protected function getItems()
     {
-        return GuiFrameworkProjectBehaviour::get()->getSpriteEditors();
+        $gui = GuiFrameworkProjectBehaviour::get();
+        return $gui ? $gui->getSpriteEditors() : [];
     }
 
     /**
@@ -54,12 +56,18 @@ class SpritesProjectControlPane extends AbstractEditorsProjectControlPane
     protected function getBigIcon($item)
     {
         $spec = $item->getSpec();
-        $image = GuiFrameworkProjectBehaviour::get()->getSpriteManager()->getSpritePreview($spec->name);
+        $gui = GuiFrameworkProjectBehaviour::get();
 
-        if (!$image) {
+        if ($gui) {
+            $image = $gui->getSpriteManager()->getSpritePreview($spec->name);
+
+            if (!$image) {
+                return ico('grayQuestion16')->image;
+            }
+
+            return $image;
+        } else {
             return ico('grayQuestion16')->image;
         }
-
-        return $image;
     }
 }

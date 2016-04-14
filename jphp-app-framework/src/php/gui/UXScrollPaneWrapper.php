@@ -18,6 +18,7 @@ class UXScrollPaneWrapper extends UXNodeWrapper
             $bounds = $node->boundsInParent;
             $node->content->data('--view-width', $bounds['width']);
             $node->content->data('--view-height', $bounds['height']);
+            $node->content->data('--scroll-pane', $node);
         };
 
         $this->node->observer('content')->addListener($handle);
@@ -25,11 +26,11 @@ class UXScrollPaneWrapper extends UXNodeWrapper
         $this->node->observer('height')->addListener($handle);
 
         $this->node->observer('hvalue')->addListener(function ($old, $new) use ($node) {
-            $node->content->data('--view-offset-x', $new);
+            $node->content->data('--view-offset-x', -$node->viewportBounds['x']);
         });
 
         $this->node->observer('vvalue')->addListener(function ($old, $new) use ($node) {
-            $node->content->data('--view-offset-y', $new);
+            $node->content->data('--view-offset-y', -$node->viewportBounds['y']);
         });
 
         $handle();

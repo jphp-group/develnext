@@ -1,9 +1,7 @@
 package org.develnext.jphp.ext.game.support;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.application.Platform;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -18,18 +16,18 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
+import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Getter;
 
-public class GamePane extends ScrollPane {
+public class GamePane extends AnchorPane {
     protected GameScene2D scene = null;
     protected AnchorPane area;
 
     protected BooleanProperty autoSizeProperty = new SimpleBooleanProperty(false);
-    protected DoubleProperty areaWidthProperty = new SimpleDoubleProperty();
-    protected DoubleProperty areaHeightProperty = new SimpleDoubleProperty();
+    protected ObjectProperty<AnchorPane> content = new SimpleObjectProperty<>(null);
 
     public GamePane() {
-        setVbarPolicy(ScrollBarPolicy.NEVER);
-        setHbarPolicy(ScrollBarPolicy.NEVER);
         setFocusTraversable(false);
 
         addEventHandler(KeyEvent.ANY, new EventHandler<KeyEvent>() {
@@ -53,67 +51,90 @@ public class GamePane extends ScrollPane {
             }
         });
 
-        contentProperty().addListener(new ChangeListener<Node>() {
+        contentProperty().addListener(new ChangeListener<AnchorPane>() {
             @Override
-            public void changed(ObservableValue<? extends Node> observable, Node oldValue, Node newValue) {
-                if (newValue == null || newValue instanceof AnchorPane) {
-                    area = (AnchorPane) newValue;
+            public void changed(ObservableValue<? extends AnchorPane> observable, AnchorPane oldValue, AnchorPane newValue) {
+                if (newValue == null) {
+                    getChildren().clear();
+                } else {
+                    getChildren().setAll(newValue);
                 }
             }
         });
-
         setContent(new AnchorPane());
 
-        setAreaWidth(800);
-        setAreaHeight(600);
         setAreaBackgroundColor(Color.WHITE);
 
         getStyleClass().add("without-focus");
-
-        widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (autoSizeProperty.get()) {
-                    area.setPrefWidth(newValue.doubleValue());
-                }
-            }
-        });
-
-        heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (autoSizeProperty.get()) {
-                    area.setPrefHeight(newValue.doubleValue());
-                }
-            }
-        });
-
-        autoSizeProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    area.setPrefWidth(getWidth());
-                    area.setPrefHeight(getHeight());
-                } else {
-                    area.setPrefWidth(areaWidthProperty.get());
-                    area.setPrefHeight(areaHeightProperty.get());
-                }
-            }
-        });
     }
 
-    public void loadArea(AnchorPane area) {
-        if (!getAutoSize()) {
-            setAreaWidth(area.getWidth());
-            setAreaHeight(area.getHeight());
-        } else {
-            area.setPrefWidth(getWidth());
-            area.setPrefHeight(getHeight());
+    public void loadArea(final AnchorPane area) {
+        setContent(area);
+        requestFocus();
+    }
+
+    public AnchorPane getContent() {
+        return content.get();
+    }
+
+    public ObjectProperty<AnchorPane> contentProperty() {
+        return content;
+    }
+
+    public void setContent(AnchorPane content) {
+        this.content.set(content);
+        area = content;
+
+        AnchorPane.setLeftAnchor(content, null);
+        AnchorPane.setTopAnchor(content, null);
+        AnchorPane.setBottomAnchor(content, null);
+        AnchorPane.setRightAnchor(content, null);
+    }
+
+    public double getViewX() {
+        return -area.getLayoutX();
+    }
+
+    public double getViewY() {
+        return -area.getLayoutY();
+    }
+
+    public double getViewWidth() {
+        return getPrefWidth();
+    }
+
+    public double getViewHeight() {
+        return getPrefHeight();
+    }
+
+    public DoubleProperty viewXProperty() {
+        return area.layoutXProperty();
+    }
+
+    public DoubleProperty viewYProperty() {
+        return area.layoutYProperty();
+    }
+
+    public void scrollTo(double x, double y) {
+        if (x < 0) {
+            x = 0;
         }
 
-        setContent(area);
+        if (y < 0) {
+            y = 0;
+        }
 
-        requestFocus();
+        if (y > area.getPrefHeight() - getPrefHeight()) {
+            y = area.getPrefHeight() - getPrefHeight();
+        }
+
+        if (x > area.getPrefWidth() - getPrefWidth()) {
+            x = area.getWidth() - getPrefWidth();
+        }
+
+        area.setClip(new Rectangle(x, y, getPrefWidth(), getPrefHeight()));
+        area.setLayoutX(-x);
+        area.setLayoutY(-y);
     }
 
     public boolean getAutoSize() {
@@ -149,41 +170,6 @@ public class GamePane extends ScrollPane {
         return null;
     }
 
-    public void setAreaWidth(double value) {
-        area.setPrefWidth(value);
-
-        if (!autoSizeProperty.get()) {
-            areaWidthProperty.setValue(value);
-        }
-    }
-
-    public void setAreaHeight(double value) {
-        areaHeightProperty.set(value);
-
-        if (!autoSizeProperty.get()) {
-            area.setPrefHeight(value);
-        }
-    }
-
-    public double getAreaWidth() {
-        return areaWidthProperty.get();
-    }
-
-    public double getAreaHeight() {
-        return areaHeightProperty.get();
-    }
-
-    public void setAreaSize(double[] value) {
-        if (value.length == 2) {
-            setAreaWidth(value[0]);
-            setAreaHeight(value[1]);
-        }
-    }
-
-    public double[] getAreaSize() {
-        return new double[] { getAreaWidth(), getAreaHeight() };
-    }
-
     public void setGameScene(GameScene2D scene) {
         if (this.scene != null) {
             this.scene.setScrollHandler(null);
@@ -195,8 +181,7 @@ public class GamePane extends ScrollPane {
             this.scene.setScrollHandler(new GameScene2D.ScrollHandler() {
                 @Override
                 public void scrollTo(double x, double y) {
-                    setVvalue(y);
-                    setHvalue(x);
+                    //GamePane.this.scrollTo(x, y);
                 }
             });
         }
@@ -204,13 +189,5 @@ public class GamePane extends ScrollPane {
 
     public GameScene2D getGameScene() {
         return scene;
-    }
-
-    public DoubleProperty areaWidthPropertyProperty() {
-        return areaWidthProperty;
-    }
-
-    public DoubleProperty areaHeightPropertyProperty() {
-        return areaHeightProperty;
     }
 }

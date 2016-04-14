@@ -10,6 +10,7 @@ use php\gui\layout\UXScrollPane;
 use php\gui\UXForm;
 use php\gui\UXLabel;
 use php\gui\UXWindow;
+use php\lib\reflect;
 
 class GameSceneBehaviour extends AbstractBehaviour
 {

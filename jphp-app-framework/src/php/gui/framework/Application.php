@@ -68,6 +68,8 @@ class Application
      */
     public function __construct($configPath = null)
     {
+       // System::setProperty("prism.lcdtext", "false");
+
         if (Stream::exists('res://.debug/preloader.php')) {
             include 'res://.debug/preloader.php';
         }

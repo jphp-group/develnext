@@ -126,4 +126,18 @@ class ScriptModuleFormat extends AbstractFormFormat
 
         return null;
     }
+
+    public function delete($path, $silent = false)
+    {
+        parent::delete($path, $silent);
+
+        if ($project = Ide::project()) {
+            $project->getSrcFile("app/modules/" . fs::name($path) . '.json')->delete();
+            $project->getSrcFile("app/modules/" . fs::name($path) . '.php')->delete();
+            $project->getSrcFile("app/modules/" . fs::name($path) . '.php.source')->delete();
+            $project->getSrcFile("app/modules/" . fs::name($path) . '.php.sourcemap')->delete();
+            $project->getSrcFile("app/modules/" . fs::name($path) . '.behaviour')->delete();
+            $project->getSrcFile("app/modules/" . fs::name($path) . '.php.axml')->delete();
+        }
+    }
 }

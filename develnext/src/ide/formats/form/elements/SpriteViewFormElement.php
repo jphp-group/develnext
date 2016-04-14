@@ -7,6 +7,7 @@ use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\Project;
+use ide\systems\Cache;
 use php\game\UXGameEntity;
 use php\game\UXGamePane;
 use php\game\UXSprite;
@@ -114,14 +115,24 @@ class SpriteViewFormElement extends AbstractFormElement
                 $sprite = new UXSprite();
                 $sprite->frameSize = [$spec->frameWidth, $spec->frameHeight];
                 $sprite->speed = $spec->speed;
+                $spritePreviewImage = $manager->getSpritePreview($data->get('sprite'));
 
-                if ($spec->file) {
+                if (!$spritePreviewImage) {
+                    waitAsync(200, function () use ($node) {
+                        $this->refreshNode($node);
+                    });
+                    return;
+                }
+
+                $sprite->image = $spritePreviewImage;
+
+                /*if ($spec->file) {
                     $file = $project->getFile("src/{$spec->file}");
 
                     if ($file->isFile()) {
-                        $sprite->image = new UXImage($file);
+                        $sprite->image = Cache::getImage($file);
                     }
-                }
+                } */
 
                 foreach ($spec->animations as $name => $indexes) {
                     $sprite->setAnimation($name, $indexes);

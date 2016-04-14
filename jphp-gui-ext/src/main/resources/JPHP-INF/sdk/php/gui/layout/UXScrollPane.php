@@ -26,6 +26,22 @@ class UXScrollPane extends UXControl
     public $scrollY;
 
     /**
+     * @readonly
+     * @var array
+     */
+    public $viewportBounds = ['x' => 0.0, 'y' => 0.0, 'z' => 0.0, 'width' => 0.0, 'height' => 0.0];
+
+    /**
+     * @var double
+     */
+    public $scrollMinX = 0, $scrollMinY = 0;
+
+    /**
+     * @var float
+     */
+    public $scrollMaxX = 1.0, $scrollMaxY = 1.0;
+
+    /**
      * @var bool
      */
     public $fitToWidth = false;

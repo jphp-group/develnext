@@ -44,8 +44,8 @@ class GamePaneFormElementTag extends AbstractFormElementTag
             $element->setAttribute('autoSize', 'true');
         }
 
-        $element->setAttribute('areaWidth', $node->areaWidth);
-        $element->setAttribute('areaHeight', $node->areaHeight);
+        //$element->setAttribute('areaWidth', $node->areaWidth);
+        //$element->setAttribute('areaHeight', $node->areaHeight);
 
         if ($node->areaBackgroundColor) {
             $element->setAttribute('areaBackgroundColor', $node->areaBackgroundColor->getWebValue());

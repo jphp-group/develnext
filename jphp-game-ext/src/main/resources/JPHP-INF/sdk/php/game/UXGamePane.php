@@ -10,7 +10,7 @@ use php\gui\UXNode;
  * Class UXGamePane
  * @package php\game
  */
-class UXGamePane extends UXScrollPane
+class UXGamePane extends UXAnchorPane
 {
     /**
      * @var UXGameScene
@@ -18,19 +18,9 @@ class UXGamePane extends UXScrollPane
     public $scene;
 
     /**
-     * @var int
+     * @var UXAnchorPane
      */
-    public $areaWidth = 800;
-
-    /**
-     * @var int
-     */
-    public $areaHeight = 600;
-
-    /**
-     * @var array
-     */
-    public $areaSize = [800, 600];
+    public $content;
 
     /**
      * @var bool
@@ -43,14 +33,21 @@ class UXGamePane extends UXScrollPane
     public $areaBackgroundColor = 'white';
 
     /**
+     * @readonly
      * @var int
      */
-    public $scrollX = 0, $scrollY = 0;
+    public $viewX = 0, $viewY = 0;
 
     /**
-     * @param UXNode $node
+     * @var float
      */
-    public function scrollTo(UXNode $node)
+    public $viewWidth = 0.0, $viewHeight = 0.0;
+
+    /**
+     * @param $x
+     * @param $y
+     */
+    public function scrollTo($x, $y)
     {
     }
 

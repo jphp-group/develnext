@@ -31,21 +31,23 @@ class BehaviourLoader
             foreach ($domTarget->findAll('./behaviour') as $domBehaviour) {
                 $type = $domBehaviour->getAttribute('type');
 
-                $attributes = $domBehaviour->getAttributes();
-                unset($attributes['type']);
+                if (class_exists($type)) {
+                    $attributes = $domBehaviour->getAttributes();
+                    unset($attributes['type']);
 
-                foreach ($attributes as &$value) {
-                    if ($value[0] == '[' && str::endsWith($value, ']')) {
-                        $value = str::split(str::sub($value, 1, str::length($value) - 2), ',');
+                    foreach ($attributes as &$value) {
+                        if ($value[0] == '[' && str::endsWith($value, ']')) {
+                            $value = str::split(str::sub($value, 1, str::length($value) - 2), ',');
+                        }
                     }
+
+                    /** @var AbstractBehaviour $behaviour */
+                    $behaviour = new $type();
+
+                    $behaviour->setProperties($attributes);
+
+                    $manager->apply($newTargetId === null ? $targetId : $newTargetId, $behaviour);
                 }
-
-                /** @var AbstractBehaviour $behaviour */
-                $behaviour = new $type();
-
-                $behaviour->setProperties($attributes);
-
-                $manager->apply($newTargetId === null ? $targetId : $newTargetId, $behaviour);
             }
         }
     }
@@ -62,20 +64,22 @@ class BehaviourLoader
             foreach ($domTarget->findAll('./behaviour') as $domBehaviour) {
                 $type = $domBehaviour->getAttribute('type');
 
-                $attributes = $domBehaviour->getAttributes();
-                unset($attributes['type']);
+                if (class_exists($type)) {
+                    $attributes = $domBehaviour->getAttributes();
+                    unset($attributes['type']);
 
-                foreach ($attributes as &$value) {
-                    if ($value[0] == '[' && str::endsWith($value, ']')) {
-                        $value = str::split(str::sub($value, 1, str::length($value) - 1), ',');
+                    foreach ($attributes as &$value) {
+                        if ($value[0] == '[' && str::endsWith($value, ']')) {
+                            $value = str::split(str::sub($value, 1, str::length($value) - 1), ',');
+                        }
                     }
+
+                    /** @var AbstractBehaviour $behaviour */
+                    $behaviour = new $type();
+                    $behaviour->setProperties($attributes);
+
+                    $manager->apply($targetId, $behaviour);
                 }
-
-                /** @var AbstractBehaviour $behaviour */
-                $behaviour = new $type();
-                $behaviour->setProperties($attributes);
-
-                $manager->apply($targetId, $behaviour);
             }
         }
     }

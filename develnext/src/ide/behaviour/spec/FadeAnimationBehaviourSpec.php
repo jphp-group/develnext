@@ -20,7 +20,7 @@ class FadeAnimationBehaviourSpec extends AbstractBehaviourSpec
      */
     public function getName()
     {
-        return 'Прозрачность (fade)';
+        return 'Затухание';
     }
 
     public function getGroup()

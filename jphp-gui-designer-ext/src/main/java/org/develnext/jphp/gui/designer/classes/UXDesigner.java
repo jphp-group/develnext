@@ -10,10 +10,9 @@ import javafx.event.EventHandler;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.*;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -23,6 +22,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.Effect;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -40,6 +40,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.develnext.jphp.ext.javafx.classes.UXImage;
 import org.develnext.jphp.ext.javafx.classes.shape.UXPolygon;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import php.runtime.annotation.Reflection.*;
@@ -54,6 +55,8 @@ import java.util.List;
 
 @Namespace(GuiDesignerExtension.NS)
 public class UXDesigner extends BaseObject {
+    public static final int AREA_BLOCK_SIZE = 1024;
+
     public enum SnapType {DOTS, GRID}
 
     private Pane area;
@@ -70,7 +73,7 @@ public class UXDesigner extends BaseObject {
     protected boolean dragged = false;
     protected boolean resizing = false;
 
-    private Canvas dots;
+    private AnchorPane dots;
 
     private Stage selectionRectangle = null;
     private Point2D selectionRectanglePoint = null;
@@ -106,31 +109,86 @@ public class UXDesigner extends BaseObject {
         }
 
         if (snapSizeX > 2 && snapSizeY > 2) {
-            dots = new Canvas(area.getWidth(), area.getHeight());
+            double width = area.getWidth();
+            double height = area.getHeight();
+
+            dots = new AnchorPane();
+            dots.resize(width, height);
             dots.setMouseTransparent(true);
-            dots.setBlendMode(BlendMode.DIFFERENCE);
 
-            GraphicsContext context2D = dots.getGraphicsContext2D();
+            int widthBlocks = (int) Math.ceil(width / AREA_BLOCK_SIZE);
+            int heightBlocks = (int) Math.ceil(height / AREA_BLOCK_SIZE);
 
-            int w = (int) dots.getWidth();
-            int h = (int) dots.getHeight();
+            WritableImage snapshot = null;
 
-            context2D.setFill(Color.GRAY);
-            context2D.setLineDashes(2, 2);
+            for (int I = 0; I < widthBlocks; I++) {
+                for (int J = 0; J < heightBlocks; J++) {
+                    if (snapshot == null) {
+                        Canvas canvas = new Canvas(AREA_BLOCK_SIZE, AREA_BLOCK_SIZE);
 
-            if (snapType == SnapType.DOTS) {
-                for (int i = 0; i < (w / snapSizeX) + 1; i++) {
-                    for (int j = 0; j < (h / snapSizeY) + 1; j++) {
-                        context2D.fillRect(i * snapSizeX, j * snapSizeY, 1, 1);
+                        if (J == heightBlocks - 1) {
+                            canvas.setHeight(height % AREA_BLOCK_SIZE);
+                        }
+
+                        if (I == widthBlocks - 1) {
+                            canvas.setWidth(width % AREA_BLOCK_SIZE);
+                        }
+
+                        canvas.setMouseTransparent(true);
+                        canvas.setBlendMode(BlendMode.DIFFERENCE);
+
+                        GraphicsContext context2D = canvas.getGraphicsContext2D();
+
+                        int w = (int) canvas.getWidth();
+                        int h = (int) canvas.getHeight();
+
+                        context2D.setFill(Color.GRAY);
+                        context2D.setLineDashes(2, 2);
+
+                        if (snapType == SnapType.DOTS) {
+                            for (int i = 0; i < (w / snapSizeX) + 1; i++) {
+                                for (int j = 0; j < (h / snapSizeY) + 1; j++) {
+                                    context2D.fillRect(i * snapSizeX, j * snapSizeY, 1, 1);
+                                }
+                            }
+                        } else {
+                            for (int i = 0; i < (w / snapSizeX) + 1; i++) {
+                                context2D.fillRect(i * snapSizeX, 0, 1, h);
+                            }
+
+                            for (int i = 0; i < (h / snapSizeY) + 1; i++) {
+                                context2D.fillRect(0, i * snapSizeY, w, 1);
+                            }
+                        }
+
+                        SnapshotParameters snapParams = new SnapshotParameters();
+                        snapParams.setFill(Color.TRANSPARENT);
+                        snapshot = canvas.snapshot(snapParams, null);
+
+                        canvas.relocate(I * AREA_BLOCK_SIZE, J * AREA_BLOCK_SIZE);
+                        dots.getChildren().add(canvas);
+                    } else {
+                        ImageView imageView = new ImageView(snapshot);
+                        imageView.setMouseTransparent(true);
+                        imageView.setPreserveRatio(false);
+                        Rectangle2D viewPort = new Rectangle2D(0, 0, AREA_BLOCK_SIZE, AREA_BLOCK_SIZE);
+
+                        imageView.setFitWidth(AREA_BLOCK_SIZE);
+                        imageView.setFitHeight(AREA_BLOCK_SIZE);
+
+                        if (J == heightBlocks - 1) {
+                            viewPort = new Rectangle2D(0, 0, viewPort.getWidth(), height % AREA_BLOCK_SIZE);
+                        }
+
+                        if (I == widthBlocks - 1) {
+                            viewPort = new Rectangle2D(0, 0, width % AREA_BLOCK_SIZE, viewPort.getHeight());
+                        }
+
+                        imageView.setClip(new Rectangle(viewPort.getWidth(), viewPort.getHeight()));
+
+                        imageView.relocate(I * AREA_BLOCK_SIZE, J * AREA_BLOCK_SIZE);
+                        dots.getChildren().addAll(imageView);
                     }
-                }
-            } else {
-                for (int i = 0; i < (w / snapSizeX) + 1; i++) {
-                    context2D.fillRect(i * snapSizeX, 0, 1, h);
-                }
-
-                for (int i = 0; i < (h / snapSizeY) + 1; i++) {
-                    context2D.fillRect(0, i * snapSizeY, w, 1);
                 }
             }
 

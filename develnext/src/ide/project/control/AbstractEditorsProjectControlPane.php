@@ -152,6 +152,8 @@ abstract class AbstractEditorsProjectControlPane extends AbstractProjectControlP
                     waitAsync(1000, function () use ($format, $file) {
                         $format->delete($file);
 
+                        $this->trigger('updateCount');
+
                         if (Ide::project()) {
                             Ide::project()->trigger('updateSettings');
                         }
@@ -206,6 +208,7 @@ abstract class AbstractEditorsProjectControlPane extends AbstractProjectControlP
         $addButton->maxHeight = 999;
         $addButton->on('action', function () {
             $this->doAdd();
+            $this->trigger('updateCount');
         });
 
         $editButton = new UXButton('Редактировать');

@@ -62,6 +62,9 @@ class ProjectEditor extends AbstractEditor
 
                 if ($pane instanceof AbstractProjectControlPane) {
                     $this->controlPanes[$one] = $pane;
+                    $pane->on('updateCount', function () {
+                        $this->menu->refresh();
+                    });
                 } else {
                     Logger::error("Unable to register $one control pane, class is not instance of AbstractProjectControlPane");
                 }

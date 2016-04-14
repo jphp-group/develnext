@@ -30,6 +30,7 @@
 
     <opt>-Dfile.encoding=UTF-8</opt>
     <opt>-Ddevelnext.launcher=root</opt>
+    <opt>-Dprism.verbose=true</opt>
   </jre>
   <versionInfo>
     <fileVersion>4.0.0.0</fileVersion>

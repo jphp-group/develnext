@@ -62,15 +62,15 @@ class WrapScreenBehaviour extends AbstractBehaviour
                 if ($this->wrapLeft && $x < -$w - self::GAP) {
                     // Animation::stopMove($target);
                     $target->x = $bounds['width'];
-                } elseif ($this->wrapRight && $x > $bounds['width'] + self::GAP) {
+                } elseif ($this->wrapRight && $x > $bounds['width'] + $bounds['x'] + self::GAP) {
                     // Animation::stopMove($target);
-                    $target->x = $bounds['x'] - $w;
+                    $target->x = $bounds['x'] - $w + $bounds['x'];
                 } elseif ($this->wrapTop && $y < -$h - self::GAP) {
                     // Animation::stopMove($target);
                     $target->y = $bounds['height'];
-                } elseif ($this->wrapBottom && $y > $bounds['height'] + self::GAP) {
+                } elseif ($this->wrapBottom && $y > $bounds['height'] + $bounds['y'] + self::GAP) {
                     // Animation::stopMove($target);
-                    $target->y = $bounds['y'] - $h;
+                    $target->y = $bounds['y'] - $h + $bounds['y'];
                 }
             });
         }

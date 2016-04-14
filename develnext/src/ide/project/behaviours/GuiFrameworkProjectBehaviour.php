@@ -392,8 +392,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $bundle = BundleProjectBehaviour::get();
-        $bundle->addBundle(Project::ENV_ALL, JPHPGuiDesktopBundle::class, false);
-        $bundle->addBundle(Project::ENV_DEV, JPHPDesktopDebugBundle::class, false);
+        if ($bundle) {
+            $bundle->addBundle(Project::ENV_ALL, JPHPGuiDesktopBundle::class, false);
+            $bundle->addBundle(Project::ENV_DEV, JPHPDesktopDebugBundle::class, false);
+        }
 
         $this->_recoverDirectories();
 

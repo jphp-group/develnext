@@ -49,7 +49,7 @@ class KeydownEventAdapter extends AbstractEventAdapter
 
             case 'anyletter':
                 return function (UXKeyEvent $event) use ($param, $handler) {
-                    if (Str::contains('qwertyuiopasdfghjklzxcvbnm', $event->codeName)) {
+                    if (Str::contains('qwertyuiopasdfghjklzxcvbnm', Str::lowerFirst($event->codeName)[0])) {
                         $handler($event);
                     }
                 };

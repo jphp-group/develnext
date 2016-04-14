@@ -417,6 +417,7 @@ class ObjectListEditor
 
         if ($this->enableAppModule && !$this->disableModules) {
             $gui = GuiFrameworkProjectBehaviour::get();
+
             if ($gui) {
                 $appModule = $gui->getModuleEditor('AppModule');
 

@@ -67,7 +67,8 @@ class FormsProjectControlPane extends AbstractEditorsProjectControlPane
      */
     protected function getItems()
     {
-        return GuiFrameworkProjectBehaviour::get()->getFormEditors();
+        $gui = GuiFrameworkProjectBehaviour::get();
+        return $gui ? $gui->getFormEditors() : [];
     }
 
     /**
@@ -88,7 +89,9 @@ class FormsProjectControlPane extends AbstractEditorsProjectControlPane
         /** @var ImageBox $box */
         $box = parent::makeItemUi($item);
 
-        if (GuiFrameworkProjectBehaviour::get()->isMainForm($item)) {
+        $gui = GuiFrameworkProjectBehaviour::get();
+
+        if ($gui && $gui->isMainForm($item)) {
             $box->setTitle($box->getTitle(), '-fx-font-weight: bold;');
         }
 
@@ -103,7 +106,11 @@ class FormsProjectControlPane extends AbstractEditorsProjectControlPane
         $formListEditor->build();
 
         $formListEditor->onChange(function ($value) {
-            GuiFrameworkProjectBehaviour::get()->setMainForm($value);
+            $gui = GuiFrameworkProjectBehaviour::get();
+            if ($gui) {
+                $gui->setMainForm($value);
+            }
+
             $this->refresh(false);
         });
 
@@ -132,12 +139,18 @@ class FormsProjectControlPane extends AbstractEditorsProjectControlPane
         parent::refresh();
 
         if ($updateUi && $this->settingsMainFormCombobox) {
-            $mainForm = GuiFrameworkProjectBehaviour::get()->getMainForm();
+            $gui = GuiFrameworkProjectBehaviour::get();
+
+            if ($gui) {
+                $mainForm = $gui->getMainForm();
+            }
 
             $this->settingsMainFormCombobox->updateUi();
 
-            GuiFrameworkProjectBehaviour::get()->setMainForm($mainForm);
-            $this->settingsMainFormCombobox->setSelected($mainForm);
+            if ($gui) {
+                $gui->setMainForm($mainForm);
+                $this->settingsMainFormCombobox->setSelected($mainForm);
+            }
         }
     }
 }
