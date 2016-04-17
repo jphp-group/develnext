@@ -284,6 +284,10 @@ class FileSystem
             $path = $path->getFile();
         }
 
+        if (Ide::project() && fs::exists($path)) {
+            $path = Ide::project()->getAbsoluteFile($path);
+        }
+
         $hash = FileUtils::hashName($path);
 
         $editor = static::$openedEditors[$hash];

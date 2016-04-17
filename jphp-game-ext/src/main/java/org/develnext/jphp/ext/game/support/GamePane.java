@@ -17,10 +17,11 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import org.develnext.jphp.ext.javafx.support.control.Panel;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
 
-public class GamePane extends AnchorPane {
+public class GamePane extends Panel {
     protected GameScene2D scene = null;
     protected AnchorPane area;
 

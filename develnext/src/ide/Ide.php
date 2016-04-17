@@ -1127,7 +1127,6 @@ class Ide extends Application
         $this->mainForm->hide();
 
         if ($project) {
-            $project->save();
             ProjectSystem::close();
         }
 

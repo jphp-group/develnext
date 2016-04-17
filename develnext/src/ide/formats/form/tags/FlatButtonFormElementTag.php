@@ -22,7 +22,9 @@ class FlatButtonFormElementTag extends AbstractFormElementTag
     {
         /** @var UXFlatButton $node */
 
-        $element->setAttribute('color', $node->color->getWebValue());
+        if ($node->color) {
+            $element->setAttribute('color', $node->color);
+        }
 
         if ($node->clickColor) {
             $element->setAttribute('clickColor', $node->clickColor->getWebValue());

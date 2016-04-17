@@ -85,6 +85,6 @@ class PanelFormElement extends AbstractFormElement
 
     public function isOrigin($any)
     {
-        return $any instanceof UXPanel;
+        return get_class($any) == UXPanel::class;
     }
 }

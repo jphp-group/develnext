@@ -1,6 +1,6 @@
-def javaVersion    = '1.7';
+def javaVersion    = '1.8';
 def projectVersion = '0.9.0';
-def jphpVersion    = projectVersion + "-SNAPSHOT";
+def jphpVersion    = "0.9.0-SNAPSHOT";
 
 rootProject.ext.jphpVersion = jphpVersion;
 
@@ -102,8 +102,8 @@ configure([
 
 project(':jphp-gui-ext') {
     dependencies {
-        compile "org.develnext:jphp-runtime:$jphpVersion"
-        compile "org.develnext:jphp-xml-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
+        compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
     }
 }
 
@@ -112,27 +112,27 @@ project(':jphp-game-ext') {
         compile 'org.dyn4j:dyn4j:3.2.1'
 
         compile project(':jphp-gui-ext')
-        compile "org.develnext:jphp-runtime:$jphpVersion"
+        compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
     }
 }
 
 project(':jphp-desktop-ext') {
     dependencies {
         compile project(':jphp-gui-ext')
-        compile "org.develnext:jphp-runtime:$jphpVersion"
+        compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
     }
 }
 
 project(':jphp-parser') {
     dependencies {
-        compile "org.develnext:jphp-core:$jphpVersion"
+        compile "org.develnext.jphp:jphp-core:$jphpVersion"
     }
 }
 
 project(':jphp-app-framework') {
     dependencies {
         compile project(':jphp-gui-ext')
-        compile "org.develnext:jphp-core:$jphpVersion"
+        compile "org.develnext.jphp:jphp-core:$jphpVersion"
     }
 }
 
@@ -155,14 +155,14 @@ project(':develnext') {
         compile project(':develnext-bundles/dn-jsoup-bundle')
         compile project(':develnext-bundles/dn-mail-bundle')
 
-        compile "org.develnext:jphp-xml-ext:$jphpVersion"
-        compile "org.develnext:jphp-json-ext:$jphpVersion"
-        compile "org.develnext:jphp-jsoup-ext:$jphpVersion"
-        compile "org.develnext:jphp-zend-ext:$jphpVersion"
-        compile "org.develnext:jphp-sql-ext:$jphpVersion"
-        compile "org.develnext:jphp-compress-ext:$jphpVersion"
-        compile "org.develnext:jphp-compress-ext:$jphpVersion"
-        compile "org.develnext:jphp-debugger:$jphpVersion"
+        compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-json-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-jsoup-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-zend-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-sql-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-compress-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-compress-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-debugger:$jphpVersion"
     }
 }
 

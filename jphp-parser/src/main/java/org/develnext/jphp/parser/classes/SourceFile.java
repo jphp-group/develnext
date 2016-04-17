@@ -13,7 +13,7 @@ import php.runtime.env.Environment;
 import php.runtime.ext.core.classes.stream.Stream;
 import php.runtime.ext.core.classes.stream.WrapIOException;
 import php.runtime.lang.BaseObject;
-import php.runtime.lang.exception.BaseParseException;
+import php.runtime.lang.exception.BaseParseError;
 import php.runtime.reflection.ClassEntity;
 
 import java.io.File;
@@ -96,7 +96,7 @@ public class SourceFile extends BaseObject {
             for (ConstStmtToken token : analyzer.getConstants()) {
                 moduleRecord.synchronize(env, token, tokenizer);
             }
-        } catch (BaseParseException | IOException e) {
+        } catch (BaseParseError | IOException e) {
         }
 
         return Memory.NULL;

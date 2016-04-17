@@ -1,6 +1,7 @@
 <?php
 namespace ide\utils;
 
+use ide\Logger;
 use php\gui\UXDialog;
 use php\io\File;
 use php\io\FileStream;
@@ -182,9 +183,22 @@ class FileUtils
 
     public static function put($filename, $content, $encoding = 'UTF-8')
     {
-        fs::ensureParent($filename);
+        //Logger::debug("Write to file $filename");
 
-        Stream::putContents($filename, Str::encode($content, $encoding));
+        if (!fs::ensureParent($filename)) {
+            Logger::error("Unable to write $filename, cannot create parent directory");
+            return false;
+        }
+
+        $encodeStr = Str::encode($content, $encoding);
+
+        if ($encodeStr !== false) {
+            Stream::putContents($filename, $encodeStr);
+            return true;
+        } else {
+            Logger::error("Unable to write $filename, cannot encode string to $encoding");
+            return false;
+        }
     }
 
     public static function get($filename, $encoding = 'UTF-8')

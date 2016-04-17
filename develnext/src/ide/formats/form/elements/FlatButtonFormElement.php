@@ -52,6 +52,10 @@ class FlatButtonFormElement extends LabeledFormElement
         $button = new UXFlatButton($this->getName());
         $button->textAlignment = 'CENTER';
         $button->alignment = 'CENTER';
+        $button->color = '#6680e6';
+        $button->hoverColor = '#4d66cc';
+        $button->textColor = 'white';
+
         return $button;
     }
 

@@ -34,9 +34,10 @@ public class FlatButton extends Button {
         super(text, graphic);
 
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
-        setTextFill(Color.WHITE);
-        setColor(Color.valueOf("#6680e6"));
-        setHoverColor(Color.valueOf("#4d66cc"));
+        setTextFill(Color.BLACK);
+        setColor(null);
+        setHoverColor(null);
+        setClickColor(null);
 
         addEventFilter(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>() {
             @Override

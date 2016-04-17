@@ -67,6 +67,8 @@ class GamePaneFormElement extends AbstractFormElement
     public function createElement()
     {
         $button = new UXGamePane();
+        $button->backgroundColor = 'white';
+
         return $button;
     }
 

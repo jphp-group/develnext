@@ -12,5 +12,5 @@ sourceSets {
 }
 
 dependencies {
-    compile "org.develnext:jphp-jsoup-ext:$rootProject.ext.jphpVersion"
+    compile "org.develnext.jphp:jphp-jsoup-ext:$rootProject.ext.jphpVersion"
 }
