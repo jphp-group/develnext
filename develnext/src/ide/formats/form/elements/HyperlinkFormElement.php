@@ -50,6 +50,8 @@ class HyperlinkFormElement extends LabeledFormElement
     public function createElement()
     {
         $button = new UXHyperlink($this->getName());
+        $button->cursor = 'HAND';
+
         return $button;
     }
 

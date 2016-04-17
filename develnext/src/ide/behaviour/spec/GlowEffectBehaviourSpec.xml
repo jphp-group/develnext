@@ -1,0 +1,5 @@
+<behaviour extends="EffectBehaviourSpec">
+    <properties>
+        <property name="Уровень" code="level" editor="floatSlider" min="0" max="1" tooltip="Уровень свечения от 0 до 1"/>
+    </properties>
+</behaviour>

@@ -25,11 +25,12 @@ public class GamePane extends Panel {
     protected GameScene2D scene = null;
     protected AnchorPane area;
 
-    protected BooleanProperty autoSizeProperty = new SimpleBooleanProperty(false);
     protected ObjectProperty<AnchorPane> content = new SimpleObjectProperty<>(null);
 
     public GamePane() {
         setFocusTraversable(false);
+        setBorderWidth(0);
+        setBackgroundColor(Color.WHITE);
 
         addEventHandler(KeyEvent.ANY, new EventHandler<KeyEvent>() {
             @Override
@@ -63,8 +64,6 @@ public class GamePane extends Panel {
             }
         });
         setContent(new AnchorPane());
-
-        setAreaBackgroundColor(Color.WHITE);
 
         getStyleClass().add("without-focus");
     }
@@ -136,39 +135,6 @@ public class GamePane extends Panel {
         area.setClip(new Rectangle(x, y, getPrefWidth(), getPrefHeight()));
         area.setLayoutX(-x);
         area.setLayoutY(-y);
-    }
-
-    public boolean getAutoSize() {
-        return autoSizeProperty.get();
-    }
-
-    public BooleanProperty autoSizeProperty() {
-        return autoSizeProperty;
-    }
-
-    public void setAutoSize(boolean autoSizeProperty) {
-        this.autoSizeProperty.set(autoSizeProperty);
-    }
-
-    public void setAreaBackgroundColor(Color color) {
-        if (color == null) {
-            area.setBackground(null);
-        } else {
-            area.setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
-        }
-    }
-
-    public Color getAreaBackgroundColor() {
-        Background background = area.getBackground();
-
-        if (background != null && background.getFills().size() > 0) {
-            Paint fill = background.getFills().get(0).getFill();
-            if (fill instanceof Color) {
-                return (Color) fill;
-            }
-        }
-
-        return null;
     }
 
     public void setGameScene(GameScene2D scene) {

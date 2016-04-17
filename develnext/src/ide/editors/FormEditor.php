@@ -4,7 +4,6 @@ namespace ide\editors;
 use ide\action\ActionEditor;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\behaviour\IdeBehaviourManager;
-use ide\editors\argument\StringArgumentEditor;
 use ide\editors\common\ObjectListEditorItem;
 use ide\editors\form\IdeActionsPane;
 use ide\editors\form\IdeBehaviourPane;
@@ -21,14 +20,10 @@ use ide\editors\value\SimpleTextPropertyEditor;
 use ide\formats\AbstractFormFormat;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElement;
-use ide\formats\form\elements\FormFormElement;
-use ide\formats\form\event\AbstractEventKind;
 use ide\formats\form\SourceEventManager;
 use ide\formats\FormFormat;
 use ide\formats\GuiFormFormat;
 use ide\formats\PhpCodeFormat;
-use ide\forms\ActionConstructorForm;
-use ide\forms\MainForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
@@ -40,16 +35,12 @@ use ide\project\ProjectFile;
 use ide\project\ProjectIndexer;
 use ide\systems\FileSystem;
 use ide\ui\Notifications;
-use ide\utils\FileUtils;
-use ide\utils\UiUtils;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
-use php\gui\framework\AbstractFactory;
 use php\gui\framework\AbstractForm;
-use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\DataUtils;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
@@ -57,42 +48,20 @@ use php\gui\layout\UXPane;
 use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
 use php\gui\paint\UXColor;
-use php\gui\text\UXFont;
 use php\gui\UXApplication;
-use php\gui\UXButton;
-use php\gui\UXContextMenu;
 use php\gui\UXCustomNode;
 use php\gui\UXData;
-use php\gui\UXDialog;
-use php\gui\UXForm;
-use php\gui\UXHyperlink;
-use php\gui\UXImage;
-use php\gui\UXImageView;
-use php\gui\UXLabel;
-use php\gui\UXList;
-use php\gui\UXListCell;
-use php\gui\UXListView;
-use php\gui\UXLoader;
-use php\gui\UXMenu;
-use php\gui\UXMenuItem;
 use php\gui\UXNode;
-use php\gui\UXParent;
-use php\gui\UXPopupWindow;
-use php\gui\UXSeparator;
 use php\gui\UXSplitPane;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
-use php\gui\UXTextArea;
-use php\gui\UXTextField;
-use php\gui\UXToggleButton;
-use php\gui\UXToggleGroup;
 use php\gui\UXTooltip;
-use php\gui\UXWebView;
 use php\io\File;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\lib\arr;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use php\lib\String;
@@ -101,7 +70,6 @@ use php\util\Configuration;
 use php\util\Flow;
 use php\util\Regex;
 use php\util\SharedStack;
-use script\TimerScript;
 use timer\AccurateTimer;
 
 /**
@@ -273,7 +241,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $confFile = $file;
 
         if (Str::endsWith($phpFile, '.fxml')) {
-            $this->factory = new IdeFormFactory(FileUtils::stripExtension(File::of($file)->getName()), $this->file);
+            $this->factory = new IdeFormFactory(fs::nameNoExt($file), $this->file);
 
             $phpFile = Str::sub($phpFile, 0, Str::length($phpFile) - 5);
             $confFile = $phpFile;
@@ -302,7 +270,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->actionEditor = new ActionEditor($phpFile . '.axml');
         $this->actionEditor->setFormEditor($this);
 
-        $this->behaviourManager = new IdeBehaviourManager(FileUtils::stripExtension($phpFile) . '.behaviour', function ($targetId) {
+        $this->behaviourManager = new IdeBehaviourManager(fs::pathNoExt($phpFile) . '.behaviour', function ($targetId) {
             $node = $targetId ? $this->layout->lookup("#$targetId") : $this;
 
             if (!$node) {
@@ -444,7 +412,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     }
 
     /**
-     * @return UXNode
+     *
      */
     public function load()
     {
@@ -470,6 +438,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $this->trigger('load:after');
+
+        return true;
     }
 
     protected function saveOthers()
@@ -518,7 +488,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     public function close($save = true)
     {
-        parent::close();
+        parent::close($save);
 
         $this->opened = false;
 

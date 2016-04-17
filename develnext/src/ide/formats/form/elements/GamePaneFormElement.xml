@@ -1,8 +1,9 @@
-<element extends="PanelFormElement">
+<element extends="NodeFormElement">
     <!--<properties group="bindings" title="Функционал" sort="500">
         <property code="modules" name="Модули" editor="moduleList" virtual="1" tooltip="Подключенные модули к панели" formConfig="1" />
     </properties>-->
 
     <properties>
+        <property code="backgroundColor" name="Цвет фона" editor="color" />
     </properties>
 </element>

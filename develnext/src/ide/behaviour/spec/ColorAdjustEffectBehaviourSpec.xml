@@ -1,0 +1,8 @@
+<behaviour extends="EffectBehaviourSpec">
+    <properties>
+        <property name="Яркость" code="brightness" editor="floatSlider" min="-1" max="1" />
+        <property name="Контрастность" code="contrast" editor="floatSlider" min="-1" max="1" />
+        <property name="Оттенок (hue)" code="hue" editor="floatSlider" min="-1" max="1" />
+        <property name="Насыщенность" code="saturation" editor="floatSlider" min="-1" max="1" />
+    </properties>
+</behaviour>

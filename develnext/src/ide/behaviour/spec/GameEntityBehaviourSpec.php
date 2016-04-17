@@ -42,7 +42,7 @@ class GameEntityBehaviourSpec extends AbstractBehaviourSpec
      */
     public function getDescription()
     {
-        return 'Объект для игровой сцены со свойства физики и не только';
+        return 'Объект для игровой сцены со свойствами физики и не только';
     }
 
     /**

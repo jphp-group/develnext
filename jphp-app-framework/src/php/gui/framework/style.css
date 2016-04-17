@@ -6,7 +6,6 @@
 
 .hyperlink {
     -fx-padding: 0; /*0.166667em 0.25em 0.166667em 0.25em;*/ /* 2 3 2 3 */
-    -fx-cursor: hand;
     -fx-content-display: LEFT;
     -fx-text-fill: -fx-text-background-color;
     -fx-border-color: transparent;

@@ -26,6 +26,19 @@ class GamePaneFormElementTag extends AbstractFormElementTag
         return UXGamePane::class;
     }
 
+    public function readContent(DomDocument $document, DomElement $element)
+    {
+        if ($element->hasAttribute('areaBackgroundColor') && !$element->hasAttribute('backgroundColor')) {
+            $element->setAttribute('backgroundColor', $element->getAttribute('areaBackgroundColor'));
+        }
+
+        foreach (['areaBackgroundColor', 'areaHeight', 'areaWidth', 'autoSize', 'hbarPolicy', 'hvalue', 'vbarPolicy', 'vvalue'] as $attr) {
+            $element->removeAttribute($attr);
+        }
+
+        $element->setAttribute('styleClass', str::trim(str::replace($element->getAttribute('styleClass'), 'scroll-pane', '')));
+    }
+
     /*public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
     {
         if ($node->content) {
@@ -40,15 +53,8 @@ class GamePaneFormElementTag extends AbstractFormElementTag
     public function writeAttributes($node, DomElement $element)
     {
         /** @var UXGamePane $node */
-        if ($node->autoSize) {
-            $element->setAttribute('autoSize', 'true');
-        }
-
-        //$element->setAttribute('areaWidth', $node->areaWidth);
-        //$element->setAttribute('areaHeight', $node->areaHeight);
-
-        if ($node->areaBackgroundColor) {
-            $element->setAttribute('areaBackgroundColor', $node->areaBackgroundColor->getWebValue());
+        if ($node->backgroundColor) {
+            $element->setAttribute('backgroundColor', $node->backgroundColor->webValue);
         }
     }
 }

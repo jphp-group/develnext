@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.game.GameExtension;
 import org.develnext.jphp.ext.game.support.GamePane;
 import org.develnext.jphp.ext.javafx.classes.layout.UXAnchorPane;
+import org.develnext.jphp.ext.javafx.classes.layout.UXPanel;
 import org.develnext.jphp.ext.javafx.classes.layout.UXScrollPane;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Namespace;
@@ -16,12 +17,9 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Namespace(GameExtension.NS)
-public class UXGamePane extends UXAnchorPane<GamePane> {
+public class UXGamePane extends UXPanel<GamePane> {
     interface WrappedInterface {
-        @Property boolean autoSize();
         @Property Node content();
-
-        @Property Color areaBackgroundColor();
 
         @Property double viewX();
         @Property double viewY();

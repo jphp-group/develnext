@@ -244,6 +244,8 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Bloom.class, UXBloomEffect.class);
         registerWrapperClass(scope, Lighting.class, UXLightingEffect.class);
         registerWrapperClass(scope, GaussianBlur.class, UXGaussianBlurEffect.class);
+        registerWrapperClass(scope, ColorAdjust.class, UXColorAdjustEffect.class);
+        registerWrapperClass(scope, Glow.class, UXGlowEffect.class);
     }
 
     protected void registerAnimationPackage(CompileScope scope) {

@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes.layout;
 
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.control.Panel;
@@ -10,7 +11,7 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Reflection.Name(JavaFXExtension.NS + "layout\\UXPanel")
-public class UXPanel extends UXAnchorPane<Panel> {
+public class UXPanel<T extends Panel> extends UXAnchorPane<Panel> {
     interface WrappedInterface {
         @Property @Nullable Color borderColor();
         @Property double borderWidth();
@@ -18,7 +19,7 @@ public class UXPanel extends UXAnchorPane<Panel> {
         @Property String borderStyle();
     }
 
-    public UXPanel(Environment env, Panel wrappedObject) {
+    public UXPanel(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -31,5 +32,9 @@ public class UXPanel extends UXAnchorPane<Panel> {
         __wrappedObject = new Panel();
     }
 
-
+    @Override
+    @SuppressWarnings("unchecked")
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
+    }
 }

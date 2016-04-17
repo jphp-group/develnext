@@ -173,8 +173,8 @@ public class UXDesigner extends BaseObject {
                         imageView.setPreserveRatio(false);
                         Rectangle2D viewPort = new Rectangle2D(0, 0, AREA_BLOCK_SIZE, AREA_BLOCK_SIZE);
 
-                        imageView.setFitWidth(AREA_BLOCK_SIZE);
-                        imageView.setFitHeight(AREA_BLOCK_SIZE);
+                        //imageView.setFitWidth(AREA_BLOCK_SIZE);
+                       // imageView.setFitHeight(AREA_BLOCK_SIZE);
 
                         if (J == heightBlocks - 1) {
                             viewPort = new Rectangle2D(0, 0, viewPort.getWidth(), height % AREA_BLOCK_SIZE);

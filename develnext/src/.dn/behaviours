@@ -4,6 +4,8 @@ ide\behaviour\spec\ReflectionEffectBehaviourSpec
 ide\behaviour\spec\BloomEffectBehaviourSpec
 ide\behaviour\spec\LightingEffectBehaviourSpec
 ide\behaviour\spec\GaussianBlurEffectBehaviourSpec
+ide\behaviour\spec\GlowEffectBehaviourSpec
+ide\behaviour\spec\ColorAdjustEffectBehaviourSpec
 
 ide\behaviour\spec\DraggingFormBehaviourSpec
 ide\behaviour\spec\DraggingBehaviourSpec

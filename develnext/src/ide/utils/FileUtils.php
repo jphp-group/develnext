@@ -2,6 +2,7 @@
 namespace ide\utils;
 
 use ide\Logger;
+use ide\ui\Notifications;
 use php\gui\UXDialog;
 use php\io\File;
 use php\io\FileStream;
@@ -186,6 +187,7 @@ class FileUtils
         //Logger::debug("Write to file $filename");
 
         if (!fs::ensureParent($filename)) {
+            Notifications::errorWriteFile($filename);
             Logger::error("Unable to write $filename, cannot create parent directory");
             return false;
         }
@@ -193,9 +195,16 @@ class FileUtils
         $encodeStr = Str::encode($content, $encoding);
 
         if ($encodeStr !== false) {
-            Stream::putContents($filename, $encodeStr);
-            return true;
+            try {
+                Stream::putContents($filename, $encodeStr);
+                return true;
+            } catch (IOException $e) {
+                Notifications::errorWriteFile($filename, $e);
+                Logger::error("Unable to write $filename, {$e->getMessage()}");
+                return false;
+            }
         } else {
+            Notifications::errorWriteFile($filename);
             Logger::error("Unable to write $filename, cannot encode string to $encoding");
             return false;
         }

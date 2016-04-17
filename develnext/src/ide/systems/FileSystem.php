@@ -167,7 +167,9 @@ class FileSystem
     static function saveAll()
     {
         foreach (static::$openedEditors as $editor) {
-            $editor->save();
+            if ($editor->isCorrectFormat()) {
+                $editor->save();
+            }
         }
     }
 
@@ -305,6 +307,11 @@ class FileSystem
             $info['mtime'] = File::of($path)->lastModified();
         }
 
+        if ($editor->isIncorrectFormat()) {
+            Ide::get()->getMainForm()->toast("Ошибка загрузки данных, некорректный или поврежденный файл.\n\n{$path}");
+            return null;
+        }
+
         if (!$tab) {
             $tab = new UXTab();
             /*$tab->detachable = false;
@@ -398,7 +405,7 @@ class FileSystem
         unset(static::$openedTabs[$hash], static::$openedEditors[$hash], static::$openedFiles[$hash], static::$cachedEditors[$hash]);
 
         if ($editor) {
-            $editor->close($save);
+            $editor->close($editor->isCorrectFormat() && $save);
         }
 
         if ($removeTab && $tab) {

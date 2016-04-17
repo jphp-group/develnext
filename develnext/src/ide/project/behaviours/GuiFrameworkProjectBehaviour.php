@@ -54,6 +54,7 @@ use php\gui\UXTextField;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
+use php\lib\fs;
 use php\lib\Str;
 use php\util\Configuration;
 use php\util\Regex;
@@ -575,10 +576,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $editors = [];
 
         FileUtils::scan($formDir, function ($filename) use (&$editors) {
-            if (FileUtils::getExtension($filename) == "fxml") {
+            if (fs::ext($filename) == "fxml") {
                 $editor = FileSystem::fetchEditor($filename, true);
 
-                $editors[FileUtils::hashName($filename)] = $editor;
+                if ($editor) {
+                    $editors[FileUtils::hashName($filename)] = $editor;
+                }
             }
         });
 

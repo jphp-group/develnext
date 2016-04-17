@@ -25,6 +25,10 @@ abstract class AbstractFormElementTag
 
     abstract public function writeAttributes($node, DomElement $element);
 
+    public function readContent(DomDocument $document, DomElement $element)
+    {
+    }
+
     public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
     {
     }

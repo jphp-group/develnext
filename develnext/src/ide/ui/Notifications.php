@@ -3,7 +3,11 @@ namespace ide\ui;
 
 use ide\Ide;
 use ide\project\Project;
+use php\gui\layout\UXAnchorPane;
+use php\gui\UXAlert;
+use php\gui\UXTextArea;
 use php\gui\UXTrayNotification;
+use php\lib\fs;
 
 class Notifications
 {
@@ -16,6 +20,34 @@ class Notifications
         $notify->show();
 
         return $notify;
+    }
+
+    static function attachException(UXTrayNotification $notify, \Exception $e) {
+        $notify->on('click', function () use ($e) {
+            $dialog = new UXAlert('ERROR');
+            $dialog->title = 'Ошибка';
+            $dialog->headerText = 'Произошла ошибка в DevelNext, сообщите об этом авторам';
+            $dialog->contentText = $e->getMessage();
+            $dialog->setButtonTypes(['Выход из DevelNext', 'Продолжить']);
+            $pane = new UXAnchorPane();
+            $pane->maxWidth = 100000;
+
+            $class = get_class($e);
+
+            $content = new UXTextArea("{$class}\n{$e->getMessage()}\n\nОшибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
+            $content->padding = 10;
+            UXAnchorPane::setAnchor($content, 0);
+
+            $pane->add($content);
+            $dialog->expandableContent = $pane;
+            $dialog->expanded = true;
+
+            switch ($dialog->showAndWait()) {
+                case 'Выход из DevelNext':
+                    Ide::get()->shutdown();
+                    break;
+            }
+        });
     }
 
     static function error($title, $message)
@@ -75,6 +107,18 @@ class Notifications
     public static function errorDeleteFile($file)
     {
         static::error('Ошибка удаления', "Файл '$file' невозможно удалить в данный момент, возможно он занят другой программой.");
+    }
+
+    public static function errorWriteFile($file, \Exception $e = null)
+    {
+        $file = fs::name($file);
+
+        if ($e) {
+            $notify = static::error('Ошибка записи', "Файл '$file' недоступен для записи, нажмите сюда для подробностей");
+            static::attachException($notify, $e);
+        } else {
+            static::error('Ошибка записи', "Файл '$file' недоступен для записи");
+        }
     }
 
     public static function errorCopyFile($file)

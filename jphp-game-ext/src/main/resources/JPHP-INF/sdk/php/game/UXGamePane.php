@@ -2,6 +2,7 @@
 namespace php\game;
 
 use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXPanel;
 use php\gui\layout\UXScrollPane;
 use php\gui\paint\UXColor;
 use php\gui\UXNode;
@@ -10,7 +11,7 @@ use php\gui\UXNode;
  * Class UXGamePane
  * @package php\game
  */
-class UXGamePane extends UXAnchorPane
+class UXGamePane extends UXPanel
 {
     /**
      * @var UXGameScene

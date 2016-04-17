@@ -8,6 +8,8 @@ use ide\formats\form\AbstractFormElementTag;
 use ide\formats\form\tags\CloneFormElementTag;
 use ide\Ide;
 use ide\Logger;
+use ide\utils\FileUtils;
+use php\format\ProcessorException;
 use php\gui\designer\UXDesigner;
 use php\gui\framework\DataUtils;
 use php\gui\layout\UXAnchorPane;
@@ -18,9 +20,11 @@ use php\gui\UXDialog;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\io\IOException;
+use php\io\MemoryStream;
 use php\io\Stream;
 use php\lib\fs;
 use php\xml\DomDocument;
+use php\xml\DomElement;
 use php\xml\XmlProcessor;
 use ReflectionClass;
 
@@ -37,17 +41,66 @@ class GuiFormDumper extends AbstractFormDumper
     protected $formElementTags;
 
     /**
+     * @var AbstractFormElementTag[]
+     */
+    protected $formElementTagsByTag;
+
+    /**
      * @var UXDesigner
      */
     protected $designer;
 
     /**
-     * @param array $formElementTags
+     * @var XmlProcessor
+     */
+    protected $xml;
+
+    /**
+     * @param AbstractFormElementTag[] $formElementTags
      */
     function __construct(array $formElementTags)
     {
         $this->processor = new XmlProcessor();
         $this->formElementTags = $formElementTags;
+
+        foreach ($formElementTags as $tag) {
+            $this->formElementTagsByTag[$tag->getTagName()] = $tag;
+        }
+
+        $this->xml = new XmlProcessor();
+    }
+
+    public function fetchFormFile(FormEditor $editor)
+    {
+        $xml = $this->xml;
+
+        try {
+            $document = $xml->parse(FileUtils::get($editor->getFile()));
+
+            /** @var DomElement $element */
+            foreach ($document->findAll('//*[@id]') as $element) {
+                $tagName = $element->getTagName();
+
+                if ($tagElement = $this->formElementTagsByTag[$tagName]) {
+                    if ($element->getAttribute('id')) {
+                        $tagElement->readContent($document, $element);
+                    }
+                }
+            }
+
+            $stream = new MemoryStream();
+
+            $xml->formatTo($document, $stream);
+            $stream->seek(0);
+
+            return $stream;
+        } catch (IOException $e) {
+            Logger::error("Unable fetchFormFile(), {$e->getMessage()}");
+            return null;
+        } catch (ProcessorException $e) {
+            Logger::error("Unable parse xml file {$editor->getFile()}, {$e->getMessage()}");
+            return null;
+        }
     }
 
     public function load(FormEditor $editor)
@@ -57,22 +110,25 @@ class GuiFormDumper extends AbstractFormDumper
         $loader = new UXLoader();
         /** @var UXAnchorPane $layout */
         try {
-            Stream::tryAccess($editor->getFile(), function ($stream) use ($loader, $editor) {
-                $layout = $loader->load($stream);
+            $stream = $this->fetchFormFile($editor);
 
-                if ($layout instanceof UXPane) {
-                    $editor->setLayout($layout);
-                }
-            });
+            if ($stream == null) {
+                throw new IOException();
+            }
+
+            $layout = $loader->load($stream);
+
+            if ($layout instanceof UXPane) {
+                $editor->setLayout($layout);
+            } else {
+                throw new IOException();
+            }
+
+            return true;
         } catch (IOException $e) {
-            Ide::get()->getMainForm()->toast('Ошибка загрузки формы: ' . $e->getMessage());
-            $layout1 = new UXAnchorPane();
-            $layout1->maxWidth = 99999999;
-            $layout1->maxHeight = 99999999;
-
-            $layout1->size = [500, 500];
-
-            $editor->setLayout($layout1);
+            $editor->setIncorrectFormat(true);
+            $editor->setLayout(new UXAnchorPane());
+            return false;
         }
     }
 

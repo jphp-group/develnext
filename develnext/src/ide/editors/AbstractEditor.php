@@ -27,6 +27,11 @@ abstract class AbstractEditor
     protected $file;
 
     /**
+     * @var bool
+     */
+    protected $incorrectFormat = false;
+
+    /**
      * @var AbstractFormat
      */
     protected $format;
@@ -79,6 +84,29 @@ abstract class AbstractEditor
                 Ide::project()->getIdeConfig($name)->save();
             }
         }
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIncorrectFormat()
+    {
+        return $this->incorrectFormat;
+    }
+
+    public function isCorrectFormat()
+    {
+        return !$this->isIncorrectFormat();
+    }
+
+    /**
+     * @param boolean $incorrectFormat
+     */
+    public function setIncorrectFormat($incorrectFormat)
+    {
+        if ($this->incorrectFormat == $incorrectFormat) return;
+
+        $this->incorrectFormat = $incorrectFormat;
     }
 
     /**
