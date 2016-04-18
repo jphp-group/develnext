@@ -200,8 +200,18 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
+    public boolean hasStylesheet(String path) {
+        return getWrappedObject().getScene().getStylesheets().contains(path);
+    }
+
+    @Signature
     public void addStylesheet(String path) {
         getWrappedObject().getScene().getStylesheets().add(path);
+    }
+
+    @Signature
+    public void removeStylesheet(String path) {
+        getWrappedObject().getScene().getStylesheets().remove(path);
     }
 
     @Signature

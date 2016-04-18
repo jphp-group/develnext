@@ -104,6 +104,10 @@ class ProjectEditor extends AbstractEditor
         if (!$this->getOpenedPane()) {
             $this->navigate(arr::firstKey($this->controlPanes));
         }
+
+        foreach ($this->controlPanes as $pane) {
+            $pane->open();
+        }
     }
 
     public function load()
@@ -114,6 +118,13 @@ class ProjectEditor extends AbstractEditor
     }
 
     public function save()
+    {
+        foreach ($this->controlPanes as $pane) {
+            $pane->save();
+        }
+    }
+
+    public function hide()
     {
         foreach ($this->controlPanes as $pane) {
             $pane->save();

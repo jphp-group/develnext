@@ -241,10 +241,11 @@ class ProjectSystem
 
             Ide::get()->setOpenedProject($project);
 
-            FileSystem::open('~project');
-
             $project->load();
             $project->recover();
+
+            FileSystem::open('~project');
+
             $project->open();
 
             Ide::get()->getMainForm()->hidePreloader();

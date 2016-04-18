@@ -176,6 +176,21 @@ abstract class UXWindow
     }
 
     /**
+     * @param string $path
+     */
+    public function removeStylesheet($path)
+    {
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function hasStylesheet($path)
+    {
+    }
+
+    /**
      * Make layout virtual.
      */
     public function makeVirtualLayout()
