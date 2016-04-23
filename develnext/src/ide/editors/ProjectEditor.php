@@ -145,8 +145,12 @@ class ProjectEditor extends AbstractEditor
             $ui = $pane->getUi();
             $pane->refresh();
 
-            UXAnchorPane::setAnchor($ui, 0);
-            $this->contentPane->children->setAll([$ui]);
+            if ($this->contentPane->children[0] != $ui) {
+                UXAnchorPane::setAnchor($ui, 0);
+                $this->contentPane->children->setAll([$ui]);
+
+                Logger::debug("Reload UI");
+            }
 
             if ($setMenu) {
                 $this->menu->selectedIndex = $this->menu->items->indexOf($pane);

@@ -45,6 +45,7 @@ use php\lib\Str;
 use php\net\URLConnection;
 use php\time\Time;
 use php\util\Scanner;
+use script\TimerScript;
 
 /**
  * Class CodeEditor
@@ -55,6 +56,11 @@ class CodeEditor extends AbstractEditor
     use EventHandlerBehaviour;
 
     protected $mode;
+
+    /**
+     * @var UXNode
+     */
+    protected $ui;
 
     /**
      * @var bool
@@ -244,7 +250,7 @@ class CodeEditor extends AbstractEditor
      */
     public function makeUi()
     {
-        $ui = new UXAnchorPane();
+        $this->ui = $ui = new UXAnchorPane();
 
         $commandPane = UiUtils::makeCommandPane($this->commands);
         $commandPane->padding = 3;
@@ -261,7 +267,29 @@ class CodeEditor extends AbstractEditor
         $commandPane->bottomAnchor = null;
         $this->textArea->topAnchor = 30;
 
+        $resize = function () {
+            $this->refreshUi();
+        };
+
+        $ui->observer('height')->addListener($resize);
+        $ui->observer('width')->addListener($resize);
+
         return $ui;
+    }
+
+    public function refreshUi()
+    {
+        $ui = $this->ui;
+
+        $ui->requestLayout();
+
+        TimerScript::executeAfter(500, function () use ($ui) {
+            $ui->requestLayout();
+        });
+
+        TimerScript::executeAfter(1000, function () use ($ui) {
+            $ui->requestLayout();
+        });
     }
 
     public function makeLeftPaneUi()

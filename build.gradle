@@ -18,7 +18,7 @@ buildscript {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = 2.4;
+    gradleVersion = 2.12;
 }
 
 allprojects {
@@ -29,6 +29,9 @@ allprojects {
 
     project.group = 'org.develnext'
     project.version = projectVersion
+
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
 
     repositories {
         mavenLocal()
@@ -53,15 +56,12 @@ allprojects {
 configure([
         project(':jphp-gui-ext'),
         project(':jphp-game-ext'),
-        project(':jphp-gui-designer-ext'),
         project(':jphp-app-framework')
 ]) {
     apply plugin: 'maven'
     apply plugin: 'java'
     apply plugin: 'com.jfrog.bintray'
 
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
 
     [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
@@ -138,7 +138,7 @@ project(':jphp-app-framework') {
 
 project(':develnext') {
     dependencies {
-        compile project(':jphp-gui-designer-ext')
+        compile project(':develnext-designer')
         compile project(':jphp-gui-richtext-ext')
         compile project(':jphp-app-framework')
         compile project(':jphp-desktop-ext')

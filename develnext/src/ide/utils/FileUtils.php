@@ -212,7 +212,12 @@ class FileUtils
 
     public static function get($filename, $encoding = 'UTF-8')
     {
-        return Str::decode(Stream::getContents($filename), $encoding);
+        try {
+            return Str::decode(Stream::getContents($filename), $encoding);
+        } catch (IOException $e) {
+            Logger::warn("Unable te get file content, message = {$e->getMessage()}, {$filename}");
+            return false;
+        }
     }
 
     public static function equalNames($oneName, $twoName)

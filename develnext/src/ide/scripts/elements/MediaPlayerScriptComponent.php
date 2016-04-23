@@ -33,7 +33,6 @@ class MediaPlayerScriptComponent extends AbstractScriptComponent
         return $text;
     }
 
-
     public function getIdPattern()
     {
         return 'player%s';
@@ -44,7 +43,7 @@ class MediaPlayerScriptComponent extends AbstractScriptComponent
      */
     public function getName()
     {
-        return 'Аудио плеер';
+        return 'Медиа плеер';
     }
 
     public function getIcon()

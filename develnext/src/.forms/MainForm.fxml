@@ -20,7 +20,7 @@
                     <Menu id="menuAccount" text="Аккаунт" visible="false" />
                     <Menu id="menuRun" text="Запуск" />
                     <Menu id="menuHelp" text="Помощь" />
-                    <Menu id="menuCreate" disable="true" mnemonicParsing="false" style="-fx-text-fill: transparent; -fx-pref-width: 0; -fx-font-size: 0; -fx-text-overrun: '';" text="Создать" />
+                    <Menu id="menuCreate" disable="true" mnemonicParsing="false" style="-fx-text-fill: transparent; -fx-pref-width: 0; -fx-font-size: 0;" text="Создать" />
                   </menus>
                   <opaqueInsets>
                     <Insets />

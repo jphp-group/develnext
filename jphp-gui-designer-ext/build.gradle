@@ -1,8 +1,0 @@
-
-dependencies {
-    compile project(':jphp-gui-ext')
-
-    compile 'com.fifesoft:rsyntaxtextarea:2.5.8'
-    compile 'com.fifesoft:rstaui:2.5.7'
-    compile 'com.fifesoft:autocomplete:2.5.8'
-}

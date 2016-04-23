@@ -728,6 +728,6 @@ abstract class AbstractForm extends UXForm
             }
         }
 
-        throw new \EngineException("Unable to call " . get_class($this) . "::" . $name . "() method");
+        throw new \Exception("Unable to call " . get_class($this) . "::" . $name . "() method");
     }
 }

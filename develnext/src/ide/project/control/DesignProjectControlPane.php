@@ -1,9 +1,12 @@
 <?php
 namespace ide\project\control;
 use ide\editors\CodeEditor;
+use ide\editors\CodeEditorX;
 use ide\Ide;
 use ide\utils\FileUtils;
 use ide\utils\StrUtils;
+use php\gui\designer\UXCssCodeArea;
+use php\gui\designer\UXSyntaxTextArea;
 use php\gui\UXApplication;
 use php\gui\UXNode;
 use php\gui\layout\UXAnchorPane;
@@ -16,7 +19,7 @@ use php\util\Regex;
 class DesignProjectControlPane extends AbstractProjectControlPane
 {
     /**
-     * @var CodeEditor
+     * @var CodeEditor|CodeEditorX
      */
     protected $editor;
 
@@ -49,6 +52,9 @@ class DesignProjectControlPane extends AbstractProjectControlPane
     public function save()
     {
         if ($this->editor) {
+            /*$file = $this->editor->data('file');
+            FileUtils::put($file, $this->editor->text);                       */
+
             $this->editor->save();
             $this->reloadStylesheet();
         }
@@ -57,15 +63,21 @@ class DesignProjectControlPane extends AbstractProjectControlPane
     public function open()
     {
         $this->reloadStylesheet();
-    }
 
+        if ($this->editor) {
+            $this->editor->refreshUi();
+        }
+    }
 
     public function load()
     {
         $this->ideStylesheet = Ide::project()->getSrcFile('.theme/style-ide.css');
 
         if ($this->editor) {
+            /*$file = $this->editor->data('file');
+            $this->editor->text = FileUtils::get($file);  */
             $this->editor->load();
+
             $this->loaded = true;
         }
     }
@@ -108,11 +120,16 @@ class DesignProjectControlPane extends AbstractProjectControlPane
             FileUtils::put($file, "/* JavaFX CSS Style with -fx- prefix */\n");
         }
 
-        $editor = new CodeEditor($file, 'css');
+       /* $editor = new UXCssSyntaxTextArea();
+        $editor->data('file', $file);
+        $this->editor = $editor;
+
+        return $editor;    */
+
+        $editor = new CodeEditorX($file, 'css');
         $editor->registerDefaultCommands();
 
         $editor->load();
-
         $this->editor = $editor;
 
         $this->reloadStylesheet();

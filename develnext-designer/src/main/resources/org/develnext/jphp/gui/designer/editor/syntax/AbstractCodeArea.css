@@ -1,0 +1,26 @@
+@font-face {
+    font-family: Delicious;
+    src: url('/Consolas.ttf');
+}
+
+.syntax-text-area {
+    -fx-font: 14px 'Consolas';
+}
+
+.syntax-text-area .gutter .note {
+    -fx-pref-width: 16px;
+    -fx-cursor: HAND;
+}
+
+.syntax-text-area .gutter .error {
+    -fx-graphic: url("errorLink.png");
+}
+
+.syntax-text-area .lineno .text {
+    -fx-font-style: normal;
+    -fx-font: 14px 'Consolas';
+}
+
+.styled-text-area .caret {
+    -fx-stroke-width: 2px;
+}

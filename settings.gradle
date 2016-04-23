@@ -1,7 +1,8 @@
 
+include 'develnext-designer';
+
 include 'jphp-gui-ext',
         'jphp-desktop-ext',
-        'jphp-gui-designer-ext',
         'jphp-app-framework',
         'jphp-game-ext',
         'jphp-parser',
@@ -9,9 +10,9 @@ include 'jphp-gui-ext',
 
 include 'develnext-doc';
 include 'develnext-control';
+include 'develnext-lexer';
 
 include 'jphp-gui-richtext-ext';
-
 
 include 'develnext-bundles/dn-orientdb-bundle'
 include 'develnext-bundles/dn-jsoup-bundle'

@@ -128,7 +128,7 @@ abstract class AbstractService
 
                     $lock->synchronize(function () use ($methodName, $files, $data) {
                         echo "POST files /$methodName [" . Json::encode($files) . "]\n";
-                        echo "\t-> [" . $data . "]\n\n";
+                        //echo "\t-> [" . $data . "]\n\n";
                     });
                 }
 

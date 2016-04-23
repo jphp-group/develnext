@@ -1,0 +1,56 @@
+.syntax-text-area {
+    -fx-background-color: #202020;
+    -fx-highlight-fill: #404E51;
+}
+
+.syntax-text-area .text {
+    -fx-fill: #E0E2E4;
+}
+
+.syntax-text-area .gutter {
+    -fx-border-color: silver;
+    -fx-background-color: #6d6d6d;
+    -fx-border-width: 0 2px 0 0;
+    -fx-padding: 0 3 0 3;
+}
+
+.styled-text-area .caret {
+    -fx-stroke: white;
+}
+
+.styled-text-area .text.semicolon {
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .text.control {
+    -fx-fill: #6A8088;
+    -fx-background-color: #6b8189;
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .text.comment {
+    -fx-fill: #939393;
+}
+
+.styled-text-area .text.selector {
+    -fx-fill: #cda869;
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .text.keyword {
+    -fx-fill: #678CB1;
+}
+
+.styled-text-area .text.pseudo-class {
+    -fx-fill: #EC7600;
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .text.color {
+    -fx-fill: #FFCD22;
+    -fx-font-weight: bold;
+}
+
+.syntax-text-area .text.number {
+    -fx-fill: #FFCD22;
+}

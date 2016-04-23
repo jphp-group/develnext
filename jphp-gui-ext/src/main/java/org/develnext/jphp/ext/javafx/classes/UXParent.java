@@ -24,6 +24,7 @@ public class UXParent<T extends Parent> extends UXNode<Parent> {
         void layout();
         void requestLayout();
 
+        @Property(hiddenInDebugInfo = true) ObservableList stylesheets();
         @Property(hiddenInDebugInfo = true) ObservableList childrenUnmodifiable();
     }
 

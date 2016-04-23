@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="450.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox id="dialogContainer" layoutX="5.0" layoutY="5.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <children>
+            <HBox id="dialogHeader" spacing="10.0">
+               <children>
+                  <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Поиск">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label text="Поиск по тексту" textFill="#757575" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="Искать:" />
+                  <TextField id="inputField" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <FlowPane alignment="TOP_RIGHT" hgap="10.0" vgap="10.0">
+               <children>
+                  <CheckBox id="caseCheckbox" mnemonicParsing="false" text="Учитывать регистр" />
+                  <CheckBox id="wholeTextCheckbox" mnemonicParsing="false" text="Все слово целиком" />
+               </children>
+            </FlowPane>
+            <Separator prefWidth="200.0" />
+            <HBox id="dialogFooter" alignment="CENTER_LEFT" prefHeight="30.0" spacing="10.0">
+               <children>
+                  <Button id="searchButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-ok" text="Найти">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+                  <Button id="cancelButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Отмена">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+                  <Label text="Поиск по тексту исходников" textFill="#949494" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

@@ -14,6 +14,12 @@ abstract class UXParent extends UXNode
     public $childrenUnmodifiable;
 
     /**
+     * @readonly
+     * @var UXList of string (paths for css style sheets)
+     */
+    public $stylesheets;
+
+    /**
      * Executes a top-down layout pass on the scene graph under this parent.
      */
     public function layout() {}
