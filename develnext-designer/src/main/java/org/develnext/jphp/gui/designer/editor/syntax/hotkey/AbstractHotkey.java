@@ -13,6 +13,10 @@ abstract public class AbstractHotkey {
     abstract public void apply(AbstractCodeArea area, KeyEvent keyEvent);
     abstract public KeyCode getDefaultKeyCode();
 
+    public boolean isAffectsUndoManager() {
+        return true;
+    }
+
     public KeyCombination.Modifier[] getDefaultKeyCombination() {
         return new KeyCombination.Modifier[0];
     }

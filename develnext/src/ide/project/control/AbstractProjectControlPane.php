@@ -37,6 +37,11 @@ abstract class AbstractProjectControlPane implements MenuViewable
         // nop.
     }
 
+    public function close()
+    {
+        // nop.
+    }
+
     public function getIcon()
     {
         return null;

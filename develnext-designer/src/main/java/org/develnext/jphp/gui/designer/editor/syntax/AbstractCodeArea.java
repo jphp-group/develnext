@@ -7,7 +7,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.gui.designer.editor.syntax.hotkey.AbstractHotkey;
+import org.develnext.jphp.gui.designer.editor.syntax.hotkey.AddTabsHotkey;
 import org.develnext.jphp.gui.designer.editor.syntax.hotkey.DuplicateSelectionHotkey;
+import org.develnext.jphp.gui.designer.editor.syntax.hotkey.RemoveTabsHotkey;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
@@ -28,8 +30,8 @@ abstract public class AbstractCodeArea extends CodeArea {
     private boolean showGutter;
     private String stylesheet;
 
-    private final Set<AbstractHotkey> hotkeys = new TreeSet<>();
-    private final Map<AbstractHotkey, EventHandler<KeyEvent>> hotkeyHandlers = new HashMap<>();
+    private final Set<AbstractHotkey> hotkeys = new HashSet<>();
+    private final Map<AbstractHotkey, EventHandler<KeyEvent>> hotkeyHandlers = new LinkedHashMap<>();
 
     private CodeAreaGutter gutter = CodeAreaGutter.get(this);
 
@@ -57,13 +59,11 @@ abstract public class AbstractCodeArea extends CodeArea {
                 })
                 .subscribe(this::applyHighlighting);
 
-        EventHandler<? super KeyEvent> tabHandler = EventHandlerHelper
-                .on(keyPressed(KeyCode.TAB)).act(event -> {
-                    replaceSelection(StringUtils.repeat(' ', tabSize));
-                })
-                .create();
 
-        EventHandlerHelper.install(onKeyPressedProperty(), tabHandler);
+        registerHotkey(new AddTabsHotkey());
+        registerHotkey(new RemoveTabsHotkey()
+        );
+        registerHotkey(new DuplicateSelectionHotkey());
 
         setStylesheet(null);
     }
@@ -81,6 +81,10 @@ abstract public class AbstractCodeArea extends CodeArea {
 
         EventHandler<KeyEvent> handler = EventHandlerHelper.on(keyPressed(keyCode, keyModifiers)).act(keyEvent -> {
             hotkey.apply(this, keyEvent);
+
+            if (hotkey.isAffectsUndoManager()) {
+                this.getUndoManager().mark();
+            }
         }).create();
 
         EventHandlerHelper.install(onKeyPressedProperty(), handler);

@@ -23,6 +23,7 @@ use php\io\IOException;
 use php\io\MemoryStream;
 use php\io\Stream;
 use php\lib\fs;
+use php\lib\reflect;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 use php\xml\XmlProcessor;
@@ -246,23 +247,30 @@ class GuiFormDumper extends AbstractFormDumper
                 return null;
             }
 
+            Logger::debug("Write " . reflect::typeOf($tag) . ", id = $node->id, node is " . reflect::typeOf($node));
             $element = $document->createElement($tag->getTagName());
 
             $oTag = $tag;
 
             if (!$tag->isFinal()) {
                 while ($class != null) {
+                    /** @var ReflectionClass $class */
                     $class = $class->getParentClass();
 
                     if ($class != null) {
                         $tag = $this->formElementTags[$class->getName()];
 
                         if ($tag != null) {
+                            Logger::debug("Write " . reflect::typeOf($tag) . ", id = $node->id");
                             $tag->writeAttributes($node, $element);
                             $tag->writeContent($node, $element, $document, $this);
 
                             if ($tag->isFinal()) {
                                 break;
+                            }
+                        } else {
+                            if (!$class->isAbstract()) {
+                                Logger::warn("Skip {$class->getName()}, element is not found.");
                             }
                         }
                     }

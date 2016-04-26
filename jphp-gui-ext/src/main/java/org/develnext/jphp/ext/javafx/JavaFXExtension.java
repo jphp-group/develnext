@@ -137,6 +137,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, TextInputControl.class, UXTextInputControl.class);
         registerWrapperClass(scope, TextArea.class, UXTextArea.class);
         registerWrapperClass(scope, TextField.class, UXTextField.class);
+        registerWrapperClass(scope, MaskTextField.class, UXMaskTextField.class);
         registerWrapperClass(scope, PasswordField.class, UXPasswordField.class);
         registerWrapperClass(scope, Spinner.class, UXSpinner.class);
         registerWrapperClass(scope, Label.class, UXLabel.class);
@@ -246,6 +247,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, GaussianBlur.class, UXGaussianBlurEffect.class);
         registerWrapperClass(scope, ColorAdjust.class, UXColorAdjustEffect.class);
         registerWrapperClass(scope, Glow.class, UXGlowEffect.class);
+        registerWrapperClass(scope, SepiaTone.class, UXSepiaToneEffect.class);
     }
 
     protected void registerAnimationPackage(CompileScope scope) {

@@ -91,7 +91,7 @@ class DesignProjectControlPane extends AbstractProjectControlPane
             return;
         }
 
-        if ($form = Ide::get()->getMainForm()) {
+        if (Ide::project() && ($form = Ide::get()->getMainForm())) {
             $source = FileUtils::get(Ide::project()->getSrcFile('.theme/style.css'));
 
             $regex = Regex::of('((\.|\#)[\w\d\-\_\:\# ]{1,}\{)')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
@@ -106,6 +106,17 @@ class DesignProjectControlPane extends AbstractProjectControlPane
 
             $form->removeStylesheet($path);
             $form->addStylesheet($path);
+        }
+    }
+
+    public function close()
+    {
+        parent::close();
+
+        // Clear all styles for MainForm.
+        if ($form = Ide::get()->getMainForm()) {
+            $path = "file:///" . str::replace($this->ideStylesheet, "\\", "/");
+            $form->removeStylesheet($path);
         }
     }
 

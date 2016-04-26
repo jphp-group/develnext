@@ -14,7 +14,7 @@ import php.runtime.reflection.ClassEntity;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXTextInputControl")
-public class UXTextInputControl extends UXControl {
+public class UXTextInputControl<T extends TextInputControl> extends UXControl {
     interface WrappedInterface {
         @Property int anchor();
         @Property int caretPosition();
@@ -62,7 +62,7 @@ public class UXTextInputControl extends UXControl {
         void selectRange(int anchor, int caretPosition);
     }
 
-    public UXTextInputControl(Environment env, TextInputControl wrappedObject) {
+    public UXTextInputControl(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -71,7 +71,7 @@ public class UXTextInputControl extends UXControl {
     }
 
     @Override
-    public TextInputControl getWrappedObject() {
-        return (TextInputControl) super.getWrappedObject();
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 }

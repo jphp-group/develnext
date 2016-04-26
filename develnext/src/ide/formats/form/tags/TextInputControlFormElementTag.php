@@ -7,7 +7,6 @@ use php\xml\DomElement;
 
 class TextInputControlFormElementTag extends AbstractFormElementTag
 {
-    
     public function getTagName()
     {
         return 'TextInputControl';

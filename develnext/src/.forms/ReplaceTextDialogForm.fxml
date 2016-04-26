@@ -46,7 +46,7 @@
             <FlowPane alignment="TOP_RIGHT" hgap="10.0" vgap="10.0">
                <children>
                   <CheckBox id="caseCheckbox" mnemonicParsing="false" text="Учитывать регистр" />
-                  <CheckBox id="wholeTextCheckbox" mnemonicParsing="false" text="Все слово целиком" />
+                  <CheckBox id="wholeTextCheckbox" mnemonicParsing="false" selected="true" text="Все слово целиком" />
                </children>
             </FlowPane>
             <Separator prefWidth="200.0" />

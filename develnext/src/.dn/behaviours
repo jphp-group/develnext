@@ -6,6 +6,7 @@ ide\behaviour\spec\LightingEffectBehaviourSpec
 ide\behaviour\spec\GaussianBlurEffectBehaviourSpec
 ide\behaviour\spec\GlowEffectBehaviourSpec
 ide\behaviour\spec\ColorAdjustEffectBehaviourSpec
+ide\behaviour\spec\SepiaToneEffectBehaviourSpec
 
 ide\behaviour\spec\DraggingFormBehaviourSpec
 ide\behaviour\spec\DraggingBehaviourSpec

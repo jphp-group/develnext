@@ -392,6 +392,7 @@ class CodeEditorX extends AbstractEditor
             case 'START':
                 $this->findDialogLastIndex = 0;
                 // continue.
+
             case 'SKIP':
                 $result = $this->_findSearchText($this->replaceDialog, $text, $options, true);
                 break;

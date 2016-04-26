@@ -119,6 +119,11 @@ class GameSpriteEditor extends AbstractEditor
     protected $tabPane;
 
     /**
+     * @var array
+     */
+    protected $previousImageSize;
+
+    /**
      * @return SpriteSpec
      */
     public function getSpec()
@@ -690,7 +695,8 @@ class GameSpriteEditor extends AbstractEditor
 
                 $multiple = false;
 
-                if ($image->width >= $this->spec->frameWidth * 2 || $image->height >= $this->spec->frameHeight * 2) {
+                if (($this->previousImageSize[0] != $image->width && $this->previousImageSize[1] != $image->height)
+                    && $image->width >= $this->spec->frameWidth * 2 || $image->height >= $this->spec->frameHeight * 2) {
                     $dialog = new MessageBoxForm(
                         "Изображение похоже на спрайт с несколькими кадрами, хотите чтобы изображение было разрезано на кадры ({$this->spec->frameWidth}x{$this->spec->frameHeight})?",
                         ['Да, разрезать на кадры', 'Нет, загрузить оригинал']
@@ -712,6 +718,7 @@ class GameSpriteEditor extends AbstractEditor
 
                     $this->updateUi();
                     $this->save();
+                    $this->previousImageSize = [$image->width, $image->height];
                 } else {
                     // Проверяем, есть ли на изображении пиксели с альфа прозрачностью.
 
@@ -771,6 +778,8 @@ class GameSpriteEditor extends AbstractEditor
                             }
                         });
                     }
+
+                    $this->previousImageSize = null;
                 }
             }
         }

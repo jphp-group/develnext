@@ -439,12 +439,12 @@ ESC
 
 XML_COMMENT
   :
-    '<!--' .*? '-->'
+    '<!--' .*? '-->' -> skip
   ;
 
 COMMENT
   :
-    '/*' .*? '*/'
+    '/*' .*? '*/' -> skip
   ;
 
 fragment

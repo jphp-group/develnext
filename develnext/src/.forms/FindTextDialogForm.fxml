@@ -7,7 +7,6 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="450.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox id="dialogContainer" layoutX="5.0" layoutY="5.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -40,7 +39,7 @@
             <FlowPane alignment="TOP_RIGHT" hgap="10.0" vgap="10.0">
                <children>
                   <CheckBox id="caseCheckbox" mnemonicParsing="false" text="Учитывать регистр" />
-                  <CheckBox id="wholeTextCheckbox" mnemonicParsing="false" text="Все слово целиком" />
+                  <CheckBox id="wholeTextCheckbox" mnemonicParsing="false" selected="true" text="Все слово целиком" />
                </children>
             </FlowPane>
             <Separator prefWidth="200.0" />

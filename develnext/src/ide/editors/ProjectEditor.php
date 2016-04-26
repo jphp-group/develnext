@@ -124,6 +124,15 @@ class ProjectEditor extends AbstractEditor
         }
     }
 
+    public function close($save = true)
+    {
+        parent::close($save);
+
+        foreach ($this->controlPanes as $pane) {
+            $pane->close();
+        }
+    }
+
     public function hide()
     {
         foreach ($this->controlPanes as $pane) {

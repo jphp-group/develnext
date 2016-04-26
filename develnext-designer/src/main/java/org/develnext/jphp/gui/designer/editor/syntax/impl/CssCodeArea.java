@@ -95,7 +95,7 @@ public class CssCodeArea extends AbstractCodeArea {
     protected void computeHighlighting(StyleSpansBuilder<Collection<String>> spansBuilder, String text) {
         ANTLRInputStream inputStream = new ANTLRInputStream(text);
         CSSLexer lex = new CSSLexer(inputStream);
-        lex.addErrorListener(errorListener);
+        //lex.addErrorListener(errorListener);
 
         int lastEnd = 0;
         for (Token token : lex.getAllTokens()) {

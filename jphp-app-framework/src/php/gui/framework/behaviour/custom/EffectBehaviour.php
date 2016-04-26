@@ -10,7 +10,7 @@ abstract class EffectBehaviour extends AbstractBehaviour
     /**
      * @var UXEffect
      */
-    private $_effect;
+    protected $_effect;
 
     /**
      * @var string

@@ -18,13 +18,13 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "UXTextField")
-public class UXTextField extends UXTextInputControl {
+public class UXTextField<T extends TextField> extends UXTextInputControl<T> {
     interface WrappedInterface {
         @Property Pos alignment();
         @Property int prefColumnCount();
     }
 
-    public UXTextField(Environment env, TextField wrappedObject) {
+    public UXTextField(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -33,8 +33,8 @@ public class UXTextField extends UXTextInputControl {
     }
 
     @Override
-    public TextField getWrappedObject() {
-        return (TextField) super.getWrappedObject();
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 
     @Signature
@@ -45,7 +45,10 @@ public class UXTextField extends UXTextInputControl {
     @Signature
     public void __construct(String text) {
         __wrappedObject = new TextField(text);
+        fixContextMenu();
+    }
 
+    protected void fixContextMenu() {
         getWrappedObject().setContextMenu(new ContextMenu());
 
         getWrappedObject().setSkin(new TextFieldSkin(getWrappedObject(), new TextFieldBehavior(getWrappedObject()) {

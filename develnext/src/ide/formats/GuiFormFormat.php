@@ -31,6 +31,7 @@ use ide\formats\form\elements\HyperlinkFormElement;
 use ide\formats\form\elements\ImageViewFormElement;
 use ide\formats\form\elements\LabelFormElement;
 use ide\formats\form\elements\ListViewFormElement;
+use ide\formats\form\elements\MaskTextFieldFormElement;
 use ide\formats\form\elements\PaginationFormElement;
 use ide\formats\form\elements\PanelFormElement;
 use ide\formats\form\elements\PasswordFieldFormElement;
@@ -67,6 +68,7 @@ use ide\formats\form\tags\ImageViewFormElementTag;
 use ide\formats\form\tags\LabeledFormElementTag;
 use ide\formats\form\tags\LabelFormElementTag;
 use ide\formats\form\tags\ListViewFormElementTag;
+use ide\formats\form\tags\MaskTextFieldFormElementTag;
 use ide\formats\form\tags\NodeFormElementTag;
 use ide\formats\form\tags\PaginationFormElementTag;
 use ide\formats\form\tags\PanelFormElementTag;
@@ -122,12 +124,14 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new HyperlinkFormElement());
         $this->register(new TextFieldFormElement());
         $this->register(new PasswordFieldFormElement());
+        $this->register(new MaskTextFieldFormElement());
         $this->register(new DatePickerFormElement());
         $this->register(new TextAreaFormElement());
         $this->register(new CheckboxFormElement());
         $this->register(new ComboBoxFormElement());
         $this->register(new ListViewFormElement());
         $this->register(new ImageViewFormElement());
+
         $this->register(new ProgressBarFormElement());
         $this->register(new SliderFormElement());
         $this->register(new ColorPickerFormElement());
@@ -161,6 +165,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new LabelFormElementTag());
         $this->register(new TextInputControlFormElementTag());
         $this->register(new TextFieldFormElementTag());
+        $this->register(new MaskTextFieldFormElementTag());
         $this->register(new PasswordFieldFormElementTag());
         $this->register(new TextAreaFormElementTag());
         $this->register(new CheckboxFormElementTag());
