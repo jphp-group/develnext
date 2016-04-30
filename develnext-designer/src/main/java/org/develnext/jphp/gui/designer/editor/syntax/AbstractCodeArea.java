@@ -61,8 +61,7 @@ abstract public class AbstractCodeArea extends CodeArea {
 
 
         registerHotkey(new AddTabsHotkey());
-        registerHotkey(new RemoveTabsHotkey()
-        );
+        registerHotkey(new RemoveTabsHotkey());
         registerHotkey(new DuplicateSelectionHotkey());
 
         setStylesheet(null);
