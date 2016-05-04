@@ -177,7 +177,9 @@ class SourceEventManager
             $regexEventSimple = Regex::of('\\*[ ]{0,}\\@event[ ]+([\w\d\\_\\-]+).*')->with(Regex::CASE_INSENSITIVE);
             $regexMethodName = Regex::of('function[ ]{1,}do'.str::upperFirst($id).'([\w\d\\_]+)')->with(Regex::CASE_INSENSITIVE);
 
-            $parser->processLines($bind['eventLine'], $bind['beginLine'], function ($line) use ($regexEvent, $regexEventSimple, $regexMethodName, $id, $oldEvent, $newEvent) {
+            $newMethodName = $bind['methodName'];
+
+            $parser->processLines($bind['eventLine'], $bind['beginLine'], function ($line) use (&$newMethodName, $regexEvent, $regexEventSimple, $regexMethodName, $id, $oldEvent, $newEvent) {
                 $regex = $regexEvent->with($line);
 
                 if ($regex->find()) {
@@ -208,7 +210,10 @@ class SourceEventManager
                     $event = $regex->group(1);
 
                     if (str::equalsIgnoreCase($event, str::replace($oldEvent, '-', ''))) {
-                        return $regex->replaceGroup(1, str::upperFirst(str::replace($newEvent, '-', '')));
+                        $replacement = str::upperFirst(str::replace($newEvent, '-', ''));
+                        $newMethodName = 'do' . str::upperFirst($id) . $replacement;
+
+                        return $regex->replaceGroup(1, $replacement);
                     }
                 }
 
@@ -217,7 +222,12 @@ class SourceEventManager
 
             $this->save($parser->getContent());
             $this->load();
+
+            $bind['newMethodName'] = $newMethodName;
+            return $bind;
         }
+
+        return null;
     }
     /**
      * @param string $oldId

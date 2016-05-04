@@ -247,7 +247,7 @@ class GuiFormDumper extends AbstractFormDumper
                 return null;
             }
 
-            Logger::debug("Write " . reflect::typeOf($tag) . ", id = $node->id, node is " . reflect::typeOf($node));
+            //Logger::debug("Write " . reflect::typeOf($tag) . ", id = $node->id, node is " . reflect::typeOf($node));
             $element = $document->createElement($tag->getTagName());
 
             $oTag = $tag;
@@ -261,7 +261,7 @@ class GuiFormDumper extends AbstractFormDumper
                         $tag = $this->formElementTags[$class->getName()];
 
                         if ($tag != null) {
-                            Logger::debug("Write " . reflect::typeOf($tag) . ", id = $node->id");
+                            //Logger::debug("Write " . reflect::typeOf($tag) . ", id = $node->id");
                             $tag->writeAttributes($node, $element);
                             $tag->writeContent($node, $element, $document, $this);
 
@@ -270,7 +270,7 @@ class GuiFormDumper extends AbstractFormDumper
                             }
                         } else {
                             if (!$class->isAbstract()) {
-                                Logger::warn("Skip {$class->getName()}, element is not found.");
+                                //Logger::warn("Skip {$class->getName()}, element is not found.");
                             }
                         }
                     }

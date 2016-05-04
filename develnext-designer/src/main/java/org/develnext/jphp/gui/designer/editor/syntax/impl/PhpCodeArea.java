@@ -1,15 +1,17 @@
 package org.develnext.jphp.gui.designer.editor.syntax.impl;
 
-import java.util.Collection;
-import java.util.Collections;
 import org.antlr.v4.runtime.*;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.CodeAreaGutterNote;
-import org.develnext.lexer.css.CSSLexer;
-import org.develnext.lexer.css.CSSParser;
-import org.fxmisc.richtext.*;
+import org.develnext.lexer.php.PHPLexer;
+import org.develnext.lexer.php.PHPParser;
+import org.fxmisc.richtext.StyleSpansBuilder;
 
-public class CssCodeArea extends AbstractCodeArea {
+import java.util.Collection;
+import java.util.Collections;
+
+
+public class PhpCodeArea extends AbstractCodeArea {
     private final BaseErrorListener errorListener = new BaseErrorListener() {
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
@@ -17,32 +19,28 @@ public class CssCodeArea extends AbstractCodeArea {
         }
     };
 
-    public CssCodeArea() {
+    public PhpCodeArea() {
         super();
-        setStylesheet(AbstractCodeArea.class.getResource("CssCodeArea.css").toExternalForm());
+        setStylesheet(AbstractCodeArea.class.getResource("PhpCodeArea.css").toExternalForm());
     }
 
     private static Collection<String> getStyleOfToken(Token token) {
         switch (token.getType()) {
-            case CSSParser.COMMENT:
+            case PHPParser.Comment:
                 return Collections.singletonList("comment");
-            case CSSParser.HEX_COLOR:
+            case PHPParser.HtmlHex:
                 return Collections.singletonList("color");
-            case CSSParser.STRING:
+            case PHPParser.StringType:
                 return Collections.singletonList("string");
-            case CSSParser.NUMBER:
+            case PHPParser.Numeric:
                 return Collections.singletonList("number");
-            case CSSParser.HASH:
-            case CSSParser.CLASS:
-                return Collections.singletonList("selector");
-            case CSSParser.IDENT:
+            case PHPParser.IsIdentical:
                 return Collections.singletonList("keyword");
             default:
                 switch (token.getText()) {
                     case "{":
                     case "}":
                     case ";":
-                    case ":":
                         return Collections.singletonList("control");
                 }
 
@@ -53,7 +51,7 @@ public class CssCodeArea extends AbstractCodeArea {
     @Override
     protected void computeHighlighting(StyleSpansBuilder<Collection<String>> spansBuilder, String text) {
         ANTLRInputStream inputStream = new ANTLRInputStream(text);
-        CSSLexer lex = new CSSLexer(inputStream);
+        PHPLexer lex = new PHPLexer(inputStream);
         //lex.addErrorListener(errorListener);
 
         int lastEnd = 0;
@@ -75,8 +73,8 @@ public class CssCodeArea extends AbstractCodeArea {
         }
 
         lex.reset();
-        CSSParser cssParser = new CSSParser(new CommonTokenStream(lex));
+        PHPParser cssParser = new PHPParser(new CommonTokenStream(lex));
         cssParser.addErrorListener(errorListener);
-        cssParser.styleSheet();
+        cssParser.htmlDocument();
     }
 }

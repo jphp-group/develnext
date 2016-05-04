@@ -15,7 +15,15 @@
             </variants>
         </property>
 
+        <property name="Твердость" code="solidType" editor="enum" tooltip="Тип твердости объекта">
+            <variants>
+                <variant value="NONE">Нет</variant>
+                <variant value="PLATFORM">Платформа</variant>
+                <variant value="MATERIAL">Материал</variant>
+                <variant value="THING">Предмет</variant>
+            </variants>
+        </property>
+
         <property code="startVelocity" name="Скорость (X, Y)" editor="doubleArray" tooltip="Начальная скорость по X и Y" />
-        <!-- <property code="solid" name="Твердый" editor="boolean" />  -->
     </properties>
 </behaviour>

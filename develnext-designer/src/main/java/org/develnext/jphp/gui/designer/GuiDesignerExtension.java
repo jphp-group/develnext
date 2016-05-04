@@ -4,6 +4,8 @@ import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.gui.designer.classes.*;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.impl.CssCodeArea;
+import org.develnext.jphp.gui.designer.editor.syntax.impl.FxCssCodeArea;
+import org.develnext.jphp.gui.designer.editor.syntax.impl.PhpCodeArea;
 import org.fife.ui.autocomplete.AutoCompletion;
 import php.runtime.env.CompileScope;
 
@@ -26,6 +28,8 @@ public class GuiDesignerExtension extends JavaFXExtension {
 
         registerWrapperClass(scope, AbstractCodeArea.class, UXAbstractCodeArea.class);
         registerWrapperClass(scope, CssCodeArea.class, UXCssCodeArea.class);
+        registerWrapperClass(scope, FxCssCodeArea.class, UXFxCssCodeArea.class);
+        registerWrapperClass(scope, PhpCodeArea.class, UXPhpCodeArea.class);
 
         registerClass(scope, FileSystemWatcher.WrapWatchKey.class);
         registerClass(scope, FileSystemWatcher.class);

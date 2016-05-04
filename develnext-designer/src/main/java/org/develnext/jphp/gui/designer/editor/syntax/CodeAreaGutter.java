@@ -25,13 +25,13 @@ public class CodeAreaGutter implements IntFunction<Node> {
     private static final Insets DEFAULT_INSETS = new Insets(0.0, 5.0, 0.0, 5.0);
     private static final Paint DEFAULT_TEXT_FILL = Color.web("#666");
     private static final Font DEFAULT_FONT = Font.font("monospace", FontPosture.ITALIC, 13);
-    private final StyledTextArea<?> area;
+    private final StyledTextArea<?, ?> area;
 
-    public static CodeAreaGutter get(StyledTextArea<?> area) {
+    public static CodeAreaGutter get(StyledTextArea<?, ?> area) {
         return get(area, digits -> "%0" + digits + "d");
     }
 
-    public static CodeAreaGutter get(StyledTextArea<?> area, IntFunction<String> format) {
+    public static CodeAreaGutter get(StyledTextArea<?, ?> area, IntFunction<String> format) {
         return new CodeAreaGutter(area, format);
     }
 
@@ -40,7 +40,7 @@ public class CodeAreaGutter implements IntFunction<Node> {
     private final Map<Integer, List<CodeAreaGutterNote>> notes = new HashMap<>();
     private int gutterNoteMax = 1;
 
-    private CodeAreaGutter(StyledTextArea<?> area, IntFunction<String> format) {
+    private CodeAreaGutter(StyledTextArea<?, ?> area, IntFunction<String> format) {
         this.area = area;
         nParagraphs = LiveList.sizeOf(area.getParagraphs());
         this.format = format;

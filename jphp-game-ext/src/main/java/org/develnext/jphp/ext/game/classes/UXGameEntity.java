@@ -19,7 +19,9 @@ public class UXGameEntity extends BaseWrapper<GameEntity2D> {
         @Property GameEntity2D.BodyType bodyType();
         @Property @Nullable Vec2d gravity();
 
+        @Property GameEntity2D.SolidType solidType();
         @Property boolean solid();
+        @Property boolean platform();
         @Property boolean active();
 
         @Property double gravityX();

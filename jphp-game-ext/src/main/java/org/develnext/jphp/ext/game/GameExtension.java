@@ -4,6 +4,7 @@ import org.develnext.jphp.ext.game.bind.Vec2dMemoryOperation;
 import org.develnext.jphp.ext.game.classes.*;
 import org.develnext.jphp.ext.game.classes.event.UXCollisionEvent;
 import org.develnext.jphp.ext.game.support.*;
+import org.develnext.jphp.ext.game.support.event.GamePaneEventProvider;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.env.CompileScope;
 
@@ -27,6 +28,7 @@ public class GameExtension extends JavaFXExtension {
 
         registerWrapperClass(scope, CollisionEvent.class, UXCollisionEvent.class);
 
+        registerEventProvider(new GamePaneEventProvider());
         //registerEventProvider(new GameObjectEventProvider());
     }
 }

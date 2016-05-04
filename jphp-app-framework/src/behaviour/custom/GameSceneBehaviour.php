@@ -46,6 +46,12 @@ class GameSceneBehaviour extends AbstractBehaviour
      */
     protected $layout;
 
+
+    public function getSort()
+    {
+        return 1000000; // max sort.
+    }
+
     /**
      * @param mixed $target
      */

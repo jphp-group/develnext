@@ -62,10 +62,6 @@ class DropShadowEffectBehaviour extends EffectBehaviour
     public function setRadius($radius)
     {
         $this->_radius = $radius;
-
-        if ($this->_effect) {
-            $this->_effect->radius = $radius;
-        }
     }
 
     /**

@@ -5,10 +5,13 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import org.dyn4j.dynamics.Capacity;
-import org.dyn4j.dynamics.CollisionAdapter;
-import org.dyn4j.dynamics.World;
+import org.dyn4j.dynamics.*;
+import org.dyn4j.dynamics.contact.Contact;
 import org.dyn4j.dynamics.contact.ContactConstraint;
+import org.dyn4j.geometry.AABB;
+import org.dyn4j.geometry.Rectangle;
+import org.dyn4j.geometry.Transform;
+import org.dyn4j.geometry.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +28,7 @@ public class GameScene2D {
     private AnimationTimer timer = new AnimationTimer() {
         @Override
         public void handle(long internalTime) {
-            processUpdate(internalTime);
+            processUpdate(System.nanoTime());
         }
     };
 
@@ -44,16 +47,30 @@ public class GameScene2D {
 
         world.addListener(new CollisionAdapter() {
             @Override
-            public boolean collision(ContactConstraint contactConstraint) {
-                GameEntity2D e1 = (GameEntity2D) contactConstraint.getBody1().getUserData();
-                GameEntity2D e2 = (GameEntity2D) contactConstraint.getBody2().getUserData();
+            public boolean collision(ContactConstraint contact) {
+                GameEntity2D e1 = (GameEntity2D) contact.getBody1().getUserData();
+                GameEntity2D e2 = (GameEntity2D) contact.getBody2().getUserData();
 
-                boolean consume1 = e1.triggerCollision(e2, contactConstraint, true);
-                boolean consume2 = e2.triggerCollision(e1, contactConstraint, false);
+                boolean consume1 = !contact.isSensor() && e1.triggerCollision(e2, contact, true);
+                boolean consume2 = !contact.isSensor() && e2.triggerCollision(e1, contact, false);
 
                 return consume1 || consume2;
             }
         });
+    }
+
+    public List<DetectResult> detectCollision(GameEntity2D entity2D, double x, double y) {
+        ArrayList<DetectResult> results = new ArrayList<>();
+
+        List<BodyFixture> fixtures = entity2D.body.getFixtures();
+        Transform transform = new Transform();
+        transform.setTranslation(x + entity2D.center.x, y + entity2D.center.y);
+
+        for (BodyFixture fixture : fixtures) {
+            world.detect(fixture.getShape(), transform, null, false, true, true, results);
+        }
+
+        return results;
     }
 
     public void play() {
@@ -128,7 +145,9 @@ public class GameScene2D {
             return;
         }
 
-        long delta = internalTime - previousTime;
+        //float delta = ((internalTime - previousTime) / 1000.0f / 1000.0f / 1000.0f);
+
+        previousTime = internalTime;
 
         world.update(TIME_STEP);
 
@@ -150,8 +169,11 @@ public class GameScene2D {
     public void addEntity(GameEntity2D entity) {
         if (entity.getScene() == null) {
             entity.scene = this;
+
             entities.add(entity);
             world.addBody(entity.body);
+
+            entity.onSceneAdd();
         }
     }
 
@@ -177,6 +199,7 @@ public class GameScene2D {
 
     public void setGravity(Vec2d gravity) {
         this.gravity = gravity;
+        this.world.setGravity(new Vector2(gravity.x, -gravity.y * 10));
     }
 
     public double getGravityX() {
@@ -185,6 +208,7 @@ public class GameScene2D {
 
     public void setGravityX(double x) {
         gravity.x = x;
+        world.setGravity(new Vector2(gravity.x, -gravity.y * 10));
     }
 
     public double getGravityY() {
@@ -193,5 +217,6 @@ public class GameScene2D {
 
     public void setGravityY(double y) {
         gravity.y = y;
+        world.setGravity(new Vector2(gravity.x, -gravity.y * 10));
     }
 }

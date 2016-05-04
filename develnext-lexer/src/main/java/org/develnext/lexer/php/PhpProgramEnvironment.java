@@ -10,7 +10,7 @@ import java.util.Stack;
 public class PhpProgramEnvironment extends AbstractProgramEnvironment<PhpProgramModule> {
     @Override
     public PhpProgramModule makeFromPath(String path) throws IOException {
-        PhpProgramModule module = new PhpProgramModule();
+        final PhpProgramModule module = new PhpProgramModule();
 
         PHPLexer phpLexer = new PHPLexer(new ANTLRFileStream(path, "UTF-8"));
         PHPParser phpParser = new PHPParser(new CommonTokenStream(phpLexer));

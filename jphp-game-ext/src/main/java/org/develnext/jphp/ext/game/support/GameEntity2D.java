@@ -3,39 +3,46 @@ package org.develnext.jphp.ext.game.support;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventDispatchChain;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import org.dyn4j.dynamics.Body;
+import org.dyn4j.dynamics.DetectResult;
 import org.dyn4j.dynamics.contact.ContactConstraint;
 import org.dyn4j.geometry.*;
-import php.runtime.common.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameEntity2D implements EventTarget {
-    public enum BodyType { STATIC, DYNAMIC, KINEMATIC }
+    public enum BodyType {STATIC, DYNAMIC, KINEMATIC}
+    public enum SolidType {NONE, PLATFORM, MATERIAL, THING};
 
     private static final float TIME = 1 / 60.0f;
 
     Body body;
 
     protected BodyType bodyType = BodyType.STATIC;
+    protected SolidType solidType = SolidType.NONE;
 
-    protected boolean solid = false;
-    protected double mass = 1;
     protected Vec2d velocity = new Vec2d(0, 0);
     protected Vec2d gravity = null;
 
     private final String entityType;
     private final Node node;
 
+    protected double width = -1;
+    protected double height = -1;
+    protected Vector2 center = new Vector2(0, 0);
+
+    protected boolean gravityFreeze = false;
+
     protected DoubleProperty x = new SimpleDoubleProperty(0);
     protected DoubleProperty y = new SimpleDoubleProperty(0);
+    protected DoubleProperty rotation = new SimpleDoubleProperty(0);
 
     private Double direction;
 
@@ -43,51 +50,121 @@ public class GameEntity2D implements EventTarget {
 
     protected Map<String, EventHandler<CollisionEvent>> collisionHandlers = new HashMap<>();
 
-    public GameEntity2D(String entityType, Node node) {
+    public GameEntity2D(String entityType, final Node node) {
         this.entityType = entityType;
         this.node = node;
 
         this.body = new Body();
         this.body.setUserData(this);
+
         this.body.setMass(MassType.NORMAL);
+
         this.body.addFixture(new Rectangle(getWidth(), getHeight()));
         this.body.setActive(!node.isDisabled());
 
-        xProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateBodyPos();
-            }
+        xProperty().addListener((observable, oldValue, newValue) -> {
+            updateBodyPos();
         });
 
-        yProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                updateBodyPos();
-            }
+        yProperty().addListener((observable, oldValue, newValue) -> {
+            updateBodyPos();
+        });
+
+        rotationProperty().addListener((observable, oldValue, newValue) -> {
+            node.setRotate(newValue.doubleValue());
         });
 
         setX(node.getLayoutX());
         setY(node.getLayoutY());
+        setRotation(node.getRotate());
+
+        ChangeListener<Number> verticalCoordListener = getVerticalCoordListener(node);
+        ChangeListener<Number> horizontalCoordListener = getHorizontalCoordListener(node);
+
+        node.layoutYProperty().addListener(verticalCoordListener);
+        node.layoutXProperty().addListener(horizontalCoordListener);
 
         node.layoutXProperty().bindBidirectional(x);
         node.layoutYProperty().bindBidirectional(y);
+        //node.rotateProperty().bindBidirectional(rotation);
 
-        ChangeListener<Number> activeTrigger = new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                body.setActive(true);
+        ChangeListener<Number> activeTrigger = (observable, oldValue, newValue) -> this.body.setActive(true);
+        node.layoutYProperty().addListener(activeTrigger);
+        node.layoutYProperty().addListener(activeTrigger);
+
+        node.disabledProperty().addListener((observable, oldValue, newValue) -> {
+            GameEntity2D.this.body.setActive(!newValue);
+        });
+    }
+
+    private ChangeListener<Number> getHorizontalCoordListener(Node node) {
+        return (observable, oldValue, newValue) -> {
+            if (isSolid() && !node.isDisabled() && solidType == SolidType.THING) {
+                List<DetectResult> results = scene.detectCollision(GameEntity2D.this, newValue.doubleValue(), node.getLayoutY());
+
+                for (DetectResult result : results) {
+                    GameEntity2D entity = (GameEntity2D) result.getBody().getUserData();
+
+                    if (entity != GameEntity2D.this && entity.isSolid()) {
+                        Vector2 normal = result.getPenetration().getNormal();
+                        double depth = result.getPenetration().getDepth();
+
+                        if (entity.isPlatform()) {
+                            continue;
+                        }
+
+                        double xValue = newValue.doubleValue() - normal.x * depth;
+                        double yValue = node.getLayoutY() - normal.y * depth;
+
+                        node.setLayoutX(xValue);
+                        setX(xValue);
+
+                        node.setLayoutY(yValue);
+                        setY(yValue);
+
+                        setVelocityX(0);
+                        return;
+                    }
+                }
             }
         };
-        node.layoutYProperty().addListener(activeTrigger);
-        node.layoutYProperty().addListener(activeTrigger);
+    }
 
-        node.disabledProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                body.setActive(!newValue);
+    private ChangeListener<Number> getVerticalCoordListener(Node node) {
+        return (observable, oldValue, newValue) -> {
+            if (isSolid() && !node.isDisabled() && solidType == SolidType.THING) {
+                List<DetectResult> results = scene.detectCollision(GameEntity2D.this, node.getLayoutX(), newValue.doubleValue());
+
+                for (DetectResult result : results) {
+                    GameEntity2D entity = (GameEntity2D) result.getBody().getUserData();
+
+                    if (entity != GameEntity2D.this && entity.isSolid()) {
+                        Vector2 normal = result.getPenetration().getNormal();
+                        double depth = result.getPenetration().getDepth();
+
+                        if (entity.isPlatform()) {
+                            if (newValue.doubleValue() <= oldValue.doubleValue() || depth >= 8 || normal.y < 0) {
+                                continue;
+                            }
+                        }
+
+                        double yValue = newValue.doubleValue() - normal.y * depth;
+                        double xValue = node.getLayoutX() - normal.x * depth;
+
+                        node.setLayoutY(yValue);
+                        setY(yValue);
+
+                        if (!entity.isPlatform()) {
+                            node.setLayoutX(xValue);
+                            setX(xValue);
+                        }
+
+                        setVelocityY(0);
+                        return;
+                    }
+                }
             }
-        });
+        };
     }
 
     public void setPolygonFixture(Vec2d[] points) {
@@ -118,21 +195,45 @@ public class GameEntity2D implements EventTarget {
 
     public void setCircleFixture(double radius) {
         this.body.removeAllFixtures();
-        this.body.addFixture(new Circle(radius));
+        this.width = this.height = radius * 2;
+        Circle circle = new Circle(radius);
+        this.center = new Vector2(radius, radius);
+
+        this.body.addFixture(circle);
     }
 
     public void setEllipseFixture(double width, double height) {
         this.body.removeAllFixtures();
-        this.body.addFixture(new Ellipse(width, height));
+        this.width = width;
+        this.height = height;
+        Ellipse ellipse = new Ellipse(width, height);
+
+        this.center = new Vector2(width / 2, height / 2);
+
+        this.body.addFixture(ellipse);
     }
 
     public void setRectangleFixture(double width, double height) {
         this.body.removeAllFixtures();
-        this.body.addFixture(new Rectangle(width, height));
+        this.width = width;
+        this.height = height;
+        Rectangle rectangle = new Rectangle(width, height);
+
+        this.center = new Vector2(width / 2, height / 2);
+
+        this.body.addFixture(rectangle);
+    }
+
+    void onSceneAdd() {
+        updateBodyPos();
     }
 
     protected void updateBodyPos() {
-        body.getTransform().setTranslation((getCenterX()), (getCenterY()));
+        if (scene == null) {
+            return;
+        }
+
+        body.getTransform().setTranslation(getCenterX(), getCenterY());
     }
 
     public DoubleProperty xProperty() {
@@ -160,11 +261,11 @@ public class GameEntity2D implements EventTarget {
     }
 
     public double getCenterX() {
-        return getX() + getWidth() / 2;
+        return getX() + center.x;
     }
 
     public double getCenterY() {
-        return getY() + getHeight() / 2;
+        return getY() + center.y;
     }
 
     public void setCenterX(double v) {
@@ -208,12 +309,16 @@ public class GameEntity2D implements EventTarget {
     }
 
     public double getWidth() {
+        if (width >= 0) return width;
+
         Bounds bounds = node.getBoundsInParent();
         double width = bounds.getWidth();
         return width <= 0 ? 1 : width;
     }
 
     public double getHeight() {
+        if (height >= 0) return height;
+
         Bounds bounds = node.getBoundsInParent();
         double height = bounds.getHeight();
         return height <= 0 ? 1 : height;
@@ -243,8 +348,8 @@ public class GameEntity2D implements EventTarget {
                         y.set(y.get() + GameScene2D.toPixels(velocity.y * dt));
                     }
 
-                   // node.setLayoutX(x.get());
-                   // node.setLayoutY(y.get());
+                    // node.setLayoutX(x.get());
+                    // node.setLayoutY(y.get());
                 }
 
                 break;
@@ -322,18 +427,19 @@ public class GameEntity2D implements EventTarget {
 
     public void setVelocityX(double value) {
         velocity.x = value;
+
         body.setActive(true);
     }
 
     public void setVelocityY(double value) {
         velocity.y = value;
+
         body.setActive(true);
     }
 
     public void setAngleSpeed(Vec2d speed) {
         double direction = -Math.toRadians(speed.x);
         velocity = new Vec2d(speed.y * Math.cos(direction), speed.y * Math.sin(direction));
-
         body.setActive(true);
     }
 
@@ -410,10 +516,38 @@ public class GameEntity2D implements EventTarget {
     }
 
     public boolean isSolid() {
-        return solid;
+        return solidType != SolidType.NONE;
     }
 
-    public void setSolid(boolean solid) {
-        this.solid = solid;
+    public boolean isPlatform() {
+        return solidType == SolidType.PLATFORM;
+    }
+
+    public double getRotation() {
+        return rotation.get();
+    }
+
+    public DoubleProperty rotationProperty() {
+        return rotation;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation.set(rotation);
+    }
+
+    public boolean isGravityFreeze() {
+        return gravityFreeze;
+    }
+
+    public void setGravityFreeze(boolean gravityFreeze) {
+        this.gravityFreeze = gravityFreeze;
+    }
+
+    public SolidType getSolidType() {
+        return solidType;
+    }
+
+    public void setSolidType(SolidType solidType) {
+        this.solidType = solidType;
     }
 }

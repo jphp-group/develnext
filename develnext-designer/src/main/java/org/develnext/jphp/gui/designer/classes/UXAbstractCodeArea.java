@@ -1,6 +1,7 @@
 package org.develnext.jphp.gui.designer.classes;
 
 import org.develnext.jphp.ext.javafx.classes.UXControl;
+import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import php.runtime.annotation.Reflection;
@@ -11,7 +12,7 @@ import php.runtime.reflection.ClassEntity;
 
 @Abstract
 @Namespace(GuiDesignerExtension.NS)
-public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXControl<AbstractCodeArea> {
+public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<AbstractCodeArea> {
     interface WrappedInterface {
         @Property int tabSize();
         @Property boolean showGutter();

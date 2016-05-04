@@ -71,6 +71,11 @@ class AutoCompletePane
 
     protected $lock = false;
 
+    /**
+     * @var bool
+     */
+    protected $inserted = false;
+
     public function __construct(UXSyntaxTextArea $area, AutoComplete $complete)
     {
         $this->area = $area;
@@ -134,6 +139,11 @@ class AutoCompletePane
                 case 'Left':
                 case 'Right':
                     return;
+            }
+
+            if ($this->inserted) {
+                $this->inserted = false;
+                return;
             }
 
             if ($this->lock) {
@@ -401,6 +411,10 @@ class AutoCompletePane
 
         if ($prefix) {
             $flow = $flow->find(function (AutoCompleteItem $one) use ($prefix) {
+                if ($prefix == $one->getName()) {
+                    return false;
+                }
+
                 return Str::startsWith($one->getName(), $prefix);
             });
         }

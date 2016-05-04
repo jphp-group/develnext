@@ -17,6 +17,8 @@ use ide\utils\Json;
 use ide\utils\UiUtils;
 use php\format\JsonProcessor;
 use php\gui\designer\UXCssCodeArea;
+use php\gui\designer\UXFxCssCodeArea;
+use php\gui\designer\UXPhpCodeArea;
 use php\gui\designer\UXSyntaxAutoCompletion;
 use php\gui\designer\UXSyntaxTextArea;
 use php\gui\event\UXKeyEvent;
@@ -125,7 +127,19 @@ class CodeEditorX extends AbstractEditor
             $this->replaceSearchText($text, $newText, $options, $command);
         });
 
-        $this->textArea = new UXCssCodeArea();
+        switch ($mode) {
+            case 'css':
+                $this->textArea = new UXCssCodeArea();
+                break;
+
+            case 'fxcss':
+                $this->textArea = new UXFxCssCodeArea();
+                break;
+
+            case 'php':
+                $this->textArea = new UXPhpCodeArea();
+                break;
+        }
         //$this->textArea->syntaxStyle = "text/$mode";
 
         $this->textArea->on('keyUp', function (UXKeyEvent $e) {
@@ -377,7 +391,7 @@ class CodeEditorX extends AbstractEditor
         return [$pos, $len];
     }
 
-    protected function findSearchText(AbstractIdeForm $dialog, $text, array $options)
+    protected function findSearchText($text, array $options)
     {
         return $this->_findSearchText($this->findDialog, $text, $options);
     }

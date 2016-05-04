@@ -30,3 +30,4 @@ ide\behaviour\spec\GridMovementBehaviourSpec
 ide\behaviour\spec\WrapScreenBehaviourSpec
 ide\behaviour\spec\LimitedMovementBehaviourSpec
 ide\behaviour\spec\CameraTargetBehaviourSpec
+ide\behaviour\spec\CameraSnapBehaviourSpec

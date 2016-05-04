@@ -160,6 +160,11 @@ abstract class AbstractBehaviour
         $this->enabled = true;
     }
 
+    public function getSort()
+    {
+        return 0;
+    }
+
     protected function timer($interval, callable $callback)
     {
         $this->__timers[] = $timerScript = new TimerScript($interval, true, function (ScriptEvent $e = null) use ($callback) {

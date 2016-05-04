@@ -1,11 +1,6 @@
 .syntax-text-area {
     -fx-background-color: #202020;
-    -fx-background-fill: #404E51;
-    -fx-cursor: text;
-}
-
-.syntax-text-area .paragraph-box:has-caret {
-    -fx-background-color: #343f41;
+    -fx-highlight-fill: #404E51;
 }
 
 .syntax-text-area .text {
@@ -13,9 +8,9 @@
 }
 
 .syntax-text-area .gutter {
-    -fx-border-color: #939393;
-    -fx-background-color: #545454;
-    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: silver;
+    -fx-background-color: #6d6d6d;
+    -fx-border-width: 0 2px 0 0;
     -fx-padding: 0 3 0 3;
 }
 
@@ -44,11 +39,6 @@
 
 .styled-text-area .text.keyword {
     -fx-fill: #678CB1;
-}
-
-.styled-text-area .text.pseudo-class {
-    -fx-fill: #EC7600;
-    -fx-font-weight: bold;
 }
 
 .styled-text-area .text.color {

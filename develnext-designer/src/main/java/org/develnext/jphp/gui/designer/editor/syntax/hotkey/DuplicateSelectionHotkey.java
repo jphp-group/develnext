@@ -15,16 +15,16 @@ public class DuplicateSelectionHotkey extends AbstractHotkey {
         if (area.getSelection().getLength() == 0) {
             int currentParagraph = area.getCurrentParagraph();
 
-            Paragraph<Collection<String>> paragraph = area.getParagraph(currentParagraph);
+            Paragraph<?, Collection<String>> paragraph = area.getParagraph(currentParagraph);
 
             int caretColumn = area.getCaretColumn();
 
             TwoDimensional.Position position = area.position(currentParagraph, 0);
             TwoDimensional.Position newPosition = area.position(currentParagraph + 1, caretColumn);
 
-            area.replaceText(position.toOffset(), position.toOffset(), paragraph.toString() + "\n");
+            area.replaceText(position.toOffset(), position.toOffset(), paragraph.getText() + "\n");
 
-            area.positionCaret(newPosition.toOffset());
+            area.moveTo(newPosition.toOffset());
         } else {
             area.replaceSelection(area.getSelectedText() + area.getSelectedText());
         }

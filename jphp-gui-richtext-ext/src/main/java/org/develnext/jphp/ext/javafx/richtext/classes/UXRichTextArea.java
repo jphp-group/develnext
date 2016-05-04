@@ -3,6 +3,7 @@ package org.develnext.jphp.ext.javafx.richtext.classes;
 import javafx.scene.control.IndexRange;
 import javafx.stage.PopupWindow;
 import org.develnext.jphp.ext.javafx.classes.UXControl;
+import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.ext.javafx.richtext.RichTextExtension;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.StyledTextArea;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Reflection.Namespace(RichTextExtension.NS)
-public class UXRichTextArea extends UXControl<InlineCssTextArea> {
+public class UXRichTextArea extends UXRegion<InlineCssTextArea> {
     interface WrappedInterface {
         @Property boolean useInitialStyleForInsertion();
         @Property String text();

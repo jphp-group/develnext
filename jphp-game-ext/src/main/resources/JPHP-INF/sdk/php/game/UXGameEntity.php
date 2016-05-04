@@ -108,6 +108,23 @@ class UXGameEntity
     public $vspeed = 0.0;
 
     /**
+     * @var string NONE, PLATFORM, PHYSIC
+     */
+    public $solidType = 'NONE';
+
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $solid = false;
+
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $platform = false;
+
+    /**
      * @param string $entityType
      * @param UXNode $node
      */

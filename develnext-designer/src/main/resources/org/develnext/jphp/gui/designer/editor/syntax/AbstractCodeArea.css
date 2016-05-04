@@ -4,7 +4,7 @@
 }
 
 .syntax-text-area {
-    -fx-font: 14px 'Consolas';
+    -fx-font: 16px 'Consolas';
 }
 
 .syntax-text-area .gutter .note {
@@ -23,4 +23,12 @@
 
 .styled-text-area .caret {
     -fx-stroke-width: 2px;
+}
+
+.code-area-popup {
+    -fx-font: 14px 'Consolas';
+
+    -fx-background-insets: 0;
+    -fx-focus-color: -fx-control-inner-background;
+    -fx-faint-focus-color: -fx-control-inner-background;
 }

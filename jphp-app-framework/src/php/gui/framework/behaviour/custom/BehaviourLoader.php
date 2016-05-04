@@ -5,6 +5,7 @@ use ParseException;
 use php\format\ProcessorException;
 use php\io\IOException;
 use php\io\Stream;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
 use php\xml\DomDocument;
@@ -56,6 +57,8 @@ class BehaviourLoader
     {
         $targets = $document->findAll('/behaviours/target');
 
+        $behaviours = [];
+
         /** @var DomElement $domTarget */
         foreach ($targets as $domTarget) {
             $targetId = $domTarget->getAttribute('id');
@@ -78,9 +81,28 @@ class BehaviourLoader
                     $behaviour = new $type();
                     $behaviour->setProperties($attributes);
 
-                    $manager->apply($targetId, $behaviour);
+                    $behaviours[] = [$targetId, $behaviour];
                 }
             }
+        }
+
+        $behaviours = arr::sort($behaviours, function ($a, $b) {
+            /** @var AbstractBehaviour $oneBehaviour */
+            /** @var AbstractBehaviour $twoBehaviour */
+            list(, $oneBehaviour) = $a;
+            list(, $twoBehaviour) = $b;
+
+            $sort1 = $oneBehaviour->getSort();
+            $sort2 = $twoBehaviour->getSort();
+
+            if ($sort1 > $sort2) return -1;
+            if ($sort2 > $sort1) return 1;
+
+            return 0;
+        });
+
+        foreach ($behaviours as list($targetId, $behaviour)) {
+            $manager->apply($targetId, $behaviour);
         }
     }
 

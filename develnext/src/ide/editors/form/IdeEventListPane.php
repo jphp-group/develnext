@@ -684,7 +684,11 @@ class IdeEventListPane
     public function doChangeEvent(UXEvent $event = null)
     {
         $menu = $this->makeContextMenuForEdit(function (array $type, $code) {
-            $this->manager->changeBind($this->targetId, $this->getSelectedCode(), $code);
+            $bind = $this->manager->changeBind($this->targetId, $this->getSelectedCode(), $code);
+
+            if ($this->actionEditor && $bind['methodName'] != $bind['newMethodName']) {
+                $this->actionEditor->renameMethod($bind['className'], $bind['methodName'], $bind['newMethodName']);
+            }
 
             uiLater(function () use ($code) {
                 if ($this->codeEditor) {

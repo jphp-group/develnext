@@ -24,6 +24,11 @@ class GameEntityBehaviour extends AbstractBehaviour
     /**
      * @var string
      */
+    public $solidType = 'NONE';
+
+    /**
+     * @var string
+     */
     public $fixtureType = 'INHERITED';
 
     /**
@@ -63,7 +68,6 @@ class GameEntityBehaviour extends AbstractBehaviour
     protected function applyImpl($target)
     {
         /** @var UXNode $target */
-
         TimerScript::executeWhile(function () use ($target) {
             return $this->findScene();
         }, function () use ($target) {
@@ -82,9 +86,10 @@ class GameEntityBehaviour extends AbstractBehaviour
             if ($sceneBehaviour) {
                 $this->entity = new UXGameEntity($type, $target);
                 $this->entity->bodyType = $this->bodyType;
+                $this->entity->solidType = $this->solidType;
                 $this->entity->velocity = $this->startVelocity;
 
-                if ($this->solid) {
+                if ($this->entity->solid) {
                     $target->data(Jumping::DATA_SOLID_PROPERTY, true);
                 }
 
@@ -154,6 +159,8 @@ class GameEntityBehaviour extends AbstractBehaviour
     {
         if ($this->entity) {
             $this->entity->{$name} = $value;
+        } else {
+            throw new IllegalStateException("Unable to set '$name'");
         }
     }
 

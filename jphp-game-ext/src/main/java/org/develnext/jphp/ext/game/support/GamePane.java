@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -25,6 +26,7 @@ public class GamePane extends Panel {
     protected GameScene2D scene = null;
     protected AnchorPane area;
 
+    protected EventHandler<ActionEvent> onScrollScene;
     protected ObjectProperty<AnchorPane> content = new SimpleObjectProperty<>(null);
 
     public GamePane() {
@@ -135,6 +137,10 @@ public class GamePane extends Panel {
         area.setClip(new Rectangle(x, y, getPrefWidth(), getPrefHeight()));
         area.setLayoutX(-x);
         area.setLayoutY(-y);
+
+        if (getOnScrollScene() != null) {
+            getOnScrollScene().handle(new ActionEvent(this, this));
+        }
     }
 
     public void setGameScene(GameScene2D scene) {
@@ -143,18 +149,17 @@ public class GamePane extends Panel {
         }
 
         this.scene = scene;
-
-        if (scene != null) {
-            this.scene.setScrollHandler(new GameScene2D.ScrollHandler() {
-                @Override
-                public void scrollTo(double x, double y) {
-                    //GamePane.this.scrollTo(x, y);
-                }
-            });
-        }
     }
 
     public GameScene2D getGameScene() {
         return scene;
+    }
+
+    public EventHandler<ActionEvent> getOnScrollScene() {
+        return onScrollScene;
+    }
+
+    public void setOnScrollScene(EventHandler<ActionEvent> onScrollScene) {
+        this.onScrollScene = onScrollScene;
     }
 }
