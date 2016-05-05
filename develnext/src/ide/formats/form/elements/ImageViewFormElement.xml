@@ -1,8 +1,8 @@
 <element extends="NodeFormElement">
     <properties>
-        <property code="image" name="Изображение" editor="image" virtual="1" />
-        <property code="hoverImage" name="Изображение наведения" editor="image" virtual="1" />
-        <property code="clickImage" name="Изображение нажатия" editor="image" virtual="1" />
+        <property code="image" name="Изображение" editor="image" virtual="1" nativeImage="1" dummyValue="1" />
+        <property code="hoverImage" name="Изображение наведения" editor="image" virtual="1" nativeImage="1" />
+        <property code="clickImage" name="Изображение нажатия" editor="image" virtual="1" nativeImage="1" />
 
         <property code="text" name="Текст" editor="text" />
         <property code="textColor" name="Цвет текста" editor="color" />

@@ -3,6 +3,7 @@ namespace php\gui\framework;
 
 use action\Animation;
 use Exception;
+use php\framework\Logger;
 use php\gui\AbstractFormWrapper;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyEvent;
@@ -300,6 +301,10 @@ abstract class AbstractForm extends UXForm
     public function free()
     {
         $this->hide();
+
+        foreach ($this->_modules as $module) {
+            $module->free();
+        }
     }
 
     public function isFree()
@@ -462,7 +467,7 @@ abstract class AbstractForm extends UXForm
     {
         // nop.
         try {
-            $instance = $this->create($node->get('type'), $node, $node->get('x'), $node->get('y'));
+            $instance = $this->instance($node->get('type'), $node->get('x'), $node->get('y'));
 
             if ($node->get('hidden')) {
                 $instance->visible = false;
@@ -494,14 +499,14 @@ abstract class AbstractForm extends UXForm
             if ($this->layout) {
                 DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node = null) {
                     if ($node) {
+                        // skip clones.
+                        if ($node->data('-factory-id')) return;
+
                         if ($node instanceof UXCustomNode) {
                             $newNode = $this->loadCustomNode($node);
 
                             if ($newNode) {
-                                if (!$newNode->parent) {
-                                    $node->parent->add($newNode);
-                                }
-
+                                $node->parent->children->replace($node, $newNode);
                                 $node = $newNode;
                             }
                         } else {

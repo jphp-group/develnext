@@ -1,6 +1,5 @@
 package org.develnext.jphp.ext.javafx.support;
 
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.Styleable;
@@ -268,8 +267,11 @@ public class ImageViewEx extends Canvas implements Styleable {
                 int horCount = (int) Math.ceil(getWidth() / w + mosaicGap);
                 int verCount = (int) Math.ceil(getHeight() / h + mosaicGap);
 
-                for (int i = 0; i < verCount; i++) {
-                    for (int j = 0; j < horCount; j++) {
+                int startX = 0;
+                int startY = 0;
+
+                for (int i = startY; i < verCount; i++) {
+                    for (int j = startX; j < horCount; j++) {
                         g2.drawImage(image, j * w + (j * mosaicGap), i * h + (i * mosaicGap), w, h);
                     }
                 }

@@ -605,7 +605,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                             $clone->y = $node->get('y');
 
                             $this->designer->unregisterNode($node);
-                            $clones[] = [$clone, $node->parent];
+                            $clones[] = [$node, $clone, $node->parent];
                         }
                     }
                 } elseif ($node instanceof UXNode) {
@@ -639,21 +639,18 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
                                 $this->designer->unregisterNode($node);
 
-                                $clones[] = [$clone, $node->parent];
+                                $clones[] = [$node, $clone, $node->parent];
                             } else {
                                 $this->getDesigner()->unselectNode($node);
                             }
                         }
                     }
                 }
-
-                $node->free();
             }
 
-            foreach ($clones as $it) {
-                $it[1]->add($it[0]);
-
-                $this->registerNode($it[0]);
+            foreach ($clones as list($node, $clone, $parent)) {
+                $parent->children->replace($node, $clone);
+                $this->registerNode($clone);
                 //$this->refreshNode($it[0]);
             }
         }
@@ -1654,9 +1651,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     protected function _onNodeClick(UXMouseEvent $e)
     {
         $node = $e->target;
-        if ($node && $node->data('-factory-id')) {
+
+        /*if ($node && $node->data('-factory-id')) {
             return false;
-        }
+        }*/
 
         $selected = $this->elementTypePane->getSelected();
 

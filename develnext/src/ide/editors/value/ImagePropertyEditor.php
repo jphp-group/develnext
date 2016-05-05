@@ -10,9 +10,29 @@ use php\gui\UXImage;
 use php\gui\UXImageArea;
 use php\gui\UXImageView;
 use php\lib\String;
+use php\xml\DomElement;
 
 class ImagePropertyEditor extends TextPropertyEditor
 {
+    /**
+     * @var bool
+     */
+    private $nativeImage;
+
+    /**
+     * @var bool
+     */
+    private $dummyValue;
+
+    public function __construct($nativeImage = false, $dummyValue = false, callable $getter = null, callable $setter = null)
+    {
+        parent::__construct($getter, $setter);
+
+        $this->nativeImage = $nativeImage;
+        $this->dummyValue = $dummyValue;
+    }
+
+
     public function makeUi()
     {
         $result = parent::makeUi();
@@ -40,26 +60,28 @@ class ImagePropertyEditor extends TextPropertyEditor
 
         $project = Ide::get()->getOpenedProject();
 
+        $target = $this->designProperties->target;
+
         if ($value) {
             $file = $project->getFile("src/$value");
 
             if ($file->exists()) {
-                if (!($this->designProperties->target instanceof UXImageArea)) {
+                if (!$this->nativeImage) {
                     $icon = new UXImageView();
                     $icon->image = new UXImage($file);
-                    $this->designProperties->target->{$this->code} = $icon;
+                    $target->{$this->code} = $icon;
                 } else {
                     $img = new UXImage($file);
-                    $this->designProperties->target->{$this->code} = $img;
+                    $target->{$this->code} = $img;
                 }
                 return;
             }
         }
 
-        if ($this->designProperties->target instanceof UXImageArea && $this->code == 'image') {
-            $this->designProperties->target->{$this->code} = Ide::get()->getImage('dummyImage.png')->image;
+        if ($this->dummyValue) {
+            $target->{$this->code} = Ide::get()->getImage('dummyImage.png')->image;
         } else {
-            $this->designProperties->target->{$this->code} = null;
+            $target->{$this->code} = null;
         }
     }
 
@@ -71,5 +93,16 @@ class ImagePropertyEditor extends TextPropertyEditor
     public function getCode()
     {
         return 'image';
+    }
+
+    /**
+     * @param DomElement $element
+     *
+     * @return ElementPropertyEditor
+     */
+    public function unserialize(DomElement $element)
+    {
+        $editor = new static($element->getAttribute('nativeImage'), $element->getAttribute('dummyValue'));
+        return $editor;
     }
 }

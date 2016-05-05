@@ -1,6 +1,7 @@
 <?php
 namespace timer;
 
+use php\framework\Logger;
 use php\gui\animation\UXAnimationTimer;
 use php\lib\str;
 use php\time\Time;
@@ -99,6 +100,10 @@ class AccurateTimer
 
         foreach ($deleted as $id) {
             unset(self::$timers[$id]);
+        }
+
+        if (sizeof($accurateTimers) - sizeof($deleted) > 1000 and rand(0, 100) == 1) {
+            Logger::warn("Accurate Timers greater then 1000");
         }
     }
 

@@ -23,6 +23,7 @@ use ide\formats\form\elements\DatePickerFormElement;
 use ide\formats\form\elements\EllipseFormElement;
 use ide\formats\form\elements\FlatButtonFormElement;
 use ide\formats\form\elements\FormFormElement;
+use ide\formats\form\elements\GameBackgroundFormElement;
 use ide\formats\form\elements\GameObjectFormElement;
 use ide\formats\form\elements\GamePaneFormElement;
 use ide\formats\form\elements\HBoxFormElement;
@@ -62,6 +63,7 @@ use ide\formats\form\tags\DataFormElementTag;
 use ide\formats\form\tags\DatePickerFormElementTag;
 use ide\formats\form\tags\EllipseFormElementTag;
 use ide\formats\form\tags\FlatButtonFormElementTag;
+use ide\formats\form\tags\GameBackgroundFormElementTag;
 use ide\formats\form\tags\GamePaneFormElementTag;
 use ide\formats\form\tags\HyperlinkFormElementTag;
 use ide\formats\form\tags\ImageViewFormElementTag;
@@ -111,8 +113,9 @@ class GuiFormFormat extends AbstractFormFormat
         $this->requireFormat(new PhpCodeFormat());
 
         // Element types.
-        $this->register(new SpriteViewFormElement());
         $this->register(new GamePaneFormElement());
+        $this->register(new SpriteViewFormElement());
+        $this->register(new GameBackgroundFormElement());
         //$this->register(new GameObjectFormElement());
 
         $this->register(new AnchorPaneFormElement());
@@ -194,6 +197,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new SpriteViewFormElementTag());
         $this->register(new ScrollPaneFormElementTag());
         $this->register(new GamePaneFormElementTag());
+        $this->register(new GameBackgroundFormElementTag());
         $this->register(new PaginationFormElementTag());
         $this->register(new TableViewFormElementTag());
         $this->register(new RadioGroupPaneFormElementTag());

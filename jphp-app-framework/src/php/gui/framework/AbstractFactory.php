@@ -3,6 +3,7 @@ namespace php\gui\framework;
 
 use behaviour\SetTextBehaviour;
 use php\format\ProcessorException;
+use php\framework\Logger;
 use php\game\UXSpriteView;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;
@@ -169,7 +170,9 @@ class AbstractFactory
 
             $node->data('-factory', $this);
             $node->data('-factory-name', $this->factoryName);
-            $node->data('-factory-id', $this->factoryName ? $this->factoryName . ".$id" : $id);
+            $node->data('-factory-id', $factoryId = ($this->factoryName ? $this->factoryName . ".$id" : $id));
+
+            Logger::debug("Create instance '$factoryId', data = " . json_encode($data->toArray()));
 
             UXNodeWrapper::get($node)->applyData($data);
 

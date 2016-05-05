@@ -3,6 +3,7 @@ namespace behaviour\custom;
 
 use php\game\UXGamePane;
 use php\game\UXGameScene;
+use php\gui\framework\AbstractForm;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXPane;
@@ -96,7 +97,14 @@ class GameSceneBehaviour extends AbstractBehaviour
             $this->layout->children->clear();
         }
 
-        $form = app()->getNewForm($name, null, false, false, true);
+        /** @var AbstractForm $previousForm */
+        static $previousForm = null;
+
+        if ($previousForm) {
+            $previousForm->free();
+        }
+
+        $form = $previousForm = app()->getNewForm($name, null, false, false, true);
 
         $form->layout->data('--game-scene', $this);
 
@@ -111,6 +119,8 @@ class GameSceneBehaviour extends AbstractBehaviour
             $this->_target->loadArea($layout);
             $form->loadBindings();
             $form->loadBehaviours();
+
+            $layout->requestFocus();
         }
 
         $this->layout = $layout;

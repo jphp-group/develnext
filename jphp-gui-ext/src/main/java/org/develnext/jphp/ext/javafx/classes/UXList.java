@@ -53,6 +53,17 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     }
 
     @Signature
+    @SuppressWarnings("unchecked")
+    public void replace(Environment env, Memory object, Memory newObject) {
+        int index = indexOf(env, object);
+
+        if (index != -1) {
+            getWrappedObject().add(index, (T) Memory.unwrap(env, newObject));
+            getWrappedObject().remove(index + 1);
+        }
+    }
+
+    @Signature
     public boolean has(Environment env, Memory object) {
         for (T t : getWrappedObject()) {
             if (Memory.wrap(env, t).equal(object)) {

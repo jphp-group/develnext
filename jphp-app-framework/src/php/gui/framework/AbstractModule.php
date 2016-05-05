@@ -215,4 +215,13 @@ abstract class AbstractModule extends AbstractScript
             app()->showForm($form);
         }
     }
+
+    public function free()
+    {
+        parent::free();
+
+        foreach ($this->scriptManager->getScripts() as $script) {
+            $script->free();
+        }
+    }
 }
