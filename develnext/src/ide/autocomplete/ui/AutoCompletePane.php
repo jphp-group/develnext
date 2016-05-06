@@ -9,6 +9,7 @@ use ide\autocomplete\PropertyAutoCompleteItem;
 use ide\autocomplete\VariableAutoCompleteItem;
 use ide\Ide;
 use ide\Logger;
+use php\gui\designer\UXAbstractCodeArea;
 use php\gui\designer\UXSyntaxTextArea;
 use php\gui\event\UXKeyEvent;
 use php\gui\layout\UXHBox;
@@ -76,7 +77,11 @@ class AutoCompletePane
      */
     protected $inserted = false;
 
-    public function __construct(UXSyntaxTextArea $area, AutoComplete $complete)
+    /**
+     * @param UXSyntaxTextArea|UXAbstractCodeArea $area
+     * @param AutoComplete $complete
+     */
+    public function __construct($area, AutoComplete $complete)
     {
         $this->area = $area;
         $this->complete = $complete;
@@ -151,7 +156,11 @@ class AutoCompletePane
                 return;
             }
 
-            list($x, $y) = $this->area->getCaretScreenPosition();
+            if ($this->area instanceof UXSyntaxTextArea) {
+                list($x, $y) = $this->area->getCaretScreenPosition();
+            } else {
+                $x = $y = null;
+            }
 
             if ($string = $this->getString()) {
                 $items = null;
@@ -206,7 +215,7 @@ class AutoCompletePane
             $this->showTimer->free();
         }
 
-        $this->showTimer = waitAsync(300, function () use ($x, $y) {
+        $this->showTimer = waitAsync($this->shown ? 1 : 300, function () use ($x, $y) {
             $this->showTimer = null;
 
             if (!$this->list->items->count) {
@@ -221,7 +230,12 @@ class AutoCompletePane
 
             $this->ui->layout->maxHeight = $size * ($this->list->fixedCellSize) + 6 + 2 + $this->list->fixedCellSize;
 
-            $this->ui->show($this->area->form, $x, $y);
+            if ($this->area instanceof UXAbstractCodeArea) {
+                $this->ui->show($this->area->form);
+            } else {
+                $this->ui->show($this->area->form, $x, $y);
+            }
+
             $this->shown = true;
         });
     }
@@ -229,6 +243,7 @@ class AutoCompletePane
     public function hide() {
         UXApplication::runLater(function () {
             $this->shown = false;
+
             $this->ui->hide();
         });
     }
@@ -346,7 +361,8 @@ class AutoCompletePane
         $list->maxHeight = 9999;
         $list->fixedCellSize = 20;
         $list->classes->add('hide-hor-scroll');
-        $list->style = '-fx-font-family: "Courier new"';
+        $list->classes->add('code-area-popup');
+        $list->style = '-fx-font: 12px "Courier new"';
         $list->width = 450;
 
         $ui->add($list);
@@ -390,6 +406,11 @@ class AutoCompletePane
                     break;
             }
         });
+
+
+        if ($this->area instanceof UXAbstractCodeArea) {
+            $this->area->popupWindow = $win;
+        }
 
         return $this->ui = $win;
     }

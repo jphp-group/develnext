@@ -1138,7 +1138,7 @@ public class UXDesigner extends BaseObject {
         node.addEventFilter(MouseEvent.MOUSE_RELEASED, onMouseReleased);
     }
 
-    public class Item {
+    static public class Item {
         public final Node node;
 
         protected boolean locked = false;

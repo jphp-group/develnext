@@ -5,6 +5,10 @@ use Files;
 use ide\autocomplete\php\PhpAutoComplete;
 use ide\autocomplete\ui\AutoCompletePane;
 use ide\editors\menu\ContextMenu;
+use ide\forms\AbstractIdeForm;
+use ide\forms\FindTextDialogForm;
+use ide\forms\MessageBoxForm;
+use ide\forms\ReplaceTextDialogForm;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
@@ -12,6 +16,10 @@ use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\utils\UiUtils;
 use php\format\JsonProcessor;
+use php\gui\designer\UXAbstractCodeArea;
+use php\gui\designer\UXCssCodeArea;
+use php\gui\designer\UXFxCssCodeArea;
+use php\gui\designer\UXPhpCodeArea;
 use php\gui\designer\UXSyntaxAutoCompletion;
 use php\gui\designer\UXSyntaxTextArea;
 use php\gui\event\UXKeyEvent;
@@ -53,6 +61,8 @@ use script\TimerScript;
  */
 class CodeEditor extends AbstractEditor
 {
+    const USE_NEW_EDITOR = true;
+
     use EventHandlerBehaviour;
 
     protected $mode;
@@ -83,7 +93,7 @@ class CodeEditor extends AbstractEditor
     protected $commands = [];
 
     /**
-     * @var UXSyntaxTextArea
+     * @var UXSyntaxTextArea|UXAbstractCodeArea
      */
     protected $textArea;
 
@@ -91,6 +101,22 @@ class CodeEditor extends AbstractEditor
      * @var AutoCompletePane
      */
     protected $autoComplete;
+
+
+    /**
+     * @var FindTextDialogForm
+     */
+    protected $findDialog;
+
+    /**
+     * @var ReplaceTextDialogForm
+     */
+    protected $replaceDialog;
+
+    /**
+     * @var int
+     */
+    protected $findDialogLastIndex = 0;
 
     public function getIcon()
     {
@@ -103,8 +129,24 @@ class CodeEditor extends AbstractEditor
 
         $this->mode = $mode;
 
-        $this->textArea = new UXSyntaxTextArea();
-        $this->textArea->syntaxStyle = "text/$mode";
+        if (self::USE_NEW_EDITOR) {
+            switch ($mode) {
+                case 'php':
+                    $this->textArea = new UXPhpCodeArea();
+                    break;
+
+                case 'css':
+                    $this->textArea = new UXCssCodeArea();
+                    break;
+
+                case 'fxcss':
+                    $this->textArea = new UXFxCssCodeArea();
+                    break;
+            }
+        } else {
+            $this->textArea = new UXSyntaxTextArea();
+            $this->textArea->syntaxStyle = "text/$mode";
+        }
 
         if ($mode == 'php') {
             $this->autoComplete = new AutoCompletePane($this->textArea, new PhpAutoComplete());
@@ -112,6 +154,14 @@ class CodeEditor extends AbstractEditor
 
         $this->textArea->on('keyUp', function (UXKeyEvent $e) {
             $this->doChange();
+        });
+
+        $this->findDialog = new FindTextDialogForm(function ($text, array $options) {
+            $this->findSearchText($text, $options);
+        });
+
+        $this->replaceDialog = new ReplaceTextDialogForm(function ($text, $newText, array $options, $command) {
+            $this->replaceSearchText($text, $newText, $options, $command);
         });
     }
 
@@ -161,8 +211,22 @@ class CodeEditor extends AbstractEditor
             case 'copy': $this->textArea->copy(); break;
             case 'cut': $this->textArea->cut(); break;
             case 'paste': $this->textArea->paste(); break;
-            case 'find': $this->textArea->showFindDialog(); break;
-            case 'replace': $this->textArea->showReplaceDialog(); break;
+
+            case 'find':
+                if ($this->textArea instanceof UXAbstractCodeArea) {
+                    $this->showFindDialog();
+                } else {
+                    $this->textArea->showFindDialog();
+                }
+                break;
+
+            case 'replace':
+                if ($this->textArea instanceof UXAbstractCodeArea) {
+                    $this->showReplaceDialog();
+                } else {
+                    $this->textArea->showReplaceDialog();
+                }
+                break;
 
             default:
                 ;
@@ -187,6 +251,7 @@ class CodeEditor extends AbstractEditor
 
     public function setValue($value)
     {
+        $value = str::replace($value, "\t", str::repeat(" ", 4));
         $this->textArea->text = $value;
     }
 
@@ -341,6 +406,124 @@ class CodeEditor extends AbstractEditor
     public function requestFocus()
     {
         $this->textArea->requestFocus();
+    }
+
+    protected function _findSearchText(AbstractIdeForm $dialog, $text, array $options, $silent = false)
+    {
+        $len = $pos = 0;
+
+        Logger::debug("Find search text '$text', from {$this->findDialogLastIndex}");
+
+        $case = $options['case'];
+        $method = str::class . '::' . ($case ? 'pos' : 'posIgnoreCase');
+
+        if ($options['wholeText']) {
+            $words = [$text];
+        } else {
+            $words = str::split($text, ' ');
+        }
+
+        foreach ($words as $word) {
+            $pos = $method($this->textArea->text, $word, $this->findDialogLastIndex);
+            $len = str::length($word);
+
+            if ($pos > -1) {
+                break;
+            }
+        }
+
+        if ($pos == -1) {
+            if ($this->findDialogLastIndex == 0) {
+                if (!$silent) {
+                    UXDialog::showAndWait('Ничего не найдено.');
+                    $dialog->show();
+                }
+
+                return null;
+            }
+
+            if (!$silent && MessageBoxForm::confirm('Больше ничего не найдено, начать сначала?')) {
+                $this->findDialogLastIndex = 0;
+                $dialog->show();
+                $this->_findSearchText($dialog, $text, $options);
+            }
+
+            return null;
+        }
+
+        $this->findDialogLastIndex = $pos + 1;
+        $this->textArea->caretPosition = $pos;
+        $this->textArea->select($pos, $pos + $len);
+
+        Logger::debug("Find select [$pos, $len]");
+
+        return [$pos, $len];
+    }
+
+    protected function findSearchText($text, array $options)
+    {
+        return $this->_findSearchText($this->findDialog, $text, $options);
+    }
+
+    protected function replaceSearchText($text, $newText, $options, $command)
+    {
+        Logger::debug("Replace search text '$text', from {$this->findDialogLastIndex}");
+
+        $result = null;
+
+        switch ($command) {
+            case 'START':
+                $this->findDialogLastIndex = 0;
+            // continue.
+
+            case 'SKIP':
+                $result = $this->_findSearchText($this->replaceDialog, $text, $options, true);
+                break;
+
+            case 'REPLACE':
+                if (!$this->textArea->selectedText) {
+                    UXDialog::showAndWait('Ничего не найдено.');
+                    break;
+                }
+
+                $this->textArea->selectedText = $newText;
+                $end = $this->findDialogLastIndex - 1 + str::length($newText);
+
+                $this->textArea->select($this->findDialogLastIndex - 1, $end);
+                $this->findDialogLastIndex = $end + 1;
+
+                $result = $this->_findSearchText($this->replaceDialog, $text, $options, true);
+
+                if (!$result) {
+                    $this->textArea->select(0, 0);
+                }
+
+                break;
+        }
+
+        $this->replaceDialog->setFindResult($result);
+    }
+
+    public function showFindDialog()
+    {
+        $this->findDialogLastIndex = 0;
+
+        if ($this->textArea->selectedText) {
+            $this->findDialog->setResult($this->textArea->selectedText);
+        }
+
+        $this->findDialog->show();
+    }
+
+    public function showReplaceDialog()
+    {
+        $this->findDialogLastIndex = 0;
+
+        if ($this->textArea->selectedText) {
+            $this->replaceDialog->setResult($this->textArea->selectedText);
+        }
+
+        $this->replaceDialog->show();
     }
 }
 

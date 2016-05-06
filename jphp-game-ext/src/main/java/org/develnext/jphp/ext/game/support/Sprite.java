@@ -15,8 +15,6 @@ public class Sprite {
         protected int[] indexes;
         protected int speed = -1;
 
-        public int currentIndex;
-
         public Animation(String name, int... indexes) {
             this.name = name;
             this.indexes = indexes;
@@ -358,7 +356,7 @@ public class Sprite {
         int cols = prototype != null ? prototype.cols : this.cols;
 
         //
-        int row = (int) Math.ceil(index / cols);
+        int row = index / cols;
         int col = index % cols;
 
         double x = col * frameWidth;

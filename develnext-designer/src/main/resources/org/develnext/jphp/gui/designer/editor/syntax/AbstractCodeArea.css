@@ -1,6 +1,12 @@
 @font-face {
-    font-family: Delicious;
+    font-family: 'Consolas';
     src: url('/Consolas.ttf');
+}
+
+@font-face {
+    font-family: 'Consolas';
+    src: url('/Consolas.ttf');
+    font-weight: bold;
 }
 
 .syntax-text-area {
@@ -19,6 +25,11 @@
 .syntax-text-area .lineno .text {
     -fx-font-style: normal;
     -fx-font: 14px 'Consolas';
+}
+
+.syntax-text-area .context-menu .text {
+    -fx-fill: #202020;
+    -fx-font: 12px 'Consolas';
 }
 
 .styled-text-area .caret {

@@ -4,22 +4,20 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
-import javafx.scene.input.InputMethodEvent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import org.develnext.jphp.gui.designer.editor.inspect.AbstractInspector;
-import org.develnext.jphp.gui.designer.editor.syntax.hotkey.AbstractHotkey;
-import org.develnext.jphp.gui.designer.editor.syntax.hotkey.AddTabsHotkey;
-import org.develnext.jphp.gui.designer.editor.syntax.hotkey.DuplicateSelectionHotkey;
-import org.develnext.jphp.gui.designer.editor.syntax.hotkey.RemoveTabsHotkey;
+import org.develnext.jphp.gui.designer.editor.syntax.hotkey.*;
+import org.develnext.jphp.gui.designer.editor.syntax.popup.CodeAreaContextMenu;
 import org.develnext.jphp.gui.designer.editor.syntax.popup.CodeAreaPopup;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.PopupAlignment;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
+import org.fxmisc.wellbehaved.event.EventPattern;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
 
@@ -30,6 +28,7 @@ import java.util.concurrent.Executors;
 
 import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 import static org.fxmisc.wellbehaved.event.EventPattern.keyReleased;
+import static org.fxmisc.wellbehaved.event.EventPattern.mouseClicked;
 
 abstract public class AbstractCodeArea extends CodeArea {
     private ExecutorService executor;
@@ -43,15 +42,26 @@ abstract public class AbstractCodeArea extends CodeArea {
 
     private CodeAreaGutter gutter = CodeAreaGutter.get(this);
     private CodeAreaPopup popup = new CodeAreaPopup();
+    private CodeAreaContextMenu contextMenu = new CodeAreaContextMenu(this);
 
     private AbstractInspector inspector;
 
+    private EventHandler<ActionEvent> onBeforeChange;
+    private EventHandler<ActionEvent> onAfterChange;
+
     public AbstractCodeArea() {
         super();
-        setTabSize(2);
+        setTabSize(4);
         setShowGutter(true);
 
         setPopupWindow(popup);
+        setOnContextMenuRequested(e -> {
+            contextMenu.show(this, e.getScreenX(), e.getScreenY());
+        });
+
+        Nodes.addInputMap(this, InputMap.consume(keyPressed(KeyCode.ESCAPE), e -> contextMenu.hide()));
+        Nodes.addInputMap(this, InputMap.consume(mouseClicked(MouseButton.PRIMARY), e -> contextMenu.hide()));
+
         setPopupAlignment(PopupAlignment.CARET_BOTTOM);
         setPopupAnchorOffset(new Point2D(4, 4));
 
@@ -75,6 +85,10 @@ abstract public class AbstractCodeArea extends CodeArea {
                 .subscribe(this::applyHighlighting);
 
         Nodes.addInputMap(this, InputMap.consume(keyReleased(), e -> {
+            if (onAfterChange != null) {
+                onAfterChange.handle(new ActionEvent(this, this));
+            }
+
             if (popup.isShowing() && (e.getCode() == KeyCode.LEFT || e.getCode() == KeyCode.RIGHT)) {
                 hidePopup();
             }
@@ -82,11 +96,11 @@ abstract public class AbstractCodeArea extends CodeArea {
             if (e.getText().isEmpty()) return;
 
             int position = this.getCaretPosition();
-            if (this.getText(position - 3, position).equals("-fx")) {
+            /*if (this.getText(position - 3, position).equals("-fx")) {
                 showPopup();
             } else {
                 hidePopup();
-            }
+            }*/
         }));
 
         focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -96,8 +110,27 @@ abstract public class AbstractCodeArea extends CodeArea {
         registerHotkey(new AddTabsHotkey());
         registerHotkey(new RemoveTabsHotkey());
         registerHotkey(new DuplicateSelectionHotkey());
+        registerHotkey(new AutoSpaceEnterHotkey());
+        registerHotkey(new AutoBracketsHotkey());
+        registerHotkey(new BackspaceHotkey());
 
         setStylesheet(null);
+    }
+
+    public EventHandler<ActionEvent> getOnBeforeChange() {
+        return onBeforeChange;
+    }
+
+    public void setOnBeforeChange(EventHandler<ActionEvent> onBeforeChange) {
+        this.onBeforeChange = onBeforeChange;
+    }
+
+    public EventHandler<ActionEvent> getOnAfterChange() {
+        return onAfterChange;
+    }
+
+    public void setOnAfterChange(EventHandler<ActionEvent> onAfterChange) {
+        this.onAfterChange = onAfterChange;
     }
 
     public CodeAreaPopup getPopup() {
@@ -131,17 +164,20 @@ abstract public class AbstractCodeArea extends CodeArea {
             throw new IllegalArgumentException("Hotkey already registered");
         }
 
-        InputMap<KeyEvent> inputMap = InputMap.sequence(
-                InputMap.consume(keyPressed(keyCode, keyModifiers), keyEvent -> {
-                    hotkey.apply(this, keyEvent);
+        EventPattern<Event, KeyEvent> eventPattern = keyCode == null ? keyReleased() : keyPressed(keyCode, keyModifiers);
 
-                    if (hotkey.isAffectsUndoManager()) {
-                        this.getUndoManager().mark();
+        InputMap<KeyEvent> inputMap = InputMap.sequence(
+                InputMap.consume(eventPattern, keyEvent -> {
+                    if (hotkey.apply(this, keyEvent)) {
+                        if (hotkey.isAffectsUndoManager()) {
+                            this.getUndoManager().mark();
+                        }
                     }
                 })
         );
 
         Nodes.addInputMap(this, inputMap);
+
         hotkeyHandlers.put(hotkey, inputMap);
     }
 
@@ -180,6 +216,7 @@ abstract public class AbstractCodeArea extends CodeArea {
     }
 
     public void setText(String text) {
+        clear();
         replaceText(0, 0, text);
     }
 

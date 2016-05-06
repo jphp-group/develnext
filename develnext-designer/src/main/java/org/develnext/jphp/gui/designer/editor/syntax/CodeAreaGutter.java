@@ -63,7 +63,14 @@ public class CodeAreaGutter implements IntFunction<Node> {
         List<CodeAreaGutterNote> noteList = notes.get(line);
 
         if (noteList == null) {
-            notes.put(line, noteList = new ArrayList<CodeAreaGutterNote>());
+            notes.put(line, noteList = new ArrayList<>());
+        }
+
+        for (CodeAreaGutterNote gutterNote : noteList) {
+            if (gutterNote.getStyleClass().equals(note.getStyleClass())) {
+                gutterNote.hint += "\n" + note.hint;
+                return;
+            }
         }
 
         noteList.add(note);

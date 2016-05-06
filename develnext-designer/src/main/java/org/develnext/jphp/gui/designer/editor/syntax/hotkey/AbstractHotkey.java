@@ -10,7 +10,7 @@ import java.util.UUID;
 abstract public class AbstractHotkey {
     protected String uid = UUID.randomUUID().toString();
 
-    abstract public void apply(AbstractCodeArea area, KeyEvent keyEvent);
+    abstract public boolean apply(AbstractCodeArea area, KeyEvent keyEvent);
     abstract public KeyCode getDefaultKeyCode();
 
     public boolean isAffectsUndoManager() {

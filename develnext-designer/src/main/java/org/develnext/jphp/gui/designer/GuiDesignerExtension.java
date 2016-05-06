@@ -35,5 +35,6 @@ public class GuiDesignerExtension extends JavaFXExtension {
         registerClass(scope, FileSystemWatcher.class);
 
         registerEventProvider(new UXSyntaxTextArea.EventProvider());
+        registerEventProvider(new UXAbstractCodeArea.EventProvider());
     }
 }

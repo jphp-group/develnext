@@ -23,6 +23,7 @@ use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use ide\utils\PhpParser;
 use php\format\ProcessorException;
+use php\gui\designer\UXPhpCodeArea;
 use php\gui\event\UXDragEvent;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
@@ -892,8 +893,8 @@ class ActionConstructorForm extends AbstractIdeForm
         $dialog->modality = 'APPLICATION_MODAL';
         $dialog->size = [700, 400];
 
-        $area = new CodeTextArea('php');
-        $area->setValue($phpParser->getContent());
+        $area = new UXPhpCodeArea();
+        $area->text = $phpParser->getContent();
         UXVBox::setVgrow($area, 'ALWAYS');
 
         $okButton = new UXButton('Закрыть');

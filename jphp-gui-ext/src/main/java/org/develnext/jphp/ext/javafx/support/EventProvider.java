@@ -8,8 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 abstract public class EventProvider<T> {
-
-    protected static Map<Class<?>, EventProvider> eventProviderMap = new HashMap<Class<?>, EventProvider>();
+    protected final static Map<Class<?>, EventProvider> eventProviderMap = new HashMap<>();
 
     abstract protected class Handler {
         abstract public void set(T target, EventHandler eventHandler);

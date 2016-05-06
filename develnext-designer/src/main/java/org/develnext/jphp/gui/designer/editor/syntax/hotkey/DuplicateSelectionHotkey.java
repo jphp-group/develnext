@@ -11,7 +11,7 @@ import java.util.Collection;
 
 public class DuplicateSelectionHotkey extends AbstractHotkey {
     @Override
-    public void apply(AbstractCodeArea area, KeyEvent keyEvent) {
+    public boolean apply(AbstractCodeArea area, KeyEvent keyEvent) {
         if (area.getSelection().getLength() == 0) {
             int currentParagraph = area.getCurrentParagraph();
 
@@ -28,6 +28,8 @@ public class DuplicateSelectionHotkey extends AbstractHotkey {
         } else {
             area.replaceSelection(area.getSelectedText() + area.getSelectedText());
         }
+
+        return true;
     }
 
     @Override

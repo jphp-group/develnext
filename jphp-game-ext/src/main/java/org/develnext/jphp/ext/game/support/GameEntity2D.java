@@ -353,6 +353,9 @@ public class GameEntity2D implements EventTarget {
                 }
 
                 break;
+
+            case STATIC:
+            default:
         }
 
     }

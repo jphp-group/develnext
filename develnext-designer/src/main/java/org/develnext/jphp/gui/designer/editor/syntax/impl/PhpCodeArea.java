@@ -26,24 +26,139 @@ public class PhpCodeArea extends AbstractCodeArea {
 
     private static Collection<String> getStyleOfToken(Token token) {
         switch (token.getType()) {
+            case PHPParser.CommentEnd:
+            case PHPParser.HtmlComment:
+            case PHPParser.MultiLineComment:
+            case PHPParser.SingleLineComment:
+            case PHPParser.PHPEndSingleLineComment:
             case PHPParser.Comment:
                 return Collections.singletonList("comment");
+
             case PHPParser.HtmlHex:
                 return Collections.singletonList("color");
+
+            case PHPParser.DoubleQuoteString:
+            case PHPParser.BackQuoteString:
+            case PHPParser.SingleQuoteString:
+            case PHPParser.HereDocText:
+            case PHPParser.StartHereDoc:
+            case PHPParser.StartNowDoc:
             case PHPParser.StringType:
                 return Collections.singletonList("string");
+
             case PHPParser.Numeric:
                 return Collections.singletonList("number");
-            case PHPParser.IsIdentical:
-                return Collections.singletonList("keyword");
-            default:
-                switch (token.getText()) {
-                    case "{":
-                    case "}":
-                    case ";":
-                        return Collections.singletonList("control");
-                }
 
+            case PHPParser.VarName:
+                return Collections.singletonList("variable");
+
+            case PHPParser.Abstract:
+            case PHPParser.As:
+            case PHPParser.Array:
+            case PHPParser.BooleanAnd:
+            case PHPParser.BooleanOr:
+            case PHPParser.BooleanConstant:
+            case PHPParser.Break:
+            case PHPParser.Continue:
+            case PHPParser.Callable:
+            case PHPParser.Case:
+            case PHPParser.Catch:
+            case PHPParser.Class:
+            case PHPParser.If:
+            case PHPParser.Else:
+            case PHPParser.ElseIf:
+            case PHPParser.Switch:
+            case PHPParser.While:
+            case PHPParser.Do:
+            case PHPParser.Const:
+            case PHPParser.Public:
+            case PHPParser.Var:
+            case PHPParser.Protected:
+            case PHPParser.Static:
+            case PHPParser.Print:
+            case PHPParser.PHPStart:
+            case PHPParser.Clone:
+            case PHPParser.Echo:
+            case PHPParser.Empty:
+            case PHPParser.IsSet:
+            case PHPParser.Eval:
+            case PHPParser.Return:
+            case PHPParser.Yield:
+            case PHPParser.Null:
+            case PHPParser.Finally:
+            case PHPParser.Try:
+            case PHPParser.Include:
+            case PHPParser.Require:
+            case PHPParser.IncludeOnce:
+            case PHPParser.RequireOnce:
+            case PHPParser.Exit:
+            case PHPParser.Foreach:
+            case PHPParser.For:
+            case PHPParser.Use:
+            case PHPParser.Namespace:
+            case PHPParser.Trait:
+            case PHPParser.Interface:
+            case PHPParser.Extends:
+            case PHPParser.Implements:
+            case PHPParser.Function:
+                return Collections.singletonList("keyword");
+
+            case PHPParser.Label:
+                return Collections.singletonList("label");
+
+            case PHPParser.Colon:
+            case PHPParser.Comma:
+            case PHPParser.OpenCurlyBracket:
+            case PHPParser.OpenRoundBracket:
+            case PHPParser.OpenSquareBracket:
+            case PHPParser.CloseCurlyBracket:
+            case PHPParser.CloseRoundBracket:
+            case PHPParser.CloseSquareBracket:
+                return Collections.singletonList("control");
+
+            case PHPParser.Plus:
+            case PHPParser.PlusEqual:
+            case PHPParser.Minus:
+            case PHPParser.MinusEqual:
+            case PHPParser.ModEqual:
+            case PHPParser.Percent:
+            case PHPParser.Divide:
+            case PHPParser.DivEqual:
+            case PHPParser.MulEqual:
+            case PHPParser.Eq:
+            case PHPParser.IsNotEq:
+            case PHPParser.Ellipsis:
+            case PHPParser.Dec:
+            case PHPParser.Inc:
+            case PHPParser.IsEqual:
+            case PHPParser.IsIdentical:
+            case PHPParser.IsNoidentical:
+            case PHPParser.ObjectOperator:
+            case PHPParser.Less:
+            case PHPParser.Greater:
+            case PHPParser.Ampersand:
+            case PHPParser.Bang:
+            case PHPParser.Pipe:
+            case PHPParser.Asterisk:
+            case PHPParser.Tilde:
+            case PHPParser.Dot:
+            case PHPParser.QuestionMark:
+            case PHPParser.DoubleArrow:
+            case PHPParser.Concaequal:
+            case PHPParser.ShiftLeftEqual:
+            case PHPParser.ShiftRightEqual:
+            case PHPParser.AndEqual:
+            case PHPParser.OrEqual:
+            case PHPParser.XorEqual:
+            case PHPParser.ShiftLeft:
+            case PHPParser.ShiftRight:
+            case PHPParser.DoubleColon:
+                return Collections.singletonList("operator");
+
+            case PHPParser.SemiColon:
+                return Collections.singletonList("semicolon");
+
+            default:
                 return Collections.emptyList();
         }
     }
@@ -56,7 +171,17 @@ public class PhpCodeArea extends AbstractCodeArea {
 
         int lastEnd = 0;
         for (Token token : lex.getAllTokens()) {
-            int spacer = token.getStartIndex() - lastEnd;
+            int startIndex = token.getStartIndex();
+
+            if (token.getType() == PHPParser.Comment) {
+                if (text.charAt(startIndex - 1) == '#') {
+                    startIndex -= 1;
+                } else if (text.charAt(startIndex - 1) == '/' && text.charAt(startIndex - 2) == '/') {
+                    startIndex -= 2;
+                }
+            }
+
+            int spacer = startIndex - lastEnd;
 
             if (spacer > 0) {
                 spansBuilder.add(Collections.emptyList(), spacer);
@@ -64,12 +189,10 @@ public class PhpCodeArea extends AbstractCodeArea {
 
             Collection<String> styleOfToken = getStyleOfToken(token);
 
-            if (!styleOfToken.isEmpty()) {
-                int gap = token.getStopIndex() - token.getStartIndex() + 1;
-                spansBuilder.add(styleOfToken, gap);
+            int gap = token.getStopIndex() - startIndex + 1;
+            spansBuilder.add(styleOfToken, gap);
 
-                lastEnd = token.getStopIndex() + 1;
-            }
+            lastEnd = token.getStopIndex() + 1;
         }
 
         lex.reset();

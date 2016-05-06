@@ -1,8 +1,12 @@
 package org.develnext.jphp.gui.designer.classes;
 
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
+import javafx.stage.PopupWindow;
 import org.develnext.jphp.ext.javafx.classes.UXControl;
 import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
+import org.develnext.jphp.gui.designer.SyntaxTextArea;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
@@ -13,9 +17,46 @@ import php.runtime.reflection.ClassEntity;
 @Abstract
 @Namespace(GuiDesignerExtension.NS)
 public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<AbstractCodeArea> {
+    public static class EventProvider extends org.develnext.jphp.ext.javafx.support.EventProvider<AbstractCodeArea> {
+        public EventProvider() {
+            setHandler("beforeChange", new Handler() {
+                @Override
+                public void set(AbstractCodeArea target, EventHandler eventHandler) {
+                    target.setOnBeforeChange(eventHandler);
+                }
+
+                @Override
+                public EventHandler get(AbstractCodeArea target) {
+                    return target.getOnBeforeChange();
+                }
+            });
+
+            setHandler("afterChange", new Handler() {
+                @Override
+                public void set(AbstractCodeArea target, EventHandler eventHandler) {
+                    target.setOnAfterChange(eventHandler);
+                }
+
+                @Override
+                public EventHandler get(AbstractCodeArea target) {
+                    return target.getOnAfterChange();
+                }
+            });
+        }
+
+        @Override
+        public Class<AbstractCodeArea> getTargetClass() {
+            return AbstractCodeArea.class;
+        }
+    }
+
     interface WrappedInterface {
         @Property int tabSize();
         @Property boolean showGutter();
+        @Property @Nullable PopupWindow popupWindow();
+
+        void showPopup();
+        void hidePopup();
     }
 
     public UXAbstractCodeArea(Environment env, T wrappedObject) {
@@ -68,7 +109,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
 
     @Getter
     public int getCaretLine() {
-        return -1; // TODO FIX;
+        return getWrappedObject().getCurrentParagraph();
     }
 
     @Getter
@@ -78,7 +119,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
 
     @Setter
     public void setCaretPosition(int value) {
-        getWrappedObject().positionCaret(value);
+        getWrappedObject().moveTo(value);
     }
 
     @Signature
@@ -118,7 +159,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
 
     @Signature
     public void jumpToLine(int line, int pos) {
-        getWrappedObject().positionCaret(getWrappedObject().position(line, pos).toOffset());
+        getWrappedObject().moveTo(getWrappedObject().position(line, pos).toOffset());
     }
 
     @Signature

@@ -1,6 +1,11 @@
 .syntax-text-area {
     -fx-background-color: #202020;
-    -fx-highlight-fill: #404E51;
+    -fx-background-fill: #404E51;
+    -fx-cursor: text;
+}
+
+.syntax-text-area .paragraph-box:has-caret {
+    -fx-background-color: #2b3436;
 }
 
 .syntax-text-area .text {
@@ -8,44 +13,52 @@
 }
 
 .syntax-text-area .gutter {
-    -fx-border-color: silver;
-    -fx-background-color: #6d6d6d;
-    -fx-border-width: 0 2px 0 0;
+    -fx-border-color: #939393;
+    -fx-background-color: #545454;
+    -fx-border-width: 0 1px 0 0;
     -fx-padding: 0 3 0 3;
 }
 
-.styled-text-area .caret {
+.syntax-text-area .caret {
     -fx-stroke: white;
 }
 
-.styled-text-area .text.semicolon {
+.syntax-text-area .text.semicolon {
     -fx-font-weight: bold;
 }
 
-.styled-text-area .text.control {
-    -fx-fill: #6A8088;
-    -fx-background-color: #6b8189;
-    -fx-font-weight: bold;
+.syntax-text-area .text.control, .syntax-text-area .text.operator {
+    -fx-fill: #22C1AE;
 }
 
-.styled-text-area .text.comment {
-    -fx-fill: #939393;
+.syntax-text-area .text.comment {
+    -fx-fill: #6c6c6c;
+    -fx-font-style: italic;
 }
 
-.styled-text-area .text.selector {
+.syntax-text-area .text.selector {
     -fx-fill: #cda869;
     -fx-font-weight: bold;
 }
 
-.styled-text-area .text.keyword {
-    -fx-fill: #678CB1;
-}
-
-.styled-text-area .text.color {
-    -fx-fill: #FFCD22;
+.syntax-text-area .text.keyword {
+    -fx-fill: #cda869;
     -fx-font-weight: bold;
 }
 
+.syntax-text-area .text.string {
+    -fx-fill: #afc9a0;
+}
+
 .syntax-text-area .text.number {
-    -fx-fill: #FFCD22;
+    -fx-fill: #54b0ff;
+}
+
+.syntax-text-area .text.variable {
+    -fx-fill: #ae9fbf;
+    -fx-font-weight: bold;
+}
+
+.syntax-text-area .text.label {
+    -fx-fill: #E6E1DC;
 }

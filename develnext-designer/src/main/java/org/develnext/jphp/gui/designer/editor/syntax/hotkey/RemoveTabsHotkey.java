@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class RemoveTabsHotkey extends AbstractHotkey {
 
     @Override
-    public void apply(AbstractCodeArea area, KeyEvent keyEvent) {
+    public boolean apply(AbstractCodeArea area, KeyEvent keyEvent) {
         String tab = StringUtils.repeat(' ', area.getTabSize());
 
         if (area.getSelection().getLength() == 0) {
@@ -43,10 +43,12 @@ public class RemoveTabsHotkey extends AbstractHotkey {
             CharSequence sequence = sb.toString().subSequence(0, sb.length() - 1);
 
             area.replaceSelection(sequence.toString());
-            area.positionCaret(pos);
+            area.moveTo(pos);
 
             area.selectRange(start, end - area.getTabSize() * stripLines);
         }
+
+        return true;
     }
 
     @Override

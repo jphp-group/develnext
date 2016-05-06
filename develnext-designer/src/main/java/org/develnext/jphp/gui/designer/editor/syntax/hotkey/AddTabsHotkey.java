@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 public class AddTabsHotkey extends AbstractHotkey {
     @Override
-    public void apply(AbstractCodeArea area, KeyEvent keyEvent) {
+    public boolean apply(AbstractCodeArea area, KeyEvent keyEvent) {
         if (area.getSelection().getLength() == 0) {
             area.replaceSelection(StringUtils.repeat(' ', area.getTabSize()));
         } else {
@@ -39,7 +39,7 @@ public class AddTabsHotkey extends AbstractHotkey {
             CharSequence sequence = sb.toString().subSequence(0, sb.length() - 1);
 
             area.replaceSelection(sequence.toString());
-            area.positionCaret(pos);
+            area.moveTo(pos);
 
             if (lines < 2) {
                 area.selectRange(start + area.getTabSize() * lines, end + area.getTabSize() * lines);
@@ -47,6 +47,8 @@ public class AddTabsHotkey extends AbstractHotkey {
                 area.selectRange(start, end + area.getTabSize() * lines);
             }
         }
+
+        return true;
     }
 
     @Override

@@ -2,6 +2,7 @@
 namespace php\gui\designer;
 
 use php\gui\UXControl;
+use php\gui\UXPopupWindow;
 
 class UXAbstractCodeArea extends UXControl
 {
@@ -36,6 +37,11 @@ class UXAbstractCodeArea extends UXControl
      * @var int
      */
     public $caretLine;
+
+    /**
+     * @var UXPopupWindow
+     */
+    public $popupWindow;
 
     /**
      * @param $line
@@ -77,6 +83,14 @@ class UXAbstractCodeArea extends UXControl
      * @param int $end
      */
     public function select($start, $end)
+    {
+    }
+
+    public function showPopup()
+    {
+    }
+
+    public function hidePopup()
     {
     }
 }

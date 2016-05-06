@@ -129,10 +129,6 @@ public class Vec2d implements Serializable {
         y = Math.abs(y);
     }
 
-    public final Vec2d clone() {
-        return new Vec2d(x, y);
-    }
-
     @Override
     public final String toString() {
         return "(" + x + "," + y + ")";

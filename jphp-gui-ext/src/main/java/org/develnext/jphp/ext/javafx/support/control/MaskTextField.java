@@ -146,7 +146,7 @@ public class MaskTextField extends TextField {
     }
 
 
-    private class Position {
+    static private class Position {
         public char mask;
         public char whatMask;
         public char placeholder;

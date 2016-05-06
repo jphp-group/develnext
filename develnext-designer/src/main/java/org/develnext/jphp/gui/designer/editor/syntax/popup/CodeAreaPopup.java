@@ -16,14 +16,11 @@ public class CodeAreaPopup extends Popup {
 
         getContent().setAll(list);
 
-        list.getItems().addListener(new ListChangeListener<String>() {
-            @Override
-            public void onChanged(Change<? extends String> c) {
-                list.setPrefHeight(list.getItems().size() * list.getFixedCellSize() + 2);
-            }
+        list.getItems().addListener((ListChangeListener<String>) c -> {
+            list.setPrefHeight(list.getItems().size() * list.getFixedCellSize() + 2);
         });
 
-        list.getItems().addAll("-fx-cursor", "-fx-font", "-fx-font-size", "-fx-font-family", "-fx-background-color");
+        //list.getItems().addAll("-fx-cursor", "-fx-font", "-fx-font-size", "-fx-font-family", "-fx-background-color");
     }
 
     public ListView<String> getList() {
