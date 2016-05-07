@@ -101,6 +101,20 @@ public class PhpCodeArea extends AbstractCodeArea {
             case PHPParser.Extends:
             case PHPParser.Implements:
             case PHPParser.Function:
+            case PHPParser.Global:
+            case PHPParser.EndDeclare:
+            case PHPParser.EndFor:
+            case PHPParser.EndForeach:
+            case PHPParser.EndIf:
+            case PHPParser.EndSwitch:
+            case PHPParser.EndWhile:
+            case PHPParser.Goto:
+            case PHPParser.InstanceOf:
+            case PHPParser.InsteadOf:
+            case PHPParser.List:
+            case PHPParser.New:
+            case PHPParser.Throw:
+            case PHPParser.Unset:
                 return Collections.singletonList("keyword");
 
             case PHPParser.Label:

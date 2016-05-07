@@ -172,24 +172,11 @@ class AbstractFactory
             $node->data('-factory-name', $this->factoryName);
             $node->data('-factory-id', $factoryId = ($this->factoryName ? $this->factoryName . ".$id" : $id));
 
-            Logger::debug("Create instance '$factoryId', data = " . json_encode($data->toArray()));
-
             UXNodeWrapper::get($node)->applyData($data);
 
             $this->eventBinder->loadBind($node, $id, __CLASS__, true);
 
             $this->behaviourManager->applyForInstance($id, $node);
-
-            uiLater(function () use ($node, $id) {
-                $this->eventBinder->trigger($node, $id, 'loading');
-                $this->eventBinder->trigger($node, $id, 'create');
-            });
-
-            $node->observer('parent')->addListener(function ($old, $new) use ($node, $id) {
-                if (!$new) {
-                    $this->eventBinder->trigger($node, $id, 'destroy');
-                }
-            });
 
             $this->prototypeInstances[$id][] = $node;
 

@@ -1,6 +1,7 @@
 <?php
 namespace behaviour\custom;
 
+use php\framework\Logger;
 use php\game\UXGamePane;
 use php\game\UXGameScene;
 use php\gui\framework\AbstractForm;
@@ -86,10 +87,14 @@ class GameSceneBehaviour extends AbstractBehaviour
         if ($this->autoplay) {
             $this->play();
         }
+
+        Logger::info("Game Scene initialized.");
     }
 
     public function loadScene($name)
     {
+        Logger::info("Game Scene loading '$name' ...");
+
         $this->scene->pause();
         $this->scene->clear();
 
@@ -115,10 +120,12 @@ class GameSceneBehaviour extends AbstractBehaviour
             $this->_target->layout = $layout;
             $form->loadBindings();
             $form->loadBehaviours();
+            $form->loadClones();
         } elseif ($this->_target instanceof UXGamePane) {
             $this->_target->loadArea($layout);
             $form->loadBindings();
             $form->loadBehaviours();
+            $form->loadClones();
 
             $layout->requestFocus();
         }
@@ -128,6 +135,8 @@ class GameSceneBehaviour extends AbstractBehaviour
         if ($this->autoplay) {
             $this->scene->play();
         }
+
+        Logger::info("Game Scene is loaded from '$name'!");
     }
 
     protected function initGravity()

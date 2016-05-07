@@ -496,7 +496,7 @@ class SourceEventManager
 
                 if ($beginLine + 2 == $token->line && $token->word == $next->word) {
                     $beginLine += 1;
-                    $beginPosition = $function->position + 1;
+                    $beginPosition = $function->position + 1; // TODO tab size
                 }
 
                 $this->eventBinds[$eventBind] = [

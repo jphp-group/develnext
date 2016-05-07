@@ -3,12 +3,6 @@
     src: url('/Consolas.ttf');
 }
 
-@font-face {
-    font-family: 'Consolas';
-    src: url('/Consolas.ttf');
-    font-weight: bold;
-}
-
 .syntax-text-area {
     -fx-font: 16px 'Consolas';
 }

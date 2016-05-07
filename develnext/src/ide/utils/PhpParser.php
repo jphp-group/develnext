@@ -620,14 +620,23 @@ class PhpParser
                 $imports = $this->findAllUseImport($tokenizer);
             }
 
-            $lines = [str::repeat("\t", $pos['pos']) . "{"];
+            $tabChar = " ";
+
+            $lines = [str::repeat($tabChar, $pos['pos']) . "{"];
 
             $scanner = new Scanner($code, 'UTF-8');
-            while ($scanner->hasNextLine()) {
-                $lines[] = str::repeat("\t", $pos['pos'] + 1) . $scanner->nextLine();
+
+            $prefixCode = str::repeat($tabChar, $pos['pos']) . str::repeat($tabChar, 4);
+
+            if (!$scanner->hasNextLine()) {
+                $lines[] = $prefixCode;
+            } else {
+                while ($scanner->hasNextLine()) {
+                    $lines[] = $prefixCode . $scanner->nextLine();
+                }
             }
 
-            $lines[] = str::repeat("\t", $pos['pos']) . "}";
+            $lines[] = str::repeat($tabChar, $pos['pos']) . "}";
 
 
             if ($smart) {

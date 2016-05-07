@@ -125,6 +125,11 @@ class UXNodeWrapper
                 return;
 
             case 'create':
+                if ($this->node->data('-factory-id')) { // if is clone!
+                    uiLater(function () use ($handler) {
+                        $handler(UXEvent::makeMock($this->node));
+                    });
+                }
                 return;
 
             case 'destroy':

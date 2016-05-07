@@ -3,6 +3,7 @@ namespace behaviour\custom;
 
 use game\Jumping;
 use game\SpriteSpec;
+use php\framework\Logger;
 use php\game\event\UXCollisionEvent;
 use php\game\UXGameEntity;
 use php\game\UXSpriteView;
@@ -62,56 +63,61 @@ class GameEntityBehaviour extends AbstractBehaviour
     private $factoryName;
 
     /**
+     * @var
+     */
+    private $type;
+
+    /**
      * @param mixed $target
      * @throws IllegalStateException
      */
     protected function applyImpl($target)
     {
         /** @var UXNode $target */
-        TimerScript::executeWhile(function () use ($target) {
-            return $this->findScene();
-        }, function () use ($target) {
+
+        $this->factoryName = $target->data('-factory-name');
+        $type = $this->type = $target->data('-factory-id') ?: ($this->factoryName ? "{$this->factoryName}.{$target->id}" : $target->id);
+
+        if ($target instanceof UXSpriteView) {
+            $target->observer('sprite')->addListener(function () {
+                $this->__loadFixture();
+            });
+        }
+
+        $this->entity = new UXGameEntity($type, $target);
+        $this->entity->bodyType = $this->bodyType;
+        $this->entity->solidType = $this->solidType;
+        $this->entity->velocity = $this->startVelocity;
+
+        if ($this->entity->solid) {
+            $target->data(Jumping::DATA_SOLID_PROPERTY, true);
+        }
+
+        $this->__loadFixture();
+
+        $collisionHandlers = $target->data(CollisionEventAdapter::class);
+
+        if ($collisionHandlers) {
+            foreach ($collisionHandlers as $entityType => $handler) {
+                $this->setCollisionHandler($entityType, $handler, null);
+            }
+
+            $target->data(CollisionEventAdapter::class, null);
+        }
+
+        $action = function () use ($target, $type) {
             $sceneBehaviour = $this->findScene();
 
-            if ($target instanceof UXSpriteView) {
-                $target->observer('sprite')->addListener(function () {
-                    $this->__loadFixture();
-                });
-            }
-
-            $this->factoryName = $target->data('-factory-name');
-
-            $type = $target->data('-factory-id') ?: ($this->factoryName ? "{$this->factoryName}.{$target->id}" : $target->id);
-
             if ($sceneBehaviour) {
-                $this->entity = new UXGameEntity($type, $target);
-                $this->entity->bodyType = $this->bodyType;
-                $this->entity->solidType = $this->solidType;
-                $this->entity->velocity = $this->startVelocity;
-
-                if ($this->entity->solid) {
-                    $target->data(Jumping::DATA_SOLID_PROPERTY, true);
-                }
-
-                $this->__loadFixture();
-
-                $target->data("--property-phys", $this->entity);
-
-                $collisionHandlers = $target->data(CollisionEventAdapter::class);
-
-                if ($collisionHandlers) {
-                    foreach ($collisionHandlers as $entityType => $handler) {
-                        $this->setCollisionHandler($entityType, $handler, null);
-                    }
-
-                    $target->data(CollisionEventAdapter::class, null);
-                }
-
                 $sceneBehaviour->getScene()->add($this->entity);
             } else {
-                throw new IllegalStateException("Unable to init GameEntity for $type, scene is not found");
+                Logger::error("Cannot init clone '$type', scene is not found");
             }
-        });
+        };
+
+        TimerScript::executeWhile(function () use ($target, $type, &$try) {
+            return $this->findScene();
+        }, $action);
     }
 
     protected function findScene()
@@ -133,6 +139,10 @@ class GameEntityBehaviour extends AbstractBehaviour
 
             if (!$sceneBehaviour && $this->_target->form) {
                 $sceneBehaviour = GameSceneBehaviour::get($this->_target->form);
+
+                if (!$sceneBehaviour) {
+                    $sceneBehaviour = $this->_target->form->layout->data('--game-scene');
+                }
             }
         }
 
@@ -153,6 +163,8 @@ class GameEntityBehaviour extends AbstractBehaviour
         if ($this->entity) {
             return $this->entity->{$name};
         }
+
+        return null;
     }
 
     public function __set($name, $value)
@@ -160,12 +172,16 @@ class GameEntityBehaviour extends AbstractBehaviour
         if ($this->entity) {
             $this->entity->{$name} = $value;
         } else {
-            throw new IllegalStateException("Unable to set '$name'");
+            Logger::error("Cannot set '{$name}' of '{$this->type}'");
         }
     }
 
     public function __call($name, array $args) {
-        return call_user_func([$this->entity, $name], $args);
+        if ($this->entity) {
+            return call_user_func([$this->entity, $name], $args);
+        } else {
+            Logger::error("Cannot call '{$name}()' of '{$this->type}'");
+        }
     }
 
     public function getCode()

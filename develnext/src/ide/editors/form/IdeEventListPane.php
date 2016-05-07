@@ -247,6 +247,7 @@ class IdeEventListPane
 
             if ($bind) {
                 $this->codeEditor->jumpToLine($bind['beginLine'], $bind['beginPosition']);
+                $this->codeEditor->jumpToLineSpaceOffset($bind['beginLine']);
             }
         }
     }
@@ -342,6 +343,7 @@ class IdeEventListPane
                 if ($actionConstructor->getResult()) {
                     $this->manager->replaceCodeOfMethod($selectedClass, $selectedMethod, $actionConstructor->getLiveCode());
                     $this->codeEditor->load();
+                    $this->jumpToLine($eventCode);
                 }
             }
         }

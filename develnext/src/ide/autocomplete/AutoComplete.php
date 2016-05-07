@@ -112,7 +112,7 @@ class AutoComplete
     public function identifyType($prefix)
     {
         $results = [];
-        Logger::debug("Identify type by prefix: $prefix ...");
+        //Logger::debug("Identify type by prefix: $prefix ...");
 
         if ($prefix) {
             if ($this->context) {
@@ -124,7 +124,7 @@ class AutoComplete
             }
 
             foreach ($this->rules as $rule) {
-                Logger::debug("Use rule " . get_class($rule));
+                //Logger::debug("Use rule " . get_class($rule));
 
                 if ($result = $rule->identifyType($prefix)) {
                     $results[] = $result;
@@ -132,7 +132,7 @@ class AutoComplete
             }
         }
 
-        Logger::debug("Identify type by prefix: $prefix = [" . Str::join($results, ', ') . ']');
+        //Logger::debug("Identify type by prefix: $prefix = [" . Str::join($results, ', ') . ']');
 
         return $results;
     }

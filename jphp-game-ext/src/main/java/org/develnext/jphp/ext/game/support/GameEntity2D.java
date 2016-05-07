@@ -97,71 +97,91 @@ public class GameEntity2D implements EventTarget {
         });
     }
 
+    private boolean horizontalCoordListenerLock = false;
+
     private ChangeListener<Number> getHorizontalCoordListener(Node node) {
         return (observable, oldValue, newValue) -> {
-            if (isSolid() && !node.isDisabled() && solidType == SolidType.THING) {
+            if (scene == null || node == null) return;
+
+            if (isSolid() && !node.isDisabled() && solidType == SolidType.THING && !horizontalCoordListenerLock) {
                 List<DetectResult> results = scene.detectCollision(GameEntity2D.this, newValue.doubleValue(), node.getLayoutY());
 
-                for (DetectResult result : results) {
-                    GameEntity2D entity = (GameEntity2D) result.getBody().getUserData();
+                horizontalCoordListenerLock = true;
 
-                    if (entity != GameEntity2D.this && entity.isSolid()) {
-                        Vector2 normal = result.getPenetration().getNormal();
-                        double depth = result.getPenetration().getDepth();
+                try {
+                    for (DetectResult result : results) {
+                        GameEntity2D entity = (GameEntity2D) result.getBody().getUserData();
 
-                        if (entity.isPlatform()) {
-                            continue;
+                        if (entity != GameEntity2D.this && entity.isSolid()) {
+                            Vector2 normal = result.getPenetration().getNormal();
+                            double depth = result.getPenetration().getDepth();
+
+                            if (entity.isPlatform()) {
+                                continue;
+                            }
+
+                            double xValue = newValue.doubleValue() - normal.x * depth;
+                            double yValue = node.getLayoutY() - normal.y * depth;
+
+                            node.setLayoutX(xValue);
+                            setX(xValue);
+
+                            node.setLayoutY(yValue);
+                            setY(yValue);
+
+                            setVelocityX(0);
+                            return;
                         }
-
-                        double xValue = newValue.doubleValue() - normal.x * depth;
-                        double yValue = node.getLayoutY() - normal.y * depth;
-
-                        node.setLayoutX(xValue);
-                        setX(xValue);
-
-                        node.setLayoutY(yValue);
-                        setY(yValue);
-
-                        setVelocityX(0);
-                        return;
                     }
+                } finally {
+                    horizontalCoordListenerLock = false;
                 }
             }
         };
     }
 
+    private boolean verticalCoordListenerLock = false;
+
     private ChangeListener<Number> getVerticalCoordListener(Node node) {
         return (observable, oldValue, newValue) -> {
-            if (isSolid() && !node.isDisabled() && solidType == SolidType.THING) {
+            if (scene == null || node == null) return;
+
+            if (isSolid() && !node.isDisabled() && solidType == SolidType.THING && !verticalCoordListenerLock) {
                 List<DetectResult> results = scene.detectCollision(GameEntity2D.this, node.getLayoutX(), newValue.doubleValue());
 
-                for (DetectResult result : results) {
-                    GameEntity2D entity = (GameEntity2D) result.getBody().getUserData();
+                verticalCoordListenerLock = true;
 
-                    if (entity != GameEntity2D.this && entity.isSolid()) {
-                        Vector2 normal = result.getPenetration().getNormal();
-                        double depth = result.getPenetration().getDepth();
+                try {
+                    for (DetectResult result : results) {
+                        GameEntity2D entity = (GameEntity2D) result.getBody().getUserData();
 
-                        if (entity.isPlatform()) {
-                            if (newValue.doubleValue() <= oldValue.doubleValue() || depth >= 8 || normal.y < 0) {
-                                continue;
+                        if (entity != GameEntity2D.this && entity.isSolid()) {
+                            Vector2 normal = result.getPenetration().getNormal();
+                            double depth = result.getPenetration().getDepth();
+
+                            if (entity.isPlatform()) {
+                                if (newValue.doubleValue() <= oldValue.doubleValue() || depth >= 8 || normal.y < 0) {
+                                    continue;
+                                }
                             }
+
+                            double yValue = newValue.doubleValue() - normal.y * depth;
+                            double xValue = node.getLayoutX() - normal.x * depth;
+
+                            node.setLayoutY(yValue);
+                            setY(yValue);
+
+                            if (!entity.isPlatform()) {
+                                node.setLayoutX(xValue);
+                                setX(xValue);
+                            }
+
+                            setVelocityY(0);
+                            return;
                         }
-
-                        double yValue = newValue.doubleValue() - normal.y * depth;
-                        double xValue = node.getLayoutX() - normal.x * depth;
-
-                        node.setLayoutY(yValue);
-                        setY(yValue);
-
-                        if (!entity.isPlatform()) {
-                            node.setLayoutX(xValue);
-                            setX(xValue);
-                        }
-
-                        setVelocityY(0);
-                        return;
                     }
+                } finally {
+                    verticalCoordListenerLock = false;
                 }
             }
         };

@@ -148,19 +148,46 @@ class CodeEditor extends AbstractEditor
             $this->textArea->syntaxStyle = "text/$mode";
         }
 
-        if ($mode == 'php') {
-            $this->autoComplete = new AutoCompletePane($this->textArea, new PhpAutoComplete());
-        }
-
         $this->textArea->on('keyUp', function (UXKeyEvent $e) {
+            if ($e->controlDown) {
+                switch ($e->codeName) {
+                    case 'F':
+                        $this->executeCommand('find');
+                        $e->consume();
+                        return;
+                    case 'R':
+                        $this->executeCommand('replace');
+                        $e->consume();
+                        return;
+                }
+            }
+
             $this->doChange();
         });
 
-        $this->findDialog = new FindTextDialogForm(function ($text, array $options) {
+        if ($mode == 'php') {
+            $this->autoComplete = new AutoCompletePane($this->textArea, new PhpAutoComplete());
+        }
+    }
+
+    public function getFindDialog()
+    {
+        if ($this->findDialog) {
+            return $this->findDialog;
+        }
+
+        return $this->findDialog = new FindTextDialogForm(function ($text, array $options) {
             $this->findSearchText($text, $options);
         });
+    }
 
-        $this->replaceDialog = new ReplaceTextDialogForm(function ($text, $newText, array $options, $command) {
+    public function getReplaceDialog()
+    {
+        if ($this->replaceDialog) {
+            return $this->replaceDialog;
+        }
+
+        return $this->replaceDialog = new ReplaceTextDialogForm(function ($text, $newText, array $options, $command) {
             $this->replaceSearchText($text, $newText, $options, $command);
         });
     }
@@ -462,7 +489,7 @@ class CodeEditor extends AbstractEditor
 
     protected function findSearchText($text, array $options)
     {
-        return $this->_findSearchText($this->findDialog, $text, $options);
+        return $this->_findSearchText($this->getFindDialog(), $text, $options);
     }
 
     protected function replaceSearchText($text, $newText, $options, $command)
@@ -477,7 +504,7 @@ class CodeEditor extends AbstractEditor
             // continue.
 
             case 'SKIP':
-                $result = $this->_findSearchText($this->replaceDialog, $text, $options, true);
+                $result = $this->_findSearchText($this->getReplaceDialog(), $text, $options, true);
                 break;
 
             case 'REPLACE':
@@ -492,7 +519,7 @@ class CodeEditor extends AbstractEditor
                 $this->textArea->select($this->findDialogLastIndex - 1, $end);
                 $this->findDialogLastIndex = $end + 1;
 
-                $result = $this->_findSearchText($this->replaceDialog, $text, $options, true);
+                $result = $this->_findSearchText($this->getReplaceDialog(), $text, $options, true);
 
                 if (!$result) {
                     $this->textArea->select(0, 0);
@@ -501,7 +528,7 @@ class CodeEditor extends AbstractEditor
                 break;
         }
 
-        $this->replaceDialog->setFindResult($result);
+        $this->getReplaceDialog()->setFindResult($result);
     }
 
     public function showFindDialog()
@@ -509,10 +536,10 @@ class CodeEditor extends AbstractEditor
         $this->findDialogLastIndex = 0;
 
         if ($this->textArea->selectedText) {
-            $this->findDialog->setResult($this->textArea->selectedText);
+            $this->getFindDialog()->setResult($this->textArea->selectedText);
         }
 
-        $this->findDialog->show();
+        $this->getFindDialog()->show();
     }
 
     public function showReplaceDialog()
@@ -520,10 +547,15 @@ class CodeEditor extends AbstractEditor
         $this->findDialogLastIndex = 0;
 
         if ($this->textArea->selectedText) {
-            $this->replaceDialog->setResult($this->textArea->selectedText);
+            $this->getReplaceDialog()->setResult($this->textArea->selectedText);
         }
 
-        $this->replaceDialog->show();
+        $this->getReplaceDialog()->show();
+    }
+
+    public function jumpToLineSpaceOffset($beginLine)
+    {
+        $this->textArea->jumpToLineSpaceOffset($beginLine);
     }
 }
 

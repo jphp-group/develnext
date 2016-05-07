@@ -8,11 +8,14 @@ import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import org.develnext.jphp.gui.designer.SyntaxTextArea;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
+import org.fxmisc.richtext.Paragraph;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
+
+import java.util.Collection;
 
 @Abstract
 @Namespace(GuiDesignerExtension.NS)
@@ -159,6 +162,29 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
 
     @Signature
     public void jumpToLine(int line, int pos) {
+        getWrappedObject().moveTo(getWrappedObject().position(line, pos).toOffset());
+    }
+
+    @Signature
+    public void jumpToLineSpaceOffset(int line) {
+        int pos = 0;
+
+        if (getWrappedObject().getParagraphs().size() < line + 1) {
+            return;
+        }
+
+        Paragraph<Collection<String>, Collection<String>> paragraph = getWrappedObject().getParagraph(line);
+
+        String text = paragraph.getText();
+
+        for (int i = 0; i < text.length(); i++) {
+            if (!Character.isSpaceChar(text.charAt(i))) {
+                break;
+            }
+
+            pos++;
+        }
+
         getWrappedObject().moveTo(getWrappedObject().position(line, pos).toOffset());
     }
 

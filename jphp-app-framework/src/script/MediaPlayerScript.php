@@ -144,8 +144,14 @@ class MediaPlayerScript extends AbstractScript implements TextableBehaviour, Val
      */
     public function setSource($source)
     {
+        $reopen = $source != $this->_source;
         $this->_source = $source;
-        $this->_init();
+
+        if ($reopen) {
+            $this->_init();
+        }
+
+        $this->setPosition(0);
 
         if ($this->autoplay && $source) {
             $this->play();

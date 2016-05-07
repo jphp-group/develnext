@@ -145,7 +145,21 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                     case ')':
                     case ']':
                     case ';':
+                    case '\\':
+                    case '*':
+                    case '/':
+                    case '.':
+                    case '+':
+                    case '-':
+                    case '>':
+                    case '<':
+                    case '%':
+                    case '@':
+                    case '?':
                     case '=':
+                    case '!':
+                    case '&':
+                    case '|':
                         return null;
                 }
 

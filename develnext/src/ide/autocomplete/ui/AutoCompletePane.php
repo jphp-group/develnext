@@ -21,6 +21,7 @@ use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\gui\UXPopupWindow;
+use php\lib\arr;
 use php\lib\Char;
 use php\lib\Items;
 use php\lib\Str;
@@ -136,6 +137,10 @@ class AutoCompletePane
         }, __CLASS__);
 
         $this->area->on('keyUp', function (UXKeyEvent $e) {
+            if ($e->controlDown || $e->altDown) {
+                return;
+            }
+
             switch ($e->codeName) {
                 case 'Up':
                 case 'Down':
@@ -189,13 +194,13 @@ class AutoCompletePane
                         $this->list->items->addAll($items);
                         $this->list->selectedIndex = 0;
 
-                        Logger::debug("Autocomplete list updated.");
+                        //Logger::debug("Autocomplete list updated.");
                     }
 
                     if ($this->list->items->count) {
                         $this->show($x + 45, $y + 20);
                     } else {
-                        Logger::debug("No auto complete items for: $string");
+                        //Logger::debug("No auto complete items for: $string");
                         $this->hide();
                     }
                 });
@@ -283,7 +288,7 @@ class AutoCompletePane
 
     protected function doPick()
     {
-        Logger::debug("do pick");
+        //Logger::debug("do pick");
 
         if ($this->shown) {
             UXApplication::runLater(function () {
@@ -300,7 +305,7 @@ class AutoCompletePane
                     $insert = Str::sub($insert, Str::length($prefix));
                 }
 
-                Logger::debug("Insert to caret: " . $insert);
+                //Logger::debug("Insert to caret: " . $insert);
                 $this->area->insertToCaret($insert);
             });
             $this->lock = true;
@@ -432,10 +437,6 @@ class AutoCompletePane
 
         if ($prefix) {
             $flow = $flow->find(function (AutoCompleteItem $one) use ($prefix) {
-                if ($prefix == $one->getName()) {
-                    return false;
-                }
-
                 return Str::startsWith($one->getName(), $prefix);
             });
         }
@@ -448,7 +449,11 @@ class AutoCompletePane
             return Str::compare($one->getName(), $two->getName());
         });
 
-        return ($items);
+        if (arr::first($items) == $prefix && sizeof($items) < 2) {
+            return [];
+        }
+
+        return $items;
     }
 
     protected function makeItemUi(UXListCell $cell, AutoCompleteItem $item)

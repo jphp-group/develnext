@@ -13,6 +13,39 @@ class Logger
     const LEVEL_DEBUG = 200;
 
     protected static $level = self::LEVEL_DEBUG;
+    protected static $showTime = false;
+
+    /**
+     * @return int
+     */
+    public static function getLevel()
+    {
+        return self::$level;
+    }
+
+    /**
+     * @param int $level
+     */
+    public static function setLevel($level)
+    {
+        self::$level = $level;
+    }
+
+    /**
+     * @return boolean
+     */
+    public static function isShowTime()
+    {
+        return self::$showTime;
+    }
+
+    /**
+     * @param boolean $showTime
+     */
+    public static function setShowTime($showTime)
+    {
+        self::$showTime = $showTime;
+    }
 
     static protected function getLogName($level)
     {
@@ -29,9 +62,13 @@ class Logger
     static protected function log($level, $message)
     {
         if ($level <= static::$level) {
-            $time = Time::now()->toString('HH:mm:ss');
+            $time = "";
 
-            $line = static::getLogName($level) . " ($time) " . $message . "\r\n";
+            if (static::$showTime) {
+                $time = "(" . Time::now()->toString('HH:mm:ss') . ") ";
+            }
+
+            $line = "[" . static::getLogName($level) . "] $time" . $message . "\r\n";
 
             $out = Stream::of('php://stdout');
             $out->write($line);

@@ -20,7 +20,7 @@ class PhpAutoComplete extends AutoComplete
 
     public function parsePrefixForRule($prefix)
     {
-        Logger::debug("Parse prefix for rule: $prefix");
+        //Logger::debug("Parse prefix for rule: $prefix");
 
         $tokens = SourceTokenizer::parseAll("<? " . $prefix);
 

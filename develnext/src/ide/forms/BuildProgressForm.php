@@ -216,6 +216,22 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
             $color = '#333333';
         }
 
+        if (str::startsWith($text, "[ERROR] ")) {
+            $color = '#D8000C';
+        }
+
+        if (str::startsWith($text, "[WARN] ") || str::startsWith($text, "[WARNING] ")) {
+            $color = '#9F6000';
+        }
+
+        if (str::startsWith($text, "[INFO] ")) {
+            $color = '#00529B';
+        }
+
+        if (str::startsWith($text, "[DEBUG] ") || $text[0] == ':') {
+            $color = 'gray';
+        }
+
         if ($this->consoleArea) {
             $this->consoleArea->appendText($text, "-fx-font-family: 'Courier New'; -fx-font-size: 14px; -fx-fill: $color");
             $this->consoleArea->caretPosition = str::length($this->consoleArea->text) - 1;

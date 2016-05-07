@@ -52,6 +52,13 @@ class UXAbstractCodeArea extends UXControl
     }
 
     /**
+     * @param $line
+     */
+    public function jumpToLineSpaceOffset($line)
+    {
+    }
+
+    /**
      * @param $text
      */
     public function insertToCaret($text)

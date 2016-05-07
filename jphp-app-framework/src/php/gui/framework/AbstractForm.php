@@ -80,6 +80,7 @@ abstract class AbstractForm extends UXForm
 
     /**
      * @param UXForm $origin
+     * @param bool $loadEvents
      * @param bool $loadBehaviours
      * @throws Exception
      * @throws IllegalStateException
@@ -113,6 +114,7 @@ abstract class AbstractForm extends UXForm
 
         if ($loadBehaviours) {
             $this->loadBehaviours();
+            $this->loadClones();  // TODO Refactor it.
         }
     }
 
@@ -483,6 +485,28 @@ abstract class AbstractForm extends UXForm
         }
     }
 
+    public function loadClones()
+    {
+        if (!$this->layout) {
+            throw new IllegalStateException("Form design is not loaded, call loadDesign() before call loadClones().");
+        }
+
+        DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node = null) {
+            if ($node) {
+                // skip clones.
+                if ($node->data('-factory-id')) return;
+
+                if ($node instanceof UXCustomNode) {
+                    $newNode = $this->loadCustomNode($node);
+
+                    if ($newNode) {
+                        $node->parent->children->replace($node, $newNode);
+                    }
+                }
+            }
+        });
+    }
+
     protected function loadDesign()
     {
         $loader = new UXLoader();
@@ -497,18 +521,15 @@ abstract class AbstractForm extends UXForm
             }
 
             if ($this->layout) {
-                DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node = null) {
+                $clones = [];
+
+                DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node = null) use (&$clones) {
                     if ($node) {
                         // skip clones.
                         if ($node->data('-factory-id')) return;
 
                         if ($node instanceof UXCustomNode) {
-                            $newNode = $this->loadCustomNode($node);
-
-                            if ($newNode) {
-                                $node->parent->children->replace($node, $newNode);
-                                $node = $newNode;
-                            }
+                            $clones[] = $node;
                         } else {
                             if ($node) {
                                 $node->data('-factory-name', $this->getName());
@@ -520,6 +541,14 @@ abstract class AbstractForm extends UXForm
                         }
                     }
                 });
+
+                foreach ($clones as $clone) {
+                    $newNode = $this->loadCustomNode($clone);
+
+                    if ($newNode) {
+                        $clone->parent->children->replace($clone, $newNode);
+                    }
+                }
             }
         });
     }
