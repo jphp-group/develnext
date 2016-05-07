@@ -17,6 +17,7 @@ use ide\utils\Json;
 use ide\utils\UiUtils;
 use php\format\JsonProcessor;
 use php\gui\designer\UXAbstractCodeArea;
+use php\gui\designer\UXCodeAreaScrollPane;
 use php\gui\designer\UXCssCodeArea;
 use php\gui\designer\UXFxCssCodeArea;
 use php\gui\designer\UXPhpCodeArea;
@@ -351,13 +352,16 @@ class CodeEditor extends AbstractEditor
         $commandPane->height = 30;
 
         $ui->add($commandPane);
-        $ui->add($this->textArea);
+
+        $scrollPane = new UXCodeAreaScrollPane($this->textArea);
+
+        $ui->add($scrollPane);
 
         UXAnchorPane::setAnchor($commandPane, 0);
-        UXAnchorPane::setAnchor($this->textArea, 0);
+        UXAnchorPane::setAnchor($scrollPane, 0);
 
         $commandPane->bottomAnchor = null;
-        $this->textArea->topAnchor = 30;
+        $scrollPane->topAnchor = 30;
 
         $resize = function () {
             $this->refreshUi();

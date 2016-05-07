@@ -12,7 +12,7 @@ class Logger
     const LEVEL_INFO = 100;
     const LEVEL_DEBUG = 200;
 
-    protected static $level = self::LEVEL_DEBUG;
+    protected static $level = self::LEVEL_INFO;
     protected static $showTime = false;
 
     /**

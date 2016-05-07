@@ -12,6 +12,7 @@ use ide\forms\SplashForm;
 use ide\library\IdeLibrary;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
+use ide\misc\GradleBuildConfig;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\protocol\AbstractProtocolHandler;
@@ -1103,6 +1104,8 @@ class Ide extends Application
 
     public function shutdown()
     {
+        GradleBuildConfig::stopDaemon();
+
         $shutdownTh = (new Thread(function () {
             sleep(40);
             Logger::warn("System halt 0\n");
@@ -1156,7 +1159,7 @@ class Ide extends Application
         try {
             parent::shutdown();
         } catch (\Exception $e) {
-            System::halt(0);
+            //System::halt(0);
         }
     }
 

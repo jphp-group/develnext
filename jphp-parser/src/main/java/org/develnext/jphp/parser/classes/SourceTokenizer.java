@@ -89,7 +89,7 @@ public class SourceTokenizer extends BaseObject {
             while ((token = tokenizer.nextToken()) != null) {
                 result.add(new SourceToken(env, token));
             }
-        } catch (ParseException e){
+        } catch (ParseException|StringIndexOutOfBoundsException e){ // TODO remove StringIndexOutOfBoundsException bug in jphp!
             return null;
         }
 

@@ -1,6 +1,7 @@
 <?php
 namespace php\gui;
 
+use php\framework\Logger;
 use php\io\IOException;
 
 class UXImageAreaWrapper extends UXNodeWrapper
@@ -15,7 +16,7 @@ class UXImageAreaWrapper extends UXNodeWrapper
             try {
                 $this->node->image = new UXImage('res://' . $data->get('image'));
             } catch (\Exception $e) {
-                UXDialog::showAndWait('Cannot load image: "' . $data->get('image') . '"', 'ERROR');
+                Logger::error('Cannot load image: "' . $data->get('image') . '", component = ' . $this->node->id);
             }
         }
 
@@ -23,7 +24,7 @@ class UXImageAreaWrapper extends UXNodeWrapper
             try {
                 $this->node->hoverImage = new UXImage('res://' . $data->get('hoverImage'));
             } catch (\Exception $e) {
-                UXDialog::showAndWait('Cannot load image: "' . $data->get('hoverImage') . '"', 'ERROR');
+                Logger::error('Cannot load hover image: "' . $data->get('hoverImage') . '", component = ' . $this->node->id);
             }
         }
 
@@ -31,7 +32,7 @@ class UXImageAreaWrapper extends UXNodeWrapper
             try {
                 $this->node->clickImage = new UXImage('res://' . $data->get('clickImage'));
             } catch (\Exception $e) {
-                UXDialog::showAndWait('Cannot load image: "' . $data->get('clickImage') . '"', 'ERROR');
+                Logger::error('Cannot load click image: "' . $data->get('clickImage') . '", component = ' . $this->node->id);
             }
         }
     }

@@ -1,6 +1,8 @@
 <?php
 namespace php\gui;
 
+use php\framework\Logger;
+
 abstract class UXLabeledWrapper extends UXNodeWrapper
 {
     public function applyData(UXData $data)
@@ -14,7 +16,7 @@ abstract class UXLabeledWrapper extends UXNodeWrapper
 
                 $this->node->graphic = $graphic;
             } catch (\Exception $e) {
-                ;
+                Logger::error('Cannot load graphic image: "' . $data->get('graphic') . '", component = ' . $this->node->id);
             }
         }
     }

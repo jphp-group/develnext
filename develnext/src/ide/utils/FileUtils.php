@@ -168,7 +168,9 @@ class FileUtils
     {
         try {
             fs::ensureParent($dest);
-            return fs::copy($origin, $dest);
+
+            Stream::putContents($dest, fs::get($origin));
+            return 0;
         } catch (IOException $e) {
             return -1;
         }

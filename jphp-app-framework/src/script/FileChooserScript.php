@@ -2,6 +2,7 @@
 namespace script;
 
 use behaviour\SetTextBehaviour;
+use php\framework\Logger;
 use php\gui\framework\AbstractScript;
 use php\gui\framework\behaviour\TextableBehaviour;
 use php\gui\framework\behaviour\ValuableBehaviour;

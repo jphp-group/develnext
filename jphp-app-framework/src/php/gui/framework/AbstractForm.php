@@ -116,6 +116,8 @@ abstract class AbstractForm extends UXForm
             $this->loadBehaviours();
             $this->loadClones();  // TODO Refactor it.
         }
+
+        Logger::debug("Form '{$this->getName()}' is created.");
     }
 
     public function loadBehaviours()
@@ -204,7 +206,7 @@ abstract class AbstractForm extends UXForm
             if ($initiator->form) {
                 $initiator->form->add($instance);
             } else {
-                throw new IllegalStateException("Unable to create instance by destroyed object");
+                Logger::error("Unable to create '$id' clone from destroyed prototype");
             }
         }
 
@@ -305,8 +307,12 @@ abstract class AbstractForm extends UXForm
         $this->hide();
 
         foreach ($this->_modules as $module) {
-            $module->free();
+            if (!$module->singleton) {
+                $module->free();
+            }
         }
+
+        Logger::debug("Form '{$this->getName()}' is destroyed");
     }
 
     public function isFree()
@@ -679,7 +685,11 @@ abstract class AbstractForm extends UXForm
         }
 
         if (!$node) {
-            throw new Exception("Unable to bind '$event', cannot find '$id' component");
+            if (isset($id)) {
+                Logger::warn("Unable to bind '$event' event, component '$id' not found");
+            }
+
+            return;
         }
 
         $eventName = Str::split($eventName, '-', 2);

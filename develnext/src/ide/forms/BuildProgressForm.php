@@ -216,7 +216,7 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
             $color = '#333333';
         }
 
-        if (str::startsWith($text, "[ERROR] ")) {
+        if (str::startsWith($text, "[ERROR] ") || str::startsWith($text, "Fatal error: ")) {
             $color = '#D8000C';
         }
 
@@ -228,7 +228,7 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
             $color = '#00529B';
         }
 
-        if (str::startsWith($text, "[DEBUG] ") || $text[0] == ':') {
+        if (str::startsWith($text, "[DEBUG] ") || $text[0] == ':' || str::trimLeft($text)[0] == '#') {
             $color = 'gray';
         }
 

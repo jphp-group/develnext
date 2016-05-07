@@ -1,5 +1,6 @@
 <?php
 namespace php\gui\framework;
+use php\framework\Logger;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;
 use php\gui\framework\behaviour\custom\ModuleBehaviourManager;
@@ -223,5 +224,7 @@ abstract class AbstractModule extends AbstractScript
         foreach ($this->scriptManager->getScripts() as $script) {
             $script->free();
         }
+
+        Logger::debug("Module '{$this->id}' (context={$this->getContextFormName()}) is destroyed");
     }
 }

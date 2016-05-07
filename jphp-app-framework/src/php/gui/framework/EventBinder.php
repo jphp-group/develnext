@@ -2,6 +2,7 @@
 namespace php\gui\framework;
 
 use Exception;
+use php\framework\Logger;
 use php\gui\AbstractFormWrapper;
 use php\gui\event\UXEvent;
 use php\gui\framework\event\AbstractEventAdapter;
@@ -137,7 +138,7 @@ class EventBinder
                         $handler = $adapter->adapt($target, $handler, $eventName[1]);
 
                         if (!$handler) {
-                            throw new Exception("Unable to bind '$name'");
+                            throw new Exception("Unable to bind '$name', handler is null");
                         }
 
                         if ($handler === true) {
@@ -226,7 +227,8 @@ class EventBinder
         }
 
         if (!$node) {
-            throw new Exception("Unable to bind '$event'");
+            Logger::warn("Unable to bind '$event', component not found");
+            return;
         }
 
         $eventName = Str::split($eventName, '-', 2);

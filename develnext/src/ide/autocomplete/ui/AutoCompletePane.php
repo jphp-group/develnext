@@ -366,8 +366,7 @@ class AutoCompletePane
         $list->maxHeight = 9999;
         $list->fixedCellSize = 20;
         $list->classes->add('hide-hor-scroll');
-        $list->classes->add('code-area-popup');
-        $list->style = '-fx-font: 12px "Courier new"';
+        $list->style = '-fx-font: 12px "Courier new"; -fx-background-insets: 0; -fx-focus-color: -fx-control-inner-background; -fx-faint-focus-color: -fx-control-inner-background;';
         $list->width = 450;
 
         $ui->add($list);

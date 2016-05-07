@@ -8,11 +8,13 @@ import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import org.dyn4j.collision.manifold.Manifold;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.DetectResult;
 import org.dyn4j.dynamics.contact.ContactConstraint;
 import org.dyn4j.geometry.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +132,15 @@ public class GameEntity2D implements EventTarget {
                             setY(yValue);
 
                             setVelocityX(0);
+
+                            if (scene != null) {
+                                ContactConstraint contact = new ContactConstraint(
+                                        body, body.getFixture(0), result.getBody(), result.getFixture(), new Manifold(Collections.emptyList(), normal.getNegative()), 1.0, 1.0
+                                );
+
+                                scene.triggerCollision(contact);
+                            }
+
                             return;
                         }
                     }
@@ -177,6 +188,15 @@ public class GameEntity2D implements EventTarget {
                             }
 
                             setVelocityY(0);
+
+                            if (scene != null) {
+                                ContactConstraint contact = new ContactConstraint(
+                                        body, body.getFixture(0), result.getBody(), result.getFixture(), new Manifold(Collections.emptyList(), normal.getNegative()), 1.0, 1.0
+                                );
+
+                                scene.triggerCollision(contact);
+                            }
+
                             return;
                         }
                     }

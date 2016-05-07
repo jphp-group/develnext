@@ -2,6 +2,7 @@
 
 use facade\Json;
 use php\format\JsonProcessor;
+use php\framework\Logger;
 use php\gui\UXApplication;
 use php\io\Stream;
 use php\lang\ClassLoader;
@@ -17,6 +18,8 @@ try {
 } catch (\php\io\IOException $e) {
     exit(1);
 }
+
+Logger::setLevel(Logger::LEVEL_DEBUG);
 
 class DebugClassLoader extends ClassLoader
 {

@@ -48,15 +48,19 @@ public class GameScene2D {
         world.addListener(new CollisionAdapter() {
             @Override
             public boolean collision(ContactConstraint contact) {
-                GameEntity2D e1 = (GameEntity2D) contact.getBody1().getUserData();
-                GameEntity2D e2 = (GameEntity2D) contact.getBody2().getUserData();
-
-                boolean consume1 = !contact.isSensor() && e1.triggerCollision(e2, contact, true);
-                boolean consume2 = !contact.isSensor() && e2.triggerCollision(e1, contact, false);
-
-                return consume1 || consume2;
+                return triggerCollision(contact);
             }
         });
+    }
+
+    public boolean triggerCollision(ContactConstraint contact) {
+        GameEntity2D e1 = (GameEntity2D) contact.getBody1().getUserData();
+        GameEntity2D e2 = (GameEntity2D) contact.getBody2().getUserData();
+
+        boolean consume1 = !contact.isSensor() && e1.triggerCollision(e2, contact, true);
+        boolean consume2 = !contact.isSensor() && e2.triggerCollision(e1, contact, false);
+
+        return consume1 || consume2;
     }
 
     public List<DetectResult> detectCollision(GameEntity2D entity2D, double x, double y) {

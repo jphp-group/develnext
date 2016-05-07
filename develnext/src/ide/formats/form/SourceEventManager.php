@@ -387,10 +387,12 @@ class SourceEventManager
 
         $arguments = Str::join($arguments, ", ");
 
+        $tab = str::repeat(' ', 4); // TODO tab size
+
         while ($scanner->hasNextLine()) {
             if ($line + 1 === $i) {
-                $source .= "\n\t/**\n\t * @event $bind \n\t **/\n";
-                $source .= "\tfunction $methodName($arguments)\n\t{\t\n\t\t\n\t}\n";
+                $source .= "\n$tab/**\n$tab * @event $bind \n$tab **/\n";
+                $source .= "{$tab}function $methodName($arguments)\n$tab{{$tab}\n{$tab}{$tab}\n{$tab}}\n";
             }
 
             $source .= $scanner->nextLine() . "\n";
@@ -429,7 +431,7 @@ class SourceEventManager
 
         $file = $this->file;
 
-        if (\Files::exists("$file.source")) {
+        if (fs::exists("$file.source")) {
             $file = "$file.source";
         }
 

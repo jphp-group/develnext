@@ -11,6 +11,7 @@ use game\Jumping;
 use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
 use ide\project\behaviours\GradleProjectBehaviour;
+use php\framework\Logger;
 use php\game\event\UXCollisionEvent;
 use php\gui\animation\UXAnimationTimer;
 use php\gui\animation\UXKeyFrame;
@@ -201,6 +202,8 @@ class JPHPGuiDesktopBundle extends AbstractJarBundle
             Geometry::class,
             Media::class,
             Score::class,
+
+            Logger::class,
         ];
     }
 }

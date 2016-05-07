@@ -5,6 +5,7 @@ use BaseException;
 use Exception;
 use facade\Json;
 use php\format\JsonProcessor;
+use php\framework\Logger;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;
 use php\gui\UXApplication;
@@ -77,6 +78,8 @@ class Application
         if ($configPath === null) {
             $configPath = 'res://.system/application.conf';
         }
+
+        Logger::info("Application starting ...");
 
         $functions = "res://php/gui/framework/functions";
 
@@ -236,6 +239,11 @@ class Application
             $class = $this->getNamespace() . "\\forms\\$name";
         }
 
+        if (!class_exists($class)) {
+            Logger::error("Cannot get form '$name', it doesn't exist, class not found");
+            return null;
+        }
+
         $form = new $class($origin, $loadEvents, $loadBehaviours);
 
         if (!$cache) {
@@ -260,7 +268,11 @@ class Application
         }
 
         $form = $this->getForm($name);
-        $form->show();
+
+        if ($form) {
+            $form->show();
+        }
+
         return $form;
     }
 
@@ -271,7 +283,11 @@ class Application
     public function showFormAndWait($name)
     {
         $form = $this->getForm($name);
-        $form->showAndWait();
+
+        if ($form) {
+            $form->showAndWait();
+        }
+
         return $form;
     }
 
@@ -282,7 +298,11 @@ class Application
     public function showNewForm($name)
     {
         $form = $this->getNewForm($name);
-        $form->show();
+
+        if ($form) {
+            $form->show();
+        }
+
         return $form;
     }
 
@@ -294,6 +314,7 @@ class Application
     {
         $form = $this->getNewForm($name);
         $form->show();
+
         return $form;
     }
 
@@ -304,7 +325,11 @@ class Application
     public function hideForm($name)
     {
         $form = $this->getForm($name);
-        $form->hide();
+
+        if ($form) {
+            $form->hide();
+        }
+
         return $form;
     }
 
@@ -461,6 +486,8 @@ class Application
             if (Stream::exists('res://.debug/bootstrap.php')) {
                 include 'res://.debug/bootstrap.php';
             }
+
+            Logger::info("Application start is done.");
         });
     }
 
@@ -469,6 +496,8 @@ class Application
      */
     public function shutdown()
     {
+        Logger::info("Application shutdown");
+
         UXApplication::shutdown();
     }
 

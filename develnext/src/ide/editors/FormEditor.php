@@ -1595,6 +1595,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $node = $this->createElement($selected, $selectionRectangle->x, $selectionRectangle->y, null, !$e->controlDown);
 
             if ($e && !$e->controlDown) {
+                Logger::debug("Clear selection from element type pane");
                 $this->elementTypePane->clearSelected();
             }
 

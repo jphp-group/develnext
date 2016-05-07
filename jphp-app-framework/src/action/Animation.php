@@ -1,6 +1,7 @@
 <?php
 namespace action;
 
+use php\framework\Logger;
 use php\gui\animation\UXAnimationTimer;
 use php\gui\animation\UXFadeAnimation;
 use php\gui\animation\UXPathAnimation;
@@ -11,6 +12,7 @@ use php\gui\framework\ScriptEvent;
 use php\gui\UXNode;
 use php\gui\UXWindow;
 use php\lang\IllegalArgumentException;
+use php\lib\reflect;
 use script\TimerScript;
 use timer\AccurateTimer;
 
@@ -160,6 +162,6 @@ class Animation
             return $timer;
         }
 
-        throw new IllegalArgumentException("Cannot animate " . $object);
+        Logger::warn("Cannot animate object(" . reflect::typeOf($object) . "), it's not supported for this type");
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace php\gui;
 
+use php\framework\Logger;
 use php\gui\animation\UXAnimationTimer;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyboardManager;
@@ -99,7 +100,7 @@ class UXNodeWrapper
                     break;
 
                 default:
-                    throw new \Exception("Unable to bind '$kind' event with param = '$param'");
+                    Logger::warn("Unable to bind '$kind' event with param = '$param'");
             }
         } else {
             TimerScript::executeWhile(function () {

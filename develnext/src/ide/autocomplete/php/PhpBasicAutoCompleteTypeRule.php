@@ -138,6 +138,10 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
             if ($last) {
                 switch ($last->word) {
+                    case '!':
+                    case '&':
+                    case '|':
+
                     case '{':
                     case '(':
                     case '[':
@@ -157,9 +161,6 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                     case '@':
                     case '?':
                     case '=':
-                    case '!':
-                    case '&':
-                    case '|':
                         return null;
                 }
 

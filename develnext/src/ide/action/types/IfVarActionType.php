@@ -76,7 +76,11 @@ class IfVarActionType extends AbstractSimpleActionType
 
         $method = TextMethodsArgumentEditor::$variants[$action->method];
 
-        return Str::format("Если глобальная переменная %s `%s` -> %s ", $name, $method, $action->get('value'));
+        if ($action->not) {
+            return Str::format("Если глобальная переменная %s НЕ `%s` -> %s ", $name, $method, $action->get('value'));
+        } else {
+            return Str::format("Если глобальная переменная %s `%s` -> %s ", $name, $method, $action->get('value'));
+        }
     }
 
     function getIcon(Action $action = null)

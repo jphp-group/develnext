@@ -1,11 +1,14 @@
 <?php
 namespace ide\misc;
 
+use ide\Ide;
+use ide\Logger;
 use ide\utils\FileUtils;
 use ide\utils\StrUtils;
 use php\format\ProcessorException;
 use php\io\File;
 use php\io\Stream;
+use php\lang\Process;
 use php\lib\arr;
 use php\lib\Str;
 use php\xml\DomDocument;
@@ -77,6 +80,23 @@ class GradleBuildConfig
 
         //$this->load();
        // $this->update();
+    }
+
+    public static function stopDaemon()
+    {
+        if ($ide = Ide::get()) {
+            Logger::info("Stop gradle daemon ...");
+
+            $process = new Process(
+                [$ide->getGradleProgram(), '--stop'],
+                $ide->getFile(''),
+                $ide->makeEnvironment()
+            );
+
+            $process->start();
+
+            //Logger::info("Gradle daemon is stopped.");
+        }
     }
 
     public function save()

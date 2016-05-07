@@ -13,6 +13,7 @@ import org.develnext.jphp.gui.designer.editor.inspect.AbstractInspector;
 import org.develnext.jphp.gui.designer.editor.syntax.hotkey.*;
 import org.develnext.jphp.gui.designer.editor.syntax.popup.CodeAreaContextMenu;
 import org.develnext.jphp.gui.designer.editor.syntax.popup.CodeAreaPopup;
+import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.PopupAlignment;
 import org.fxmisc.richtext.StyleSpans;
@@ -71,14 +72,14 @@ abstract public class AbstractCodeArea extends CodeArea {
 
         richChanges()
                 .filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
-                .successionEnds(Duration.ofMillis(10))
+                .successionEnds(Duration.ofMillis(200))
                 .supplyTask(this::computeHighlightingAsync)
                 .awaitLatest(richChanges())
                 .filterMap(t -> {
                     if (t.isSuccess()) {
                         return Optional.of(t.get());
                     } else {
-                        t.getFailure().printStackTrace();
+                        //t.getFailure().printStackTrace();
                         return Optional.empty();
                     }
                 })
@@ -255,7 +256,7 @@ abstract public class AbstractCodeArea extends CodeArea {
         try {
             setStyleSpans(0, highlighting);
         } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-            System.err.println(e.getMessage());
+            //System.err.println(e.getMessage());
         }
     }
 

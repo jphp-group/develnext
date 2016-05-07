@@ -1,5 +1,6 @@
 package org.develnext.jphp.gui.designer.editor.syntax.impl;
 
+import javafx.application.Platform;
 import org.antlr.v4.runtime.*;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.CodeAreaGutterNote;
@@ -167,6 +168,11 @@ public class PhpCodeArea extends AbstractCodeArea {
             case PHPParser.ShiftLeft:
             case PHPParser.ShiftRight:
             case PHPParser.DoubleColon:
+            case PHPParser.IsSmallerOrEqual:
+            case PHPParser.IsGreaterOrEqual:
+            case PHPParser.Pow:
+            case PHPParser.SuppressWarnings:
+            case PHPParser.BackQuote:
                 return Collections.singletonList("operator");
 
             case PHPParser.SemiColon:
@@ -176,6 +182,8 @@ public class PhpCodeArea extends AbstractCodeArea {
                 return Collections.emptyList();
         }
     }
+
+    protected Thread lastCheckThread = null;
 
     @Override
     protected void computeHighlighting(StyleSpansBuilder<Collection<String>> spansBuilder, String text) {
@@ -209,9 +217,27 @@ public class PhpCodeArea extends AbstractCodeArea {
             lastEnd = token.getStopIndex() + 1;
         }
 
-        lex.reset();
-        PHPParser cssParser = new PHPParser(new CommonTokenStream(lex));
-        cssParser.addErrorListener(errorListener);
-        cssParser.htmlDocument();
+        Thread thread = lastCheckThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    return;
+                }
+
+                if (lastCheckThread != this) {
+                    return;
+                }
+
+                lex.reset();
+                PHPParser cssParser = new PHPParser(new CommonTokenStream(lex));
+                cssParser.addErrorListener(errorListener);
+                cssParser.htmlDocument();
+
+                Platform.runLater(PhpCodeArea.this::refreshGutter);
+            }
+        };
+        thread.start();
     }
 }

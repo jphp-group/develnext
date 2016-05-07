@@ -2,6 +2,7 @@
 namespace behaviour\custom;
 
 use action\Element;
+use php\framework\Logger;
 use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
@@ -33,6 +34,7 @@ class WatchMakerBehaviour extends AbstractBehaviour
             try {
                 Element::setText($target, $now->toString($this->format));
             } catch (IllegalArgumentException $e) {
+                Logger::error("Invalid time format '$this->format' for apply watch maker behaviour");
                 Element::setText($target, "[invalid format]");
             }
         };
