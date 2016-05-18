@@ -42,7 +42,7 @@ trait SavableFormMixin
             }
         }
 
-        uiLater(function () use ($config) {
+        waitAsync(50, function () use ($config) {
             /** @var $this AbstractForm */
             $this->maximized = $config->get("maximized", $this->maximized);
         });

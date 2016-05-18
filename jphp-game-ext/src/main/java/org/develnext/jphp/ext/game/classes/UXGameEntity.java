@@ -42,6 +42,8 @@ public class UXGameEntity extends BaseWrapper<GameEntity2D> {
         void setRectangleFixture(double width, double height);
         void setEllipseFixture(double width, double height);
         void setCircleFixture(double radius);
+
+        boolean isPlaceFree(double x, double y);
     }
 
     public UXGameEntity(Environment env, GameEntity2D wrappedObject) {

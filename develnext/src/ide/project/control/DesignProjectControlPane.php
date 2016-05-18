@@ -94,7 +94,7 @@ class DesignProjectControlPane extends AbstractProjectControlPane
         if (Ide::project() && ($form = Ide::get()->getMainForm())) {
             $source = FileUtils::get(Ide::project()->getSrcFile('.theme/style.css'));
 
-            $regex = Regex::of('((\.|\#)[\w\d\-\_\:\# ]{1,}\{)')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
+            $regex = Regex::of('((\.|\#)[\w\d\-\_\:\# \r\n]{1,}\{)')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
 
             $source = $regex->replaceWithCallback(function () {
                 return '.FormEditor $1';

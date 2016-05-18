@@ -128,6 +128,8 @@ class ExecuteProjectCommand extends AbstractCommand
             } finally {
                 $this->startButton->enabled = true;
                 $this->processDialog->hide();
+
+                Ide::get()->getMainForm()->hideBottom();
             }
 
             $appPidFile->delete();
@@ -160,15 +162,15 @@ class ExecuteProjectCommand extends AbstractCommand
         }
     }
 
-    /*public function tryShowConsole()
+    public function tryShowConsole()
     {
-        $console = new UXRichTextArea();
+        $console = new BuildProgressForm();
+
+        /*$console = new UXRichTextArea();
         $console->height = 150;
 
-        $console->appendText("Hi, I'm robot \n", '-fx-font-weight: bold; -fx-fill: green; -fx-font-family: "Courier New"; -fx-font-size: 12px;');
-
-        Ide::get()->getMainForm()->showBottom($console);
-    }*/
+        $console->appendText("Hi, I'm robot \n", '-fx-font-weight: bold; -fx-fill: green; -fx-font-family: "Courier New"; -fx-font-size: 12px;'); */
+    }
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
@@ -180,7 +182,6 @@ class ExecuteProjectCommand extends AbstractCommand
         $appPidFile = $project->getFile("application.pid");
         $appPidFile->delete();
 
-        //$this->tryShowConsole();
 
         $this->process = new Process(
             [$ide->getGradleProgram(), 'run', '-Dfile.encoding=UTF-8', '--daemon'],
@@ -190,10 +191,20 @@ class ExecuteProjectCommand extends AbstractCommand
 
         if ($project) {
             $this->processDialog = $dialog = new BuildProgressForm();
+            //$dialog->removeHeader();
+            $dialog->removeProgressbar();
+
+            Ide::get()->getMainForm()->showBottom($dialog->layout);
+
             $dialog->show();
+            $dialog->hide();
 
             $this->startButton->enabled = false;
             $this->stopButton->enabled = true;
+
+            $dialog->closeButton->on('action', function () {
+                Ide::get()->getMainForm()->hideBottom();
+            }, __CLASS__);
 
             ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'gradle run', function () use ($dialog) {
                 try {
@@ -203,11 +214,17 @@ class ExecuteProjectCommand extends AbstractCommand
                     $dialog->setStopProcedure(function () use ($dialog) {
                         $this->onStopExecute();
                         $dialog->hide();
+
+                        Ide::get()->getMainForm()->hideBottom();
                     });
 
-                    $dialog->setOnExitProcess(function () {
+                    $dialog->setOnExitProcess(function ($exitValue) use ($dialog) {
                         $this->stopButton->enabled = false;
                         $this->startButton->enabled = true;
+
+                        if (!$exitValue && $dialog->closeAfterDoneCheckbox->selected) {
+                            Ide::get()->getMainForm()->hideBottom();
+                        }
                     });
 
                 } catch (IOException $e) {

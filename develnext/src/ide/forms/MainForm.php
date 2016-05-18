@@ -62,7 +62,7 @@ class MainForm extends AbstractIdeForm
 
         $mainMenu = $this->mainMenu; // FIX!!!!! see FixSkinMenu
 
-        $this->contentSplit->items->removeByIndex(1); // TODO implement bottom slider.
+       // $this->contentSplit->items->removeByIndex(1); // TODO implement bottom slider.
 
         $pane = UXTabPane::createDefaultDnDPane();
 
@@ -284,20 +284,31 @@ class MainForm extends AbstractIdeForm
 
     public function hideBottom()
     {
-        $this->contentSplit->dividerPositions = [1, 0];
+        $this->showBottom(null);
     }
 
-    public function showBottom(UXNode $content)
+    public function showBottom(UXNode $content = null)
     {
-        UXAnchorPane::setAnchor($content, 0);
+        if ($content) {
+            $this->bottomSpoiler->children->clear();
 
-        $height = $this->layout->height;
+            $height = $this->layout->height;
 
-        $this->bottomSpoiler->children->clear();
-        $this->bottomSpoiler->add($content);
+            $content->height = Ide::get()->getUserConfigValue('mainForm.consoleHeight', 300);
+            UXAnchorPane::setAnchor($content, 0);
 
-        $percent = ($content->height * 100 / $height) / 100;
+            $this->bottomSpoiler->add($content);
 
-        $this->contentSplit->dividerPositions = [1 - $percent, $percent];
+            $percent = ($content->height * 100 / $height) / 100;
+
+            $this->contentSplit->dividerPositions = [1 - $percent, $percent];
+        } else {
+            if ($this->bottomSpoiler->children->count()) {
+                Ide::get()->setUserConfigValue('mainForm.consoleHeight', $this->bottomSpoiler->children[0]->height);
+            }
+
+            $this->bottomSpoiler->children->clear();
+            $this->contentSplit->dividerPositions = [1, 0];
+        }
     }
 }

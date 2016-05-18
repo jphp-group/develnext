@@ -1019,7 +1019,7 @@ class Ide extends Application
 
         $ideConfig = $this->getUserConfig('ide');
 
-        if (!$ideConfig->has('projectDirectory')) {
+        if (!fs::isDir($ideConfig->get('projectDirectory'))) {
             $ideConfig->set('projectDirectory', File::of(System::getProperty('user.home') . '/DevelNextProjects/'));
         }
 
@@ -1104,8 +1104,6 @@ class Ide extends Application
 
     public function shutdown()
     {
-        GradleBuildConfig::stopDaemon();
-
         $shutdownTh = (new Thread(function () {
             sleep(40);
             Logger::warn("System halt 0\n");

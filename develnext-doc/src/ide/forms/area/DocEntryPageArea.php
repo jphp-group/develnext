@@ -21,6 +21,7 @@ use php\gui\UXTextField;
 use php\gui\UXWebEngine;
 use php\gui\UXWebView;
 use php\io\Stream;
+use php\lib\fs;
 use php\time\Time;
 use php\time\TimeZone;
 
@@ -48,6 +49,12 @@ class DocEntryPageArea extends AbstractFormArea
     public function __construct()
     {
         parent::__construct();
+
+        $this->entryContent->engine->userDataDirectory = $file = Ide::get()->getFile('cache/webview');
+
+        if (!fs::isDir($file)) {
+            fs::makeDir($file);
+        }
     }
 
     public function setContent(array $entry = null)

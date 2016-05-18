@@ -593,4 +593,12 @@ public class GameEntity2D implements EventTarget {
     public void setSolidType(SolidType solidType) {
         this.solidType = solidType;
     }
+
+    public boolean isPlaceFree(double x, double y) {
+        if (scene != null) {
+            return scene.detectCollision(this, x, y).isEmpty();
+        }
+
+        return true;
+    }
 }

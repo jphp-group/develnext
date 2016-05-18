@@ -100,9 +100,11 @@ class FileSystem
                         break;
                     }
                 }
-            }
 
-            static::_openEditor($editor, $param);
+                static::_openEditor($editor, $param);
+            } else {
+                $editor->open($param);
+            }
 
             return $editor;
         }

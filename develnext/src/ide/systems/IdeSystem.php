@@ -84,7 +84,10 @@ class IdeSystem
         return File::of("$home/$path");
     }
 
-
+    /**
+     * @param $path
+     * @return File
+     */
     static function getFile($path)
     {
         $home = System::getProperty('user.home');

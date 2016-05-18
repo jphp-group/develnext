@@ -85,6 +85,16 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
         });
     }
 
+    public function removeHeader()
+    {
+        $this->header->free();
+    }
+
+    public function removeProgressbar()
+    {
+        $this->progress->free();
+    }
+
     /**
      * @param array $tasksOrProcesses
      */
@@ -160,7 +170,10 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
      */
     public function doOpen()
     {
-        $this->progress->progress = -1;
+        if ($this->progress) {
+            $this->progress->progress = -1;
+        }
+
         $this->closeAfterDoneCheckbox->selected = true; Ide::get()->getUserConfigValue('builder.closeAfterDone', true);
     }
 
@@ -255,7 +268,9 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
         $this->addConsoleLine($e->getMessage(), 'red');
 
-        $this->progress->progress = 100;
+        if ($this->progress) {
+            $this->progress->progress = 100;
+        }
         //$this->closeButton->enabled = true;
     }
 
@@ -293,14 +308,16 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
         $this->processDone = true;
 
         UXApplication::runLater(function() {
-            $this->progress->progress = 1;
+            if ($this->progress) {
+                $this->progress->progress = 1;
+            }
         });
 
         $func = function() use ($self, $exitValue, $onExit) {
             if ($exitValue) {
                 $self->addConsoleLine('');
                 $self->addConsoleLine('(!) Ошибка запуска, что-то пошло не так', 'red');
-                $self->addConsoleLine('   --> возможно ошибка в вашей программе или ошибка альфа-версии среды...', 'gray');
+                $self->addConsoleLine('   --> возможно ошибка в вашей программе или ошибка IDE...', 'gray');
                 $self->addConsoleLine('');
             }
 

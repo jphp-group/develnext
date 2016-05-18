@@ -42,7 +42,7 @@ class DebugClassLoader extends ClassLoader
             $t = Time::millis() - $t;
             $this->allTime += $t;
 
-            //echo "require '$filename', $t ms ($this->allTime ms)\n";
+            echo "[DEBUG] require '$filename', $t ms ($this->allTime ms)\n";
         }
     }
 

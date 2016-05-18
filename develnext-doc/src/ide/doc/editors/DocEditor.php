@@ -487,6 +487,7 @@ class DocEditor extends AbstractEditor
         $this->anotherPage = true;
 
         $this->uiSection->setContent($searchSection);
+        $this->uiSection->setAccess(false, $this->accessEntry);
         $this->uiSection->showPreloader("Поиск '$query' ...");
 
         $this->docService->searchAsync($query, 0, 20, function (ServiceResponse $response) use ($searchSection, $query) {

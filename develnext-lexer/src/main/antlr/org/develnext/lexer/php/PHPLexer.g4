@@ -145,7 +145,7 @@ fragment Hex:                       '0' ('x'|'X') HexDigit+;
 fragment Float:                     Digit* '.'? Digit+;
 fragment SingleQuoteStringFragment: (~('\'' | '\\') | '\\' . )* ;
 fragment DoubleQuoteStringFragment: (~('\\' | '"') | '\\' . )* ;
-fragment String:                    ( '\\' EscapeCharacter | ~('\\'| '"') )*;
+fragment String:                    ( '\\' EscapeCharacter | ~('\\'| '`') )*;
 fragment A: [aA];
 fragment B: [bB];
 fragment C: [cC];

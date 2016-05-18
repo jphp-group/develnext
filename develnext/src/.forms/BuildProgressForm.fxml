@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.text.*?>
@@ -7,26 +8,48 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="497.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="431.0" prefWidth="603.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ListView id="consoleList" layoutX="14.0" layoutY="66.0" prefHeight="178.0" prefWidth="572.0" AnchorPane.bottomAnchor="84.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="66.0" />
-      <Label id="workTitle" layoutX="59.0" layoutY="14.0" prefHeight="21.0" prefWidth="498.0" text="Сборка проекта">
-         <font>
-            <Font name="Tahoma" size="17.0" />
-         </font>
-      </Label>
-      <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="17.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" />
-      <CheckBox id="closeAfterDoneCheckbox" layoutX="156.0" layoutY="451.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="288.0" selected="true" text="Закрыть после выполнения" AnchorPane.bottomAnchor="14.0" />
-      <Button id="closeButton" layoutX="14.0" layoutY="268.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="124.0" styleClass="icon-exit" text="Закрыть" AnchorPane.bottomAnchor="14.0">
-         <cursor>
-            <Cursor fx:constant="DEFAULT" />
-         </cursor>
-      </Button>
-      <ProgressBar id="progress" layoutX="14.0" layoutY="251.0" prefHeight="21.0" prefWidth="572.0" AnchorPane.bottomAnchor="56.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
-      <Label id="workTitle" layoutX="59.0" layoutY="35.0" prefHeight="15.0" prefWidth="526.0" text="Подождите пару мгновений ..." textFill="#7c7c7c">
-         <font>
-            <Font name="Tahoma" size="12.0" />
-         </font>
-      </Label>
+      <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox id="header" spacing="15.0">
+               <children>
+                  <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
+                  <VBox>
+                     <children>
+                        <Label id="workTitle" prefHeight="21.0" prefWidth="498.0" text="Сборка проекта">
+                           <font>
+                              <Font name="Tahoma" size="17.0" />
+                           </font>
+                        </Label>
+                        <Label id="workTitle" prefHeight="15.0" prefWidth="526.0" text="Подождите пару мгновений ..." textFill="#7c7c7c">
+                           <font>
+                              <Font name="Tahoma" size="12.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <ListView id="consoleList" VBox.vgrow="ALWAYS" />
+            <ProgressBar id="progress" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="23.0" />
+            <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="35.0" spacing="15.0">
+               <children>
+                  <Button id="closeButton" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-exit" text="Закрыть">
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+                  <CheckBox id="closeAfterDoneCheckbox" mnemonicParsing="false" selected="true" text="Закрыть после выполнения" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </VBox>
    </children>
 </AnchorPane>

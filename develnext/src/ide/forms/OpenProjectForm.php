@@ -342,7 +342,7 @@ class OpenProjectForm extends AbstractIdeForm
     }
 
     /**
-     * @event show
+     * @event showing
      */
     public function doShow()
     {

@@ -67,6 +67,11 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     protected $uiUseImportCheckbox;
 
     /**
+     * @var array
+     */
+    protected $fileStat = [];
+
+    /**
      * @return int
      */
     public function getPriority()
@@ -158,10 +163,37 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
+    protected function tryFileChange($filename, callable $handle)
+    {
+        $filename = fs::normalize($filename);
+
+        $stat = $this->fileStat[FileUtils::hashName($filename)];
+
+        $fTime = fs::time("$filename");
+        if ($fTime <= (int) $stat['time']) {
+            //return false;
+        }
+
+        $fHash = fs::hash("$filename");
+        if ($fHash === $stat['hash']) {
+            return false;
+        }
+
+        $handle();
+
+        $this->fileStat[FileUtils::hashName($filename)] = [
+            'time' => fs::time($filename), 'hash' => fs::hash($filename)
+        ];
+
+        return true;
+    }
+
     protected function doPreCompileUseImports($env, callable $log = null)
     {
         if ($this->getIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, true)) {
             $withSourceMap = Project::ENV_DEV == $env;
+            static $prevImports = [];
+
             $imports = [];
 
             $allBundles = $this->fetchAllBundles($env);
@@ -172,17 +204,34 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 }
             }
 
+            if ($prevImports != $imports) {
+                $this->fileStat = [];
+            }
+
+            $prevImports = $imports;
+
             if ($imports) {
                 FileUtils::scan($this->project->getFile('src/app'), function ($filename) use ($imports, $log, $withSourceMap) {
-                    if (str::endsWith($filename, '.php')) {
-                        $phpParser = PhpParser::ofFile($filename, $withSourceMap);
+                    if (str::endsWith($filename, '.php') && fs::isFile("$filename.source")) {
+                        $filename = fs::normalize($filename);
+                        $file = $this->project->getAbsoluteFile($filename);
 
+                        $stat = $this->fileStat[FileUtils::hashName($filename)];
+
+                        $fTime = fs::time("$filename");
+                        if ($fTime <= (int) $stat['time']) {
+                            //return;
+                        }
+
+                        $fHash = fs::hash("$filename");
+                        if ($fHash === $stat['hash']) {
+                            return;
+                        }
+
+                        $phpParser = PhpParser::ofFile($filename, $withSourceMap);
                         $phpParser->addUseImports($imports);
 
                         if ($log) {
-                            $filename = fs::normalize($filename);
-                            $file = $this->project->getAbsoluteFile($filename);
-
                             if (!$file->exists()) {
                                 return;
                             }
@@ -191,6 +240,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                         }
 
                         $phpParser->saveContent($filename, $withSourceMap);
+
+                        $this->fileStat[FileUtils::hashName($filename)] = [
+                            'time' => $fTime, 'hash' => $fHash
+                        ];
                     }
                 });
             }
@@ -209,7 +262,9 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             }
 
             if (str::endsWith($filename, '.php.source')) {
-                FileUtils::copyFile($filename, FileUtils::stripExtension($filename)); // rewrite from origin.
+                //$this->tryFileChange("$filename.php.source", function () use ($filename) {
+                FileUtils::copyFile($filename, fs::pathNoExt($filename)); // rewrite from origin.
+                //});
             }
         });
 

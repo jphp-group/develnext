@@ -26,6 +26,18 @@ class GradleProjectBehaviour extends AbstractProjectBehaviour
 
         $this->project->on('save', [$this, 'doSave']);
         $this->project->on('export', [$this, 'doExport']);
+        $this->project->on('open', [$this, 'doOpen']);
+        $this->project->on('close', [$this, 'doClose']);
+    }
+
+    public function doOpen()
+    {
+        $this->config->startDaemon();
+    }
+
+    public function doClose()
+    {
+        $this->config->stopDaemon();
     }
 
     public function doExport(ProjectExporter $exporter)

@@ -78,8 +78,7 @@ class NewProjectForm extends AbstractIdeForm
         $this->modality = 'APPLICATION_MODAL';
         $this->title = 'Новый проект';
 
-        $this->pathField->text = Ide::get()->getUserConfigValue('projectDirectory');
-
+        $this->pathField->text = $projectDir = Ide::get()->getUserConfigValue('projectDirectory');
 
         $this->templateList->setCellFactory(function (UXListCell $cell, $template = null) {
             if ($template) {

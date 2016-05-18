@@ -38,7 +38,12 @@ class OpenProjectCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        $dialog = new OpenProjectForm();
+        static $dialog = null;
+
+        if (!$dialog) {
+            $dialog = new OpenProjectForm();
+        }
+
         $dialog->showDialog();
     }
 }

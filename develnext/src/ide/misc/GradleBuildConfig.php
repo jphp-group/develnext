@@ -66,6 +66,11 @@ class GradleBuildConfig
     protected $projectName;
 
     /**
+     * @var bool
+     */
+    protected $daemon = false;
+
+    /**
      * @param string $filename path to build.gradle or build.gradle.xml
      */
     public function __construct($filename)
@@ -82,7 +87,7 @@ class GradleBuildConfig
        // $this->update();
     }
 
-    public static function stopDaemon()
+    public function stopDaemon()
     {
         if ($ide = Ide::get()) {
             Logger::info("Stop gradle daemon ...");
@@ -94,8 +99,28 @@ class GradleBuildConfig
             );
 
             $process->start();
+            $this->daemon = false;
 
             //Logger::info("Gradle daemon is stopped.");
+        }
+    }
+
+    public function startDaemon()
+    {
+        if (!$this->daemon) {
+            if ($ide = Ide::get()) {
+                $this->daemon = true;
+                Logger::info("Start gradle daemon '$this->file'");
+
+                $process = new Process(
+                    [$ide->getGradleProgram(), 'tasks', '-Dfile.encoding=UTF-8', '--daemon'],
+                    $this->file->getParent(),
+                    $ide->makeEnvironment()
+                );
+
+                $process = $process->start();
+                //Logger::info("Daemon is started, exit code = " . $process->getExitValue());
+            }
         }
     }
 
