@@ -10,9 +10,9 @@
 
 <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="431.0" prefWidth="603.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox spacing="10.0" id="content" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox id="header" spacing="15.0">
+            <HBox id="header" spacing="15.0" alignment="CENTER_LEFT">
                <children>
                   <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
                   <VBox>
@@ -22,7 +22,7 @@
                               <Font name="Tahoma" size="17.0" />
                            </font>
                         </Label>
-                        <Label id="workTitle" prefHeight="15.0" prefWidth="526.0" text="Подождите пару мгновений ..." textFill="#7c7c7c">
+                        <Label id="workDescription" prefHeight="15.0" prefWidth="526.0" text="Подождите пару мгновений ..." textFill="#7c7c7c">
                            <font>
                               <Font name="Tahoma" size="12.0" />
                            </font>
@@ -31,11 +31,11 @@
                   </VBox>
                </children>
             </HBox>
-            <ListView id="consoleList" VBox.vgrow="ALWAYS" />
+            <ListView id="consoleList" VBox.vgrow="ALWAYS" styleClass="dn-console-list" />
             <ProgressBar id="progress" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="23.0" />
             <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="35.0" spacing="15.0">
                <children>
-                  <Button id="closeButton" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-exit" text="Закрыть">
+                  <Button id="closeButton" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-square" text="Закрыть">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>

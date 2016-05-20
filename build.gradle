@@ -1,6 +1,6 @@
-def javaVersion    = '1.8';
+def javaVersion = '1.8';
 def projectVersion = '0.9.0';
-def jphpVersion    = "0.9.0-SNAPSHOT";
+def jphpVersion = "0.9.0-SNAPSHOT";
 
 rootProject.ext.jphpVersion = jphpVersion;
 
@@ -20,6 +20,7 @@ buildscript {
 task wrapper(type: Wrapper) {
     gradleVersion = 2.12;
 }
+
 
 allprojects {
     apply plugin: 'idea'
@@ -50,6 +51,50 @@ allprojects {
 
     sourceSets {
         main { compileClasspath += configurations.provided }
+    }
+}
+
+subprojects {
+    if (it.name.startsWith("develnext-bundles")) {
+        def dirName = file(it.name).name;
+        def bundleDir = "${projectDir}/../../develnext/misc/library/bundles/${dirName}/";
+
+        clean {
+            delete bundleDir
+        }
+
+        jar {
+            doLast {
+                copy {
+                    from jar.archivePath
+                    from(configurations.runtime) {
+                        exclude '**/jphp-runtime-*.jar'
+                    }
+
+                    into bundleDir
+                }
+
+                copy {
+                    from "$projectDir/.resource"
+                    into "$bundleDir/.."
+                    rename ".resource", "${dirName}.resource"
+                }
+
+                fileTree(bundleDir).visit { FileVisitDetails el ->
+                    def name = el.getName()
+
+                    if (name.endsWith(".jar")) {
+                        name = name.replaceAll(/(-[0-9]+|\.[0-9]+|-SNAPSHOT)/, "");
+
+                        if (!name.equals(el.getName())) {
+                            println "Rename '" + el.file.parent + "/" + name + "' file"
+
+                            el.file.renameTo(file(el.file.parent + "/" + name));
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -152,15 +197,13 @@ project(':develnext') {
 
         // bundles.
         //compile project(':develnext-bundles/dn-orientdb-bundle')
-        compile project(':develnext-bundles/dn-jsoup-bundle')
-        compile project(':develnext-bundles/dn-mail-bundle')
+        provided project(':develnext-bundles/dn-jsoup-bundle')
+        provided project(':develnext-bundles/dn-mail-bundle')
 
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-json-ext:$jphpVersion"
-        compile "org.develnext.jphp:jphp-jsoup-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-zend-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-sql-ext:$jphpVersion"
-        compile "org.develnext.jphp:jphp-compress-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-compress-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-debugger:$jphpVersion"
     }

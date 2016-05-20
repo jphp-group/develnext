@@ -6,6 +6,7 @@ use ide\Logger;
 use php\io\File;
 use php\io\IOException;
 use php\lang\IllegalStateException;
+use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
 use ide\utils\FileUtils;
@@ -45,7 +46,7 @@ abstract class IdeLibraryResource
                 $this->config->load($path . '.resource');
             } catch (IOException $e) {
                 $this->config = new Configuration();
-                Logger::warn("Unable to read '$path.description' file - " . $e->getMessage());
+                Logger::warn("Unable to read '$path.resource' file - " . $e->getMessage());
             }
         } else {
             $this->config = new Configuration();
@@ -149,11 +150,11 @@ abstract class IdeLibraryResource
 
     public function delete()
     {
-        if (!Files::delete($this->getPath())) {
+        if (!fs::delete($this->getPath())) {
             Logger::error("Unable to delete {$this->getPath()}");
         }
 
-        if (!Files::delete("{$this->getPath()}.resource")) {
+        if (!fs::delete("{$this->getPath()}.resource")) {
             Logger::error("Unable to delete {$this->getPath()}.resource");
         }
     }

@@ -143,7 +143,7 @@ abstract class AbstractModule extends AbstractScript
         }
 
         if (!$script) {
-            throw new Exception("Unable to bind '$event'");
+            throw new \Exception("Unable to bind '$event'");
         }
 
         $script->on($eventName, $handler, $group);
@@ -205,7 +205,7 @@ abstract class AbstractModule extends AbstractScript
             return $this->_context->{$name}(...$args);
         }
 
-        throw new \EngineException("Unable to call " . get_class($this) . "::" . $name . "() method");
+        throw new \Error("Unable to call " . get_class($this) . "::" . $name . "() method");
     }
 
     public function loadForm($form, $saveSize = false, $savePosition = false)

@@ -6,6 +6,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
+import org.fxmisc.richtext.StyledTextArea;
 
 public class CodeAreaContextMenu extends ContextMenu {
     protected final MenuItem pasteItem = new MenuItem("Вставить");
@@ -13,9 +14,9 @@ public class CodeAreaContextMenu extends ContextMenu {
     protected final MenuItem cutItem = new MenuItem("Вырезать");
     protected final MenuItem selectAllItem = new MenuItem("Выделить все");
 
-    private final AbstractCodeArea codeArea;
+    private final StyledTextArea codeArea;
 
-    public CodeAreaContextMenu(AbstractCodeArea codeArea) {
+    public CodeAreaContextMenu(StyledTextArea codeArea) {
         super();
         getItems().addAll(cutItem, copyItem, pasteItem, new SeparatorMenuItem(), selectAllItem);
 

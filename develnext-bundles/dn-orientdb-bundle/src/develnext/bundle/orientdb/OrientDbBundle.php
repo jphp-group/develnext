@@ -30,11 +30,6 @@ class OrientDbBundle extends AbstractBundle
         return [ODocument::class, ODatabase::class];
     }
 
-    public function onRegister()
-    {
-
-    }
-
     public function onPreCompile(Project $project, $env, callable $log = null)
     {
     }

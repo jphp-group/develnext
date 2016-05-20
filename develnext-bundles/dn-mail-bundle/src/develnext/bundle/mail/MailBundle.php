@@ -33,16 +33,10 @@ class MailBundle extends AbstractBundle
         ];
     }
 
-    public function onPreCompile(Project $project, $env, callable $log = null)
-    {
-        $file = $project->getSrcFile('script/MailScript.php', true);
-        fs::ensureParent($file);
-
-        fs::copy('res://script/MailScript.php', $file);
-    }
-
     public function onAdd(Project $project)
     {
+        parent::onAdd($project);
+
         $format = Ide::get()->getRegisteredFormat(ScriptModuleFormat::class);
 
         if ($format) {
@@ -52,6 +46,8 @@ class MailBundle extends AbstractBundle
 
     public function onRemove(Project $project)
     {
+        parent::onRemove($project);
+
         $format = Ide::get()->getRegisteredFormat(ScriptModuleFormat::class);
 
         if ($format) {

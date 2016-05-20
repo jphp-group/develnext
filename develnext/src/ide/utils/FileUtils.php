@@ -172,6 +172,7 @@ class FileUtils
             Stream::putContents($dest, fs::get($origin));
             return 0;
         } catch (IOException $e) {
+            Logger::warn("Unable copy $origin to $dest, {$e->getMessage()}");
             return -1;
         }
     }

@@ -7,10 +7,17 @@ use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\Project;
 use ide\utils\FileUtils;
+use php\compress\ArchiveEntry;
+use php\compress\ArchiveInputStream;
 use php\io\File;
+use php\io\IOException;
+use php\io\Stream;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
+use php\net\URL;
 use php\util\Regex;
+use php\util\Scanner;
 
 /**
  * Class AbstractJarBundle
@@ -21,7 +28,10 @@ abstract class AbstractJarBundle extends AbstractBundle
     /**
      * @return array
      */
-    abstract function getJarDependencies();
+    function getJarDependencies()
+    {
+        return [];
+    }
 
     /**
      * @return string
@@ -38,6 +48,8 @@ abstract class AbstractJarBundle extends AbstractBundle
      */
     public function onPreCompile(Project $project, $env, callable $log = null)
     {
+        parent::onPreCompile($project, $env, $log);
+
         $libPath = $project->getFile('lib/');
 
         foreach ($this->getJarDependencies() as $dep) {
@@ -56,6 +68,7 @@ abstract class AbstractJarBundle extends AbstractBundle
                                 Logger::error("Unable to copy $jarFile to $file");
                             }
                         }
+
                     } else {
                         Logger::error("Unable to copy $jarFile");
                     }
@@ -66,6 +79,20 @@ abstract class AbstractJarBundle extends AbstractBundle
                         $php->addExternalJarLibrary($file);
                     }
                 }
+            }
+        }
+
+        if (fs::isDir($this->bundleDirectory)) {
+            FileUtils::copyDirectory($this->bundleDirectory, "$libPath/{$this->getVendorName()}");
+
+            $php = PhpProjectBehaviour::get();
+
+            if ($php) {
+                fs::scan($this->bundleDirectory, function ($filename) use ($php) {
+                    if (fs::ext($filename) == 'jar' && fs::nameNoExt($filename) != fs::name($this->bundleDirectory)) {
+                        $php->addExternalJarLibrary($filename);
+                    }
+                });
             }
         }
     }
@@ -81,6 +108,10 @@ abstract class AbstractJarBundle extends AbstractBundle
             } else {
                 $gradle->addDependency($dep);
             }
+        }
+
+        if ($this->bundleDirectory) {
+            $gradle->addDependency("dir:lib/{$this->getVendorName()}");
         }
     }
 

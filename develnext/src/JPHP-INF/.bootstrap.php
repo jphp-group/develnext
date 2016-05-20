@@ -14,6 +14,7 @@ $cache = false; //  TODO delete it.
 $loader = new IdeClassLoader($cache, IdeSystem::getOwnLibVersion());
 $loader->register(true);
 
+IdeSystem::setLoader($loader);
 
 $app = new Ide();
 $app->launch();

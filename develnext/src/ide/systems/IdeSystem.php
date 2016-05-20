@@ -2,6 +2,7 @@
 namespace ide\systems;
 
 
+use ide\IdeClassLoader;
 use php\io\File;
 use php\lang\System;
 use php\lib\fs;
@@ -99,5 +100,20 @@ class IdeSystem
         }
 
         return File::of("$ideHome/$path");
+    }
+
+    /**
+     * @var IdeClassLoader
+     */
+    protected static $loader;
+
+    public static function setLoader($loader)
+    {
+        self::$loader = $loader;
+    }
+
+    public static function getLoader()
+    {
+        return self::$loader;
     }
 }

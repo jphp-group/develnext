@@ -294,7 +294,14 @@ class MainForm extends AbstractIdeForm
 
             $height = $this->layout->height;
 
-            $content->height = Ide::get()->getUserConfigValue('mainForm.consoleHeight', 300);
+            $content->height = Ide::get()->getUserConfigValue('mainForm.consoleHeight', 350);
+
+            $content->observer('height')->addListener(function ($old, $new) use ($content) {
+                if (!$content->isFree()) {
+                    Ide::get()->setUserConfigValue('mainForm.consoleHeight', $new);
+                }
+            });
+
             UXAnchorPane::setAnchor($content, 0);
 
             $this->bottomSpoiler->add($content);
@@ -303,10 +310,6 @@ class MainForm extends AbstractIdeForm
 
             $this->contentSplit->dividerPositions = [1 - $percent, $percent];
         } else {
-            if ($this->bottomSpoiler->children->count()) {
-                Ide::get()->setUserConfigValue('mainForm.consoleHeight', $this->bottomSpoiler->children[0]->height);
-            }
-
             $this->bottomSpoiler->children->clear();
             $this->contentSplit->dividerPositions = [1, 0];
         }

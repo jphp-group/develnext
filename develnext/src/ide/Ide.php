@@ -996,6 +996,8 @@ class Ide extends Application
             $this->registerCommand($command);
         }
 
+        $this->library->update();
+
         /** @var AccurateTimer $inactiveTimer */
         $inactiveTimer = new AccurateTimer(5 * 60 * 1000, function () {
             $this->idle = true;

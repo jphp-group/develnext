@@ -3,13 +3,15 @@ namespace develnext\bundle\jsoup;
 
 use develnext\bundle\jsoup\components\JsoupScriptComponent;
 use ide\bundle\AbstractBundle;
+use ide\bundle\AbstractJarBundle;
 use ide\formats\ScriptModuleFormat;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\Project;
+use php\jsoup\Jsoup;
 use php\lib\fs;
 
-class JsoupBundle extends AbstractBundle
+class JsoupBundle extends AbstractJarBundle
 {
     function getName()
     {
@@ -26,23 +28,10 @@ class JsoupBundle extends AbstractBundle
         return $project->hasBehaviour(GuiFrameworkProjectBehaviour::class);
     }
 
-    public function getDependencies()
-    {
-        return [
-            JPHPJsoupBundle::class
-        ];
-    }
-
-    public function onPreCompile(Project $project, $env, callable $log = null)
-    {
-        $file = $project->getSrcFile('script/JsoupScript.php', true);
-        fs::ensureParent($file);
-
-        fs::copy('res://script/JsoupScript.php', $file);
-    }
-
     public function onAdd(Project $project)
     {
+        parent::onAdd($project);
+
         $format = Ide::get()->getRegisteredFormat(ScriptModuleFormat::class);
 
         if ($format) {
@@ -52,10 +41,20 @@ class JsoupBundle extends AbstractBundle
 
     public function onRemove(Project $project)
     {
+        parent::onRemove($project);
+
         $format = Ide::get()->getRegisteredFormat(ScriptModuleFormat::class);
 
         if ($format) {
             $format->unregister(new JsoupScriptComponent());
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getUseImports()
+    {
+        return [Jsoup::class];
     }
 }

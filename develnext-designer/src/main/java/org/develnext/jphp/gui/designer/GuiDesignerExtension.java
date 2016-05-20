@@ -8,6 +8,7 @@ import org.develnext.jphp.gui.designer.editor.syntax.impl.FxCssCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.impl.PhpCodeArea;
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.InlineCssTextArea;
 import php.runtime.env.CompileScope;
 
 public class GuiDesignerExtension extends JavaFXExtension {
@@ -27,6 +28,7 @@ public class GuiDesignerExtension extends JavaFXExtension {
         registerWrapperClass(scope, AutoCompletion.class, UXSyntaxAutoCompletion.class);
         registerWrapperClass(scope, SyntaxTextArea.class, UXSyntaxTextArea.class);
 
+        registerWrapperClass(scope, InlineCssTextArea.class, UXRichTextArea.class);
         registerWrapperClass(scope, AbstractCodeArea.class, UXAbstractCodeArea.class);
         registerWrapperClass(scope, VirtualizedScrollPane.class, UXCodeAreaScrollPane.class);
         registerWrapperClass(scope, CssCodeArea.class, UXCssCodeArea.class);

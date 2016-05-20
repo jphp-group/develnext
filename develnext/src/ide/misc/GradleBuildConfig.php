@@ -195,6 +195,11 @@ class GradleBuildConfig
         $this->sourceSets[$name] = $value;
     }
 
+    public function removeSourceSet($name, $value)
+    {
+        unset($this->sourceSets[$name][$value]);
+    }
+
     public function addSourceSet($name, $value)
     {
         if (isset($this->sourceSets[$name])) {
@@ -339,7 +344,12 @@ class GradleBuildConfig
                 if ($dep[0] && $dep[1] && $dep[2]) {
                     $stream->write("\tcompile '" . Str::join($dep, ":") . "'\n");
                 } else {
-                    $stream->write("\tcompile name: '" . $dep[1] . "'\n");
+                    if (str::startsWith($dep[1], 'dir:')) {
+                        $dir = str::sub($dep[1], 4);
+                        $stream->write("\tcompile fileTree(include: ['*.jar'], dir: '$dir')\n");
+                    } else {
+                        $stream->write("\tcompile name: '" . $dep[1] . "'\n");
+                    }
                 }
             }
 

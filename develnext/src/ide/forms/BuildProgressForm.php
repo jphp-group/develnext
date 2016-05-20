@@ -4,10 +4,13 @@ namespace ide\forms;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\project\ProjectConsoleOutput;
+use php\gui\designer\UXCodeAreaScrollPane;
+use php\gui\designer\UXRichTextArea;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\event\UXWindowEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\layout\UXVBox;
 use php\gui\paint\UXColor;
 use php\gui\text\UXFont;
 use php\gui\UXApplication;
@@ -17,7 +20,6 @@ use php\gui\UXDialog;
 use php\gui\UXImageView;
 use php\gui\UXListCell;
 use php\gui\UXListView;
-use php\gui\UXRichTextArea;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\Process;
@@ -65,24 +67,43 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
     {
         $this->icon->image = ico('wait32')->image;
 
-        $consoleArea = new UXRichTextArea();
-        $consoleArea->style = '-fx-border-width: 1px; -fx-border-color: silver;';
-        $consoleArea->id = 'consoleArea';
-        $consoleArea->position = $this->consoleList->position;
-        $consoleArea->size = $this->consoleList->size;
-        $consoleArea->anchors = $this->consoleList->anchors;
-
-        /*$this->consoleList->hide();
-        $this->add($consoleArea); */
-
         $this->consoleList->setCellFactory(function (UXListCell $cell, $item, $empty) {
-            $cell->font = UXFont::of('Courier New', 12);
+            //$cell->font = UXFont::of('Courier New', 12);
 
             if (is_array($item)) {
                 $cell->text = $item[0];
                 $cell->textColor = UXColor::of($item[1]);
             }
         });
+
+
+        $consoleArea = new UXRichTextArea();
+        $consoleArea->style = '-fx-border-width: 1px; -fx-border-color: silver;';
+        $consoleArea->id = 'consoleArea';
+        $consoleArea->classes->add('dn-console-list');
+
+        $this->consoleArea = $consoleArea;
+
+        $scrollPane = new UXCodeAreaScrollPane($consoleArea);
+        $scrollPane->position = $this->consoleList->position;
+        $scrollPane->size = $this->consoleList->size;
+        $scrollPane->anchors = $this->consoleList->anchors;
+
+        UXVBox::setVgrow($scrollPane, 'ALWAYS');
+
+        //$this->consoleList->hide();
+        $this->consoleList->parent->children->replace($this->consoleList, $scrollPane);
+    }
+
+    public function reduceHeader()
+    {
+        $this->content->padding = 10;
+        $this->content->spacing = 10;
+        $this->header->spacing = 5;
+        $this->workTitle->font = $this->workTitle->font->withSize(12)->withBold();
+        $this->workDescription->free();
+        $this->icon->preserveRatio = true;
+        $this->icon->size = [16, 16];
     }
 
     public function removeHeader()
@@ -140,6 +161,23 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
         parent::show();
     }
 
+    public function hide()
+    {
+        parent::hide();
+
+        Ide::get()->setUserConfigValue('builder.closeAfterDone', $this->closeAfterDoneCheckbox->selected);
+    }
+
+    /**
+     * @event closeAfterDoneCheckbox.click
+     */
+    public function doCloseAfterDoneCheckboxMouseDown()
+    {
+        uiLater(function () {
+            Ide::get()->setUserConfigValue('builder.closeAfterDone', $this->closeAfterDoneCheckbox->selected);
+        });
+    }
+
     public function watchProcess(Process $process, callable $onExit = null)
     {
         $thread = new Thread(function () use ($process, $onExit) {
@@ -174,7 +212,7 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
             $this->progress->progress = -1;
         }
 
-        $this->closeAfterDoneCheckbox->selected = true; Ide::get()->getUserConfigValue('builder.closeAfterDone', true);
+        $this->closeAfterDoneCheckbox->selected = Ide::get()->getUserConfigValue('builder.closeAfterDone', true);
     }
 
     /**
@@ -205,16 +243,6 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
     }
 
     /**
-     * @event closeAfterDoneCheckbox.mouseUp
-     *
-     * @param UXMouseEvent $e
-     */
-    public function doCloseAfterDoneCheckboxClick(UXMouseEvent $e)
-    {
-        Ide::get()->setUserConfigValue('builder.closeAfterDone', $this->closeAfterDoneCheckbox->selected);
-    }
-
-    /**
      * @param $line
      * @param string $color
      */
@@ -242,12 +270,12 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
         }
 
         if (str::startsWith($text, "[DEBUG] ") || $text[0] == ':' || str::trimLeft($text)[0] == '#') {
-            $color = 'gray';
+            $color = '#5c5c5c';
         }
 
         if ($this->consoleArea) {
-            $this->consoleArea->appendText($text, "-fx-font-family: 'Courier New'; -fx-font-size: 14px; -fx-fill: $color");
-            $this->consoleArea->caretPosition = str::length($this->consoleArea->text) - 1;
+            $this->consoleArea->appendText($text, "-fx-fill: $color");
+            $this->consoleArea->jumpToEndLine(0, 1);
         } else {
             $this->consoleList->items->add([$text, $color]);
 
@@ -337,6 +365,8 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
             if ($onExitProcess) {
                 $onExitProcess($exitValue);
+
+                Ide::get()->setUserConfigValue('builder.closeAfterDone', $this->closeAfterDoneCheckbox->selected);
             }
         };
 

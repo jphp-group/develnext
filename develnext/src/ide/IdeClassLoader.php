@@ -44,6 +44,11 @@ class IdeClassLoader extends ClassLoader
     protected $needToDumpClasses;
 
     /**
+     * @var array
+     */
+    protected $classPaths = [];
+
+    /**
      * IdeClassLoader constructor.
      * @param bool $cache
      * @param null $version
@@ -83,6 +88,35 @@ class IdeClassLoader extends ClassLoader
         }
     }
 
+    public function addClassPath($path)
+    {
+        $this->classPaths[FileUtils::hashName($path)] = FileUtils::normalizeName($path);
+    }
+
+    public function removeClassPath($path)
+    {
+        unset($this->classPaths[FileUtils::hashName($path)]);
+    }
+
+    protected function loadClassFromPath($name, File $fileCompiled = null)
+    {
+        foreach ([""] + $this->classPaths as $path) {
+            try {
+                $module = new Module(Stream::of("res://$path/$name.php"));
+                $module->call();
+
+                if ($this->cache && $fileCompiled) {
+                    fs::makeDir($fileCompiled->getParent());
+                    $module->dump($fileCompiled, true);
+                }
+
+                break;
+            } catch (IOException $e) {
+                continue;
+            }
+        }
+    }
+
     function loadClass($name)
     {
         $name = str::replace($name, '\\', '/');
@@ -97,17 +131,10 @@ class IdeClassLoader extends ClassLoader
                     $module->call();
                 } catch (\Exception $e) {
                     echo " ---> error \n";
-                    $module = new Module(Stream::of("res://$name.php"));
-                    $module->call();
+                    $this->loadClassFromPath($name);
                 }
             } else {
-                $module = new Module(Stream::of("res://$name.php"));
-                $module->call();
-
-                if ($this->cache) {
-                    fs::makeDir($fileCompiled->getParent());
-                    $module->dump($fileCompiled, true);
-                }
+                $this->loadClassFromPath($name, $fileCompiled);
             }
 
             return true;

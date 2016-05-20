@@ -7,9 +7,11 @@ use ide\editors\ProjectEditor;
 use ide\forms\BundleCheckListForm;
 use ide\Ide;
 use ide\IdeConfiguration;
+use ide\library\IdeLibraryBundleResource;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
+use ide\systems\IdeSystem;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
 use php\gui\layout\UXFlowPane;
@@ -35,6 +37,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     const CONFIG_BUNDLE_KEY_USE_IMPORTS = 'useImports';
 
     const GENERATED_DIRECTORY = 'src_generated';
+    const VENDOR_DIRECTORY = 'vendor';
 
     /**
      * @var UXNode
@@ -91,6 +94,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             }
         });
 
+        foreach ($this->getPublicBundles() as $bundle) {
+            IdeSystem::getLoader()->addClassPath($bundle->getVendorDirectory());
+        }
+
         $this->project->setSrcDirectory('src');
         $this->project->setSrcGeneratedDirectory(self::GENERATED_DIRECTORY);
 
@@ -119,6 +126,16 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             return false;
         });
 
+        $gradle = GradleProjectBehaviour::get();
+
+        // remove all bundles source dirs.
+        if ($gradle) {
+            $config = $gradle->getConfig();
+
+            foreach ($this->getPublicBundles() as $bundle) {
+                $config->removeSourceSet('main.resources.srcDirs', self::VENDOR_DIRECTORY . "/{$bundle->getVendorName()}");
+            }
+        }
 
         foreach ($this->bundles as $env => $group) {
             /** @var AbstractBundle $bundle */
@@ -131,6 +148,12 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
                 $bundle->onSave($this->project, $config);
                 $config->save();
+
+                if ($gradle && $env != Project::ENV_DEV) {
+                    $config = $gradle->getConfig();
+
+                    $config->addSourceSet('main.resources.srcDirs', self::VENDOR_DIRECTORY . "/{$bundle->getVendorName()}");
+                }
             }
         }
 
@@ -150,7 +173,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 $class = str::replace(fs::nameNoExt($file), '.', '\\');
 
                 if (class_exists($class)) {
-                    $bundle = new $class();
+                    $bundle = $this->makeBundle($class);
 
                     if ($bundle instanceof AbstractBundle) {
                         $this->bundleConfigs[get_class($bundle)] = $config;
@@ -161,6 +184,30 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 }
             }
         }
+    }
+
+    /**
+     * @param $class
+     * @return AbstractBundle
+     */
+    public function makeBundle($class)
+    {
+        /** @var AbstractBundle $bundle */
+        $bundle = null;
+
+        /** @var IdeLibraryBundleResource $resource */
+        foreach (Ide::get()->getLibrary()->getResources('bundles') as $resource) {
+            if (reflect::typeOf($resource->getBundle()) == $class) {
+                $bundle = $resource->getBundle();
+                break;
+            }
+        }
+
+        if (!$bundle) {
+            $bundle = new $class();
+        }
+
+        return $bundle;
     }
 
     protected function tryFileChange($filename, callable $handle)
@@ -225,7 +272,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
                         $fHash = fs::hash("$filename");
                         if ($fHash === $stat['hash']) {
-                            return;
+                            //return;
                         }
 
                         $phpParser = PhpParser::ofFile($filename, $withSourceMap);
@@ -255,6 +302,8 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         $generatedDirectory = $this->project->getSrcFile('', true);
         fs::clean($generatedDirectory);
         fs::makeDir($generatedDirectory);
+
+        //FileUtils::deleteDirectory($this->project->getFile(self::VENDOR_DIRECTORY));
 
         FileUtils::scan($this->project->getSrcFile(''), function ($filename) {
             if (str::endsWith($filename, '.php.sourcemap')) {
@@ -349,7 +398,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             return $bundle;
         }
 
-        return $bundle = new $class();
+        return $bundle = $this->makeBundle($class);
     }
 
     /**
@@ -375,14 +424,15 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
-     * @return array
+     * @return AbstractBundle[]
      */
     public function getPublicBundles()
     {
         $result = [];
 
-        foreach (Ide::get()->getInternalList('.dn/bundles') as $bundle) {
-            $result[$bundle] = new $bundle();
+        /** @var IdeLibraryBundleResource $resource */
+        foreach (Ide::get()->getLibrary()->getResources('bundles') as $resource) {
+            $result[reflect::typeOf($resource->getBundle())] = $resource->getBundle();
         }
 
         return $result;
@@ -424,8 +474,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         if (!$this->bundles[$env][$class]) {
             unset($this->bundles[Project::ENV_ALL][$class]);
 
-            /** @var AbstractBundle $bundle */
-            $bundle = new $class();
+            $bundle = $this->makeBundle($class);
             $this->bundles[$env][$class] = $bundle;
 
             $bundle->onAdd($this->project);

@@ -10,8 +10,16 @@ import php.runtime.lang.BaseObject;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+
 @Namespace(GuiDesktopExtension.NS)
 public class Runtime extends BaseObject {
+    private static final Class[] parameters = new Class[]{URL.class};
+
     public Runtime(Environment env, ClassEntity clazz) {
         super(env, clazz);
     }
@@ -34,5 +42,19 @@ public class Runtime extends BaseObject {
     @Signature
     public static long totalMemory() {
         return java.lang.Runtime.getRuntime().totalMemory();
+    }
+
+    @Signature
+    public static void addJar(File file) throws IOException {
+        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        Class sysclass = URLClassLoader.class;
+
+        try {
+            Method method = sysclass.getDeclaredMethod("addURL", parameters);
+            method.setAccessible(true);
+            method.invoke(sysloader, file.toURI().toURL());
+        } catch (Throwable t) {
+            throw new IOException("Error, could not add URL to system classloader, " + t.getMessage());
+        }//end try catch
     }
 }

@@ -83,7 +83,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
         if ($gradle) {
             $config = $gradle->getConfig();
-            $config->addSourceSet('main.resources.srcDirs', self::GENERATED_DIRECTORY);
+            $config->addSourceSet('main.resources.srcDirs', [self::GENERATED_DIRECTORY]);
         }
     }
 

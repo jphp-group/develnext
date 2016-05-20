@@ -8,6 +8,7 @@ use ide\utils\FileUtils;
 use php\io\File;
 use php\lang\IllegalArgumentException;
 use php\lang\System;
+use php\lib\fs;
 use php\lib\Str;
 
 /**
@@ -32,6 +33,10 @@ class IdeLibrary
         'quests' => [
             'title' => 'Квесты',
             'type' => 'ide\library\IdeLibraryQuestResource',
+        ],
+        'bundles' => [
+            'title' => 'Пакеты расширений',
+            'type' => 'ide\library\IdeLibraryBundleResource',
         ],
     ];
 
@@ -77,10 +82,6 @@ class IdeLibrary
                 Logger::error('Cannot create default library directory');
             }
         }
-
-        $ide->on('start', function () {
-            $this->update();
-        }, __CLASS__);
     }
 
     public function update()
@@ -98,7 +99,7 @@ class IdeLibrary
 
                 FileUtils::scan("$directory/$code", function ($filename) use ($code, $type) {
                     if (Str::endsWith($filename, '.resource')) {
-                        $path = FileUtils::stripExtension($filename);
+                        $path = fs::pathNoExt($filename);
 
                         Logger::info("Add library resource $filename, type = $type[type]");
 
@@ -121,7 +122,7 @@ class IdeLibrary
     public function findResource($category, $path)
     {
         /** @var IdeLibraryResource $resource */
-        foreach ((array) $this->resources[$category] as $resource) {
+        foreach ((array)$this->resources[$category] as $resource) {
             if (FileUtils::equalNames($resource->getPath(), $path)) {
                 return $resource;
             }
@@ -136,7 +137,7 @@ class IdeLibrary
      */
     public function getResources($category)
     {
-        return (array) $this->resources[$category];
+        return (array)$this->resources[$category];
     }
 
     /**
@@ -159,8 +160,8 @@ class IdeLibrary
         if (!$rewrite && Files::exists("$path.resource")) {
             return null;
         } else {
-            Files::delete("$path.resource");
-            Files::delete("$path");
+            fs::delete("$path.resource");
+            fs::delete("$path");
         }
 
         return new $info['type']($path);

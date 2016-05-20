@@ -7,9 +7,9 @@ class UXCodeAreaScrollPane extends UXRegion
 {
     /**
      * UXCodeAreaScrollPane constructor.
-     * @param UXAbstractCodeArea $codeArea
+     * @param UXAbstractCodeArea|UXRichTextArea $codeArea
      */
-    public function __construct(UXAbstractCodeArea $codeArea)
+    public function __construct($codeArea)
     {
     }
 }

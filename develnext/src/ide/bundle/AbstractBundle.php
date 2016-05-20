@@ -1,10 +1,16 @@
 <?php
 namespace ide\bundle;
 
+use ide\Logger;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\Project;
 use ide\VendorContainer;
+use php\io\IOException;
+use php\io\Stream;
+use php\lib\reflect;
+use php\lib\str;
 use php\util\Configuration;
+use php\util\Scanner;
 
 /**
  * Class AbstractBundle
@@ -13,6 +19,11 @@ use php\util\Configuration;
 abstract class AbstractBundle
 {
     use VendorContainer;
+
+    /**
+     * @var string
+     */
+    protected $bundleDirectory = null;
 
     abstract function getName();
     abstract function getDescription();
@@ -80,6 +91,8 @@ abstract class AbstractBundle
      */
     public function onAdd(Project $project)
     {
+        $this->deleteVendorDirectory();
+        $this->copyVendorDirectory();
     }
 
     /**
@@ -87,6 +100,7 @@ abstract class AbstractBundle
      */
     public function onRemove(Project $project)
     {
+        $this->deleteVendorDirectory();
     }
 
     public function onSave(Project $project, Configuration $config)
@@ -95,5 +109,21 @@ abstract class AbstractBundle
 
     public function onLoad(Project $project, Configuration $config)
     {
+    }
+
+    /**
+     * @return string
+     */
+    public function getBundleDirectory()
+    {
+        return $this->bundleDirectory;
+    }
+
+    /**
+     * @param string $bundleDirectory
+     */
+    public function setBundleDirectory($bundleDirectory)
+    {
+        $this->bundleDirectory = $bundleDirectory;
     }
 }

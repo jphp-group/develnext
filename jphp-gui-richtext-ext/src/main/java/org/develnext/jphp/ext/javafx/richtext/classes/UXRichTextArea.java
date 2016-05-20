@@ -34,7 +34,6 @@ public class UXRichTextArea extends UXRegion<InlineCssTextArea> {
     @Signature
     public void __construct() {
         __wrappedObject = new InlineCssTextArea();
-        getWrappedObject().selectLine();
     }
 
     @Getter

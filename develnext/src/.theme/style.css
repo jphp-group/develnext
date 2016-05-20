@@ -44,6 +44,7 @@
 .icon-share-ex { -fx-graphic: url("/.data/img/icons/shareEx16.png"); }
 .icon-upload { -fx-graphic: url("/.data/img/icons/upload16.png"); }
 .icon-library { -fx-graphic: url("/.data/img/icons/library16.png"); }
+.icon-square { -fx-graphic: url("/.data/img/icons/square16.png"); }
 
 .icon-refresh { -fx-graphic: url("/.data/img/icons/refresh16.png"); }
 .icon-refresh32 { -fx-graphic: url("/.data/img/icons/refresh32.png"); }
@@ -101,6 +102,11 @@
 .dn-simple-toggle-button, .dn-simple-button { -fx-background-color: white; -fx-border-color: silver; -fx-border-width: 1px; -fx-cursor: hand; }
 
 .dn-simple-button { -fx-border-radius: 3px; }
+
+.dn-console-list {
+    -fx-font: 14px "Consolas";
+    -fx-line-spacing: 30px;
+}
 
 .account-menu {
     -fx-padding: 5px;
