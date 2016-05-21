@@ -177,7 +177,8 @@ class ExecuteProjectCommand extends AbstractCommand
         $ide = Ide::get();
         $project = $ide->getOpenedProject();
 
-        FileUtils::deleteDirectory($project->getFile("build/"));
+        // deprecated, see GradleProjectBehaviour.doOpen()
+        //FileUtils::deleteDirectory($project->getFile("build/"));
 
         $appPidFile = $project->getFile("application.pid");
         $appPidFile->delete();

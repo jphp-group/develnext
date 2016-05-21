@@ -16,7 +16,7 @@ class JPHPMailBundle extends AbstractJarBundle
      */
     function getJarDependencies()
     {
-        return ["jphp-mail-ext", "commons-email", "activation", "mail"];
+        return [];
     }
 
     /**

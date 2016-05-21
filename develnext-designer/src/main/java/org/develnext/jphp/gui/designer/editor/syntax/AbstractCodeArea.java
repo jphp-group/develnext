@@ -182,6 +182,10 @@ abstract public class AbstractCodeArea extends CodeArea {
         hotkeyHandlers.put(hotkey, inputMap);
     }
 
+    public void forgetHistory() {
+        getUndoManager().forgetHistory();
+    }
+
     public void registerHotkey(AbstractHotkey hotkey) {
         registerHotkey(hotkey.getDefaultKeyCode(), hotkey.getDefaultKeyCombination(), hotkey);
     }

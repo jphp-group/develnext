@@ -8,6 +8,7 @@ use ide\utils\StrUtils;
 use php\format\ProcessorException;
 use php\io\File;
 use php\io\Stream;
+use php\lang\IllegalArgumentException;
 use php\lang\Process;
 use php\lib\arr;
 use php\lib\Str;
@@ -202,6 +203,10 @@ class GradleBuildConfig
 
     public function addSourceSet($name, $value)
     {
+        if (!is_scalar($value)) {
+            throw new IllegalArgumentException("Value must be scalar");
+        }
+
         if (isset($this->sourceSets[$name])) {
             if (!is_array($this->sourceSets[$name])) {
                 $value = $this->sourceSets[$name];

@@ -4,6 +4,7 @@ namespace ide\project\behaviours;
 use ide\misc\GradleBuildConfig;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\ProjectExporter;
+use ide\utils\FileUtils;
 use php\io\File;
 
 /**
@@ -32,6 +33,7 @@ class GradleProjectBehaviour extends AbstractProjectBehaviour
 
     public function doOpen()
     {
+        FileUtils::deleteDirectory($this->project->getFile("build/"));
         $this->config->startDaemon();
     }
 

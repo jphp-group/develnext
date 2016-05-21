@@ -210,43 +210,47 @@ class WindowsApplicationBuildType extends AbstractBuildType
         $dialog = new BuildProgressForm();
         $dialog->show();
 
-        ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'gradle installDist', function () use ($ide, $project, $dialog, $config) {
-            $commands = [$ide->getGradleProgram(), 'clean'];
+        ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'gradle installDist', function ($success) use ($ide, $project, $dialog, $config) {
+            if ($success) {
+                $commands = [$ide->getGradleProgram(), 'clean'];
 
-            if ($config['oneJar']) {
-                $commands[] = 'splitConfig';
-                $commands[] = 'jar';
+                if ($config['oneJar']) {
+                    $commands[] = 'splitConfig';
+                    $commands[] = 'jar';
+                }
+
+                $commands[] = 'installDist';
+
+                /** @var GradleProjectBehaviour $gradle */
+                $gradle = $project->getBehaviour(GradleProjectBehaviour::class);
+
+                OneJarBuildType::appendJarTasks($gradle->getConfig(), $config['oneJar']);
+
+                $process = new Process($commands, $project->getRootDir(), $ide->makeEnvironment());
+                $process = $process->start();
+
+                $dialog->watch([
+                    $process,
+                    function () use ($project, $config) {
+                        FileUtils::deleteDirectory($this->getBuildPath($project) . "/bin");
+                        $libPath = File::of($this->getBuildPath($project) . "/lib");
+
+                        if ($config['oneJar']) {
+                            FileUtils::scan($libPath, function ($filename) {
+                                $file = File::of($filename);
+
+                                if (!Str::startsWith($file->getName(), "dn-compile")) {
+                                    $file->delete();
+                                }
+                            });
+                        }
+
+                        return $this->makeExecutableFile($project);
+                    },
+                ]);
+            } else {
+                $dialog->stopWithError();
             }
-
-            $commands[] = 'installDist';
-
-            /** @var GradleProjectBehaviour $gradle */
-            $gradle = $project->getBehaviour(GradleProjectBehaviour::class);
-
-            OneJarBuildType::appendJarTasks($gradle->getConfig(), $config['oneJar']);
-
-            $process = new Process($commands, $project->getRootDir(), $ide->makeEnvironment());
-            $process = $process->start();
-
-            $dialog->watch([
-                $process,
-                function () use ($project, $config) {
-                    FileUtils::deleteDirectory($this->getBuildPath($project) . "/bin");
-                    $libPath = File::of($this->getBuildPath($project) . "/lib");
-
-                    if ($config['oneJar']) {
-                        FileUtils::scan($libPath, function ($filename) {
-                            $file = File::of($filename);
-
-                            if (!Str::startsWith($file->getName(), "dn-compile")) {
-                                $file->delete();
-                            }
-                        });
-                    }
-
-                    return $this->makeExecutableFile($project);
-                },
-            ]);
         });
 
         $dialog->setOnExitProcess(function ($exitValue) use ($project, $dialog, $finished, $config) {

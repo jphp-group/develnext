@@ -100,4 +100,8 @@ class UXAbstractCodeArea extends UXControl
     public function hidePopup()
     {
     }
+
+    public function forgetHistory()
+    {
+    }
 }

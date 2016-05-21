@@ -54,24 +54,38 @@ class ProjectSystem
         }
 
         $th = new Thread(function () use ($project, $consoleOutput, $callback, $env, $hintCommand) {
-            $project->preCompile($env, function ($log) use ($consoleOutput) {
-                uiLater(function () use ($consoleOutput, $log) {
-                    $consoleOutput->addConsoleLine($log, 'gray');
+            try {
+                $project->preCompile($env, function ($log) use ($consoleOutput) {
+                    uiLater(function () use ($consoleOutput, $log) {
+                        $consoleOutput->addConsoleLine($log, 'gray');
+                    });
                 });
-            });
 
-            $project->compile($env, function ($log) use ($consoleOutput) {
-                uiLater(function () use ($consoleOutput, $log) {
-                    $consoleOutput->addConsoleLine($log, 'blue');
+                $project->compile($env, function ($log) use ($consoleOutput) {
+                    uiLater(function () use ($consoleOutput, $log) {
+                        $consoleOutput->addConsoleLine($log, 'blue');
+                    });
                 });
-            });
 
-            uiLater(function () use ($consoleOutput, $project, $hintCommand) {
-                $consoleOutput->addConsoleLine('> ' . $hintCommand, 'green');
-                $consoleOutput->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
-            });
+                uiLater(function () use ($consoleOutput, $project, $hintCommand) {
+                    $consoleOutput->addConsoleLine('> ' . $hintCommand, 'green');
+                    $consoleOutput->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
+                });
 
-            uiLater($callback);
+                uiLater(function() use ($callback) {
+                    $callback(true);
+                });
+            } catch (\Error $e) {
+                uiLater(function () use ($consoleOutput, $e, $callback) {
+                    $file = Ide::project() ? Ide::project()->getAbsoluteFile($e->getFile())->getRelativePath() : $e->getFile();
+
+                    $consoleOutput->addConsoleLine("[ERROR] Cannot build project");
+                    $consoleOutput->addConsoleLine("  -> {$file}");
+                    $consoleOutput->addConsoleLine("  -> {$e->getMessage()}, on line {$e->getLine()}", 'red');
+
+                    $callback(false);
+                });
+            }
         });
         $th->setName("ProjectSystem.compileAll #" . str::random());
 

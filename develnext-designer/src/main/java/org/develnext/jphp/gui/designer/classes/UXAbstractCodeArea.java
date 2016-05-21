@@ -60,6 +60,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
 
         void showPopup();
         void hidePopup();
+        void forgetHistory();
     }
 
     public UXAbstractCodeArea(Environment env, T wrappedObject) {

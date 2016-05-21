@@ -1,15 +1,11 @@
 <?php
 namespace ide\project\behaviours;
 
-use ide\editors\ProjectEditor;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
-use ide\project\ProjectFile;
-use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
-use ide\utils\PhpParser;
 use ide\zip\JarArchive;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
@@ -83,7 +79,9 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
         if ($gradle) {
             $config = $gradle->getConfig();
-            $config->addSourceSet('main.resources.srcDirs', [self::GENERATED_DIRECTORY]);
+            $config->addSourceSet('main.resources.srcDirs', self::GENERATED_DIRECTORY);
+        } else {
+            Logger::warn("Unable to add the generated src directory to build.gradle file");
         }
     }
 
@@ -96,7 +94,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     public function doPreCompile()
     {
-        FileUtils::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) {
+        fs::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) {
             if (fs::ext($filename) == 'phb') {
                 fs::delete($filename);
             }
@@ -159,7 +157,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 });
             });
 
-            FileUtils::scan($this->project->getSrcFile(''), function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory) {
+            fs::scan($this->project->getSrcFile(''), function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory) {
                 if (str::endsWith($filename, '.php')) {
                     $filename = fs::normalize($filename);
 
@@ -182,7 +180,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 }
             });
 
-            FileUtils::scan($generatedDirectory, function ($filename) use ($log, $scope, $useByteCode) {
+            fs::scan($generatedDirectory, function ($filename) use ($log, $scope, $useByteCode) {
                 if (fs::ext($filename) == 'php') {
                     $filename = fs::normalize($filename);
 
@@ -194,7 +192,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                         $module = new Module($filename, false, true);
                         $module->dump($compiledFile);
                     });
-
                     fs::delete($filename);
                 }
             });
@@ -220,15 +217,22 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                             }
 
                             $stream = $jar->getEntryStream($entry->getName());
-                            $className = FileUtils::stripExtension($entry->getName());
+                            $className = fs::pathNoExt($entry->getName());
                             $className = str::replace($className, '/', '\\');
 
                             try {
-                                $done = $scope->execute(function () use ($stream, $compiled, $className) {
+                                $done = $scope->execute(function () use ($stream, $compiled, $className, $log) {
                                     if (!class_exists($className, false)) {
-                                        $module = new Module($stream, false);
-                                        $module->dump($compiled, true);
-                                        return true;
+                                        try {
+                                            $module = new Module($stream, false);
+                                            $module->dump($compiled, true);
+                                            return true;
+                                        } catch (\Error $e) {
+                                            if ($log) {
+                                                $log("[ERROR] Unable to compile '{$className}', {$e->getMessage()}, on line {$e->getLine()}");
+                                                return false;
+                                            }
+                                        }
                                     }
 
                                     return false;
@@ -252,7 +256,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $this->externalJarLibraries[FileUtils::hashName($file)] = $file;
     }
 
-
     public function doUpdateSettings(CommonProjectControlPane $editor = null)
     {
         if ($this->uiSettings) {
@@ -268,7 +271,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $opts = new UXHBox();
         $opts->spacing = 5;
 
-        $this->uiByteCodeCheckbox = $byteCodeCheckbox = new UXCheckbox('Компилировать в байткод');
+        $this->uiByteCodeCheckbox = $byteCodeCheckbox = new UXCheckbox('Компилировать в байткод (+ защита от декомпиляции)');
         $this->uiByteCodeCheckbox->on('mouseUp', [$this, 'doSave']);
         $byteCodeCheckbox->tooltipText = 'Компиляция будет происходить только во время итоговой сборки проекта.';
         $opts->add($byteCodeCheckbox);

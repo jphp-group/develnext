@@ -283,7 +283,7 @@ class CodeEditor extends AbstractEditor
         $this->textArea->text = $value;
     }
 
-    public function load()
+    public function load($resetHistory = true)
     {
         if (!$this->file) {
             return;
@@ -311,6 +311,10 @@ class CodeEditor extends AbstractEditor
         }
 
         $this->setValue($content);
+
+        if ($resetHistory) {
+            $this->textArea->forgetHistory();
+        }
 
         Logger::info("Finish load file $file");
     }

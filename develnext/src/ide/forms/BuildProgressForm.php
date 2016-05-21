@@ -302,6 +302,18 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
         //$this->closeButton->enabled = true;
     }
 
+    public function stopWithError()
+    {
+        $this->processDone = true;
+
+        $this->addConsoleLine("");
+        $this->addConsoleLine("BUILD FAILED.");
+
+        if ($this->progress) {
+            $this->progress->progress = 100;
+        }
+    }
+
     /**
      * @param Process $process
      * @param callable $onExit

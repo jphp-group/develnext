@@ -3,13 +3,14 @@ namespace develnext\bundle\mail;
 
 use develnext\bundle\mail\components\MailScriptComponent;
 use ide\bundle\AbstractBundle;
+use ide\bundle\AbstractJarBundle;
 use ide\formats\ScriptModuleFormat;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\Project;
 use php\lib\fs;
 
-class MailBundle extends AbstractBundle
+class MailBundle extends AbstractJarBundle
 {
     function getName()
     {

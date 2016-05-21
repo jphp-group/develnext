@@ -136,20 +136,7 @@ class OneJarBuildType extends AbstractBuildType
         $dialog = new BuildProgressForm();
         $dialog->show();
 
-        ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'gradle jar', function () use ($ide, $project, $dialog) {
-            $process = new Process([$ide->getGradleProgram(), 'clean', 'splitConfig', 'jar'], $project->getRootDir(), $ide->makeEnvironment());
-
-            /** @var GradleProjectBehaviour $gradle */
-            $gradle = $project->getBehaviour(GradleProjectBehaviour::class);
-
-            self::appendJarTasks($gradle->getConfig());
-
-            $process = $process->start();
-
-            $dialog->watchProcess($process);
-        });
-
-        $dialog->setOnExitProcess(function ($exitValue) use ($project, $dialog, $finished, $config) {
+        $onExitProcess = function ($exitValue) use ($project, $dialog, $finished, $config) {
             Logger::info("Finish executing: exitValue = $exitValue");
 
             if ($exitValue == 0) {
@@ -181,6 +168,25 @@ class OneJarBuildType extends AbstractBuildType
                     $dialog->showAndWait();
                 }
             }
+        };
+
+        ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'gradle jar', function ($success) use ($ide, $project, $dialog) {
+            if ($success) {
+                $process = new Process([$ide->getGradleProgram(), 'clean', 'splitConfig', 'jar'], $project->getRootDir(), $ide->makeEnvironment());
+
+                /** @var GradleProjectBehaviour $gradle */
+                $gradle = $project->getBehaviour(GradleProjectBehaviour::class);
+
+                self::appendJarTasks($gradle->getConfig());
+
+                $process = $process->start();
+
+                $dialog->watchProcess($process);
+            } else {
+                $dialog->stopWithError();
+            }
         });
+
+        $dialog->setOnExitProcess($onExitProcess);
     }
 }

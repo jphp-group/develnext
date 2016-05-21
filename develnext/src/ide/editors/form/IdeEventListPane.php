@@ -342,7 +342,7 @@ class IdeEventListPane
 
                 if ($actionConstructor->getResult()) {
                     $this->manager->replaceCodeOfMethod($selectedClass, $selectedMethod, $actionConstructor->getLiveCode());
-                    $this->codeEditor->load();
+                    $this->codeEditor->load(false);
                     $this->jumpToLine($eventCode);
                 }
             }
@@ -667,7 +667,7 @@ class IdeEventListPane
 
                     AccurateTimer::executeAfter(100, function () use ($selected, $bind) {
                         if ($this->codeEditor) {
-                            $this->codeEditor->load();
+                            $this->codeEditor->load(false);
                         }
 
                         $this->manager->load();
@@ -694,7 +694,7 @@ class IdeEventListPane
 
             uiLater(function () use ($code) {
                 if ($this->codeEditor) {
-                    $this->codeEditor->load();
+                    $this->codeEditor->load(false);
                 }
 
                 $this->manager->load();
@@ -721,7 +721,7 @@ class IdeEventListPane
 
             uiLater(function () use ($code, $type) {
                 if ($this->codeEditor) {
-                    $this->codeEditor->load();
+                    $this->codeEditor->load(false);
                 }
 
                 $this->manager->load();
