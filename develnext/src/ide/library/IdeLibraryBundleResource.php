@@ -28,6 +28,8 @@ class IdeLibraryBundleResource extends IdeLibraryResource
     {
         parent::onRegister($library);
 
+        Runtime::addJar($this->getPath() . "/" . fs::name($this->getPath()) . ".jar");
+
         $class = $this->config->get('class');
 
         if (class_exists($class)) {
@@ -36,8 +38,6 @@ class IdeLibraryBundleResource extends IdeLibraryResource
         } else {
             throw new \Exception("Cannot register bundle resource, class '$class' is not found");
         }
-
-        Runtime::addJar($this->getPath() . "/" . fs::name($this->getPath()) . ".jar");
     }
 
     /**

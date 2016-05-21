@@ -1,4 +1,4 @@
-name=HTML Парсер (Jsoup)
-description=Пакет для парсинга html и сайтов в стиле апи jQuery
+name=HTML РџР°СЂСЃРµСЂ (Jsoup)
+description=РџР°РєРµС‚ РґР»СЏ РїР°СЂСЃРёРЅРіР° html Рё СЃР°Р№С‚РѕРІ РІ СЃС‚РёР»Рµ Р°РїРё jQuery
 
 class=develnext\\bundle\\jsoup\\JsoupBundle

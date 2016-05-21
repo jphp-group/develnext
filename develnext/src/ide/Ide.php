@@ -157,7 +157,7 @@ class Ide extends Application
 
                 restore_exception_handler();
 
-                set_exception_handler(function (\BaseException $e) {
+                set_exception_handler(function ($e) {
                     static $showError;
 
                     if ($e instanceof JSException) {

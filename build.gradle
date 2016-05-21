@@ -89,7 +89,15 @@ subprojects {
                         if (!name.equals(el.getName())) {
                             println "Rename '" + el.file.parent + "/" + name + "' file"
 
-                            el.file.renameTo(file(el.file.parent + "/" + name));
+                            def file = file(el.file.parent + "/" + name)
+
+                            if (file.exists()) {
+                                file.delete()
+                            }
+
+                            if (!el.file.renameTo(file)) {
+                                el.file.delete()
+                            }
                         }
                     }
                 }

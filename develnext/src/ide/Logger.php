@@ -160,7 +160,7 @@ class Logger
         $time = Time::millis();
     }
 
-    static function exception($message, \BaseException $e)
+    static function exception($message, $e)
     {
         $message .= "\r\n" . $e->getMessage() . " on line {$e->getLine()} at file {$e->getFile()}\r\nStack Trace:\r\n";
         $message .= $e->getTraceAsString();
