@@ -3,10 +3,12 @@ package org.develnext.lexer.jphp.classes;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.develnext.lexer.jphp.DevelNextLexerExtension;
+import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
+import php.runtime.memory.ArrayMemory;
 import php.runtime.reflection.ClassEntity;
 
 @Name("Token")
@@ -33,6 +35,20 @@ public class PToken<T extends Token> extends BaseWrapper<Token> {
 
     public PToken(Environment env, ClassEntity clazz) {
         super(env, clazz);
+    }
+
+    @Signature
+    public Memory __debugInfo() {
+        ArrayMemory memory = new ArrayMemory();
+        memory.refOfIndex("type").assign(getWrappedObject().getType());
+        memory.refOfIndex("text").assign(getWrappedObject().getText());
+        memory.refOfIndex("line").assign(getWrappedObject().getLine());
+        memory.refOfIndex("channel").assign(getWrappedObject().getChannel());
+        memory.refOfIndex("startIndex").assign(getWrappedObject().getStartIndex());
+        memory.refOfIndex("stopIndex").assign(getWrappedObject().getStopIndex());
+        memory.refOfIndex("tokenIndex").assign(getWrappedObject().getTokenIndex());
+
+        return memory.toConstant();
     }
 
     @Signature

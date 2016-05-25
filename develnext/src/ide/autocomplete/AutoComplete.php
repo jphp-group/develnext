@@ -45,7 +45,10 @@ class AutoComplete
     {
         $mem = new MemoryStream();
         $mem->write($sourceCode);
-        $mem->seek(0);
+
+        if ($sourceCode) {
+            $mem->seek(0);
+        }
 
         $tokenizer = new SourceTokenizer($mem, '', 'UTF-8');
 

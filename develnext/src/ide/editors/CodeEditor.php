@@ -355,7 +355,9 @@ class CodeEditor extends AbstractEditor
         $commandPane->fillHeight = true;
         $commandPane->height = 30;
 
-        $ui->add($commandPane);
+        if ($this->commands) {
+            $ui->add($commandPane);
+        }
 
         $scrollPane = new UXCodeAreaScrollPane($this->textArea);
 

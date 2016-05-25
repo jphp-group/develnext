@@ -13,6 +13,7 @@ use php\lang\Module;
 use php\lib\fs;
 use php\lib\reflect;
 use php\lib\str;
+use php\time\Time;
 
 class IdeClassLoader extends ClassLoader
 {
@@ -102,8 +103,14 @@ class IdeClassLoader extends ClassLoader
     {
         foreach ([""] + $this->classPaths as $path) {
             try {
-                $module = new Module(Stream::of("res://$path/$name.php"));
+                $t = Time::millis();
+
+                $filename = "res://$path/$name.php";
+                $module = new Module(Stream::of($filename));
                 $module->call();
+
+                $t = Time::millis() - $t;
+                echo "[DEBUG] load '$filename', $t ms\n";
 
                 if ($this->cache && $fileCompiled) {
                     fs::makeDir($fileCompiled->getParent());

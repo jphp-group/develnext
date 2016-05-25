@@ -207,6 +207,7 @@ class SimpleSingleCommand extends AbstractCommand
     public function makeUiForHead()
     {
         $button = $this->makeGlyphButton();
+        $button->maxHeight = 9999;
 
         if ($this->textVisible) {
             $button->text = $this->getName();

@@ -59,4 +59,9 @@ public class PAbstractLexer<T extends Lexer> extends BaseWrapper<T> {
     public void __destruct(Environment env) {
         Stream.closeStream(env, stream);
     }
+
+    @Override
+    public T getWrappedObject() {
+        return super.getWrappedObject();
+    }
 }

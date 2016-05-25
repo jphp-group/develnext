@@ -13,5 +13,6 @@ ide\commands\IdeLogShowCommand
 ide\commands\OfficialSiteCommand
 ide\commands\YoutubeChannelCommand
 ide\commands\VkGroupCommand
+ide\commands\IdeSandboxShowCommand
 
 ide\commands\CheckUpdatesCommand

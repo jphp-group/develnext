@@ -41,6 +41,7 @@ abstract class AbstractLexer
     public $line;
 
     /**
+     * @readonly
      * @var int
      */
     public $position;
