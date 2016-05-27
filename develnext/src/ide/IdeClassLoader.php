@@ -110,7 +110,12 @@ class IdeClassLoader extends ClassLoader
                 $module->call();
 
                 $t = Time::millis() - $t;
-                echo "[DEBUG] load '$filename', $t ms\n";
+
+                if (class_exists(Logger::class, false)) {
+                    if ($t > 90) {
+                        Logger::warn("Loading '$filename' takes a long time, $t ms");
+                    }
+                }
 
                 if ($this->cache && $fileCompiled) {
                     fs::makeDir($fileCompiled->getParent());

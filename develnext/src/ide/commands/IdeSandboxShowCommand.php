@@ -51,6 +51,7 @@ class IdeSandboxShowCommand extends AbstractCommand
         $ui->padding = 5;
 
         $editor = new CodeEditor(IdeSystem::getFile("sandbox.php"), 'php');
+        $editor->setSourceFile(false);
         $editor->registerDefaultCommands();
         $editor->load();
 

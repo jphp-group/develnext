@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.tree.pattern.TokenTagToken;
 import org.develnext.lexer.css.CSSLexer;
 import org.develnext.lexer.jphp.classes.*;
 import org.develnext.lexer.jphp.classes.tree.PAbstractTree;
+import org.develnext.lexer.jphp.classes.tree.PParserRuleContext;
 import org.develnext.lexer.jphp.classes.tree.PRuleContext;
 import org.develnext.lexer.json.JSONLexer;
 import org.develnext.lexer.php.PHPLexer;
@@ -32,6 +33,7 @@ public class DevelNextLexerExtension extends Extension {
 
         registerWrapperClass(scope, Tree.class, PAbstractTree.class);
         registerWrapperClass(scope, RuleContext.class, PRuleContext.class);
+        registerWrapperClass(scope, ParserRuleContext.class, PParserRuleContext.class);
 
         registerWrapperClass(scope, Lexer.class, PAbstractLexer.class);
         registerWrapperClass(scope, JSONLexer.class, PJSONLexer.class);

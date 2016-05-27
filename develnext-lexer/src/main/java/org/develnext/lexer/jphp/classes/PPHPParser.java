@@ -2,6 +2,7 @@ package org.develnext.lexer.jphp.classes;
 
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.develnext.lexer.jphp.DevelNextLexerExtension;
 import org.develnext.lexer.jphp.classes.PAbstractParser;
 import org.develnext.lexer.php.PHPParser;
@@ -24,5 +25,25 @@ public class PPHPParser extends PAbstractParser<PHPParser> {
     @Signature
     public void __construct(PAbstractLexer lexer) {
         __wrappedObject = new PHPParser(new CommonTokenStream(lexer.getWrappedObject()));
+    }
+
+    @Signature
+    public ParserRuleContext htmlDocument() {
+        return getWrappedObject().htmlDocument();
+    }
+
+    @Signature
+    public ParserRuleContext namespaceDeclaration() {
+        return getWrappedObject().namespaceDeclaration();
+    }
+
+    @Signature
+    public ParserRuleContext functionDeclaration() {
+        return getWrappedObject().functionDeclaration();
+    }
+
+    @Signature
+    public ParserRuleContext classDeclaration() {
+        return getWrappedObject().classDeclaration();
     }
 }

@@ -13,6 +13,7 @@ import php.runtime.reflection.ClassEntity;
 @Abstract
 @Name("AbstractParser")
 @Namespace(DevelNextLexerExtension.NS)
+@Reflection.WrapInterface(value = Parser.class, skipConflicts = true)
 public class PAbstractParser<T extends Parser> extends BaseWrapper<Parser> {
     public PAbstractParser(Environment env, T wrappedObject) {
         super(env, wrappedObject);
@@ -20,7 +21,10 @@ public class PAbstractParser<T extends Parser> extends BaseWrapper<Parser> {
 
     public PAbstractParser(Environment env, ClassEntity clazz) {
         super(env, clazz);
+    }
 
-
+    @Override
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 }

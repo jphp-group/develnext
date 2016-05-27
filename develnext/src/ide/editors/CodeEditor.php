@@ -115,9 +115,30 @@ class CodeEditor extends AbstractEditor
     protected $replaceDialog;
 
     /**
+     * @var bool
+     */
+    protected $sourceFile = false;
+
+    /**
      * @var int
      */
     protected $findDialogLastIndex = 0;
+
+    /**
+     * @return boolean
+     */
+    public function isSourceFile()
+    {
+        return $this->sourceFile;
+    }
+
+    /**
+     * @param boolean $sourceFile
+     */
+    public function setSourceFile($sourceFile)
+    {
+        $this->sourceFile = $sourceFile;
+    }
 
     public function getIcon()
     {
@@ -129,6 +150,7 @@ class CodeEditor extends AbstractEditor
         parent::__construct($file);
 
         $this->mode = $mode;
+        $this->sourceFile = $mode == 'php';
 
         if (self::USE_NEW_EDITOR) {
             switch ($mode) {
@@ -289,7 +311,7 @@ class CodeEditor extends AbstractEditor
             return;
         }
 
-        if ($this->mode == 'php') {
+        if ($this->isSourceFile()) {
             $sourceFile = "$this->file.source";
 
             if (fs::exists($sourceFile)) {
@@ -333,7 +355,7 @@ class CodeEditor extends AbstractEditor
             FileUtils::put($this->file, $value);
         }
 
-        if ($this->mode == 'php') {
+        if ($this->isSourceFile()) {
             FileUtils::put("$this->file.source", $value);
         } else {
             FileUtils::put($this->file, $value);
