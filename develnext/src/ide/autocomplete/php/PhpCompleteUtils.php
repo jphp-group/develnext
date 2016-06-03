@@ -1,6 +1,7 @@
 <?php
 namespace ide\autocomplete\php;
 
+use develnext\lexer\inspector\entry\MethodEntry;
 use ide\autocomplete\MethodAutoCompleteItem;
 use php\lib\str;
 
@@ -68,6 +69,60 @@ abstract class PhpCompleteUtils
             );
         } else {
             return new MethodAutoCompleteItem($method->getName(), $description, $insert);
+        }
+    }
+
+    static function methodParamsString2(MethodEntry $method)
+    {
+        $_params = [];
+
+        foreach ($method->arguments as $arg) {
+            $item = "\${$arg->name}";
+
+            if ($arg->reference) {
+                $item = "&$item";
+            }
+
+            if ($arg->type) {
+                $item = "$arg->type $item";
+            }
+
+            if ($arg->value) {
+                $item = "$item = $arg->value";
+            }
+
+            $_params[] = $item;
+        }
+
+        if ($_params) {
+            $description = '(' . str::join($_params, ', ') . ')';
+        } else {
+            $description = "";
+        }
+
+        if ($method->data['returnType']) {
+            if ($description) {
+                $description = "$description: {$method->data['returnType']}";
+            } else {
+                $description = $method->data['returnType'];
+            }
+        }
+
+        return $description;
+    }
+
+    static function methodAutoComplete2(MethodEntry $method, $bold = true)
+    {
+        $insert = $method->name . '(';
+
+        $description = self::methodParamsString2($method);
+
+        if ($method->static) {
+            return MethodAutoCompleteItem::func(
+                $method->name, $description, $insert, null, $bold ? ';' : '-fx-text-fill: #4c4c4c;'
+            );
+        } else {
+            return new MethodAutoCompleteItem($method->name, $description, $insert, null, $bold ? ';' : '-fx-text-fill: #4c4c4c;');
         }
     }
 }

@@ -1,10 +1,17 @@
 <?php
 namespace ide\autocomplete\php;
 
+use develnext\lexer\inspector\entry\TypeEntry;
+use develnext\lexer\SyntaxAnalyzer;
+use develnext\lexer\token\DynamicAccessExprToken;
+use develnext\lexer\token\NameToken;
+use develnext\lexer\token\SimpleToken;
+use develnext\lexer\token\StaticAccessExprToken;
 use ide\autocomplete\AutoCompleteRegion;
 use ide\autocomplete\AutoCompleteTypeRule;
 use ide\Logger;
 use php\gui\framework\Application;
+use php\io\MemoryStream;
 use php\lib\arr;
 use php\lib\Items;
 use php\lib\num;
@@ -116,8 +123,166 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
         return null;
     }
 
-    public function identifyType($string)
+    protected function findReturnType(SimpleToken $token, $previousType = null, AutoCompleteRegion $region)
     {
+        $inspector = $this->complete->getInspector();
+
+        $returnType = $previousType;
+
+        switch ($token->getTypeName()) {
+            case 'VariableExpr':
+                if ($token->getWord() == '$this') {
+                    if ($class = $region->getLastValue('self')) {
+                        return ($class['namespace'] ? $class['namespace'] . "\\" : '') . $class['name'];
+                    }
+                }
+
+                return null;
+
+            case 'FulledName':
+                $type = $inspector->findType($token->getName());
+
+                if ($type) {
+                    return $type->fulledName;
+                }
+
+                return null;
+
+            case 'DynamicAccessExpr':
+                $field = $token->getField();
+
+                if ($field instanceof NameToken) {
+                    $type = $inspector->findType($returnType);
+
+                    if ($type) {
+                        $property = $inspector->findProperty($type, $field->getName());
+
+                        if ($property) {
+                            foreach ((array) $property->data['type'] as $one) {
+                                if ($inspector->findType($one)) {
+                                    return $one;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return null;
+
+            case 'StaticAccessExpr':
+                if ($token instanceof StaticAccessExprToken) {
+                    $clazz = $token->getClazz();
+                    $field = $token->getField();
+
+                    if ($class = $region->getLastValue('self')) {
+                        return ($class['namespace'] ? $class['namespace'] . "\\" : '') . $class['name'];
+                    }
+
+                    var_dump($clazz->getName());
+
+                    if ($clazz instanceof NameToken) {
+                        $type = $inspector->findType($clazz->getName());
+
+                        if ($type && $field instanceof NameToken) {
+                            $method = $inspector->findMethod($type, $field->getName());
+
+                            if ($method && $method->static) {
+                                return $method->data['returnType'];
+                            }
+                        }
+                    }
+                }
+
+                return null;
+
+            case 'CallExpr':
+                $name = $token->getName();
+
+                if ($returnType) {
+                    $type = $inspector->findType($returnType);
+
+                    if ($name instanceof DynamicAccessExprToken) {
+                        $field = $name->getField();
+
+                        if ($field instanceof NameToken) {
+                            $method = $inspector->findMethod($type, $field->getName());
+
+                            if ($method && !$method->static) {
+                                return $method->data['returnType'];
+                            }
+                        }
+                    } else if ($name instanceof StaticAccessExprToken) {
+                        $clazz = $name->getClazz();
+                        $field = $name->getField();
+
+                        if ($clazz instanceof NameToken) {
+                            $type = $inspector->findType($clazz->getName());
+
+                            if ($type && $field instanceof NameToken) {
+                                $method = $inspector->findMethod($type, $field->getName());
+
+                                if ($method && $method->static) {
+                                    return $method->data['returnType'];
+                                }
+                            }
+                        }
+                    }
+
+                    return null;
+                    // method
+                } else {
+                    if ($name instanceof NameToken) {
+                        $name = $name->getName();
+
+                        $func = $inspector->findFunction($name);
+
+                        if ($func) {
+                            return $func->data['returnType'];
+                        }
+                    }
+
+                    // function
+                }
+                break;
+        }
+
+        return null;
+    }
+
+    public function identifyType($string, AutoCompleteRegion $region)
+    {
+        $tokens = SyntaxAnalyzer::analyzeExpressionForDetectType($string);
+        $type = null;
+
+        print_r($tokens);
+        $accessType = 'dynamic';
+
+        foreach ($tokens as $i => $token) {
+            if ($i == sizeof($tokens) - 1 && sizeof($tokens) > 1) {
+                switch ($token->getTypeName()) {
+                    case 'DynamicAccessExpr':
+                        $accessType = 'dynamic';
+                        break 2;
+                    case 'FulledName':
+                    case 'StaticAccessExpr':
+                        $accessType = 'static';
+                        break;
+                }
+            }
+
+            $type = $this->findReturnType($token, $type, $region);
+
+            if ($type == null) {
+                break;
+            }
+        }
+
+        var_dump($accessType, $type);
+
+        if ($type) {
+            return "~$accessType $type";
+        }
+
         /** @var PhpAutoComplete $complete */
         $complete = $this->complete;
 
@@ -189,8 +354,17 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
     protected $classExists;
 
-    public function updateStart()
+    public function updateStart($sourceCode)
     {
+        $stream = new MemoryStream();
+        $stream->write($sourceCode);
+
+        if ($sourceCode) {
+            $stream->seek(0);
+        }
+
+        $this->complete->getInspector()->loadSource($stream);
+
         $this->classExists = false;
     }
 
@@ -316,7 +490,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
         }
     }
 
-    public function updateDone()
+    public function updateDone($sourceCode)
     {
 
     }

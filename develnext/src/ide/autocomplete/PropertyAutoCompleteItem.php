@@ -7,5 +7,8 @@ namespace ide\autocomplete;
  */
 class PropertyAutoCompleteItem extends AutoCompleteItem
 {
-    
+    public function getDefaultIcon()
+    {
+        return 'icons/greenSquare16.png';
+    }
 }

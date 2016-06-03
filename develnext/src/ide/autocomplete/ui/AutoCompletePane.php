@@ -171,7 +171,8 @@ class AutoCompletePane
                 $items = null;
 
                 if ($string != $this->lastString) {
-                    $types = $this->complete->identifyType($string);
+                    $region = $this->complete->findRegion($this->area->caretLine, $this->area->caretOffset);
+                    $types = $this->complete->identifyType($string, $region);
 
                     if (Items::keys($this->types) != $types) {
                         $this->types = [];
@@ -334,15 +335,24 @@ class AutoCompletePane
         $i = $this->area->caretPosition;
 
         $string = '';
+        $braces = [];
+
+        if (Char::isSpace($text[$i - 1])) {
+            return $string;
+        }
 
         while ($i-- >= 0) {
             $ch = $text[$i];
 
             if (Char::isPrintable($ch)
-                && (Char::isLetterOrDigit($ch) || (!$onlyName && Str::contains('!@#$%^&*()_+=-,./\\:;|><{}[]"\'', $ch)))) {
+                && (Char::isLetterOrDigit($ch)) || $ch == '_') {
                 $string .= $ch;
             } else {
-                break;
+                if ($onlyName) {
+                    break;
+                } else {
+                    $string .= $ch;
+                }
             }
         }
 
@@ -365,8 +375,8 @@ class AutoCompletePane
         $list = new UXListView();
         $list->maxHeight = 9999;
         $list->fixedCellSize = 20;
-        $list->classes->add('hide-hor-scroll');
-        $list->style = '-fx-font: 12px "Courier new"; -fx-background-insets: 0; -fx-focus-color: -fx-control-inner-background; -fx-faint-focus-color: -fx-control-inner-background;';
+        $list->classes->addAll(['hide-hor-scroll', 'dn-console-list']);
+        $list->style = '-fx-background-insets: 0; -fx-focus-color: -fx-control-inner-background; -fx-faint-focus-color: -fx-control-inner-background;';
         $list->width = 450;
 
         $ui->add($list);
@@ -459,9 +469,13 @@ class AutoCompletePane
     {
         $label = new UXLabel($item->getName());
         $label->textColor = UXColor::of('black');
-        $label->style = '-fx-font-weight: bold;';
+        $label->style = $item->getStyle();
 
-        $icon = Ide::get()->getImage($item->getIcon(), [16, 16]);
+        $icon = Ide::get()->getImage($item->getIcon() ?: $item->getDefaultIcon(), [16, 16]);
+
+        if ($icon) {
+            UXHBox::setMargin($icon, [0, 5, 0, 0]);
+        }
 
         if (!$item->getDescription()) {
             $cell->graphic = $icon ? new UXHBox([$icon, $label]) : $label;
@@ -474,11 +488,10 @@ class AutoCompletePane
                     $dots = new UXLabel(": ");
                     $dots->textColor = $hintLabel->textColor;
                     $hintLabel->text = $item->getDescription();
-                    $hintLabel->paddingLeft = 2;
 
-                    $cell->graphic = new UXHBox([$label, $dots, $icon, $hintLabel]);
+                    $cell->graphic = new UXHBox([$icon, $label, $dots, $hintLabel]);
                 } else {
-                    $cell->graphic = new UXHBox([$label, $icon]);
+                    $cell->graphic = new UXHBox([$icon, $label]);
                 }
             } else {
                 $cell->graphic = new UXHBox([$label, $hintLabel]);
@@ -494,14 +507,14 @@ class AutoCompletePane
             if ($item->isFunction()) {
                 $label->text = "{$label->text}()";
             } else {
-                $label->text = "->{$label->text}()";
+                $label->text = "{$label->text}()";
             }
 
             $label->textColor = UXColor::of('black');
         }
 
         if ($item instanceof PropertyAutoCompleteItem) {
-            $label->text = "->{$label->text}";
+            $label->text = "{$label->text}";
             $label->textColor = UXColor::of('green');
         }
     }

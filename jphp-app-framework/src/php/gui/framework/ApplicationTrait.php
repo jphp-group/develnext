@@ -4,11 +4,19 @@ namespace php\gui\framework;
 
 trait ApplicationTrait
 {
+    /**
+     * @param $name
+     * @return AbstractFactory
+     * @throws \php\lang\IllegalArgumentException
+     */
     public function factory($name)
     {
         return app()->factory($name);
     }
 
+    /**
+     * @return null|AbstractModule
+     */
     public function appModule()
     {
         return app()->appModule();

@@ -1,6 +1,8 @@
 <?php
 namespace ide\project\behaviours;
 
+use develnext\lexer\inspector\PHPInspector;
+use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
@@ -15,10 +17,13 @@ use php\io\File;
 use php\io\IOException;
 use php\lang\Environment;
 use php\lang\Module;
+use php\lang\ThreadPool;
 use php\lib\fs;
 use php\lib\str;
 use php\net\URL;
 use php\util\LauncherClassLoader;
+use php\util\Shared;
+use php\util\SharedValue;
 
 /**
  * Class PhpProjectBehaviour
@@ -52,6 +57,16 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     protected $uiByteCodeCheckbox;
 
     /**
+     * @var PHPInspector
+     */
+    protected $inspector;
+
+    /**
+     * @var ThreadPool
+     */
+    protected $inspectorThreadPool;
+
+    /**
      * @return int
      */
     public function getPriority()
@@ -60,10 +75,22 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
+     * @return PHPInspector
+     */
+    public function getInspector()
+    {
+        return $this->inspector;
+    }
+
+    /**
      * ...
      */
     public function inject()
     {
+        $this->inspectorThreadPool = ThreadPool::createSingle();
+        $this->inspector = new PHPInspector();
+
+        $this->project->on('close', [$this, 'doClose']);
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('save', [$this, 'doSave']);
         $this->project->on('preCompile', [$this, 'doPreCompile']);
@@ -71,6 +98,31 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
         $this->project->on('makeSettings', [$this, 'doMakeSettings']);
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
+    }
+
+    public function refreshInspectorInBackground()
+    {
+        $this->inspectorThreadPool->execute(function () {
+            $this->refreshInspector();
+        });
+    }
+
+    public function refreshInspector()
+    {
+        $this->inspector->setExtensions(['source']);
+        $this->inspector->loadDirectory($this->project->getFile("src/"), true);
+
+        $this->inspector->setExtensions(['php']);
+        $this->inspector->loadDirectory($this->project->getFile(self::GENERATED_DIRECTORY), true);
+
+        $this->inspector->loadSource($this->project->getFile('lib/jphp-runtime.jar'));
+        $this->inspector->loadSource($this->project->getFile('lib/jphp-gui-ext.jar'));
+        $this->inspector->loadSource($this->project->getFile('lib/jphp-app-framework.jar'));
+    }
+
+    public function doClose()
+    {
+        $this->inspectorThreadPool->shutdown();
     }
 
     public function doOpen()
@@ -83,6 +135,8 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         } else {
             Logger::warn("Unable to add the generated src directory to build.gradle file");
         }
+
+        $this->refreshInspectorInBackground();
     }
 
     public function doSave()
@@ -90,6 +144,8 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         if ($this->uiSettings) {
             $this->setIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, $this->uiByteCodeCheckbox->selected);
         }
+
+        $this->refreshInspectorInBackground();
     }
 
     public function doPreCompile()

@@ -23,12 +23,13 @@ abstract class AutoCompleteTypeRule
         $this->complete = $complete;
     }
 
-    abstract public function identifyType($string);
+    abstract public function identifyType($string, AutoCompleteRegion $region);
 
     /**
+     * @param $sourceCode
      * @return mixed
      */
-    abstract public function updateStart();
+    abstract public function updateStart($sourceCode);
 
     /**
      * @param SourceTokenizer $tokenizer
@@ -39,7 +40,8 @@ abstract class AutoCompleteTypeRule
     abstract public function update(SourceTokenizer $tokenizer, SourceToken $token, SourceToken $previousToken = null);
 
     /**
+     * @param $sourceCode
      * @return mixed
      */
-    abstract public function updateDone();
+    abstract public function updateDone($sourceCode);
 }

@@ -1,6 +1,7 @@
 <?php
 namespace ide\autocomplete\php;
 
+use develnext\lexer\inspector\AbstractInspector;
 use ide\autocomplete\AutoCompleteTypeLoader;
 use php\lib\Str;
 
@@ -24,14 +25,21 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
     protected $reflectionTypes = [];
 
     /**
-     * PhpAutoCompleteLoader constructor.
+     * @var AbstractInspector
      */
-    public function __construct()
+    private $inspector;
+
+    /**
+     * PhpAutoCompleteLoader constructor.
+     * @param AbstractInspector $inspector
+     */
+    public function __construct(AbstractInspector $inspector)
     {
         $this->anyType = new PhpAnyAutoCompleteType();
         $this->variableType = new PhpAnyAutoCompleteType('~variable');
         $this->thisType = new ThisAutoCompleteType();
         $this->eventType = new EventVariableAutoCompleteType();
+        $this->inspector = $inspector;
     }
 
     public function load($name)
@@ -56,7 +64,10 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
                 }
 
                 if (str::startsWith($name, '~dynamic ')) {
-                    return new DynamicAccessAutoCompleteType(str::sub($name, 9));
+                    $name = str::sub($name, 9);
+                    $typeEntry = $this->inspector->findType($name);
+
+                    return new DynamicAccessAutoCompleteType($typeEntry ?: $name, $this->inspector);
                 }
 
                 if (class_exists($name)) {

@@ -12,20 +12,9 @@ class MethodAutoCompleteItem extends AutoCompleteItem
      */
     protected $function = false;
 
-    /**
-     * @param $name
-     * @param string $description
-     * @param null $insert
-     * @param null $icon
-     */
-    public function __construct($name, $description = '', $insert = null, $icon = null)
+    static function func($name, $description = '', $insert = null, $icon = null, $style = null)
     {
-        parent::__construct($name, $description, $insert, $icon);
-    }
-
-    static function func($name, $description = '', $insert = null, $icon = null)
-    {
-        $item = new MethodAutoCompleteItem($name, $description, $insert, $icon);
+        $item = new MethodAutoCompleteItem($name, $description, $insert, $icon, $style);
         $item->function = true;
 
         return $item;
@@ -37,5 +26,10 @@ class MethodAutoCompleteItem extends AutoCompleteItem
     public function isFunction()
     {
         return $this->function;
+    }
+
+    public function getDefaultIcon()
+    {
+        return 'icons/redLeaf16.png';
     }
 }

@@ -4,16 +4,10 @@ namespace php\gui\framework;
 use action\Animation;
 use Exception;
 use php\framework\Logger;
-use php\gui\AbstractFormWrapper;
-use php\gui\event\UXEvent;
-use php\gui\event\UXKeyEvent;
-use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;
 use php\gui\framework\behaviour\custom\FormBehaviourManager;
 use php\gui\framework\event\AbstractEventAdapter;
-use php\gui\layout\UXAnchorPane;
-use php\gui\layout\UXRegion;
 use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXCustomNode;
@@ -26,7 +20,6 @@ use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
 use php\gui\UXParent;
-use php\gui\UXProgressIndicator;
 use php\gui\UXScreen;
 use php\gui\UXTooltip;
 use php\gui\UXWindow;
@@ -38,11 +31,11 @@ use php\lang\IllegalStateException;
 use php\lang\Thread;
 use php\lib\Items;
 use php\lib\Str;
-use php\lib\String;
 use php\util\Configuration;
 use php\util\Scanner;
 use ReflectionClass;
 use ReflectionMethod;
+use php\gui\framework\Application;
 
 /**
  * Class AbstractForm
@@ -60,7 +53,9 @@ abstract class AbstractForm extends UXForm
     /** @var Configuration */
     protected $_config;
 
-    /** @var AbstractModule[] */
+    /**
+     * @var AbstractModule[]
+     */
     protected $_modules = [];
 
     /**

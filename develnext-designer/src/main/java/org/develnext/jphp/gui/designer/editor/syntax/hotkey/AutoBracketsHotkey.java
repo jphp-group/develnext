@@ -10,6 +10,9 @@ public class AutoBracketsHotkey extends AbstractHotkey {
         char addClosed = '\0';
 
         int pos = area.getCaretPosition();
+
+        if (area.getText().isEmpty()) return false;
+
         String ch = area.getText(pos - 1, pos);
 
         switch (ch) {

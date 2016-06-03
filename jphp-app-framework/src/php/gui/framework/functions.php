@@ -20,6 +20,10 @@ use php\lib\Items;
 use php\lib\Str;
 use timer\AccurateTimer;
 
+/**
+ * @return Application
+ * @throws Exception
+ */
 function app()
 {
     return Application::get();

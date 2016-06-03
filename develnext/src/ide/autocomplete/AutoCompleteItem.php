@@ -30,18 +30,25 @@ abstract class AutoCompleteItem
     protected $insert = null;
 
     /**
+     * @var string
+     */
+    private $style;
+
+    /**
      * @param $name
      * @param string $description
      * @param null $insert
      * @param null $icon
+     * @param null $style
      */
-    public function __construct($name, $description = '', $insert = null, $icon = null)
+    public function __construct($name, $description = '', $insert = null, $icon = null, $style = null)
     {
         $this->name = $name;
         $this->description = $description;
         $this->icon = $icon;
 
         $this->insert = $insert ? $insert : $name;
+        $this->style = $style;
     }
 
     public function getInsert()
@@ -71,5 +78,18 @@ abstract class AutoCompleteItem
     public function getIcon()
     {
         return $this->icon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStyle()
+    {
+        return $this->style;
+    }
+
+    public function getDefaultIcon()
+    {
+        return null;
     }
 }

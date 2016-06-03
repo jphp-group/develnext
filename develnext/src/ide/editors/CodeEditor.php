@@ -12,6 +12,7 @@ use ide\forms\ReplaceTextDialogForm;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
+use ide\project\behaviours\PhpProjectBehaviour;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\utils\UiUtils;
@@ -189,7 +190,8 @@ class CodeEditor extends AbstractEditor
         });
 
         if ($mode == 'php') {
-            $this->autoComplete = new AutoCompletePane($this->textArea, new PhpAutoComplete());
+            $php = PhpProjectBehaviour::get();
+            $this->autoComplete = new AutoCompletePane($this->textArea, new PhpAutoComplete($php->getInspector()));
         }
     }
 

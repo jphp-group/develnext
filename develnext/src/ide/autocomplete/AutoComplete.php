@@ -1,5 +1,6 @@
 <?php
 namespace ide\autocomplete;
+use develnext\lexer\inspector\AbstractInspector;
 use ide\Logger;
 use php\io\MemoryStream;
 use php\lib\Items;
@@ -37,6 +38,26 @@ class AutoComplete
      */
     protected $globalRegion = [];
 
+    /**
+     * @var AbstractInspector
+     */
+    private $inspector;
+
+    /**
+     * @param AbstractInspector $inspector
+     */
+    public function __construct(AbstractInspector $inspector)
+    {
+        $this->inspector = $inspector;
+    }
+
+    /**
+     * @return AbstractInspector
+     */
+    public function getInspector()
+    {
+        return $this->inspector;
+    }
 
     /**
      * @param $sourceCode
@@ -56,7 +77,7 @@ class AutoComplete
         $this->globalRegion = new AutoCompleteRegion(0, 0);
 
         foreach ($this->rules as $rule) {
-            $rule->updateStart();
+            $rule->updateStart($sourceCode);
         }
 
         $prev = null;
@@ -70,7 +91,7 @@ class AutoComplete
         }
 
         foreach ($this->rules as $rule) {
-            $rule->updateDone();
+            $rule->updateDone($sourceCode);
         }
     }
 
@@ -112,14 +133,14 @@ class AutoComplete
      * @param string $prefix
      * @return string[]
      */
-    public function identifyType($prefix)
+    public function identifyType($prefix, AutoCompleteRegion $region)
     {
         $results = [];
         //Logger::debug("Identify type by prefix: $prefix ...");
 
         if ($prefix) {
             if ($this->context) {
-                $result = $this->context->identifyType($prefix);
+                $result = $this->context->identifyType($prefix, $region);
 
                 if ($result) {
                     $results[] = $result;
@@ -129,7 +150,7 @@ class AutoComplete
             foreach ($this->rules as $rule) {
                 //Logger::debug("Use rule " . get_class($rule));
 
-                if ($result = $rule->identifyType($prefix)) {
+                if ($result = $rule->identifyType($prefix, $region)) {
                     $results[] = $result;
                 }
             }
