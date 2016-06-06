@@ -554,6 +554,10 @@ abstract class AbstractForm extends UXForm
         });
     }
 
+    /**
+     * @param string $message
+     * @param int $timeout
+     */
     public function toast($message, $timeout = 0)
     {
         uiLater(function () use ($message, $timeout) {

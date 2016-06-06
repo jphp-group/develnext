@@ -8,7 +8,7 @@ namespace develnext\lexer\inspector\entry;
 class TypePropertyEntry
 {
     public $name;
-    public $modifier;
+    public $modifier = 'PUBLIC';
     public $value;
 
     public $static = false;

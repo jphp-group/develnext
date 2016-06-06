@@ -28,6 +28,21 @@ abstract class AbstractBundle
     abstract function getName();
     abstract function getDescription();
 
+
+    /**
+     * @param Project $project
+     */
+    public function addToInspector(Project $project)
+    {
+    }
+
+    /**
+     * @param Project $project
+     */
+    public function removeFromInspector(Project $project)
+    {
+    }
+
     /**
      * @param Project $project
      * @return bool
@@ -88,19 +103,24 @@ abstract class AbstractBundle
 
     /**
      * @param Project $project
+     * @param AbstractBundle $owner
      */
-    public function onAdd(Project $project)
+    public function onAdd(Project $project, AbstractBundle $owner = null)
     {
         $this->deleteVendorDirectory();
         $this->copyVendorDirectory();
+
+        $project->loadDirectoryForInspector($this->getProjectVendorDirectory());
     }
 
     /**
      * @param Project $project
+     * @param AbstractBundle $owner
      */
-    public function onRemove(Project $project)
+    public function onRemove(Project $project, AbstractBundle $owner = null)
     {
         $this->deleteVendorDirectory();
+        $project->unloadDirectoryForInspector($this->getProjectVendorDirectory());
     }
 
     public function onSave(Project $project, Configuration $config)

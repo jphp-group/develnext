@@ -58,6 +58,27 @@ class PHPInspector extends AbstractInspector
         }
     }
 
+    public function unloadSource($path)
+    {
+        if ($path instanceof Stream) {
+            return $this->loadPhpSource($path, $path, true);
+        }
+
+        switch (fs::ext($path)) {
+            case 'zip':
+            case 'jar':
+                $this->loadZipSource($path, true);
+                return true;
+            default:
+                if (arr::has($this->extensions, fs::ext($path))) {
+                    $this->loadPhpSource($path, $path, true);
+                    return true;
+                } else {
+                    return false;
+                }
+        }
+    }
+
     /**
      * @param array $extensions
      */
@@ -66,7 +87,7 @@ class PHPInspector extends AbstractInspector
         $this->extensions = $extensions;
     }
 
-    protected function loadZipSource($path)
+    protected function loadZipSource($path, $unload = false)
     {
         $archive = new ArchiveInputStream('zip', $path);
         $entries = [];
@@ -82,15 +103,15 @@ class PHPInspector extends AbstractInspector
             /** @var ArchiveEntry $entry */
             $entry = arr::shift($entries);
 
-            if (fs::ext($entry->getName()) == 'php') {
-                $this->loadPhpSource($archive, $entry->getName());
+            if (arr::has($this->extensions, fs::ext($entry->getName()))) {
+                $this->loadPhpSource($archive, $entry->getName(), $unload);
             }
         }
 
         $archive->close();
     }
 
-    protected function loadPhpSource($path, $moduleName = null)
+    protected function loadPhpSource($path, $moduleName = null, $unload = false)
     {
         $stream = $path instanceof Stream ? $path : Stream::of($path);
 
@@ -99,11 +120,19 @@ class PHPInspector extends AbstractInspector
             $analyzer = new SyntaxAnalyzer(Environment::current(), $tokenizer);
 
             foreach ($analyzer->getClasses() as $class) {
-                $this->putType($this->makeType($class, $analyzer));
+                if ($unload) {
+                    $this->removeType($class->getFulledName());
+                } else {
+                    $this->putType($this->makeType($class));
+                }
             }
 
             foreach ($analyzer->getFunctions() as $function) {
-                $this->putFunction($this->makeFunction($function, $analyzer));
+                if ($unload) {
+                    $this->removeFunction($function->getFulledName());
+                } else {
+                    $this->putFunction($this->makeFunction($function));
+                }
             }
 
         } catch (\ParseError $e) {
@@ -127,8 +156,14 @@ class PHPInspector extends AbstractInspector
             $type = $regex->group(1);
 
             foreach (str::split($type, '|') as $one) {
-                if (!arr::has($this->simpleTypes, $one)) {
-                    $data['return'] = SyntaxAnalyzer::getRealName($one, $owner, 'CLASS');
+                $realType = str::split($one, '[]', 2)[0];
+
+                if (!arr::has($this->simpleTypes, $realType)) {
+                    $data['return'] = SyntaxAnalyzer::getRealName($realType, $owner, 'CLASS');
+
+                    if (str::endsWith($one, '[]')) {
+                        $data['return'] .= '[]';
+                    }
                 } else {
                     $data['return'] = $one;
                 }
@@ -159,8 +194,16 @@ class PHPInspector extends AbstractInspector
 
             foreach (str::split($type, '|') as $one) {
                 if ($one) {
-                    if (!arr::has($this->simpleTypes, $one)) {
-                        $data['type'][$one] = SyntaxAnalyzer::getRealName($one, $owner, 'CLASS');
+                    $realType = str::split($one, '[]', 2)[0];
+
+                    if (!arr::has($this->simpleTypes, $realType)) {
+                        $t = SyntaxAnalyzer::getRealName($realType, $owner, 'CLASS');
+
+                        if (str::endsWith($one, '[]')) {
+                            $t .= '[]';
+                        }
+
+                        $data['type'][$one] = $t;
                     } else {
                         $data['type'][$one] = $one;
                     }
@@ -173,7 +216,7 @@ class PHPInspector extends AbstractInspector
         return $data;
     }
 
-    protected function makeFunction(FunctionStmtToken $token, SyntaxAnalyzer $analyzer)
+    protected function makeFunction(FunctionStmtToken $token)
     {
         $entry = new FunctionEntry();
         $entry->name = $token->getShortName();
@@ -201,11 +244,15 @@ class PHPInspector extends AbstractInspector
         $entry->abstract = $token->isAbstract();
 
         if ($token->getExtendName()) {
-            $entry->extends[] = new ExtendTypeEntry($token->getExtendName());
+            $entry->extends[str::lower($token->getExtendName())] = new ExtendTypeEntry($token->getExtendName());
         }
 
         foreach ($token->getImplementNames() as $name) {
-            $entry->extends[] = new ExtendTypeEntry($name);
+            $entry->extends[str::lower($name)] = new ExtendTypeEntry($name, ['interface' => true]);
+        }
+
+        foreach ($token->getUseNames() as $name) {
+            $entry->extends[str::lower($name)] = new ExtendTypeEntry($name, ['trait' => true]);
         }
 
         $entry->methods = [];
@@ -327,6 +374,10 @@ class PHPInspector extends AbstractInspector
         return $property;
     }
 
+    public function putDynamicType(TypeEntry $entry)
+    {
+        $this->dynamicTypes[str::lower($entry->fulledName)] = $entry;
+    }
 
     public function putType(TypeEntry $entry)
     {
@@ -336,5 +387,15 @@ class PHPInspector extends AbstractInspector
     public function putFunction(FunctionEntry $entry)
     {
         $this->functions[str::lower($entry->fulledName)] = $entry;
+    }
+
+    public function removeType($fullName)
+    {
+        parent::removeType(str::lower($fullName));
+    }
+
+    public function removeFunction($fullName)
+    {
+        parent::removeFunction(str::lower($fullName));
     }
 }

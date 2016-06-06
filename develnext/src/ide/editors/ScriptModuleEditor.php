@@ -1,6 +1,9 @@
 <?php
 namespace ide\editors;
 
+use develnext\lexer\inspector\entry\ExtendTypeEntry;
+use develnext\lexer\inspector\entry\TypeEntry;
+use develnext\lexer\inspector\entry\TypePropertyEntry;
 use Files;
 use ide\behaviour\IdeBehaviourManager;
 use ide\editors\form\FormElementTypePane;
@@ -121,7 +124,60 @@ class ScriptModuleEditor extends FormEditor
 
         $indexer->set($this->file, '_objects', $index);
 
+        $this->refreshInspectorType();
+
         return $result;
+    }
+
+    public function refreshInspectorType()
+    {
+        if ($project = Ide::project()) {
+            $type = new TypeEntry();
+            $type->fulledName = "app\\modules\\" . $this->getTitle();
+
+            foreach ($this->getModules() as $name) {
+                $name = "mixin:app\\modules\\$name";
+                $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($name, ['weak' => true, 'public' => true]);
+            }
+
+            foreach ($this->getFormEditors() as $one) {
+                $name = "mixin:app\\forms\\" . $one->getTitle();
+                $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($name, ['weak' => true, 'public' => true]);
+            }
+
+            foreach ($this->manager->getComponents() as $el) {
+                $type->properties[$el->id] = $prop = new TypePropertyEntry();
+                $prop->name = $el->id;
+
+                $prop->data['icon'] = $el->getType()->getIcon();
+                $prop->data['type'][] = $el->getType()->getElementClass() ?: AbstractScript::class;
+            }
+
+            foreach ($project->getInspectors() as $inspector) {
+                $inspector->putDynamicType($type);
+            }
+
+
+            $type = new TypeEntry();
+            $type->fulledName = "mixin:app\\modules\\" . $this->getTitle();
+
+            foreach ($this->getModules() as $name) {
+                $name = "mixin:app\\modules\\$name";
+                $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($name, ['weak' => true, 'public' => true]);
+            }
+
+            foreach ($this->manager->getComponents() as $el) {
+                $type->properties[$el->id] = $prop = new TypePropertyEntry();
+                $prop->name = $el->id;
+
+                $prop->data['icon'] = $el->getType()->getIcon();
+                $prop->data['type'][] = $el->getType()->getElementClass() ?: AbstractScript::class;
+            }
+
+            foreach ($project->getInspectors() as $inspector) {
+                $inspector->putDynamicType($type);
+            }
+        }
     }
 
     public function save()

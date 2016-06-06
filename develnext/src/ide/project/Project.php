@@ -1,5 +1,6 @@
 <?php
 namespace ide\project;
+use develnext\lexer\inspector\AbstractInspector;
 use Exception;
 use Files;
 use ide\formats\AbstractFileTemplate;
@@ -21,6 +22,7 @@ use php\io\File;
 use php\io\FileStream;
 use php\io\IOException;
 use php\io\Stream;
+use php\lang\ThreadPool;
 use php\lib\arr;
 use php\lib\Items;
 use php\lib\Str;
@@ -131,6 +133,11 @@ class Project
     protected $configConfigurers = [];
 
     /**
+     * @var AbstractInspector[]
+     */
+    protected $inspectors = [];
+
+    /**
      * Project constructor.
      *
      * @param string $rootDir
@@ -150,6 +157,7 @@ class Project
         $this->refactorManager = new ProjectRefactorManager($this);
 
         $this->tickTimer = new TimerScript(1000 * 9, true, [$this, 'doTick']);
+        $this->inspectorLoaderThreadPoll = ThreadPool::createSingle();
     }
 
     /**
@@ -639,6 +647,9 @@ class Project
     {
         Logger::info("Project loading ...");
 
+        $this->inspectors = [];
+        $this->inspectorLoaderThreadPoll = ThreadPool::createSingle();
+
         $dir = $this->getIdeDir();
 
         if (!$dir->isDirectory()) {
@@ -889,6 +900,8 @@ class Project
 
         $this->ideConfigs = [];
         $this->tree->clear(true);
+
+        $this->inspectorLoaderThreadPoll->shutdown();
     }
 
     /**
@@ -970,5 +983,105 @@ class Project
         }
 
         return false;
+    }
+
+    public function loadSourceForInspector($path)
+    {
+        $inspectors = $this->inspectors;
+
+        Logger::info("Load source for inspector: $path");
+
+        if (!$inspectors) {
+            Logger::warn("Unable to loadSourceForInspector(), inspectors are empty.");
+        }
+
+        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
+            foreach ($inspectors as $one) {
+                if (!$one->loadSource($path)) {
+                    Logger::warn("Unable to load source for inspector, $path");
+                }
+            }
+        });
+    }
+
+    public function unloadSourceForInspector($path)
+    {
+        $inspectors = $this->inspectors;
+
+        if (!$inspectors) {
+            Logger::warn("Unable to unloadSourceForInspector(), inspectors are empty.");
+        }
+
+        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
+            foreach ($inspectors as $one) {
+                $one->unloadSource($path);
+            }
+        });
+    }
+
+    public function loadDirectoryForInspector($path)
+    {
+        $inspectors = $this->inspectors;
+
+        Logger::info("Load directory for inspector: $path");
+
+        if (!$inspectors) {
+            Logger::warn("Unable to loadDirectoryForInspector(), inspectors are empty.");
+        }
+
+        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
+            foreach ($inspectors as $one) {
+                $one->loadDirectory($path);
+            }
+        });
+    }
+
+    public function unloadDirectoryForInspector($path)
+    {
+        $inspectors = $this->inspectors;
+
+        if (!$inspectors) {
+            Logger::warn("Unable to unloadDirectoryForInspector(), inspectors are empty.");
+        }
+
+        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
+            foreach ($inspectors as $one) {
+                $one->unloadDirectory($path);
+            }
+        });
+    }
+
+    /**
+     * @return AbstractInspector[]
+     */
+    public function getInspectors()
+    {
+        return $this->inspectors;
+    }
+
+    /**
+     * @param $context
+     * @return AbstractInspector
+     */
+    public function getInspector($context)
+    {
+        return $this->inspectors[$context];
+    }
+
+    /**
+     * @param string $context
+     * @param AbstractInspector $inspector
+     */
+    public function registerInspector($context, AbstractInspector $inspector)
+    {
+        $this->inspectors[str::lower($context)] = $inspector;
+    }
+
+    /**
+     * @param string $context
+     */
+    public function unregisterInspector($context)
+    {
+        unset($this->inspectors[str::lower($context)]);
     }
 }

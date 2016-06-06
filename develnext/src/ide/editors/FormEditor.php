@@ -1,6 +1,9 @@
 <?php
 namespace ide\editors;
 
+use develnext\lexer\inspector\entry\ExtendTypeEntry;
+use develnext\lexer\inspector\entry\TypeEntry;
+use develnext\lexer\inspector\entry\TypePropertyEntry;
 use ide\action\ActionEditor;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\behaviour\IdeBehaviourManager;
@@ -411,6 +414,48 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
+    public function refreshInspectorType()
+    {
+        if ($project = Ide::project()) {
+            $type = new TypeEntry();
+            $type->fulledName = "app\\forms\\" . $this->getTitle();
+
+            foreach ($this->getModules() as $name) {
+                $name = "mixin:app\\modules\\$name";
+                $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($name, ['weak' => true, 'public' => true]);
+            }
+
+            foreach ($this->getObjectList() as $el) {
+                $type->properties[$el->value] = $prop = new TypePropertyEntry();
+                $prop->name = $el->value;
+                $prop->data['icon'] = $el->getIcon();
+                $prop->data['type'][] = $el->element->getElementClass() ?: UXNode::class;
+                $prop->data['dynamicType'][] = $type->fulledName . ":" . $el->value;
+
+                $behaviours = $this->behaviourManager->getBehaviours($el->value);
+            }
+
+            foreach ($project->getInspectors() as $inspector) {
+                $inspector->putDynamicType($type);
+            }
+
+
+            $type = new TypeEntry();
+            $type->fulledName = "mixin:app\\forms\\" . $this->getTitle();
+
+            foreach ($this->getObjectList() as $el) {
+                $type->properties[$el->value] = $prop = new TypePropertyEntry();
+                $prop->name = $el->value;
+                $prop->data['icon'] = $el->getIcon();
+                $prop->data['type'][] = $el->element->getElementClass() ?: UXNode::class;
+            }
+
+            foreach ($project->getInspectors() as $inspector) {
+                $inspector->putDynamicType($type);
+            }
+        }
+    }
+
     /**
      *
      */
@@ -436,6 +481,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if ($this->config->get('form.backgroundColor')) {
             $this->layout->backgroundColor = UXColor::of($this->config->get('form.backgroundColor'));
         }
+
+        $this->refreshInspectorType();
 
         $this->trigger('load:after');
 
@@ -828,6 +875,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $indexer->set($this->file, '_objects', $index);
+
+        $this->refreshInspectorType();
 
         return $result;
     }

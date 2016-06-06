@@ -16,9 +16,11 @@ class ExtendTypeEntry
     /**
      * ExtendTypeEntry constructor.
      * @param string $type
+     * @param array $data
      */
-    public function __construct($type)
+    public function __construct($type, array $data = [])
     {
         $this->type = $type;
+        $this->data = $data;
     }
 }

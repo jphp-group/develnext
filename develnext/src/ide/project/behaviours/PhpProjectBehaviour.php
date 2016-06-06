@@ -90,6 +90,8 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $this->inspectorThreadPool = ThreadPool::createSingle();
         $this->inspector = new PHPInspector();
 
+        $this->project->registerInspector('php', $this->inspector);
+
         $this->project->on('close', [$this, 'doClose']);
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('save', [$this, 'doSave']);
@@ -100,24 +102,13 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
     }
 
-    public function refreshInspectorInBackground()
-    {
-        $this->inspectorThreadPool->execute(function () {
-            $this->refreshInspector();
-        });
-    }
-
-    public function refreshInspector()
+    protected function refreshInspector()
     {
         $this->inspector->setExtensions(['source']);
-        $this->inspector->loadDirectory($this->project->getFile("src/"), true);
+        $this->project->loadDirectoryForInspector($this->project->getFile("src/"));
 
         $this->inspector->setExtensions(['php']);
-        $this->inspector->loadDirectory($this->project->getFile(self::GENERATED_DIRECTORY), true);
-
-        $this->inspector->loadSource($this->project->getFile('lib/jphp-runtime.jar'));
-        $this->inspector->loadSource($this->project->getFile('lib/jphp-gui-ext.jar'));
-        $this->inspector->loadSource($this->project->getFile('lib/jphp-app-framework.jar'));
+        $this->project->loadDirectoryForInspector($this->project->getFile(self::GENERATED_DIRECTORY));
     }
 
     public function doClose()
@@ -136,7 +127,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
             Logger::warn("Unable to add the generated src directory to build.gradle file");
         }
 
-        $this->refreshInspectorInBackground();
+        $this->refreshInspector();
     }
 
     public function doSave()
@@ -145,7 +136,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
             $this->setIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, $this->uiByteCodeCheckbox->selected);
         }
 
-        $this->refreshInspectorInBackground();
+        $this->refreshInspector();
     }
 
     public function doPreCompile()

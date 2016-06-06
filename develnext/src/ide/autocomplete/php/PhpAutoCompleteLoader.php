@@ -65,7 +65,7 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
 
                 if (str::startsWith($name, '~dynamic ')) {
                     $name = str::sub($name, 9);
-                    $typeEntry = $this->inspector->findType($name);
+                    $typeEntry = $this->inspector->findType($name, true);
 
                     return new DynamicAccessAutoCompleteType($typeEntry ?: $name, $this->inspector);
                 }

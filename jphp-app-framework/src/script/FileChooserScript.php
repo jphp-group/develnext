@@ -82,6 +82,9 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour, Set
         $this->_dialog = new UXFileChooser();
     }
 
+    /**
+     * @return null|File|File[]
+     */
     public function execute()
     {
         $anyFilter = false;
@@ -125,11 +128,13 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour, Set
             $this->_adaptValue($this->inputNode, $this->files);
 
             $this->trigger('action');
+            return $this->multiple ? $this->files : $this->file;
         } else {
             $this->file = null;
             $this->files = [];
 
             $this->trigger('cancel');
+            return null;
         }
     }
 

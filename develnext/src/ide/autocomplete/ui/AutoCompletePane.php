@@ -302,9 +302,12 @@ class AutoCompletePane
 
                 $insert = $selected->getInsert();
 
-                if (Str::startsWith($insert, $prefix)) {
+                /*if (Str::startsWith($insert, $prefix)) {
                     $insert = Str::sub($insert, Str::length($prefix));
-                }
+                }*/
+
+                $this->area->caretPosition -= str::length($prefix);
+                $this->area->deleteText($this->area->caretPosition, $this->area->caretPosition + str::length($prefix));
 
                 //Logger::debug("Insert to caret: " . $insert);
                 $this->area->insertToCaret($insert);
@@ -446,14 +449,20 @@ class AutoCompletePane
 
         if ($prefix) {
             $flow = $flow->find(function (AutoCompleteItem $one) use ($prefix) {
-                return Str::startsWith($one->getName(), $prefix);
+                return Str::contains(str::lower($one->getName()), str::lower($prefix));
             });
         }
 
-        $items = $flow->sort(function (AutoCompleteItem $one, AutoCompleteItem $two) {
+        $items = $flow->sort(function (AutoCompleteItem $one, AutoCompleteItem $two) use ($prefix) {
             if ($one->getName() == $two->getName()) {
                 return 0;
             }
+
+            if ($one->getName() == $prefix) { return -1; }
+            if ($two->getName() == $prefix) { return 1; }
+
+            if (str::startsWith($one->getName(), $prefix)) { return -1; }
+            if (str::startsWith($two->getName(), $prefix)) { return 1; }
 
             return Str::compare($one->getName(), $two->getName());
         });

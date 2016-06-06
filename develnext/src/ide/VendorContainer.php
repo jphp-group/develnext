@@ -66,10 +66,15 @@ trait VendorContainer
         FileUtils::copyFile($vendorResource, $file);
     }
 
+    function getProjectVendorDirectory()
+    {
+        return Ide::project()->getFile("vendor/{$this->getVendorName()}");
+    }
+
     function copyVendorResource($name)
     {
         if (Ide::project()) {
-            $this->copyVendorResourceToFile($name, Ide::project()->getFile("vendor/{$this->getVendorName()}/$name"));
+            $this->copyVendorResourceToFile($name, Ide::project()->getFile("{$this->getProjectVendorDirectory()}/$name"));
         } else {
             Logger::warn("Unable to copy vendor resource $name, project is not opened");
         }

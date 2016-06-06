@@ -15,17 +15,22 @@ abstract class AbstractInspector
     /**
      * @var FunctionEntry[]
      */
-    public $functions = [];
+    protected $functions = [];
 
     /**
      * @var TypeEntry[]
      */
-    public $types = [];
+    protected $types = [];
+
+    /**
+     * @var TypeEntry[]
+     */
+    protected $dynamicTypes = [];
 
     /**
      * @var array
      */
-    public $constants = [];
+    protected $constants = [];
 
     /**
      * @param string $path
@@ -35,9 +40,15 @@ abstract class AbstractInspector
 
     /**
      * @param string $path
+     * @return mixed
+     */
+    abstract public function unloadSource($path);
+
+    /**
+     * @param string $path
      * @param bool $recursive
      */
-    public function loadDirectory($path, $recursive = false)
+    public function loadDirectory($path, $recursive = true)
     {
         fs::scan($path, function ($filename) use ($recursive) {
             if (fs::isDir($filename)) {
@@ -47,7 +58,64 @@ abstract class AbstractInspector
             } else {
                 $this->loadSource($filename);
             }
-        });
+        }, 1);
+    }
+
+    public function unloadDirectory($path, $recursive = true)
+    {
+        fs::scan($path, function ($filename) use ($recursive) {
+            if (fs::isDir($filename)) {
+                if ($recursive) {
+                    $this->unloadDirectory($filename);
+                }
+            } else {
+                $this->unloadSource($filename);
+            }
+        }, 1);
+    }
+
+    protected function mergeType(TypeEntry $entry = null, TypeEntry $dynamicType = null)
+    {
+        if ($dynamicType) {
+            $return = clone $dynamicType;
+
+            if ($entry == null) {
+                return $return;
+            }
+
+            $return->name = $entry->name;
+            $return->namespace = $entry->namespace;
+            $return->fulledName = $entry->fulledName;
+            $return->abstract = $entry->abstract;
+            $return->final = $entry->final;
+
+            foreach ($entry->constants as $name => $prop) {
+                $return->constants[$name] = $prop;
+            }
+
+            foreach ($entry->properties as $name => $prop) {
+                $return->properties[$name] = $prop;
+            }
+
+            foreach ($entry->methods as $name => $method) {
+                $return->methods[$name] = $method;
+            }
+
+            foreach ($entry->extends as $name => $extend) {
+                $return->extends[$name] = $extend;
+            }
+
+            $return->data = $return->data + $entry->data;
+
+            return $return;
+        }
+
+        return $entry;
+    }
+
+    public function putDynamicType(TypeEntry $entry)
+    {
+        $this->dynamicTypes[$entry->fulledName] = $this->mergeType($entry, $this->dynamicTypes[$entry->fulledName]);
     }
 
     public function putType(TypeEntry $entry)
@@ -63,6 +131,21 @@ abstract class AbstractInspector
     public function putConstant(ConstantEntry $entry)
     {
         $this->constants[$entry->name] = $entry;
+    }
+
+    public function removeType($fullName)
+    {
+        unset($this->types[$fullName]);
+    }
+
+    public function removeFunction($fullName)
+    {
+        unset($this->functions[$fullName]);
+    }
+
+    public function removeConstant($fullName)
+    {
+        unset($this->constants[$fullName]);
     }
 
     /**
@@ -128,8 +211,12 @@ abstract class AbstractInspector
         return $type == null ? null : $type->properties[$name];
     }
 
-    public function findType($name)
+    public function findType($name, $withDynamic = true)
     {
-        return $this->types[$name];
+        if ($withDynamic) {
+            return $this->mergeType($this->types[$name], $this->dynamicTypes[$name]);
+        } else {
+            return $this->types[$name];
+        }
     }
 }

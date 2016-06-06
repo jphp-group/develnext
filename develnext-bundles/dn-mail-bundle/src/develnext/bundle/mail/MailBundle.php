@@ -34,9 +34,9 @@ class MailBundle extends AbstractJarBundle
         ];
     }
 
-    public function onAdd(Project $project)
+    public function onAdd(Project $project, AbstractBundle $owner = null)
     {
-        parent::onAdd($project);
+        parent::onAdd($project, $owner);
 
         $format = Ide::get()->getRegisteredFormat(ScriptModuleFormat::class);
 
@@ -45,9 +45,9 @@ class MailBundle extends AbstractJarBundle
         }
     }
 
-    public function onRemove(Project $project)
+    public function onRemove(Project $project, AbstractBundle $owner = null)
     {
-        parent::onRemove($project);
+        parent::onRemove($project, $owner);
 
         $format = Ide::get()->getRegisteredFormat(ScriptModuleFormat::class);
 

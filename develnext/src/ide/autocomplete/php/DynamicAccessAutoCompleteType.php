@@ -13,6 +13,7 @@ use ide\autocomplete\StatementAutoCompleteItem;
 use ide\autocomplete\VariableAutoCompleteItem;
 use ide\bundle\AbstractJarBundle;
 use ide\editors\AbstractEditor;
+use ide\Logger;
 use ide\project\behaviours\BundleProjectBehaviour;
 use php\lib\str;
 
@@ -80,6 +81,108 @@ class DynamicAccessAutoCompleteType extends AutoCompleteType
         return [];
     }
 
+    protected function getTypeProperties(TypeEntry $type, $context = '', $parentContext = null)
+    {
+        $result = [];
+        $currentClass = $parentContext ?: $type->fulledName;
+
+        foreach ($type->properties as $prop) {
+            if ($prop->static || str::startsWith($prop->name, '__')) {
+                continue;
+            }
+
+            $description = str::join($prop->data['type'], '|');
+
+            if ($prop->value) {
+                $description = "$description (default $prop->value)";
+            }
+
+            $icon = $prop->data['icon'] ?: 'icons/greenSquare16.png';
+
+            if ($prop->modifier != 'PUBLIC') {
+                if ($type->data['public'] || !str::equalsIgnoreCase($currentClass, $context)) {
+                    continue;
+                }
+
+                if ($prop->modifier == 'PRIVATE' && $parentContext) {
+                    continue;
+                }
+
+                $icon = 'icons/greenSquares16.png';
+            }
+
+            $result[$prop->name] = $p = new PropertyAutoCompleteItem(
+                $prop->name,
+                $description,
+                null, $icon
+            );
+        }
+
+        if (!$type->data['weak']) {
+            foreach ($type->extends as $one) {
+                $t = $this->inspector->findType($one->type);
+
+                if ($t) {
+                    foreach ($this->getTypeProperties($t, $context, $currentClass) as $name => $prop) {
+                        if (!$result[$name]) {
+                            $result[$name] = $prop;
+                        }
+                    }
+                } else {
+                    Logger::warn("Unable to find '$one->type' class");
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    protected function getTypeMethods(TypeEntry $type, $context = '', $parentContext = null)
+    {
+        $result = [];
+        $currentClass = $parentContext ?: $type->fulledName;
+
+        foreach ($type->methods as $method) {
+            if ($method->static || $method->abstract) {
+                continue;
+            }
+
+            if (str::startsWith($method->name, '__')) {
+                continue;
+            }
+
+            if ($method->modifier != 'PUBLIC') {
+                if ($type->data['public'] || !str::equalsIgnoreCase($currentClass, $context)) {
+                    continue;
+                }
+
+                if ($method->modifier == 'PRIVATE' && $parentContext) {
+                    continue;
+                }
+            }
+
+            $result[$method->name] = PhpCompleteUtils::methodAutoComplete2($method, !$parentContext);
+        }
+
+        if (!$type->data['weak']) {
+            foreach ($type->extends as $one) {
+                $t = $this->inspector->findType($one->type);
+
+                if ($t) {
+                    foreach ($this->getTypeMethods($t, $context, $currentClass) as $name => $prop) {
+                        if (!$result[$name]) {
+                            $result[$name] = $prop;
+                        }
+                    }
+                } else {
+                    Logger::warn("Unable to find '$one->type' class");
+                }
+            }
+        }
+
+        return $result;
+    }
+
     /**
      * @param AutoComplete $context
      * @param AutoCompleteRegion $region
@@ -92,29 +195,13 @@ class DynamicAccessAutoCompleteType extends AutoCompleteType
         if ($this->class instanceof TypeEntry) {
             $type = $this->class;
 
-            $primary = true;
+            $contextClass = '';
 
-            do {
-                foreach ($type->properties as $prop) {
-                    if ($prop->static || str::startsWith($prop->name, '__') || $result[$prop->name]) {
-                        continue;
-                    }
+            if ($class = $region->getLastValue('self')) {
+                $contextClass = ($class['namespace'] ? $class['namespace'] . "\\" : '') . $class['name'];
+            }
 
-                    $description = str::join($prop->data['type'], '|');
-
-                    if ($prop->value) {
-                        $description = "$description (default $prop->value)";
-                    }
-
-                    $result[$prop->name] = new PropertyAutoCompleteItem(
-                        $prop->name,
-                        $description
-                    );
-                }
-
-                $type = $type->extends[0] ? $this->inspector->findType($type->extends[0]->type) : null;
-                $primary = false;
-            } while ($type);
+            return $this->getTypeProperties($type, $contextClass);
         }
 
         return $result;
@@ -131,25 +218,13 @@ class DynamicAccessAutoCompleteType extends AutoCompleteType
 
         if ($this->class instanceof TypeEntry) {
             $type = $this->class;
+            $contextClass = '';
 
-            $primary = true;
-            do {
-                foreach ($type->methods as $method) {
-                    if ($method->static || $method->abstract) {
-                        continue;
-                    }
+            if ($class = $region->getLastValue('self')) {
+                $contextClass = ($class['namespace'] ? $class['namespace'] . "\\" : '') . $class['name'];
+            }
 
-                    if (str::startsWith($method->name, '__')) {
-                        continue;
-                    }
-
-                    $result[$method->name] = PhpCompleteUtils::methodAutoComplete2($method, $primary);
-                }
-
-                $type = $type->extends[0] ? $this->inspector->findType($type->extends[0]->type) : null;
-                $primary = false;
-            } while ($type);
-
+            return $this->getTypeMethods($type, $contextClass);
         } elseif ($reflection = $this->reflection) {
             foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
                 if ($method->isStatic() || $method->isAbstract()) {

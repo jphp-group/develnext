@@ -178,8 +178,6 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                         return ($class['namespace'] ? $class['namespace'] . "\\" : '') . $class['name'];
                     }
 
-                    var_dump($clazz->getName());
-
                     if ($clazz instanceof NameToken) {
                         $type = $inspector->findType($clazz->getName());
 

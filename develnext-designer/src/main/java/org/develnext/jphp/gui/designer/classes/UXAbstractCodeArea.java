@@ -195,6 +195,11 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
     }
 
     @Signature
+    public void deleteText(int from, int to) {
+        getWrappedObject().deleteText(from, to);
+    }
+
+    @Signature
     public void select(int position, int length) {
         getWrappedObject().selectRange(position, length);
     }

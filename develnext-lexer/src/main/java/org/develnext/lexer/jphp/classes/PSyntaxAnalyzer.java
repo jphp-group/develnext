@@ -5,6 +5,7 @@ import org.develnext.jphp.core.tokenizer.Tokenizer;
 import org.develnext.jphp.core.tokenizer.token.SemicolonToken;
 import org.develnext.jphp.core.tokenizer.token.Token;
 import org.develnext.jphp.core.tokenizer.token.expr.BraceExprToken;
+import org.develnext.jphp.core.tokenizer.token.expr.OperatorExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.ValueExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.operator.DynamicAccessExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.value.FulledNameToken;
@@ -118,6 +119,12 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
 
                 if (token instanceof BreakStmtToken || token instanceof SemicolonToken) {
                     break;
+                }
+
+                if (token instanceof OperatorExprToken) {
+                    if (!(token instanceof DynamicAccessExprToken)) {
+                        break;
+                    }
                 }
 
                 if (token instanceof BraceExprToken) {

@@ -35,5 +35,8 @@ class TypeEntry
      */
     public $constants = [];
 
+    /**
+     * @var array
+     */
     public $data = [];
 }

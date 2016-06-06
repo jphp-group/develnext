@@ -104,4 +104,12 @@ class UXAbstractCodeArea extends UXControl
     public function forgetHistory()
     {
     }
+
+    /**
+     * @param int $from
+     * @param int $to
+     */
+    public function deleteText($from, $to)
+    {
+    }
 }

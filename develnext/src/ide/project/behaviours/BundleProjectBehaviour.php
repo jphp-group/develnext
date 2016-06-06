@@ -326,7 +326,6 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             $gradle->addMavenLocalRepository();
             $gradle->addLocalLibRepository();
 
-
             foreach ($allBundles as $bundle) {
                 if ($log) {
                     $log(':apply-bundle "' . $bundle->getName() . '"');
@@ -341,6 +340,30 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $this->doPreCompileUseImports($env, $log);
+    }
+
+    /**
+     * @param $env
+     * @param AbstractBundle $bundle
+     * @return AbstractBundle[]
+     */
+    public function getDependenciesOfBundle($env, AbstractBundle $bundle)
+    {
+        $result = [];
+
+        $fetchDependencies = function ($dependencies) use (&$result, &$fetchDependencies, $env) {
+            foreach ($dependencies as $dep) {
+                if (!$result[$dep]) {
+                    $result[$dep] = $one = $this->fetchBundle($env, $dep);
+
+                    $fetchDependencies($one->getDependencies());
+                }
+            }
+        };
+
+        $fetchDependencies($bundle->getDependencies());
+
+        return $result;
     }
 
     /**
@@ -478,6 +501,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             $this->bundles[$env][$class] = $bundle;
 
             $bundle->onAdd($this->project);
+
+            foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
+                $one->onAdd($this->project, $bundle);
+            }
         }
 
         if (!$canRemove) {
@@ -502,6 +529,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             if ($bundle = $bundles[$class]) {
                 if (!$removed) {
                     $bundle->onRemove($this->project);
+
+                    foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
+                        $one->onRemove($this->project, $bundle);
+                    }
                 }
 
                 $this->bundles[$env][$class] = null;
