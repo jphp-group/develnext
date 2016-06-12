@@ -27,6 +27,7 @@ use php\gui\designer\UXSyntaxTextArea;
 use php\gui\event\UXKeyEvent;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
+use php\gui\text\UXFont;
 use php\gui\UXApplication;
 use php\gui\UXCheckbox;
 use php\gui\UXClipboard;
@@ -590,6 +591,10 @@ class CodeEditor extends AbstractEditor
     public function jumpToLineSpaceOffset($beginLine)
     {
         $this->textArea->jumpToLineSpaceOffset($beginLine);
+
+        waitAsync(250, function () use ($beginLine) {
+            $this->textArea->estimatedScrollY = ($this->textArea->lineHeight) * $beginLine;
+        });
     }
 }
 

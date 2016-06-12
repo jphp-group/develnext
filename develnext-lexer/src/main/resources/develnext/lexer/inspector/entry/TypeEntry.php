@@ -6,7 +6,7 @@ use develnext\lexer\inspector\entry\ExtendTypeEntry;
 use develnext\lexer\inspector\entry\MethodEntry;
 use develnext\lexer\inspector\entry\TypePropertyEntry;
 
-class TypeEntry
+class TypeEntry extends AbstractEntry
 {
     public $name = '';
     public $fulledName = '';

@@ -71,24 +71,31 @@ class AutoComplete
             $mem->seek(0);
         }
 
-        $tokenizer = new SourceTokenizer($mem, '', 'UTF-8');
+        //$tokenizer = new SourceTokenizer($mem, '', 'UTF-8');
+
+        $oldRegions = $this->regions;
+        $oldGlobalRegion = $this->globalRegion;
 
         $this->regions = [];
         $this->globalRegion = new AutoCompleteRegion(0, 0);
 
         foreach ($this->rules as $rule) {
-            $rule->updateStart($sourceCode);
+            if ($rule->updateStart($sourceCode) === false) {
+                $this->regions = $oldRegions;
+                $this->globalRegion = $oldGlobalRegion;
+                return;
+            }
         }
 
         $prev = null;
 
-        while ($token = $tokenizer->next()) {
+        /*while ($token = $tokenizer->next()) {
             foreach ($this->rules as $rule) {
                 $rule->update($tokenizer, $token, $prev);
             }
 
             $prev = $token;
-        }
+        }*/
 
         foreach ($this->rules as $rule) {
             $rule->updateDone($sourceCode);
@@ -143,7 +150,11 @@ class AutoComplete
                 $result = $this->context->identifyType($prefix, $region);
 
                 if ($result) {
-                    $results[] = $result;
+                    if (is_array($result)) {
+                        $results += $result;
+                    } else {
+                        $results[] = $result;
+                    }
                 }
             }
 
@@ -151,7 +162,11 @@ class AutoComplete
                 //Logger::debug("Use rule " . get_class($rule));
 
                 if ($result = $rule->identifyType($prefix, $region)) {
-                    $results[] = $result;
+                    if (is_array($result)) {
+                        $results += $result;
+                    } else {
+                        $results[] = $result;
+                    }
                 }
             }
         }

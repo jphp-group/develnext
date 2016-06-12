@@ -5,7 +5,7 @@ namespace develnext\lexer\inspector\entry;
  * Class TypePropertyEntry
  * @package develnext\lexer\inspector\entry
  */
-class TypePropertyEntry
+class TypePropertyEntry extends AbstractEntry
 {
     public $name;
     public $modifier = 'PUBLIC';

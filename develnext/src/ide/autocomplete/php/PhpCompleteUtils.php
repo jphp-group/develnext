@@ -1,6 +1,7 @@
 <?php
 namespace ide\autocomplete\php;
 
+use develnext\lexer\inspector\entry\FunctionEntry;
 use develnext\lexer\inspector\entry\MethodEntry;
 use ide\autocomplete\MethodAutoCompleteItem;
 use php\lib\str;
@@ -72,9 +73,10 @@ abstract class PhpCompleteUtils
         }
     }
 
-    static function methodParamsString2(MethodEntry $method)
+    static function methodParamsString2(FunctionEntry $method)
     {
         $_params = [];
+        $optional = false;
 
         foreach ($method->arguments as $arg) {
             $item = "\${$arg->name}";
@@ -91,11 +93,16 @@ abstract class PhpCompleteUtils
                 $item = "$item = $arg->value";
             }
 
+            if ($arg->optional && !$optional) {
+                $item = "[$item";
+                $optional = true;
+            }
+
             $_params[] = $item;
         }
 
         if ($_params) {
-            $description = '(' . str::join($_params, ', ') . ')';
+            $description = '(' . str::join($_params, ', ') . ($optional ? ']' : '') . ')';
         } else {
             $description = "";
         }
@@ -111,7 +118,7 @@ abstract class PhpCompleteUtils
         return $description;
     }
 
-    static function methodAutoComplete2(MethodEntry $method, $bold = true)
+    static function methodAutoComplete2(FunctionEntry $method, $bold = true)
     {
         $insert = $method->name . '(';
 

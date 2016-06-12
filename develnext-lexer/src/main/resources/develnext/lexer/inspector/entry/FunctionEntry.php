@@ -1,7 +1,7 @@
 <?php
 namespace develnext\lexer\inspector\entry;
 
-class FunctionEntry
+class FunctionEntry extends AbstractEntry
 {
     public $name;
     public $namespace = null;

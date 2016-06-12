@@ -16,10 +16,13 @@ use timer\AccurateTimer;
 /**
  * Class AbstractBehaviour
  * @package behaviour\custom
+ *
+ * @getters
  */
 abstract class AbstractBehaviour
 {
     /**
+     * @hidden
      * @var bool
      */
     public $enabled = true;
@@ -50,6 +53,10 @@ abstract class AbstractBehaviour
         }
     }
 
+    /**
+     * @non-getter
+     * @return string
+     */
     public function getCode()
     {
         return null;
@@ -61,6 +68,7 @@ abstract class AbstractBehaviour
     abstract protected function applyImpl($target);
 
     /**
+     * @non-getter
      * @param array $properties
      */
     public function setProperties(array $properties)
@@ -77,6 +85,7 @@ abstract class AbstractBehaviour
     }
 
     /**
+     * @non-getter
      * @return array
      */
     public function getProperties()
@@ -160,6 +169,10 @@ abstract class AbstractBehaviour
         $this->enabled = true;
     }
 
+    /**
+     * @non-getter
+     * @return int
+     */
     public function getSort()
     {
         return 0;

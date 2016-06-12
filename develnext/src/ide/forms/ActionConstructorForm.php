@@ -423,19 +423,19 @@ class ActionConstructorForm extends AbstractIdeForm
         return $this->contextEditor;
     }
 
-    public function setLiveCode($value)
+    public function setLiveCode($value, $beginLine = 0, $beginPosition = 0)
     {
-        $regex = Regex::of("\\/\\/ \\+Actions\\:[ ]+?[0-9]+?[ ]+?//")->with($value);
-        $value = $regex->replace("");
+        $this->liveCodeEditor->setValue($value);
 
-        $this->liveCodeEditor->setValue("<?\n$value");
+        $this->liveCodeEditor->jumpToLine($beginLine, $beginPosition);
+        $this->liveCodeEditor->jumpToLineSpaceOffset($beginLine);
     }
 
     public function getLiveCode()
     {
         $value = $this->liveCodeEditor->getValue();
 
-        if (Str::startsWith($value, "<?\n")) {
+        /*if (Str::startsWith($value, "<?\n")) {
             $value = str::sub($value, 3);
         }
 
@@ -455,7 +455,7 @@ class ActionConstructorForm extends AbstractIdeForm
             if ($this->list->items->count) {
                 $value = "// +Actions: {$this->list->items->count} //\n" . $value;
             }
-        }
+        }*/
 
         return $value;
     }

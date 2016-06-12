@@ -211,6 +211,12 @@ abstract class AbstractInspector
         return $type == null ? null : $type->properties[$name];
     }
 
+    public function collectTypeData($name, $withDynamic = true)
+    {
+        $type = $this->findType($name, $withDynamic);
+        return $type ? $type->data : [];
+    }
+
     public function findType($name, $withDynamic = true)
     {
         if ($withDynamic) {

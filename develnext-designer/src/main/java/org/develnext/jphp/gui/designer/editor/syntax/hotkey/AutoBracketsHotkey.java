@@ -5,6 +5,10 @@ import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 
 public class AutoBracketsHotkey extends AbstractHotkey {
+    protected boolean isCharForQuote(char ch) {
+        return !Character.isLetterOrDigit(ch);
+    }
+
     @Override
     public boolean apply(AbstractCodeArea area, KeyEvent keyEvent) {
         char addClosed = '\0';
@@ -14,6 +18,7 @@ public class AutoBracketsHotkey extends AbstractHotkey {
         if (area.getText().isEmpty()) return false;
 
         String ch = area.getText(pos - 1, pos);
+        char nextCh = area.getText().length() >= pos + 1 ? area.getText(pos, pos + 1).charAt(0) : '\0';
 
         switch (ch) {
             case "{":
@@ -39,7 +44,7 @@ public class AutoBracketsHotkey extends AbstractHotkey {
                 if (keyEvent.getCode() == KeyCode.QUOTE) {
                     if (area.getText().length() >= pos + 1 && area.getText().charAt(pos) == ch.charAt(0)) {
                         area.replaceText(pos, pos + 1, "");
-                    } else {
+                    } else if (isCharForQuote(nextCh)) {
                         addClosed = '"';
                     }
                 }
@@ -49,7 +54,7 @@ public class AutoBracketsHotkey extends AbstractHotkey {
                 if (keyEvent.getCode() == KeyCode.QUOTE) {
                     if (area.getText().length() >= pos + 1 && area.getText().charAt(pos) == ch.charAt(0)) {
                         area.replaceText(pos, pos + 1, "");
-                    } else {
+                    } else if (isCharForQuote(nextCh)) {
                         addClosed = '\'';
                     }
                 }

@@ -2,6 +2,7 @@
 namespace ide\autocomplete\php;
 
 use develnext\lexer\inspector\AbstractInspector;
+use develnext\lexer\inspector\entry\TypeEntry;
 use ide\autocomplete\AutoCompleteTypeLoader;
 use php\lib\Str;
 
@@ -35,8 +36,8 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
      */
     public function __construct(AbstractInspector $inspector)
     {
-        $this->anyType = new PhpAnyAutoCompleteType();
-        $this->variableType = new PhpAnyAutoCompleteType('~variable');
+        $this->anyType = new PhpAnyAutoCompleteType('~any', $inspector);
+        $this->variableType = new PhpAnyAutoCompleteType('~variable', $inspector);
         $this->thisType = new ThisAutoCompleteType();
         $this->eventType = new EventVariableAutoCompleteType();
         $this->inspector = $inspector;
@@ -44,6 +45,10 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
 
     public function load($name)
     {
+        if ($name instanceof TypeEntry) {
+            return new TypeAccessAutoCompleteType($name, 'dynamic', $this->inspector);
+        }
+
         switch ($name) {
             case '~any':
                 return $this->anyType;
@@ -55,19 +60,26 @@ class PhpAutoCompleteLoader extends AutoCompleteTypeLoader
                 return $this->eventType;
 
             default:
+                if (str::startsWith($name, '~any ')) {
+                    return $this->anyType;
+                }
+
                 if (str::startsWith($name, '~this ')) {
                     return new ThisObjectAutoCompleteType(Str::sub($name, 6));
                 }
 
                 if (str::startsWith($name, '~static ')) {
-                    return new StaticAccessAutoCompleteType(str::sub($name, 8));
+                    $name = str::sub($name, 8);
+                    $typeEntry = $this->inspector->findType($name, true);
+
+                    return new TypeAccessAutoCompleteType($typeEntry ?: $name, 'static', $this->inspector);
                 }
 
                 if (str::startsWith($name, '~dynamic ')) {
                     $name = str::sub($name, 9);
                     $typeEntry = $this->inspector->findType($name, true);
 
-                    return new DynamicAccessAutoCompleteType($typeEntry ?: $name, $this->inspector);
+                    return new TypeAccessAutoCompleteType($typeEntry ?: $name, 'dynamic', $this->inspector);
                 }
 
                 if (class_exists($name)) {

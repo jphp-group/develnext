@@ -2,6 +2,7 @@
 namespace ide\autocomplete\ui;
 
 use ide\autocomplete\AutoComplete;
+use ide\autocomplete\AutoCompleteInsert;
 use ide\autocomplete\AutoCompleteItem;
 use ide\autocomplete\AutoCompleteType;
 use ide\autocomplete\MethodAutoCompleteItem;
@@ -178,9 +179,9 @@ class AutoCompletePane
                         $this->types = [];
 
                         foreach ($types as $type) {
-                            if (!$this->hasType($type)) {
-                                $this->addType($type);
-                            }
+                            //if (!$this->hasType($type)) {
+                            $this->addType($type);
+                            //}
                         }
                     }
 
@@ -221,7 +222,7 @@ class AutoCompletePane
             $this->showTimer->free();
         }
 
-        $this->showTimer = waitAsync($this->shown ? 1 : 300, function () use ($x, $y) {
+        $this->showTimer = waitAsync($this->shown ? 1 : 100, function () use ($x, $y) {
             $this->showTimer = null;
 
             if (!$this->list->items->count) {
@@ -302,9 +303,24 @@ class AutoCompletePane
 
                 $insert = $selected->getInsert();
 
-                /*if (Str::startsWith($insert, $prefix)) {
-                    $insert = Str::sub($insert, Str::length($prefix));
-                }*/
+                if (is_callable($insert)) {
+                    $in = new AutoCompleteInsert($this->area);
+                    $insert($in);
+
+                    $insert = $in->getValue();
+                    $scrollY = $this->area->estimatedScrollY;
+                    $caret = $this->area->caretPosition;
+
+                    if ($in->getAfterText()) {
+                        $this->area->text = $in->getAfterText();
+                    } elseif ($in->getBeforeText()) {
+                        $caret += str::length($in->getBeforeText()) - str::length($this->area->text);
+                        $this->area->text = $in->getBeforeText();
+                    }
+
+                    $this->area->caretPosition = $caret;
+                    $this->area->estimatedScrollY = $scrollY;
+                }
 
                 $this->area->caretPosition -= str::length($prefix);
                 $this->area->deleteText($this->area->caretPosition, $this->area->caretPosition + str::length($prefix));
@@ -327,7 +343,7 @@ class AutoCompletePane
         $type = $this->complete->fetchType($name);
 
         if ($type) {
-            $this->types[$name] = $type;
+            $this->types[is_string($name) ? $name : str::uuid()] = $type;
         }
     }
 
@@ -351,7 +367,7 @@ class AutoCompletePane
                 && (Char::isLetterOrDigit($ch)) || $ch == '_') {
                 $string .= $ch;
             } else {
-                if ($onlyName) {
+                if ($onlyName /*&& $ch != '$'*/) { // todo refactor for $
                     break;
                 } else {
                     $string .= $ch;

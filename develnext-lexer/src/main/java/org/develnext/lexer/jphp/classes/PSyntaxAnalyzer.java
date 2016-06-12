@@ -1,19 +1,21 @@
 package org.develnext.lexer.jphp.classes;
 
 import org.develnext.jphp.core.syntax.SyntaxAnalyzer;
+import org.develnext.jphp.core.tokenizer.TokenMeta;
 import org.develnext.jphp.core.tokenizer.Tokenizer;
+import org.develnext.jphp.core.tokenizer.token.ColonToken;
 import org.develnext.jphp.core.tokenizer.token.SemicolonToken;
 import org.develnext.jphp.core.tokenizer.token.Token;
 import org.develnext.jphp.core.tokenizer.token.expr.BraceExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.OperatorExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.ValueExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.operator.DynamicAccessExprToken;
-import org.develnext.jphp.core.tokenizer.token.expr.value.FulledNameToken;
-import org.develnext.jphp.core.tokenizer.token.expr.value.StaticAccessExprToken;
+import org.develnext.jphp.core.tokenizer.token.expr.value.*;
 import org.develnext.jphp.core.tokenizer.token.stmt.*;
 import org.develnext.lexer.jphp.DevelNextLexerExtension;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Signature;
+import php.runtime.common.Messages;
 import php.runtime.common.StringUtils;
 import php.runtime.env.Context;
 import php.runtime.env.Environment;
@@ -25,10 +27,7 @@ import php.runtime.lang.exception.BaseError;
 import php.runtime.reflection.ClassEntity;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Reflection.Name("SyntaxAnalyzer")
 @Reflection.Namespace(DevelNextLexerExtension.NS)
@@ -117,7 +116,7 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
                     }
                 }
 
-                if (token instanceof BreakStmtToken || token instanceof SemicolonToken) {
+                if (token instanceof BreakStmtToken || token instanceof SemicolonToken || token instanceof NewExprToken || token instanceof ColonToken) {
                     break;
                 }
 
@@ -150,6 +149,18 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
                 }
 
                 newRawTokens.add(0, token);
+            }
+
+            if (newRawTokens.size() > 0 && newRawTokens.get(0) instanceof NameToken) {
+                if (newRawTokens.size() == 2) {
+                    newRawTokens.remove(newRawTokens.size() - 1);
+                    return newRawTokens;
+                } else if (newRawTokens.size() > 2 && newRawTokens.get(1) instanceof StaticAccessExprToken) {
+                    if (newRawTokens.size() == 3) {
+                        newRawTokens.remove(newRawTokens.size() - 1);
+                        return newRawTokens;
+                    }
+                }
             }
 
             SyntaxAnalyzer analyzer = new SyntaxAnalyzer(env, new Tokenizer(tokenizer.getContext()) {
@@ -204,6 +215,10 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
 
             return Collections.emptyList();
         } catch (BaseError | ParseException e) {
+            if (e.getMessage() != null && e.getMessage().equals(Messages.ERR_PARSE_UNEXPECTED_END_OF_STRING.fetch())) {
+                return Arrays.asList(new StringExprToken(TokenMeta.of(""), StringExprToken.Quote.DOUBLE));
+            }
+
             return Collections.emptyList();
         }
     }

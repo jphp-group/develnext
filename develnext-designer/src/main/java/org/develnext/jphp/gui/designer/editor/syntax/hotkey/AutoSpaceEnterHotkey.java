@@ -32,7 +32,7 @@ public class AutoSpaceEnterHotkey extends AbstractHotkey {
         Paragraph<?, Collection<String>> paragraph = area.getParagraph(currentParagraph);
 
         StringBuilder prefix = new StringBuilder("\n");
-        String text = paragraph.getText();
+        String text = paragraph.getText().substring(0, area.getCaretColumn());
 
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);

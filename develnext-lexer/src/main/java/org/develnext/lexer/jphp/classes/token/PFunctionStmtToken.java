@@ -1,8 +1,11 @@
 package org.develnext.lexer.jphp.classes.token;
 
+import org.develnext.jphp.core.syntax.ExpressionInfo;
 import org.develnext.jphp.core.tokenizer.TokenMeta;
 import org.develnext.jphp.core.tokenizer.token.CommentToken;
+import org.develnext.jphp.core.tokenizer.token.Token;
 import org.develnext.jphp.core.tokenizer.token.expr.value.NameToken;
+import org.develnext.jphp.core.tokenizer.token.expr.value.VariableExprToken;
 import org.develnext.jphp.core.tokenizer.token.stmt.ArgumentStmtToken;
 import org.develnext.jphp.core.tokenizer.token.stmt.FunctionStmtToken;
 import org.develnext.lexer.jphp.DevelNextLexerExtension;
@@ -13,6 +16,8 @@ import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Reflection.Name("FunctionStmtToken")
 @Reflection.Namespace(DevelNextLexerExtension.NS + "\\token")
@@ -49,5 +54,20 @@ public class PFunctionStmtToken<T extends FunctionStmtToken> extends PSimpleToke
     @Signature
     public List<ArgumentStmtToken> getArguments() {
         return getWrappedObject().getArguments();
+    }
+
+    @Signature
+    public Set<VariableExprToken> getLocalVariables() {
+        return getWrappedObject().getLocal();
+    }
+
+    @Signature
+    public Set<VariableExprToken> getStaticLocalVariables() {
+        return getWrappedObject().getStaticLocal();
+    }
+
+    @Signature
+    public ExpressionInfo getTypeInfo(Token token) {
+        return getWrappedObject().getTypeInfo().get(token);
     }
 }

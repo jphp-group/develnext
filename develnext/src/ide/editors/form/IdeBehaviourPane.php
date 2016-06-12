@@ -245,6 +245,8 @@ class IdeBehaviourPane
 
                 $this->behaviourManager->save();
 
+                $this->trigger('add', [$targetId, $behaviour]);
+
                 $this->makeUi($targetId, $this->lastUi);
             }
         });

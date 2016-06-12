@@ -5,14 +5,12 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.Tree;
 import org.antlr.v4.runtime.tree.pattern.RuleTagToken;
 import org.antlr.v4.runtime.tree.pattern.TokenTagToken;
+import org.develnext.jphp.core.syntax.ExpressionInfo;
 import org.develnext.jphp.core.syntax.SyntaxAnalyzer;
 import org.develnext.jphp.core.tokenizer.Tokenizer;
 import org.develnext.jphp.core.tokenizer.token.*;
 import org.develnext.jphp.core.tokenizer.token.expr.operator.DynamicAccessExprToken;
-import org.develnext.jphp.core.tokenizer.token.expr.value.CallExprToken;
-import org.develnext.jphp.core.tokenizer.token.expr.value.FulledNameToken;
-import org.develnext.jphp.core.tokenizer.token.expr.value.NameToken;
-import org.develnext.jphp.core.tokenizer.token.expr.value.StaticAccessExprToken;
+import org.develnext.jphp.core.tokenizer.token.expr.value.*;
 import org.develnext.jphp.core.tokenizer.token.stmt.*;
 import org.develnext.lexer.css.CSSLexer;
 import org.develnext.lexer.jphp.classes.*;
@@ -63,6 +61,8 @@ public class DevelNextLexerExtension extends Extension {
 
         registerWrapperClass(scope, org.develnext.jphp.core.tokenizer.token.Token.class, PSimpleToken.class);
 
+        registerWrapperClass(scope, ExpressionInfo.class, PExpressionInfo.class);
+        registerWrapperClass(scope, VariableExprToken.class, PVariableExprToken.class);
         registerWrapperClass(scope, CallExprToken.class, PCallExprToken.class);
         registerWrapperClass(scope, DynamicAccessExprToken.class, PDynamicAccessExprToken.class);
         registerWrapperClass(scope, StaticAccessExprToken.class, PStaticAccessExprToken.class);

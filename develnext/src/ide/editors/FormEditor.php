@@ -66,6 +66,7 @@ use php\lang\IllegalStateException;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\Items;
+use php\lib\reflect;
 use php\lib\Str;
 use php\lib\String;
 use php\time\Time;
@@ -430,9 +431,18 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 $prop->name = $el->value;
                 $prop->data['icon'] = $el->getIcon();
                 $prop->data['type'][] = $el->element->getElementClass() ?: UXNode::class;
-                $prop->data['dynamicType'][] = $type->fulledName . ":" . $el->value;
 
-                $behaviours = $this->behaviourManager->getBehaviours($el->value);
+                $behaviourType = new TypeEntry();
+                $behaviourType->data['getters'] = true;
+
+                foreach ($this->behaviourManager->getBehaviours($el->value) as $one) {
+                    $behaviourType->properties[$one->getCode()] = $t = new TypePropertyEntry();
+                    $t->name = $one->getCode();
+                    $t->data['icon'] = $this->behaviourManager->getBehaviourSpec($one)->getIcon();
+                    $t->data['type'][] = reflect::typeOf($one);
+                }
+
+                $prop->data['type'][] = $behaviourType;
             }
 
             foreach ($project->getInspectors() as $inspector) {
@@ -1802,12 +1812,16 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
                 if ($behaviour) {
                     $spec->deleteSelf($node, $behaviour);
+                    $this->reindex();
                 } else {
                     Logger::warn("Unable to call deleteSelf() of behaviour spec class, behaviour not found");
                 }
             } else {
                 Logger::warn("Unable to call deleteSelf() of behaviour spec class, node not found, targetId = $targetId");
             }
+        });
+        $this->behaviourPane->on('add', function () {
+            $this->reindex();
         });
 
         $ui->addBehaviourPane($this->behaviourPane);

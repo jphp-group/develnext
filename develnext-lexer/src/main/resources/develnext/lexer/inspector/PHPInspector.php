@@ -34,7 +34,7 @@ use php\util\Regex;
 class PHPInspector extends AbstractInspector
 {
     protected $typeNameRegex = '([a-z_\\x7f-\\xff][\\|\\[\\]a-z0-9_\\x7f-\\xff]+)';
-    protected $simpleTypes = ['null', 'string', 'int', 'bool', 'float', 'double', 'boolean', 'integer', 'void', 'false', 'true', 'array', 'callable', 'mixed'];
+    protected $simpleTypes = ['null', 'string', 'int', 'bool', 'float', 'double', 'boolean', 'integer', 'void', 'false', 'true', 'array', 'callable', 'mixed', 'object'];
     protected $extensions = ['php'];
 
     public function loadSource($path)
@@ -50,8 +50,7 @@ class PHPInspector extends AbstractInspector
                 return true;
             default:
                 if (arr::has($this->extensions, fs::ext($path))) {
-                    $this->loadPhpSource($path, $path);
-                    return true;
+                    return $this->loadPhpSource($path, $path);
                 } else {
                     return false;
                 }
@@ -104,7 +103,8 @@ class PHPInspector extends AbstractInspector
             $entry = arr::shift($entries);
 
             if (arr::has($this->extensions, fs::ext($entry->getName()))) {
-                $this->loadPhpSource($archive, $entry->getName(), $unload);
+                if (!$this->loadPhpSource($archive, $entry->getName(), $unload)) {
+                }
             }
         }
 
@@ -115,6 +115,8 @@ class PHPInspector extends AbstractInspector
     {
         $stream = $path instanceof Stream ? $path : Stream::of($path);
 
+        $result = ['classes' => [], 'functions' => []];
+
         try {
             $tokenizer = new Tokenizer(new Context($stream, $moduleName));
             $analyzer = new SyntaxAnalyzer(Environment::current(), $tokenizer);
@@ -123,7 +125,8 @@ class PHPInspector extends AbstractInspector
                 if ($unload) {
                     $this->removeType($class->getFulledName());
                 } else {
-                    $this->putType($this->makeType($class));
+                    $this->putType($t = $this->makeType($class));
+                    $result['classes'][] = $t;
                 }
             }
 
@@ -131,10 +134,12 @@ class PHPInspector extends AbstractInspector
                 if ($unload) {
                     $this->removeFunction($function->getFulledName());
                 } else {
-                    $this->putFunction($this->makeFunction($function));
+                    $this->putFunction($f = $this->makeFunction($function));
+                    $result['functions'][] = $f;
                 }
             }
 
+            return $result;
         } catch (\ParseError $e) {
             return false;
         } finally {
@@ -142,8 +147,17 @@ class PHPInspector extends AbstractInspector
                 $stream->close();
             }
         }
+    }
 
-        return true;
+    protected function parseClassDocType($comment, SimpleToken $owner)
+    {
+        $data = [];
+
+        if (str::contains($comment, '@getters')) {
+            $data['getters'] = true;
+        }
+
+        return $data;
     }
 
     protected function parseFunctionDocType($comment, SimpleToken $owner)
@@ -170,15 +184,26 @@ class PHPInspector extends AbstractInspector
             }
         }
 
-        $regex = Regex::of("\\@param[ ]+$this->typeNameRegex \\$([a-z0-9_]+)", Regex::CASE_INSENSITIVE | Regex::DOTALL)->with($comment);
+        $regex = Regex::of("\\@param[ ]+$this->typeNameRegex \\$([a-z0-9_]+)[ ]+?(.+?)", Regex::CASE_INSENSITIVE | Regex::DOTALL)->with($comment);
 
         while ($regex->find()) {
-            $data['params'][$regex->group(2)] = [
+            $one = [
                 'name' => $regex->group(2),
                 'type' => $regex->group(1),
-                'description' => '',
+                'description' => str::trim($regex->group(3)),
+                'optional' => false,
             ];
+
+            if (str::startsWith($one['description'], '(optional)')) {
+                $one = str::trim(str::sub($one['description'], 10));
+                $one['optional'] = true;
+            }
+
+            $data['params'][$regex->group(2)] = $one;
         }
+
+        $data['non-getter'] = str::contains($comment, '@non-getter');
+        $data['hidden'] = str::contains($comment, '@hidden');
 
         return $data;
     }
@@ -213,6 +238,8 @@ class PHPInspector extends AbstractInspector
             $data['type']['mixed'] = 'mixed';
         }
 
+        $data['hidden'] = str::contains($comment, '@hidden');
+
         return $data;
     }
 
@@ -221,8 +248,16 @@ class PHPInspector extends AbstractInspector
         $entry = new FunctionEntry();
         $entry->name = $token->getShortName();
         $entry->fulledName = $token->getFulledName();
+        $entry->token = $token;
+
+        $entry->startLine = $token->getStartLine();
+        $entry->startPosition = $token->getStartPosition();
+        $entry->endLine = $token->getEndLine();
+        $entry->endPosition = $token->getEndPosition();
 
         $data = $this->parseFunctionDocType($token->getComment(), $token);
+        $entry->data = $data;
+
         if ($data['return']) {
             $entry->data['returnType'] = $data['return'];
         }
@@ -231,17 +266,32 @@ class PHPInspector extends AbstractInspector
             $entry->arguments[$arg->getName()] = $this->makeArgument($arg);
         }
 
+        foreach ((array) $data['params'] as $name => $info) {
+            if ($arg = $entry->arguments[$name]) {
+                $arg->type = $info['type'];
+                $arg->optional = $arg->optional || $info['optional'];
+            }
+        }
+
         return $entry;
     }
 
     protected function makeType(ClassStmtToken $token)
     {
         $entry = new TypeEntry();
+        $entry->token = $token;
         $entry->name = $token->getName()->getWord();
         $entry->fulledName = $token->getFulledName();
         $entry->namespace = $token->getNamespaceName();
         $entry->final = $token->isFinal();
         $entry->abstract = $token->isAbstract();
+
+        $entry->data = $this->parseClassDocType($token->getComment(), $token);
+
+        $entry->startLine = $token->getStartLine();
+        $entry->startPosition = $token->getStartPosition();
+        $entry->endLine = $token->getEndLine();
+        $entry->endPosition = $token->getEndPosition();
 
         if ($token->getExtendName()) {
             $entry->extends[str::lower($token->getExtendName())] = new ExtendTypeEntry($token->getExtendName());
@@ -280,6 +330,7 @@ class PHPInspector extends AbstractInspector
     protected function makeMethod(MethodStmtToken $token, ClassStmtToken $owner)
     {
         $entry = new MethodEntry();
+        $entry->token = $token;
         $entry->name = $token->getShortName();
         $entry->fulledName = $token->getFulledName();
         $entry->abstract = $token->isAbstract();
@@ -288,11 +339,18 @@ class PHPInspector extends AbstractInspector
         $entry->static = $token->isStatic();
         $entry->modifier = $token->getModifier();
 
+        $entry->startLine = $token->getStartLine();
+        $entry->startPosition = $token->getStartPosition();
+        $entry->endLine = $token->getEndLine();
+        $entry->endPosition = $token->getEndPosition();
+
         foreach ($token->getArguments() as $arg) {
             $entry->arguments[$arg->getName()] = $this->makeArgument($arg);
         }
 
         $data = $this->parseFunctionDocType($token->getComment(), $owner);
+        $entry->data = $data;
+
         if ($data['return']) {
             $entry->data['returnType'] = $data['return'];
         }
@@ -300,6 +358,7 @@ class PHPInspector extends AbstractInspector
         foreach ((array) $data['params'] as $name => $info) {
             if ($arg = $entry->arguments[$name]) {
                 $arg->type = $info['type'];
+                $arg->optional = $arg->optional || $info['optional'];
             }
         }
 
@@ -309,10 +368,16 @@ class PHPInspector extends AbstractInspector
     protected function makeProperty(ClassVarStmtToken $token, ClassStmtToken $owner)
     {
         $entry = new TypePropertyEntry();
+        $entry->token = $token;
         $entry->name = $token->getVariable();
         $entry->modifier = $token->getModifier();
         $entry->value = $token->getValue() ? $token->getValue()->getExprString() : null;
         $entry->static = $token->isStatic();
+
+        $entry->startLine = $token->getStartLine();
+        $entry->startPosition = $token->getStartPosition();
+        $entry->endLine = $token->getEndLine();
+        $entry->endPosition = $token->getEndPosition();
 
         $entry->data = $this->parsePropertyDocType($token->getComment(), $owner);
 
@@ -322,22 +387,48 @@ class PHPInspector extends AbstractInspector
     protected function makeArgument(ArgumentStmtToken $arg)
     {
         $e = new ArgumentEntry();
+        $e->token = $arg;
+
+        $arg->startLine = $arg->getStartLine();
+        $arg->startPosition = $arg->getStartPosition();
+        $arg->endLine = $arg->getEndLine();
+        $arg->endPosition = $arg->getEndPosition();
 
         $e->name = $arg->getName();
         $e->value = $arg->getValue() ? $arg->getValue()->getExprString() : null;
         $e->type = $arg->getHintTypeClass() ? $arg->getHintTypeClass()->getWord() : $arg->getHintType();
+        $e->optional = !!$arg->getValue();
 
         return $e;
     }
 
     public function findFunction($name)
     {
+        if ($name[0] == '\\') $name = str::sub($name, 1);
+
         return parent::findFunction(str::lower($name));
     }
 
-    public function findType($name)
+    public function collectTypeData($name, $withDynamic = true)
     {
-        return parent::findType(str::lower($name));
+        $data = parent::collectTypeData($name, $withDynamic);
+
+        $type = $this->findType($name, $withDynamic);
+
+        if ($type) {
+            foreach ($type->extends as $one) {
+                $data += $this->collectTypeData($one->type, $withDynamic);
+            }
+        }
+
+        return $data;
+    }
+
+    public function findType($name, $withDynamic = true)
+    {
+        if ($name[0] == '\\') $name = str::sub($name, 1);
+
+        return parent::findType(str::lower($name), $withDynamic);
     }
 
     public function findMethod(TypeEntry $type = null, $name)

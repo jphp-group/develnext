@@ -13,6 +13,7 @@ import org.develnext.jphp.gui.designer.editor.inspect.AbstractInspector;
 import org.develnext.jphp.gui.designer.editor.syntax.hotkey.*;
 import org.develnext.jphp.gui.designer.editor.syntax.popup.CodeAreaContextMenu;
 import org.develnext.jphp.gui.designer.editor.syntax.popup.CodeAreaPopup;
+import org.fxmisc.flowless.VirtualFlow;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.PopupAlignment;
@@ -118,6 +119,16 @@ abstract public class AbstractCodeArea extends CodeArea {
         setStylesheet(null);
     }
 
+    public double getLineHeight() {
+        VirtualFlow<?, ?> vf = (VirtualFlow<?, ?>) this.lookup(".virtual-flow");
+
+        if (vf != null && !vf.visibleCells().isEmpty()) {
+            return vf.visibleCells().get(0).getNode().getLayoutBounds().getHeight();
+        }
+
+        return 0;
+    }
+
     public EventHandler<ActionEvent> getOnBeforeChange() {
         return onBeforeChange;
     }
@@ -169,9 +180,11 @@ abstract public class AbstractCodeArea extends CodeArea {
 
         InputMap<KeyEvent> inputMap = InputMap.sequence(
                 InputMap.consume(eventPattern, keyEvent -> {
-                    if (hotkey.apply(this, keyEvent)) {
-                        if (hotkey.isAffectsUndoManager()) {
-                            this.getUndoManager().mark();
+                    if (!keyEvent.isShortcutDown()) {
+                        if (hotkey.apply(this, keyEvent)) {
+                            if (hotkey.isAffectsUndoManager()) {
+                                this.getUndoManager().mark();
+                            }
                         }
                     }
                 })

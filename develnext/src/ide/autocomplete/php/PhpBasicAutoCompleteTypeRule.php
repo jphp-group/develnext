@@ -1,18 +1,27 @@
 <?php
 namespace ide\autocomplete\php;
 
+use develnext\lexer\Context;
+use develnext\lexer\inspector\entry\FunctionEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
 use develnext\lexer\SyntaxAnalyzer;
+use develnext\lexer\token\ClassStmtToken;
 use develnext\lexer\token\DynamicAccessExprToken;
+use develnext\lexer\token\FunctionStmtToken;
+use develnext\lexer\token\MethodStmtToken;
 use develnext\lexer\token\NameToken;
 use develnext\lexer\token\SimpleToken;
 use develnext\lexer\token\StaticAccessExprToken;
+use develnext\lexer\token\VariableExprToken;
+use develnext\lexer\Tokenizer;
 use ide\autocomplete\AutoCompleteRegion;
 use ide\autocomplete\AutoCompleteTypeRule;
 use ide\Logger;
 use php\gui\framework\Application;
 use php\io\MemoryStream;
+use php\lang\Environment;
 use php\lib\arr;
+use php\lib\char;
 use php\lib\Items;
 use php\lib\num;
 use php\lib\Str;
@@ -22,226 +31,161 @@ use phpx\parser\SourceTokenizer;
 
 class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 {
-    protected function tryGetVariable(SourceToken $last, array &$tokens)
-    {
-        switch ($last->type) {
-            case 'DollarExpr':
-            case 'VariableExpr':
-                return '~variable';
-        }
-
-        return null;
-    }
-
-    protected function tryGetDynamicAccess(SourceToken $last, array &$tokens)
-    {
-        $string = '';
-
-        foreach ($tokens as $token) {
-            $string .= $token->word;
-        }
-
-        $dynamic = $last->type == 'DynamicAccessExpr';
-
-        if (!$dynamic) {
-            if ($last = arr::peak($tokens)) {
-                $dynamic = $last->type == 'DynamicAccessExpr';
-
-                if ($dynamic) {
-                    arr::pop($tokens);
-                }
-            }
-        }
-
-        if ($dynamic) {
-            $last = arr::peak($tokens);
-
-            if ($last) {
-                arr::pop($tokens);
-
-                if ($last->word == '$this') {
-                    return '~this';
-                }
-
-                if ($last->word == '$event') {
-                    return '~event';
-                }
-
-                if ($last->type == 'Name') {
-                    $name = $last->word;
-
-                    if ($last = arr::peak($tokens)) {
-                        if ($last->type == 'DynamicAccessExpr') {
-                            arr::pop($tokens);
-
-                            if ($last = Items::peak($tokens)) {
-                                arr::pop($tokens);
-
-                                if ($last->word == '$this') {
-                                    return "~this $name";
-                                }
-
-                                return "~dynamic $name";
-                            }
-                        }
-                    }
-                }
-
-                if (str::startsWith($string, 'app()')) {
-                    return "~dynamic " . Application::class;
-                }
-
-                return "~dynamic";
-            }
-        }
-
-        return null;
-    }
-
-    protected function tryGetStaticAccess(SourceToken $last, array &$tokens)
-    {
-        $static = $last->type == 'StaticAccessExpr';
-
-        if (!$static) {
-            if ($last = arr::peak($tokens)) {
-                $static = $last->type == 'StaticAccessExpr';
-
-                if ($static) {
-                    arr::pop($tokens);
-                }
-            }
-        }
-
-        if ($static) {
-            $class = arr::peak($tokens);
-
-            if (arr::has(['Name', 'FulledName'], $class->type)) {
-                return "~static " . $class->word;
-            }
-        }
-
-        return null;
-    }
-
     protected function findReturnType(SimpleToken $token, $previousType = null, AutoCompleteRegion $region)
     {
         $inspector = $this->complete->getInspector();
 
         $returnType = $previousType;
 
-        switch ($token->getTypeName()) {
-            case 'VariableExpr':
-                if ($token->getWord() == '$this') {
-                    if ($class = $region->getLastValue('self')) {
-                        return ($class['namespace'] ? $class['namespace'] . "\\" : '') . $class['name'];
+        if (!is_array($returnType)) {
+            $returnType = [$returnType];
+        }
+
+        foreach ($returnType as $oneType) {
+            switch ($token->getTypeName()) {
+                case 'VariableExpr':
+                    if ($token instanceof VariableExprToken) {
+                        $variables = $region->getValues('variable');
+
+                        foreach ($variables as $one) {
+                            if ($one['name'] == $token->getName()) {
+                                return $one['type'];
+                            }
+                        }
                     }
-                }
 
-                return null;
+                    break;
 
-            case 'FulledName':
-                $type = $inspector->findType($token->getName());
+                case 'Name':
+                case 'FulledName':
+                    $t = $region->getLastValue('tokenOwner') ?: $region->getLastValue('token');
 
-                if ($type) {
-                    return $type->fulledName;
-                }
+                    $name = $token->getName();
 
-                return null;
+                    if ($token->getWord()[0] != '\\') {
+                        $name = $t ? SyntaxAnalyzer::getRealName($name, $t, 'CLASS') : $name;
+                    }
 
-            case 'DynamicAccessExpr':
-                $field = $token->getField();
-
-                if ($field instanceof NameToken) {
-                    $type = $inspector->findType($returnType);
+                    $type = $inspector->findType($name);
 
                     if ($type) {
-                        $property = $inspector->findProperty($type, $field->getName());
+                        return $type->fulledName;
+                    }
 
-                        if ($property) {
-                            foreach ((array) $property->data['type'] as $one) {
-                                if ($inspector->findType($one)) {
-                                    return $one;
+                    break;
+
+                case 'DynamicAccessExpr':
+                    $field = $token->getField();
+
+                    if ($field instanceof NameToken) {
+                        $type = $oneType instanceof TypeEntry ? $oneType : $inspector->findType($oneType);
+
+                        if ($type) {
+                            $property = $inspector->findProperty($type, $field->getName());
+
+                            if ($property) {
+                                $result = [];
+
+                                foreach ((array)$property->data['type'] as $one) {
+                                    if ($one instanceof TypeEntry) {
+                                        $result[] = $one;
+                                    } else {
+                                        if ($inspector->findType($one)) {
+                                            $result[] = $one;
+                                        }
+                                    }
+                                }
+
+                                if ($result) {
+                                    return $result;
                                 }
                             }
                         }
                     }
-                }
 
-                return null;
+                    break;
 
-            case 'StaticAccessExpr':
-                if ($token instanceof StaticAccessExprToken) {
-                    $clazz = $token->getClazz();
-                    $field = $token->getField();
-
-                    if ($class = $region->getLastValue('self')) {
-                        return ($class['namespace'] ? $class['namespace'] . "\\" : '') . $class['name'];
-                    }
-
-                    if ($clazz instanceof NameToken) {
-                        $type = $inspector->findType($clazz->getName());
-
-                        if ($type && $field instanceof NameToken) {
-                            $method = $inspector->findMethod($type, $field->getName());
-
-                            if ($method && $method->static) {
-                                return $method->data['returnType'];
-                            }
-                        }
-                    }
-                }
-
-                return null;
-
-            case 'CallExpr':
-                $name = $token->getName();
-
-                if ($returnType) {
-                    $type = $inspector->findType($returnType);
-
-                    if ($name instanceof DynamicAccessExprToken) {
-                        $field = $name->getField();
-
-                        if ($field instanceof NameToken) {
-                            $method = $inspector->findMethod($type, $field->getName());
-
-                            if ($method && !$method->static) {
-                                return $method->data['returnType'];
-                            }
-                        }
-                    } else if ($name instanceof StaticAccessExprToken) {
-                        $clazz = $name->getClazz();
-                        $field = $name->getField();
+                case 'StaticAccessExpr':
+                    if ($token instanceof StaticAccessExprToken) {
+                        $clazz = $token->getClazz();
+                        $field = $token->getField();
 
                         if ($clazz instanceof NameToken) {
-                            $type = $inspector->findType($clazz->getName());
+                            $t = $region->getLastValue('tokenOwner') ?: $region->getLastValue('token');
+                            $name = $clazz->getName();
 
-                            if ($type && $field instanceof NameToken) {
+                            if ($clazz->getWord()[0] != '\\') {
+                                $name = $t ? SyntaxAnalyzer::getRealName($name, $t, 'CLASS') : $name;
+                            }
+
+                            $type = $inspector->findType($name);
+
+                            if ($type) {
+                                return $type->fulledName;
+                            }
+
+                            /*if ($type && $field instanceof NameToken) {
                                 $method = $inspector->findMethod($type, $field->getName());
 
                                 if ($method && $method->static) {
                                     return $method->data['returnType'];
                                 }
+                            }*/
+                        }
+                    }
+
+                    break;
+
+                case 'CallExpr':
+                    $name = $token->getName();
+
+                    if ($oneType) {
+                        $type = $oneType instanceof TypeEntry ? $oneType : $inspector->findType($oneType);
+
+                        if ($name instanceof DynamicAccessExprToken) {
+                            $field = $name->getField();
+
+                            if ($field instanceof NameToken) {
+                                $method = $inspector->findMethod($type, $field->getName());
+
+                                if ($method && !$method->static) {
+                                    return $method->data['returnType'];
+                                }
+                            }
+                        } else if ($name instanceof StaticAccessExprToken) {
+                            $clazz = $name->getClazz();
+                            $field = $name->getField();
+
+                            if ($clazz instanceof NameToken) {
+                                $type = $inspector->findType($clazz->getName());
+
+                                if ($type && $field instanceof NameToken) {
+                                    $method = $inspector->findMethod($type, $field->getName());
+
+                                    if ($method && $method->static) {
+                                        return $method->data['returnType'];
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    return null;
-                    // method
-                } else {
-                    if ($name instanceof NameToken) {
-                        $name = $name->getName();
+                        break;
+                        // method
+                    } else {
+                        if ($name instanceof NameToken) {
+                            $name = $name->getName();
 
-                        $func = $inspector->findFunction($name);
+                            $func = $inspector->findFunction($name);
 
-                        if ($func) {
-                            return $func->data['returnType'];
+                            if ($func) {
+                                return $func->data['returnType'];
+                            }
                         }
-                    }
 
-                    // function
-                }
-                break;
+                        // function
+                    }
+                    break;
+            }
         }
 
         return null;
@@ -253,18 +197,28 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
         $type = null;
 
         print_r($tokens);
-        $accessType = 'dynamic';
+
+        $accessType = '';
 
         foreach ($tokens as $i => $token) {
-            if ($i == sizeof($tokens) - 1 && sizeof($tokens) > 1) {
+            if ($i == sizeof($tokens) - 1) {
                 switch ($token->getTypeName()) {
                     case 'DynamicAccessExpr':
                         $accessType = 'dynamic';
-                        break 2;
-                    case 'FulledName':
+
+                        if (sizeof($tokens) > 1) {
+                            break 2;
+                        } else {
+                            break 1;
+                        }
                     case 'StaticAccessExpr':
                         $accessType = 'static';
-                        break;
+
+                        if (sizeof($tokens) > 1) {
+                            break 2;
+                        } else {
+                            break 1;
+                        }
                 }
             }
 
@@ -277,73 +231,53 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
         var_dump($accessType, $type);
 
-        if ($type) {
-            return "~$accessType $type";
+        if ($accessType && $type) {
+            if (is_array($type)) {
+                $r = [];
+
+                foreach ($type as $one) {
+                    if ($one instanceof TypeEntry) {
+                        $r[] = $one;
+                    } else {
+                        $r[] = "~$accessType $one";
+                    }
+                }
+
+                return $r;
+            } else {
+                return "~$accessType $type";
+            }
         }
 
-        /** @var PhpAutoComplete $complete */
-        $complete = $this->complete;
-
-        $tokens = $complete->parsePrefixForRule($string);
-
-        $token = Items::first($tokens);
 
         if (sizeof($tokens) == 1) {
-            switch ($token->type) {
-                case 'StringExpr':
-                    return '~string';
+            if ($tokens[0] instanceof NameToken) {
+                if (str::length($tokens[0]->getName()) >= 1) {
+                    $t = $region->getLastValue('tokenOwner') ?: $region->getLastValue('token');
+                    $name = $tokens[0]->getName();
+
+                    $str = "~any " . $name . " " . ($t ? SyntaxAnalyzer::getRealName($name, $t, 'CLASS') : $name);
+
+                    return $str;
+                }
+            } elseif ($tokens[0] instanceof VariableExprToken) {
+                return "~variable";
             }
+        }
+
+        $string = str::trim($string);
+
+        $ch = $string[str::length($string) - 1];
+
+        if ($string[0] == '"' || $string[0] == "'" || $string[0] == '`' || $ch == '"' || $ch == "'" || $ch == '`') {
+            return null;
+        }
+
+        if (!char::isLetterOrDigit($string[str::length($string) - 1])) {
+            return null;
         }
 
         if ($tokens) {
-            /** @var SourceToken $last */
-            $last = Items::pop($tokens);
-
-            if ($last) {
-                switch ($last->word) {
-                    case '!':
-                    case '&':
-                    case '|':
-
-                    case '{':
-                    case '(':
-                    case '[':
-                    case '}':
-                    case ')':
-                    case ']':
-                    case ';':
-                    case '\\':
-                    case '*':
-                    case '/':
-                    case '.':
-                    case '+':
-                    case '-':
-                    case '>':
-                    case '<':
-                    case '%':
-                    case '@':
-                    case '?':
-                    case '=':
-                        return null;
-                }
-
-                if ($ret = $this->tryGetVariable($last, $tokens)) {
-                    return $ret;
-                }
-
-                if ($ret = $this->tryGetDynamicAccess($last, $tokens)) {
-                    return $ret;
-                }
-
-                if ($ret = $this->tryGetStaticAccess($last, $tokens)) {
-                    return $ret;
-                }
-            }
-
-            if (sizeof($tokens) > 1) {
-                return null;
-            }
-        } else {
             return null;
         }
 
@@ -351,6 +285,41 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
     }
 
     protected $classExists;
+
+    protected function addFunctionRegion(FunctionStmtToken $token, ClassStmtToken $owner = null)
+    {
+        $this->complete->addRegion(new AutoCompleteRegion($token->getStartLine(), $token->getStartPosition()));
+
+        $this->complete->setValueOfRegion($token, 'token', $token->getStartLine(), $token->getStartPosition() + 1);
+        $this->complete->setValueOfRegion($owner, 'tokenOwner', $token->getStartLine(), $token->getStartPosition() + 1);
+
+        if ($token instanceof MethodStmtToken) {
+            if ($owner != null) {
+                $this->complete->setValueOfRegion([
+                    'name' => 'this',
+                    'type' => $owner->getFulledName(),
+                ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
+            } else {
+                Logger::warn("Cannot find class for method when add function region, '{$token->getShortName()}' method");
+            }
+        }
+
+        foreach ($token->getArguments() as $arg) {
+            $this->complete->setValueOfRegion([
+                'name' => $arg->getName(),
+                'type' => $arg->getHintType() ?: ($arg->getHintTypeClass() ? $arg->getHintTypeClass()->getName() : 'mixed')
+            ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
+        }
+
+        foreach ($token->getLocalVariables() as $var) {
+            $info = $token->getTypeInfo($var);
+
+            $this->complete->setValueOfRegion([
+                'name' => $var->getName(),
+                'type' => $info ? $info->getTypes()[0] : 'mixed',
+            ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
+        }
+    }
 
     public function updateStart($sourceCode)
     {
@@ -361,131 +330,30 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
             $stream->seek(0);
         }
 
-        $this->complete->getInspector()->loadSource($stream);
+        $result = $this->complete->getInspector()->loadSource($stream);
 
-        $this->classExists = false;
+        if ($result) {
+            foreach ($result['classes'] as $type) {
+                /** @var TypeEntry $type */
+                $this->complete->setValueOfRegion($type, 'class');
+
+                foreach ($type->methods as $one) {
+                    $this->addFunctionRegion($one->token, $type->token);
+                }
+            }
+
+            foreach ($result['functions'] as $func) {
+                /** @var FunctionEntry $func */
+                $this->complete->setValueOfRegion($func, 'function');
+                $this->addFunctionRegion($func->token);
+            }
+        } else {
+            return false;
+        }
     }
 
     public function update(SourceTokenizer $tokenizer, SourceToken $token, SourceToken $previousToken = null)
     {
-        switch ($token->type) {
-            case 'NamespaceStmt':
-                if ($tk = $tokenizer->next()) {
-                    if ($tk->isNamedToken()) {
-                        $this->complete->setValueOfRegion($tk->word, 'namespace');
-                    }
-                }
-                break;
-
-            case 'NamespaceUseStmt':
-                if ($tk = $tokenizer->next()) {
-                    if ($tk->isNamedToken()) {
-                        if ($this->classExists) {
-                            // todo trait.
-                        } else {
-                            $this->complete->setValueOfRegion([
-                                'name' => $tk->word,
-                            ], 'use');
-                        }
-                    }
-                }
-
-                break;
-
-            case 'ClassStmt':
-                if ($tk = $tokenizer->next()) {
-                    if ($tk->isNamedToken()) {
-                        $this->classExists = true;
-
-                        $this->complete->setValueOfRegion([
-                            'name' => $tk->word,
-                            'namespace' => $this->complete->getGlobalRegion()->getLastValue('namespace')
-                        ], 'class');
-                    }
-                }
-
-                break;
-
-            case 'ConstStmt':
-                if ($tk = $tokenizer->next()) {
-                    if ($tk->isNamedToken()) {
-                        $class =& $this->complete->getGlobalRegion()->getLastValue('class');
-
-                        if ($class) {
-                            $class['constants'][] = [
-                                'name' => $tk->word,
-                                'type' => 'mixed'
-                            ];
-                        } else {
-                            $this->complete->setValueOfRegion(['name' => $tk->word, 'type' => 'mixed'], 'constant');
-                        }
-                    }
-                }
-                break;
-            case 'FunctionStmt':
-            case 'MethodStmt':
-                if ($previousToken) {
-                    if ($region = $this->complete->findRegion($previousToken->line, $previousToken->position)) {
-                        $region->setToLine($token->line);
-                        $region->setToPos($token->position);
-                    }
-                }
-
-                $region = new AutoCompleteRegion($token->line, $token->position);
-
-                $this->complete->addRegion($region);
-
-                $class =& $this->complete->getGlobalRegion()->getLastValue('class');
-
-                if ($class) {
-                    $region->setValueAsRef($class, 'self');
-
-                    $region->setValue([
-                        'name' => 'this',
-                        'type' => $class['name'],
-                    ], 'variable');
-
-                    if ($tk = $tokenizer->next()) {
-                        if ($tk->type == 'Name') {
-                            $class['methods'][$tk->word] = [
-                                'name' => $tk->word,
-                            ];
-                        }
-                    }
-                }
-
-                break;
-
-            case 'VariableExpr':
-                $region = $this->complete->findRegion($token->line, $token->position);
-
-                $class =& $region->getLastValue('class');
-
-                if ($class) {
-                    if ($previousToken) {
-                        $name = Str::sub($token->word, 1);
-
-                        switch ($previousToken->type) {
-                            case 'VarStmt':
-                            case 'PublicStmt':
-                            case 'ProtectedStmt':
-                            case 'PrivateStmt':
-                                $class['variables'][$name] = [
-                                    'name' => $name,
-                                    'type' => 'mixed'
-                                ];
-                                break;
-                        }
-                    }
-                } else {
-                    $this->complete->setValueOfRegion([
-                        'name' => Str::sub($token->word, 1),
-                        'type' => $previousToken && $previousToken->isNamedToken() ? $previousToken->word : 'mixed'
-                    ], 'variable', $token->line, $token->position);
-                }
-
-                break;
-        }
     }
 
     public function updateDone($sourceCode)

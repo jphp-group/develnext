@@ -1,7 +1,7 @@
 <?php
 namespace develnext\lexer\inspector\entry;
 
-class ExtendTypeEntry
+class ExtendTypeEntry extends AbstractEntry
 {
     /**
      * @var string

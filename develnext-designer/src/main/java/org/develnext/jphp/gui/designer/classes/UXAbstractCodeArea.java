@@ -56,6 +56,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
     interface WrappedInterface {
         @Property int tabSize();
         @Property boolean showGutter();
+        @Property double lineHeight();
         @Property @Nullable PopupWindow popupWindow();
 
         void showPopup();
@@ -124,6 +125,26 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
     @Setter
     public void setCaretPosition(int value) {
         getWrappedObject().moveTo(value);
+    }
+
+    @Getter
+    public double getEstimatedScrollY() {
+        return getWrappedObject().getEstimatedScrollY();
+    }
+
+    @Setter
+    public void setEstimatedScrollY(double value) {
+        getWrappedObject().setEstimatedScrollY(value);
+    }
+
+    @Getter
+    public double getEstimatedScrollX() {
+        return getWrappedObject().getEstimatedScrollX();
+    }
+
+    @Setter
+    public void setEstimatedScrollX(double value) {
+        getWrappedObject().setEstimatedScrollX(value);
     }
 
     @Signature

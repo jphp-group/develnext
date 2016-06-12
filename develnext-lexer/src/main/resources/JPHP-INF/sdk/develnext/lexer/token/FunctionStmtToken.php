@@ -1,5 +1,6 @@
 <?php
 namespace develnext\lexer\token;
+use develnext\lexer\Token;
 
 /**
  * Class FunctionStmtToken
@@ -43,6 +44,27 @@ class FunctionStmtToken extends SimpleToken
      * @return ArgumentStmtToken[]
      */
     public function getArguments()
+    {
+    }
+
+    /**
+     * @return VariableExprToken[]
+     */
+    public function getLocalVariables()
+    {
+    }
+
+    /**
+     * @return VariableExprToken[]
+     */
+    public function getStaticLocalVariables()
+    {
+    }
+
+    /**
+     * @return ExpressionInfo
+     */
+    public function getTypeInfo(SimpleToken $token)
     {
     }
 }

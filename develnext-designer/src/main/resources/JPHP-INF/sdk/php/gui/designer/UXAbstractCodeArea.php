@@ -39,6 +39,22 @@ class UXAbstractCodeArea extends UXControl
     public $caretLine;
 
     /**
+     * @readonly
+     * @var double
+     */
+    public $lineHeight;
+
+    /**
+     * @var float
+     */
+    public $estimatedScrollY = 0.0;
+
+    /**
+     * @var float
+     */
+    public $estimatedScrollX = 0.0;
+
+    /**
      * @var UXPopupWindow
      */
     public $popupWindow;
