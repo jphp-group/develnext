@@ -4,11 +4,20 @@ namespace game;
 use action\Geometry;
 use php\gui\UXNode;
 
+/**
+ * Class Jumping
+ * --RU--
+ * Утилитный класс для перемещения игровых объектов.
+ *
+ * @package game
+ */
 class Jumping
 {
     const DATA_SOLID_PROPERTY = '--jumping-solid';
 
     /**
+     * Прилипить объект к сетке.
+     *
      * @param UXNode $node
      * @param $gridX
      * @param $gridY
@@ -29,6 +38,8 @@ class Jumping
     }
 
     /**
+     * Переместить объект в случайную позицию (можно указать сетку).
+     *
      * @param UXNode $node
      * @param int $gridX
      * @param int $gridY
@@ -52,6 +63,8 @@ class Jumping
     }
 
     /**
+     * Переместить объект к начальной позиции.
+     *
      * @param UXNode $node
      */
     static function toStart(UXNode $node)
@@ -62,6 +75,8 @@ class Jumping
     }
 
     /**
+     * Переместить объект к позиции x, y (можно относительно).
+     *
      * @param UXNode $node
      * @param $x
      * @param $y

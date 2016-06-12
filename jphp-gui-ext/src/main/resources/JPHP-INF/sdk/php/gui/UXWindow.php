@@ -19,12 +19,15 @@ use php\lang\IllegalStateException;
 abstract class UXWindow
 {
     /**
+     * --RU--
+     * Сцена.
      * @var UXScene
      */
     public $scene;
 
     /**
-     * [width, height]
+     * --RU--
+     * Размеры [width, height]
      * @var double[]
      */
     public $size;
@@ -35,60 +38,81 @@ abstract class UXWindow
     public $layout;
 
     /**
+     * --RU--
+     * Компоненты.
+     *
      * @readonly
      * @var UXList
      */
     public $children;
 
     /**
+     * --RU--
+     * Видимость.
+     *
      * @var bool
      */
     public $visible;
 
     /**
+     * --RU--
+     * Тип курсора.
+     *
      * @var string
      */
     public $cursor;
 
     /**
+     * --RU--
+     * Любые данные.
+     *
      * @var mixed
      */
     public $userData = null;
 
+    /**
+     * --RU--
+     * Перевести фокус на окно.
+     */
     public function requestFocus()
     {
     }
 
     /**
-     * ...
+     * --RU--
+     * Показать окно.
      */
     public function show()
     {
     }
 
     /**
-     * ...
+     * --RU--
+     * Скрыть окно.
      */
     public function hide()
     {
     }
 
     /**
-     * ...
+     * --RU--
+     * Отцентрировать окно относительно разрешения.
      */
     public function centerOnScreen()
     {
     }
 
     /**
-     * ...
+     *
      */
     public function sizeToScene()
     {
     }
 
     /**
-     * Getter and Setter for object data
+     * Getter and Setter for object data.
+     * --RU--
+     * Пополнительные данные окна (геттер и сеттер).
      * @param string $name
      * @param mixed $value (optional)
      * @return mixed
@@ -98,6 +122,8 @@ abstract class UXWindow
     }
 
     /**
+     * --RU--
+     * Навесить событие.
      * @param string $event
      * @param callable $handler
      * @param string $group
@@ -150,6 +176,9 @@ abstract class UXWindow
     }
 
     /**
+     * --RU--
+     * Добавить компонент.
+     *
      * @param UXNode $node
      *
      * @throws IllegalStateException
@@ -159,6 +188,9 @@ abstract class UXWindow
     }
 
     /**
+     * --RU--
+     * Удалить компонент.
+     *
      * @param UXNode $node
      *
      * @return bool
@@ -169,6 +201,9 @@ abstract class UXWindow
     }
 
     /**
+     * --RU--
+     * Добавить файл css стилей окну.
+     *
      * @param string $path
      */
     public function addStylesheet($path)
@@ -176,6 +211,9 @@ abstract class UXWindow
     }
 
     /**
+     * --RU--
+     * Удалить файл css стилей у окна.
+     *
      * @param string $path
      */
     public function removeStylesheet($path)
@@ -183,6 +221,9 @@ abstract class UXWindow
     }
 
     /**
+     * --RU--
+     * Возвращает true если указанный файл css стилей уже добавлен окну.
+     *
      * @param string $path
      * @return bool
      */

@@ -22,6 +22,8 @@ use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\gui\UXPopupWindow;
+use php\gui\UXSeparator;
+use php\gui\UXWebView;
 use php\lib\arr;
 use php\lib\Char;
 use php\lib\Items;
@@ -36,6 +38,11 @@ class AutoCompletePane
      * @var UXPopupWindow
      */
     protected $ui;
+
+    /**
+     * @var UXPopupWindow
+     */
+    protected $uiDescription;
 
     /**
      * @var UXSyntaxTextArea
@@ -131,7 +138,7 @@ class AutoCompletePane
                     break;
 
                 default:
-                    $this->complete->update($this->area->text);
+                    $this->complete->update($this->area->text, $this->area->caretPosition, $this->area->caretLine, $this->area->caretOffset);
                     break;
             }
 
@@ -252,6 +259,7 @@ class AutoCompletePane
             $this->shown = false;
 
             $this->ui->hide();
+            $this->uiDescription->hide();
         });
     }
 
@@ -302,32 +310,21 @@ class AutoCompletePane
                 $prefix = $this->getString(true);
 
                 $insert = $selected->getInsert();
+                Logger::debug("Insert to caret: " . $insert);
 
-                if (is_callable($insert)) {
+                if (!is_string($insert) && is_callable($insert)) {
                     $in = new AutoCompleteInsert($this->area);
                     $insert($in);
 
                     $insert = $in->getValue();
-                    $scrollY = $this->area->estimatedScrollY;
-                    $caret = $this->area->caretPosition;
-
-                    if ($in->getAfterText()) {
-                        $this->area->text = $in->getAfterText();
-                    } elseif ($in->getBeforeText()) {
-                        $caret += str::length($in->getBeforeText()) - str::length($this->area->text);
-                        $this->area->text = $in->getBeforeText();
-                    }
-
-                    $this->area->caretPosition = $caret;
-                    $this->area->estimatedScrollY = $scrollY;
                 }
 
                 $this->area->caretPosition -= str::length($prefix);
                 $this->area->deleteText($this->area->caretPosition, $this->area->caretPosition + str::length($prefix));
 
-                //Logger::debug("Insert to caret: " . $insert);
                 $this->area->insertToCaret($insert);
             });
+
             $this->lock = true;
             return true;
         }
@@ -383,8 +380,83 @@ class AutoCompletePane
         $this->list->items->add($string);
     }
 
+    protected function updateDescription(AutoCompleteItem $item)
+    {
+        //$cell = new UXListCell();
+        $this->uiDescription->autoFix = true;
+        $name = $item->getName();
+
+        if ($item instanceof MethodAutoCompleteItem) {
+            $name .= '()';
+        }
+
+        if ($item instanceof VariableAutoCompleteItem) {
+            $name = "\${$name}";
+        }
+
+        $this->uiDescription->layout->lookup('.title')->text = $name;
+        $this->uiDescription->layout->lookup('.description')->text = $item->getDescription();
+
+        /** @var UXHBox $header */
+        $header = $this->uiDescription->layout->lookup('.header');
+        if ($header->children->count > 1) {
+            $header->children->removeByIndex(0);
+        }
+
+        if ($ic = $this->getImageOfItem($item)) {
+            $header->children->insert(0, $ic);
+        }
+        //$this->makeItemUi($cell, $item);
+
+        /** @var UXVBox $content */
+        $content = $this->uiDescription->layout->lookup('.content');
+        $content->children->clear();
+
+        $contentValue = $item->getContent();
+
+        if ($contentValue['DEF']) {
+            $content->add(new UXSeparator());
+            $content->add(new UXLabel($contentValue['RU'] ?: $contentValue['DEF']));
+        }
+    }
+
+    private function makeDescriptionUi()
+    {
+        $ui = new UXVBox();
+        $ui->spacing = 5;
+        $ui->padding = 10;
+        $ui->maxWidth = 650;
+        $ui->focusTraversable = false;
+        $ui->padding = 3;
+
+        $title = new UXLabel("Title");
+        $title->classes->add('title');
+
+        $header = new UXHBox([$title]);
+        $header->classes->add('header');
+        $ui->add($header);
+
+        $desc = new UXLabel("Description");
+        $desc->classes->add('description');
+        $ui->add($desc);
+
+        $content = new UXVBox();
+        $content->padding = $content->spacing = 5;
+        $content->classes->add('content');
+        $ui->add($content);
+
+        $ui->classes->add('dn-autocomplete-description');
+
+        $win = new UXPopupWindow();
+        $win->layout = $ui;
+
+        $this->uiDescription = $win;
+    }
+
     private function makeUi()
     {
+        $this->makeDescriptionUi();
+
         $ui = new UXVBox();
         $ui->height = 150;
         $ui->maxWidth = 650;
@@ -392,11 +464,23 @@ class AutoCompletePane
         $ui->padding = 3;
 
         $list = new UXListView();
+        $list->on('action', function () use ($list) {
+            if ($list->selectedIndex > -1) {
+                if (!$this->uiDescription->visible) {
+                    $this->uiDescription->show($this->area->form, $this->ui->x + $this->ui->width + 3, $this->ui->y + 3);
+                }
+
+                $this->updateDescription($list->selectedItem);
+            } else {
+                $this->uiDescription->hide();
+            }
+        });
+
         $list->maxHeight = 9999;
         $list->fixedCellSize = 20;
-        $list->classes->addAll(['hide-hor-scroll', 'dn-console-list']);
+        $list->classes->addAll(['hide-hor-scroll', 'dn-console-list', 'dn-autocomplete']);
         $list->style = '-fx-background-insets: 0; -fx-focus-color: -fx-control-inner-background; -fx-faint-focus-color: -fx-control-inner-background;';
-        $list->width = 450;
+        $list->width = 400;
 
         $ui->add($list);
         $ui->focusTraversable = false;
@@ -416,9 +500,15 @@ class AutoCompletePane
 
         $win = new UXPopupWindow();
         $win->layout = $ui;
-        $win->width = 450;
         /*$win->style = 'TRANSPARENT';
         $win->opacity = 0.7;*/
+
+        $v = function () {
+            $this->uiDescription->x = $this->ui->x + $this->ui->width + 3;
+            $this->uiDescription->y = $this->ui->y + 3;
+        };
+        $win->observer('x')->addListener($v);
+        $win->observer('y')->addListener($v);
 
         $list->on('click', function () {
             $this->doPick();
@@ -477,8 +567,17 @@ class AutoCompletePane
             if ($one->getName() == $prefix) { return -1; }
             if ($two->getName() == $prefix) { return 1; }
 
-            if (str::startsWith($one->getName(), $prefix)) { return -1; }
-            if (str::startsWith($two->getName(), $prefix)) { return 1; }
+            if (str::startsWith($one->getName(), $prefix) && str::startsWith($two->getName(), $prefix)) {
+                // nop.
+            } else {
+                if (str::startsWith($one->getName(), $prefix)) {
+                    return -1;
+                }
+
+                if (str::startsWith($two->getName(), $prefix)) {
+                    return 1;
+                }
+            }
 
             return Str::compare($one->getName(), $two->getName());
         });
@@ -490,17 +589,24 @@ class AutoCompletePane
         return $items;
     }
 
+    protected function getImageOfItem(AutoCompleteItem $item)
+    {
+        $icon = Ide::get()->getImage($item->getIcon() ?: $item->getDefaultIcon(), [16, 16]);
+
+        if ($icon) {
+            UXHBox::setMargin($icon, [0, 5, 0, 0]);
+        }
+
+        return $icon;
+    }
+
     protected function makeItemUi(UXListCell $cell, AutoCompleteItem $item)
     {
         $label = new UXLabel($item->getName());
         $label->textColor = UXColor::of('black');
         $label->style = $item->getStyle();
 
-        $icon = Ide::get()->getImage($item->getIcon() ?: $item->getDefaultIcon(), [16, 16]);
-
-        if ($icon) {
-            UXHBox::setMargin($icon, [0, 5, 0, 0]);
-        }
+        $icon = $this->getImageOfItem($item);
 
         if (!$item->getDescription()) {
             $cell->graphic = $icon ? new UXHBox([$icon, $label]) : $label;

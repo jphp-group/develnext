@@ -15,6 +15,8 @@ class TypeEntry extends AbstractEntry
     public $final = false;
     public $abstract = false;
 
+    public $kind = 'CLASS';
+
     /**
      * @var ExtendTypeEntry[]
      */

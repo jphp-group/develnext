@@ -20,6 +20,11 @@ abstract class AutoCompleteItem
     protected $description;
 
     /**
+     * @var string
+     */
+    protected $content;
+
+    /**
      * @var string|UXImage|UXImageArea
      */
     protected $icon;
@@ -47,7 +52,7 @@ abstract class AutoCompleteItem
         $this->description = $description;
         $this->icon = $icon;
 
-        $this->insert = $insert ? $insert : $name;
+        $this->insert = $insert !== null ? $insert : $name;
         $this->style = $style;
     }
 
@@ -91,5 +96,21 @@ abstract class AutoCompleteItem
     public function getDefaultIcon()
     {
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param string $content
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
     }
 }

@@ -3,7 +3,6 @@ namespace php\gui;
 
 
 /**
- * Class UXStage
  * @package php\gui
  *
  * @property double $maxHeight
@@ -18,6 +17,8 @@ namespace php\gui;
 class UXForm extends UXWindow
 {
     /**
+     * --RU--
+     * Заголовок окна.
      * @var string
      */
     public $title;
@@ -29,11 +30,17 @@ class UXForm extends UXWindow
     public $modality;
 
     /**
+     * --RU--
+     * Всегда поверх всех окон.
+     *
      * @var bool
      */
     public $alwaysOnTop;
 
     /**
+     * --RU--
+     * Раскрытость на весь экран.
+     *
      * @var bool
      */
     public $maximized;
@@ -44,22 +51,30 @@ class UXForm extends UXWindow
     public $owner;
 
     /**
+     * --RU--
+     * Стиль окна.
      * DECORATED, UNDECORATED, TRANSPARENT, UTILITY, UNIFIED
      * @var string
      */
     public $style;
 
     /**
+     * --RU--
+     * Иконки окна.
      * @var UXList of UXImage
      */
     public $icons;
 
     /**
+     * --RU--
+     * Прозрачность.
      * @var bool
      */
     public $transparent = false;
 
     /**
+     * --RU--
+     * Фулскрин.
      * @var bool
      */
     public $fullScreen = false;
@@ -72,21 +87,25 @@ class UXForm extends UXWindow
     }
 
     /**
-     * ...
+     * --RU--
+     * Показать окно и ожидать его закрытия.
+     * ! Только для модальных окон.
      */
     public function showAndWait()
     {
     }
 
     /**
-     * ...
+     * --RU--
+     * Переместить назад (под все окна).
      */
     public function toBack()
     {
     }
 
     /**
-     * ...
+     * --RU--
+     * Переместить вперед (над всеми окнами).
      */
     public function toFront()
     {

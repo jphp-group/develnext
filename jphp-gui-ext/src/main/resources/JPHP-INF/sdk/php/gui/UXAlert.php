@@ -3,6 +3,9 @@ namespace php\gui;
 
 /**
  * Class UXAlert
+ * --RU--
+ * Класс для отображения всплывающих диалогов с кнопками.
+ *
  * @package php\gui
  */
 class UXAlert
@@ -40,7 +43,7 @@ class UXAlert
     }
 
     /**
-     * ...
+     * Показать диалог.
      */
     public function show()
     {
@@ -48,7 +51,7 @@ class UXAlert
 
 
     /**
-     * ...
+     * Скрыть диалог.
      */
     public function hide()
     {

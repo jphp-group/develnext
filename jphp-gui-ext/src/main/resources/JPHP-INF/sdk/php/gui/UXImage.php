@@ -10,18 +10,21 @@ use php\io\Stream;
  */
 class UXImage {
     /**
+     * Ширина картинки.
      * @readonly
      * @var double
      */
     public $width;
 
     /**
+     * Высота картинки.
      * @readonly
      * @var double
      */
     public $height;
 
     /**
+     * Прогресс загрузки.
      * @readonly
      * @var double
      */
@@ -36,6 +39,7 @@ class UXImage {
     public function __construct($stream, $requiredWidth, $requiredHeight, $proportional = true) {}
 
     /**
+     * Возвращает цвет пикселя картинки.
      * @param $x
      * @param $y
      * @return UXColor
@@ -45,11 +49,13 @@ class UXImage {
     }
 
     /**
-     * ...
+     * Отменяет загрузку картинки.
      */
     public function cancel() {}
 
     /**
+     * Создает новую картинку из URL.
+     *
      * @param string $url
      * @param bool $background
      * @return UXImage

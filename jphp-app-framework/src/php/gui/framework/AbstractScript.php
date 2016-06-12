@@ -52,6 +52,7 @@ class ScriptEvent extends \stdClass
 
 /**
  * Class AbstractScript
+ * @getters
  * @package php\gui\framework
  */
 abstract class AbstractScript

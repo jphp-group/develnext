@@ -169,6 +169,8 @@ abstract class AbstractForm extends UXForm
     }
 
     /**
+     * Create a clone from prototype ($id).
+     *
      * @param $id
      * @param UXNode|UXWindow $initiator
      * @param int $offsetX

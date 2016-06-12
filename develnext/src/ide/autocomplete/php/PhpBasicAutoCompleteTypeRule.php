@@ -18,6 +18,7 @@ use ide\autocomplete\AutoCompleteRegion;
 use ide\autocomplete\AutoCompleteTypeRule;
 use ide\Logger;
 use php\gui\framework\Application;
+use php\gui\text\UXFont;
 use php\io\MemoryStream;
 use php\lang\Environment;
 use php\lib\arr;
@@ -26,6 +27,8 @@ use php\lib\Items;
 use php\lib\num;
 use php\lib\Str;
 use php\util\Flow;
+use php\util\Regex;
+use php\util\Scanner;
 use phpx\parser\SourceToken;
 use phpx\parser\SourceTokenizer;
 
@@ -152,12 +155,23 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                                     return $method->data['returnType'];
                                 }
                             }
-                        } else if ($name instanceof StaticAccessExprToken) {
+                        }
+                        break;
+                        // method
+                    } else {
+                        if ($name instanceof StaticAccessExprToken) {
                             $clazz = $name->getClazz();
                             $field = $name->getField();
-
                             if ($clazz instanceof NameToken) {
-                                $type = $inspector->findType($clazz->getName());
+                                $t = $region->getLastValue('tokenOwner') ?: $region->getLastValue('token');
+                                $name = $clazz->getName();
+
+                                if ($clazz->getWord()[0] != '\\') {
+                                    $name = $t ? SyntaxAnalyzer::getRealName($name, $t, 'CLASS') : $name;
+                                }
+
+                                $type = $inspector->findType($name);
+
 
                                 if ($type && $field instanceof NameToken) {
                                     $method = $inspector->findMethod($type, $field->getName());
@@ -167,12 +181,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                                     }
                                 }
                             }
-                        }
-
-                        break;
-                        // method
-                    } else {
-                        if ($name instanceof NameToken) {
+                        } else if ($name instanceof NameToken) {
                             $name = $name->getName();
 
                             $func = $inspector->findFunction($name);
@@ -195,8 +204,6 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
     {
         $tokens = SyntaxAnalyzer::analyzeExpressionForDetectType($string);
         $type = null;
-
-        print_r($tokens);
 
         $accessType = '';
 
@@ -228,8 +235,6 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                 break;
             }
         }
-
-        var_dump($accessType, $type);
 
         if ($accessType && $type) {
             if (is_array($type)) {
@@ -286,42 +291,106 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
     protected $classExists;
 
-    protected function addFunctionRegion(FunctionStmtToken $token, ClassStmtToken $owner = null)
+    protected function addFunctionRegion(FunctionStmtToken $token, ClassStmtToken $owner = null, $code = [])
     {
-        $this->complete->addRegion(new AutoCompleteRegion($token->getStartLine(), $token->getStartPosition()));
+        $region = new AutoCompleteRegion($token->getStartLine(), $token->getStartPosition());
+        $region->setToLine($token->getEndLine());
+        $region->setToPos($token->getEndPosition());
 
-        $this->complete->setValueOfRegion($token, 'token', $token->getStartLine(), $token->getStartPosition() + 1);
-        $this->complete->setValueOfRegion($owner, 'tokenOwner', $token->getStartLine(), $token->getStartPosition() + 1);
+        $this->complete->addRegion($region);
+
+        $region->setValue($token, 'token');
+        $region->setValue($owner, 'tokenOwner');
+
+        $vars = [];
 
         if ($token instanceof MethodStmtToken) {
             if ($owner != null) {
-                $this->complete->setValueOfRegion([
+                $vars['this'] = 1;
+
+                $region->setValue([
                     'name' => 'this',
                     'type' => $owner->getFulledName(),
-                ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
+                ], 'variable');
             } else {
                 Logger::warn("Cannot find class for method when add function region, '{$token->getShortName()}' method");
             }
         }
 
         foreach ($token->getArguments() as $arg) {
+            $vars[$arg->getName()] = 1;
+
             $this->complete->setValueOfRegion([
                 'name' => $arg->getName(),
                 'type' => $arg->getHintType() ?: ($arg->getHintTypeClass() ? $arg->getHintTypeClass()->getName() : 'mixed')
             ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
         }
 
-        foreach ($token->getLocalVariables() as $var) {
-            $info = $token->getTypeInfo($var);
 
-            $this->complete->setValueOfRegion([
-                'name' => $var->getName(),
-                'type' => $info ? $info->getTypes()[0] : 'mixed',
-            ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
+        foreach ($code as $one) {
+            if (str::trim($one) && str::contains($one, '$')) {
+                $regexOfComment = Regex::of('\\/\\*\\*[ ]+\\@var[ ]+([a-z0-9_\\\\]+)[ ]+\\$([a-z0-9_]+)', Regex::CASE_INSENSITIVE | Regex::DOTALL);
+                $r = $regexOfComment->with($one);
+
+                while ($r->find()) {
+                    $varName = $r->group(2);
+                    $type = $r->group(1);
+
+                    if ($type[0] != '\\') {
+                        $type = SyntaxAnalyzer::getRealName($type, $owner ? $owner : $token, 'CLASS');
+                    }
+
+                    if (!$vars[$varName]) {
+                        $vars[$varName] = 1;
+
+                        $region->setValue([
+                            'name' => $varName,
+                            'type' => $type,
+                        ], 'variable');
+                    }
+                }
+
+                $regexOfVars = Regex::of('\\$([a-z][a-z0-9\\_]{0,})[ ]+\\=[ ]+(.+?)(\\;)', Regex::CASE_INSENSITIVE | Regex::DOTALL);
+                $r = $regexOfVars->with($one);
+
+                while ($r->find()) {
+                    $varName = $r->group(1);
+
+                    if (!$vars[$varName]) {
+                        $expression = $r->group(2);
+
+                        $types = $this->complete->identifyType("; " . $expression . "->", $region);
+
+                        foreach ($types as $type) {
+                            if (str::startsWith($type, "~dynamic ")) {
+                                $vars[$varName] = 1;
+
+                                $region->setValue([
+                                    'name' => $varName,
+                                    'type' => str::sub($type, 9)
+                                ], 'variable');
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach ($token->getLocalVariables() as $var) {
+            if (!$vars[$var->getName()]) {
+                $info = $token->getTypeInfo($var);
+
+                $region->setValue([
+                    'name' => $var->getName(),
+                    'type' => $info ? $info->getTypes()[0] : 'mixed',
+                ], 'variable');
+            }
         }
     }
 
-    public function updateStart($sourceCode)
+    public function updateStart($sourceCode, $caretPosition = 0, $caretLine = 0, $caretOffset = 0)
     {
         $stream = new MemoryStream();
         $stream->write($sourceCode);
@@ -329,6 +398,8 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
         if ($sourceCode) {
             $stream->seek(0);
         }
+
+        //var_dump($this->complete->identifyType('; app()->', $this->complete->getGlobalRegion()));
 
         $result = $this->complete->getInspector()->loadSource($stream);
 
@@ -338,7 +409,25 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                 $this->complete->setValueOfRegion($type, 'class');
 
                 foreach ($type->methods as $one) {
-                    $this->addFunctionRegion($one->token, $type->token);
+                    $code = [];
+
+                    if ($one->startLine <= $caretLine && $one->endLine >= $caretLine) {
+                        $scanner = new Scanner($sourceCode);
+
+                        $i = 0;
+
+                        while ($scanner->hasNextLine()) {
+                            if ($i >= $one->startLine && $i <= $one->endLine) {
+                                $code []= $scanner->nextLine();
+                            } else {
+                                $scanner->nextLine();
+                            }
+
+                            $i++;
+                        }
+                    }
+
+                    $this->addFunctionRegion($one->token, $type->token, $code);
                 }
             }
 
@@ -356,7 +445,8 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
     {
     }
 
-    public function updateDone($sourceCode)
+    public
+    function updateDone($sourceCode)
     {
 
     }

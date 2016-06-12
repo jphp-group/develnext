@@ -12,9 +12,11 @@ use ide\autocomplete\PropertyAutoCompleteItem;
 use ide\autocomplete\StatementAutoCompleteItem;
 use ide\autocomplete\VariableAutoCompleteItem;
 use ide\bundle\AbstractJarBundle;
+use ide\editors\common\CodeTextArea;
 use ide\Ide;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\Project;
+use php\gui\designer\UXAbstractCodeArea;
 use php\lib\fs;
 use php\lib\str;
 use php\util\Regex;
@@ -43,6 +45,52 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
         $this->kind = $kind;
     }
 
+    protected function appendUseClass(UXAbstractCodeArea $area, $use)
+    {
+        $useString = "use " . $use . ";";
+
+        $text = $area->text;
+
+        $pos = -1;
+        $caret = $area->caretPosition;
+
+        $regex = Regex::of('use[ ]+([0-9\\_a-z\\\\]+)', Regex::DOTALL | Regex::CASE_INSENSITIVE)->with($text);
+        if ($regex->find()) {
+            $pos = $regex->start(0);
+        } else {
+            $useString = "\n$useString";
+
+            $regex = Regex::of('namespace[ ]+([0-9\\_a-z\\\\]+\\;)', Regex::DOTALL | Regex::CASE_INSENSITIVE)->with($text);
+
+            if ($regex->find()) {
+                $pos = $regex->end(0) + 1;
+            } else {
+                $regex = Regex::of('namespace[ ]+([0-9\\_a-z\\\\]+[ \\r\\t\\n]+\\{)', Regex::DOTALL | Regex::CASE_INSENSITIVE)->with($text);
+
+                if ($regex->find()) {
+                    $pos = $regex->end(0) + 1;
+                } else {
+                    $regex = Regex::of('(\\<\\?)', Regex::DOTALL | Regex::CASE_INSENSITIVE)->with($text);
+
+                    if ($regex->find()) {
+                        $pos = $regex->end(0) + 1;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        $useString .= "\n";
+        $area->insertText($pos, $useString);
+
+        if ($pos < $caret) {
+            $area->caretPosition = $caret + str::length($useString);
+        }
+
+        return true;
+    }
+
     protected function insertClassName(AutoCompleteInsert $insert)
     {
         $regex = Regex::of('use[ ]+([0-9\\_a-z\\\\]+)', Regex::DOTALL | Regex::CASE_INSENSITIVE);
@@ -57,9 +105,13 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
             }
         }
 
-        $regex->reset();
+        if ($this->appendUseClass($insert->getArea(), $insert->getValue())) {
+            $insert->setValue(fs::name($insert->getValue()));
+        } else {
+            $insert->setValue("\\" . "{$insert->getValue()}");
+        }
 
-        if ($regex->find()) {
+        /*if ($regex->find()) {
             $insert->setBeforeText($regex->replaceGroup(0, "use " . $insert->getValue() . ";" . "\n" . $regex->group(0)));
             $insert->setValue(fs::name($insert->getValue()));
         } else {
@@ -112,25 +164,50 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
             $result['__NAMESPACE__'] = new ConstantAutoCompleteItem('__NAMESPACE__');
             $result['__LINE__'] = new ConstantAutoCompleteItem('__LINE__');
 
-            if ($bundle) {
-                foreach ($bundle->fetchAllBundles(Project::ENV_ALL) as $one) {
-                    if ($one instanceof AbstractJarBundle) {
-                        foreach ($one->getUseImports() as $import) {
-                            $name = fs::name($import);
+            foreach ($this->inspector->getTypes() as $type) {
+                $import = $type->fulledName;
+                $name = fs::name($import);
+                $description = $import;
 
-                            $result[$name] = new ConstantAutoCompleteItem(
-                                $name,
-                                $import,
-                                function (AutoCompleteInsert $insert) use ($import) {
-                                    $insert->setValue($import);
-                                    $this->insertClassName($insert);
-                                },
-                                'icons/class16.png'
-                            );
-                        }
+                $style = '';
+
+                if ($type->kind == 'INTERFACE') {
+                    $description = "$description (interface)";
+                } elseif ($type->kind == 'TRAIT') {
+                    $description = "$description (trait)";
+                }
+
+                $result[$name] = $c = new ConstantAutoCompleteItem(
+                    $name,
+                    $description,
+                    function (AutoCompleteInsert $insert) use ($import) {
+                        $insert->setValue($import);
+                        $this->insertClassName($insert);
+                    },
+                    'icons/class16.png',
+                    $style
+                );
+
+                $c->setContent($type->data['content']);
+            }
+
+            /*foreach ($bundle->fetchAllBundles(Project::ENV_ALL) as $one) {
+                if ($one instanceof AbstractJarBundle) {
+                    foreach ($one->getUseImports() as $import) {
+                        $name = fs::name($import);
+
+                        $result[$name] = new ConstantAutoCompleteItem(
+                            $name,
+                            $import,
+                            function (AutoCompleteInsert $insert) use ($import) {
+                                $insert->setValue($import);
+                                $this->insertClassName($insert);
+                            },
+                            'icons/class16.png'
+                        );
                     }
                 }
-            }
+            } */
 
             foreach ($context->getGlobalRegion()->getValues('use') as $one) {
                 $name = fs::name($one['name']);

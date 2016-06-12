@@ -5,6 +5,9 @@ use php\io\File;
 
 /**
  * Class UXClipboard
+ * --RU--
+ * Класс для работы с буфером обмена.
+ *
  * @package php\gui
  */
 class UXClipboard
@@ -15,12 +18,17 @@ class UXClipboard
 
     /**
      * Clear clipboard.
+     * --RU--
+     * Очистить буфер.
      */
     public static function clear()
     {
     }
 
     /**
+     * --RU--
+     * Возвращает true если буфер содержит какой-то текст.
+     *
      * @return bool
      */
     public static function hasText()
@@ -91,6 +99,9 @@ class UXClipboard
     }
 
     /**
+     * --RU--
+     * Помещает в буфер указанный текст.
+     *
      * @param string $text
      */
     public static function setText($text)

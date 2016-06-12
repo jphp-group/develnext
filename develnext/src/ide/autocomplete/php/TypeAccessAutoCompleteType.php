@@ -128,6 +128,8 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                 $description,
                 null, $icon
             );
+
+            $p->setContent($prop->data['content']);
         }
 
         if ($this->typeData['getters']) {
@@ -149,6 +151,8 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                         null,
                         'icons/greenSquare16.png'
                     );
+
+                    $p->setContent($method->data['content']);
                 }
             }
         }

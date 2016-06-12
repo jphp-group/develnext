@@ -208,6 +208,10 @@ project(':develnext') {
         provided project(':develnext-bundles/dn-jsoup-bundle')
         provided project(':develnext-bundles/dn-mail-bundle')
 
+        // stubs.
+        compile project(':develnext-stubs/dn-php-sdk')
+        compile project(':develnext-stubs/dn-zend-php-sdk')
+
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-json-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-zend-ext:$jphpVersion"

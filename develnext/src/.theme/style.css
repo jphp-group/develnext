@@ -108,6 +108,30 @@
     -fx-line-spacing: 30px;
 }
 
+.dn-autocomplete {
+    -fx-border-width: 1px;
+    -fx-border-color: #dddddd;
+}
+
+.dn-autocomplete-description {
+    -fx-font: 14px "Consolas";
+    -fx-background-color: #feffc5;
+}
+
+.dn-autocomplete-description .title {
+    -fx-font-weight: bold;
+    -fx-font-size: 1.1em;
+}
+.dn-autocomplete-description .description {
+    -fx-text-fill: gray;
+}
+
+.dn-autocomplete-description .content .label {
+    -fx-font-family: System;
+    -fx-font-style: italic;
+    -fx-text-fill: gray;
+}
+
 .account-menu {
     -fx-padding: 5px;
 }

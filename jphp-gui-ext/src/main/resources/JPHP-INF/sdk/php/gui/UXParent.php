@@ -14,6 +14,7 @@ abstract class UXParent extends UXNode
     public $childrenUnmodifiable;
 
     /**
+     * Список css таблиц стилей (пути к файлам и ресурсам).
      * @readonly
      * @var UXList of string (paths for css style sheets)
      */

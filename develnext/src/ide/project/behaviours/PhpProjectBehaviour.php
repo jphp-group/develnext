@@ -104,6 +104,8 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     protected function refreshInspector()
     {
+        $this->project->loadDirectoryForInspector($this->project->getFile("src/"));
+
         $this->inspector->setExtensions(['source']);
         $this->project->loadDirectoryForInspector($this->project->getFile("src/"));
 
@@ -204,28 +206,37 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 });
             });
 
-            fs::scan($this->project->getSrcFile(''), function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory) {
-                if (str::endsWith($filename, '.php')) {
-                    $filename = fs::normalize($filename);
+            $dirs = [$this->project->getSrcFile('')];
 
-                    if ($log) {
-                        $log(":compile $filename");
-                    }
-
-                    $file = $this->project->getAbsoluteFile($filename);
-                    $relativePath = $file->getSrcRelativePath();
-                    $compiledFile = new File($generatedDirectory, '/' . FileUtils::stripExtension($relativePath) . '.phb');
-
-                    if ($compiledFile->getParentFile() && !$compiledFile->getParentFile()->isDirectory()) {
-                        $compiledFile->getParentFile()->mkdirs();
-                    }
-
-                    $scope->execute(function () use ($filename, $compiledFile) {
-                        $module = new Module($filename, false, true);
-                        $module->dump($compiledFile, true);
-                    });
+            if ($bundle = BundleProjectBehaviour::get()) {
+                foreach ($bundle->fetchAllBundles($env) as $one) {
+                    $dirs[] = $one->getProjectVendorDirectory();
                 }
-            });
+            }
+
+            foreach ($dirs as $dir) {
+                fs::scan($dir, function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory, $dir) {
+                    if (str::endsWith($filename, '.php')) {
+                        $filename = fs::normalize($filename);
+
+                        if ($log) {
+                            $log(":compile $filename");
+                        }
+
+                        $relativePath = FileUtils::relativePath($dir, $filename);
+                        $compiledFile = new File($generatedDirectory, '/' . fs::pathNoExt($relativePath) . '.phb');
+
+                        if ($compiledFile->getParentFile() && !$compiledFile->getParentFile()->isDirectory()) {
+                            $compiledFile->getParentFile()->mkdirs();
+                        }
+
+                        $scope->execute(function () use ($filename, $compiledFile) {
+                            $module = new Module($filename, false, true);
+                            $module->dump($compiledFile, true);
+                        });
+                    }
+                });
+            }
 
             fs::scan($generatedDirectory, function ($filename) use ($log, $scope, $useByteCode) {
                 if (fs::ext($filename) == 'php') {

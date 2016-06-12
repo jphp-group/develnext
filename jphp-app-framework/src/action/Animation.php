@@ -18,6 +18,13 @@ use timer\AccurateTimer;
 
 class Animation
 {
+    /**
+     * @param $object
+     * @param $duration
+     * @param $value
+     * @param callable|null $callback
+     * @return null|UXAnimationTimer
+     */
     static function fadeTo($object, $duration, $value, callable $callback = null)
     {
         if ($object instanceof Instances) {

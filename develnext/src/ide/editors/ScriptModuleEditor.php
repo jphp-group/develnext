@@ -149,6 +149,7 @@ class ScriptModuleEditor extends FormEditor
                 $type->properties[$el->id] = $prop = new TypePropertyEntry();
                 $prop->name = $el->id;
 
+                $prop->data['content']['DEF'] = $el->getType()->getName();
                 $prop->data['icon'] = $el->getType()->getIcon();
                 $prop->data['type'][] = $el->getType()->getElementClass() ?: AbstractScript::class;
             }

@@ -27,9 +27,12 @@ abstract class AutoCompleteTypeRule
 
     /**
      * @param $sourceCode
+     * @param int $caretPosition
+     * @param int $caretLine
+     * @param int $caretOffset
      * @return mixed
      */
-    abstract public function updateStart($sourceCode);
+    abstract public function updateStart($sourceCode, $caretPosition = 0, $caretLine = 0, $caretOffset = 0);
 
     /**
      * @param SourceTokenizer $tokenizer

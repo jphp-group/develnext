@@ -9,16 +9,19 @@ use php\gui\layout\UXRegion;
 abstract class UXControl extends UXRegion
 {
     /**
+     * Подсказка (тултип).
      * @var UXTooltip
      */
     public $tooltip = null;
 
     /**
+     * Текстовая подсказка.
      * @var string
      */
     public $tooltipText = null;
 
     /**
+     * Контекстное меню.
      * @var UXContextMenu
      */
     public $contextMenu = null;

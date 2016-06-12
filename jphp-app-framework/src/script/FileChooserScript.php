@@ -83,7 +83,7 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour, Set
     }
 
     /**
-     * @return null|File|File[]
+     * @return File
      */
     public function execute()
     {

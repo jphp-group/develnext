@@ -10,11 +10,13 @@ use php\gui\text\UXFont;
 abstract class UXLabeled extends UXControl
 {
     /**
+     * Выравнивание для контейнеров.
      * @var string
      */
     public $alignment = 'BASELINE_CENTER';
 
     /**
+     * Текстовое выравнивание.
      * @var string
      */
     public  $textAlignment = 'LEFT';
@@ -25,41 +27,49 @@ abstract class UXLabeled extends UXControl
     public $wrapText = false;
 
     /**
+     * Подчеркивание.
      * @var bool
      */
     public $underline = false;
 
     /**
+     * Текст.
      * @var string
      */
     public $text;
 
     /**
+     * Шрифт.
      * @var UXFont
      */
     public $font;
 
     /**
+     * Иконка.
      * @var UXNode
      */
     public $graphic;
 
     /**
+     * Отступ для иконки.
      * @var double
      */
     public $graphicTextGap = 4;
 
     /**
+     * Цвет текста.
      * @var UXColor
      */
     public $textColor;
 
     /**
+     * Текст сокращения.
      * @var string
      */
     public $ellipsisString = '...';
 
     /**
+     * Отображение контента.
      * @var string LEFT, TOP, RIGHT, BOTTOM, TEXT_ONLY, GRAPHIC_ONLY
      */
     public $contentDisplay = 'LEFT';

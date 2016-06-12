@@ -5,14 +5,18 @@ use php\gui\animation\UXAnimationTimer;
 
 /**
  * Class Collision
+ * --RU--
+ * Утилитный класс для обработки столкновений.
  * @package action
  */
 class Collision
 {
     /**
-     * Collision::bounce($this->object, $event->normal)
+     * --RU--
+     * Отскок исходя из нормали столкновения.
      *
-     * Отскок исходя из нормали столкновения
+     * Например: Collision::bounce($this->object, $event->normal)
+     *
      * @param $object
      * @param array $normal [x, y]
      * @param float|int $bounciness

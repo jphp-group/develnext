@@ -8,30 +8,35 @@ namespace php\gui\paint;
 class UXColor
 {
     /**
+     * Уровень красного (от 0 до 1)
      * @readonly
      * @var double
      */
     public $red;
 
     /**
+     * Уровень синего (от 0 до 1).
      * @readonly
      * @var double
      */
     public $blue;
 
     /**
+     * Уровень зеленого (от 0 до 1).
      * @readonly
      * @var double
      */
     public $green;
 
     /**
+     * Уровень прозрачности (от 0 до 1).
      * @readonly
      * @var double
      */
     public $opacity;
 
     /**
+     * Уровень яркости.
      * @readonly
      * @var double
      */
@@ -50,6 +55,7 @@ class UXColor
     public $saturation;
 
     /**
+     * WEB значение цвета.
      * @readonly
      * @var string
      */

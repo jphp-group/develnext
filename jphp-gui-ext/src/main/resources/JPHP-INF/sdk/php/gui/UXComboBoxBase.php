@@ -18,11 +18,13 @@ class UXComboBoxBase extends UXControl
     public $armed;
 
     /**
+     * Редактируемый.
      * @var bool
      */
     public $editable;
 
     /**
+     * Текст-подсказка.
      * @var string
      */
     public $promptText;
@@ -34,15 +36,20 @@ class UXComboBoxBase extends UXControl
     public $showing;
 
     /**
+     * Значение.
      * @var mixed
      */
     public $value;
 
     /**
+     * Текст.
      * @var string
      */
     public $text;
 
+    /**
+     * Показать меню-попап.
+     */
     public function showPopup()
     {
     }

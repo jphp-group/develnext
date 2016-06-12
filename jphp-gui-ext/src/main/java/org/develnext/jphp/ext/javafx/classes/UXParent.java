@@ -74,7 +74,7 @@ public class UXParent<T extends Parent> extends UXNode<Parent> {
             ObservableList<Node> nodes = ((Parent) parent).getChildrenUnmodifiable();
 
             for (Node nd : nodes) {
-                if (filter.call(nd)) {
+                if (filter != null && filter.call(nd)) {
                     return nd;
                 }
 

@@ -17,3 +17,8 @@ include 'jphp-gui-richtext-ext';
 include 'develnext-bundles/dn-orientdb-bundle'
 include 'develnext-bundles/dn-jsoup-bundle'
 include 'develnext-bundles/dn-mail-bundle'
+
+// stubs
+include 'develnext-stubs/dn-php-sdk'
+include 'develnext-stubs/dn-jphp-sdk'
+include 'develnext-stubs/dn-zend-php-sdk'

@@ -10,71 +10,85 @@ use php\gui\text\UXFont;
 class UXImageArea extends UXCanvas
 {
     /**
+     * Центроровано.
      * @var bool
      */
     public $centered = false;
 
     /**
+     * Растягивать.
      * @var bool
      */
     public $stretch = false;
 
     /**
+     * Растягивать по-умному, не растягивая маленькие картинки.
      * @var bool
      */
     public $smartStretch = false;
 
     /**
+     * Авторазмер.
      * @var bool
      */
     public $autoSize = false;
 
     /**
+     * Пропорциональность.
      * @var bool
      */
     public $proportional = false;
 
     /**
+     * Мозаичное изображение.
      * @var bool
      */
     public $mosaic = false;
 
     /**
+     * Отступы для мозайки.
      * @var float
      */
     public $mosaicGap = 0.0;
 
     /**
+     * Текст.
      * @var string
      */
     public $text = '';
 
     /**
+     * Шрифт текста.
      * @var UXFont
      */
     public $font;
 
     /**
+     * Цвет текста.
      * @var UXColor
      */
     public $textColor;
 
     /**
+     * Фоновый цвет.
      * @var UXColor
      */
     public $backgroundColor = null;
 
     /**
+     * Изображение.
      * @var UXImage
      */
     public $image = null;
 
     /**
+     * Изображение при наведении.
      * @var UXImage
      */
     public $hoverImage = null;
 
     /**
+     * Изображение при клике.
      * @var UXImage
      */
     public $clickImage = null;

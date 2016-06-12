@@ -971,17 +971,20 @@ class ActionConstructorForm extends AbstractIdeForm
                 $this->class,
                 $this->method,
                 Items::toArray($this->list->items),
-                'Сгенерированный код',
-                '------------------',
+                'Generated',
+                '',
                 ''
             );
 
-            $code = $this->getLiveCode() . "\n\n" . $code;
-
-            $phpParser = new PhpParser($code);
+            $phpParser = new PhpParser($this->getLiveCode());
             $phpParser->addUseImports($imports);
 
-            $this->setLiveCode($phpParser->getContent());
+            $code = $phpParser->getCodeOfMethod($this->class, $this->method) . "\n\n" . $code;
+
+            $phpParser->replaceOfMethod($this->class, $this->method, $code);
+            $bind = $phpParser->findMethod($this->class, $this->method);
+
+            $this->setLiveCode($phpParser->getContent(), $bind['line'], $bind['pos']);
 
             $this->editor->removeMethod($this->class, $this->method);
             $this->list->items->clear();

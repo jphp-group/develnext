@@ -51,6 +51,9 @@ class DirectoryChooserScript extends AbstractScript implements TextableBehaviour
         $this->_dialog = new UXDirectoryChooser();
     }
 
+    /**
+     * @return File
+     */
     public function execute()
     {
         $file = $this->_dialog->showDialog();
@@ -61,11 +64,14 @@ class DirectoryChooserScript extends AbstractScript implements TextableBehaviour
             $this->_adaptValue($this->inputNode, $this->file);
 
             $this->trigger('action');
+            return $file;
         } else {
             $this->file = null;
 
             $this->trigger('cancel');
         }
+
+        return null;
     }
 
     /**

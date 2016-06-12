@@ -10,21 +10,26 @@ use Traversable;
 class UXComboBox extends UXComboBoxBase
 {
     /**
+     * Список.
      * @var UXList
      */
     public $items;
 
     /**
+     * Выбранный элемент.
      * @var mixed
      */
     public $selected;
 
     /**
+     * Выбранный индекс, начиная с 0.
+     * -1 ничего не выбрано.
      * @var int
      */
     public $selectedIndex;
 
     /**
+     * Видимое количество пунктов.
      * @var int
      */
     public $visibleRowCount;

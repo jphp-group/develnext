@@ -1,7 +1,9 @@
 <?php
 namespace ide\editors;
 
+use develnext\lexer\inspector\entry\ArgumentEntry;
 use develnext\lexer\inspector\entry\ExtendTypeEntry;
+use develnext\lexer\inspector\entry\MethodEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
 use develnext\lexer\inspector\entry\TypePropertyEntry;
 use ide\action\ActionEditor;
@@ -429,6 +431,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             foreach ($this->getObjectList() as $el) {
                 $type->properties[$el->value] = $prop = new TypePropertyEntry();
                 $prop->name = $el->value;
+                $prop->data['content']['DEF'] = $el->element ? $el->element->getName() : '';
                 $prop->data['icon'] = $el->getIcon();
                 $prop->data['type'][] = $el->element->getElementClass() ?: UXNode::class;
 
@@ -448,7 +451,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             foreach ($project->getInspectors() as $inspector) {
                 $inspector->putDynamicType($type);
             }
-
 
             $type = new TypeEntry();
             $type->fulledName = "mixin:app\\forms\\" . $this->getTitle();

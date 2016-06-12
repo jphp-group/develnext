@@ -342,8 +342,12 @@ class IdeEventListPane
                 $actionConstructor->showAndWait($this->actionEditor, $selectedClass, $selectedMethod);
 
                 if ($actionConstructor->getResult()) {
-                    $this->codeEditor->setValue($actionConstructor->getLiveCode());
-                    $this->codeEditor->load(false);
+                    if ($actionConstructor->getLiveCode() != $this->codeEditor->getValue()) {
+                        $this->codeEditor->setValue($actionConstructor->getLiveCode());
+                        $this->codeEditor->save();
+                    }
+
+                    //$this->codeEditor->load(false);
                     $this->jumpToLine($eventCode);
                 }
             }

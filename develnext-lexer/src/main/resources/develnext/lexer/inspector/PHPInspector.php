@@ -19,6 +19,7 @@ use develnext\lexer\token\SimpleToken;
 use develnext\lexer\Tokenizer;
 use php\compress\ArchiveEntry;
 use php\compress\ArchiveInputStream;
+use php\framework\Logger;
 use php\io\File;
 use php\io\Stream;
 use php\lang\Environment;
@@ -26,6 +27,7 @@ use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
 use php\util\Regex;
+use php\util\Scanner;
 
 /**
  * Class PHPInspector
@@ -141,6 +143,10 @@ class PHPInspector extends AbstractInspector
 
             return $result;
         } catch (\ParseError $e) {
+            if (is_string($path)) {
+                Logger::warn("Unable to load php source $moduleName");
+            }
+
             return false;
         } finally {
             if (!($path instanceof Stream)) {
@@ -157,7 +163,40 @@ class PHPInspector extends AbstractInspector
             $data['getters'] = true;
         }
 
+        $data['content'] = $this->parseDescription($comment);
+
         return $data;
+    }
+
+    protected function parseDescription($comment)
+    {
+        $content = '';
+        $scanner = new Scanner($comment, 'UTF-8');
+
+        $result = [];
+        $lang = 'DEF';
+
+        while ($scanner->hasNextLine()) {
+            $line = $scanner->nextLine();
+
+            if (str::startsWith($line, "--") && str::endsWith($line, "--")) {
+                $result[$lang] = $content;
+                $content = '';
+
+                $lang = str::sub($line, 2, str::length($line) - 2);
+                continue;
+            }
+
+            if (str::trimLeft($line)[0] != '@' && $line) {
+                $content .= "$line\n";
+            }
+        }
+
+        if ($content) {
+            $result[$lang] = $content;
+        }
+
+        return $result;
     }
 
     protected function parseFunctionDocType($comment, SimpleToken $owner)
@@ -205,6 +244,8 @@ class PHPInspector extends AbstractInspector
         $data['non-getter'] = str::contains($comment, '@non-getter');
         $data['hidden'] = str::contains($comment, '@hidden');
 
+        $data['content'] = $this->parseDescription($comment);
+
         return $data;
     }
 
@@ -239,6 +280,7 @@ class PHPInspector extends AbstractInspector
         }
 
         $data['hidden'] = str::contains($comment, '@hidden');
+        $data['content'] = $this->parseDescription($comment);
 
         return $data;
     }
@@ -280,6 +322,7 @@ class PHPInspector extends AbstractInspector
     {
         $entry = new TypeEntry();
         $entry->token = $token;
+        $entry->kind = $token->getClassType();
         $entry->name = $token->getName()->getWord();
         $entry->fulledName = $token->getFulledName();
         $entry->namespace = $token->getNamespaceName();

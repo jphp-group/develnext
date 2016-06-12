@@ -112,7 +112,7 @@ class IdeClassLoader extends ClassLoader
                 $t = Time::millis() - $t;
 
                 if (class_exists(Logger::class, false)) {
-                    if ($t > 90) {
+                    if ($t > 150) {
                         Logger::warn("Loading '$filename' takes a long time, $t ms");
                     }
                 }

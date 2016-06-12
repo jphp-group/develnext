@@ -216,6 +216,16 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
     }
 
     @Signature
+    public void insertText(int index, String text) {
+        getWrappedObject().insertText(index, text);
+    }
+
+    @Signature
+    public void replaceText(int from, int to, String text) {
+        getWrappedObject().replaceText(from, to, text);
+    }
+
+    @Signature
     public void deleteText(int from, int to) {
         getWrappedObject().deleteText(from, to);
     }

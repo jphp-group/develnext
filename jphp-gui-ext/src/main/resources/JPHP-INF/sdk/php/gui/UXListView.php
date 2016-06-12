@@ -8,6 +8,7 @@ namespace php\gui;
 class UXListView extends UXControl
 {
     /**
+     * Редактируемый.
      * @var bool
      */
     public $editable = false;
@@ -19,9 +20,10 @@ class UXListView extends UXControl
     public $editingIndex = -1;
 
     /**
+     * Фиксированный размер (высота) строк.
      * @var double
      */
-    public $fixedCellSize;
+    public $fixedCellSize = -1;
 
     /**
      * @var UXNode
@@ -29,54 +31,64 @@ class UXListView extends UXControl
     public $placeholder = null;
 
     /**
+     * Список.
      * @var UXList
      */
     public $items;
 
     /**
+     * Ориентация.
      * @var string HORIZONTAL or VERTICAL
      */
     public $orientation = 'HORIZONTAL';
 
     /**
+     * Множественное выделение.
      * @var bool
      */
     public $multipleSelection = false;
 
     /**
+     * Выделенные индексы (массив), начиная с 0.
      * @var int[]
      */
     public $selectedIndexes = [];
 
     /**
+     * Выделенный индекс, начиная с 0.
      * @var int
      */
     public $selectedIndex = -1;
 
     /**
+     * Сфокусированный индекс.
      * @var int
      */
     public $focusedIndex = -1;
 
     /**
+     * Выделенные элементы.
      * @readonly
      * @var mixed[]
      */
     public $selectedItems = [];
 
     /**
+     * Выделенный элемент.
      * @readonly
      * @var mixed
      */
     public $selectedItem = null;
 
     /**
+     * Сфокусированный элемент.
      * @readonly
      * @var mixed
      */
     public $focusedItem = null;
 
     /**
+     * Скролить к индексу.
      * @param int $index
      */
     public function scrollTo($index)
@@ -105,6 +117,9 @@ class UXListView extends UXControl
     {
     }
 
+    /**
+     * Визуально обновить список.
+     */
     public function update()
     {
     }

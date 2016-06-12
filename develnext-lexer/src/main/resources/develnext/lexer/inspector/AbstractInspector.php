@@ -30,6 +30,11 @@ abstract class AbstractInspector
     /**
      * @var array
      */
+    protected $dynamicReturnTypes = [];
+
+    /**
+     * @var array
+     */
     protected $constants = [];
 
     /**
@@ -77,35 +82,35 @@ abstract class AbstractInspector
     protected function mergeType(TypeEntry $entry = null, TypeEntry $dynamicType = null)
     {
         if ($dynamicType) {
-            $return = clone $dynamicType;
-
             if ($entry == null) {
-                return $return;
+                return clone $dynamicType;
             }
 
-            $return->name = $entry->name;
+            $return = clone $entry;
+
+            /*$return->name = $entry->name;
             $return->namespace = $entry->namespace;
             $return->fulledName = $entry->fulledName;
             $return->abstract = $entry->abstract;
-            $return->final = $entry->final;
+            $return->final = $entry->final;*/
 
-            foreach ($entry->constants as $name => $prop) {
+            foreach ($dynamicType->constants as $name => $prop) {
                 $return->constants[$name] = $prop;
             }
 
-            foreach ($entry->properties as $name => $prop) {
+            foreach ($dynamicType->properties as $name => $prop) {
                 $return->properties[$name] = $prop;
             }
 
-            foreach ($entry->methods as $name => $method) {
+            foreach ($dynamicType->methods as $name => $method) {
                 $return->methods[$name] = $method;
             }
 
-            foreach ($entry->extends as $name => $extend) {
+            foreach ($dynamicType->extends as $name => $extend) {
                 $return->extends[$name] = $extend;
             }
 
-            $return->data = $return->data + $entry->data;
+            $return->data = $return->data + $dynamicType->data;
 
             return $return;
         }
@@ -224,5 +229,14 @@ abstract class AbstractInspector
         } else {
             return $this->types[$name];
         }
+    }
+
+    /**
+     * @param string $rule "className@methodName@argName@property", "className@methodName@argName"
+     * @param $type
+     */
+    public function addDynamicReturnType($rule, $type)
+    {
+        $this->dynamicReturnTypes[$rule] = $type;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace ide\autocomplete;
 use develnext\lexer\inspector\AbstractInspector;
+use develnext\lexer\inspector\entry\TypeEntry;
 use ide\Logger;
 use php\io\MemoryStream;
 use php\lib\Items;
@@ -36,7 +37,7 @@ class AutoComplete
     /**
      * @var AutoCompleteRegion
      */
-    protected $globalRegion = [];
+    protected $globalRegion = null;
 
     /**
      * @var AbstractInspector
@@ -61,8 +62,11 @@ class AutoComplete
 
     /**
      * @param $sourceCode
+     * @param int $caretPosition
+     * @param int $caretLine
+     * @param int $caretOffset
      */
-    public function update($sourceCode)
+    public function update($sourceCode, $caretPosition = 0, $caretLine = 0, $caretOffset = 0)
     {
         $mem = new MemoryStream();
         $mem->write($sourceCode);
@@ -80,9 +84,9 @@ class AutoComplete
         $this->globalRegion = new AutoCompleteRegion(0, 0);
 
         foreach ($this->rules as $rule) {
-            if ($rule->updateStart($sourceCode) === false) {
+            if ($rule->updateStart($sourceCode, $caretPosition, $caretLine, $caretOffset) === false) {
                 $this->regions = $oldRegions;
-                $this->globalRegion = $oldGlobalRegion;
+                $this->globalRegion = $oldGlobalRegion ?: $this->globalRegion;
                 return;
             }
         }
@@ -110,6 +114,11 @@ class AutoComplete
         return $this->globalRegion;
     }
 
+    /**
+     * @param $line
+     * @param $pos
+     * @return AutoCompleteRegion
+     */
     public function findRegion($line, $pos) {
         if ($line == 0 && $pos == 0) {
             return $this->globalRegion;
@@ -134,6 +143,36 @@ class AutoComplete
     public function addRegion(AutoCompleteRegion $region)
     {
         $this->regions[] = $region;
+    }
+
+    /**
+     * @param $string
+     * @param AutoCompleteRegion $region
+     * @return TypeEntry[]|string[]
+     */
+    public function identifyAndFetchType($string, AutoCompleteRegion $region = null)
+    {
+        if ($region == null) {
+            $region = $this->getGlobalRegion();
+        }
+
+        $types = $this->identifyType($string, $region);
+
+        $result = [];
+
+        foreach ($types as $type) {
+            if ($type instanceof TypeEntry) {
+                $result[] = $type;
+            } else {
+                if ($t = $this->fetchType($type)) {
+                    $result[] = $t;
+                } else {
+                    $result[] = $type;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

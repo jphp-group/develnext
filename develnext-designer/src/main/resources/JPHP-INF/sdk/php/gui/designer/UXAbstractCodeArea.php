@@ -128,4 +128,21 @@ class UXAbstractCodeArea extends UXControl
     public function deleteText($from, $to)
     {
     }
+
+    /**
+     * @param int $index
+     * @param int $text
+     */
+    public function insertText($index, $text)
+    {
+    }
+
+    /**
+     * @param int $from
+     * @param int $to
+     * @param string $text
+     */
+    public function replaceText($from, $to, $text)
+    {
+    }
 }

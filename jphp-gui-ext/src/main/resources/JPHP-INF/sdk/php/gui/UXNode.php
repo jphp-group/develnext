@@ -13,21 +13,29 @@ use php\lang\IllegalArgumentException;
 abstract class UXNode
 {
     /**
+     * --RU--
+     * Идентификатор.
      * @var string
      */
     public $id;
 
     /**
+     * --RU--
+     * CSS стили компонента в одну строку.
      * @var string
      */
     public $style;
 
     /**
+     * --RU--
+     * Родительский компонент.
      * @var UXParent
      */
     public $parent;
 
     /**
+     * --RU--
+     * Эффекты компонента.
      * @var UXEffectPipeline
      */
     public $effects;
@@ -38,31 +46,43 @@ abstract class UXNode
     public $clip = null;
 
     /**
+     * --RU--
+     * Сцена компонента.
      * @var UXScene
      */
     public $scene;
 
     /**
+     * --RU--
+     * Форма компонента.
      * @var UXForm
      */
     public $form;
 
     /**
+     * --RU--
+     * Позиция по X.
      * @var double
      */
     public $x;
 
     /**
+     * --RU--
+     * Позиция по Y.
      * @var double
      */
     public $y;
 
     /**
+     * --RU--
+     * Смещение по X.
      * @var double
      */
     public $translateX;
 
     /**
+     * --RU--
+     * Смещение по Y.
      * @var double
      */
     public $translateY;
@@ -73,100 +93,136 @@ abstract class UXNode
     public $translateZ;
 
     /**
+     * --RU--
+     * Экранная позция по X
      * @var double
      */
     public $screenX;
 
     /**
+     * --RU--
+     * Экранная позиция по Y
      * @var double
      */
     public $screenY;
 
     /**
+     * --RU--
+     * Ширина компонента.
      * @var double
      */
     public $width;
 
     /**
+     * --RU--
+     * Высота компонента.
      * @var double
      */
     public $height;
 
     /**
-     * Width + Height
+     * --RU--
+     * Размеры (ширина, высота)
      * @var double[]
      */
     public $size;
 
     /**
-     * X + Y
+     * --RU--
+     * Позиция (x, y)
      * @var double[]
      */
     public $position;
 
     /**
+     * --RU--
+     * Видимость
      * @var bool
      */
     public $visible = true;
 
     /**
+     * --RU--
+     * Доступность
      * @var bool
      */
     public $enabled = true;
 
     /**
+     * --RU--
+     * Прозрачность от 0 до 1.
      * @var double
      */
     public $opacity = 1;
 
     /**
+     * --RU--
+     * Угол поворота (от 0 до 360).
      * @var double 0..360
      */
     public $rotate = 0;
 
     /**
+     * --RU--
+     * Сфокусированный.
      * @readonly
      * @var bool
      */
     public $focused = false;
 
     /**
+     * --RU--
+     * Доступность фокусировки через Tab.
      * @var bool
      */
     public $focusTraversable = true;
 
     /**
+     * --RU--
+     * Список CSS классов.
      * @readonly
      * @var UXList of string
      */
     public $classes;
 
     /**
+     * --RU--
+     * Список CSS классов одной строкой через пробел.
      * @var string
      */
     public $classesString;
 
     /**
+     * --RU--
+     * Пользовательские данные.
      * @var mixed
      */
     public $userData = null;
 
     /**
+     * --RU--
+     * Игнорирование действий мышки.
      * @var bool
      */
     public $mouseTransparent = false;
 
     /**
+     * --RU--
+     * Курсор
      * @var string|UXImage
      */
     public $cursor = 'DEFAULT';
 
     /**
+     * --RU--
+     * Якорь.
      * @var double|null
      */
     public $leftAnchor, $rightAnchor, $topAnchor, $bottomAnchor = null;
 
     /**
+     * --RU--
+     * Якоря для фиксации размеров и позиции.
      * @var array
      */
     public $anchors = [];
@@ -210,6 +266,8 @@ abstract class UXNode
     }
 
     /**
+     * --RU--
+     * Возвращает скриншот компонента.
      * @return UXImage
      */
     public function snapshot()
@@ -217,6 +275,9 @@ abstract class UXNode
     }
 
     /**
+     * --RU--
+     * Ищет и возвращает один компонент по css селектору.
+     *
      * @param string $selector
      *
      * @return UXNode
@@ -226,6 +287,9 @@ abstract class UXNode
     }
 
     /**
+     * --RU--
+     * Ищет и возвращает все компоненты по css селектору.
+     *
      * @param $selector
      *
      * @return UXNode[]
@@ -251,42 +315,63 @@ abstract class UXNode
     }
 
     /**
-     * Send to front
+     * Send to front.
+     * --RU--
+     * Переместить компонент поверх объектов.
      */
     public function toFront()
     {
     }
 
     /**
-     * Send to back
+     * Send to back.
+     * --RU--
+     * Переместить компонент под объекты.
      */
     public function toBack()
     {
     }
 
+    /**
+     * --RU--
+     * Перевести фокус на объект.
+     */
     public function requestFocus()
     {
     }
 
+    /**
+     * Скрыть объект.
+     */
     public function hide()
     {
     }
 
+    /**
+     * Показать объект.
+     */
     public function show()
     {
     }
 
+    /**
+     * Скырть объект если он видимый, показать если невидим.
+     */
     public function toggle()
     {
     }
 
     /**
+     * Возвращает true, если объект не находится ни накаком другом объекте.
      * @return bool
      */
     public function isFree()
     {
     }
 
+    /**
+     * Уничтожить объект.
+     */
     public function free()
     {
     }

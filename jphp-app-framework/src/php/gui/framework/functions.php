@@ -21,6 +21,9 @@ use php\lib\Str;
 use timer\AccurateTimer;
 
 /**
+ * --RU--
+ * Возвращает главный объект программы.
+ *
  * @return Application
  * @throws Exception
  */
@@ -29,16 +32,30 @@ function app()
     return Application::get();
 }
 
+/**
+ * Открывает файл.
+ * @param string $file
+ */
 function open($file)
 {
     (new UXDesktop())->open($file);
 }
 
+/**
+ * Открывает url в браузере.
+ * @param string $url
+ */
 function browse($url)
 {
     (new UXDesktop())->browse($url);
 }
 
+/**
+ * Выполняет команду в рамках ОС и возвращает процесс.
+ * @param string $command
+ * @param bool $wait
+ * @return Process
+ */
 function execute($command, $wait = false)
 {
     $process = new Process(Str::split($command, ' '));
@@ -46,16 +63,32 @@ function execute($command, $wait = false)
     return $wait ? $process->startAndWait() : $process->start();
 }
 
+/**
+ * Пауза в выполнении кода в млсек.
+ * 1 сек = 1000 млсек.
+ * @param int $millis
+ */
 function wait($millis)
 {
     Thread::sleep($millis);
 }
 
+/**
+ * Ассинхронная пауза в выполнении кода с колбэком.
+ * @param int $millis
+ * @param callable $callback
+ * @return AccurateTimer
+ */
 function waitAsync($millis, callable $callback)
 {
     return AccurateTimer::executeAfter($millis, $callback);
 }
 
+/**
+ * Выполнить колбэк позже в UI потоке.
+ * Необходимо для работы с UI из других паралельных потоков.
+ * @param callable $callback
+ */
 function uiLater(callable $callback)
 {
     UXApplication::runLater($callback);
@@ -119,11 +152,19 @@ function uiConfirm($message)
     return $alert->showAndWait() == $buttons[0];
 }
 
+/**
+ * Показать значение переменной как print_r.
+ * @param $var
+ */
 function pre($var)
 {
     UXDialog::showAndWait(print_r($var, true));
 }
 
+/**
+ * Показать значение переменной как var_dump.
+ * @param $var
+ */
 function dump($var)
 {
     ob_start();
@@ -134,11 +175,19 @@ function dump($var)
     UXDialog::showAndWait($text);
 }
 
+/**
+ * Простое сообщение с ожиданием закрытия.
+ * @param $message
+ */
 function alert($message)
 {
     UXDialog::showAndWait($message);
 }
 
+/**
+ * Простое сообщение с ожиданием закрытия.
+ * @param $message
+ */
 function message($message)
 {
     UXDialog::showAndWait($message);

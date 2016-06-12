@@ -8,6 +8,7 @@ namespace php\gui;
 class UXCheckbox extends UXButtonBase
 {
     /**
+     * Отмечен или нет.
      * @var bool
      */
     public $selected;
