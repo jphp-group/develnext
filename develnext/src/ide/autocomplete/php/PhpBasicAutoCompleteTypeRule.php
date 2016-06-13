@@ -203,6 +203,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
     public function identifyType($string, AutoCompleteRegion $region)
     {
         $tokens = SyntaxAnalyzer::analyzeExpressionForDetectType($string);
+
         $type = null;
 
         $accessType = '';

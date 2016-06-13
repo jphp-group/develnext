@@ -160,15 +160,44 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
         if ($useByteCode && $this->isByteCodeEnabled()) {
             $scope = new Environment(null, Environment::HOT_RELOAD);
+            $scope->importClass(FileUtils::class);
 
             $jarLibraries = $this->externalJarLibraries;
 
             $generatedDirectory = $this->project->getSrcFile('', true);
+            $dirs = [$this->project->getSrcFile('')];
 
-            $scope->execute(function () use ($jarLibraries, $generatedDirectory) {
+            $includedFiles = [];
+
+            if ($bundle = BundleProjectBehaviour::get()) {
+                foreach ($bundle->fetchAllBundles($env) as $one) {
+                    $dirs[] = $one->getProjectVendorDirectory();
+                }
+            }
+
+            $scope->execute(function () use ($jarLibraries, $generatedDirectory, $dirs, &$includedFiles) {
                 ob_implicit_flush(true);
 
-                spl_autoload_register(function ($name) use ($jarLibraries, $generatedDirectory) {
+                spl_autoload_register(function ($name) use ($jarLibraries, $generatedDirectory, $dirs, &$includedFiles) {
+                    echo("Try class '$name' auto load");
+
+                    foreach ($dirs as $dir) {
+                        $filename = "$dir/$name.php";
+
+                        if (fs::exists($filename)) {
+                            echo "Find class '$name' in ", $filename, "\n";
+
+                            $compiled = new File($generatedDirectory, $name . ".phb");
+                            fs::ensureParent($compiled);
+
+                            $includedFiles[FileUtils::hashName($filename)] = true;
+
+                            $module = new Module($filename, false, true);
+                            $module->dump($compiled, true);
+                            return;
+                        }
+                    }
+
                     foreach ($jarLibraries as $file) {
                         if (!fs::exists($file)) {
                             echo "SKIP $file, is not exists.\n";
@@ -192,9 +221,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
                             $compiled = new File($generatedDirectory, $name . ".phb");
 
-                            if ($compiled->getParentFile() && !$compiled->getParentFile()->isDirectory()) {
-                                $compiled->getParentFile()->mkdirs();
-                            }
+                            fs::ensureParent($compiled);
 
                             $module->dump($compiled, true);
 
@@ -206,17 +233,13 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 });
             });
 
-            $dirs = [$this->project->getSrcFile('')];
-
-            if ($bundle = BundleProjectBehaviour::get()) {
-                foreach ($bundle->fetchAllBundles($env) as $one) {
-                    $dirs[] = $one->getProjectVendorDirectory();
-                }
-            }
-
             foreach ($dirs as $dir) {
-                fs::scan($dir, function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory, $dir) {
+                fs::scan($dir, function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory, $dir, &$includedFiles) {
                     if (str::endsWith($filename, '.php')) {
+                        if ($includedFiles[FileUtils::hashName($filename)]) {
+                            return;
+                        }
+
                         $filename = fs::normalize($filename);
 
                         if ($log) {
@@ -230,6 +253,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                             $compiledFile->getParentFile()->mkdirs();
                         }
 
+                        $includedFiles[FileUtils::hashName($filename)] = true;
                         $scope->execute(function () use ($filename, $compiledFile) {
                             $module = new Module($filename, false, true);
                             $module->dump($compiledFile, true);
@@ -238,14 +262,19 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 });
             }
 
-            fs::scan($generatedDirectory, function ($filename) use ($log, $scope, $useByteCode) {
+            fs::scan($generatedDirectory, function ($filename) use ($log, $scope, $useByteCode, &$includedFiles) {
                 if (fs::ext($filename) == 'php') {
+                    if ($includedFiles[FileUtils::hashName($filename)]) {
+                        return;
+                    }
+
                     $filename = fs::normalize($filename);
 
                     if ($log) $log(":compile $filename");
 
                     $compiledFile = fs::pathNoExt($filename) . '.phb';
 
+                    $includedFiles[FileUtils::hashName($filename)] = true;
                     $scope->execute(function () use ($filename, $compiledFile) {
                         $module = new Module($filename, false, true);
                         $module->dump($compiledFile);

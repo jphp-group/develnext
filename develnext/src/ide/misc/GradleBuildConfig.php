@@ -91,6 +91,8 @@ class GradleBuildConfig
     public function stopDaemon()
     {
         if ($ide = Ide::get()) {
+            $this->daemon = false;
+
             Logger::info("Stop gradle daemon ...");
 
             $process = new Process(
@@ -100,9 +102,8 @@ class GradleBuildConfig
             );
 
             $process->start();
-            $this->daemon = false;
 
-            //Logger::info("Gradle daemon is stopped.");
+            Logger::info("Gradle daemon is stopped.");
         }
     }
 
@@ -120,7 +121,6 @@ class GradleBuildConfig
                 );
 
                 $process = $process->start();
-                //Logger::info("Daemon is started, exit code = " . $process->getExitValue());
             }
         }
     }
