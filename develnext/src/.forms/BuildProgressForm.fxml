@@ -10,9 +10,9 @@
 
 <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="431.0" prefWidth="603.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox spacing="10.0" id="content" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox id="content" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox id="header" spacing="15.0" alignment="CENTER_LEFT">
+            <HBox id="header" alignment="CENTER_LEFT" spacing="15.0">
                <children>
                   <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
                   <VBox>
@@ -31,17 +31,21 @@
                   </VBox>
                </children>
             </HBox>
-            <ListView id="consoleList" VBox.vgrow="ALWAYS" styleClass="dn-console-list" />
+            <ListView id="consoleList" styleClass="dn-console-list" VBox.vgrow="ALWAYS" />
             <ProgressBar id="progress" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="23.0" />
             <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="35.0" spacing="15.0">
                <children>
-                  <Button id="closeButton" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-square" text="Закрыть">
+                  <Button id="closeButton" mnemonicParsing="false" prefHeight="35.0" text="Закрыть">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
                      <padding>
                         <Insets left="15.0" right="15.0" />
                      </padding>
+                     <styleClass>
+                        <String fx:value="icon-square" />
+                        <String fx:value="foobar" />
+                     </styleClass>
                   </Button>
                   <CheckBox id="closeAfterDoneCheckbox" mnemonicParsing="false" selected="true" text="Закрыть после выполнения" />
                </children>

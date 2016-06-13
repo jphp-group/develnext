@@ -35,7 +35,7 @@ class NodeFormElementTag extends AbstractFormElementTag
             $element->setAttribute('style', $node->style);
         }
 
-        if ($node->classes->count) {
+        if ($node->classes->count <= 2) {
             $element->setAttribute('styleClass', $node->classesString);
         }
 
@@ -74,5 +74,19 @@ class NodeFormElementTag extends AbstractFormElementTag
 
     public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
     {
+        /** @var UXNode $node */
+
+        if ($node->classes->count > 2) {
+            $styleClass = $document->createElement('styleClass');
+            $styleClass->setAttribute('xmlns:fx', "http://javafx.com/fxml");
+
+            foreach (str::split($node->classesString, ' ') as $one) {
+                if (str::trim($one)) {
+                    $styleClass->appendChild($document->createElement('String', ['@fx:value' => str::trim($one)]));
+                }
+            }
+
+            $element->appendChild($styleClass);
+        }
     }
 }

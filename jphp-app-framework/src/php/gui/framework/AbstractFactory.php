@@ -255,9 +255,14 @@ class AbstractFactory
         $processor = new XmlProcessor();
         $document = $processor->createDocument();
 
+        /** @var DomElement $cloneNode */
         $cloneNode = $document->importNode($node, true);
 
         $document->appendChild($cloneNode);
+        $element = $document->getDocumentElement();
+
+        $element->setAttribute('xmlns', 'http://javafx.com/javafx/8');
+        $element->setAttribute('xmlns:fx', 'http://javafx.com/fxml/1');
 
         foreach ($imports as $import) {
             $cloneImport = $import->cloneNode(true);

@@ -8,6 +8,7 @@ use php\gui\event\UXKeyboardManager;
 use php\gui\event\UXKeyEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\View;
+use php\lib\arr;
 use php\lib\str;
 use script\TimerScript;
 
@@ -33,9 +34,14 @@ class UXNodeWrapper
      */
     public function applyData(UXData $data)
     {
-        if ($data->has('classesString')) {
-            $this->node->classesString .= $data->get('classesString');
+        if ($this->node->classes->count == 2 && str::contains($this->node->classes[1], ' ')) {
+            $first = $this->node->classes[0];
+            $this->node->classes->setAll([$first] + str::split($this->node->classes[1], ' '));
         }
+
+        /*if ($data->has('classesString')) {
+            $this->node->classesString .= $data->get('classesString');
+        } */
 
         if ($data->has('enabled')) {
             $this->node->enabled = $data->get('enabled');

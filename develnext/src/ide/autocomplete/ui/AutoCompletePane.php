@@ -465,12 +465,19 @@ class AutoCompletePane
 
         $list = new UXListView();
         $list->on('action', function () use ($list) {
-            if ($list->selectedIndex > -1) {
-                if (!$this->uiDescription->visible) {
-                    $this->uiDescription->show($this->area->form, $this->ui->x + $this->ui->width + 3, $this->ui->y + 3);
-                }
+            /** @var AutoCompleteItem $item */
+            if ($item = $list->selectedItem) {
+                if ($item->getDescription() || $item->getContent()) {
+                    $this->updateDescription($list->selectedItem);
 
-                $this->updateDescription($list->selectedItem);
+                    if ($this->uiDescription->visible) {
+                        $this->uiDescription->hide();
+                    }
+
+                    $this->uiDescription->show($this->area->form, $this->ui->x + $this->ui->width + 3, $this->ui->y + 3);
+                } else {
+                    $this->uiDescription->hide();
+                }
             } else {
                 $this->uiDescription->hide();
             }
