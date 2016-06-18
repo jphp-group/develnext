@@ -20,22 +20,12 @@ class IniStorage extends AbstractStorage
     /**
      * @var bool
      */
-    public $autoSave = true;
-
-    /**
-     * @var bool
-     */
     public $trimValues = true;
 
     /**
      * @var bool
      */
     public $multiLineValues = true;
-
-    /**
-     * @var array
-     */
-    protected $data = [];
 
     /**
      * IniStorage constructor.
@@ -47,118 +37,6 @@ class IniStorage extends AbstractStorage
 
         if ($path) {
             $this->load();
-        }
-    }
-
-    /**
-     * @param $key
-     * @param string $section
-     * @return mixed
-     */
-    public function get($key, $section = '')
-    {
-        if ($this->disabled) {
-            return null;
-        }
-
-        $value = $this->data["$section"][$key];
-
-        if (str::contains($value, '|')) {
-            $value = str::split($value, '|');
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param string $name
-     * @return array
-     */
-    public function section($name = '')
-    {
-        return (array) $this->data["$name"];
-    }
-
-    /**
-     * @return array
-     */
-    public function sections()
-    {
-        $keys = [];
-
-        foreach (arr::keys($this->data) as $key) {
-            if ($key) {
-                $keys[] = $key;
-            }
-        }
-
-        return $keys;
-    }
-
-    /**
-     * @param array $values
-     * @param string $section
-     */
-    public function put(array $values, $section = '')
-    {
-        if ($this->disabled) {
-            return;
-        }
-
-        foreach ($values as $key => $value) {
-            $this->set($key, $value, $section, false);
-        }
-
-        if ($this->autoSave) {
-            $this->save();
-        }
-    }
-
-    /**
-     * @param $key
-     * @param $value
-     * @param string $section
-     * @param bool $checkAutoSave
-     */
-    public function set($key, $value, $section = '', $checkAutoSave = true)
-    {
-        if ($this->disabled) {
-            return;
-        }
-
-        $this->data["$section"][$key] = is_array($value) ? str::join($value, '|') : $value;
-
-        if ($checkAutoSave && $this->autoSave) {
-            $this->save();
-        }
-    }
-
-    /**
-     * @param string $key
-     * @param string $section
-     */
-    public function remove($key, $section = '')
-    {
-        if ($this->disabled) {
-            return;
-        }
-
-        unset($this->data["$section"][$key]);
-
-        if ($this->autoSave) {
-            $this->save();
-        }
-    }
-
-    /**
-     * @param string $section
-     */
-    public function removeSection($section)
-    {
-        unset($this->data["$section"]);
-
-        if ($this->autoSave) {
-            $this->save();
         }
     }
 
@@ -283,13 +161,5 @@ class IniStorage extends AbstractStorage
         $this->_path = $source;
 
         $this->load();
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return $this->data;
     }
 }

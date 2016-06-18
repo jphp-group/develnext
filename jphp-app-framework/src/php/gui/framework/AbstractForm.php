@@ -47,18 +47,26 @@ abstract class AbstractForm extends UXForm
 
     const DEFAULT_PATH = 'res://.forms/';
 
-    /** @var Application */
+    /**
+     * @hidden
+     * @var Application
+     */
     protected $_app;
 
-    /** @var Configuration */
+    /**
+     * @hidden
+     * @var Configuration
+     */
     protected $_config;
 
     /**
+     * @hidden
      * @var AbstractModule[]
      */
     protected $_modules = [];
 
     /**
+     * @hidden
      * @var BehaviourManager
      */
     protected $behaviourManager;
@@ -233,15 +241,6 @@ abstract class AbstractForm extends UXForm
     }
 
     /**
-     * @param $name
-     * @return AbstractForm
-     */
-    public function form($name)
-    {
-        return $this->_app->getForm($name);
-    }
-
-    /**
      * @return Configuration
      */
     public function getConfig()
@@ -335,6 +334,7 @@ abstract class AbstractForm extends UXForm
     /**
      * @param $id
      * @return AbstractModule
+     * @return-dynamic app\modules\$0
      * @throws Exception
      */
     protected function module($id)
@@ -437,19 +437,20 @@ abstract class AbstractForm extends UXForm
                 $type = $this->_app->getNamespace() . "\\modules\\$type";
             }
 
-            $module = new $type();
+            // create mock.
+            $module = new $type(true);
 
             if ($module->singleton) {
                 $this->_modules[$module->id] = app()->module($module->id);
             } else {
-                $this->_modules[$module->id] = $module;
+                $this->_modules[$module->id] =  new $type();
             }
         }
 
         foreach ($this->_modules as $module) {
-            UXApplication::runLater(function () use ($module) {
+            if (!$module->singleton) {
                 $module->apply($this);
-            });
+            }
         }
     }
 

@@ -35,7 +35,8 @@ use php\util\Scanner;
  */
 class PHPInspector extends AbstractInspector
 {
-    protected $typeNameRegex = '([a-z_\\x7f-\\xff][\\|\\[\\]a-z0-9_\\x7f-\\xff]+)';
+    protected $typeNameRegex = '([a-z_\\x7f-\\xff][\\|\\[\\]a-z\\\\0-9_\\x7f-\\xff]+)';
+    protected $typeNameRegexDyn = '([a-z_\\x7f-\\xff\\$][\\$\\|\\[\\]a-z\\\\0-9_\\x7f-\\xff]+)';
     protected $simpleTypes = ['null', 'string', 'int', 'bool', 'float', 'double', 'boolean', 'integer', 'void', 'false', 'true', 'array', 'callable', 'mixed', 'object'];
     protected $extensions = ['php'];
 
@@ -163,6 +164,10 @@ class PHPInspector extends AbstractInspector
             $data['getters'] = true;
         }
 
+        if (str::contains($comment, '@non-getters')) {
+            $data['getters'] = false;
+        }
+
         $data['content'] = $this->parseDescription($comment);
 
         return $data;
@@ -223,7 +228,7 @@ class PHPInspector extends AbstractInspector
             }
         }
 
-        $regex = Regex::of("\\@param[ ]+$this->typeNameRegex \\$([a-z0-9_]+)[ ]+?(.+?)", Regex::CASE_INSENSITIVE | Regex::DOTALL)->with($comment);
+        $regex = Regex::of("\\@param[ ]+$this->typeNameRegex[ ]+\\$([a-z0-9_]+)([ ]{0,}[\\w\\d\\(\\)\\.\\,\\;\\- \\t]+)?", Regex::CASE_INSENSITIVE | Regex::DOTALL)->with($comment);
 
         while ($regex->find()) {
             $one = [
@@ -233,9 +238,14 @@ class PHPInspector extends AbstractInspector
                 'optional' => false,
             ];
 
-            if (str::startsWith($one['description'], '(optional)')) {
-                $one = str::trim(str::sub($one['description'], 10));
+            if ($one['description'] == '(optional)') {
+                $one['description'] = '';
                 $one['optional'] = true;
+            } else {
+                if (str::startsWith($one['description'], '(optional)')) {
+                    $one['description'] = str::trim(str::sub($one['description'], 10));
+                    $one['optional'] = true;
+                }
             }
 
             $data['params'][$regex->group(2)] = $one;
@@ -245,6 +255,12 @@ class PHPInspector extends AbstractInspector
         $data['hidden'] = str::contains($comment, '@hidden');
 
         $data['content'] = $this->parseDescription($comment);
+
+        $regex = Regex::of('\\@return-dynamic[ ]+' . $this->typeNameRegexDyn, Regex::CASE_INSENSITIVE | Regex::DOTALL)->with($comment);
+
+        if ($regex->find()) {
+            $data['returnDynamic'] = $regex->group(1);
+        }
 
         return $data;
     }
@@ -439,7 +455,7 @@ class PHPInspector extends AbstractInspector
 
         $e->name = $arg->getName();
         $e->value = $arg->getValue() ? $arg->getValue()->getExprString() : null;
-        $e->type = $arg->getHintTypeClass() ? $arg->getHintTypeClass()->getWord() : $arg->getHintType();
+        $e->type = $arg->getHintTypeClass() ? $arg->getHintTypeClass()->getWord() : str::lower($arg->getHintType());
         $e->optional = !!$arg->getValue();
 
         return $e;
@@ -460,7 +476,11 @@ class PHPInspector extends AbstractInspector
 
         if ($type) {
             foreach ($type->extends as $one) {
-                $data += $this->collectTypeData($one->type, $withDynamic);
+                foreach ($this->collectTypeData($one->type, $withDynamic) as $name => $value) {
+                    if (!isset($data[$name])) {
+                        $data[$name] = $value;
+                    }
+                }
             }
         }
 

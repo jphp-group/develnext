@@ -1,0 +1,16 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="path" value="config.db" />
+        <property code="autoSave" value="1" />
+    </init>
+
+    <properties group="general">
+        <property code="path" name="Источник" editor="text" tooltip="Имя или путь к файлу, ресурсу или url" />
+        <property code="autoSave" name="Автосохранение" editor="boolean" tooltip="Сохранять данные сразу при любых изменениях" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="save" name="Сохранение" kind="ObjectEvent" />
+        <eventType code="error" name="Ошибка чтения/записи" kind="ObjectEvent" />
+    </eventTypes>
+</element>

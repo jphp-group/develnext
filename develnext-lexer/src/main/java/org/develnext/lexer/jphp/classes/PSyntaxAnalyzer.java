@@ -4,9 +4,11 @@ import org.develnext.jphp.core.syntax.SyntaxAnalyzer;
 import org.develnext.jphp.core.tokenizer.TokenMeta;
 import org.develnext.jphp.core.tokenizer.Tokenizer;
 import org.develnext.jphp.core.tokenizer.token.ColonToken;
+import org.develnext.jphp.core.tokenizer.token.CommentToken;
 import org.develnext.jphp.core.tokenizer.token.SemicolonToken;
 import org.develnext.jphp.core.tokenizer.token.Token;
 import org.develnext.jphp.core.tokenizer.token.expr.BraceExprToken;
+import org.develnext.jphp.core.tokenizer.token.expr.CommaToken;
 import org.develnext.jphp.core.tokenizer.token.expr.OperatorExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.ValueExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.operator.DynamicAccessExprToken;
@@ -91,8 +93,14 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
 
     @Signature
     public static List<Token> analyzeExpressionForDetectType(Environment env, String expression) throws IOException {
+        return analyzeExpressionForDetectType(env, expression, false);
+    }
+
+    protected static List<Token> analyzeExpressionForDetectType(Environment env, String expression, boolean shortExpr) throws IOException {
         try {
-            expression += ";";
+            if (!shortExpr) {
+                expression += ";";
+            }
 
             Tokenizer tokenizer = new Tokenizer(new Context(expression));
 
@@ -116,7 +124,12 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
                     }
                 }
 
-                if (token instanceof BreakStmtToken || token instanceof SemicolonToken || token instanceof NewExprToken || token instanceof ColonToken) {
+                if (token instanceof BreakStmtToken || token instanceof SemicolonToken || token instanceof NewExprToken || token instanceof ColonToken
+                        || token instanceof CommentToken || token instanceof ReturnStmtToken || token instanceof CaseStmtToken) {
+                    break;
+                }
+
+                if (shortExpr && token instanceof CommaToken) {
                     break;
                 }
 
@@ -215,6 +228,10 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
 
             return Collections.emptyList();
         } catch (BaseError | ParseException e) {
+            if (!shortExpr) {
+                return analyzeExpressionForDetectType(env, expression, true);
+            }
+
             if (e.getMessage() != null && e.getMessage().equals(Messages.ERR_PARSE_UNEXPECTED_END_OF_STRING.fetch())) {
                 return Arrays.asList(new StringExprToken(TokenMeta.of(""), StringExprToken.Quote.DOUBLE));
             }

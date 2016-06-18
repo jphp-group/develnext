@@ -1,0 +1,19 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="file" value="example.db" />
+        <property code="autoOpen" value="1" />
+        <property code="catchErrors" value="1" />
+    </init>
+
+    <properties group="general">
+        <property code="file" name="Файл" editor="text" tooltip="Относительный или полный путь к файлу, значение :memory: для базы в памяти." />
+        <property code="autoOpen" name="Авто-открытие" editor="boolean" tooltip="Автоматически открывать базу при смене источника" />
+        <property code="options" name="Опции" editor="text" tooltip="Список опций, каждая опция на отдельной строке, формат как name=value" />
+        <property code="catchErrors" name="Игнорировать ошибки" editor="boolean" tooltip="Если опция включения, компонент не будет кидать исключения Exception" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="open" name="Открытие" kind="ObjectEvent" />
+        <eventType code="error" name="Ошибка" kind="ObjectEvent" />
+    </eventTypes>
+</element>

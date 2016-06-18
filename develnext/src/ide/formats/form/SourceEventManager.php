@@ -391,7 +391,7 @@ class SourceEventManager
 
         while ($scanner->hasNextLine()) {
             if ($line + 1 === $i) {
-                $source .= "\n$tab/**\n$tab * @event $bind \n$tab **/\n";
+                $source .= "\n$tab/**\n$tab * @event $bind \n$tab */\n";
                 $source .= "{$tab}function $methodName($arguments)\n$tab{{$tab}\n{$tab}{$tab}\n{$tab}}\n";
             }
 

@@ -62,6 +62,7 @@ abstract class UXNode
     /**
      * --RU--
      * Позиция по X.
+     *
      * @var double
      */
     public $x;
@@ -69,6 +70,7 @@ abstract class UXNode
     /**
      * --RU--
      * Позиция по Y.
+     *
      * @var double
      */
     public $y;

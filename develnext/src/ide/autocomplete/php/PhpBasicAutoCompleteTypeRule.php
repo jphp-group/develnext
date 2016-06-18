@@ -5,8 +5,10 @@ use develnext\lexer\Context;
 use develnext\lexer\inspector\entry\FunctionEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
 use develnext\lexer\SyntaxAnalyzer;
+use develnext\lexer\token\CallExprToken;
 use develnext\lexer\token\ClassStmtToken;
 use develnext\lexer\token\DynamicAccessExprToken;
+use develnext\lexer\token\ExprStmtToken;
 use develnext\lexer\token\FunctionStmtToken;
 use develnext\lexer\token\MethodStmtToken;
 use develnext\lexer\token\NameToken;
@@ -34,6 +36,22 @@ use phpx\parser\SourceTokenizer;
 
 class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 {
+    protected function fetchDynamicType(FunctionEntry $method, CallExprToken $token)
+    {
+        if ($dynamic = $method->data['returnDynamic']) {
+            /** @var ExprStmtToken $param */
+            foreach ($token->getParameters() as $i => $param) {
+                $dynamic = str::replace($dynamic, "\${$i}", $param->getExprString());
+            }
+
+            if ($type = $this->complete->getInspector()->findType($dynamic)) {
+                return $type->fulledName;
+            }
+        }
+
+        return null;
+    }
+
     protected function findReturnType(SimpleToken $token, $previousType = null, AutoCompleteRegion $region)
     {
         $inspector = $this->complete->getInspector();
@@ -152,6 +170,10 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                                 $method = $inspector->findMethod($type, $field->getName());
 
                                 if ($method && !$method->static) {
+                                    if ($type = $this->fetchDynamicType($method, $token)) {
+                                        return $type;
+                                    }
+
                                     return $method->data['returnType'];
                                 }
                             }
@@ -177,6 +199,10 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                                     $method = $inspector->findMethod($type, $field->getName());
 
                                     if ($method && $method->static) {
+                                        if ($type = $this->fetchDynamicType($method, $token)) {
+                                            return $type;
+                                        }
+
                                         return $method->data['returnType'];
                                     }
                                 }
@@ -187,6 +213,10 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                             $func = $inspector->findFunction($name);
 
                             if ($func) {
+                                if ($type = $this->fetchDynamicType($func, $token)) {
+                                    return $type;
+                                }
+
                                 return $func->data['returnType'];
                             }
                         }
@@ -255,7 +285,6 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
             }
         }
 
-
         if (sizeof($tokens) == 1) {
             if ($tokens[0] instanceof NameToken) {
                 if (str::length($tokens[0]->getName()) >= 1) {
@@ -302,6 +331,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
         $region->setValue($token, 'token');
         $region->setValue($owner, 'tokenOwner');
+        $region->setValue($owner ? $owner->getFulledName() : null, 'self');
 
         $vars = [];
 
@@ -323,7 +353,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
             $this->complete->setValueOfRegion([
                 'name' => $arg->getName(),
-                'type' => $arg->getHintType() ?: ($arg->getHintTypeClass() ? $arg->getHintTypeClass()->getName() : 'mixed')
+                'type' => $arg->getHintType() ? str::lower($arg->getHintType()) : ($arg->getHintTypeClass() ? $arg->getHintTypeClass()->getName() : 'mixed')
             ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
         }
 
@@ -336,6 +366,27 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                 while ($r->find()) {
                     $varName = $r->group(2);
                     $type = $r->group(1);
+
+                    if ($type[0] != '\\') {
+                        $type = SyntaxAnalyzer::getRealName($type, $owner ? $owner : $token, 'CLASS');
+                    }
+
+                    if (!$vars[$varName]) {
+                        $vars[$varName] = 1;
+
+                        $region->setValue([
+                            'name' => $varName,
+                            'type' => $type,
+                        ], 'variable');
+                    }
+                }
+
+                $regexOfNew = Regex::of('\$([a-z][a-z0-9\\_]{0,})[ ]+\=[ ]+new[ ]+([a-z\\_][a-z0-9\\_]{0,})', Regex::CASE_INSENSITIVE | Regex::DOTALL);
+                $r = $regexOfNew->with($one);
+
+                while ($r->find()) {
+                    $varName = $r->group(1);
+                    $type = $r->group(2);
 
                     if ($type[0] != '\\') {
                         $type = SyntaxAnalyzer::getRealName($type, $owner ? $owner : $token, 'CLASS');
@@ -376,16 +427,35 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                         }
                     }
                 }
+
+                $regexOfVarType = Regex::of('([a-z\\_][a-z0-9]{0,})?[ ]{0,}\\$([a-z\\_][a-z0-9\\_]{0,})', Regex::CASE_INSENSITIVE | Regex::DOTALL);
+                $r = $regexOfVarType->with($one);
+
+                while ($r->find()) {
+                    $varName = $r->group(2);
+                    $type = $r->group(1);
+
+                    if ($type && $type[0] != '\\') {
+                        $type = SyntaxAnalyzer::getRealName($type, $owner ? $owner : $token, 'CLASS');
+                    }
+
+                    if (!$vars[$varName]) {
+                        $vars[$varName] = 1;
+
+                        $region->setValue([
+                            'name' => $varName,
+                            'type' => $type ?: 'mixed',
+                        ], 'variable');
+                    }
+                }
             }
         }
 
         foreach ($token->getLocalVariables() as $var) {
             if (!$vars[$var->getName()]) {
-                $info = $token->getTypeInfo($var);
-
                 $region->setValue([
                     'name' => $var->getName(),
-                    'type' => $info ? $info->getTypes()[0] : 'mixed',
+                    'type' => 'mixed',
                 ], 'variable');
             }
         }

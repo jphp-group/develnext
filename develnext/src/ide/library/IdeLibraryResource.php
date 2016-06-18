@@ -63,6 +63,14 @@ abstract class IdeLibraryResource
     }
 
     /**
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return $this->config->get('hidden');
+    }
+
+    /**
      * @return string
      */
     public function getDescription()

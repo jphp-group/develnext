@@ -15,6 +15,8 @@ use ReflectionMethod;
 
 /**
  * Class AbstractModule
+ *
+ * @non-getters
  * @package php\gui
  */
 abstract class AbstractModule extends AbstractScript
@@ -58,8 +60,10 @@ abstract class AbstractModule extends AbstractScript
 
     /**
      * AbstractModule constructor.
+     * @param bool $mock
+     * @throws IllegalStateException
      */
-    public function __construct()
+    public function __construct($mock = false)
     {
         $this->_enabledGetters = $this->_enabledSetters = false;
 
@@ -72,7 +76,7 @@ abstract class AbstractModule extends AbstractScript
 
         $json = $this->scriptManager->addFromIndex(
             "res://$path.json",
-            'res://.scripts/' . $this->id . '/'
+            'res://.scripts/' . $this->id . '/', !$mock
         );
 
         if ($json && is_array($json['properties'])) {
@@ -81,10 +85,14 @@ abstract class AbstractModule extends AbstractScript
             }
         }
 
-        $this->loadBinds($this);
+        if (!$mock) {
+            $this->loadBinds($this);
 
-        $this->behaviourManager = new ModuleBehaviourManager($this);
-        BehaviourLoader::load("res://$name.behaviour", $this->behaviourManager);
+            $this->behaviourManager = new ModuleBehaviourManager($this);
+            BehaviourLoader::load("res://$name.behaviour", $this->behaviourManager);
+
+            Logger::debug("Module '$this->id' is created.");
+        }
     }
 
     public function behaviour($target, $class)

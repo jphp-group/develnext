@@ -57,7 +57,16 @@ class ScriptEvent extends \stdClass
  */
 abstract class AbstractScript
 {
+    /**
+     * @hidden
+     * @var bool
+     */
     protected $_enabledSetters = true;
+
+    /**
+     * @hidden
+     * @var bool
+     */
     protected $_enabledGetters = true;
 
     /**
@@ -66,6 +75,7 @@ abstract class AbstractScript
     protected $_context;
 
     /**
+     * @hidden
      * @var mixed
      */
     protected $_owner;

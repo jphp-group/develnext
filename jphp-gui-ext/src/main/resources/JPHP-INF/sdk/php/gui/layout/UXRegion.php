@@ -26,13 +26,25 @@ class UXRegion extends UXParent
      * Минимальная ширина.
      * @var double
      */
-    public $minWidth, $minHeight = -1;
+    public $minWidth = -1;
+
+    /**
+     * Минимальная высота.
+     * @var double
+     */
+    public $minHeight = -1;
 
     /**
      * Максимальная ширина.
      * @var double
      */
-    public $maxWidth, $maxHeight = -1;
+    public $maxWidth = -1;
+
+    /**
+     * Максимальная высота
+     * @var double
+     */
+    public $maxHeight = -1;
 
     /**
      * Внутренние отступы.

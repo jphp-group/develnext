@@ -368,6 +368,7 @@ class Application
 
     /**
      * @return null|AbstractModule
+     * @return-dynamic app\modules\AppModule
      */
     public function appModule()
     {
@@ -401,7 +402,10 @@ class Application
                     /** @var AbstractModule $module */
                     $module = new $type();
 
-                    $this->modules[$module->id] = $module;
+                    if ($module->singleton) {
+                        $this->modules[$module->id] = $module;
+                        $module->apply($this);
+                    }
                 }
             }
         } catch (IOException $e) {

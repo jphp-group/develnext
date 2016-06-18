@@ -40,6 +40,9 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
      */
     private $accessType;
 
+    /**
+     * @var array
+     */
     private $typeData = [];
 
     /**
@@ -101,7 +104,9 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                 continue;
             }
 
-            if ($prop->data['hidden']) { continue; }
+            if ($prop->data['hidden']) {
+                continue;
+            }
 
             $description = str::join($prop->data['type'], '|');
 
@@ -157,8 +162,8 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
             }
         }
 
-        if (!$type->data['weak']) {
-            foreach ($type->extends as $one) {
+        foreach ($type->extends as $one) {
+            if (!$one->data['weak'] && !$one->data['interface']) {
                 $t = $this->inspector->findType($one->type);
 
                 if ($t) {
@@ -185,7 +190,7 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
 
     protected function getStaticTypeProperties(TypeEntry $type, $context = '', $parentContext = null)
     {
-        return $this->getTypeProperties($type, $context, $parentContext, function (TypePropertyEntry $prop) {
+        return $this->getTypeProperties($type, $context, $parentContext, function ($prop) {
             return !(!$prop->static || str::startsWith($prop->name, '__'));
         });
     }
@@ -200,7 +205,9 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                 continue;
             }
 
-            if ($method->data['hidden']) { continue; }
+            if ($method->data['hidden']) {
+                continue;
+            }
 
             switch ($this->accessType) {
                 case 'dynamic':
@@ -277,8 +284,10 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
             $this->typeData = $this->inspector->collectTypeData($type->fulledName);
 
             switch ($this->accessType) {
-                case 'dynamic': return $this->getDynamicTypeProperties($type, $contextClass);
-                case 'static': return $this->getStaticTypeProperties($type, $contextClass);
+                case 'dynamic':
+                    return $this->getDynamicTypeProperties($type, $contextClass);
+                case 'static':
+                    return $this->getStaticTypeProperties($type, $contextClass);
             }
         }
 
@@ -296,11 +305,7 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
 
         if ($this->class instanceof TypeEntry) {
             $type = $this->class;
-            $contextClass = '';
-
-            if ($class = $region->getLastValue('self')) {
-                $contextClass = ($class['namespace'] ? $class['namespace'] . "\\" : '') . $class['name'];
-            }
+            $contextClass = $region->getLastValue('self');
 
             $this->typeData = $this->inspector->collectTypeData($type->fulledName);
 

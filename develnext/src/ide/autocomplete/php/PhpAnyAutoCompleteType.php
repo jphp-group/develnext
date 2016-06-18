@@ -274,12 +274,13 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
 
         $result['GLOBALS'] = new VariableAutoCompleteItem('GLOBALS', 'array', $this->kind == '~any' ? '$GLOBALS' : null);
 
+        var_dump($this->kind);
         foreach ($context->getGlobalRegion()->getValues('variable') as $one) {
-            $result[$one['name']] = new VariableAutoCompleteItem($one['name'], $one['type'], $this->kind == '~any' ? "$" . $one['name'] : null);
+            $result[$one['name']] = new VariableAutoCompleteItem($one['name'], $one['type'], ($this->kind == '~any') ? "$" . $one['name'] : null);
         }
 
         foreach ($region->getValues('variable') as $one) {
-            $result[$one['name']] = new VariableAutoCompleteItem($one['name'], $one['type'], $this->kind == '~any' ? "$" . $one['name'] : null);
+            $result[$one['name']] = new VariableAutoCompleteItem($one['name'], $one['type'], ($this->kind == '~any') ? "$" . $one['name'] : null);
         }
 
         return $result;
@@ -324,6 +325,7 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                 new StatementAutoCompleteItem('false', '', 'false'),
                 new StatementAutoCompleteItem('null', '', 'null'),
                 new StatementAutoCompleteItem('as', '', 'as '),
+                new StatementAutoCompleteItem('return', '', 'return '),
                 new StatementAutoCompleteItem('goto', '', 'goto '),
                 new StatementAutoCompleteItem('unset', '', 'unset('),
                 new StatementAutoCompleteItem('isset', '', 'isset('),

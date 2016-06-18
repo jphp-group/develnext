@@ -1,0 +1,8 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="rootVisible" name="Видимость корня" editor="boolean" tooltip="Видимость корня (root)." />
+        <property code="fixedCellSize" name="Высота пункта" editor="integer" />
+
+        <!-- <property code="multipleSelection" name="Множественный выбор" editor="boolean" />-->
+    </properties>
+</element>

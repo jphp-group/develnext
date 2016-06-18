@@ -37,12 +37,30 @@ public class AutoSpaceEnterHotkey extends AbstractHotkey {
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
 
-            if (Character.isSpaceChar(c)) {
+            if (Character.isSpaceChar(c) || c == '*') {
                 prefix.append(c);
                 continue;
             }
 
             break;
+        }
+
+        int offset = 0;
+
+        if (text.trim().endsWith("/**")) {
+            try {
+                Paragraph<Collection<String>, Collection<String>> nextParagraph = area.getParagraph(currentParagraph + 1);
+                if (!nextParagraph.getText().trim().startsWith("*")) {
+                    offset = -(prefix.length() + 3);
+
+                    prefix.append(" *").append(" " + prefix.toString()).append("/");
+                } else {
+                    prefix.append(" * ");
+                }
+            } catch (IndexOutOfBoundsException e) {
+                // nop.
+            }
+
         }
 
         if (openBlock) {
@@ -51,6 +69,10 @@ public class AutoSpaceEnterHotkey extends AbstractHotkey {
             area.moveTo(pos + replacement.length());
         } else {
             area.replaceSelection(prefix.toString());
+        }
+
+        if (offset != 0) {
+            area.moveTo(area.getCaretPosition() + offset);
         }
 
         return true;

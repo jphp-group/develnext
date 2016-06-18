@@ -5,7 +5,7 @@ namespace php\gui\framework;
 trait ApplicationTrait
 {
     /**
-     * @param $name
+     * @param string $name
      * @return AbstractFactory
      * @throws \php\lang\IllegalArgumentException
      */
@@ -16,6 +16,7 @@ trait ApplicationTrait
 
     /**
      * @return null|AbstractModule
+     * @return-dynamic app\modules\AppModule
      */
     public function appModule()
     {
@@ -23,8 +24,9 @@ trait ApplicationTrait
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @return AbstractForm
+     * @return-dynamic app\forms\$0
      */
     public function form($name)
     {

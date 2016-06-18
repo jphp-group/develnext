@@ -133,7 +133,7 @@ class ScriptModuleEditor extends FormEditor
     {
         if ($project = Ide::project()) {
             $type = new TypeEntry();
-            $type->fulledName = "app\\modules\\" . $this->getTitle();
+            $type->fulledName = $className = "app\\modules\\" . $this->getTitle();
 
             foreach ($this->getModules() as $name) {
                 $name = "mixin:app\\modules\\$name";
@@ -157,7 +157,6 @@ class ScriptModuleEditor extends FormEditor
             foreach ($project->getInspectors() as $inspector) {
                 $inspector->putDynamicType($type);
             }
-
 
             $type = new TypeEntry();
             $type->fulledName = "mixin:app\\modules\\" . $this->getTitle();

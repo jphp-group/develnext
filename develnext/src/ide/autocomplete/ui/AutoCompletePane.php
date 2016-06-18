@@ -111,6 +111,11 @@ class AutoCompletePane
         });
 
         $this->area->on('keyDown', function (UXKeyEvent $e) {
+            if ($e->controlDown || $e->altDown || $e->shortcutDown) {
+                $this->inserted = true;
+                return;
+            }
+
             $this->area->data('oldCaretPosition', $this->area->caretPosition);
 
             switch ($e->codeName) {
@@ -145,9 +150,6 @@ class AutoCompletePane
         }, __CLASS__);
 
         $this->area->on('keyUp', function (UXKeyEvent $e) {
-            if ($e->controlDown || $e->altDown) {
-                return;
-            }
 
             switch ($e->codeName) {
                 case 'Up':
@@ -182,7 +184,7 @@ class AutoCompletePane
                     $region = $this->complete->findRegion($this->area->caretLine, $this->area->caretOffset);
                     $types = $this->complete->identifyType($string, $region);
 
-                    if (Items::keys($this->types) != $types) {
+                    if (arr::keys($this->types) != $types) {
                         $this->types = [];
 
                         foreach ($types as $type) {
@@ -414,7 +416,7 @@ class AutoCompletePane
 
         $contentValue = $item->getContent();
 
-        if ($contentValue['DEF']) {
+        if ($contentValue['DEF'] || $contentValue['RU']) {
             $content->add(new UXSeparator());
             $content->add(new UXLabel($contentValue['RU'] ?: $contentValue['DEF']));
         }

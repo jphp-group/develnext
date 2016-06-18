@@ -292,6 +292,10 @@ class Project
         $file->applyTemplate($template);
         $file->updateTemplate(true);
 
+        foreach ($this->inspectors as $inspector) {
+            $inspector->loadSource($file);
+        }
+
         return $file;
     }
 
@@ -887,6 +891,7 @@ class Project
     public function close($save = true)
     {
         Logger::info("Close project ...");
+        $this->trigger(__FUNCTION__);
 
         $this->tickTimer->stop();
 

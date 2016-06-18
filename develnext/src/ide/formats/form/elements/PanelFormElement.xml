@@ -1,9 +1,9 @@
 <element extends="NodeFormElement">
     <properties>
         <property code="backgroundColor" name="Цвет фона" editor="color" />
-        <property code="borderWidth" name="Размер оконтовки" editor="float" />
-        <property code="borderColor" name="Цвет оконтовки" editor="color" />
-        <property code="borderStyle" name="Стиль оконтовки" editor="enum">
+        <property code="borderWidth" name="Размер окантовки" editor="float" />
+        <property code="borderColor" name="Цвет окантовки" editor="color" />
+        <property code="borderStyle" name="Стиль окантовки" editor="enum">
             <variants>
                 <variant value="NONE">Без окантовки</variant>
                 <variant value="SOLID">Линия</variant>

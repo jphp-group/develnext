@@ -424,8 +424,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $type->fulledName = "app\\forms\\" . $this->getTitle();
 
             foreach ($this->getModules() as $name) {
-                $name = "mixin:app\\modules\\$name";
-                $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($name, ['weak' => true, 'public' => true]);
+                $_name = "mixin:app\\modules\\$name";
+                $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($_name, ['weak' => true, 'public' => true]);
+
+                $_name = "app\\modules\\$name";
+                $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($_name, ['weak' => true, 'interface' => true]);
             }
 
             foreach ($this->getObjectList() as $el) {

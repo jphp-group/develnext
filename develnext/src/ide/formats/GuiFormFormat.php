@@ -51,6 +51,7 @@ use ide\formats\form\elements\TextAreaFormElement;
 use ide\formats\form\elements\TextFieldFormElement;
 use ide\formats\form\elements\TitledPaneFormElement;
 use ide\formats\form\elements\ToggleButtonFormElement;
+use ide\formats\form\elements\TreeViewFormElement;
 use ide\formats\form\elements\WebViewFormElement;
 use ide\formats\form\tags\AnchorPaneFormElementTag;
 use ide\formats\form\tags\ButtonFormElementTag;
@@ -92,6 +93,7 @@ use ide\formats\form\tags\TextFieldFormElementTag;
 use ide\formats\form\tags\TextInputControlFormElementTag;
 use ide\formats\form\tags\TitledPaneFormElementTag;
 use ide\formats\form\tags\ToggleButtonFormElementTag;
+use ide\formats\form\tags\TreeViewFormElementTag;
 use ide\formats\form\tags\WebViewFormElementTag;
 use ide\forms\SetMainFormForm;
 use ide\Ide;
@@ -133,6 +135,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new CheckboxFormElement());
         $this->register(new ComboBoxFormElement());
         $this->register(new ListViewFormElement());
+        $this->register(new TreeViewFormElement());
         $this->register(new ImageViewFormElement());
 
         $this->register(new ProgressBarFormElement());
@@ -201,6 +204,7 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new PaginationFormElementTag());
         $this->register(new TableViewFormElementTag());
         $this->register(new RadioGroupPaneFormElementTag());
+        $this->register(new TreeViewFormElementTag());
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());

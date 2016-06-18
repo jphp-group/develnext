@@ -13,4 +13,11 @@ class CallExprToken extends SimpleToken
     public function getName()
     {
     }
+
+    /**
+     * @return ExprStmtToken
+     */
+    public function getParameters()
+    {
+    }
 }

@@ -28,7 +28,6 @@ abstract class AbstractBundle
     abstract function getName();
     abstract function getDescription();
 
-
     /**
      * @param Project $project
      */

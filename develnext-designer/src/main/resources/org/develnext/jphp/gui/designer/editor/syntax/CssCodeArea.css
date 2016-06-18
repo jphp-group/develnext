@@ -46,6 +46,10 @@
     -fx-fill: #678CB1;
 }
 
+.styled-text-area .text.attribute {
+    -fx-fill: #aab8dd;
+}
+
 .styled-text-area .text.pseudo-class {
     -fx-fill: #EC7600;
     -fx-font-weight: bold;
@@ -58,4 +62,8 @@
 
 .syntax-text-area .text.number {
     -fx-fill: #FFCD22;
+}
+
+.syntax-text-area .text.string {
+    -fx-fill: #afc9a0;
 }

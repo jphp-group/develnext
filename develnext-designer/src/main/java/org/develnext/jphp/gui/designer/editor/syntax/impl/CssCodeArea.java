@@ -2,81 +2,39 @@ package org.develnext.jphp.gui.designer.editor.syntax.impl;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.antlr.v4.runtime.*;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.CodeAreaGutterNote;
 import org.develnext.lexer.css.CSSLexer;
 import org.develnext.lexer.css.CSSParser;
+import org.develnext.lexer.regex.RegexToken;
+import org.develnext.lexer.regex.css.FxCssRegexLexer;
 import org.fxmisc.richtext.*;
 
 public class CssCodeArea extends AbstractCodeArea {
-    private final BaseErrorListener errorListener = new BaseErrorListener() {
-        @Override
-        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-            getGutter().addNote(line, new CodeAreaGutterNote("error", msg));
-        }
-    };
+    protected final FxCssRegexLexer cssRegexLexer = new FxCssRegexLexer();
 
     public CssCodeArea() {
         super();
         setStylesheet(AbstractCodeArea.class.getResource("CssCodeArea.css").toExternalForm());
     }
 
-    private static Collection<String> getStyleOfToken(Token token) {
-        switch (token.getType()) {
-            case CSSParser.COMMENT:
-                return Collections.singletonList("comment");
-            case CSSParser.HEX_COLOR:
-                return Collections.singletonList("color");
-            case CSSParser.STRING:
-                return Collections.singletonList("string");
-            case CSSParser.NUMBER:
-                return Collections.singletonList("number");
-            case CSSParser.HASH:
-            case CSSParser.CLASS:
-                return Collections.singletonList("selector");
-            case CSSParser.IDENT:
-                return Collections.singletonList("keyword");
-            default:
-                switch (token.getText()) {
-                    case "{":
-                    case "}":
-                    case ";":
-                    case ":":
-                        return Collections.singletonList("control");
-                }
-
-                return Collections.emptyList();
-        }
-    }
-
     @Override
     protected void computeHighlighting(StyleSpansBuilder<Collection<String>> spansBuilder, String text) {
-        ANTLRInputStream inputStream = new ANTLRInputStream(text);
-        CSSLexer lex = new CSSLexer(inputStream);
-        //lex.addErrorListener(errorListener);
+        cssRegexLexer.setContent(text);
 
-        int lastEnd = 0;
-        for (Token token : lex.getAllTokens()) {
-            int spacer = token.getStartIndex() - lastEnd;
+        int lastKwEnd = 0;
+        RegexToken token;
 
-            if (spacer > 0) {
-                spansBuilder.add(Collections.emptyList(), spacer);
-            }
-
-            Collection<String> styleOfToken = getStyleOfToken(token);
-
-            if (!styleOfToken.isEmpty()) {
-                int gap = token.getStopIndex() - token.getStartIndex() + 1;
-                spansBuilder.add(styleOfToken, gap);
-
-                lastEnd = token.getStopIndex() + 1;
-            }
+        while ((token = cssRegexLexer.nextToken()) != null) {
+            spansBuilder.add(Collections.emptyList(), token.getStart() - lastKwEnd);
+            spansBuilder.add(Collections.singleton(token.getCode().toLowerCase()), token.getEnd() - token.getStart());
+            lastKwEnd = token.getEnd();
         }
 
-        lex.reset();
-        CSSParser cssParser = new CSSParser(new CommonTokenStream(lex));
-        cssParser.addErrorListener(errorListener);
-        cssParser.styleSheet();
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
     }
 }

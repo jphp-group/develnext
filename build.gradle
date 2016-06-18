@@ -56,47 +56,49 @@ allprojects {
 
 subprojects {
     if (it.name.startsWith("develnext-bundles")) {
-        def dirName = file(it.name).name;
-        def bundleDir = "${projectDir}/../../develnext/misc/library/bundles/${dirName}/";
+        if (file("$projectDir/.resource").exists()) {
+            def dirName = file(it.name).name;
+            def bundleDir = "${projectDir}/../../develnext/misc/library/bundles/${dirName}/";
 
-        clean {
-            delete bundleDir
-        }
+            clean {
+                delete bundleDir
+            }
 
-        jar {
-            doLast {
-                copy {
-                    from jar.archivePath
-                    from(configurations.runtime) {
-                        exclude '**/jphp-runtime-*.jar'
+            jar {
+                doLast {
+                    copy {
+                        from jar.archivePath
+                        from(configurations.runtime) {
+                            exclude '**/jphp-runtime-*.jar'
+                        }
+
+                        into bundleDir
                     }
 
-                    into bundleDir
-                }
+                    copy {
+                        from "$projectDir/.resource"
+                        into "$bundleDir/.."
+                        rename ".resource", "${dirName}.resource"
+                    }
 
-                copy {
-                    from "$projectDir/.resource"
-                    into "$bundleDir/.."
-                    rename ".resource", "${dirName}.resource"
-                }
+                    fileTree(bundleDir).visit { FileVisitDetails el ->
+                        def name = el.getName()
 
-                fileTree(bundleDir).visit { FileVisitDetails el ->
-                    def name = el.getName()
+                        if (name.endsWith(".jar")) {
+                            name = name.replaceAll(/(-[0-9]+|\.[0-9]+|-SNAPSHOT)/, "");
 
-                    if (name.endsWith(".jar")) {
-                        name = name.replaceAll(/(-[0-9]+|\.[0-9]+|-SNAPSHOT)/, "");
+                            if (!name.equals(el.getName())) {
+                                println "Rename '" + el.file.parent + "/" + name + "' file"
 
-                        if (!name.equals(el.getName())) {
-                            println "Rename '" + el.file.parent + "/" + name + "' file"
+                                def file = file(el.file.parent + "/" + name)
 
-                            def file = file(el.file.parent + "/" + name)
+                                if (file.exists()) {
+                                    file.delete()
+                                }
 
-                            if (file.exists()) {
-                                file.delete()
-                            }
-
-                            if (!el.file.renameTo(file)) {
-                                el.file.delete()
+                                if (!el.file.renameTo(file)) {
+                                    el.file.delete()
+                                }
                             }
                         }
                     }
@@ -207,6 +209,8 @@ project(':develnext') {
         //compile project(':develnext-bundles/dn-orientdb-bundle')
         provided project(':develnext-bundles/dn-jsoup-bundle')
         provided project(':develnext-bundles/dn-mail-bundle')
+        provided project(':develnext-bundles/dn-sql-bundle')
+        provided project(':develnext-bundles/dn-sqlite-bundle')
 
         // stubs.
         compile project(':develnext-stubs/dn-php-sdk')

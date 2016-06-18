@@ -137,7 +137,7 @@ class IdeLibrary
      */
     public function getResources($category)
     {
-        return (array)$this->resources[$category];
+        return (array) $this->resources[$category];
     }
 
     /**

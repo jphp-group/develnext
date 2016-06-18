@@ -50,6 +50,7 @@ class AutoComplete
     public function __construct(AbstractInspector $inspector)
     {
         $this->inspector = $inspector;
+        $this->globalRegion = new AutoCompleteRegion(0, 0);
     }
 
     /**

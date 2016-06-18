@@ -23,17 +23,21 @@ class ScriptManager
     /**
      * @param string $path
      * @param string $baseUri
+     * @param bool $loadScripts
      * @return array
+     * @throws IllegalStateException
      */
-    public function addFromIndex($path, $baseUri = '')
+    public function addFromIndex($path, $baseUri = '', $loadScripts = true)
     {
         $json = Json::fromFile($path);
 
         $result = [];
 
-        if ($json && $json['scripts']) {
-            foreach ($json['scripts'] as $path) {
-                $result[] = $this->addFromConfig($baseUri . $path);
+        if ($loadScripts) {
+            if ($json && $json['scripts']) {
+                foreach ($json['scripts'] as $path) {
+                    $result[] = $this->addFromConfig($baseUri . $path);
+                }
             }
         }
 

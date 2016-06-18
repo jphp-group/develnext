@@ -103,6 +103,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
         $this->project->on('save', [$this, 'doSave']);
         $this->project->on('open', [$this, 'doLoad']);
+        $this->project->on('close', [$this, 'doClose']);
         $this->project->on('preCompile', [$this, 'doPreCompile']);
         $this->project->on('makeSettings', [$this, 'doMakeSettings']);
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
@@ -116,6 +117,20 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         });
     }
 
+    public function doClose()
+    {
+        foreach ($this->bundles as $env => $bundles) {
+            /** @var AbstractBundle $bundle */
+            foreach ($bundles as $bundle) {
+                $bundle->onRemove($this->project);
+
+                foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
+                    $one->onRemove($this->project, $bundle);
+                }
+            }
+        }
+    }
+
     public function doSave()
     {
         fs::clean($this->project->getIdeFile('bundles/'), function ($filename) {
@@ -125,17 +140,6 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
             return false;
         });
-
-        $gradle = GradleProjectBehaviour::get();
-
-        // remove all bundles source dirs.
-        if ($gradle) {
-            $config = $gradle->getConfig();
-
-            foreach ($this->getPublicBundles() as $bundle) {
-                $config->removeSourceSet('main.resources.srcDirs', self::VENDOR_DIRECTORY . "/{$bundle->getVendorName()}");
-            }
-        }
 
         foreach ($this->bundles as $env => $group) {
             /** @var AbstractBundle $bundle */
@@ -148,12 +152,6 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
                 $bundle->onSave($this->project, $config);
                 $config->save();
-
-                if ($gradle && $env != Project::ENV_DEV) {
-                    $config = $gradle->getConfig();
-
-                    $config->addSourceSet('main.resources.srcDirs', self::VENDOR_DIRECTORY . "/{$bundle->getVendorName()}");
-                }
             }
         }
 
@@ -217,7 +215,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         $stat = $this->fileStat[FileUtils::hashName($filename)];
 
         $fTime = fs::time("$filename");
-        if ($fTime <= (int) $stat['time']) {
+        if ($fTime <= (int)$stat['time']) {
             //return false;
         }
 
@@ -237,6 +235,26 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     protected function doPreCompileUseImports($env, callable $log = null)
     {
+        $gradle = GradleProjectBehaviour::get();
+
+        if ($gradle) {
+            $config = $gradle->getConfig();
+
+            foreach ($this->getPublicBundles(true) as $bundle) {
+                $config->removeSourceSet('main.resources.srcDirs', self::VENDOR_DIRECTORY . "/{$bundle->getVendorName()}");
+            }
+
+            foreach ($this->fetchAllBundles($env) as $bundle) {
+                if ($gradle) {
+                    $config = $gradle->getConfig();
+
+                    $config->addSourceSet('main.resources.srcDirs', self::VENDOR_DIRECTORY . "/{$bundle->getVendorName()}");
+                }
+            }
+
+            $config->save();
+        }
+
         if ($this->getIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, true)) {
             $withSourceMap = Project::ENV_DEV == $env;
             static $prevImports = [];
@@ -266,7 +284,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                         $stat = $this->fileStat[FileUtils::hashName($filename)];
 
                         $fTime = fs::time("$filename");
-                        if ($fTime <= (int) $stat['time']) {
+                        if ($fTime <= (int)$stat['time']) {
                             //return;
                         }
 
@@ -447,15 +465,18 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
-     * @return AbstractBundle[]
+     * @param bool $hidden
+     * @return \ide\bundle\AbstractBundle[]
      */
-    public function getPublicBundles()
+    public function getPublicBundles($hidden = false)
     {
         $result = [];
 
         /** @var IdeLibraryBundleResource $resource */
         foreach (Ide::get()->getLibrary()->getResources('bundles') as $resource) {
-            $result[reflect::typeOf($resource->getBundle())] = $resource->getBundle();
+            if (!$resource->isHidden() || $hidden) {
+                $result[reflect::typeOf($resource->getBundle())] = $resource->getBundle();
+            }
         }
 
         return $result;
@@ -608,12 +629,12 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
             /** @var AbstractBundle $bundle */
             foreach ($bundles as $bundle) {
-                    $uiItem = new UXButton($bundle->getName());
-                    $uiItem->graphic = ico('bundle16');
-                    $uiItem->classes->add('dn-simple-button');
-                    $uiItem->tooltipText = $bundle->getDescription();
+                $uiItem = new UXButton($bundle->getName());
+                $uiItem->graphic = ico('bundle16');
+                $uiItem->classes->add('dn-simple-button');
+                $uiItem->tooltipText = $bundle->getDescription();
 
-                    $this->uiPackages->add($uiItem);
+                $this->uiPackages->add($uiItem);
             }
 
             $addButton = new UXButton();
