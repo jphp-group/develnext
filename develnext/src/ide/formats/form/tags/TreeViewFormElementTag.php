@@ -27,7 +27,7 @@ class TreeViewFormElementTag extends AbstractFormElementTag
         /** @var UXTreeView $node */
         $element->setAttribute('editable', $node->editable ? 'true' : 'false');
         $element->setAttribute('fixedCellSize', $node->fixedCellSize);
-        $element->setAttribute('rootVisible', $node->rootVisible ? 'true' : 'false');
+        $element->setAttribute('showRoot', $node->rootVisible ? 'true' : 'false');
         //$element->setAttribute('multipleSelection', $node->multipleSelection ? 'true' : 'false');
     }
 }
