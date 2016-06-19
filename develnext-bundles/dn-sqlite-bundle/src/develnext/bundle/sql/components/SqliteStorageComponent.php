@@ -22,7 +22,7 @@ class SqliteStorageComponent extends AbstractScriptComponent
 
     public function getIcon()
     {
-        return 'develnext/bundle/sql/storage16.png';
+        return 'develnext/bundle/sql/sdMemory16.png';
     }
 
     public function getIdPattern()

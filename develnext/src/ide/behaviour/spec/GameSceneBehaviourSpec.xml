@@ -22,5 +22,7 @@
                 <variant value="LEFT">Влево</variant>
             </variants>
         </property>
+
+        <property name="Кэшировать сцены" code="cacheScenes" editor="boolean" tooltip="Сохранять состояние ранее загруженных сцен не уничтожая их" />
     </properties>
 </behaviour>

@@ -9,11 +9,6 @@ use php\lang\IllegalStateException;
  * Class UXWindow
  * @package php\gui
  *
- * @property double $x
- * @property double $y
- * @property double $width
- * @property double $height
- * @property double $opacity
  * @property bool $focused
  */
 abstract class UXWindow
@@ -24,6 +19,31 @@ abstract class UXWindow
      * @var UXScene
      */
     public $scene;
+
+    /**
+     * @var double
+     */
+    public $x;
+
+    /**
+     * @var double
+     */
+    public $y;
+
+    /**
+     * @var double
+     */
+    public $width;
+
+    /**
+     * @var double
+     */
+    public $height;
+
+    /**
+     * @var double
+     */
+    public $opacity = 1.0;
 
     /**
      * --RU--

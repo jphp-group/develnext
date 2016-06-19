@@ -35,6 +35,11 @@ abstract class SqlClient extends AbstractScript
     public $catchErrors = true;
 
     /**
+     * @var int
+     */
+    public $transactionIsolation = 0;
+
+    /**
      * @return SqlConnection
      */
     abstract protected function buildClient();
@@ -58,6 +63,8 @@ abstract class SqlClient extends AbstractScript
     {
         if (!$this->isOpened()) {
             $this->client = $this->buildClient();
+            $this->client->transactionIsolation = $this->getTransactionIsolation();
+
             $this->closed = false;
             $this->trigger('open');
         }
@@ -127,6 +134,66 @@ abstract class SqlClient extends AbstractScript
     public function rollback()
     {
         $this->client->rollback();
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     *
+     * @throws SqlException
+     */
+    public function identifier($name)
+    {
+        return $this->client->identifier($name);
+    }
+
+    /**
+     * See SqlConnection::TRANSACTION_* constants.
+     *
+     * @return int
+     */
+    public function getTransactionIsolation()
+    {
+        return $this->transactionIsolation;
+    }
+
+    /**
+     * @param int $value
+     */
+    public function setTransactionIsolation($value)
+    {
+        $this->transactionIsolation = $value;
+
+        if ($this->client) {
+            $this->client->transactionIsolation = $value;
+        }
+    }
+
+    /**
+     * @non-getter
+     * @return array
+     */
+    public function getCatalogs()
+    {
+        return $this->client->getCatalogs();
+    }
+
+    /**
+     * @non-getter
+     * @return array
+     */
+    public function getMetaData()
+    {
+        return $this->client->getMetaData();
+    }
+
+    /**
+     * @non-getter
+     * @return array
+     */
+    public function getSchemas()
+    {
+        return $this->client->getSchemas();
     }
 
     public function __destruct()

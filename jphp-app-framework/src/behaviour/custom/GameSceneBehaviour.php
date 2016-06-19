@@ -39,6 +39,11 @@ class GameSceneBehaviour extends AbstractBehaviour
     public $gravityDirection = 'DOWN';
 
     /**
+     * @var bool
+     */
+    public $cacheScenes = false;
+
+    /**
      * @var UXGameScene
      */
     protected $scene;
@@ -47,6 +52,11 @@ class GameSceneBehaviour extends AbstractBehaviour
      * @var UXPane
      */
     protected $layout;
+
+    /**
+     * @var AbstractForm[]
+     */
+    protected $loadedScenes = [];
 
 
     public function getSort()
@@ -98,36 +108,62 @@ class GameSceneBehaviour extends AbstractBehaviour
         $this->scene->pause();
         $this->scene->clear();
 
-        if ($this->layout) {
+        if ($this->layout && !$this->cacheScenes) {
             $this->layout->children->clear();
         }
 
         /** @var AbstractForm $previousForm */
         static $previousForm = null;
 
-        if ($previousForm) {
+        if ($previousForm && !$this->cacheScenes) {
             $previousForm->free();
         }
 
-        $form = $previousForm = app()->getNewForm($name, null, false, false, true);
+        $form = null;
+        $cashed = false;
+
+        if ($this->cacheScenes) {
+            if ($form = $this->loadedScenes[$name]) {
+                $cashed = true;
+            }
+        }
+
+        if (!$form) {
+            $form = app()->getNewForm($name, null, false, false, true);
+        }
+
+        $previousForm = $form;
 
         $form->layout->data('--game-scene', $this);
 
         $layout = $form->layout;
 
         if ($this->_target instanceof UXWindow) {
-            $form->makeVirtualLayout();
+            if (!$cashed) {
+                $form->makeVirtualLayout();
+            }
+
             $this->_target->layout = $layout;
-            $form->loadBindings();
-            $form->loadBehaviours();
-            $form->loadClones();
+
+            if (!$cashed) {
+                $form->loadBindings();
+                $form->loadBehaviours();
+                $form->loadClones();
+            }
         } elseif ($this->_target instanceof UXGamePane) {
             $this->_target->loadArea($layout);
-            $form->loadBindings();
-            $form->loadBehaviours();
-            $form->loadClones();
+
+            if (!$cashed) {
+                $form->loadBindings();
+                $form->loadBehaviours();
+                $form->loadClones();
+            }
 
             $layout->requestFocus();
+        }
+
+        if ($this->cacheScenes) {
+            $this->loadedScenes[$name] = $form;
         }
 
         $this->layout = $layout;

@@ -22,6 +22,11 @@ class SqliteClient extends SqlClient
      */
     public $options = [];
 
+    function __construct()
+    {
+        $this->setTransactionIsolation(SqlConnection::TRANSACTION_SERIALIZABLE);
+    }
+
     /**
      * @return SqlConnection
      */

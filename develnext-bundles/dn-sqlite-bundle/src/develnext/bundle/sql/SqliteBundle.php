@@ -20,9 +20,8 @@ class SqliteBundle extends AbstractJarBundle
 
     function getDescription()
     {
-        return "Пакет для работы с базой данных SQLite";
+        return "Пакет для работы с базой данных SQLite 3";
     }
-
 
     public function isAvailable(Project $project)
     {
