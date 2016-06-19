@@ -255,7 +255,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             $config->save();
         }
 
-        if ($this->getIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, true)) {
+        if ($this->getIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, false)) {
             $withSourceMap = Project::ENV_DEV == $env;
             static $prevImports = [];
 
@@ -644,7 +644,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             });
             $this->uiPackages->add($addButton);
 
-            $this->uiUseImportCheckbox->selected = $this->getIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, true);
+            $this->uiUseImportCheckbox->selected = $this->getIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, false);
         }
     }
 
@@ -657,7 +657,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         $packages->hgap = $packages->vgap = 5;
         $this->uiPackages = $packages;
 
-        $this->uiUseImportCheckbox = $useImportCheckbox = new UXCheckbox("Добавлять use импорты классов");
+        $this->uiUseImportCheckbox = $useImportCheckbox = new UXCheckbox("Добавлять use импорты классов (устарело)");
         $this->uiUseImportCheckbox->on('mouseUp', [$this, 'doSave']);
         $useImportCheckbox->tooltipText = 'Добавлять во все исходники подключение классов через use из всех пакетов';
 
