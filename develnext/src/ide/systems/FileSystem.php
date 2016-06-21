@@ -344,7 +344,9 @@ class FileSystem
             $tab->on('closeRequest', function (UXEvent $e) use ($path, $editor) {
                 if (static::$previousEditor === $e->sender->userData) {
                     uiLater(function () {
-                        FileSystem::open('~project');
+                        if (Ide::project()) {
+                            FileSystem::open('~project');
+                        }
                     });
                 }
 

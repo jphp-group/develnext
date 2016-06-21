@@ -86,6 +86,7 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
         exclude('bin/develnext')
         exclude('tools/gradle/bin/gradle')
         exclude('tools/jre/bin/java')
+        exclude('tools/Launch4jLinux/launch4j')
     }
 
     from(installDir) {
@@ -94,6 +95,7 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
         include('bin/develnext')
         include('tools/gradle/bin/gradle')
         include('tools/jre/bin/java')
+        include('tools/Launch4jLinux/launch4j')
 
         fileMode = 0755
     }
@@ -136,12 +138,14 @@ task distPatch(dependsOn: ['clean', 'installDist']) {
 task distIdeWindows(dependsOn: ['distIde']) {
     doLast {
         delete "$project.buildDir/install/$project.name/tools/jreLinux"
+        delete "$project.buildDir/install/$project.name/tools/Launch4jLinux"
     }
 }
 
 task distIdeLinux(dependsOn: ['distIde']) {
     doLast {
         delete "$project.buildDir/install/$project.name/tools/jre"
+        delete "$project.buildDir/install/$project.name/tools/Launch4j"
         file("$project.buildDir/install/$project.name/tools/jreLinux").renameTo(file("$project.buildDir/install/$project.name/tools/jre"))
     }
 }
@@ -151,6 +155,11 @@ task distIde(dependsOn: ['installDist']) {
         if (System.properties['os.name'].toLowerCase().contains('windows')) {
             exec {
                 commandLine "$project.rootDir/develnext-tools/Launch4j/launch4jc.exe"
+                args "$project.rootDir/develnext/launcher/winLauncher.xml"
+            }
+        } else if (System.properties['os.name'].toLowerCase().contains('linux')) {
+            exec {
+                commandLine "$project.rootDir/develnext-tools/Launch4jLinux/launch4j"
                 args "$project.rootDir/develnext/launcher/winLauncher.xml"
             }
         }
@@ -204,6 +213,7 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
         exclude('bin/develnext')
         exclude('tools/gradle/bin/gradle')
         exclude('tools/jre/bin/java')
+        exclude('tools/Launch4jLinux/launch4j')
     }
 
     from(installDir) {
@@ -212,6 +222,7 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
         include('bin/develnext')
         include('tools/gradle/bin/gradle')
         include('tools/jre/bin/java')
+        include('tools/Launch4jLinux/launch4j')
 
         fileMode = 0755
     }

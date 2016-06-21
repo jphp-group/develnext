@@ -304,7 +304,11 @@ class Ide extends Application
 
     public function getLaunch4JProgram()
     {
-        $launch4jPath = new File($this->getToolPath(), '/Launch4j/launch4jc.exe');
+        if (Ide::get()->isWindows()) {
+            $launch4jPath = new File($this->getToolPath(), '/Launch4j/launch4jc.exe');
+        } else {
+            $launch4jPath = new File($this->getToolPath(), '/Launch4jLinux/launch4j');
+        }
 
         return $launch4jPath && $launch4jPath->exists() ? $launch4jPath->getCanonicalFile() : null;
     }
