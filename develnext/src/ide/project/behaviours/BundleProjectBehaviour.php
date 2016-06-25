@@ -531,6 +531,8 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         if (!$canRemove) {
             $this->bundlesCannotBeRemoved[$class] = $class;
         }
+
+        $this->project->clearIdeCache('bytecode');
     }
 
     /**
@@ -575,6 +577,8 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $this->bundles = $newBundles;
+
+        $this->project->clearIdeCache('bytecode');
     }
 
     /**

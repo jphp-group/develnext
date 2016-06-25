@@ -1,5 +1,6 @@
 <?php
 namespace php\gui\framework;
+use Error;
 use php\framework\Logger;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;
@@ -213,7 +214,8 @@ abstract class AbstractModule extends AbstractScript
             return $this->_context->{$name}(...$args);
         }
 
-        throw new \Error("Unable to call " . get_class($this) . "::" . $name . "() method");
+        $class = 'Error';
+        throw new $class("Unable to call " . get_class($this) . "::" . $name . "() method");
     }
 
     public function loadForm($form, $saveSize = false, $savePosition = false)

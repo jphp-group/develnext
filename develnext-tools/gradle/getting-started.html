@@ -146,7 +146,10 @@ h3, h4, h5, h6 {
 
 .text-container,
 div.book,
-div.chapter {
+div.chapter,
+div.part,
+div.appendix,
+div.glossary {
   margin-left: 10px;
   margin-right: 10px;
 }
@@ -430,6 +433,14 @@ div.toc p b {
     font-weight: normal;
 }
 
+.chapter > .toc {
+    margin-bottom: 1em;
+}
+
+.chapter > .toc > dl {
+    margin-left: 1.5em;
+}
+
 /*
  * HEADER/FOOTER
  */
@@ -496,26 +507,63 @@ div.example code.filename {
   font-weight: bold;
 }
 
-        </style></head><body><div class="chapter"><div class="titlepage"><div><div><h1 xmlns:xslthl="http://xslthl.sf.net"><a name="installation"></a>Installing Gradle</h1></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10007"></a>Prerequisites</h2></div></div></div><p>Gradle requires a Java JDK or JRE to be installed, version 6 or higher (to check, use <strong class="userinput"><code>java -version</code></strong>).
+/* Clickable links on section headers */
+h2 > a.section-anchor, h3 > a.section-anchor, h4 > a.section-anchor {
+    background-image: url("icon-link.svg");
+    background-repeat: no-repeat;
+    background-position: 0em 105%;  /* 105% works well for published docs */
+    background-size: 0.9em;
+    display: inline-block;
+    text-decoration: none !important;
+    width: 0.9em;
+    height: 0.9em;
+    margin-left: -0.9em;
+    visibility: hidden;
+}
+
+/* This is a similar approach to the one immediately
+   above, but using a Unicode character rather than
+   an SVG image. It's the approach currently taken by
+   Asciidoctor.
+
+   I'm leaving it here in case someone wants to switch
+   back to using a character rather than an image.
+
+h2 > a:before, h3 > a:before, h4 > a:before {
+    content: "\00A7";
+    display: inline-block;
+    font-size: 90%;
+}
+*/
+
+h2:hover > a.section-anchor, h2 > a.section-anchor:hover,
+h3:hover > a.section-anchor, h3 > a.section-anchor:hover,
+h4:hover > a.section-anchor, h4 > a.section-anchor:hover {
+    border: inherit;
+    visibility: visible;
+}
+
+        </style></head><body><div class="chapter"><div class="titlepage"><div><div><h1 xmlns:xslthl="http://xslthl.sf.net"><a name="installation"></a>Installing Gradle</h1></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10007" class="section-anchor" href="#N10007"></a>Prerequisites</h2></div></div></div><p>Gradle requires a Java JDK or JRE to be installed, version 6 or higher (to check, use <strong class="userinput"><code>java -version</code></strong>).
     	Gradle ships with its own Groovy library, therefore Groovy does not need to be installed. Any existing Groovy installation is ignored by Gradle.
     </p><p>Gradle uses whatever JDK it finds in your path.
         Alternatively, you can set the <code class="envar">JAVA_HOME</code> environment variable to point to the installation directory
         of the desired JDK.
-    </p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10014"></a>Download</h2></div></div></div><p>You can download one of the Gradle distributions from the <a class="ulink" href="http://www.gradle.org/downloads" target="_top">Gradle web site</a>.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N1001D"></a>Unpacking</h2></div></div></div><p>The Gradle distribution comes packaged as a ZIP. The full distribution contains:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><p>The Gradle binaries.</p></li><li class="listitem"><p>The user guide (HTML and PDF).</p></li><li class="listitem"><p>The DSL reference guide.</p></li><li class="listitem"><p>The API documentation (Javadoc and Groovydoc).</p></li><li class="listitem"><p>Extensive samples, including the examples referenced in the user guide, along with some complete and more
+    </p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10014" class="section-anchor" href="#N10014"></a>Download</h2></div></div></div><p>You can download one of the Gradle distributions from the <a class="ulink" href="http://www.gradle.org/downloads" target="_top">Gradle web site</a>.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N1001D" class="section-anchor" href="#N1001D"></a>Unpacking</h2></div></div></div><p>The Gradle distribution comes packaged as a ZIP. The full distribution contains:</p><div class="itemizedlist"><ul class="itemizedlist"><li class="listitem"><p>The Gradle binaries.</p></li><li class="listitem"><p>The user guide (HTML and PDF).</p></li><li class="listitem"><p>The DSL reference guide.</p></li><li class="listitem"><p>The API documentation (Javadoc and Groovydoc).</p></li><li class="listitem"><p>Extensive samples, including the examples referenced in the user guide, along with some complete and more
             complex builds you can use as a starting point for your own build.
         </p></li><li class="listitem"><p>The binary sources. This is for reference only. If you want to build Gradle you need to download the source distribution
             or checkout the sources from the source repository. See the <a class="ulink" href="http://www.gradle.org/development" target="_top">Gradle web site</a> for details.
-        </p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10039"></a>Environment variables</h2></div></div></div><p>For running Gradle, add <code class="filename"><em class="replaceable"><code>GRADLE_HOME</code></em>/bin</code> to your <code class="envar">PATH</code>
-    environment variable. Usually, this is sufficient to run Gradle.
-</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10046"></a>Running and testing your installation</h2></div></div></div><p>You run Gradle via the <span class="command"><strong>gradle</strong></span> command. To check if Gradle is properly installed just type
+        </p></li></ul></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10039" class="section-anchor" href="#N10039"></a>Environment variables</h2></div></div></div><p>For running Gradle, firstly add the environment variable <code class="envar">GRADLE_HOME</code>. This should point to the unpacked files from the 
+    Gradle website. Next add <code class="filename"><em class="replaceable"><code>GRADLE_HOME</code></em>/bin</code> to your <code class="envar">PATH</code> environment variable. 
+    Usually, this is sufficient to run Gradle.
+</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10049" class="section-anchor" href="#N10049"></a>Running and testing your installation</h2></div></div></div><p>You run Gradle via the <span class="command"><strong>gradle</strong></span> command. To check if Gradle is properly installed just type
 <span class="command"><strong>gradle -v</strong></span>. The output shows the Gradle version and also the local environment configuration (Groovy, JVM version, OS, etc.).
     The displayed Gradle version should match the distribution you have downloaded.
-</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10051"></a>JVM options</h2></div></div></div><p>JVM options for running Gradle can be set via environment variables. You can use either <code class="envar">GRADLE_OPTS</code>
+</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10054" class="section-anchor" href="#N10054"></a>JVM options</h2></div></div></div><p>JVM options for running Gradle can be set via environment variables. You can use either <code class="envar">GRADLE_OPTS</code>
 or <code class="envar">JAVA_OPTS</code>, or both. <code class="envar">JAVA_OPTS</code> is by convention an environment
 variable shared by many Java applications. A typical use case would be to set the HTTP proxy in <code class="envar">JAVA_OPTS</code>
 and the memory options in <code class="envar">GRADLE_OPTS</code>. Those variables can also be set at the beginning
 of the <span class="command"><strong>gradle</strong></span> or <span class="command"><strong>gradlew</strong></span> script.
-</p><p>Note that it's not currently possible to set JVM options for Gradle on the command line.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N1006D"></a>Getting help</h2></div></div></div><p>You might check the user guide at <code class="filename"><em class="replaceable"><code>GRADLE_HOME</code></em>/docs/userguide/userguide.html</code>.
+</p><p>Note that it's not currently possible to set JVM options for Gradle on the command line.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title"><a name="N10070" class="section-anchor" href="#N10070"></a>Getting help</h2></div></div></div><p>You might check the user guide at <code class="filename"><em class="replaceable"><code>GRADLE_HOME</code></em>/docs/userguide/userguide.html</code>.
 It is also available on the <a class="ulink" href="http://www.gradle.org/documentation.html" target="_top">Gradle web site</a>.
 Typing <span class="command"><strong>gradle help</strong></span> prints the command line help. Typing <span class="command"><strong>gradle tasks</strong></span> shows all the
 tasks of a Gradle build.

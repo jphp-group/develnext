@@ -11,7 +11,7 @@
    <children>
       <VBox layoutX="10.0" layoutY="10.0" prefHeight="65.0" prefWidth="578.0" style="-fx-background-color: white;" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0">
          <children>
-            <Label prefHeight="35.0" text="Доступ ограничен" textFill="#486aa8">
+            <Label prefHeight="35.0" text="Доступ ограничен" textFill="#486aa8" id="title">
                <font>
                   <Font name="Tahoma" size="28.0" />
                </font>

@@ -240,8 +240,10 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         if (memories[0].isNull()) {
             getWrappedObject().add((T) Memory.unwrap(environment, memories[1]));
         } else {
-            environment.exception("Unable to modify the list");
+            insert(environment, memories[0].toInteger(), memories[1]);
+            removeByIndex(environment, memories[0].toInteger() + 1);
         }
+
         return Memory.NULL;
     }
 

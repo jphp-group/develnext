@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox id="content" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+              spacing="5.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox id="nonSyncPane" alignment="CENTER_LEFT" prefHeight="35.0" spacing="10.0">
+                    <children>
+                        <Button id="shareButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false"
+                                text="Загрузить">
+                            <padding>
+                                <Insets left="15.0" right="15.0"/>
+                            </padding>
+                            <styleClass>
+                                <String fx:value="icon-upload"/>
+                                <String fx:value="flat-button"/>
+                            </styleClass>
+                        </Button>
+                        <Label text="Вы можете загрузить проект на develnext.org и поделиться ссылкой на него"
+                               textFill="#616161"/>
+                    </children>
+                </HBox>
+                <VBox id="syncPane" spacing="5.0">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="35.0" spacing="10.0">
+                            <children>
+                                <Button id="uploadButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false"
+                                        text="Загрузить изменения">
+                                    <padding>
+                                        <Insets left="15.0" right="15.0"/>
+                                    </padding>
+                                    <styleClass>
+                                        <String fx:value="icon-upload"/>
+                                        <String fx:value="flat-button"/>
+                                    </styleClass>
+                                </Button>
+                                <Button id="сontrolButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Настройки">
+                                    <padding>
+                                        <Insets left="15.0" right="15.0"/>
+                                    </padding>
+                                    <styleClass>
+                                        <String fx:value="icon-settings"/>
+                                        <String fx:value="flat-button"/>
+                                    </styleClass>
+                                </Button>
+                                <Separator orientation="VERTICAL"/>
+                                <Hyperlink id="urlLink" text="http://develnext.org/project/foobar123">
+                                    <font>
+                                        <Font size="18.0"/>
+                                    </font>
+                                </Hyperlink>
+                                <Button id="copyButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false"
+                                        text="">
+                                    <styleClass>
+                                        <String fx:value="icon-copy"/>
+                                        <String fx:value="flat-button"/>
+                                    </styleClass>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+        </VBox>
+    </children>
+</AnchorPane>

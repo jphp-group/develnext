@@ -1,17 +1,25 @@
 <?php
 
 /**
+ * Returns a random number from $from (include) and $to (include).
+ * --RU--
+ * Возвращает случайное число от $from (включительно) до $to (включительно).
+ * @param int $from
+ * @param int $to
+ * @return int
+ */
+function rand($from, $to)
+{
+}
+
+/**
  * (PHP 4, PHP 5)<br/>
  * Absolute value
  * @link http://php.net/manual/en/function.abs.php
  * @param mixed $number <p>
  * The numeric value to process
  * </p>
- * @return number The absolute value of number. If the
- * argument number is
- * of type float, the return type is also float,
- * otherwise it is integer (as float usually has a
- * bigger value range than integer).
+ * @return number
  */
 function abs ($number) {}
 

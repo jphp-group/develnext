@@ -34,12 +34,12 @@ class GradleProjectBehaviour extends AbstractProjectBehaviour
     public function doOpen()
     {
         FileUtils::deleteDirectory($this->project->getFile("build/"));
-        $this->config->startDaemon();
+        //$this->config->startDaemon();
     }
 
     public function doClose()
     {
-        $this->config->stopDaemon();
+        //$this->config->stopDaemon();
     }
 
     public function doExport(ProjectExporter $exporter)

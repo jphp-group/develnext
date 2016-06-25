@@ -181,6 +181,30 @@ class GradleBuildConfig
         $this->plugins[$name] = $plugin;
     }
 
+    /**
+     * @return string[]
+     */
+    public function getRepositories()
+    {
+        return $this->repositories;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDirectoryRepositories()
+    {
+        $result = [];
+
+        foreach ($this->getRepositories() as $name => $value) {
+            if ($name != $value) {
+                $result[] = $value;
+            }
+        }
+
+        return $result;
+    }
+
     public function addRepository($name, $value = null)
     {
         $this->repositories[$name] = $value === null ? $name : $value;
@@ -199,6 +223,14 @@ class GradleBuildConfig
     public function removeSourceSet($name, $value)
     {
         unset($this->sourceSets[$name][$value]);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSourceSets($name)
+    {
+        return $this->sourceSets[$name];
     }
 
     public function addSourceSet($name, $value)

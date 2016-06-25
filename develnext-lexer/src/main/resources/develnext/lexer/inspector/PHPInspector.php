@@ -37,7 +37,7 @@ class PHPInspector extends AbstractInspector
 {
     protected $typeNameRegex = '([a-z_\\x7f-\\xff][\\|\\[\\]a-z\\\\0-9_\\x7f-\\xff]+)';
     protected $typeNameRegexDyn = '([a-z_\\x7f-\\xff\\$][\\$\\|\\[\\]a-z\\\\0-9_\\x7f-\\xff]+)';
-    protected $simpleTypes = ['null', 'string', 'int', 'bool', 'float', 'double', 'boolean', 'integer', 'void', 'false', 'true', 'array', 'callable', 'mixed', 'object'];
+    protected $simpleTypes = ['null', 'string', 'int', 'bool', 'float', 'double', 'boolean', 'integer', 'void', 'false', 'true', 'array', 'callable', 'mixed', 'object', 'number'];
     protected $extensions = ['php'];
 
     public function loadSource($path)
@@ -169,6 +169,7 @@ class PHPInspector extends AbstractInspector
         }
 
         $data['content'] = $this->parseDescription($comment);
+        $data['deprecated'] = str::contains($comment, '@deprecated');
 
         return $data;
     }
@@ -252,6 +253,7 @@ class PHPInspector extends AbstractInspector
         }
 
         $data['non-getter'] = str::contains($comment, '@non-getter');
+        $data['deprecated'] = str::contains($comment, '@deprecated');
         $data['hidden'] = str::contains($comment, '@hidden');
 
         $data['content'] = $this->parseDescription($comment);
@@ -296,6 +298,7 @@ class PHPInspector extends AbstractInspector
         }
 
         $data['hidden'] = str::contains($comment, '@hidden');
+        $data['deprecated'] = str::contains($comment, '@deprecated');
         $data['content'] = $this->parseDescription($comment);
 
         return $data;

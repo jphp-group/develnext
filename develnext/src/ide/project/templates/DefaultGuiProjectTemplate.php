@@ -5,6 +5,8 @@ use ide\project\AbstractProjectTemplate;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\behaviours\PhpProjectBehaviour;
+use ide\project\behaviours\RunBuildProjectBehaviour;
+use ide\project\behaviours\ShareProjectBehaviour;
 use ide\project\Project;
 
 /**
@@ -46,6 +48,14 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
         if (!$project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
             $project->register(new GuiFrameworkProjectBehaviour(), false);
         }
+
+        if (!$project->hasBehaviour(RunBuildProjectBehaviour::class)) {
+            $project->register(new RunBuildProjectBehaviour(), false);
+        }
+
+        if (!$project->hasBehaviour(ShareProjectBehaviour::class)) {
+            $project->register(new ShareProjectBehaviour(), false);
+        }
     }
 
     /**
@@ -58,6 +68,8 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
         $project->register(new BundleProjectBehaviour());
         $project->register(new PhpProjectBehaviour());
         $project->register(new GuiFrameworkProjectBehaviour());
+        $project->register(new RunBuildProjectBehaviour());
+        $project->register(new ShareProjectBehaviour());
 
         $project->setIgnoreRules([
             '*.log', '*.tmp'

@@ -83,6 +83,7 @@ class CommonProjectControlPane extends AbstractProjectControlPane
     /**
      * @param UXNode $node
      * @param bool $prepend
+     * @return UXVBox|UXNode
      */
     public function addSettingsPane(UXNode $node, $prepend = true)
     {
@@ -104,6 +105,8 @@ class CommonProjectControlPane extends AbstractProjectControlPane
             $this->content->add($pane);
             $this->content->add(new UXSeparator());
         }
+
+        return $pane;
     }
 
     /**

@@ -154,8 +154,6 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
         $result = [];
 
         if (in_array($this->kind, ['~any'])) {
-            $bundle = BundleProjectBehaviour::get();
-
             $result['__CLASS__'] = new ConstantAutoCompleteItem('__CLASS__');
             $result['__METHOD__'] = new ConstantAutoCompleteItem('__METHOD__');
             $result['__FUNCTION__'] = new ConstantAutoCompleteItem('__FUNCTION__');
@@ -165,6 +163,10 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
             $result['__LINE__'] = new ConstantAutoCompleteItem('__LINE__');
 
             foreach ($this->inspector->getTypes() as $type) {
+                if ($type->data['deprecated']) {
+                    continue;
+                }
+
                 $import = $type->fulledName;
                 $name = fs::name($import);
                 $description = $import;

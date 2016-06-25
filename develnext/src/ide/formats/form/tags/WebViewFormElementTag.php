@@ -28,5 +28,12 @@ class WebViewFormElementTag extends AbstractFormElementTag
         }
 
         $element->removeAttribute('style');
+        $element->removeAttribute('styleClass');
+
+        $find = $element->find('./styleClass');
+
+        if ($find) {
+            $element->removeChild($find);
+        }
     }
 }

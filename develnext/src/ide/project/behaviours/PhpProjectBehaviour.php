@@ -129,6 +129,8 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
             Logger::warn("Unable to add the generated src directory to build.gradle file");
         }
 
+        $this->project->clearIdeCache('bytecode');
+
         $this->refreshInspector();
     }
 
@@ -141,8 +143,21 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $this->refreshInspector();
     }
 
-    public function doPreCompile()
+    public function doPreCompile($env, callable $log = null)
     {
+        $directory = $this->project->getFile(self::SOURCES_DIRECTORY);
+
+        fs::scan($directory, function ($filename) use ($directory, $log) {
+            $name = FileUtils::relativePath($directory, $filename);
+
+            if (fs::ext($name) == 'php') {
+                if ($log) $log(":clear $name");
+                $this->project->clearIdeCache(fs::pathNoExt($name) . '.phb');
+            }
+        });
+
+        $this->project->clearIdeCache('bytecode/app');
+
         fs::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) {
             if (fs::ext($filename) == 'phb') {
                 fs::delete($filename);

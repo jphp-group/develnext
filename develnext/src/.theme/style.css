@@ -1,8 +1,8 @@
 .root {
 }
 
-.flat-button { -fx-background-color: white; }
-.flat-button:hover { -fx-background-color: #ececec; }
+.flat-button { -fx-background-color: #f1f1f1; }
+.flat-button:hover { -fx-background-color: #e6e6e6; }
 
 /* icons .. */
 .icon-flat-edit { -fx-graphic: url("/.data/img/icons/flatEdit16.png"); }
@@ -45,6 +45,7 @@
 .icon-upload { -fx-graphic: url("/.data/img/icons/upload16.png"); }
 .icon-library { -fx-graphic: url("/.data/img/icons/library16.png"); }
 .icon-square { -fx-graphic: url("/.data/img/icons/square16.png"); }
+.icon-control-panel { -fx-graphic: url("/.data/img/icons/controlPanel16.png"); }
 
 .icon-refresh { -fx-graphic: url("/.data/img/icons/refresh16.png"); }
 .icon-refresh32 { -fx-graphic: url("/.data/img/icons/refresh32.png"); }

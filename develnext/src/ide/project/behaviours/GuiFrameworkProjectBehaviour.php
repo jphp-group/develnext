@@ -138,14 +138,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         WatcherSystem::addListener([$this, 'doWatchFile']);
 
-        $buildProjectCommand = new BuildProjectCommand();
-        $buildProjectCommand->register(new WindowsApplicationBuildType());
-        $buildProjectCommand->register(new SetupWindowsApplicationBuildType());
-        $buildProjectCommand->register(new OneJarBuildType());
-
-        Ide::get()->registerCommand(new ExecuteProjectCommand());
-        Ide::get()->registerCommand($buildProjectCommand);
-
         Ide::get()->registerCommand(new CreateFormProjectCommand());
         Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
         //Ide::get()->registerCommand(new CreateFactoryProjectCommand());

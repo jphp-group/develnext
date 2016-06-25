@@ -42,14 +42,14 @@ class KeydownEventAdapter extends AbstractEventAdapter
         switch ($param) {
             case 'anydigit':
                 return function (UXKeyEvent $event) use ($param, $handler) {
-                    if (Str::contains('0123456789', $event->codeName)) {
+                    if (Str::contains('0123456789', $event->codeName) && str::length($event->codeName) == 1) {
                         $handler($event);
                     }
                 };
 
             case 'anyletter':
                 return function (UXKeyEvent $event) use ($param, $handler) {
-                    if (Str::contains('qwertyuiopasdfghjklzxcvbnm', Str::lowerFirst($event->codeName)[0])) {
+                    if (Str::contains('qwertyuiopasdfghjklzxcvbnm', Str::lowerFirst($event->codeName)[0]) && str::length($event->codeName) == 1) {
                         $handler($event);
                     }
                 };

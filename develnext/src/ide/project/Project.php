@@ -24,6 +24,7 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\ThreadPool;
 use php\lib\arr;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use php\time\Time;
@@ -454,6 +455,21 @@ class Project
     public function getIdeFile($name)
     {
         return new File($this->getIdeDir(), "/$name");
+    }
+
+    /**
+     * @param string $group
+     * @return bool
+     */
+    public function clearIdeCache($group = '')
+    {
+        $file = $this->getIdeFile("cache/$group");
+
+        if ($file->isFile()) {
+            return fs::delete($file);
+        } else {
+            return FileUtils::deleteDirectory($file);
+        }
     }
 
     /**

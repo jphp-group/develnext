@@ -91,7 +91,13 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
      */
     public function getConstants(AutoComplete $context, AutoCompleteRegion $region)
     {
-        return [];
+        $result = [];
+
+        foreach ($this->class->constants as $one) {
+            $result[$one->name] = new ConstantAutoCompleteItem($one->name, $one->value, $one->name);
+        }
+
+        return $result;
     }
 
     protected function getTypeProperties(TypeEntry $type, $context = '', $parentContext = null, callable $filter)
@@ -163,7 +169,7 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
         }
 
         foreach ($type->extends as $one) {
-            if (!$one->data['weak'] && !$one->data['interface']) {
+            if (!$one->data['interface']) {
                 $t = $this->inspector->findType($one->type);
 
                 if ($t) {
@@ -231,8 +237,10 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                 }
             }
 
+            var_dump($method);
+
             if ($method->modifier != 'PUBLIC') {
-                if ($type->data['public'] || !str::equalsIgnoreCase($currentClass, $context)) {
+                if (!str::equalsIgnoreCase($currentClass, $context)) {
                     continue;
                 }
 
@@ -244,19 +252,17 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
             $result[$method->name] = PhpCompleteUtils::methodAutoComplete2($method, !$parentContext);
         }
 
-        if (!$type->data['weak']) {
-            foreach ($type->extends as $one) {
-                $t = $this->inspector->findType($one->type);
+        foreach ($type->extends as $one) {
+            $t = $this->inspector->findType($one->type);
 
-                if ($t) {
-                    foreach ($this->getTypeMethods($t, $context, $currentClass) as $name => $prop) {
-                        if (!$result[$name]) {
-                            $result[$name] = $prop;
-                        }
+            if ($t) {
+                foreach ($this->getTypeMethods($t, $context, $currentClass) as $name => $prop) {
+                    if (!$result[$name]) {
+                        $result[$name] = $prop;
                     }
-                } else {
-                    Logger::warn("Unable to find '$one->type' class");
                 }
+            } else {
+                Logger::warn("Unable to find '$one->type' class");
             }
         }
 

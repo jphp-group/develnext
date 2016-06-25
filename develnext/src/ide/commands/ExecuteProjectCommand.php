@@ -7,6 +7,7 @@ use ide\forms\BuildProgressForm;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
+use ide\project\behaviours\RunBuildProjectBehaviour;
 use ide\project\Project;
 use ide\project\ProjectConsoleOutput;
 use ide\systems\ProjectSystem;
@@ -17,12 +18,14 @@ use php\gui\framework\ScriptEvent;
 use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\gui\UXRichTextArea;
+use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
 use php\lang\Process;
 use php\lang\Thread;
 use php\lang\ThreadPool;
+use php\lib\arr;
 use php\lib\number;
 use php\lib\Str;
 use php\time\Time;
@@ -41,13 +44,23 @@ class ExecuteProjectCommand extends AbstractCommand
     /** @var Process */
     protected $process;
 
-    function __construct()
+    /**
+     * @var RunBuildProjectBehaviour
+     */
+    protected $behaviour;
+
+    /**
+     * @param RunBuildProjectBehaviour $behaviour
+     */
+    function __construct(RunBuildProjectBehaviour $behaviour)
     {
         Ide::get()->on('closeProject', function () {
             if ($this->isRunning()) {
                 $this->onStopExecute();
             }
         }, __CLASS__);
+
+        $this->behaviour = $behaviour;
     }
 
     public function getName()
@@ -183,12 +196,7 @@ class ExecuteProjectCommand extends AbstractCommand
         $appPidFile = $project->getFile("application.pid");
         $appPidFile->delete();
 
-
-        $this->process = new Process(
-            [$ide->getGradleProgram(), 'run', '-Dfile.encoding=UTF-8', '--daemon'],
-            $project->getRootDir(),
-            $ide->makeEnvironment()
-        );
+        $project->trigger('execute');
 
         if ($project) {
             $this->processDialog = $dialog = new BuildProgressForm();
@@ -209,8 +217,22 @@ class ExecuteProjectCommand extends AbstractCommand
                 Ide::get()->getMainForm()->hideBottom();
             }, __CLASS__);
 
-            ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'gradle run', function () use ($dialog) {
+            ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'java -cp ... php.runtime.launcher.Launcher', function () use ($dialog, $project, $ide) {
                 try {
+                    $classPaths = arr::toList($this->behaviour->getSourceDirectories(), $this->behaviour->getLibraries(['jar']));
+
+                    $args = ['java', '-cp', str::join($classPaths, File::PATH_SEPARATOR), 'php.runtime.launcher.Launcher', '-Dfile.encoding=UTF-8'];
+
+                    Logger::debug("Run -> " . str::join($args, ' '));
+
+                    //$args = [$ide->getGradleProgram(), 'run', '-Dfile.encoding=UTF-8', '--daemon'];
+
+                    $this->process = new Process(
+                        $args,
+                        $project->getRootDir(),
+                        $ide->makeEnvironment()
+                    );
+
                     $this->process = $this->process->start();
                     $dialog->watchProcess($this->process);
 

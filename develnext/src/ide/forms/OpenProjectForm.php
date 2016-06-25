@@ -176,8 +176,8 @@ class OpenProjectForm extends AbstractIdeForm
         $this->modality = 'APPLICATION_MODAL';
         $this->title = 'Открыть проект';
 
-        Ide::accountManager()->on('login', [$this, 'updateShared']);
-        Ide::accountManager()->on('logout', [$this, 'updateShared']);
+        Ide::accountManager()->bind('login', [$this, 'updateShared']);
+        Ide::accountManager()->bind('logout', [$this, 'updateShared']);
     }
 
     protected function sharedCellFactory(array $item)

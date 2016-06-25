@@ -125,7 +125,9 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
                 }
 
                 if (token instanceof BreakStmtToken || token instanceof SemicolonToken || token instanceof NewExprToken || token instanceof ColonToken
-                        || token instanceof CommentToken || token instanceof ReturnStmtToken || token instanceof CaseStmtToken) {
+                        || token instanceof CommentToken || token instanceof ReturnStmtToken || token instanceof CaseStmtToken
+                        || token instanceof ExtendsStmtToken || token instanceof ImplementsStmtToken || token instanceof ClassStmtToken || token instanceof InterfaceStmtToken
+                        || token instanceof TraitStmtToken || token instanceof AsStmtToken) {
                     break;
                 }
 

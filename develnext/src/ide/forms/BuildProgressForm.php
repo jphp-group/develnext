@@ -347,6 +347,11 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
         $exitValue = $process->getExitValue();
         $this->processDone = true;
 
+        uiLater(function () use ($exitValue) {
+            $this->addConsoleLine("");
+            $this->addConsoleLine("Process shutdown, exit code = $exitValue.", 'blue');
+        });
+
         UXApplication::runLater(function() {
             if ($this->progress) {
                 $this->progress->progress = 1;
