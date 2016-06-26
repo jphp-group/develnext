@@ -5,6 +5,7 @@ use php\format\JsonProcessor;
 use php\framework\Logger;
 use php\gui\framework\Application;
 use php\gui\UXApplication;
+use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\ClassLoader;
@@ -14,6 +15,7 @@ use php\lang\SourceMap;
 use php\lib\fs;
 use php\lib\str;
 use php\time\Time;
+use php\util\Scanner;
 
 define('DEVELNEXT_PROJECT_DEBUG', true);
 
@@ -43,6 +45,11 @@ class DebugClassLoader extends ClassLoader
     protected $threadPool;
 
     /**
+     * @var array
+     */
+    protected $ignoreCacheFiles = [];
+
+    /**
      * DebugClassLoader constructor.
      */
     public function __construct()
@@ -53,7 +60,40 @@ class DebugClassLoader extends ClassLoader
             $this->cacheDir = null;
         }
 
-        $this->threadPool = \php\lang\ThreadPool::create(1, 5, 30 * 1000);
+        $this->threadPool = \php\lang\ThreadPool::create(1, 5, 7 * 1000);
+
+        $this->readCacheIgnore();
+    }
+
+    protected function readCacheIgnore()
+    {
+        $file = new File($this->cacheDir, "bytecode/.cacheignore");
+
+        if ($file->isFile()) {
+            try {
+                $scanner = new Scanner($stream = Stream::of($file), 'UTF-8');
+                while ($scanner->hasNextLine()) {
+                    $line = str::trim($scanner->nextLine());
+
+                    if ($line) {
+                        $this->ignoreCacheFiles[$line] = 1;
+                    }
+                }
+            } catch (IOException $e) {
+                echo "[WARN] Unable to load .cacheignore, {$e->getMessage()}";
+            } finally {
+                if (isset($stream)) {
+                    $stream->close();
+                }
+            }
+        } else {
+            echo "[DEBUG] Skip load .cacheignore file.";
+        }
+    }
+
+    protected function isIgnore($name)
+    {
+        return $this->ignoreCacheFiles["$name.php"];
     }
 
     public function __destruct()
@@ -70,7 +110,7 @@ class DebugClassLoader extends ClassLoader
         $t = Time::millis();
         $filenameEncoded = null;
 
-        if ($this->cacheDir) {
+        if ($this->cacheDir && !$this->isIgnore($name)) {
             $filenameEncoded = $this->cacheDir . "bytecode/$name.phb";
 
             if (fs::isFile($filenameEncoded)) {
@@ -93,7 +133,7 @@ class DebugClassLoader extends ClassLoader
             $module = new Module($filename);
             $module->call();
 
-            if ($filenameEncoded) {
+            if ($filenameEncoded && !$this->isIgnore($name)) {
                 if (fs::ensureParent($filenameEncoded)) {
                     $module->dump($filenameEncoded);
                 }

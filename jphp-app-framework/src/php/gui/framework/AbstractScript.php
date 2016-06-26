@@ -4,6 +4,7 @@ namespace php\gui\framework;
 use php\gui\UXForm;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
+use php\lib\reflect;
 use php\util\Scanner;
 use php\xml\DomDocument;
 use php\xml\DomElement;
@@ -201,7 +202,7 @@ abstract class AbstractScript
             return;
         }
 
-        throw new \Exception("Unable to set the '$name' property");
+        throw new \Exception("Unable to set the '$name' property of class " . reflect::typeOf($this));
     }
 
     public function __get($name)

@@ -30,6 +30,10 @@ class Instances implements Countable, Iterator, ArrayAccess
         $this->instances = $instances;
     }
 
+    /**
+     * @param $name
+     * @param $value
+     */
     public function __set($name, $value)
     {
         foreach ($this->instances as $instance) {
@@ -37,6 +41,10 @@ class Instances implements Countable, Iterator, ArrayAccess
         }
     }
 
+    /**
+     * @param $name
+     * @return Instances
+     */
     public function __get($name)
     {
         $result = [];
@@ -48,6 +56,11 @@ class Instances implements Countable, Iterator, ArrayAccess
         return new Instances($result);
     }
 
+    /**
+     * @param $name
+     * @param array $args
+     * @return array
+     */
     public function __call($name, array $args)
     {
         $result = [];

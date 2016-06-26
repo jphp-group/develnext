@@ -1,7 +1,6 @@
 ide\commands\MyAccountCommand
 ide\commands\NewProjectCommand
 ide\commands\OpenProjectCommand
-ide\commands\ShareProjectCommand
 ide\commands\SaveProjectCommand
 ide\commands\ExportProjectCommand
 ide\commands\SaveProjectForLibraryCommand

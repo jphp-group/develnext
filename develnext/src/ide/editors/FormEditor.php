@@ -1392,6 +1392,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $area = new UXAnchorPane();
         $area->classes->add('FormEditor');
+        //$area->backgroundColor = 'green';
 
         $viewer = new UXScrollPane($area);
 
@@ -1415,8 +1416,37 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         } else {
             $this->markerNode = $this->layout;
 
-            $this->layout->style = '-fx-border-width: 1px; -fx-border-style: none; -fx-border-color: silver;';
-            $this->layout->position = [10, 10];
+            $this->layout->style = '-fx-border-width: 0px; -fx-border-style: none; -fx-border-color: silver;';
+            $this->layout->backgroundColor = '#F7F7F7';
+            //$this->layout->position = [10, 10];
+            //$this->layout->size = $area->size;
+            //UXAnchorPane::setAnchor($this->layout, 0);
+
+            uiLater(function () use ($area, $viewer) {
+                $area->minWidth = $viewer->viewportBounds['width'];
+                $area->minHeight = $viewer->viewportBounds['height'];
+            });
+
+            $viewer->observer('width')->addListener(function () use ($viewer, $area) {
+                $viewer->hbarPolicy = 'NEVER';
+
+                uiLater(function () use ($viewer, $area) {
+                    $area->minWidth = $this->layout->width = $viewer->viewportBounds['width'];
+
+                    $viewer->hbarPolicy = 'AS_NEEDED';
+                });
+            });
+
+            $viewer->observer('height')->addListener(function () use ($viewer, $area) {
+                $viewer->vbarPolicy = 'NEVER';
+
+                uiLater(function () use ($viewer, $area) {
+                    $area->minHeight = $this->layout->height = $viewer->viewportBounds['height'];
+
+                    $viewer->vbarPolicy = 'AS_NEEDED';
+                });
+            });
+
             $area->add($this->layout);
         }
 

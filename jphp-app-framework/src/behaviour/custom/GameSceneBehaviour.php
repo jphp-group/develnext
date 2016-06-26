@@ -101,6 +101,11 @@ class GameSceneBehaviour extends AbstractBehaviour
         Logger::info("Game Scene initialized.");
     }
 
+    /**
+     * @var AbstractForm
+     */
+    protected $previousForm = null;
+
     public function loadScene($name)
     {
         Logger::info("Game Scene loading '$name' ...");
@@ -112,8 +117,7 @@ class GameSceneBehaviour extends AbstractBehaviour
             $this->layout->children->clear();
         }
 
-        /** @var AbstractForm $previousForm */
-        static $previousForm = null;
+        $previousForm = $this->previousForm;
 
         if ($previousForm && !$this->cacheScenes) {
             $previousForm->free();
@@ -132,7 +136,7 @@ class GameSceneBehaviour extends AbstractBehaviour
             $form = app()->getNewForm($name, null, false, false, true);
         }
 
-        $previousForm = $form;
+        $this->previousForm = $previousForm = $form;
 
         $form->layout->data('--game-scene', $this);
 

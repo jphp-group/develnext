@@ -449,7 +449,9 @@ abstract class AbstractForm extends UXForm
 
         foreach ($this->_modules as $module) {
             if (!$module->singleton) {
-                $module->apply($this);
+                uiLater(function () use ($module) {
+                    $module->apply($this);
+                });
             }
         }
     }
@@ -774,6 +776,7 @@ abstract class AbstractForm extends UXForm
             }
         }
 
-        throw new \Error("Unable to call " . get_class($this) . "::" . $name . "() method");
+        $class = 'Error';
+        throw new $class("Unable to call " . get_class($this) . "::" . $name . "() method");
     }
 }

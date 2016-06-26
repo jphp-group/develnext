@@ -21,6 +21,7 @@ use php\compress\ArchiveEntry;
 use php\compress\ArchiveInputStream;
 use php\framework\Logger;
 use php\io\File;
+use php\io\IOException;
 use php\io\Stream;
 use php\lang\Environment;
 use php\lib\arr;
@@ -93,11 +94,16 @@ class PHPInspector extends AbstractInspector
     {
         $archive = new ArchiveInputStream('zip', $path);
         $entries = [];
-        while ($entry = $archive->nextEntry()) {
-            $entries[] = $entry;
-        }
-        $archive->close();
 
+        try {
+            while ($entry = $archive->nextEntry()) {
+                $entries[] = $entry;
+            }
+        } catch (IOException $e) {
+            return;
+        }
+
+        $archive->close();
 
         $archive = new ArchiveInputStream('zip', $path);
 

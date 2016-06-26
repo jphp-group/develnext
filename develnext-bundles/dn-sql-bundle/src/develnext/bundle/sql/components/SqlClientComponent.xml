@@ -1,17 +1,18 @@
 <element extends="ide\scripts\elements\AbstractComponent">
     <init>
-        <property code="file" value="example.db" />
         <property code="autoOpen" value="1" />
         <property code="catchErrors" value="1" />
         <property code="transactionIsolation" value="8" />
+
+        <property code="autoCommit" value="1" />
     </init>
 
-    <properties group="general">
-        <property code="file" name="Файл" editor="text" tooltip="Относительный или полный путь к файлу, значение :memory: для базы в памяти." />
+    <properties group="general" title="Главное" sort="1000">
         <property code="autoOpen" name="Авто-открытие" editor="boolean" tooltip="Автоматически открывать базу при смене источника" />
         <property code="options" name="Опции" editor="text" tooltip="Список опций, каждая опция на отдельной строке, формат как name=value" />
         <property code="logSql" name="Логировать SQL" editor="boolean" tooltip="Логировать все SQL запросы к базе" />
         <property code="catchErrors" name="Игнорировать ошибки" editor="boolean" tooltip="Если опция включения, компонент не будет кидать исключения Exception" />
+        <property code="autoCommit" name="Авто-коммит" editor="boolean" tooltip="Автоматически оборачивать все запросы в транзакцию и сразу коммитить их." />
         <property code="transactionIsolation" name="Тип транзакций" editor="enum" tooltip="Тип изоляции транзакций">
             <variants>
                 <variant value="0">NONE</variant>

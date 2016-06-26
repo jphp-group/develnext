@@ -238,6 +238,23 @@ class ScriptModuleEditor extends FormEditor
         $this->reindex();
     }
 
+    protected function updateEmptyLabel()
+    {
+        if ($this->manager->getComponents()) {
+            if ($label = $this->layout->lookup('#empty-title')) {
+                $label->free();
+            }
+        } else {
+            $label = new UXLabel('Добавьте сюда компонентов для модуля.');
+            $label->classes->add('dn-title');
+            $label->textColor = 'gray';
+            $label->mouseTransparent = true;
+            $label->id = 'empty-title';
+
+            $this->layout->add($label);
+        }
+    }
+
     public function load()
     {
         $this->loadOthers();
@@ -250,10 +267,9 @@ class ScriptModuleEditor extends FormEditor
         }
 
         $this->layout = new UXAnchorPane();
-        $this->layout->padding = 3;
-        $this->layout->minSize = [800, 600];
-        $this->layout->size = [800, 600];
-        $this->layout->css('background-color', 'white');
+        //$this->layout->minSize = [800, 600];
+        //$this->layout->size = [800, 600];
+        //$this->layout->css('background-color', 'white');
 
         $files = File::of($this->file)->findFiles();
 
@@ -266,6 +282,8 @@ class ScriptModuleEditor extends FormEditor
                 }
             }
         }
+
+        $this->updateEmptyLabel();
     }
 
     public function changeNodeId($container, $newId)
@@ -334,7 +352,9 @@ class ScriptModuleEditor extends FormEditor
 
     protected function makeDesigner($fullArea = true)
     {
-        return parent::makeDesigner(true);
+        $pane = parent::makeDesigner(true);
+        $this->designer->snapSizeX = $this->designer->snapSizeY = 16;
+        return $pane;
     }
 
     public function deleteNode($node)
@@ -376,6 +396,8 @@ class ScriptModuleEditor extends FormEditor
         $this->leftPaneUi->refreshObjectTreeList();
 
         $this->reindex();
+
+        $this->updateEmptyLabel();
     }
 
     public function getModules()
@@ -481,6 +503,7 @@ class ScriptModuleEditor extends FormEditor
         $this->leftPaneUi->refreshObjectTreeList($this->getNodeId($node));
         $this->save();
 
+        $this->updateEmptyLabel();
         return $node;
     }
 

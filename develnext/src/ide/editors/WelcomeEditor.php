@@ -10,6 +10,11 @@ use php\gui\UXNode;
 
 class WelcomeEditor extends AbstractEditor
 {
+    public function isCloseable()
+    {
+        return false;
+    }
+
     public function getTitle()
     {
         return 'Welcome';

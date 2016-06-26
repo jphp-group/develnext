@@ -458,12 +458,26 @@ class Project
     }
 
     /**
+     * @param string $name
+     * @return File
+     */
+    public function getIdeCacheFile($name)
+    {
+        return $this->getIdeFile("cache/$name");
+    }
+
+    /**
      * @param string $group
      * @return bool
      */
     public function clearIdeCache($group = '')
     {
-        $file = $this->getIdeFile("cache/$group");
+        $file = $this->getIdeCacheFile($group);
+
+        if (!fs::exists($file)) {
+            Logger::info("Skip clear cache: $file");
+            return false;
+        }
 
         if ($file->isFile()) {
             return fs::delete($file);

@@ -94,7 +94,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             }
         });
 
-        foreach ($this->getPublicBundles() as $bundle) {
+        foreach ($this->getPublicBundles(true) as $bundle) {
             IdeSystem::getLoader()->addClassPath($bundle->getVendorDirectory());
         }
 
@@ -521,11 +521,11 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             $bundle = $this->makeBundle($class);
             $this->bundles[$env][$class] = $bundle;
 
-            $bundle->onAdd($this->project);
-
             foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
                 $one->onAdd($this->project, $bundle);
             }
+
+            $bundle->onAdd($this->project);
         }
 
         if (!$canRemove) {

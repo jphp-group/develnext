@@ -17,6 +17,7 @@ use php\gui\UXNodeWrapper;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
+use php\lib\arr;
 use php\lib\str;
 use php\xml\DomElement;
 use php\xml\DomNode;
@@ -101,6 +102,14 @@ class AbstractFactory
         $instances = $this->prototypeInstances[$name];
 
         return new Instances((array) $instances);
+    }
+
+    /**
+     * @return Instances
+     */
+    public function getAllInstances()
+    {
+        return new Instances( arr::toList($this->prototypeInstances) );
     }
 
     protected function makeNode($id)

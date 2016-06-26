@@ -410,11 +410,14 @@ class Application
             if ($json && ($modules = $json['modules'])) {
                 foreach ($modules as $type) {
                     /** @var AbstractModule $module */
-                    $module = new $type();
+                    $module = new $type(true);
 
-                    if ($module->singleton) {
-                        $this->modules[$module->id] = $module;
-                        $module->apply($this);
+                    if ($module->id == 'AppModule') {
+                        $this->appModule = new $type();
+                    } else {
+                        if ($module->singleton) {
+                            $this->modules[$module->id] = new $type();
+                        }
                     }
                 }
             }
@@ -477,21 +480,19 @@ class Application
 
             $this->mainForm = $mainFormClass ? $this->getForm($mainFormClass, $mainForm) : null;
 
+            if ($this->appModule) {
+                $this->appModule->apply($this);
+            }
+
+            foreach ($this->modules as $module) {
+                $module->apply($this);
+            }
+
             if ($showMainForm && $this->mainForm) {
                 $this->mainForm->show();
             }
 
             $this->launched = true;
-
-            foreach ($this->modules as $module) {
-                if ($module->applyToApplication || $module->id == 'AppModule') {
-                    $this->appModule = $module;
-
-                    UXApplication::runLater(function () use ($module) {
-                        $module->apply($this);
-                    });
-                }
-            }
 
             if ($after) {
                 $after();

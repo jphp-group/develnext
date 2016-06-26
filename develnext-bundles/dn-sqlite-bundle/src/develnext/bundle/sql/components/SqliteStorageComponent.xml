@@ -7,6 +7,7 @@
     <properties group="general">
         <property code="path" name="Источник" editor="text" tooltip="Имя или путь к файлу, ресурсу или url" />
         <property code="autoSave" name="Автосохранение" editor="boolean" tooltip="Сохранять данные сразу при любых изменениях" />
+
     </properties>
 
     <eventTypes>

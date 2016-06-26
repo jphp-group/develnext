@@ -25,6 +25,11 @@ class FormNamedBlock extends UXAnchorPane
     protected $icon;
 
     /**
+     * @var UXLabel
+     */
+    protected $label;
+
+    /**
      * FormNamedBlock constructor.
      * @param $title
      * @param $icon
@@ -34,28 +39,46 @@ class FormNamedBlock extends UXAnchorPane
         parent::__construct();
 
         $this->maxSize = $this->minSize = $this->size = [32, 32];
-        $this->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-background-color: silver; -fx-border-radius: 3px; cursor: hand;';
+        $this->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-background-color: #DCDCDC; -fx-border-radius: 3px; cursor: hand;';
 
         $label = new UXLabel($title);
         $label->id = 'title';
         $label->padding = [2, 5];
-        $label->style = '-fx-border-width: 1px; -fx-border-color: gray; -fx-background-color: white; -fx-border-style: dashed; cursor: hand;';
+        $label->style = '-fx-background-color: #DCDCDC; -fx-border-color: silver; cursor: hand; -fx-border-radius: 2px;';
         $label->mouseTransparent = true;
 
-        $this->add($label);
+        $this->label = $label;
+        //$this->add($label);
 
         $this->setIcon($icon);
         $this->setTitle($title);
 
-        $this->watch('width', function () use ($label) {
-            $centerX = $this->width / 2;
+        $hUpdater = function ($old, $new) {
+            $this->updateLabelX();
+            if ($new < 0) { $this->x = 0; }
+        };
 
-            $width = $label->font->calculateTextWidth($label->text) + 5 * 2;
-            $label->x = round($centerX - $width / 2);
-        });
+        $vUpdater = function ($old, $new) use ($label) {
+            $this->updateLabelY();
+            if ($new < 0) { $this->y = 0; }
+        };
 
-        $this->watch('height', function () use ($label) {
-            $label->y = $this->height + 7;
+        $this->observer('layoutX')->addListener($hUpdater);
+
+        $this->observer('layoutY')->addListener($vUpdater);
+
+        $this->observer('parent')->addListener(function ($old, $new) use ($label, $vUpdater, $hUpdater) {
+            if ($new) {
+                $new->add($label);
+                uiLater(function () {
+                    $this->updateLabelY();
+                    $this->updateLabelX();
+                });
+            } else {
+                uiLater(function () use ($label) {
+                    $label->free();
+                });
+            }
         });
 
         $mouseUp = function () {
@@ -66,6 +89,19 @@ class FormNamedBlock extends UXAnchorPane
 
         $label->on('click', $mouseUp);
         $this->on('click', $mouseUp);
+    }
+
+    protected function updateLabelX()
+    {
+        $centerX = $this->x + $this->width / 2;
+
+        $width = $this->label->font->calculateTextWidth($this->label->text) + 5 * 2;
+        $this->label->x = round($centerX - $width / 2);
+    }
+
+    protected function updateLabelY()
+    {
+        $this->label->y = $this->y + $this->height + 7;
     }
 
     /**
@@ -84,13 +120,11 @@ class FormNamedBlock extends UXAnchorPane
         $this->title = $title;
 
         /** @var UXLabel $label */
-        $label = $this->lookup('#title');
+        $label = $this->label;
         $label->text = $title;
 
-        $centerX = $this->width / 2;
-
-        $width = $label->font->calculateTextWidth($label->text) + 5 * 2;
-        $label->x = round($centerX - $width / 2);
+        $this->updateLabelX();
+        $this->updateLabelY();
     }
 
     /**
@@ -121,7 +155,7 @@ class FormNamedBlock extends UXAnchorPane
             $icon->id = 'icon';
             $icon->style = 'cursor: hand;';
             $icon->mouseTransparent = true;
-            $icon->position = [8, 8];
+            $icon->position = [$this->minWidth / 2 - $icon->width / 2, $this->minHeight / 2 - $icon->height / 2];
 
             $icon->on('mouseUp', function () {
                 $this->parent->requestFocus();
