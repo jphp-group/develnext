@@ -5,9 +5,12 @@ use ide\systems\IdeSystem;
 use php\io\Stream;
 use php\lang\Environment;
 use php\lang\IllegalArgumentException;
+use php\lang\Thread;
+use php\lang\ThreadPool;
 use php\lib\char;
 use php\lib\Str;
 use php\time\Time;
+use php\util\Shared;
 
 /**
  * Class Logger
@@ -48,6 +51,10 @@ class Logger
     const LEVEL_INFO = 100;
     const LEVEL_DEBUG = 200;
 
+    /**
+     * @var ThreadPool
+     */
+    protected static $threadPool = null;
     protected static $level = self::LEVEL_DEBUG;
 
     protected static function withColor($str, $color)
@@ -120,7 +127,15 @@ class Logger
             }
 
             if (Ide::isCreated()) {
-                Stream::putContents($file, $line, 'a+');
+                $sync = Shared::value(__CLASS__ . '#logfile');
+
+                if (self::$threadPool) {
+                    self::$threadPool->execute(function () use ($sync, $file, $line) {
+                        $sync->synchronize(function () use ($file, $line) {
+                            Stream::putContents($file, $line, 'a+');
+                        });
+                    });
+                }
             }
         }
     }
@@ -175,6 +190,7 @@ class Logger
 
         ob_implicit_flush(true);
 
+        self::$threadPool = ThreadPool::createSingle();
         Environment::current()->onOutput(function ($output) {
             $out = Stream::of('php://stdout');
             $out->write($output);
@@ -185,5 +201,11 @@ class Logger
                 Stream::putContents($file, $output, 'a+');
             }
         });
+    }
+
+    public static function shutdown()
+    {
+        self::$threadPool->shutdown();
+        self::$threadPool = null;
     }
 }

@@ -221,7 +221,7 @@ class ExecuteProjectCommand extends AbstractCommand
                 try {
                     $classPaths = arr::toList($this->behaviour->getSourceDirectories(), $this->behaviour->getLibraries(['jar']));
 
-                    $args = ['java', '-cp', str::join($classPaths, File::PATH_SEPARATOR), 'php.runtime.launcher.Launcher', '-Dfile.encoding=UTF-8'];
+                    $args = ['javaw', '-cp', str::join($classPaths, File::PATH_SEPARATOR), '-Dfile.encoding=UTF-8', 'php.runtime.launcher.Launcher'];
 
                     Logger::debug("Run -> " . str::join($args, ' '));
 

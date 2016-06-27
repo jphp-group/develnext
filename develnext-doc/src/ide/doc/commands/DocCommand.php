@@ -36,6 +36,11 @@ class DocCommand extends AbstractCommand
         return 'icons/help16.png';
     }
 
+    public function getAccelerator()
+    {
+        return 'F1';
+    }
+
     protected function makeSearchInputUi()
     {
         $input = new UXTextField();
@@ -50,10 +55,10 @@ class DocCommand extends AbstractCommand
     public function makeUiForRightHead()
     {
         $button = $this->makeGlyphButton();
-        $button->text = $this->getName();
+        //$button->text = $this->getName();
         $button->maxHeight = 999;
         //$button->style = '-fx-font-weight: bold;';
-        $button->padding = [0, 15];
+        $button->width = 35;
 
         $searchButton = new UXButton();
         $searchButton->classes->addAll(['icon-flat-search']);
@@ -89,7 +94,7 @@ class DocCommand extends AbstractCommand
 
         $searchButton->on('action', $searchHandle);
 
-        $ui = new UXHBox([$searchButton, $input, $button]);
+        $ui = new UXHBox([$input, $searchButton, $button]);
         $ui->spacing = 5;
         $ui->fillHeight = true;
 

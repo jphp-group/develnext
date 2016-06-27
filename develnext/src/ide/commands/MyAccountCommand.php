@@ -103,7 +103,8 @@ class MyAccountCommand extends AbstractCommand
     {
         $btn = $this->makeGlyphButton();
         $btn->text = $this->getName();
-        $btn->font = UXFont::of($btn->font->family, $btn->font->size, 'BOLD');
+        $btn->font = $btn->font->withBold(); //UXFont::of($btn->font->family, $btn->font->size, 'BOLD');
+        $btn->classes->addAll(['flat-button']);
 
         $this->accountButton = $btn;
         $this->accountLabel = new UXLabel();

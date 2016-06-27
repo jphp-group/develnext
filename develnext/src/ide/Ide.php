@@ -1002,7 +1002,7 @@ class Ide extends Application
             $commands[] = $command;
         }
 
-        arr::sort($commands, function (AbstractCommand $a, AbstractCommand $b) {
+        $commands = arr::sort($commands, function (AbstractCommand $a, AbstractCommand $b) {
             if ($a->getPriority() == $b->getPriority()) { return 0; }
             if ($a->getPriority() < $b->getPriority()) { return 1; }
             return -1;
@@ -1173,6 +1173,7 @@ class Ide extends Application
 
         Logger::info("Finish IDE shutdown");
         try {
+            Logger::shutdown();
             parent::shutdown();
         } catch (\Exception $e) {
             //System::halt(0);
