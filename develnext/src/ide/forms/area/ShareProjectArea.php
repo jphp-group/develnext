@@ -7,11 +7,13 @@ use ide\forms\SharedProjectDetailForm;
 use ide\Ide;
 use ide\Logger;
 use ide\ui\Notifications;
+use ide\utils\TimeUtils;
 use php\gui\framework\AbstractFormArea;
 use php\gui\layout\UXVBox;
 use php\gui\UXCheckbox;
 use php\gui\UXClipboard;
 use php\gui\UXHyperlink;
+use php\gui\UXLabel;
 use php\gui\UXNode;
 
 /**
@@ -20,6 +22,7 @@ use php\gui\UXNode;
  *
  * @property UXVBox $content
  * @property UXHyperlink $urlLink
+ * @property UXLabel $updatedAtLabel
  * @property UXNode $syncPane
  * @property UXCheckbox $autoSyncCheckbox
  * @property UXNode $nonSyncPane
@@ -31,9 +34,15 @@ class ShareProjectArea extends AbstractFormArea
 
     protected $data;
 
-    public function __construct()
+    /**
+     * @var callable
+     */
+    protected $doRefresh;
+
+    public function __construct(callable $refreshCallback)
     {
         parent::__construct();
+        $this->doRefresh = $refreshCallback;
 
         $this->_syncPane = $this->syncPane;
         $this->_nonSyncPane = $this->nonSyncPane;
@@ -53,6 +62,7 @@ class ShareProjectArea extends AbstractFormArea
             if ($this->data['canWrite'] || !isset($this->data['canWrite'])) {
                 $this->content->add($this->_syncPane);
 
+                $this->updatedAtLabel->text = TimeUtils::getUpdateAt($data['updatedAt']);
                 $this->setUrl(Ide::service()->getEndpoint() . $data['shareUrl']);
             } else {
                 $this->content->add($this->_nonSyncPane);
@@ -97,6 +107,8 @@ class ShareProjectArea extends AbstractFormArea
         $project = Ide::project();
         $project->save();
 
+        $this->showPreloader('Загружаем проект на develnext.org ...');
+
         $file = Ide::get()->createTempFile('.zip');
 
         $project->export($file);
@@ -114,6 +126,8 @@ class ShareProjectArea extends AbstractFormArea
                 });
 
                 if (!$silent) {
+                    $this->refresh();
+
                     uiLater(function () {
                         Notifications::show('Проект перезалит', 'Проект был успешно перезалит в общую базу проектов');
                     });
@@ -133,6 +147,8 @@ class ShareProjectArea extends AbstractFormArea
                     }
                 }
             }
+
+            $this->hidePreloader();
         });
     }
 
@@ -146,6 +162,26 @@ class ShareProjectArea extends AbstractFormArea
         }
 
         $this->reUpload();
+    }
+
+    /**
+     * @event сontrolButton.action
+     */
+    public function doControlAction()
+    {
+        $form = new SharedProjectDetailForm($this->data['uid']);
+        $form->showAndWait();
+
+        $this->refresh();
+    }
+
+    /**
+     * ...
+     */
+    public function refresh()
+    {
+        $refresh = $this->doRefresh;
+        $refresh();
     }
 
     /**
@@ -186,8 +222,6 @@ class ShareProjectArea extends AbstractFormArea
 
                         uiLater(function () use ($response) {
                             $this->setData($response->data());
-                            $dialog = new SharedProjectDetailForm($response->data()['uid'], true);
-                            $dialog->showAndWait();
                         });
                     } else {
                         Logger::error("Unable to update project {$response->toLog()}");

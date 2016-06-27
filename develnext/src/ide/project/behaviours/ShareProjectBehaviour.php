@@ -11,6 +11,7 @@ use ide\Ide;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
 use ide\ui\Notifications;
+use ide\utils\TimeUtils;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXHyperlink;
@@ -18,6 +19,7 @@ use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXParent;
 use php\net\URL;
+use php\time\Time;
 
 class ShareProjectBehaviour extends AbstractProjectBehaviour
 {
@@ -79,7 +81,6 @@ class ShareProjectBehaviour extends AbstractProjectBehaviour
 
             if ( Ide::accountManager()->isAuthorized() ) {
                 $this->uiSettings->add($this->uiSyncPane);
-                $this->uiSyncPane->setAutoSync($this->getIdeConfigValue('autoSync', true));
 
                 $uid = Ide::project()->getIdeServiceConfig()->get('projectArchive.uid');
 
@@ -87,7 +88,7 @@ class ShareProjectBehaviour extends AbstractProjectBehaviour
                     $this->projectService->getAsync($uid, function (ServiceResponse $response) {
                         if ($response->isSuccess()) {
                             $this->data = $response->data();
-                            $this->uiSyncPane->setData($response->data());
+                            $this->uiSyncPane->setData($data = $response->data());
                         } else {
                             $this->uiSyncPane->setData(null);
                             $this->data = $response->data();
@@ -107,7 +108,7 @@ class ShareProjectBehaviour extends AbstractProjectBehaviour
         $title = new UXLabel('Синхронизация с ');
         $title->font = $title->font->withBold();
 
-        $colon = new UXLabel(':');
+        $colon = new UXLabel(': ');
         $colon->font = $colon->font->withBold();
 
         $url = new URL(Ide::service()->getEndpoint());
@@ -120,7 +121,7 @@ class ShareProjectBehaviour extends AbstractProjectBehaviour
         $this->uiAuthPane = $authPane = new NeedAuthPane();
         $authPane->setTitle('Синхронизация недоступна');
 
-        $this->uiSyncPane = $syncPane = new ShareProjectArea();
+        $this->uiSyncPane = $syncPane = new ShareProjectArea([$this, 'doUpdateSettings']);
 
         Ide::accountManager()->bind('login', [$this, 'doUpdateSettings']);
         Ide::accountManager()->bind('logout', [$this, 'doUpdateSettings']);

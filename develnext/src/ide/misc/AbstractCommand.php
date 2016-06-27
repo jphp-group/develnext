@@ -27,6 +27,14 @@ abstract class AbstractCommand
         return get_class($this);
     }
 
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return 10000;
+    }
+
     public function withBeforeSeparator()
     {
         return false;

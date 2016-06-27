@@ -9,6 +9,7 @@ include 'jphp-gui-ext',
         'develnext';
 
 include 'develnext-doc';
+include 'develnext-store';
 include 'develnext-control';
 include 'develnext-lexer';
 

@@ -62,6 +62,7 @@ class MainForm extends AbstractIdeForm
 
         $mainMenu = $this->mainMenu; // FIX!!!!! see FixSkinMenu
 
+        $this->headRightPane->spacing = 5;
        // $this->contentSplit->items->removeByIndex(1); // TODO implement bottom slider.
 
         $pane = UXTabPane::createDefaultDnDPane();

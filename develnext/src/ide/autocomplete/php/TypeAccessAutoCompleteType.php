@@ -93,9 +93,11 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
     {
         $result = [];
 
-        foreach ($this->class->constants as $one) {
-            $result[$one->name] = new ConstantAutoCompleteItem($one->name, $one->value, $one->name);
-        }
+        /*if ($this->class) {
+            foreach ($this->class->constants as $one) {
+                $result[$one->name] = new ConstantAutoCompleteItem($one->name, $one->value, $one->name);
+            }
+        }*/
 
         return $result;
     }

@@ -1,5 +1,6 @@
 <?php
 namespace ide\project\control;
+use php\gui\layout\UXScrollPane;
 use php\gui\UXNode;
 use php\gui\UXLoader;
 use php\gui\framework\AbstractForm;
@@ -65,6 +66,7 @@ class CommonProjectControlPane extends AbstractProjectControlPane
     {
         $loader = new UXLoader();
         $ui = $loader->load(Stream::of(AbstractForm::DEFAULT_PATH . 'blocks/_ProjectTab.fxml'));
+        $ui->maxWidth = 99999;
 
         $binder = new EventBinder($ui, $this);
         $binder->setLookup(function (UXNode $context, $id) {
@@ -77,7 +79,11 @@ class CommonProjectControlPane extends AbstractProjectControlPane
         $this->projectNameLabel = $ui->lookup('#projectNameLabel');
         $this->projectDirLabel = $ui->lookup('#projectDirLabel');
 
-        return $ui;
+        $pane = new UXScrollPane($ui);
+        $pane->padding = 0;
+        $pane->fitToWidth = true;
+
+        return $pane;
     }
 
     /**

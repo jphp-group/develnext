@@ -337,7 +337,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
         if ($token instanceof MethodStmtToken) {
             if ($owner != null) {
-                $vars['this'] = 1;
+                $vars['this'] = $owner->getFulledName();
 
                 $region->setValue([
                     'name' => 'this',
@@ -349,11 +349,12 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
         }
 
         foreach ($token->getArguments() as $arg) {
-            $vars[$arg->getName()] = 1;
+            $type = $arg->getHintType() ? str::lower($arg->getHintType()) : ($arg->getHintTypeClass() ? $arg->getHintTypeClass()->getName() : 'mixed');
+            $vars[$arg->getName()] = $type;
 
             $this->complete->setValueOfRegion([
                 'name' => $arg->getName(),
-                'type' => $arg->getHintType() ? str::lower($arg->getHintType()) : ($arg->getHintTypeClass() ? $arg->getHintTypeClass()->getName() : 'mixed')
+                'type' => $type,
             ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
         }
 
@@ -371,8 +372,8 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                         $type = SyntaxAnalyzer::getRealName($type, $owner ? $owner : $token, 'CLASS');
                     }
 
-                    if (!$vars[$varName]) {
-                        $vars[$varName] = 1;
+                    if (!$vars[$varName] || $vars[$varName] == 'mixed') {
+                        $vars[$varName] = $type;
 
                         $region->setValue([
                             'name' => $varName,
@@ -392,8 +393,8 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                         $type = SyntaxAnalyzer::getRealName($type, $owner ? $owner : $token, 'CLASS');
                     }
 
-                    if (!$vars[$varName]) {
-                        $vars[$varName] = 1;
+                    if (!$vars[$varName] || $vars[$varName] == 'mixed') {
+                        $vars[$varName] = $type;
 
                         $region->setValue([
                             'name' => $varName,
@@ -408,14 +409,14 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                 while ($r->find()) {
                     $varName = $r->group(1);
 
-                    if (!$vars[$varName]) {
+                    if (!$vars[$varName] || $vars[$varName] == 'mixed') {
                         $expression = $r->group(2);
 
                         $types = $this->complete->identifyType("; " . $expression . "->", $region);
 
                         foreach ($types as $type) {
                             if (str::startsWith($type, "~dynamic ")) {
-                                $vars[$varName] = 1;
+                                $vars[$varName] = str::sub($type, 9);
 
                                 $region->setValue([
                                     'name' => $varName,
@@ -435,12 +436,14 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                     $varName = $r->group(2);
                     $type = $r->group(1);
 
+                    if ($type == 'global' || $type == 'static' || $type == 'as') continue;
+
                     if ($type && $type[0] != '\\') {
                         $type = SyntaxAnalyzer::getRealName($type, $owner ? $owner : $token, 'CLASS');
                     }
 
-                    if (!$vars[$varName]) {
-                        $vars[$varName] = 1;
+                    if (!$vars[$varName] || $vars[$varName] == 'mixed') {
+                        $vars[$varName] = $type ?: 'mixed';
 
                         $region->setValue([
                             'name' => $varName,

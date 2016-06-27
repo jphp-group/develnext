@@ -45,7 +45,7 @@ class FormNamedBlock extends UXAnchorPane
         $label->id = 'title';
         $label->padding = [2, 5];
         $label->style = '-fx-background-color: #DCDCDC; -fx-border-color: silver; cursor: hand; -fx-border-radius: 2px;';
-        $label->mouseTransparent = true;
+       // $label->mouseTransparent = true;
 
         $this->label = $label;
         //$this->add($label);
@@ -70,6 +70,7 @@ class FormNamedBlock extends UXAnchorPane
         $this->observer('parent')->addListener(function ($old, $new) use ($label, $vUpdater, $hUpdater) {
             if ($new) {
                 $new->add($label);
+
                 uiLater(function () {
                     $this->updateLabelY();
                     $this->updateLabelX();
@@ -84,6 +85,8 @@ class FormNamedBlock extends UXAnchorPane
         $mouseUp = function () {
             UXApplication::runLater(function () {
                 $this->parent->requestFocus();
+                $this->updateLabelX();
+                $this->updateLabelY();
             });
         };
 
@@ -162,5 +165,8 @@ class FormNamedBlock extends UXAnchorPane
             });
             $this->add($icon);
         }
+
+        $this->updateLabelY();
+        $this->updateLabelX();
     }
 }

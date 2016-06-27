@@ -52,7 +52,7 @@ class DocCommand extends AbstractCommand
         $button = $this->makeGlyphButton();
         $button->text = $this->getName();
         $button->maxHeight = 999;
-        $button->style = '-fx-font-weight: bold;';
+        //$button->style = '-fx-font-weight: bold;';
         $button->padding = [0, 15];
 
         $searchButton = new UXButton();

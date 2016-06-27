@@ -44,6 +44,7 @@ use php\io\ResourceStream;
 use php\io\Stream;
 use php\lang\System;
 use php\lang\Thread;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\Items;
 use php\lib\reflect;
@@ -993,10 +994,21 @@ class Ide extends Application
         }
 
         $mainCommands = $this->getInternalList('.dn/mainCommands');
+        $commands = [];
         foreach ($mainCommands as $commandClass) {
             /** @var AbstractCommand $command */
             $command = new $commandClass();
 
+            $commands[] = $command;
+        }
+
+        arr::sort($commands, function (AbstractCommand $a, AbstractCommand $b) {
+            if ($a->getPriority() == $b->getPriority()) { return 0; }
+            if ($a->getPriority() < $b->getPriority()) { return 1; }
+            return -1;
+        });
+
+        foreach ($commands as $command) {
             $this->registerCommand($command);
         }
 

@@ -107,17 +107,21 @@ class PHPInspector extends AbstractInspector
 
         $archive = new ArchiveInputStream('zip', $path);
 
-        while ($entry = $archive->nextEntry()) {
-            /** @var ArchiveEntry $entry */
-            $entry = arr::shift($entries);
+        try {
+            while ($entry = $archive->nextEntry()) {
+                /** @var ArchiveEntry $entry */
+                $entry = arr::shift($entries);
 
-            if (arr::has($this->extensions, fs::ext($entry->getName()))) {
-                if (!$this->loadPhpSource($archive, $entry->getName(), $unload)) {
+                if (arr::has($this->extensions, fs::ext($entry->getName()))) {
+                    if (!$this->loadPhpSource($archive, $entry->getName(), $unload)) {
+                    }
                 }
             }
-        }
 
-        $archive->close();
+            $archive->close();
+        } catch (IOException $e) {
+            return;
+        }
     }
 
     protected function loadPhpSource($path, $moduleName = null, $unload = false)

@@ -67,11 +67,12 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
             $forUpload = true;
         }
 
+        $this->reuploadButton->free();
+
         if ($forUpload) {
             $this->openButton->free();
         } else {
             $this->deleteButton->free();
-            $this->reuploadButton->free();
         }
 
         $this->forUpload = $forUpload;
