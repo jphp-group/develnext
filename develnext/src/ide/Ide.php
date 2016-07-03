@@ -1225,6 +1225,10 @@ class Ide extends Application
         }
     }
 
+    /**
+     * @param $argv
+     * @return bool
+     */
     protected function handleArgs($argv)
     {
         $arg = $argv[1];

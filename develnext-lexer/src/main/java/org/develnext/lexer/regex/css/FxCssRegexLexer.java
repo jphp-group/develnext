@@ -16,7 +16,7 @@ public class FxCssRegexLexer extends RegexLexer {
         addRule(new RegexLexerRule("CONTROL", "\\;|\\,|\\:"));
         addRule(new RegexLexerRule("STRING", "((\"([^\"\\\\]|\\\\.)*\")|(\'([^\'\\\\]|\\\\.)*\'))"));
         addRule(new RegexLexerRule("COMMENT", "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/"));
-        addRule(new RegexLexerRule("SELECTOR", "(\\.|\\#)[a-zA-Z0-9\\_\\-\\ \\.\\#\\:\\,\\n\\r\\t]{1,}[ ]{0,}(\\{)", -1));
+        addRule(new RegexLexerRule("SELECTOR", "(\\.|\\#)?[a-zA-Z0-9\\_\\*\\+\\-\\ \\.\\#\\:\\,\\n\\r\\t]{1,}[ ]{0,}(\\{)", -1));
 
         addRule(new RegexLexerRule("NUMBER", "[0-9]+(\\.[0-9]+)?"));
         addRule(new RegexLexerRule("COLOR", "\\#[\\dA-Fa-f]{2,6}"));

@@ -71,7 +71,7 @@ class DesignProjectControlPane extends AbstractProjectControlPane
 
     public function load()
     {
-        $this->ideStylesheet = Ide::project()->getSrcFile('.theme/style-ide.css');
+        $this->ideStylesheet = Ide::project()->getIdeCacheFile('.theme/style-ide.css');
 
         if ($this->editor) {
             /*$file = $this->editor->data('file');
@@ -94,10 +94,18 @@ class DesignProjectControlPane extends AbstractProjectControlPane
         if (Ide::project() && ($form = Ide::get()->getMainForm())) {
             $source = FileUtils::get(Ide::project()->getSrcFile('.theme/style.css'));
 
-            $regex = Regex::of('((\.|\#)[\.\w\d\-\_\:\# \r\n]{1,}\{)')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
+            $regex = Regex::of('((\.|\#)?[\.\w\d\,\*\+\-\_\:\# \r\n]{1,}(\{))')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
 
-            $source = $regex->replaceWithCallback(function () {
-                return '.FormEditor $1';
+            $source = $regex->replaceWithCallback(function (Regex $regex) {
+                $selector = str::trim($regex->group(1));
+
+                $newSelector = [];
+
+                foreach (str::split($selector, ',') as $one) {
+                    $newSelector[] = ".FormEditor $one";
+                }
+
+                return str::join($newSelector, ', ');
             });
 
             FileUtils::put($this->ideStylesheet, $source);
