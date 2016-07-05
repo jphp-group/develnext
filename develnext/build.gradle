@@ -2,6 +2,8 @@ apply plugin: 'application'
 
 project.version = '1.0'
 
+project.ext.distVersion = System.getProperty("version");
+
 repositories {
     mavenLocal()
     jcenter()
@@ -196,6 +198,7 @@ task distIdeWindowsSetup(dependsOn: ['distIdeWindows']) {
             copy {
                 from "$project.buildDir/distributions/DevelNextSetup.exe"
                 into "$uploadPath/YandexDisk"
+                rename "DevelNextSetup.exe", "DevelNextSetup-${project.ext.distVersion}.exe"
             }
         }
     }
