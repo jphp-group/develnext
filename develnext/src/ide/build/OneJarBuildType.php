@@ -161,9 +161,9 @@ class OneJarBuildType extends AbstractBuildType
                     $dialog->setBuildPath($this->getBuildPath($project));
                     $dialog->setOpenDirectory($this->getBuildPath($project));
 
-                    $pathToProgram = Ide::get()->getJrePath() . "/bin/java -jar {$this->getBuildPath($project)}/{$project->getName()}.jar";
+                    $pathToProgram = [Ide::get()->getJrePath() . "/bin/java",  "-jar", "{$this->getBuildPath($project)}/{$project->getName()}.jar"];
 
-                    $dialog->setRunProgram($pathToProgram);
+                    //$dialog->setRunProgram($pathToProgram);
 
                     $dialog->showAndWait();
                 }

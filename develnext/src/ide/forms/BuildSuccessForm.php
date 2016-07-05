@@ -11,6 +11,9 @@ use php\gui\UXImageView;
 use php\gui\UXTextField;
 use php\io\File;
 use php\io\IOException;
+use php\lang\Process;
+use php\lib\fs;
+use php\lib\str;
 
 /**
  * Class BuildSuccessForm
@@ -62,11 +65,21 @@ class BuildSuccessForm extends AbstractIdeForm
 
     public function setRunProgram($pathToProgram)
     {
-        $pathToProgram = File::of($pathToProgram);
+        $pathToProgram = is_array($pathToProgram) ? $pathToProgram : str::split($pathToProgram, ' ');
 
         $this->onRun = function () use ($pathToProgram) {
             try {
-                $result = `$pathToProgram`;
+                $result = (new Process($pathToProgram, $this->buildPath, Ide::get()->makeEnvironment()))->start();
+
+                /*$exit = $result->getExitValue();
+
+                if ($exit != 0) {
+                    $error = $result->getError()->readFully();
+
+                    if ($error) {
+                        UXDialog::showAndWait($error, 'ERROR');
+                    }
+                } */
             } catch (IOException $e) {
                 UXDialog::showAndWait('Невозможно запустить программу: ' . $e->getMessage(), 'ERROR');
             }
@@ -98,8 +111,8 @@ class BuildSuccessForm extends AbstractIdeForm
     {
         Logger::info("Show build success: buildPath = {$this->buildPath}");
 
-        $this->runButton->visible = !!$this->onRun;
-        $this->openButton->visible = !!$this->onOpenDirectory;
+        $this->runButton->enabled = !!$this->onRun;
+        $this->openButton->enabled = !!$this->onOpenDirectory;
 
         $this->pathField->text = File::of($this->buildPath);
     }

@@ -130,8 +130,8 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             }
         }
 
-        $this->bundleConfigs = [];
-        $this->bundles = [];
+        //$this->bundleConfigs = [];
+       // $this->bundles = [];
         $this->fileStat = [];
     }
 
