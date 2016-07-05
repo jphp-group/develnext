@@ -49,6 +49,7 @@ use php\lib\fs;
 use php\lib\Items;
 use php\lib\reflect;
 use php\lib\Str;
+use php\time\Time;
 use php\util\Configuration;
 use php\util\Scanner;
 use script\TimerScript;
@@ -506,6 +507,38 @@ class Ide extends Application
     }
 
     /**
+     * @return File
+     */
+    public function getLogFile()
+    {
+        $uuid = $this->getInstanceId();
+
+        return $this->getFile("log/ide-$uuid.log");
+    }
+
+    /**
+     *
+     */
+    public function cleanup()
+    {
+        (new Thread(function() {
+            Logger::info("Clean IDE files...");
+
+            fs::scan($this->getFile("log/"), function ($logfile) {
+                if (fs::time($logfile) < Time::millis() - 1000 * 60 * 60 * 3) { // 3 hours.
+                    fs::delete($logfile);
+                }
+            });
+
+            fs::scan($this->getFile("cache/"), function ($file) {
+                if (fs::time($file) < Time::millis() - 1000 * 60 * 60 * 24 * 30) { // 30 days.
+                    fs::delete($file);
+                }
+            });
+        }))->start();
+    }
+
+    /**
      * @param string $suffix
      * @return File
      */
@@ -628,7 +661,7 @@ class Ide extends Application
 
         if ($data['menuItem']) {
             /** @var UXMenu $menu */
-            $menu = $mainForm->{'menu' . Str::upperFirst($command->getCategory())};
+            $menu = $mainForm->findSubMenu('menu' . Str::upperFirst($command->getCategory()));
 
             if ($menu instanceof UXMenu) {
                 foreach ($data['menuItem'] as $el) {
@@ -762,7 +795,7 @@ class Ide extends Application
                 $mainForm = $this->getMainForm();
 
                 /** @var UXMenu $menu */
-                $menu = $mainForm->{'menu' . Str::upperFirst($category)};
+                $menu = $mainForm->findSubMenu('menu' . Str::upperFirst($category));
 
                 if ($menu instanceof UXMenu) {
                     $items = [];
@@ -955,6 +988,8 @@ class Ide extends Application
 
     public function registerAll()
     {
+        $this->cleanup();
+
         $extensions = $this->getInternalList('.dn/extensions');
 
         foreach ($extensions as $extension) {
@@ -1149,7 +1184,7 @@ class Ide extends Application
             ProjectSystem::close();
         }
 
-        WatcherSystem::shutdown();
+        //WatcherSystem::shutdown();
 
         $stream = null;
 

@@ -15,6 +15,12 @@ class Cache
     protected static $cacheImage = [];
     protected static $cacheImageView = [];
 
+    public static function clear()
+    {
+        self::$cacheImageView = [];
+        self::$cacheImage = [];
+    }
+
     /**
      * @param $path
      * @param array|null $size

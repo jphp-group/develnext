@@ -3,6 +3,7 @@ package org.develnext.jphp.ext.javafx.classes.text;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
@@ -139,17 +140,22 @@ public class UXFont extends BaseWrapper<Font> {
         return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().getFontMetrics(getWrappedObject()).getLineHeight();
     }
 
-    public static float getLineHeight(Font font) {
-        return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().getFontMetrics(font).getLineHeight();
+    public static double getLineHeight(Font font) {
+        Text text = new Text("A");
+        text.setFont(font);
+        return text.getLayoutBounds().getHeight();
     }
 
     @Signature
-    public float calculateTextWidth(String text) {
-        return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().computeStringWidth(text, getWrappedObject());
+    public double calculateTextWidth(String atext) {
+        Text text = new Text(atext);
+        text.setFont(this.getWrappedObject());
+        return text.getLayoutBounds().getWidth();
     }
 
-
-    public static float calculateTextWidth(String text, Font font) {
-        return com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().computeStringWidth(text, font);
+    public static double calculateTextWidth(String atext, Font font) {
+        Text text = new Text(atext);
+        text.setFont(font);
+        return text.getLayoutBounds().getWidth();
     }
 }

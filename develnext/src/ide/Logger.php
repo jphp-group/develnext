@@ -8,6 +8,7 @@ use php\lang\IllegalArgumentException;
 use php\lang\Thread;
 use php\lang\ThreadPool;
 use php\lib\char;
+use php\lib\fs;
 use php\lib\Str;
 use php\time\Time;
 use php\util\Shared;
@@ -96,7 +97,7 @@ class Logger
     {
         if ($level <= static::$level) {
             if (Ide::isCreated()) {
-                $file = Ide::get()->getFile('ide.log');
+                $file = Ide::get()->getLogFile();
             }
 
             $time = Time::now()->toString('YYYY-MM-dd HH:mm:ss');
@@ -185,18 +186,21 @@ class Logger
 
     public static function reset()
     {
-        $file = Ide::get()->getFile('ide.log');
+        $file = Ide::get()->getLogFile();
         $file->delete();
+
+        fs::ensureParent($file);
 
         ob_implicit_flush(true);
 
         self::$threadPool = ThreadPool::createSingle();
+
         Environment::current()->onOutput(function ($output) {
             $out = Stream::of('php://stdout');
             $out->write($output);
 
             if (Ide::isCreated()) {
-                $file = Ide::get()->getFile('ide.log');
+                $file = Ide::get()->getLogFile();
 
                 Stream::putContents($file, $output, 'a+');
             }

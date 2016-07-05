@@ -196,6 +196,14 @@ class CodeEditor extends AbstractEditor
         }
     }
 
+    public function close($save = true)
+    {
+        parent::close($save);
+
+        //$this->autoComplete = null;
+    }
+
+
     public function getFindDialog()
     {
         if ($this->findDialog) {

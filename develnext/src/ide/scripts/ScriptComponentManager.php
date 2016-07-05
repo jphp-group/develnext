@@ -207,4 +207,10 @@ class ScriptComponentManager
 
         return false;
     }
+
+    public function free()
+    {
+        $this->components = [];
+        $this->modules = [];
+    }
 }

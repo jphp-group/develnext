@@ -2,10 +2,8 @@ package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Side;
-import javafx.scene.Parent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.control.TabPaneEx;
@@ -52,6 +50,10 @@ public class UXTabPane extends UXControl<TabPane> {
 
     @Signature
     public static Pane createDefaultDnDPane() {
+        if (JavaFXExtension.isJigsaw()) {
+            return null;
+        }
+
         return DndTabPaneFactory.createDefaultDnDPane(DndTabPaneFactory.FeedbackType.MARKER, null);
     }
 

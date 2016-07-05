@@ -6,9 +6,11 @@ use ide\Logger;
 use php\gui\UXDesktop;
 use php\gui\framework\AbstractForm;
 use php\gui\UXButton;
+use php\gui\UXDialog;
 use php\gui\UXImageView;
 use php\gui\UXTextField;
 use php\io\File;
+use php\io\IOException;
 
 /**
  * Class BuildSuccessForm
@@ -63,7 +65,11 @@ class BuildSuccessForm extends AbstractIdeForm
         $pathToProgram = File::of($pathToProgram);
 
         $this->onRun = function () use ($pathToProgram) {
-            $result = `$pathToProgram`;
+            try {
+                $result = `$pathToProgram`;
+            } catch (IOException $e) {
+                UXDialog::showAndWait('Невозможно запустить программу: ' . $e->getMessage(), 'ERROR');
+            }
         };
     }
 

@@ -1,11 +1,5 @@
 package org.develnext.jphp.ext.javafx.classes;
 
-import com.sun.javafx.scene.control.behavior.TextFieldBehavior;
-import com.sun.javafx.scene.control.skin.TextFieldSkin;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.TextField;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.control.MaskTextField;
 import php.runtime.annotation.Reflection;

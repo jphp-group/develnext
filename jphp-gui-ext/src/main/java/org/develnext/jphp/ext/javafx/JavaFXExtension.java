@@ -1,6 +1,5 @@
 package org.develnext.jphp.ext.javafx;
 
-import com.sun.javafx.scene.control.skin.CustomColorDialog;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
@@ -147,7 +146,6 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, ComboBox.class, UXComboBox.class);
         registerWrapperClass(scope, ChoiceBox.class, UXChoiceBox.class);
         registerWrapperClass(scope, ColorPicker.class, UXColorPicker.class);
-        registerWrapperClass(scope, CustomColorDialog.class, UXColorChooser.class);
         registerWrapperClass(scope, ProgressIndicator.class, UXProgressIndicator.class);
         registerWrapperClass(scope, ProgressBar.class, UXProgressBar.class);
         registerWrapperClass(scope, HTMLEditor.class, UXHtmlEditor.class);
@@ -258,6 +256,11 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, PathTransition.class, UXPathAnimation.class);
 
         registerWrapperClass(scope, AnimationTimer.class, UXAnimationTimer.class);
+    }
+
+    public static boolean isJigsaw() {
+        String property = System.getProperty("java.version");
+        return property.startsWith("9-") || property.startsWith("9.");
     }
 
     protected void registerEvents(CompileScope scope) {

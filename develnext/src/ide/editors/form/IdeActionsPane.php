@@ -36,6 +36,11 @@ class IdeActionsPane extends UXHBox
     protected $snapGridButton;
 
     /**
+     * @var UXToggleButton
+     */
+    protected $snapEmptyButton;
+
+    /**
      * @var UXTextField
      */
     protected $snapXInput;
@@ -81,8 +86,20 @@ class IdeActionsPane extends UXHBox
             $this->trigger('change');
         });
 
+        $emptyButton = $this->snapEmptyButton = new UXToggleButton();
+        $emptyButton->toggleGroup = $group;
+        $emptyButton->graphic = ico('grayRect16');
+
+        $emptyButton->on('action', function () use ($emptyButton) {
+            $this->designer->snapType = 'HIDDEN';
+            $emptyButton->selected = true;
+            $this->trigger('change');
+        });
+
+
         $ui->add($dotsButton);
         $ui->add($gridButton);
+        $ui->add($emptyButton);
         $ui->add(new UXSeparator('VERTICAL'));
 
         $xTitle = new UXLabel('Сетка X:');
@@ -135,6 +152,10 @@ class IdeActionsPane extends UXHBox
             switch ($this->designer->snapType = $type) {
                 case 'GRID':
                     $this->snapTypeButtons->selected = $this->snapGridButton;
+                    break;
+
+                case 'HIDDEN':
+                    $this->snapTypeButtons->selected = $this->snapEmptyButton;
                     break;
 
                 default:

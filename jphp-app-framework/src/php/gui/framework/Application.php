@@ -110,6 +110,20 @@ class Application
     /**
      * @return string
      */
+    public function getInstanceId()
+    {
+        static $id = null;
+
+        if ($id == null) {
+            $id = str::uuid();
+        }
+
+        return $id;
+    }
+
+    /**
+     * @return string
+     */
     public function getUuid()
     {
         if (!$this->config->has('app.uuid')) {

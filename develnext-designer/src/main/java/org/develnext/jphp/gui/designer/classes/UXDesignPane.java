@@ -1,11 +1,17 @@
 package org.develnext.jphp.gui.designer.classes;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import org.develnext.jphp.ext.javafx.classes.layout.UXAnchorPane;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
@@ -30,6 +36,8 @@ public class UXDesignPane extends UXAnchorPane {
 
     protected Invoker onResize = null;
 
+    protected AnchorPane topBorders = new AnchorPane();
+
     public UXDesignPane(Environment env, AnchorPane wrappedObject) {
         super(env, wrappedObject);
     }
@@ -44,6 +52,16 @@ public class UXDesignPane extends UXAnchorPane {
 
         updateStyle();
 
+        getWrappedObject().getChildren().add(topBorders);
+        UXAnchorPane.setAnchor(topBorders, -borderWidth);
+
+        //topBorders.setLayoutX(-borderWidth/2);
+        //topBorders.setLayoutY(-borderWidth/2);
+
+        getWrappedObject().getChildren().addListener((ListChangeListener<Node>) c -> {
+            Platform.runLater(this::update);
+        });
+
         getWrappedObject().setOnMouseExited(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -53,96 +71,89 @@ public class UXDesignPane extends UXAnchorPane {
             }
         });
 
-        getWrappedObject().setOnMouseMoved(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                double x = event.getX();
-                double y = event.getY();
+        getWrappedObject().setOnMouseMoved(event -> {
+            double x = event.getX();
+            double y = event.getY();
 
-                Scene scene = getWrappedObject().getScene();
+            Scene scene = getWrappedObject().getScene();
 
-                boolean blockWidth = getWrappedObject().getMaxWidth() == getWrappedObject().getPrefWidth() &&
-                        getWrappedObject().getMinWidth() == getWrappedObject().getPrefWidth();
+            boolean blockWidth = getWrappedObject().getMaxWidth() == getWrappedObject().getPrefWidth() &&
+                    getWrappedObject().getMinWidth() == getWrappedObject().getPrefWidth();
 
-                boolean blockHeight = getWrappedObject().getMaxHeight() == getWrappedObject().getPrefHeight() &&
-                        getWrappedObject().getMinHeight() == getWrappedObject().getPrefHeight();
+            boolean blockHeight = getWrappedObject().getMaxHeight() == getWrappedObject().getPrefHeight() &&
+                    getWrappedObject().getMinHeight() == getWrappedObject().getPrefHeight();
 
-                if ((!blockWidth && isHResize(x, y)) && (!blockHeight && isVResize(x, y))) {
-                    scene.setCursor(Cursor.SE_RESIZE);
-                } else if (!blockWidth && isHResize(x, y)) {
-                    scene.setCursor(Cursor.H_RESIZE);
-                } else if (!blockHeight && isVResize(x, y)) {
-                    scene.setCursor(Cursor.V_RESIZE);
-                } else {
-                    scene.setCursor(Cursor.DEFAULT);
-                }
+            if ((!blockWidth && isHResize(x, y)) && (!blockHeight && isVResize(x, y))) {
+                scene.setCursor(Cursor.SE_RESIZE);
+            } else if (!blockWidth && isHResize(x, y)) {
+                scene.setCursor(Cursor.H_RESIZE);
+            } else if (!blockHeight && isVResize(x, y)) {
+                scene.setCursor(Cursor.V_RESIZE);
+            } else {
+                scene.setCursor(Cursor.DEFAULT);
             }
         });
 
-        getWrappedObject().setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                double x = event.getX();
-                double y = event.getY();
+        getWrappedObject().setOnMousePressed(event -> {
+            double x = event.getX();
+            double y = event.getY();
 
-                if (isHResize(x, y) && isVResize(x, y)) {
-                    startDragPoint = new Point2D(event.getScreenX(), event.getScreenY());
-                } else if (isHResize(x, y)) {
-                    startDragPoint = new Point2D(event.getScreenX(), 0.0);
-                } else if (isVResize(x, y)) {
-                    startDragPoint = new Point2D(0.0, event.getScreenY());
-                } else {
-                    startDragPoint = null;
-                }
+            if (isHResize(x, y) && isVResize(x, y)) {
+                startDragPoint = new Point2D(event.getScreenX(), event.getScreenY());
+            } else if (isHResize(x, y)) {
+                startDragPoint = new Point2D(event.getScreenX(), 0.0);
+            } else if (isVResize(x, y)) {
+                startDragPoint = new Point2D(0.0, event.getScreenY());
+            } else {
+                startDragPoint = null;
+            }
+
+            Pane node = (Pane) getWrappedObject().getChildren().get(0);
+
+            if (startDragPoint != null) {
+                startWidth = node.getPrefWidth();
+                startHeight = node.getPrefHeight();
+
+                update();
+                event.consume();
+            }
+        });
+
+        getWrappedObject().setOnMouseDragged(event -> {
+            if (startDragPoint != null) {
+                double hOffset = event.getScreenX() - startDragPoint.getX();
+                double vOffset = event.getScreenY() - startDragPoint.getY();
 
                 Pane node = (Pane) getWrappedObject().getChildren().get(0);
 
-                if (startDragPoint != null) {
-                    startWidth = node.getPrefWidth();
-                    startHeight = node.getPrefHeight();
+                if (startDragPoint.getX() > 0) {
+                    double value = startWidth + hOffset;
 
-                    event.consume();
+                    if (snapSize > 1) {
+                        value = Math.round(Math.round(value / snapSize) * snapSize);
+                    }
+
+                    node.setPrefWidth(value);
                 }
-            }
-        });
 
-        getWrappedObject().setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (startDragPoint != null) {
-                    double hOffset = event.getScreenX() - startDragPoint.getX();
-                    double vOffset = event.getScreenY() - startDragPoint.getY();
+                if (startDragPoint.getY() > 0) {
+                    double value = startHeight + vOffset;
 
-                    Pane node = (Pane) getWrappedObject().getChildren().get(0);
-
-                    if (startDragPoint.getX() > 0) {
-                        double value = startWidth + hOffset;
-
-                        if (snapSize > 1) {
-                            value = Math.round(Math.round(value / snapSize) * snapSize);
-                        }
-
-                        node.setPrefWidth(value);
+                    if (snapSize > 1) {
+                        value = Math.round(Math.round(value / snapSize) * snapSize);
                     }
 
-                    if (startDragPoint.getY() > 0) {
-                        double value = startHeight + vOffset;
-
-                        if (snapSize > 1) {
-                            value = Math.round(Math.round(value / snapSize) * snapSize);
-                        }
-
-                        node.setPrefHeight(value);
-                    }
-
-                    resizing = true;
-
-                    if (onResize != null) {
-                        onResize.callAny();
-                    }
-
-                    event.consume();
+                    node.setPrefHeight(value);
                 }
+
+                resizing = true;
+
+                if (onResize != null) {
+                    onResize.callAny();
+                }
+
+                update();
+                event.consume();
             }
         });
 
@@ -151,6 +162,7 @@ public class UXDesignPane extends UXAnchorPane {
             public void handle(MouseEvent event) {
                 if (resizing) {
                     resizing = false;
+                    update();
                     event.consume();
                 }
             }
@@ -160,7 +172,7 @@ public class UXDesignPane extends UXAnchorPane {
     protected boolean isHResize(double x, double y) {
         double width = getWidth();
 
-        return  x > width - borderWidth && x < width;
+        return x > width - borderWidth && x < width;
     }
 
     protected boolean isVResize(double x, double y) {
@@ -211,7 +223,15 @@ public class UXDesignPane extends UXAnchorPane {
         this.onResize = onResize;
     }
 
+    @Signature
+    public void update() {
+        topBorders.toFront();
+    }
+
     protected void updateStyle() {
-        getWrappedObject().setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: " + borderWidth + "px;");
+        getWrappedObject().setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: " + borderWidth + "px; -fx-border-radius: 4px;");
+        topBorders.setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: " + borderWidth + "px; -fx-border-radius: 4px;");
+        topBorders.setMouseTransparent(true);
+        topBorders.setBackground(Background.EMPTY);
     }
 }

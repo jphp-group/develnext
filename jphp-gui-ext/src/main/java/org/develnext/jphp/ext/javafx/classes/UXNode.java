@@ -23,11 +23,8 @@ import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.classes.effect.UXEffectPipeline;
 import org.develnext.jphp.ext.javafx.classes.support.Eventable;
-import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
-import org.develnext.jphp.ext.javafx.support.StyleManager;
 import org.develnext.jphp.ext.javafx.support.UserData;
-import org.develnext.jphp.ext.javafx.support.effect.EffectPipeline;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -101,9 +98,6 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
 
         void requestFocus();
     }
-
-    protected final StyleManager styleManager = new StyleManager(this);
-
 
     public UXNode(Environment env, T wrappedObject) {
         super(env, wrappedObject);
@@ -342,11 +336,20 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
 
     @Setter
     public void setAnchorFlags(ArrayMemory value) {
+        Parent parent = getWrappedObject().getParent();
+        Bounds parentBounds = parent == null ? null: parent.getLayoutBounds();
+
+        if (parent == null) {
+            return;
+        }
+
+        Bounds bounds = getBoundsInParent();
+
         if (value.containsKey("left")) {
             boolean left = value.valueOfIndex("left").toBoolean();
 
             if (left) {
-                setLeftAnchor(DoubleMemory.valueOf(getWrappedObject().getLayoutX()));
+                setLeftAnchor(DoubleMemory.valueOf(bounds.getMinX()));
             } else {
                 setLeftAnchor(Memory.NULL);
             }
@@ -356,7 +359,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             boolean top = value.valueOfIndex("top").toBoolean();
 
             if (top) {
-                setTopAnchor(DoubleMemory.valueOf(getWrappedObject().getLayoutY()));
+                setTopAnchor(DoubleMemory.valueOf(bounds.getMinY()));
             } else {
                 setTopAnchor(Memory.NULL);
             }
@@ -366,11 +369,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             boolean right = value.valueOfIndex("right").toBoolean();
 
             if (right) {
-                Parent parent = getWrappedObject().getParent();
-
-                if (parent != null) {
-                    setRightAnchor(DoubleMemory.valueOf(parent.getBoundsInLocal().getWidth() - (getX() + getWidth())));
-                }
+                setRightAnchor(DoubleMemory.valueOf(parentBounds.getWidth() - bounds.getMaxX()));
             } else {
                 setRightAnchor(Memory.NULL);
             }
@@ -380,11 +379,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             boolean bottom = value.valueOfIndex("bottom").toBoolean();
 
             if (bottom) {
-                Parent parent = getWrappedObject().getParent();
-
-                if (parent != null) {
-                    setBottomAnchor(DoubleMemory.valueOf(parent.getBoundsInLocal().getHeight() - (getY() + getHeight())));
-                }
+                setBottomAnchor(DoubleMemory.valueOf(parentBounds.getHeight() - bounds.getMaxY()));
             } else {
                 setBottomAnchor(Memory.NULL);
             }
@@ -585,23 +580,6 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
         Dragboard dragboard = getWrappedObject().startDragAndDrop(modes.toArray(new TransferMode[0]));
 
         return dragboard == null ? null : new UXDragboard(env, dragboard);
-    }
-
-    @Signature
-    public Memory css(Environment env, Memory... args) {
-        if (args == null || args.length == 0) {
-            return ArrayMemory.ofStringMap(styleManager.all()).toConstant();
-        } else if (args.length == 1) {
-            if (args[0].isArray()) {
-                styleManager.set(args[0].toValue(ArrayMemory.class).toStringMap());
-            } else {
-                return StringMemory.valueOf(styleManager.get(args[0].toString()));
-            }
-        } else {
-            styleManager.set(args[0].toString(), args[1].toString());
-        }
-
-        return Memory.NULL;
     }
 
     @Signature

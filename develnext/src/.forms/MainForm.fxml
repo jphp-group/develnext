@@ -11,9 +11,9 @@
   <children>
       <SplitPane id="contentSplit" dividerPositions="1.0" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
-            <VBox layoutX="-86.0" layoutY="-52.0" prefHeight="151.0" prefWidth="1055.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <VBox id="contentVBox" layoutX="-86.0" layoutY="-52.0" prefHeight="151.0" prefWidth="1055.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                <MenuBar id="mainMenu" focusTraversable="false" prefHeight="25.0" prefWidth="900.0">
+                <MenuBar focusTraversable="false" prefHeight="25.0" prefWidth="900.0">
                   <menus>
                     <Menu id="menuProject" mnemonicParsing="false" text="Проект" />
                         <Menu id="menuLibrary" mnemonicParsing="false" text="Библиотека" />

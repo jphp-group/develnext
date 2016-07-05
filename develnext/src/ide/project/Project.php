@@ -939,6 +939,29 @@ class Project
         $this->inspectorLoaderThreadPoll->shutdown();
     }
 
+    function free()
+    {
+        foreach ($this->inspectors as $one) {
+            $one->free();
+        }
+
+        $this->inspectors = [];
+        $this->configConfigurers = [];
+        $this->filesData = [];
+        $this->indexer = null;
+        $this->config = null;
+        $this->handlers = [];
+
+        $this->ignoreRules = [];
+        $this->refactorManager = null;
+        $this->tree = null;
+
+        $this->tickTimer->free();
+        $this->tickTimer = null;
+
+        $this->behaviours = [];
+    }
+
     /**
      * @param string $fileName
      * @return ProjectFile[]

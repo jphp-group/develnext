@@ -57,7 +57,7 @@ import java.util.List;
 public class UXDesigner extends BaseObject {
     public static final int AREA_BLOCK_SIZE = 1024;
 
-    public enum SnapType {DOTS, GRID}
+    public enum SnapType {DOTS, GRID, HIDDEN}
 
     private Pane area;
 
@@ -108,7 +108,7 @@ public class UXDesigner extends BaseObject {
             area.getChildren().removeAll(dots);
         }
 
-        if (snapSizeX > 2 && snapSizeY > 2) {
+        if (snapSizeX > 2 && snapSizeY > 2 && snapType != SnapType.HIDDEN) {
             double width = area.getWidth();
             double height = area.getHeight();
 

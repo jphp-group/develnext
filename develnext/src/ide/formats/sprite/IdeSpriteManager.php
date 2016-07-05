@@ -192,4 +192,10 @@ class IdeSpriteManager
     {
         return $this->sprites[$name];
     }
+
+    public function free()
+    {
+        $this->sprites = [];
+        $this->xml = null;
+    }
 }

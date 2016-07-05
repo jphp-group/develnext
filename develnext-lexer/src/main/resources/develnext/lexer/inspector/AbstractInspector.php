@@ -239,4 +239,13 @@ abstract class AbstractInspector
     {
         $this->dynamicReturnTypes[$rule] = $type;
     }
+
+    public function free()
+    {
+        $this->constants = [];
+        $this->types = [];
+        $this->dynamicTypes = [];
+        $this->dynamicReturnTypes = [];
+        $this->functions = [];
+    }
 }

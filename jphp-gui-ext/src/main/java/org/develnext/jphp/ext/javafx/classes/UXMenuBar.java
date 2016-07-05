@@ -1,7 +1,5 @@
 package org.develnext.jphp.ext.javafx.classes;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -11,7 +9,6 @@ import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
-import php.runtime.memory.ReferenceMemory;
 import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "UXMenuBar")
@@ -24,8 +21,10 @@ public class UXMenuBar extends UXControl {
     public UXMenuBar(Environment env, final MenuBar wrappedObject) {
         super(env, wrappedObject);
 
-        if (!(getWrappedObject().getSkin() instanceof FixMenuSkinBar)) {
-            getWrappedObject().setSkin(new FixMenuSkinBar(getWrappedObject()));
+        if ( !JavaFXExtension.isJigsaw() ) {
+            if (!(getWrappedObject().getSkin() instanceof FixMenuSkinBar)) {
+                getWrappedObject().setSkin(new FixMenuSkinBar(getWrappedObject()));
+            }
         }
     }
 

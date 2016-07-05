@@ -59,6 +59,14 @@ class FileSystem
     static protected $freeze = false;
 
     /**
+     * ..
+     */
+    static function clearCache()
+    {
+        self::$cachedEditors = [];
+    }
+
+    /**
      * @param $path
      * @param null $param
      */
@@ -460,7 +468,7 @@ class FileSystem
                 $contextMenu = new UXContextMenu();
 
                 // @var UXMenu $menu
-                $menu = Ide::get()->getMainForm()->{'menuCreate'};
+                $menu = Ide::get()->getMainForm()->findSubMenu('menuCreate');
 
                 foreach ($menu->items as $item) {
                     $contextMenu->items->add($item);

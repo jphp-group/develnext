@@ -75,7 +75,6 @@ abstract class AbstractCommand
         }
 
         $button->graphic = Ide::get()->getImage($this->getIcon());
-        $button->css('cursor', 'hand');
         $button->padding = [4, 5];
 
         $button->on('action', function () {

@@ -104,18 +104,26 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     protected function refreshInspector()
     {
-        $this->project->loadDirectoryForInspector($this->project->getFile("src/"));
+        if ($this->inspector) {
+            $this->project->loadDirectoryForInspector($this->project->getFile("src/"));
 
-        $this->inspector->setExtensions(['source']);
-        $this->project->loadDirectoryForInspector($this->project->getFile("src/"));
+            $this->inspector->setExtensions(['source']);
+            $this->project->loadDirectoryForInspector($this->project->getFile("src/"));
 
-        $this->inspector->setExtensions(['php']);
-        $this->project->loadDirectoryForInspector($this->project->getFile(self::GENERATED_DIRECTORY));
+            $this->inspector->setExtensions(['php']);
+            $this->project->loadDirectoryForInspector($this->project->getFile(self::GENERATED_DIRECTORY));
+        }
     }
 
     public function doClose()
     {
         $this->inspectorThreadPool->shutdown();
+        $this->externalJarLibraries = [];
+        $this->inspector->free();
+
+        $this->uiSettings = null;
+        $this->uiByteCodeCheckbox = null;
+        $this->globalUseImports = null;
     }
 
     public function doOpen()

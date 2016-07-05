@@ -99,4 +99,9 @@ class ActionManager
     {
         $this->actionTypes[Str::lower($type->getTagName())] = $type;
     }
+
+    public function free()
+    {
+        $this->actionTypes = [];
+    }
 }

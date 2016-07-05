@@ -16,6 +16,7 @@ class ListMenu extends UXListView
         parent::__construct();
 
         $this->classes->add('dn-list-menu');
+        $this->fixedCellSize = 50;
 
         $this->setCellFactory(function (UXListCell $view, MenuViewable $page) {
             $this->cellRender($view, $page);

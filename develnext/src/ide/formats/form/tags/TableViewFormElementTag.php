@@ -60,7 +60,8 @@ class TableViewFormElementTag extends AbstractFormElementTag
             $columnTag->setAttribute('text', $column->text);
             $columnTag->setAttribute('style', $column->style);
             $columnTag->setAttribute('resizable', $column->resizable ? 'true' : 'false');
-            $columnTag->setAttribute('sortable', false);
+            $columnTag->setAttribute('sortable', 'false');
+            $columnTag->setAttribute('visible', $column->visible ? 'true' : 'false');
 
             $columnsTag->appendChild($columnTag);
         }

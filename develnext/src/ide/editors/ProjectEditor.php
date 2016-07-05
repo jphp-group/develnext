@@ -157,8 +157,6 @@ class ProjectEditor extends AbstractEditor
             if ($this->contentPane->children[0] != $ui) {
                 UXAnchorPane::setAnchor($ui, 0);
                 $this->contentPane->children->setAll([$ui]);
-
-                Logger::debug("Reload UI");
             }
 
             if ($setMenu) {
@@ -170,6 +168,7 @@ class ProjectEditor extends AbstractEditor
 
         return null;
     }
+
     /**
      * @return UXNode
      */

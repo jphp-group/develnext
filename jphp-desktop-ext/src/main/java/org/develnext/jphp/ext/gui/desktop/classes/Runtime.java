@@ -18,8 +18,6 @@ import java.net.URLClassLoader;
 
 @Namespace(GuiDesktopExtension.NS)
 public class Runtime extends BaseObject {
-    private static final Class[] parameters = new Class[]{URL.class};
-
     public Runtime(Environment env, ClassEntity clazz) {
         super(env, clazz);
     }
@@ -45,14 +43,9 @@ public class Runtime extends BaseObject {
     }
 
     @Signature
-    public static void addJar(File file) throws IOException {
-        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        Class sysclass = URLClassLoader.class;
-
+    public static void addJar(Environment env, File file) throws IOException {
         try {
-            Method method = sysclass.getDeclaredMethod("addURL", parameters);
-            method.setAccessible(true);
-            method.invoke(sysloader, file.toURI().toURL());
+            env.getScope().getClassLoader().addLibrary(file.toURI().toURL());
         } catch (Throwable t) {
             throw new IOException("Error, could not add URL to system classloader, " + t.getMessage());
         }//end try catch

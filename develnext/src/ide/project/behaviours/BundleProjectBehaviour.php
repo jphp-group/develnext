@@ -129,6 +129,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 }
             }
         }
+
+        $this->bundleConfigs = [];
+        $this->bundles = [];
+        $this->fileStat = [];
     }
 
     public function doSave()

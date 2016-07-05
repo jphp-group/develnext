@@ -44,12 +44,52 @@ use script\TimerScript;
  * @property UXHBox $headPane
  * @property UXHBox $headRightPane
  * @property UXSplitPane $contentSplitPane
- * @property UXMenuBar $mainMenu
+ * @property UXVBox $contentVBox
  * @property UXAnchorPane $bottomSpoiler
  * @property UXTabPane $bottomSpoilerTabPane
  */
 class MainForm extends AbstractIdeForm
 {
+    /**
+     * @var UXMenuBar
+     */
+    public $mainMenu;
+
+    /**
+     * MainForm constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        foreach ($this->contentVBox->children as $one) {
+            if ($one instanceof UXMenuBar) {
+                $this->mainMenu = $one;
+                break;
+            }
+        }
+
+        if (!$this->mainMenu) {
+            throw new IdeException("Cannot find main menu on main form");
+        }
+    }
+
+    /**
+     * @param $string
+     * @return null|UXMenu
+     */
+    public function findSubMenu($string)
+    {
+        /** @var UXMenu $one */
+        foreach ($this->mainMenu->menus as $one) {
+            if ($one->id == $string) {
+                return $one;
+            }
+        }
+
+        return null;
+    }
+
     protected function init()
     {
         parent::init();
@@ -71,12 +111,16 @@ class MainForm extends AbstractIdeForm
         $this->fileTabPane->free();
 
         /** @var UXTabPane $tabPane */
-        $tabPane = $pane->children[0];
+        $tabPane = $pane ? $pane->children[0] : new UXTabPane();
         $tabPane->id = 'fileTabPane';
         $tabPane->tabClosingPolicy = 'ALL_TABS';
 
-        UXAnchorPane::setAnchor($pane, 0);
-        $parent->add($pane);
+        if ($pane) {
+            UXAnchorPane::setAnchor($pane, 0);
+            $parent->add($pane);
+        } else {
+            $parent->add($tabPane);
+        }
     }
 
     /**

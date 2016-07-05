@@ -35,7 +35,7 @@ class SetupWindowsApplicationBuildType extends AbstractBuildType
      */
     function getName()
     {
-        return 'Инсталятор Windows приложения';
+        return 'Windows Инсталятор';
     }
 
     /**
@@ -134,7 +134,8 @@ Name: "czech"; MessagesFile: "compiler:Languages\\Czech.isl"
 Name: "japanese"; MessagesFile: "compiler:Languages\\Japanese.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checked
+Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 Source: "{$project->getName()}\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -149,7 +150,7 @@ OUT
             $out->write('Name: "{group}\\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"' . "\n");
 
             if ($config['linkOnDesktop']) {
-                $out->write('Name: "{commondesktop}\\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"; Tasks: desktopicon');
+                $out->write('Name: "{commondesktop}\\{#MyAppName}"; Filename: "{app}\\{#MyAppExeName}"; Tasks: desktopicon' . "\n");
             }
 
             if ($config['linkOnQuickLaunch']) {
@@ -173,6 +174,11 @@ OUT
      */
     function onExecute(Project $project, $finished = true)
     {
+        if (!Ide::get()->isWindows()) {
+            UXDialog::showAndWait('Данная функция доступна только на Windows.');
+            return;
+        }
+
         $config = $this->getConfig();
 
         if (!$config['name']) {

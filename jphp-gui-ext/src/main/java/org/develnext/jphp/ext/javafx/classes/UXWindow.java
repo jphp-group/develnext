@@ -365,11 +365,11 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
 
         Node node = UXNode.__globalLookup(getLayout(env), "#" + name);
 
-        if (node instanceof MenuButton && node.getClass().getName().endsWith("MenuBarButton")) {
+        /*if (node instanceof MenuButton && node.getClass().getName().endsWith("MenuBarButton")) {
             Field field = node.getClass().getDeclaredField("menu");
             field.setAccessible(true);
             return Memory.wrap(env, field.get(node));
-        }
+        }*/
 
         return Memory.wrap(env, node);
     }

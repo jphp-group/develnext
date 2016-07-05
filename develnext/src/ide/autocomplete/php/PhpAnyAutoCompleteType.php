@@ -276,7 +276,6 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
 
         $result['GLOBALS'] = new VariableAutoCompleteItem('GLOBALS', 'array', $this->kind == '~any' ? '$GLOBALS' : null);
 
-        var_dump($this->kind);
         foreach ($context->getGlobalRegion()->getValues('variable') as $one) {
             $result[$one['name']] = new VariableAutoCompleteItem($one['name'], $one['type'], ($this->kind == '~any') ? "$" . $one['name'] : null);
         }

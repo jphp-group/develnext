@@ -561,7 +561,7 @@ class IdeEventListPane
                 });
 
                 $name = new UXLabel($eventType['name']);
-                $name->css('font-weight', 'bold');
+                $name->font = $name->font->withBold();
 
                 $nameLabel = new UXHBox([$name]);
                 $nameLabel->spacing = 4;

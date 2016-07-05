@@ -32,8 +32,8 @@ class ProjectSystem
 {
     protected static function clear()
     {
-        WatcherSystem::clear();
-        WatcherSystem::clearListeners();
+        //WatcherSystem::clear();
+        //WatcherSystem::clearListeners();
         Ide::get()->unregisterCommands();
     }
 
@@ -310,6 +310,8 @@ class ProjectSystem
             $project->close($save);
         }
 
+        Cache::clear();
+
         /** @var MainForm $mainForm */
         $mainForm = Ide::get()->getMainForm();
         $pane = $mainForm->getPropertiesPane();
@@ -328,6 +330,10 @@ class ProjectSystem
 
         if ($project) {
             Ide::get()->trigger('afterCloseProject', [$project]);
+
+            $project->free();
         }
+
+        FileSystem::clearCache();
     }
 }

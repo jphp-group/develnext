@@ -1395,6 +1395,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         //$area->backgroundColor = 'green';
 
         $viewer = new UXScrollPane($area);
+        $viewer->fitToWidth = true;
+        $viewer->fitToHeight = true;
+        //$viewer->backgroundColor = 'white';
 
         $viewer->on('mouseUp', function ($e) {
             $this->selectForm();
@@ -1403,7 +1406,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if (!$fullArea) {
             $designPane = new UXDesignPane();
             $designPane->size = $this->layout->size;
-            $designPane->position = [10, 10];
+            $designPane->position = [0, 0];
             $designPane->onResize(function () {
                 $this->designer->update();
             });

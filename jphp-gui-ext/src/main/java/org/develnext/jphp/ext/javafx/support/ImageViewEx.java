@@ -302,8 +302,8 @@ public class ImageViewEx extends Canvas implements Styleable {
             g2.setFont(font);
             g2.setFill(textFill);
 
-            float fWidth = UXFont.calculateTextWidth(text, font);
-            float fHeight = UXFont.getLineHeight(font);
+            double fWidth = UXFont.calculateTextWidth(text, font);
+            double fHeight = UXFont.getLineHeight(font);
 
             g2.fillText(text, getWidth() / 2 - fWidth / 2, getHeight() / 2 + fHeight / 4, getWidth());
         }

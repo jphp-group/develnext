@@ -22,14 +22,19 @@ class StoreLinkCommand extends AbstractCommand
         return true;
     }
 
+    public function getCategory()
+    {
+        return 'library';
+    }
+
     public function getName()
     {
-        return 'Дополнения';
+        return 'DevelStore (Магазин)';
     }
 
     public function getIcon()
     {
-        return 'icons/gift_gray16.png';
+        return 'icons/product16.png';
     }
 
     public function getPriority()
@@ -43,9 +48,9 @@ class StoreLinkCommand extends AbstractCommand
         $button->text = $this->getName();
         $button->font = $button->font->withBold();
         $button->maxHeight = 999;
-        $button->classes->addAll(['flat-button', 'primary']);
+        $button->classes->addAll(['btn-link']);
         $button->padding = [0, 15];
-        $button->graphicTextGap = 5;
+        $button->graphicTextGap = 7;
 
         //UXHBox::setMargin($button, [0, 0, 0, 10]);
 
@@ -59,6 +64,7 @@ class StoreLinkCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        FileSystem::openOrRefresh('~doc');
+        alert('Раздел находится в разработке.');
+        //FileSystem::openOrRefresh('~dn-store');
     }
 }

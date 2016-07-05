@@ -127,6 +127,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('recover', [$this, 'doRecover']);
         $this->project->on('create', [$this, 'doCreate']);
         $this->project->on('open', [$this, 'doOpen']);
+        $this->project->on('close', [$this, 'doClose']);
         $this->project->on('updateTree', [$this, 'doUpdateTree']);
         $this->project->on('preCompile', [$this, 'doPreCompile']);
         $this->project->on('compile', [$this, 'doCompile']);
@@ -136,7 +137,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('makeSettings', [$this, 'doMakeSettings']);
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
 
-        WatcherSystem::addListener([$this, 'doWatchFile']);
+        //WatcherSystem::addListener([$this, 'doWatchFile']);
 
         Ide::get()->registerCommand(new CreateFormProjectCommand());
         Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
@@ -200,6 +201,13 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function getSpriteManager()
     {
         return $this->spriteManager;
+    }
+
+    public function doClose()
+    {
+        $this->actionManager->free();
+        $this->scriptComponentManager->free();
+        $this->spriteManager->free();
     }
 
     public function doCreate()
@@ -337,13 +345,13 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doOpen()
     {
-        $tree = $this->project->getTree();
+        /*$tree = $this->project->getTree();
 
         $tree->register(new FormProjectTreeNavigation(self::FORMS_DIRECTORY));
         $tree->register(new ModuleProjectTreeNavigation(self::SCRIPTS_DIRECTORY));
         $tree->register(new SpriteProjectTreeNavigation(self::GAME_DIRECTORY . '/sprites'));
 
-        $tree->getRoot()->root->children->add( $tree->createItemForFile($this->project->getFile('src/.theme/style.css'))->getOrigin() );
+        $tree->getRoot()->root->children->add( $tree->createItemForFile($this->project->getFile('src/.theme/style.css'))->getOrigin() );  */
 
         /** @var GradleProjectBehaviour $gradleBehavior */
         $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
