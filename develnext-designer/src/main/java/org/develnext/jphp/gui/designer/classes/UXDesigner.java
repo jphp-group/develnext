@@ -27,10 +27,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
@@ -969,6 +966,12 @@ public class UXDesigner extends BaseObject {
         }
     }
 
+    protected boolean isWithChildrenNode(Node node) {
+        return node instanceof AnchorPane || node instanceof VBox || node instanceof HBox || node instanceof FlowPane
+                /* || node instanceof TitledPane
+                || node instanceof TabPane || node instanceof ScrollPane*/;
+    }
+
     @Signature
     public void registerNode(final Node node) {
         if (nodes.containsKey(node)) {
@@ -1051,17 +1054,17 @@ public class UXDesigner extends BaseObject {
             public void handle(final MouseEvent e) {
                 final Node node = (Node) e.getSource();
 
-                Node intersectedNode = e.getPickResult().getIntersectedNode();
+                /*Node intersectedNode = e.getPickResult().getIntersectedNode();
 
-                if (intersectedNode != null && intersectedNode != node && intersectedNode instanceof Parent) {
-                    return;
-                }
-
-                if (onNodeClick != null) {
-                    if (onNodeClick.callAny(e).toBoolean()) {
-                        return;
+                if (intersectedNode != null && intersectedNode != node && isWithChildrenNode(intersectedNode)) {
+                    //return;
+                } else { */
+                    if (onNodeClick != null) {
+                        if (onNodeClick.callAny(e).toBoolean()) {
+                            return;
+                        }
                     }
-                }
+                //}
 
                 if (!dragged) {
                     boolean isSelected = selections.get(node) != null;

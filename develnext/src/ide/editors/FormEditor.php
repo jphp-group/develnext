@@ -625,13 +625,41 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return $count;
     }
 
+    /**
+     * @return array
+     */
+    public function getPrototypeUsageList()
+    {
+        $result = [];
+
+        DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node) use (&$result) {
+            $type = null;
+
+            if ($node instanceof UXCustomNode) {
+                $type = $node->get('type');
+            } else {
+                $factoryId = $node->data('-factory-id');
+
+                if ($factoryId) {
+                    $type = $factoryId;
+                }
+            }
+
+            if ($type) {
+                list($factoryName, $factoryId) = str::split($type, '.');
+
+                $result[$factoryName][$factoryId] = $factoryId;
+            }
+        });
+
+        return $result;
+    }
+
     public function reloadClones()
     {
         if ($this->factory) {
             $this->factory->reload();
         }
-
-        Logger::trace();
 
         $gui = GuiFrameworkProjectBehaviour::get();
 
@@ -721,8 +749,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 //$this->refreshNode($it[0]);
             }
         }
-
-        Logger::trace('Reload Clones finished.');
     }
 
     public function open()

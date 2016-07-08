@@ -1,7 +1,7 @@
 <element>
     <properties group="bindings" title="Функционал">
         <property code="modules" name="Модули" editor="moduleList" tooltip="Подключенные модули к форме" formConfig="1" />
-        <property code="form.withPrototypes" name="Прототипы" editor="boolean" tooltip="Возможность использовать компоненты формы как прототипы в других формах" formConfig="1" />
+        <property code="form.withPrototypes" name="Для прототипов" editor="boolean" tooltip="Возможность использовать компоненты формы как прототипы в других формах" formConfig="1" />
     </properties>
 
     <properties group="general" title="Главное">

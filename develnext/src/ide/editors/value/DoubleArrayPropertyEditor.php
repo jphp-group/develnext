@@ -3,6 +3,7 @@ namespace ide\editors\value;
 
 use php\gui\layout\UXHBox;
 use php\gui\UXLabel;
+use php\gui\UXSpinner;
 use php\gui\UXTextField;
 use php\xml\DomElement;
 
@@ -14,25 +15,44 @@ class DoubleArrayPropertyEditor extends ElementPropertyEditor
     protected $firstField;
 
     /**
+     * @var UXSpinner
+     */
+    protected $firstFieldSpinner;
+
+    /**
      * @var UXTextField
      */
     protected $secondField;
 
+    /**
+     * @var UXSpinner
+     */
+    protected $secondFieldSpinner;
+
     public function makeUi()
     {
+        $handle = function () {
+            $this->applyValue([$this->firstField->text, $this->secondField->text], false);
+        };
+
         foreach (['firstField', 'secondField'] as $name) {
-            $field = new UXTextField();
+            $spinner = new UXSpinner();
+            $spinner->editable = true;
+            $spinner->setIntegerValueFactory(-999999999, 999999999, 0);
+
+            $field = $spinner->editor;
+            //$field = new UXTextField();
             $field->padding = 2;
             $field->style = "-fx-background-insets: 0; -fx-background-color: -fx-control-inner-background; -fx-background-radius: 0;";
 
-            $field->on('keyUp', function () {
-                $this->applyValue([$this->firstField->text, $this->secondField->text], false);
-            });
+            $spinner->on('click', $handle);
+            $field->on('keyUp', $handle);
 
             $this->{$name} = $field;
+            $this->{"{$name}Spinner"} = $spinner;
         }
 
-        $box = new UXHBox([$this->firstField, new UXLabel(','), $this->secondField]);
+        $box = new UXHBox([$this->firstFieldSpinner, $this->secondFieldSpinner]);
         $box->spacing = 3;
 
         return $box;

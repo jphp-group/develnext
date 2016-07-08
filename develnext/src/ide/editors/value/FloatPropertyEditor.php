@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\value;
 
+use php\gui\UXSpinner;
 use php\lib\String;
 
 /**
@@ -14,13 +15,28 @@ class FloatPropertyEditor extends SimpleTextPropertyEditor
         return (double) $value;
     }
 
-    public function makeUi()
-    {
-        return parent::makeUi();
-    }
-
     public function getCode()
     {
         return 'float';
+    }
+
+    public function makeUi()
+    {
+        $spinner = new UXSpinner();
+        $spinner->editable = true;
+        $spinner->setIntegerValueFactory(-99999999, 99999999, 0);
+
+        $this->textField = $spinner->editor;
+
+        parent::makeUi();
+
+        $spinner->on('click', function () {
+            if ($this->textField->editable) {
+                $this->updateUi($this->textField->text, false);
+                $this->applyValue($this->textField->text, false);
+            }
+        });
+
+        return $spinner;
     }
 }

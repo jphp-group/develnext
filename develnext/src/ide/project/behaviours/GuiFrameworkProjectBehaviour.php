@@ -393,6 +393,20 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->defineFile('src/JPHP-INF/.bootstrap', new GuiBootstrapFileTemplate());
         $this->project->defineFile('src/JPHP-INF/launcher.conf', new GuiLauncherConfFileTemplate());
         $this->project->defineFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
+
+        // Set config for prototype forms.
+        foreach ($this->getFormEditors() as $editor) {
+            $usagePrototypes = $editor->getPrototypeUsageList();
+
+            foreach ($usagePrototypes as $factoryId => $ids) {
+                $formEditor = $this->getFormEditor($factoryId);
+
+                if (!$formEditor->getConfig()->get('form.withPrototypes')) {
+                    $formEditor->getConfig()->set('form.withPrototypes', true);
+                    $formEditor->saveConfig();
+                }
+            }
+        }
     }
 
     public function updateScriptManager()
@@ -420,7 +434,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $file->addLink($sources);
         }
 
-        if (!$sources->exists() && !Files::exists("$sources.source")) {
+        if (!$sources->exists() && !fs::exists("$sources.source")) {
             $this->createModule($rel);
         }
     }
@@ -443,7 +457,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $form->addLink($sources);
         }
 
-        if (!$sources->exists() && !Files::exists("$sources.source")) {
+        if (!$sources->exists() && !fs::exists("$sources.source")) {
             Logger::warn("Source file of the '$rel' form not found - $sources, will be create ...");
             $this->createForm($rel);
         }
