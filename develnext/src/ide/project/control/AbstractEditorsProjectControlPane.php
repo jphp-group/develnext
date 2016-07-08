@@ -145,12 +145,12 @@ abstract class AbstractEditorsProjectControlPane extends AbstractProjectControlP
 
                     FileSystem::close($file);
 
-                    if ($format->delete($file) === false) {
+                    if ($editor->delete($file) === false) {
                         return true;
                     }
 
-                    waitAsync(1000, function () use ($format, $file) {
-                        $format->delete($file);
+                    waitAsync(1000, function () use ($editor, $file) {
+                        $editor->delete($file);
 
                         $this->trigger('updateCount');
 

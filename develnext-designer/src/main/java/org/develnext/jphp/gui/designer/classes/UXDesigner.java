@@ -128,10 +128,14 @@ public class UXDesigner extends BaseObject {
 
                         if (J == heightBlocks - 1) {
                             canvas.setHeight(height % AREA_BLOCK_SIZE);
+
+                            if (canvas.getHeight() <= 0) canvas.setHeight(AREA_BLOCK_SIZE);
                         }
 
                         if (I == widthBlocks - 1) {
                             canvas.setWidth(width % AREA_BLOCK_SIZE);
+
+                            if (canvas.getWidth() <= 0) canvas.setWidth(AREA_BLOCK_SIZE);
                         }
 
                         canvas.setMouseTransparent(true);
@@ -177,11 +181,17 @@ public class UXDesigner extends BaseObject {
                        // imageView.setFitHeight(AREA_BLOCK_SIZE);
 
                         if (J == heightBlocks - 1) {
-                            viewPort = new Rectangle2D(0, 0, viewPort.getWidth(), height % AREA_BLOCK_SIZE);
+                            double hh = height % AREA_BLOCK_SIZE;
+                            hh = hh == 0 ? AREA_BLOCK_SIZE : hh;
+
+                            viewPort = new Rectangle2D(0, 0, viewPort.getWidth(), hh);
                         }
 
                         if (I == widthBlocks - 1) {
-                            viewPort = new Rectangle2D(0, 0, width % AREA_BLOCK_SIZE, viewPort.getHeight());
+                            double ww = width % AREA_BLOCK_SIZE;
+                            ww = ww == 0 ? AREA_BLOCK_SIZE : ww;
+
+                            viewPort = new Rectangle2D(0, 0, ww, viewPort.getHeight());
                         }
 
                         imageView.setClip(new Rectangle(viewPort.getWidth(), viewPort.getHeight()));
@@ -1041,7 +1051,14 @@ public class UXDesigner extends BaseObject {
             public void handle(final MouseEvent e) {
                 final Node node = (Node) e.getSource();
 
+                Node intersectedNode = e.getPickResult().getIntersectedNode();
+
+                if (intersectedNode != null && intersectedNode != node && intersectedNode instanceof Parent) {
+                    return;
+                }
+
                 if (onNodeClick != null) {
+                    System.out.println(node.getId());
                     if (onNodeClick.callAny(e).toBoolean()) {
                         return;
                     }

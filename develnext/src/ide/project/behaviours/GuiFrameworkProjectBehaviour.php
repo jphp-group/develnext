@@ -72,7 +72,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     const GAME_DIRECTORY = 'src/.game';
 
     /** @var string */
-    protected $mainForm = 'MainForm';
+    protected $mainForm = '';
 
     /**
      * @var ScriptComponentManager
@@ -213,17 +213,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function doCreate()
     {
         $this->setAppUuid(str::uuid());
-
-        $appModule = $this->createModule('AppModule');
-        FileSystem::open($appModule);
-
-        $mainModule = $this->createModule('MainModule');
-        FileSystem::open($mainModule);
-
-        $mainForm = $this->createForm($this->mainForm);
-        FileSystem::open($mainForm);
-
-        FileSystem::open('~project');
+        //FileSystem::open('~project');
     }
 
     public function doUpdate()
@@ -373,7 +363,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             Logger::warn("Unable to load application.conf, {$e->getMessage()}");
         }
 
-        $this->mainForm = $this->applicationConfig->get('app.mainForm', 'MainForm');
+        $this->mainForm = $this->applicationConfig->get('app.mainForm', '');
         $this->appUuid = $this->applicationConfig->get('app.uuid', str::uuid());
     }
 
@@ -746,11 +736,13 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                 continue;
             }
 
-            foreach ($editor->getObjectList() as $it) {
-                if ($it->element && $it->element->canBePrototype()) {
-                    $it->group = $editor->getTitle();
-                    $it->value = "{$it->getGroup()}.{$it->value}";
-                    $elements[] = $it;
+            if ($editor->getConfig()->get('form.withPrototypes')) {
+                foreach ($editor->getObjectList() as $it) {
+                    if ($it->element && $it->element->canBePrototype()) {
+                        $it->group = $editor->getTitle();
+                        $it->value = "{$it->getGroup()}.{$it->value}";
+                        $elements[] = $it;
+                    }
                 }
             }
         }

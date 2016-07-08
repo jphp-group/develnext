@@ -322,6 +322,8 @@ class CodeEditor extends AbstractEditor
             return;
         }
 
+        $caret = $this->textArea->caretPosition;
+
         if ($this->isSourceFile()) {
             $sourceFile = "$this->file.source";
 
@@ -348,6 +350,8 @@ class CodeEditor extends AbstractEditor
         if ($resetHistory) {
             $this->textArea->forgetHistory();
         }
+
+        $this->textArea->caretPosition = $caret;
 
         Logger::info("Finish load file $file");
     }

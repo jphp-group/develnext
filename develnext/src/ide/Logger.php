@@ -120,11 +120,13 @@ class Logger
             if (IdeSystem::isDevelopment()) {
                 $out = Stream::of('php://stdout');
 
+                $_line = $line;
+
                 if ($color = static::getLogColor($level)) {
-                    $line = static::withColor($line, $color);
+                    $_line = static::withColor($line, $color);
                 }
 
-                $out->write($line);
+                $out->write($_line);
             }
 
             if (Ide::isCreated()) {

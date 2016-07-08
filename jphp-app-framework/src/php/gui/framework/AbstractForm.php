@@ -443,15 +443,13 @@ abstract class AbstractForm extends UXForm
             if ($module->singleton) {
                 $this->_modules[$module->id] = app()->module($module->id);
             } else {
-                $this->_modules[$module->id] =  new $type();
+                $this->_modules[$module->id] = new $type();
             }
         }
 
         foreach ($this->_modules as $module) {
             if (!$module->singleton) {
-                uiLater(function () use ($module) {
-                    $module->apply($this);
-                });
+                $module->apply($this);
             }
         }
     }

@@ -21,6 +21,7 @@ include 'develnext-bundles/dn-mail-bundle'
 include 'develnext-bundles/dn-sql-bundle'
 include 'develnext-bundles/dn-sqlite-bundle'
 include 'develnext-bundles/dn-mysql-bundle'
+include 'develnext-bundles/dn-game2d-bundle'
 
 // stubs
 include 'develnext-stubs/dn-php-sdk'

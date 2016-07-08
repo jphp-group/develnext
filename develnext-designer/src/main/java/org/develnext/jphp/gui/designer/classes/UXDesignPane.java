@@ -233,5 +233,6 @@ public class UXDesignPane extends UXAnchorPane {
         topBorders.setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: " + borderWidth + "px; -fx-border-radius: 4px;");
         topBorders.setMouseTransparent(true);
         topBorders.setBackground(Background.EMPTY);
+        topBorders.setOpacity(0.5);
     }
 }

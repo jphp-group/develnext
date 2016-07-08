@@ -48,6 +48,7 @@ public class PhpCodeArea extends AbstractCodeArea {
                 return Collections.singletonList("string");
 
             case PHPParser.Numeric:
+            case PHPParser.Real:
                 return Collections.singletonList("number");
 
             case PHPParser.VarName:
@@ -56,8 +57,9 @@ public class PhpCodeArea extends AbstractCodeArea {
             case PHPParser.Abstract:
             case PHPParser.As:
             case PHPParser.Array:
-            case PHPParser.BooleanAnd:
-            case PHPParser.BooleanOr:
+            case PHPParser.LogicalAnd:
+            case PHPParser.LogicalOr:
+            case PHPParser.LogicalXor:
             case PHPParser.BooleanConstant:
             case PHPParser.Break:
             case PHPParser.Continue:
@@ -75,9 +77,11 @@ public class PhpCodeArea extends AbstractCodeArea {
             case PHPParser.Public:
             case PHPParser.Var:
             case PHPParser.Protected:
+            case PHPParser.Private:
             case PHPParser.Static:
             case PHPParser.Print:
             case PHPParser.PHPStart:
+            case PHPParser.PHPStartInside:
             case PHPParser.Clone:
             case PHPParser.Echo:
             case PHPParser.Empty:
@@ -116,6 +120,8 @@ public class PhpCodeArea extends AbstractCodeArea {
             case PHPParser.New:
             case PHPParser.Throw:
             case PHPParser.Unset:
+            case PHPParser.Default:
+            case PHPParser.Final:
                 return Collections.singletonList("keyword");
 
             case PHPParser.Label:
@@ -131,6 +137,8 @@ public class PhpCodeArea extends AbstractCodeArea {
             case PHPParser.CloseSquareBracket:
                 return Collections.singletonList("control");
 
+            case PHPParser.BooleanAnd:
+            case PHPParser.BooleanOr:
             case PHPParser.Plus:
             case PHPParser.PlusEqual:
             case PHPParser.Minus:

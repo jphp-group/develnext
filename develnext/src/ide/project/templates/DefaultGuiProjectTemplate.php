@@ -8,6 +8,7 @@ use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\behaviours\RunBuildProjectBehaviour;
 use ide\project\behaviours\ShareProjectBehaviour;
 use ide\project\Project;
+use ide\systems\FileSystem;
 
 /**
  * Class DefaultGuiProjectTemplate
@@ -67,13 +68,27 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
     {
         $project->register(new BundleProjectBehaviour());
         $project->register(new PhpProjectBehaviour());
-        $project->register(new GuiFrameworkProjectBehaviour());
+
+        /** @var GuiFrameworkProjectBehaviour $gui */
+        $gui = $project->register(new GuiFrameworkProjectBehaviour());
+
         $project->register(new RunBuildProjectBehaviour());
         $project->register(new ShareProjectBehaviour());
 
         $project->setIgnoreRules([
             '*.log', '*.tmp'
         ]);
+
+        $project->on('create', function () use ($gui) {
+            $appModule  = $gui->createModule('AppModule');
+            $mainModule = $gui->createModule('MainModule');
+            $mainForm   = $gui->createForm('MainForm');
+
+            $gui->setMainForm('MainForm');
+
+            FileSystem::open($mainModule);
+            FileSystem::open($mainForm);
+        });
 
         return $project;
     }

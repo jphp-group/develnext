@@ -329,6 +329,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             } else {
                 uiLater(function () {
                     $this->viewerAndEvents->orientation = $this->viewerAndEvents->orientation == 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL';
+                    $this->codeEditor->requestFocus();
                 });
             }
         }));
@@ -533,15 +534,19 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
+    public function saveConfig()
+    {
+        Stream::tryAccess($this->configFile, function (Stream $stream) {
+            $this->config->save($stream);
+        }, 'w+');
+    }
+
     public function save()
     {
         $this->formDumper->save($this);
 
         $this->saveOthers();
-
-        Stream::tryAccess($this->configFile, function (Stream $stream) {
-            $this->config->save($stream);
-        }, 'w+');
+        $this->saveConfig();
 
         if ($this->factory) {
             $this->factory->reload();
@@ -726,6 +731,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->reloadClones();
 
+        Logger::trace("0");
+
         $ideConfig = $this->getIdeConfig();
 
         if ($this->actionsPane) {
@@ -751,7 +758,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->prototypeTypePane->resetConfigurable(get_class($this) . "#prototype");
 
             if ($gui) {
-                $this->prototypeTypePane->setElements($gui->getAllPrototypes($this));
+                $prototypes = $gui->getAllPrototypes($this);
+                $this->prototypeTypePane->setElements($prototypes);
             }
         }
 
@@ -1118,7 +1126,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                     if ($tabs->selectedTab === $this->codeTab) {
                         if ($this->viewerAndEvents->items[1] != null) {
                             $this->hideCodeEditorInDesigner();
-
                             /*TimerScript::executeAfter(2000, function () {
                                 $this->switchToSource();
                             });  */
@@ -1127,6 +1134,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
                     if ($tabs->selectedTab === $this->designerTab) {
                         $this->updateMultipleEditor();
+                    } else {
+                        $this->codeEditor->requestFocus();
                     }
                 });
             });
@@ -1164,6 +1173,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $this->codeTab->content = $this->codeEditorUi;
+
+        uiLater(function () {
+            $this->codeEditor->requestFocus();
+        });
     }
 
     public function switchToSmallSource()
@@ -1244,6 +1257,22 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return $result;
     }
 
+    public function removeModule($name)
+    {
+        $modules = $this->getModules();
+
+        if ($modules[$name]) {
+            unset($modules[$name]);
+
+            $this->config->set('modules', str::join($modules, '|'));
+
+            $this->saveConfig();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function getModuleEditors()
     {
         $modules = $this->getModules();
@@ -1271,6 +1300,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             AccurateTimer::executeAfter(100, function () use ($content) {
                 $this->codeTab->content = $content;
+                $this->codeEditor->requestFocus();
             });
         }
     }
@@ -1395,8 +1425,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         //$area->backgroundColor = 'green';
 
         $viewer = new UXScrollPane($area);
-        $viewer->fitToWidth = true;
-        $viewer->fitToHeight = true;
         //$viewer->backgroundColor = 'white';
 
         $viewer->on('mouseUp', function ($e) {
@@ -1404,6 +1432,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         });
 
         if (!$fullArea) {
+            $viewer->fitToWidth = true;
+            $viewer->fitToHeight = true;
+
             $designPane = new UXDesignPane();
             $designPane->size = $this->layout->size;
             $designPane->position = [0, 0];

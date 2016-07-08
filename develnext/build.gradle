@@ -208,7 +208,7 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
     def installDir = "$project.buildDir/install/$project.name"
 
     compression = Compression.GZIP
-    archiveName "DevelNextLinux.tar.gz"
+    archiveName "DevelNextLinux-${project.ext.distVersion}.tar.gz"
 
     from(installDir) {
         exclude('*.sh')

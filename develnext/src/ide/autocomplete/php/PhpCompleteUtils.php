@@ -122,9 +122,11 @@ abstract class PhpCompleteUtils
     {
         $insert = $method->name . '(';
 
-        if (!$method->arguments) {
-            $insert .= ')';
+        if ($method->arguments) {
+            $insert .= '#';
         }
+
+        $insert .= ')';
 
         $description = self::methodParamsString2($method);
 

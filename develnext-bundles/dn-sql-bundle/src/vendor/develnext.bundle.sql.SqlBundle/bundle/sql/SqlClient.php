@@ -121,6 +121,10 @@ abstract class SqlClient extends AbstractScript
                 Logger::info("SQL -> $sql, arguments = " . Json::encode($arguments, false));
             }
 
+            if (!$this->client) {
+                throw new SqlException("Cannot query(), sql client is not connected.");
+            }
+
             return $this->client->query($sql, $arguments);
         } catch (SqlException $e) {
             $this->processSqlException($e);

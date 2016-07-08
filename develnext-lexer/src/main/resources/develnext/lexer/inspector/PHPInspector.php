@@ -181,6 +181,26 @@ class PHPInspector extends AbstractInspector
         $data['content'] = $this->parseDescription($comment);
         $data['deprecated'] = str::contains($comment, '@deprecated');
 
+        $regex = Regex::of('\\@iterator-type[ ]+' . $this->typeNameRegex, Regex::CASE_INSENSITIVE | Regex::DOTALL)->with($comment);
+
+        if ($regex->find()) {
+            $type = $regex->group(1);
+
+            foreach (str::split($type, '|') as $one) {
+                $realType = str::split($one, '[]', 2)[0];
+
+                if (!arr::has($this->simpleTypes, $realType)) {
+                    $data['iterator-type'] = SyntaxAnalyzer::getRealName($realType, $owner, 'CLASS');
+
+                    if (str::endsWith($one, '[]')) {
+                        $data['iterator-type'] .= '[]';
+                    }
+                } else {
+                    $data['iterator-type'] = $one;
+                }
+            }
+        }
+
         return $data;
     }
 
@@ -470,6 +490,11 @@ class PHPInspector extends AbstractInspector
         $e->value = $arg->getValue() ? $arg->getValue()->getExprString() : null;
         $e->type = $arg->getHintTypeClass() ? $arg->getHintTypeClass()->getWord() : str::lower($arg->getHintType());
         $e->optional = !!$arg->getValue();
+
+        if ($arg->getHintType() == 'VARARG') {
+            $e->optional = true;
+            $e->type = '...';
+        }
 
         return $e;
     }

@@ -314,17 +314,25 @@ class AutoCompletePane
                 $insert = $selected->getInsert();
                 Logger::debug("Insert to caret: " . $insert);
 
+                $altCaret = 0;
+
                 if (!is_string($insert) && is_callable($insert)) {
                     $in = new AutoCompleteInsert($this->area);
                     $insert($in);
 
                     $insert = $in->getValue();
+                } else {
+                    if (str::contains($insert, '#')) {
+                        $altCaret = -(str::length($insert) - str::lastPos($insert, '#')) + 1;
+                        $insert = str::replace($insert, '#', '');
+                    }
                 }
 
                 $this->area->caretPosition -= str::length($prefix);
                 $this->area->deleteText($this->area->caretPosition, $this->area->caretPosition + str::length($prefix));
 
                 $this->area->insertToCaret($insert);
+                $this->area->caretPosition += $altCaret;
             });
 
             $this->lock = true;

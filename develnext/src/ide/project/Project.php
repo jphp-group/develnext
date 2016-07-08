@@ -658,6 +658,7 @@ class Project
         $exporter->removeFile($this->indexer->getIndexFile());
         $exporter->removeFile($this->getIdeLibraryConfig());
         $exporter->removeFile($this->getIdeFile("ide.lock"));
+        $exporter->removeFile($this->getIdeCacheFile(''));
 
         $this->trigger('export', $exporter);
 

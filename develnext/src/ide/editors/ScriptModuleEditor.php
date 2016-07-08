@@ -415,7 +415,7 @@ class ScriptModuleEditor extends FormEditor
 
     public function getModuleName()
     {
-        return FileUtils::stripExtension(File::of($this->file)->getName());
+        return fs::pathNoExt(File::of($this->file)->getName());
     }
 
     protected $forms = [];
@@ -595,5 +595,14 @@ class ScriptModuleEditor extends FormEditor
     public function getRefactorRenameNodeType()
     {
         return ScriptModuleFormat::REFACTOR_ELEMENT_ID_TYPE;
+    }
+
+    public function delete($silent = false)
+    {
+        foreach ($this->getFormEditors() as $editor) {
+            $editor->removeModule($this->getModuleName());
+        }
+
+        parent::delete($silent);
     }
 }

@@ -34,7 +34,7 @@ class IdeLogShowCommand extends AbstractCommand
 
         $dialog->size = [1000, 600];
 
-        $textArea = new UXTextArea(FileUtils::get(Ide::get()->getFile('ide.log')));
+        $textArea = new UXTextArea(FileUtils::get(Ide::get()->getLogFile()));
         $textArea->font = new UXFont(11, 'Courier New');
         UXAnchorPane::setAnchor($textArea, 10);
 
