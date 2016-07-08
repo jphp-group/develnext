@@ -1058,7 +1058,6 @@ public class UXDesigner extends BaseObject {
                 }
 
                 if (onNodeClick != null) {
-                    System.out.println(node.getId());
                     if (onNodeClick.callAny(e).toBoolean()) {
                         return;
                     }
