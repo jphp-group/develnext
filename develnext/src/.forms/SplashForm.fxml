@@ -10,7 +10,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="698.0" style="-fx-border-color: transparent;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="698.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ImageView id="image" fitHeight="430.0" fitWidth="698.0" pickOnBounds="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <image>
@@ -19,15 +19,21 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
-         <effect>
-            <InnerShadow color="WHITE" />
-         </effect>
       </ImageView>
-      <Label id="version" alignment="TOP_RIGHT" layoutX="410.0" layoutY="356.0" prefHeight="20.0" prefWidth="188.0" style="-fx-font-style: italic;" text="... version" textAlignment="RIGHT" textFill="#747575" visible="false">
+      <Label id="version" alignment="TOP_RIGHT" layoutX="134" layoutY="320" prefHeight="-1" prefWidth="434" text="... version" textAlignment="RIGHT" textFill="white">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
+      <HBox layoutY="370" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" style="-fx-background-color: #1e4e7a;" alignment="CENTER">
+         <children>
+            <Label id="tip" style="-fx-padding: 10px 10px; -fx-font-style: normal;" text="Если у проекта нет главной формы, используйте модуль загрузчик для действий при старте" textAlignment="CENTER" textFill="white">
+               <font>
+                  <Font size="14" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
       <HBox id="accountPane" layoutX="14.0" layoutY="14.0" spacing="15.0" style="-fx-background-color: white;">
          <children>
             <AnchorPane id="accountAvatarImage" prefWidth="50.0" />
@@ -53,7 +59,7 @@
             <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
          </padding>
          <effect>
-            <DropShadow blurType="GAUSSIAN" color="WHITE" />
+            <DropShadow blurType="GAUSSIAN" color="white" />
          </effect>
       </HBox>
    </children>

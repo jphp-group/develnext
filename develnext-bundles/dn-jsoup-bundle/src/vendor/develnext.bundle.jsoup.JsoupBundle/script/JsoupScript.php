@@ -8,6 +8,8 @@ use php\io\Stream;
 use php\jsoup\Connection;
 use php\jsoup\ConnectionResponse;
 use php\jsoup\Document;
+use php\jsoup\Element;
+use php\jsoup\Elements;
 use php\jsoup\Jsoup;
 use php\lang\Thread;
 use php\lib\str;
@@ -238,11 +240,17 @@ class JsoupScript extends AbstractScript
         return $this->isReady();
     }
 
+    /**
+     * @return array
+     */
     public function getResponseCookies()
     {
         return $this->_response->cookies();
     }
 
+    /**
+     * @return array
+     */
     public function getResponseHeaders()
     {
         return $this->_response->headers();
@@ -288,6 +296,10 @@ class JsoupScript extends AbstractScript
         return $this->_response->contentType();
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function getTitle()
     {
         if (!$this->_document) {
@@ -297,6 +309,10 @@ class JsoupScript extends AbstractScript
         return $this->_document->title();
     }
 
+    /**
+     * @return Element
+     * @throws \Exception
+     */
     public function getBody()
     {
         if (!$this->_document) {
@@ -306,6 +322,10 @@ class JsoupScript extends AbstractScript
         return $this->_document->body();
     }
 
+    /**
+     * @return Element
+     * @throws \Exception
+     */
     public function getHead()
     {
         if (!$this->_document) {
@@ -315,6 +335,11 @@ class JsoupScript extends AbstractScript
         return $this->_document->head();
     }
 
+    /**
+     * @param $query
+     * @return Elements
+     * @throws \Exception
+     */
     public function find($query)
     {
         if (!$this->_document) {
@@ -324,11 +349,21 @@ class JsoupScript extends AbstractScript
         return $this->_document->select($query);
     }
 
+    /**
+     * @param $query
+     * @return Element
+     * @throws \Exception
+     */
     public function findFirst($query)
     {
         return $this->find($query)->first();
     }
 
+    /**
+     * @param $query
+     * @return Element
+     * @throws \Exception
+     */
     public function findLast($query)
     {
         return $this->find($query)->last();

@@ -35,6 +35,7 @@ class IdeLibraryBundleResource extends IdeLibraryResource
         if (class_exists($class)) {
             $this->bundle = new $class();
             $this->bundle->setBundleDirectory($this->getPath());
+            $this->bundle->onRegister($this);
         } else {
             throw new \Exception("Cannot register bundle resource, class '$class' is not found");
         }

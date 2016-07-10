@@ -1,6 +1,7 @@
 <?php
 namespace ide\bundle;
 
+use ide\library\IdeLibraryBundleResource;
 use ide\Logger;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\Project;
@@ -27,6 +28,14 @@ abstract class AbstractBundle
 
     abstract function getName();
     abstract function getDescription();
+
+    /**
+     * @return array
+     */
+    public function useNewBundles()
+    {
+        return [];
+    }
 
     /**
      * @param Project $project
@@ -95,8 +104,9 @@ abstract class AbstractBundle
 
     /**
      * On register in ide globally.
+     * @param IdeLibraryBundleResource $resource
      */
-    public function onRegister()
+    public function onRegister(IdeLibraryBundleResource $resource)
     {
     }
 

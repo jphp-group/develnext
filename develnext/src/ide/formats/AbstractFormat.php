@@ -2,6 +2,7 @@
 namespace ide\formats;
 
 use ide\editors\AbstractEditor;
+use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
 use ide\project\ProjectFile;
@@ -101,6 +102,30 @@ abstract class AbstractFormat
      * @return mixed
      */
     abstract public function register($any);
+
+    /**
+     * @param string $source
+     */
+    public function registerInternalList($source)
+    {
+        $ones = Ide::get()->getInternalList($source);
+
+        foreach ($ones as $one) {
+            $this->register(new $one);
+        }
+    }
+
+    /**
+     * @param string $source
+     */
+    public function unregisterInternalList($source)
+    {
+        $ones = Ide::get()->getInternalList($source);
+
+        foreach ($ones as $one) {
+            $this->unregister(new $one);
+        }
+    }
 
     /**
      * @param $any

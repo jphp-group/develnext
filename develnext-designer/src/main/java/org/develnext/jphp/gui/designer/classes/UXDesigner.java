@@ -1273,7 +1273,7 @@ public class UXDesigner extends BaseObject {
 
             sizeText = new Label();
             sizeText.setMouseTransparent(true);
-            sizeText.setStyle("-fx-background-color: #fffe85; -fx-opacity: 0.9; -fx-padding: 1px 10px;");
+            sizeText.setStyle("-fx-background-color: #fffe85; -fx-padding: 1px 10px;");
 
             area.getChildren().addAll(sizeText);
 
@@ -1306,6 +1306,8 @@ public class UXDesigner extends BaseObject {
             } else {
                 destroy();
             }
+
+            showHelperText(node.getId());
         }
 
         protected void updateResized() {
@@ -1358,7 +1360,7 @@ public class UXDesigner extends BaseObject {
             double sizeTextY = y - sizeText.getBoundsInLocal().getHeight() - POINT_SIZE;
 
             if (sizeTextY < 0) {
-                sizeTextY = y;
+                sizeTextY = y + border.getHeight() + POINT_SIZE;
             }
 
             sizeText.relocate(x, sizeTextY);
@@ -1672,6 +1674,14 @@ public class UXDesigner extends BaseObject {
                 if (dragged) {
                     sizeText.setText("X: " + (int) x + ", Y: " + (int) y);
                 }
+            }
+        }
+
+        public void showHelperText(String text) {
+            if (helpersEnabled && text != null && !text.isEmpty()) {
+                sizeText.setVisible(true);
+
+                sizeText.setText(text);
             }
         }
     }

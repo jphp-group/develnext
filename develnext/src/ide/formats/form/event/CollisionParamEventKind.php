@@ -25,7 +25,7 @@ class CollisionParamEventKind extends AbstractEventKind
                 } elseif ($item->element) {
                     $spec = $contextEditor->getBehaviourManager()->getBehaviourSpecByClass(GameEntityBehaviour::class);
 
-                    if ($spec->isAllowedFor($item->element)) {
+                    if ($spec && $spec->isAllowedFor($item->element)) {
                         $result[$item->text . " (недоступно)"] = false; //$item->value;
                     }
                 }

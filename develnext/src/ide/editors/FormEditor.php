@@ -276,11 +276,15 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->actionEditor = new ActionEditor($phpFile . '.axml');
         $this->actionEditor->setFormEditor($this);
 
-        $this->behaviourManager = new IdeBehaviourManager(fs::pathNoExt($phpFile) . '.behaviour', function ($targetId) {
+        $this->behaviourManager = new IdeBehaviourManager(fs::pathNoExt($phpFile) . '.behaviour', function ($targetId, $has = false) {
             $node = $targetId ? $this->layout->lookup("#$targetId") : $this;
 
             if (!$node) {
                 return null;
+            }
+
+            if ($has) {
+                return true;
             }
 
             return $this->getFormat()->getFormElement($node);
@@ -437,7 +441,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 $prop->name = $el->value;
                 $prop->data['content']['DEF'] = $el->element ? $el->element->getName() : '';
                 $prop->data['icon'] = $el->getIcon();
-                $prop->data['type'][] = $el->element->getElementClass() ?: UXNode::class;
+                $prop->data['type'][] = $el->element ? ($el->element->getElementClass() ?: UXNode::class) : UXNode::class;
 
                 $behaviourType = new TypeEntry();
                 $behaviourType->data['getters'] = true;
@@ -445,8 +449,13 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 foreach ($this->behaviourManager->getBehaviours($el->value) as $one) {
                     $behaviourType->properties[$one->getCode()] = $t = new TypePropertyEntry();
                     $t->name = $one->getCode();
-                    $t->data['icon'] = $this->behaviourManager->getBehaviourSpec($one)->getIcon();
-                    $t->data['type'][] = reflect::typeOf($one);
+
+                    $spec = $this->behaviourManager->getBehaviourSpec($one);
+
+                    if ($spec) {
+                        $t->data['icon'] = $spec->getIcon();
+                        $t->data['type'][] = reflect::typeOf($one);
+                    }
                 }
 
                 $prop->data['type'][] = $behaviourType;
@@ -463,7 +472,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 $type->properties[$el->value] = $prop = new TypePropertyEntry();
                 $prop->name = $el->value;
                 $prop->data['icon'] = $el->getIcon();
-                $prop->data['type'][] = $el->element->getElementClass() ?: UXNode::class;
+                $prop->data['type'][] = $el->element ? ($el->element->getElementClass() ?: UXNode::class) : UXNode::class;
             }
 
             foreach ($project->getInspectors() as $inspector) {
@@ -918,8 +927,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $index[$this->getNodeId($node)] = [
                 'id' => $this->getNodeId($node),
                 'type' => get_class($element),
-                'version' => (int) $node->data('-factory-version'),
-                'data' => $element->getIndexData($node),
+                'version' => (int)$node->data('-factory-version'),
+                'data' => $element ? $element->getIndexData($node) : [],
             ];
         }
 

@@ -51,6 +51,7 @@ use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\io\MemoryStream;
 use php\lang\IllegalStateException;
+use php\lib\arr;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Flow;
@@ -513,9 +514,13 @@ class ActionConstructorForm extends AbstractIdeForm
     {
         static $buildTabs;
         static $subGroups = [];
+        static $managerUpd = 0;
 
-        if (!$buildTabs) {
+        if ($editor->getManager()->lastUpdated() > $managerUpd) {
             $buildTabs = [];
+            $subGroups = [];
+
+            $managerUpd = $editor->getManager()->lastUpdated();
 
             $actions = $editor->getManager()->getActionTypes();
 

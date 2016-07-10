@@ -11,6 +11,7 @@ use ide\library\IdeLibraryBundleResource;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
+use ide\systems\FileSystem;
 use ide\systems\IdeSystem;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
@@ -177,11 +178,19 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 if (class_exists($class)) {
                     $bundle = $this->makeBundle($class);
 
-                    if ($bundle instanceof AbstractBundle) {
-                        $this->bundleConfigs[get_class($bundle)] = $config;
+                    if ($bundle->useNewBundles()) {
+                        foreach ($bundle->useNewBundles() as $newClass) {
+                            $this->addBundle($config->get('env') ?: Project::ENV_ALL, $newClass);
+                        }
 
-                        $bundle->onLoad($this->project, $config);
-                        $this->addBundle($config->get('env') ?: Project::ENV_ALL, $class);
+                        $this->removeBundle($class, true);
+                    } else {
+                        if ($bundle instanceof AbstractBundle) {
+                            $this->bundleConfigs[get_class($bundle)] = $config;
+
+                            $bundle->onLoad($this->project, $config);
+                            $this->addBundle($config->get('env') ?: Project::ENV_ALL, $class);
+                        }
                     }
                 }
             }
@@ -523,6 +532,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             unset($this->bundles[Project::ENV_ALL][$class]);
 
             $bundle = $this->makeBundle($class);
+
             $this->bundles[$env][$class] = $bundle;
 
             foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
@@ -625,6 +635,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
             $this->doUpdateSettings();
             $this->doSave();
+
+            if ($editor = FileSystem::getSelectedEditor()) {
+                $editor->open();
+            }
         }
     }
 

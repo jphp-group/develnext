@@ -12,6 +12,8 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':jphp-game-ext')
+    compile (project(':jphp-game-ext')) {
+        exclude group: 'org.develnext', module: 'jphp-gui-ext'
+    }
 }
 

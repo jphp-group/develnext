@@ -3,6 +3,8 @@ namespace ide\forms;
 
 use ide\Ide;
 use ide\Logger;
+use ide\systems\SplashTipSystem;
+use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
@@ -22,6 +24,7 @@ use php\lang\ThreadPool;
  * @property UXLabel $accountNameLabel
  * @property UXAnchorPane $accountAvatarImage
  * @property UXHBox $accountPane
+ * @property UXLabel $tip
  */
 class SplashForm extends AbstractIdeForm
 {
@@ -78,12 +81,24 @@ class SplashForm extends AbstractIdeForm
     }
 
     /**
+     * @param UXEvent $e
+     * @event tip.click
+     */
+    public function doTipClick(UXEvent $e)
+    {
+        $this->tip->text = SplashTipSystem::get();
+        $e->consume();
+    }
+
+    /**
      * @event show
      */
     public function doShow()
     {
+        $this->tip->text = SplashTipSystem::get();
+
         if (Ide::get()->isDevelopment()) {
-            $this->opacity = 0.05;
+            //$this->opacity = 0.05;
         }
     }
 

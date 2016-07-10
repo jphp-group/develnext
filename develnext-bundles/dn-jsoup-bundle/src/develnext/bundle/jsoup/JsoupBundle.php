@@ -15,7 +15,7 @@ class JsoupBundle extends AbstractJarBundle
 {
     function getName()
     {
-        return "HTML Парсер (Jsoup)";
+        return "Jsoup";
     }
 
     function getDescription()

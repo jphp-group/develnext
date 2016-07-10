@@ -217,7 +217,15 @@ class ExecuteProjectCommand extends AbstractCommand
                 Ide::get()->getMainForm()->hideBottom();
             }, __CLASS__);
 
-            ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'java -cp ... php.runtime.launcher.Launcher', function () use ($dialog, $project, $ide) {
+            ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'java -cp ... php.runtime.launcher.Launcher', function ($success) use ($dialog, $project, $ide) {
+                if (!$success) {
+                    $dialog->stopWithError();
+                    $this->startButton->enabled = true;
+                    $this->stopButton->enabled = false;
+
+                    return;
+                }
+
                 try {
                     $classPaths = arr::toList($this->behaviour->getSourceDirectories(), $this->behaviour->getLibraries(['jar']));
 

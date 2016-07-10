@@ -14,7 +14,7 @@ class MailBundle extends AbstractJarBundle
 {
     function getName()
     {
-        return "Отправитель писем";
+        return "Mailer";
     }
 
     function getDescription()

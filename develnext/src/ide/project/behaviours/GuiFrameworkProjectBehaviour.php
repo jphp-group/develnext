@@ -1,6 +1,7 @@
 <?php
 namespace ide\project\behaviours;
 
+use develnext\bundle\game2d\Game2DBundle;
 use develnext\bundle\jsoup\JsoupBundle;
 use develnext\bundle\orientdb\OrientDbBundle;
 use Files;
@@ -8,6 +9,7 @@ use ide\action\ActionManager;
 use ide\build\OneJarBuildType;
 use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
+use ide\bundle\std\UIDesktopBundle;
 use ide\bundle\std\JPHPDesktopDebugBundle;
 use ide\bundle\std\JPHPGuiDesktopBundle;
 use ide\commands\BuildProjectCommand;
@@ -24,6 +26,10 @@ use ide\editors\GameSpriteEditor;
 use ide\editors\ProjectEditor;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\form\AbstractFormElement;
+use ide\formats\form\elements\GameBackgroundFormElement;
+use ide\formats\form\elements\GameObjectFormElement;
+use ide\formats\form\elements\GamePaneFormElement;
+use ide\formats\form\elements\SpriteViewFormElement;
 use ide\formats\form\FormProjectTreeNavigation;
 use ide\formats\module\ModuleProjectTreeNavigation;
 use ide\formats\sprite\IdeSpriteManager;
@@ -147,7 +153,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         Ide::get()->registerCommand(new CreateGameSpriteProjectCommand());
 
         $this->scriptComponentManager = new ScriptComponentManager();
-        $this->actionManager = new ActionManager();
+        $this->actionManager = ActionManager::get();
         $this->spriteManager = new IdeSpriteManager($this->project);
     }
 
@@ -383,8 +389,15 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $bundle = BundleProjectBehaviour::get();
+
         if ($bundle) {
-            $bundle->addBundle(Project::ENV_ALL, JPHPGuiDesktopBundle::class, false);
+            if (!$this->project->getIdeFile("bundles/")->findFiles()) { // for old project formats
+                $bundle->addBundle(Project::ENV_ALL, UIDesktopBundle::class, false);
+                $bundle->addBundle(Project::ENV_ALL, Game2DBundle::class);
+            } else {
+                $bundle->addBundle(Project::ENV_ALL, UIDesktopBundle::class, false);
+            }
+
             $bundle->addBundle(Project::ENV_DEV, JPHPDesktopDebugBundle::class, false);
         }
 
@@ -786,6 +799,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $item->hint = $element ? $element->getName() : '';
             $item->element = $element;
             $item->version = (int) $it['version'];
+            $item->rawType = $it['type'];
 
             if ($element) {
                 if ($graphic = $element->getCustomPreviewImage((array) $it['data'])) {

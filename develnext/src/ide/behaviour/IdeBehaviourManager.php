@@ -2,6 +2,7 @@
 namespace ide\behaviour;
 
 use ide\Ide;
+use ide\IdeException;
 use ide\utils\FileUtils;
 use php\format\ProcessorException;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
@@ -19,16 +20,6 @@ use php\xml\XmlProcessor;
  */
 class IdeBehaviourManager extends BehaviourManager
 {
-    /**
-     * @var AbstractBehaviourSpec[]
-     */
-    protected static $specs = [];
-
-    /**
-     * @var AbstractBehaviourSpec[]
-     */
-    protected static $specsByCode = [];
-
     /**
      * @var string
      */
@@ -50,33 +41,19 @@ class IdeBehaviourManager extends BehaviourManager
     protected $undeletable = [];
 
     /**
+     * @var IdeBehaviourDatabase
+     */
+    private $database;
+
+    /**
      * @param $file
      * @param callable $targetGetter
      */
     public function __construct($file, callable $targetGetter = null)
     {
-        if (!self::$specs) {
-            $behaviours = Ide::get()->getInternalList('.dn/behaviours');
-
-            foreach ($behaviours as $behaviour) {
-                /** @var AbstractBehaviourSpec $behaviour */
-                $behaviour = new $behaviour();
-
-                $type = $behaviour->getType();
-
-                self::$specs[$type] = $behaviour;
-
-                /** @var AbstractBehaviour $tmp */
-                $tmp = new $type();
-
-                if ($code = $tmp->getCode()) {
-                    self::$specsByCode[$code] = $behaviour;
-                }
-            }
-        }
-
         $this->file = $file;
         $this->targetGetter = $targetGetter;
+        $this->database = IdeBehaviourDatabase::get();
     }
 
     /**
@@ -85,20 +62,16 @@ class IdeBehaviourManager extends BehaviourManager
      */
     public function getBehaviourSpec(AbstractBehaviour $behaviour)
     {
-        return self::$specs[get_class($behaviour)];
+        return $this->database->getBehaviourSpec($behaviour);
     }
 
+    /**
+     * @param $className
+     * @return AbstractBehaviourSpec
+     */
     public function getBehaviourSpecByClass($className)
     {
-        if ($spec = self::$specsByCode[$className]) {
-            return $spec;
-        }
-
-        if ($className[0] == '\\') {
-            $className = Str::sub($className, 1);
-        }
-
-        return self::$specs[$className];
+        return $this->database->getBehaviourSpecByClass($className);
     }
 
     /**
@@ -106,7 +79,7 @@ class IdeBehaviourManager extends BehaviourManager
      */
     public function getAllBehaviourSpecs()
     {
-        return self::$specs;
+        return $this->database->getAllBehaviourSpecs();
     }
 
     /**
@@ -259,7 +232,7 @@ class IdeBehaviourManager extends BehaviourManager
         $document->appendChild($root);
 
         foreach ($this->behaviours as $targetId => $behaviours) {
-            if (!$this->getTarget($targetId)) {
+            if (!$this->hasTarget($targetId)) {
                 continue;
             }
 
@@ -334,6 +307,15 @@ class IdeBehaviourManager extends BehaviourManager
         }
 
         return call_user_func($this->targetGetter, $targetId);
+    }
+
+    public function hasTarget($targetId)
+    {
+        if (!$this->targetGetter) {
+            return false;
+        }
+
+        return call_user_func($this->targetGetter, $targetId, true);
     }
 
     /**

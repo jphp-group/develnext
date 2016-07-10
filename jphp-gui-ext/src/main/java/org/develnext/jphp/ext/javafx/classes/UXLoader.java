@@ -30,13 +30,15 @@ public class UXLoader extends BaseWrapper<FXMLLoader> {
     }
 
     @Signature
-    public void __construct() {
+    public void __construct(Environment env) {
         __wrappedObject = new FXMLLoader();
+        getWrappedObject().setClassLoader(env.getScope().getClassLoader());
     }
 
     @Signature
-    public void __construct(URL source) {
+    public void __construct(Environment env, URL source) {
         __wrappedObject = new FXMLLoader(source);
+        getWrappedObject().setClassLoader(env.getScope().getClassLoader());
     }
 
     @Signature

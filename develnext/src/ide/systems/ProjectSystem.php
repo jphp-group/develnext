@@ -72,10 +72,10 @@ class ProjectSystem
                     $consoleOutput->addConsoleLine('   --> ' . $project->getRootDir() . ' ..', 'gray');
                 });
 
-                uiLater(function() use ($callback) {
+                uiLater(function () use ($callback) {
                     $callback(true);
                 });
-            } catch (\Error $e) {
+            } catch (\Throwable $e) {
                 uiLater(function () use ($consoleOutput, $e, $callback) {
                     $file = Ide::project() ? Ide::project()->getAbsoluteFile($e->getFile())->getRelativePath() : $e->getFile();
 

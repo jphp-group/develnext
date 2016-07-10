@@ -1,5 +1,6 @@
 <?php
 namespace ide\action;
+use ide\Logger;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\utils\PhpParser;
@@ -251,16 +252,22 @@ class ActionScript
 
                 $actions = [];
 
+                /** @var DomElement $domAction */
                 foreach ($domMethod->findAll('*') as $domAction) {
                     $count += 1;
 
                     $action = $this->manager->buildAction($domAction);
-                    $action->setContextClass($className);
-                    $action->setContextMethod($methodName);
 
-                    $actions[] = $action;
+                    if ($action) {
+                        $action->setContextClass($className);
+                        $action->setContextMethod($methodName);
 
-                    $imports = $imports->append($action->imports());
+                        $actions[] = $action;
+
+                        $imports = $imports->append($action->imports());
+                    } else {
+                        throw new \Exception("Cannot find action type '{$domAction->getTagName()}', method = '$className.$methodName()'");
+                    }
                 }
 
                 $code = $this->compileActions($className, $methodName, $actions);

@@ -1231,6 +1231,10 @@ class Ide extends Application
 
         $result = [];
 
+        if (!$resources) {
+            Logger::warn("Internal list '$resourceName' is empty");
+        }
+
         foreach ($resources as $resource) {
             $scanner = new Scanner($resource, 'UTF-8');
 

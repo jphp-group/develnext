@@ -5,6 +5,7 @@ use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionScript;
 use ide\behaviour\AbstractBehaviourSpec;
+use ide\behaviour\IdeBehaviourDatabase;
 use ide\behaviour\IdeBehaviourManager;
 use ide\editors\argument\BehaviourTypeArgumentEditor;
 use ide\editors\argument\EnumArgumentEditor;
@@ -23,7 +24,7 @@ use php\lib\Str;
 class BehaviourEnableActionType extends AbstractSimpleActionType
 {
     /**
-     * @var IdeBehaviourManager
+     * @var IdeBehaviourDatabase
      */
     protected $manager;
 
@@ -32,7 +33,7 @@ class BehaviourEnableActionType extends AbstractSimpleActionType
      */
     public function __construct()
     {
-        $this->manager = new IdeBehaviourManager(null);
+        $this->manager = IdeBehaviourDatabase::get();
     }
 
     function attributes()

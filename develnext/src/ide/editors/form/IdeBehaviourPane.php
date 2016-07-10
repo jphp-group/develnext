@@ -17,6 +17,7 @@ use php\gui\layout\UXHBox;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXVBox;
 use php\gui\UXButton;
+use php\gui\UXDialog;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXTitledPane;
@@ -107,6 +108,11 @@ class IdeBehaviourPane
 
         foreach ($behaviours as $class => $behaviour) {
             $spec = $this->behaviourManager->getBehaviourSpec($behaviour);
+
+            if (!$spec) {
+                continue;
+            }
+
             $properties = $spec->getProperties();
 
             $code = $class;
@@ -219,7 +225,14 @@ class IdeBehaviourPane
         $button->style = '-fx-font-weight: bold;';
 
         $button->on('action', function () use ($targetId) {
-            $dialog = new BehaviourCreateForm($this->behaviourManager, $this->behaviourManager->getTarget($targetId));
+            $target = $this->behaviourManager->getTarget($targetId);
+
+            if (!$target) {
+                UXDialog::showAndWait('Незарегистрированный тип компонента', 'ERROR');
+                return;
+            }
+
+            $dialog = new BehaviourCreateForm($this->behaviourManager, $target);
 
             $behaviourSpecs = Flow::of($this->behaviourManager->getBehaviours($targetId))->map(function (AbstractBehaviour $behaviour) {
                 return $this->behaviourManager->getBehaviourSpec($behaviour);

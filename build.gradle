@@ -166,7 +166,10 @@ project(':jphp-game-ext') {
     dependencies {
         compile 'org.dyn4j:dyn4j:3.2.1'
 
-        compile project(':jphp-gui-ext')
+        compile (project(':jphp-gui-ext')) {
+            transitive = false
+        }
+
         compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
     }
 }
@@ -197,7 +200,6 @@ project(':develnext') {
         compile project(':jphp-gui-richtext-ext')
         compile project(':jphp-app-framework')
         compile project(':jphp-desktop-ext')
-        compile project(':jphp-game-ext')
         compile project(':jphp-parser')
         compile project(':develnext-doc')
         compile project(':develnext-store')
@@ -213,7 +215,7 @@ project(':develnext') {
         provided project(':develnext-bundles/dn-sql-bundle')
         provided project(':develnext-bundles/dn-sqlite-bundle')
         provided project(':develnext-bundles/dn-mysql-bundle')
-        //provided project(':develnext-bundles/dn-game2d-bundle')
+        provided project(':develnext-bundles/dn-game2d-bundle')
 
         // stubs.
         compile project(':develnext-stubs/dn-php-sdk')

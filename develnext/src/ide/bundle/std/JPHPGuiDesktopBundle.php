@@ -7,6 +7,7 @@ use action\Element;
 use action\Geometry;
 use action\Media;
 use action\Score;
+use develnext\bundle\game2d\Game2DBundle;
 use game\Jumping;
 use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
@@ -84,6 +85,11 @@ use php\gui\UXWebEngine;
 use php\gui\UXWebView;
 use php\gui\UXWindow;
 
+/**
+ * Class JPHPGuiDesktopBundle
+ * @deprecated
+ * @package ide\bundle\std
+ */
 class JPHPGuiDesktopBundle extends AbstractJarBundle
 {
     function getName()
@@ -91,119 +97,11 @@ class JPHPGuiDesktopBundle extends AbstractJarBundle
         return "JPHP UI Desktop";
     }
 
-    public function getDependencies()
+    public function useNewBundles()
     {
         return [
-            JPHPCoreBundle::class,
-            JPHPJsonBundle::class,
-            JPHPXmlBundle::class,
-        ];
-    }
-
-    public function applyForGradle(GradleProjectBehaviour $gradle)
-    {
-        parent::applyForGradle($gradle);
-
-        // legacy.
-        $gradle->removeDependency('jphp-gui-desktop-ext');
-    }
-
-    /**
-     * @return array
-     */
-    function getJarDependencies()
-    {
-        return [
-            'jphp-gui-ext', 'jphp-desktop-ext', 'jphp-game-ext', 'dyn4j', 'jphp-zend-ext', 'jphp-app-framework',
-        ];
-    }
-
-    public function getUseImports()
-    {
-        return [
-            UXNode::class,
-            UXEvent::class,
-            UXApplication::class,
-            UXAnimationTimer::class,
-            UXHBox::class,
-            UXAnchorPane::class,
-            UXClipboard::class,
-            UXColor::class,
-            UXContextMenuEvent::class,
-            UXDialog::class,
-            UXFont::class,
-            UXGeometry::class,
-            UXImage::class,
-            UXMedia::class,
-            UXMenu::class,
-            UXMenuItem::class,
-            UXButton::class,
-            UXTooltip::class,
-            UXToggleButton::class,
-            UXToggleGroup::class,
-            UXImageView::class,
-            UXImageArea::class,
-            UXSlider::class,
-            UXSpinner::class,
-            UXVBox::class,
-            UXTitledPane::class,
-            UXPanel::class,
-            UXFlowPane::class,
-            UXForm::class,
-            UXWindow::class,
-            UXAlert::class,
-            UXContextMenu::class,
-            UXControl::class,
-            UXDirectoryChooser::class,
-            UXFileChooser::class,
-            UXFlatButton::class,
-            UXHyperlink::class,
-            UXList::class,
-            UXListView::class,
-            UXComboBox::class,
-            UXChoiceBox::class,
-            UXLabel::class,
-            UXLabelEx::class,
-            UXLabeled::class,
-            UXListCell::class,
-            UXMediaPlayer::class,
-            UXParent::class,
-            UXPopupWindow::class,
-            UXPasswordField::class,
-            UXProgressIndicator::class,
-            UXProgressBar::class,
-            UXTab::class,
-            UXTabPane::class,
-            UXTreeView::class,
-            UXTrayNotification::class,
-            UXWebEngine::class,
-            UXWebView::class,
-            UXCell::class,
-            UXColorPicker::class,
-            UXCanvas::class,
-            UXStackPane::class,
-            UXPane::class,
-            UXScrollPane::class,
-
-            UXCollisionEvent::class,
-            UXKeyEvent::class,
-            UXDragEvent::class,
-            UXMouseEvent::class,
-            UXWebEvent::class,
-            UXWindowEvent::class,
-
-            AbstractForm::class,
-            AbstractModule::class,
-
-            Animation::class,
-            Collision::class,
-            Jumping::class,
-            Element::class,
-            Geometry::class,
-            Media::class,
-            Score::class,
-
-            Logger::class,
+            UIDesktopBundle::class,
+            Game2DBundle::class
         ];
     }
 }

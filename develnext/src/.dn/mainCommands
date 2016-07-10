@@ -14,3 +14,4 @@ ide\commands\YoutubeChannelCommand
 ide\commands\VkGroupCommand
 
 ide\commands\CheckUpdatesCommand
+ide\commands\AboutCommand

@@ -1,6 +1,7 @@
 <?php
 namespace ide\project\templates;
 
+use ide\bundle\std\UIDesktopBundle;
 use ide\project\AbstractProjectTemplate;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
@@ -66,7 +67,9 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
      */
     public function makeProject(Project $project)
     {
-        $project->register(new BundleProjectBehaviour());
+        /** @var BundleProjectBehaviour $bundle */
+        $bundle = $project->register(new BundleProjectBehaviour());
+
         $project->register(new PhpProjectBehaviour());
 
         /** @var GuiFrameworkProjectBehaviour $gui */
@@ -79,7 +82,9 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
             '*.log', '*.tmp'
         ]);
 
-        $project->on('create', function () use ($gui) {
+        $project->on('create', function () use ($gui, $bundle) {
+            $bundle->addBundle(Project::ENV_ALL, UIDesktopBundle::class, false);
+
             $appModule  = $gui->createModule('AppModule');
             $mainModule = $gui->createModule('MainModule');
             $mainForm   = $gui->createForm('MainForm');

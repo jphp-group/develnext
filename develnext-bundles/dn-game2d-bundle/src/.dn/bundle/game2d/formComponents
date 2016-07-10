@@ -1,0 +1,8 @@
+ide\formats\form\elements\GamePaneFormElement
+ide\formats\form\elements\SpriteViewFormElement
+ide\formats\form\elements\GameBackgroundFormElement
+
+
+ide\formats\form\tags\GamePaneFormElementTag
+ide\formats\form\tags\SpriteViewFormElementTag
+ide\formats\form\tags\GameBackgroundFormElementTag

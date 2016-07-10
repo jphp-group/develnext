@@ -70,7 +70,12 @@ class Logger
 
             $line = "[" . static::getLogName($level) . "] $time" . $message . "\r\n";
 
-            $out = Stream::of('php://stdout');
+            static $out = null;
+
+            if (!$out) {
+                $out = Stream::of('php://stdout');
+            }
+
             $out->write($line);
         }
     }

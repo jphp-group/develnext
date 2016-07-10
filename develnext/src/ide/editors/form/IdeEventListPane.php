@@ -583,7 +583,7 @@ class IdeEventListPane
 
                 $namesBox = new UXVBox([$nameLabel, $line]);
 
-                $icon = Ide::get()->getImage($eventType['icon']);
+                $icon = str::trim($eventType['icon']) ? Ide::get()->getImage($eventType['icon']) : null;
 
                 if ($icon) {
                     $box = new UXHBox([$icon, $namesBox]);
