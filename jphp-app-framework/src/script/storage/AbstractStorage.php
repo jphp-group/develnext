@@ -17,7 +17,7 @@ abstract class AbstractStorage extends AbstractScript
     protected $data = [];
 
     /**
-     * Автосохранение данных при изменении.
+     * РђРІС‚РѕСЃРѕС…СЂР°РЅРµРЅРёРµ РґР°РЅРЅС‹С… РїСЂРё РёР·РјРµРЅРµРЅРёРё.
      * @var bool
      */
     public $autoSave = true;
@@ -34,7 +34,7 @@ abstract class AbstractStorage extends AbstractScript
     /**
      * Returns value of key and section.
      * --RU--
-     * Возвращает значение по ключу (и секции, если передать).
+     * Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїРѕ РєР»СЋС‡Сѓ (Рё СЃРµРєС†РёРё, РµСЃР»Рё РїРµСЂРµРґР°С‚СЊ).
      * @param $key
      * @param string $section
      * @return mixed
@@ -57,7 +57,7 @@ abstract class AbstractStorage extends AbstractScript
     /**
      * Returns an array of section.
      * --RU--
-     * Возвращает массив данных секции.
+     * Р’РѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ РґР°РЅРЅС‹С… СЃРµРєС†РёРё.
      * @param string $name
      * @return array
      */
@@ -69,7 +69,7 @@ abstract class AbstractStorage extends AbstractScript
     /**
      * Returns names of sections.
      * --RU--
-     * Возвращает массив имен секций.
+     * Р’РѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ РёРјРµРЅ СЃРµРєС†РёР№.
      * @return array
      */
     public function sections()
@@ -88,7 +88,7 @@ abstract class AbstractStorage extends AbstractScript
     /**
      * Writes a few values into section.
      * --RU--
-     * Записывает сразу несколько значений в секцию.
+     * Р—Р°РїРёСЃС‹РІР°РµС‚ СЃСЂР°Р·Сѓ РЅРµСЃРєРѕР»СЊРєРѕ Р·РЅР°С‡РµРЅРёР№ РІ СЃРµРєС†РёСЋ.
      * @param array $values
      * @param string $section
      */
@@ -110,7 +110,7 @@ abstract class AbstractStorage extends AbstractScript
     /**
      * Set value of key of section.
      * --RU--
-     * Задает значение ключа секции.
+     * Р—Р°РґР°РµС‚ Р·РЅР°С‡РµРЅРёРµ РєР»СЋС‡Р° СЃРµРєС†РёРё.
      *
      * @param $key
      * @param $value
@@ -133,7 +133,7 @@ abstract class AbstractStorage extends AbstractScript
     /**
      * Removes value by key from section.
      * --RU--
-     * Удаляет значение по ключу из секции.
+     * РЈРґР°Р»СЏРµС‚ Р·РЅР°С‡РµРЅРёРµ РїРѕ РєР»СЋС‡Сѓ РёР· СЃРµРєС†РёРё.
      * @param string $key
      * @param string $section
      */
@@ -152,7 +152,7 @@ abstract class AbstractStorage extends AbstractScript
 
     /**
      * --RU--
-     * Удаляет секцию.
+     * РЈРґР°Р»СЏРµС‚ СЃРµРєС†РёСЋ.
      * @param string $section
      */
     public function removeSection($section)
@@ -165,7 +165,7 @@ abstract class AbstractStorage extends AbstractScript
     }
 
     /**
-     * Возвращает все данные в виде массива.
+     * Р’РѕР·РІСЂР°С‰Р°РµС‚ РІСЃРµ РґР°РЅРЅС‹Рµ РІ РІРёРґРµ РјР°СЃСЃРёРІР°.
      * @return array
      */
     public function toArray()
