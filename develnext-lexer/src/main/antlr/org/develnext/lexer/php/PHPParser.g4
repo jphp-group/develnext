@@ -8,7 +8,7 @@ parser grammar PHPParser;
 
 @header {package org.develnext.lexer.php;}
 
-options { tokenVocab='org/develnext/lexer/php/PHPLexer'; }
+options { tokenVocab='./org/develnext/lexer/php/PHPLexer'; }
 
 // HTML
 // Also see here: https://github.com/antlr/grammars-v4/tree/master/html
