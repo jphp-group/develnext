@@ -12,6 +12,7 @@ dependencies {
 generateGrammarSource {
     maxHeapSize = "64m"
     arguments += ["-visitor", "-long-messages"]
+    outputDirectory = file("build/generated-src/antlr/main")
 }
 
 idea.module {
