@@ -86,23 +86,24 @@ task distWindowsPatch(type: Zip, dependsOn: ['clean', 'distPatch']) {
 
     doLast {
         def issFile = "$project.rootDir/develnext/windowsSetup/innopatchsetup.iss".replace("\\", "/")
-        def innoSetupBin = "$project.rootDir/develnext-tools/innoSetup/ISCC.exe".replace("\\", "/")
 
-        exec {
-            commandLine innoSetupBin, '/Qp', issFile
+        if (System.properties['os.name'].toLowerCase().contains('linux')) {
+            issFile = "windowsSetup/innopatchsetup.iss"
         }
 
-        def uploadPath = System.getProperty("uploadPath", "E:/Upload")
+        buildISS(issFile)
+
+        def uploadPath = System.getProperty("uploadPath", "E:/Upload/YandexDisk")
 
         if (new File(uploadPath).isDirectory()) {
             copy {
                 from "$project.buildDir/distributions/DevelNext.WindowsPatch.exe"
-                into "$uploadPath/YandexDisk"
+                into "$uploadPath"
             }
 
             copy {
                 from distWindowsPatch.archivePath
-                into "$uploadPath/YandexDisk"
+                into "$uploadPath"
             }
         }
     }
