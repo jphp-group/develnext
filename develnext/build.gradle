@@ -52,9 +52,9 @@ def makeExe = { file ->
             args file
         }
     } else if (System.properties['os.name'].toLowerCase().contains('linux')) {
-        file("$project.rootDir/develnext-tools/Launch4jLinux/launch4j").setExecutable(true, true);
-        file("$project.rootDir/develnext-tools/Launch4jLinux/bin/windres").setExecutable(true, true);
-        file("$project.rootDir/develnext-tools/Launch4jLinux/bin/ld").setExecutable(true, true);
+        new File("$project.rootDir/develnext-tools/Launch4jLinux/launch4j").setExecutable(true, true);
+        new File("$project.rootDir/develnext-tools/Launch4jLinux/bin/windres").setExecutable(true, true);
+        new File("$project.rootDir/develnext-tools/Launch4jLinux/bin/ld").setExecutable(true, true);
 
         exec {
             commandLine "$project.rootDir/develnext-tools/Launch4jLinux/launch4j"
