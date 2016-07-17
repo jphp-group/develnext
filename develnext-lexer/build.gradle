@@ -1,29 +1,29 @@
 project.version = '1.0'
 
-apply plugin: 'antlr'
+//apply plugin: 'antlr'
 
 dependencies {
-    antlr 'org.antlr:antlr4:4.5.3'
+    //antlr 'org.antlr:antlr4:4.5.3'
     compile 'org.antlr:antlr4-runtime:4.5.3'
     compile "org.develnext.jphp:jphp-core:$rootProject.ext.jphpVersion"
     compile "org.develnext.jphp:jphp-compress-ext:$rootProject.ext.jphpVersion"
 }
 
-generateGrammarSource {
+/*generateGrammarSource {
     maxHeapSize = "64m"
     arguments += ["-visitor", "-long-messages", "-lib", "src/main/antlr"]
     outputDirectory = file("build/generated-src/antlr/main/")
-}
+}*/
 
-idea.module {
+/*idea.module {
     excludeDirs -= file("$buildDir")
     sourceDirs += file("$buildDir/generated-src")
-}
+}*/
 
-sourceSets {
+/*sourceSets {
     main {
         java {
             srcDirs += "$buildDir/generated-src"
         }
     }
-}
+}*/
