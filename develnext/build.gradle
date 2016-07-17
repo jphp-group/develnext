@@ -31,6 +31,38 @@ manifest {
     attributes 'Main-Class': 'php.runtime.launcher.Launcher'
 }
 
+def buildISS = { issFile ->
+    def innoSetupBin = "$project.rootDir/develnext-tools/innoSetup/ISCC.exe".replace("\\", "/")
+
+    if (System.properties['os.name'].toLowerCase().contains('linux')) {
+        exec {
+            commandLine 'wine', innoSetupBin, '/Qp', issFile
+        }
+    } else {
+        exec {
+            commandLine innoSetupBin, '/Qp', issFile
+        }
+    }
+}
+
+def makeExe = { file ->
+    if (System.properties['os.name'].toLowerCase().contains('windows')) {
+        exec {
+            commandLine "$project.rootDir/develnext-tools/Launch4j/launch4jc.exe"
+            args file
+        }
+    } else if (System.properties['os.name'].toLowerCase().contains('linux')) {
+        file("$project.rootDir/develnext-tools/Launch4jLinux/launch4j").setExecutable(true, true);
+        file("$project.rootDir/develnext-tools/Launch4jLinux/bin/windres").setExecutable(true, true);
+        file("$project.rootDir/develnext-tools/Launch4jLinux/bin/ld").setExecutable(true, true);
+
+        exec {
+            commandLine "$project.rootDir/develnext-tools/Launch4jLinux/launch4j"
+            args file
+        }
+    }
+}
+
 installDist.doLast {
     fileTree("$project.buildDir/install/$project.name/lib").visit { FileVisitDetails el ->
         def name = el.getName()
@@ -158,21 +190,7 @@ task distIdeLinux(dependsOn: ['distIde']) {
 
 task distIde(dependsOn: ['installDist']) {
     doLast {
-        if (System.properties['os.name'].toLowerCase().contains('windows')) {
-            exec {
-                commandLine "$project.rootDir/develnext-tools/Launch4j/launch4jc.exe"
-                args "$project.rootDir/develnext/launcher/winLauncher.xml"
-            }
-        } else if (System.properties['os.name'].toLowerCase().contains('linux')) {
-            file("$project.rootDir/develnext-tools/Launch4jLinux/launch4j").setExecutable(true, true);
-            file("$project.rootDir/develnext-tools/Launch4jLinux/bin/windres").setExecutable(true, true);
-            file("$project.rootDir/develnext-tools/Launch4jLinux/bin/ld").setExecutable(true, true);
-
-            exec {
-                commandLine "$project.rootDir/develnext-tools/Launch4jLinux/launch4j"
-                args "$project.rootDir/develnext/launcher/winLauncher.xml"
-            }
-        }
+        makeExe("$project.rootDir/develnext/launcher/winLauncher.xml")
 
         copy {
             from "$project.rootDir/develnext-tools"
@@ -194,11 +212,12 @@ task distIde(dependsOn: ['installDist']) {
 task distIdeWindowsSetup(dependsOn: ['distIdeWindows']) {
     doLast {
         def issFile = "$project.rootDir/develnext/windowsSetup/innosetup.iss".replace("\\", "/")
-        def innoSetupBin = "$project.rootDir/develnext-tools/innoSetup/ISCC.exe".replace("\\", "/")
 
-        exec {
-            commandLine innoSetupBin, '/Qp', issFile
+        if (System.properties['os.name'].toLowerCase().contains('linux')) {
+            issFile = 'windowsSetup/innosetup.iss'
         }
+
+        buildISS(issFile);
 
         def uploadPath = System.getProperty("uploadPath", "E:/Upload/YandexDisk")
 
