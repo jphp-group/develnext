@@ -200,12 +200,12 @@ task distIdeWindowsSetup(dependsOn: ['distIdeWindows']) {
             commandLine innoSetupBin, '/Qp', issFile
         }
 
-        def uploadPath = System.getProperty("uploadPath", "E:/Upload")
+        def uploadPath = System.getProperty("uploadPath", "E:/Upload/YandexDisk")
 
         if (new File(uploadPath).isDirectory()) {
             copy {
                 from "$project.buildDir/distributions/DevelNextSetup.exe"
-                into "$uploadPath/YandexDisk"
+                into "$uploadPath"
                 rename "DevelNextSetup.exe", "DevelNextSetup-${project.ext.distVersion}.exe"
             }
         }
@@ -243,12 +243,12 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
     }
 
     doLast {
-        def uploadPath = System.getProperty("uploadPath", "E:/Upload")
+        def uploadPath = System.getProperty("uploadPath", "E:/Upload/YandexDisk")
 
         if (new File(uploadPath).isDirectory()) {
             copy {
                 from distIdeLinuxSetup.archivePath
-                into "$uploadPath/YandexDisk"
+                into "$uploadPath"
             }
         }
     }
