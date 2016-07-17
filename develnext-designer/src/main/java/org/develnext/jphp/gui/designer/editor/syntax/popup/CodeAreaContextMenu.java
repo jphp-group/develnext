@@ -9,10 +9,10 @@ import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.fxmisc.richtext.StyledTextArea;
 
 public class CodeAreaContextMenu extends ContextMenu {
-    protected final MenuItem pasteItem = new MenuItem("Вставить");
-    protected final MenuItem copyItem = new MenuItem("Копировать");
-    protected final MenuItem cutItem = new MenuItem("Вырезать");
-    protected final MenuItem selectAllItem = new MenuItem("Выделить все");
+    protected final MenuItem pasteItem = new MenuItem("Р’СЃС‚Р°РІРёС‚СЊ");
+    protected final MenuItem copyItem = new MenuItem("РљРѕРїРёСЂРѕРІР°С‚СЊ");
+    protected final MenuItem cutItem = new MenuItem("Р’С‹СЂРµР·Р°С‚СЊ");
+    protected final MenuItem selectAllItem = new MenuItem("Р’С‹РґРµР»РёС‚СЊ РІСЃРµ");
 
     private final StyledTextArea codeArea;
 

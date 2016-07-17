@@ -89,6 +89,8 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
         exclude('tools/gradle/bin/gradle')
         exclude('tools/jre/bin/java')
         exclude('tools/Launch4jLinux/launch4j')
+        exclude('tools/Launch4jLinux/bin/windres')
+        exclude('tools/Launch4jLinux/bin/ld')
     }
 
     from(installDir) {
@@ -98,6 +100,8 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
         include('tools/gradle/bin/gradle')
         include('tools/jre/bin/java')
         include('tools/Launch4jLinux/launch4j')
+        include('tools/Launch4jLinux/bin/windres')
+        include('tools/Launch4jLinux/bin/ld')
 
         fileMode = 0755
     }
@@ -160,6 +164,10 @@ task distIde(dependsOn: ['installDist']) {
                 args "$project.rootDir/develnext/launcher/winLauncher.xml"
             }
         } else if (System.properties['os.name'].toLowerCase().contains('linux')) {
+            file("$project.rootDir/develnext-tools/Launch4jLinux/launch4j").setExecutable(true, true);
+            file("$project.rootDir/develnext-tools/Launch4jLinux/bin/windres").setExecutable(true, true);
+            file("$project.rootDir/develnext-tools/Launch4jLinux/bin/ld").setExecutable(true, true);
+
             exec {
                 commandLine "$project.rootDir/develnext-tools/Launch4jLinux/launch4j"
                 args "$project.rootDir/develnext/launcher/winLauncher.xml"
@@ -217,6 +225,8 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
         exclude('tools/gradle/bin/gradle')
         exclude('tools/jre/bin/java')
         exclude('tools/Launch4jLinux/launch4j')
+        exclude('tools/Launch4jLinux/bin/windres')
+        exclude('tools/Launch4jLinux/bin/ld')
     }
 
     from(installDir) {
@@ -226,6 +236,8 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
         include('tools/gradle/bin/gradle')
         include('tools/jre/bin/java')
         include('tools/Launch4jLinux/launch4j')
+        include('tools/Launch4jLinux/bin/windres')
+        include('tools/Launch4jLinux/bin/ld')
 
         fileMode = 0755
     }
