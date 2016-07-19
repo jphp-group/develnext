@@ -134,6 +134,9 @@ class Ide extends Application
      */
     protected $idle = false;
 
+
+    protected $disableOpenLastProject = false;
+
     /**
      * @var string
      */
@@ -1081,13 +1084,13 @@ class Ide extends Application
 
             FileSystem::open('~welcome');
 
-            if ($projectFile && File::of($projectFile)->exists()) {
+            if (!$this->disableOpenLastProject && $projectFile && File::of($projectFile)->exists()) {
                 ProjectSystem::open($projectFile, false);
             }
         });
     }
 
-    protected function afterShow(callable $handle)
+    public function afterShow(callable $handle)
     {
         if ($this->isLaunched()) {
             $handle();
@@ -1297,5 +1300,10 @@ class Ide extends Application
         }
 
         return false;
+    }
+
+    public function disableOpenLastProject()
+    {
+        $this->disableOpenLastProject = true;
     }
 }

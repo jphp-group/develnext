@@ -30,10 +30,20 @@ class FileOpenProjectProtocolHandler extends AbstractProtocolHandler
      */
     public function handle($query)
     {
+        Logger::info("Trigger open $query");
+
         if (fs::hasExt($query, 'dnproject')) {
-            ProjectSystem::open($query);
+            Ide::get()->disableOpenLastProject();
+
+            Ide::get()->bind('start', function () use ($query) {
+                ProjectSystem::open($query);
+            });
         } elseif (fs::hasExt($query, 'zip')) {
-            ProjectSystem::import($query);
+            Ide::get()->disableOpenLastProject();
+
+            Ide::get()->bind('start', function () use ($query) {
+                ProjectSystem::import($query);
+            });
         }
     }
 }

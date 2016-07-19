@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DevelNext Patch"
-#define MyAppVersion "Patch-A"
+#define MyAppVersion "2016"
 #define MyAppPublisher "develnext.org"
 #define MyAppURL "http://develnext.org"
 #define MyAppExeName "DevelNext.exe"
@@ -26,6 +26,7 @@ OutputBaseFilename=DevelNext.WindowsPatch
 Compression=lzma
 SolidCompression=yes
 WizardImageFile=wizardPatchImage.bmp
+ChangesAssociations=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -47,4 +48,10 @@ Root: HKCR; Subkey: "develnext"; ValueType: "string"; ValueData: "URL:DevelNext 
 Root: HKCR; Subkey: "develnext"; ValueType: "string"; ValueName: "URL Protocol"; ValueData: ""
 Root: HKCR; Subkey: "develnext\DefaultIcon"; ValueType: "string"; ValueData: "{app}\DevelNext.exe,0"
 Root: HKCR; Subkey: "develnext\shell\open\command"; ValueType: "string"; ValueData: """{app}\DevelNext.exe"" ""%1"""
+
+; Ext assoc:
+Root: HKCR; Subkey: ".dnproject"; ValueData: "DevelNext"; Flags: uninsdeletevalue; ValueType: string;  ValueName: ""
+Root: HKCR; Subkey: "{#MyAppName}"; ValueData: "DevelNext Project"; Flags: uninsdeletekey; ValueType: string;  ValueName: ""
+Root: HKCR; Subkey: "{#MyAppName}\DefaultIcon"; ValueData: "{app}\projectExtension.ico"; ValueType: string;  ValueName: ""
+Root: HKCR; Subkey: "{#MyAppName}\shell\open\command"; ValueData: """{app}\{#MyAppExeName}"" ""%1"""; ValueType: string;  ValueName: ""
 
