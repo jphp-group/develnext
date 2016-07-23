@@ -294,8 +294,17 @@ class Ide extends Application
     {
         $env = System::getEnv();
 
-        $env['JAVA_HOME'] = $this->getJrePath();
-        $env['GRADLE_HOME'] = $this->getGradlePath();
+        if ($this->getJrePath()) {
+            $env['JAVA_HOME'] = $this->getJrePath();
+        }
+
+        if ($this->getGradlePath()) {
+            $env['GRADLE_HOME'] = $this->getGradlePath();
+        }
+
+        if ($this->getApacheAntPath()) {
+            $env['ANT_HOME'] = $this->getApacheAntPath();
+        }
 
         return $env;
     }
@@ -316,6 +325,17 @@ class Ide extends Application
         }
 
         return $launch4jPath && $launch4jPath->exists() ? $launch4jPath->getCanonicalFile() : null;
+    }
+
+    public function getApacheAntProgram()
+    {
+        $antPath = $this->getApacheAntPath();
+
+        if ($antPath) {
+            return FileUtils::normalizeName("$antPath/bin/ant" . ($this->isWindows() ? '.bat' : ''));
+        } else {
+            return 'ant';
+        }
     }
 
     public function getGradleProgram()
@@ -352,6 +372,21 @@ class Ide extends Application
         Logger::info("Detect tool path: '$file', mode = {$this->mode}, launcher = {$launcher}");
 
         return $file;
+    }
+
+    public function getApacheAntPath()
+    {
+        $antPath = new File($this->getToolPath(), '/apache-ant');
+
+        if (!$antPath->exists()) {
+            $antPath = System::getEnv()['ANT_HOME'];
+
+            if ($antPath) {
+                $antPath = File::of($antPath);
+            }
+        }
+
+        return $antPath && $antPath->exists() ? $antPath->getCanonicalFile() : null;
     }
 
     public function getGradlePath()

@@ -14,6 +14,7 @@ import php.runtime.reflection.ClassEntity;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Name(JavaFXExtension.NS + "UXFileChooser")
@@ -155,6 +156,10 @@ public class UXFileChooser extends BaseWrapper<FileChooser> {
     @Signature
     public List<File> showOpenMultipleDialog(@Nullable Window window) {
         List<File> files = getWrappedObject().showOpenMultipleDialog(window);
+
+        if (files == null) {
+            return Collections.emptyList();
+        }
 
         if (!files.isEmpty()) {
             getWrappedObject().setInitialDirectory(files.get(0).getParentFile());

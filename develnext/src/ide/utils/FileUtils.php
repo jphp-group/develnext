@@ -3,6 +3,7 @@ namespace ide\utils;
 
 use ide\Logger;
 use ide\ui\Notifications;
+use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\io\File;
 use php\io\FileStream;
@@ -11,6 +12,7 @@ use php\io\Stream;
 use php\lang\System;
 use php\lib\fs;
 use php\lib\Str;
+use php\time\Time;
 
 /**
  * Class FileUtils
@@ -169,7 +171,23 @@ class FileUtils
         try {
             fs::ensureParent($dest);
 
-            fs::copy($origin, $dest);
+            $time = Time::millis();
+
+            $size = fs::size($origin);
+
+            if ($size < 1024 * 1024 * 32) {
+                Stream::putContents($dest, fs::get($origin));
+            } else {
+                fs::copy($origin, $dest);
+            }
+
+            if (UXApplication::isUiThread()) {
+                $time = Time::millis() - $time;
+
+                if ($time > 150) {
+                    Logger::warn("Slow copy file [$time ms, size = $size b] in ui thread, $origin -> $dest");
+                }
+            }
             //Stream::putContents($dest, fs::get($origin));
             return 0;
         } catch (IOException $e) {

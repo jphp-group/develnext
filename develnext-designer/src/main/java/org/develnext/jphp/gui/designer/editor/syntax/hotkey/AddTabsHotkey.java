@@ -1,12 +1,8 @@
 package org.develnext.jphp.gui.designer.editor.syntax.hotkey;
 
-import javafx.scene.control.IndexRange;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
-import org.fxmisc.richtext.Paragraph;
-import org.fxmisc.richtext.TwoDimensional;
 import php.runtime.common.StringUtils;
 
 import java.util.Collection;

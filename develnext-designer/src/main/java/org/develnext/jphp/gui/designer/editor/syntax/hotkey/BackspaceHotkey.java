@@ -3,7 +3,6 @@ package org.develnext.jphp.gui.designer.editor.syntax.hotkey;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
-import org.fxmisc.richtext.Paragraph;
 
 import java.util.Collection;
 

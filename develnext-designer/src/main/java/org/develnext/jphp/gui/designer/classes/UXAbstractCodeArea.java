@@ -1,18 +1,13 @@
 package org.develnext.jphp.gui.designer.classes;
 
 import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
 import javafx.stage.PopupWindow;
-import org.develnext.jphp.ext.javafx.classes.UXControl;
 import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
-import org.develnext.jphp.gui.designer.SyntaxTextArea;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
-import org.fxmisc.richtext.Paragraph;
-import php.runtime.annotation.Reflection;
+import org.fxmisc.richtext.model.Paragraph;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
-import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
 import java.util.Collection;

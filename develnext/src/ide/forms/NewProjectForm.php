@@ -217,7 +217,9 @@ class NewProjectForm extends AbstractIdeForm
             ProjectSystem::close();
 
             uiLater(function () use ($template, $filename) {
+                app()->getMainForm()->showPreloader('Создание проекта ...');
                 ProjectSystem::create($template, $filename);
+                app()->getMainForm()->hidePreloader();
             });
         }
     }
