@@ -14,5 +14,5 @@ dependencies {
     //compile 'com.fifesoft:rstaui:2.5.7'
     //compile 'com.fifesoft:autocomplete:2.5.8'
 
-    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.7-M2'
+    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.7-M1'
 }

@@ -13,7 +13,7 @@ import org.develnext.lexer.css.CSSParser;
 import org.develnext.lexer.regex.RegexToken;
 import org.develnext.lexer.regex.css.FxCssRegexLexer;
 import org.fxmisc.richtext.*;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.fxmisc.richtext.StyleSpansBuilder;
 
 public class CssCodeArea extends AbstractCodeArea {
     protected final FxCssRegexLexer cssRegexLexer = new FxCssRegexLexer();
