@@ -492,8 +492,6 @@ class Application
                 $handler();
             }
 
-            $this->mainForm = $mainFormClass ? $this->getForm($mainFormClass, $mainForm) : null;
-
             if ($this->appModule) {
                 $this->appModule->apply($this);
             }
@@ -501,6 +499,8 @@ class Application
             foreach ($this->modules as $module) {
                 $module->apply($this);
             }
+
+            $this->mainForm = $mainFormClass ? $this->getForm($mainFormClass, $mainForm) : null;
 
             if ($showMainForm && $this->mainForm) {
                 $this->mainForm->show();

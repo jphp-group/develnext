@@ -1301,13 +1301,15 @@ public class UXDesigner extends BaseObject {
 
             Point2D point2D = parent == null ? null : parent.localToScreen(node.getLayoutX(), node.getLayoutY());
 
+            showHelperText(node.getId());
+
             if (point2D != null) {
                 update(point2D.getX(), point2D.getY(), bounds);
+
+                showHelperText(node.getId());
             } else {
                 destroy();
             }
-
-            showHelperText(node.getId());
         }
 
         protected void updateResized() {
@@ -1679,9 +1681,9 @@ public class UXDesigner extends BaseObject {
 
         public void showHelperText(String text) {
             if (helpersEnabled && text != null && !text.isEmpty()) {
+                sizeText.setText(text);
                 sizeText.setVisible(true);
 
-                sizeText.setText(text);
             }
         }
     }
