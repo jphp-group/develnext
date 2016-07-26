@@ -98,7 +98,7 @@ class SplashForm extends AbstractIdeForm
         $this->tip->text = SplashTipSystem::get();
 
         if (Ide::get()->isDevelopment()) {
-            //$this->opacity = 0.05;
+            $this->opacity = 0.05;
         }
     }
 

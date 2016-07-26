@@ -30,6 +30,7 @@ use ide\formats\form\elements\GameBackgroundFormElement;
 use ide\formats\form\elements\GameObjectFormElement;
 use ide\formats\form\elements\GamePaneFormElement;
 use ide\formats\form\elements\SpriteViewFormElement;
+use ide\formats\form\FormEditorSettings;
 use ide\formats\form\FormProjectTreeNavigation;
 use ide\formats\module\ModuleProjectTreeNavigation;
 use ide\formats\sprite\IdeSpriteManager;
@@ -151,6 +152,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         //Ide::get()->registerCommand(new CreateGameObjectPrototypeProjectCommand());
         Ide::get()->registerCommand(new CreateGameSpriteProjectCommand());
+
+        Ide::get()->registerSettings(new FormEditorSettings());
 
         $this->scriptComponentManager = new ScriptComponentManager();
         $this->actionManager = ActionManager::get();

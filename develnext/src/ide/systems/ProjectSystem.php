@@ -34,6 +34,7 @@ class ProjectSystem
     {
         //WatcherSystem::clear();
         //WatcherSystem::clearListeners();
+        Ide::get()->unregisterAllSettings(false);
         Ide::get()->unregisterCommands();
     }
 

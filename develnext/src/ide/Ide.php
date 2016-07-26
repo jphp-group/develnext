@@ -17,6 +17,8 @@ use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
 use ide\protocol\AbstractProtocolHandler;
 use ide\protocol\handlers\FileOpenProjectProtocolHandler;
+use ide\settings\AbstractSettings;
+use ide\settings\AllSettings;
 use ide\systems\Cache;
 use ide\systems\FileSystem;
 use ide\systems\IdeSystem;
@@ -105,7 +107,7 @@ class Ide extends Application
     protected $afterShow = [];
 
     /**
-     * @var Configuration[]
+     * @var IdeConfiguration[]
      */
     protected $configurations = [];
 
@@ -133,6 +135,11 @@ class Ide extends Application
      * @var boolean
      */
     protected $idle = false;
+
+    /**
+     * @var AbstractSettings[]
+     */
+    protected $settings = [];
 
 
     protected $disableOpenLastProject = false;
@@ -200,15 +207,7 @@ class Ide extends Application
                             }
                         });
 
-                        if (Ide::service()->canPrivate() && Ide::accountManager()->isAuthorized()) {
-                            try {
-                                Ide::service()->ide()->sendErrorAsync($e, function () {
-
-                                });
-                            } catch (\Exception $e) {
-                                echo "Unable to send error, exception = {$e->getMessage()}\n";
-                            }
-                        }
+                        $this->sendError($e);
 
                         $notify->on('hide', function () use (&$showError) {
                             $showError = false;
@@ -288,6 +287,23 @@ class Ide extends Application
     public function getLibrary()
     {
         return $this->library;
+    }
+
+    /**
+     * @param \Exception|\Error $e
+     * @param string $context
+     */
+    public function sendError($e, $context = 'global')
+    {
+        if (Ide::service()->canPrivate() && Ide::accountManager()->isAuthorized()) {
+            try {
+                Ide::service()->ide()->sendErrorAsync($e, function () {
+
+                });
+            } catch (\Exception $e) {
+                echo "Unable to send error, exception = {$e->getMessage()}\n";
+            }
+        }
     }
 
     public function makeEnvironment()
@@ -472,12 +488,8 @@ class Ide extends Application
             return $config;
         }
 
-        $config = new Configuration();
-
         try {
-            $file = $this->getFile("$name.conf");
-
-            $config->load($file);
+            $config = new IdeConfiguration("$name.conf");
         } catch (IOException $e) {
             // ...
         }
@@ -584,9 +596,9 @@ class Ide extends Application
     {
         $tempDir = $this->getFile('tmp');
 
-        if (!Files::isDir($tempDir)) {
-            if (Files::exists($tempDir)) {
-                Files::delete($tempDir);
+        if (!fs::isDir($tempDir)) {
+            if (fs::exists($tempDir)) {
+                fs::delete($tempDir);
             }
         }
 
@@ -617,6 +629,53 @@ class Ide extends Application
         }
 
         $this->projectTemplates[$class] = $template;
+    }
+
+    /**
+     * @param AbstractSettings $settings
+     */
+    public function registerSettings(AbstractSettings $settings)
+    {
+        $class = get_class($settings);
+
+        if (isset($this->settings[$class])) {
+            return;
+        }
+
+        $this->settings[$class] = $settings;
+        $settings->onRegister();
+    }
+
+    /**
+     * @param $class
+     * @param bool $ignoreAlways
+     */
+    public function unregisterSettings($class, $ignoreAlways = true)
+    {
+        if ($settings = $this->settings[$class]) {
+            if ($ignoreAlways || !$settings->isAlways()) {
+                $settings->onUnregister();
+                unset($this->settings[$class]);
+            }
+        }
+    }
+
+    /**
+     * @param bool|true $ignoreAlways
+     */
+    public function unregisterAllSettings($ignoreAlways = true)
+    {
+        foreach ($this->settings as $settings) {
+            $this->unregisterSettings(get_class($settings), $ignoreAlways);
+        }
+    }
+
+    /**
+     * @return AbstractSettings[]
+     */
+    public function getAllSettings()
+    {
+        return $this->settings;
     }
 
     /**
@@ -742,7 +801,7 @@ class Ide extends Application
     }
 
     /**
-     * @param $commandClass
+     * @param string $commandClass class or uid
      * @return AbstractCommand|null
      */
     public function getRegisteredCommand($commandClass)
@@ -764,7 +823,7 @@ class Ide extends Application
      */
     public function registerCommand(AbstractCommand $command, $category = null)
     {
-        $this->unregisterCommand(get_class($command));
+        $this->unregisterCommand($command->getUniqueId());
 
         $data = [
             'command' => $command,
@@ -866,7 +925,7 @@ class Ide extends Application
             });
         }
 
-        $this->commands[get_class($command)] = $data;
+        $this->commands[$command->getUniqueId()] = $data;
     }
 
     /**
@@ -1066,6 +1125,8 @@ class Ide extends Application
             $this->registerProjectTemplate(new $projectTemplate());
         }
 
+        $this->registerSettings(new AllSettings());
+
         $mainCommands = $this->getInternalList('.dn/mainCommands');
         $commands = [];
         foreach ($mainCommands as $commandClass) {
@@ -1227,20 +1288,8 @@ class Ide extends Application
         $stream = null;
 
         foreach ($this->configurations as $name => $config) {
-            $name = FileUtils::normalizeName($name);
-
-            try {
-                Logger::info("Save IDE config ($name.conf)");
-                $file = $this->getFile("$name.conf");
-                $file->createNewFile(true);
-
-                $stream = Stream::of($file, 'w+');
-                $config->save($stream);
-            } catch (IOException $e) {
-                Logger::error("Unable to save config ($name), {$e->getMessage()}");
-                //throw $e;
-            } finally {
-                if ($stream) $stream->close();
+            if ($config->isAutoSave()) {
+                $config->save();
             }
         }
 
