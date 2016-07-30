@@ -17,6 +17,7 @@ use develnext\lexer\token\FunctionStmtToken;
 use develnext\lexer\token\MethodStmtToken;
 use develnext\lexer\token\SimpleToken;
 use develnext\lexer\Tokenizer;
+use ide\Ide;
 use php\compress\ArchiveEntry;
 use php\compress\ArchiveInputStream;
 use php\framework\Logger;
@@ -24,6 +25,7 @@ use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\Environment;
+use php\lang\JavaException;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
@@ -153,6 +155,13 @@ class PHPInspector extends AbstractInspector
             }
 
             return $result;
+        } catch (JavaException $e) {
+            if ($e->isNullPointerException() || $e->isIllegalArgumentException()) {
+                Ide::get()->sendError($e, 'php-inspector');
+                return false;
+            }
+
+            throw $e;
         } catch (\ParseError $e) {
             if (is_string($path)) {
                 Logger::warn("Unable to load php source $moduleName");

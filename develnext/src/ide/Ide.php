@@ -14,6 +14,7 @@ use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use ide\misc\GradleBuildConfig;
 use ide\project\AbstractProjectTemplate;
+use ide\project\control\AbstractProjectControlPane;
 use ide\project\Project;
 use ide\protocol\AbstractProtocolHandler;
 use ide\protocol\handlers\FileOpenProjectProtocolHandler;
@@ -27,6 +28,8 @@ use ide\systems\WatcherSystem;
 use ide\ui\LazyLoadingImage;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
+use php\desktop\SystemTray;
+use php\desktop\TrayIcon;
 use php\gui\framework\Application;
 use php\gui\JSException;
 use php\gui\layout\UXAnchorPane;
@@ -115,6 +118,11 @@ class Ide extends Application
      * @var Project
      */
     protected $openedProject = null;
+
+    /**
+     * @var AbstractProjectControlPane[]
+     */
+    protected $projectControlPanes = [];
 
     /**
      * @var AccountManager
@@ -648,25 +656,22 @@ class Ide extends Application
 
     /**
      * @param $class
-     * @param bool $ignoreAlways
      */
-    public function unregisterSettings($class, $ignoreAlways = true)
+    public function unregisterSettings($class)
     {
         if ($settings = $this->settings[$class]) {
-            if ($ignoreAlways || !$settings->isAlways()) {
-                $settings->onUnregister();
-                unset($this->settings[$class]);
-            }
+            $settings->onUnregister();
+            unset($this->settings[$class]);
         }
     }
 
     /**
      * @param bool|true $ignoreAlways
      */
-    public function unregisterAllSettings($ignoreAlways = true)
+    public function unregisterAllSettings()
     {
         foreach ($this->settings as $settings) {
-            $this->unregisterSettings(get_class($settings), $ignoreAlways);
+            $this->unregisterSettings(get_class($settings));
         }
     }
 
@@ -1182,6 +1187,14 @@ class Ide extends Application
 
             if (!$this->disableOpenLastProject && $projectFile && File::of($projectFile)->exists()) {
                 ProjectSystem::open($projectFile, false);
+            }
+
+            if (SystemTray::isSupported()) {
+                $icon = new TrayIcon(ico('browse16')->image);
+                $icon->tooltip = 'HI!';
+                $icon->imageAutoSize = true;
+
+                SystemTray::add($icon);
             }
         });
     }

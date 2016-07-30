@@ -52,52 +52,13 @@ abstract class AbstractSettings
         $this->getConfig()->load();
     }
 
-    /**
-     * Show settings form.
-     */
-    public function show()
-    {
-        /** @var IdeSettingsForm $settingsForm */
-        $settingsForm = app()->getForm('IdeSettingsForm');
-        $settingsForm->setDefault($this);
-        $settingsForm->showAndWait();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMenuTitle()
-    {
-        return $this->getTitle();
-    }
-
-    public function isShowInMenu()
-    {
-        return true;
-    }
-
     public function onRegister()
     {
-        if ($this->isShowInMenu()) {
-            $this->command = $command = AbstractCommand::makeForMenu($this->getMenuTitle(), null, function () {
-                $this->show();
-            });
-            $command->setCategory('settings');
-            $command->setAlways($this->isAlways());
 
-            Ide::get()->registerCommand($command);
-        }
     }
 
     public function onUnregister()
     {
-        if ($this->isShowInMenu()) {
-            Ide::get()->unregisterCommand($this->command->getUniqueId(), false);
-        }
-    }
 
-    public function isAlways()
-    {
-        return false;
     }
 }

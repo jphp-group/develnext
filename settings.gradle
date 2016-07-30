@@ -5,6 +5,7 @@ include 'jphp-gui-ext',
         'jphp-desktop-ext',
         'jphp-app-framework',
         'jphp-game-ext',
+        'jphp-systemtray-ext',
         'jphp-parser',
         'develnext';
 
