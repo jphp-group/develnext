@@ -502,7 +502,7 @@ class Ide extends Application
         }
 
         try {
-            $config = new IdeConfiguration("$name.conf");
+            $config = new IdeConfiguration(IdeSystem::getFile("$name.conf"));
         } catch (IOException $e) {
             // ...
         }
@@ -1194,13 +1194,13 @@ class Ide extends Application
                 ProjectSystem::open($projectFile, false);
             }
 
-            if (SystemTray::isSupported()) {
+            /*if (SystemTray::isSupported()) {
                 $icon = new TrayIcon(ico('browse16')->image);
                 $icon->tooltip = 'HI!';
                 $icon->imageAutoSize = true;
 
                 SystemTray::add($icon);
-            }
+            }*/
         });
     }
 
