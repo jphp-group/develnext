@@ -439,7 +439,7 @@ function var_export($value, $return = false)
  * @param array|Countable $array
  * @return int
  */
-function count($array)
+function count(array $array)
 {
 }
 

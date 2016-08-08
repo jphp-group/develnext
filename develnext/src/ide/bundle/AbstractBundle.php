@@ -5,6 +5,7 @@ use ide\library\IdeLibraryBundleResource;
 use ide\Logger;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\Project;
+use ide\project\ProjectModule;
 use ide\VendorContainer;
 use php\io\IOException;
 use php\io\Stream;
@@ -87,18 +88,19 @@ abstract class AbstractBundle
     }
 
     /**
+     * @return ProjectModule[]
+     */
+    public function getProjectModules()
+    {
+        return [];
+    }
+
+    /**
      * @param Project $project
      * @param string $env
      * @param callable|null $log
      */
     public function onPreCompile(Project $project, $env, callable $log = null)
-    {
-    }
-
-    /**
-     * @param GradleProjectBehaviour $gradle
-     */
-    public function applyForGradle(GradleProjectBehaviour $gradle)
     {
     }
 
@@ -116,6 +118,10 @@ abstract class AbstractBundle
      */
     public function onAdd(Project $project, AbstractBundle $owner = null)
     {
+        foreach ($this->getProjectModules() as $module) {
+            $project->addModule($module, reflect::typeOf($this));
+        }
+
         $this->deleteVendorDirectory();
         $this->copyVendorDirectory();
 
@@ -128,6 +134,10 @@ abstract class AbstractBundle
      */
     public function onRemove(Project $project, AbstractBundle $owner = null)
     {
+        foreach ($this->getProjectModules() as $module) {
+            $project->removeModule($module, reflect::typeOf($this));
+        }
+
         $this->deleteVendorDirectory();
         $project->unloadDirectoryForInspector($this->getProjectVendorDirectory());
     }

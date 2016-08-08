@@ -6,6 +6,7 @@ use ide\Logger;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\Project;
+use ide\project\ProjectModule;
 use ide\utils\FileUtils;
 use php\compress\ArchiveEntry;
 use php\compress\ArchiveInputStream;
@@ -34,88 +35,47 @@ abstract class AbstractJarBundle extends AbstractBundle
     }
 
     /**
+     * @return ProjectModule[]
+     */
+    public function getProjectModules()
+    {
+        $result = [];
+
+        foreach ($this->getJarDependencies() as $dep) {
+            if (is_array($dep)) {
+                $result[] = new ProjectModule(str::split($dep, ':', 4), 'maven');
+            } else {
+                $id = $this->findLibFile($dep);
+
+                if ($id) {
+                    $result[] = new ProjectModule($id, 'jarfile');
+                }
+            }
+        }
+
+        if ($this->bundleDirectory) {
+            $nameDirectory = fs::name($this->bundleDirectory);
+
+            fs::scan($this->bundleDirectory, function ($filename) use (&$result, $nameDirectory) {
+                if (fs::ext($filename) == 'jar' && fs::nameNoExt($filename) != $nameDirectory) {
+                    $result[] = new ProjectModule($filename, 'jarfile');
+                }
+            }, 1);
+
+            //$result[] = new ProjectModule($this->bundleDirectory, 'jardir');
+        }
+
+        return $result;
+    }
+
+
+    /**
      * @return string
      */
     function getDescription()
     {
         return $this->getName() . " JAR Library";
     }
-
-    public function onAdd(Project $project, AbstractBundle $owner = null)
-    {
-        parent::onAdd($project, $owner);
-
-        $libPath = $project->getFile('lib/');
-
-        foreach ($this->getJarDependencies() as $dep) {
-            if (!is_array($dep)) {
-                $jarFile = $this->findLibFile($dep);
-
-                if ($jarFile) {
-                    $file = "$libPath/$dep.jar";
-
-                    if (fs::isFile($jarFile)) {
-                        $size1 = fs::size($jarFile);
-                        $size2 = fs::size($file);
-
-                        if ($size1 != $size2 || !fs::isFile($file)) {
-                            if (FileUtils::copyFile($jarFile, $file) < 0) {
-                                Logger::error("Unable to copy $jarFile to $file");
-                            }
-                        }
-
-                    } else {
-                        Logger::error("Unable to copy $jarFile");
-                    }
-
-                    $project->loadSourceForInspector($file);
-                    $php = PhpProjectBehaviour::get();
-
-                    if ($php) {
-                        $php->addExternalJarLibrary($file);
-                    }
-                }
-            }
-        }
-
-        if (fs::isDir($this->bundleDirectory)) {
-            FileUtils::copyDirectory($this->bundleDirectory, "$libPath/{$this->getVendorName()}");
-
-            $php = PhpProjectBehaviour::get();
-
-            fs::scan($this->bundleDirectory, function ($filename) use ($php, $project) {
-                if (fs::ext($filename) == 'jar' && fs::nameNoExt($filename) != fs::name($this->bundleDirectory)) {
-                    $project->loadSourceForInspector($filename);
-
-                    /*if ($php) {
-                        $php->addExternalJarLibrary($filename);
-                    }  */
-                }
-            });
-        }
-    }
-
-    public function onRemove(Project $project, AbstractBundle $owner = null)
-    {
-        parent::onRemove($project, $owner);
-
-        $libPath = $project->getFile('lib/');
-
-        if (fs::isDir("$libPath/{$this->getVendorName()}")) {
-            $php = PhpProjectBehaviour::get();
-
-            fs::scan($this->bundleDirectory, function ($filename) use ($php, $project) {
-                if (fs::ext($filename) == 'jar' && fs::nameNoExt($filename) != fs::name($this->bundleDirectory)) {
-                    $project->unloadSourceForInspector($filename);
-
-                    /*if ($php) {
-                        $php->addExternalJarLibrary($filename);
-                    }*/
-                }
-            });
-        }
-    }
-
 
     /**
      * @param Project $project
@@ -129,24 +89,6 @@ abstract class AbstractJarBundle extends AbstractBundle
         // todo remove it!
     }
 
-    /**
-     * @param GradleProjectBehaviour $gradle
-     */
-    public function applyForGradle(GradleProjectBehaviour $gradle)
-    {
-        foreach ($this->getJarDependencies() as $dep) {
-            if (is_array($dep)) {
-                $gradle->addDependency($dep[1], $dep[0], $dep[2]);
-            } else {
-                $gradle->addDependency($dep);
-            }
-        }
-
-        if ($this->bundleDirectory) {
-            $gradle->addDependency("dir:lib/{$this->getVendorName()}");
-        }
-    }
-
     protected function getSearchLibPaths()
     {
         return [
@@ -154,6 +96,10 @@ abstract class AbstractJarBundle extends AbstractBundle
         ];
     }
 
+    /**
+     * @param $name
+     * @return null|File
+     */
     private function findLibFile($name)
     {
         /** @var File[] $libPaths */

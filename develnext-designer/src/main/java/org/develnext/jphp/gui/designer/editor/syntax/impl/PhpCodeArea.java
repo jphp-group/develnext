@@ -2,12 +2,22 @@ package org.develnext.jphp.gui.designer.editor.syntax.impl;
 
 import javafx.application.Platform;
 import org.antlr.v4.runtime.*;
+import org.develnext.jphp.core.compiler.jvm.JvmCompiler;
+import org.develnext.jphp.core.syntax.SyntaxAnalyzer;
+import org.develnext.jphp.core.tokenizer.Tokenizer;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.CodeAreaGutterNote;
 import org.develnext.lexer.php.PHPLexer;
 import org.develnext.lexer.php.PHPParser;
 import org.fxmisc.richtext.StyleSpansBuilder;
+import php.runtime.env.Context;
+import php.runtime.env.Environment;
+import php.runtime.env.handler.ExceptionHandler;
+import php.runtime.lang.exception.BaseError;
+import php.runtime.lang.exception.BaseParseError;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -19,6 +29,7 @@ public class PhpCodeArea extends AbstractCodeArea {
             getGutter().addNote(line, new CodeAreaGutterNote("error", msg));
         }
     };
+    private Environment environment = new Environment();
 
     public PhpCodeArea() {
         super();
@@ -229,7 +240,7 @@ public class PhpCodeArea extends AbstractCodeArea {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     return;
                 }
@@ -238,12 +249,29 @@ public class PhpCodeArea extends AbstractCodeArea {
                     return;
                 }
 
-                lex.reset();
+                try {
+                    Environment env = environment;
+                    SyntaxAnalyzer analyzer = new SyntaxAnalyzer(env, new Tokenizer(new Context(text, new File("source.php"))));
+                    analyzer.getTree();
+                } catch (IOException e) {
+                    // throw new RuntimeException(e);
+                } catch (BaseError e) {
+                    Platform.runLater(() ->
+                                    getGutter().addNote(
+                                            e.getLine(environment).toInteger(),
+                                            new CodeAreaGutterNote("error", e.getMessage(environment).toString() + " at pos " + e.getPosition(environment).toInteger())
+                                    )
+                    );
+
+                    Platform.runLater(PhpCodeArea.this::refreshGutter);
+                } catch (Throwable e) {
+                    ;
+                }
+
+                /*lex.reset();
                 PHPParser cssParser = new PHPParser(new CommonTokenStream(lex));
                 cssParser.addErrorListener(errorListener);
-                cssParser.htmlDocument();
-
-                Platform.runLater(PhpCodeArea.this::refreshGutter);
+                cssParser.htmlDocument();*/
             }
         };
         thread.start();

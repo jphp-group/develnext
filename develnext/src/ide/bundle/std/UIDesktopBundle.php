@@ -109,14 +109,6 @@ class UIDesktopBundle extends AbstractJarBundle
         ];
     }
 
-    public function applyForGradle(GradleProjectBehaviour $gradle)
-    {
-        parent::applyForGradle($gradle);
-
-        // legacy.
-        $gradle->removeDependency('jphp-gui-desktop-ext');
-    }
-
     /**
      * @return array
      */

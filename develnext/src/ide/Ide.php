@@ -340,6 +340,11 @@ class Ide extends Application
         return $innoPath && $innoPath->exists() ? $innoPath->getCanonicalFile() : null;
     }
 
+    public function getLaunch4JPath()
+    {
+        return fs::parent($this->getLaunch4JProgram());
+    }
+
     public function getLaunch4JProgram()
     {
         if (Ide::get()->isWindows()) {
@@ -393,7 +398,7 @@ class Ide extends Application
 
         $file = $path && $path->exists() ? fs::abs($path) : null;
 
-        Logger::info("Detect tool path: '$file', mode = {$this->mode}, launcher = {$launcher}");
+        //Logger::info("Detect tool path: '$file', mode = {$this->mode}, launcher = {$launcher}");
 
         return $file;
     }

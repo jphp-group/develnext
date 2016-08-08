@@ -59,6 +59,16 @@ class Project
     protected $sourceRoots = [];
 
     /**
+     * @var ProjectModule[]
+     */
+    protected $modules = [];
+
+    /**
+     * @var callable
+     */
+    protected $moduleTypeHandlers = [];
+
+    /**
      * @var AbstractProjectBehaviour[]
      */
     protected $behaviours = [];
@@ -158,12 +168,12 @@ class Project
         $this->refactorManager = new ProjectRefactorManager($this);
 
         $this->tickTimer = new TimerScript(1000 * 9, true, [$this, 'doTick']);
-        $this->inspectorLoaderThreadPoll = ThreadPool::createSingle();
+        $this->inspectorLoaderThreadPoll = ThreadPool::createFixed(2);
     }
 
     /**
      * @param string $filename
-     *
+     *                                                                                                                                                                                                                               3
      * @return Project
      */
     public static function createForFile($filename)
@@ -382,6 +392,96 @@ class Project
     public function removeSourceRoot($root)
     {
         $this->sourceRoots[FileUtils::hashName($root)] = $root;
+    }
+
+    /**
+     * @param $type
+     * @param callable $handler (ProjectModule $module, $first, $remove)
+     */
+    public function registerModuleTypeHandler($type, callable $handler)
+    {
+        $this->moduleTypeHandlers[$type][] = $handler;
+    }
+
+    /**
+     * @param ProjectModule $module
+     * @param $owner
+     */
+    public function addModule(ProjectModule $module, $owner = 'user')
+    {
+        if (!$this->modules[$module->getUniqueId()][$owner]) {
+            Logger::info("Add module: " . $module->getUniqueId() . ", owner = $owner");
+            $handlers = $this->moduleTypeHandlers[$module->getType()];
+
+            if ($handlers) {
+                foreach ($handlers as $handler) {
+                    $handler($module, sizeof($this->modules[$module->getType()]) < 1, false, $owner);
+                }
+            }
+
+            $this->modules[$module->getUniqueId()][$owner] = $module;
+        }
+    }
+
+    /**
+     * @param ProjectModule $module
+     * @param string $owner
+     * @return bool
+     */
+    public function hasModule(ProjectModule $module, $owner = 'user')
+    {
+        return isset($this->modules[$module->getUniqueId()][$owner]);
+    }
+
+    /**
+     * @param ProjectModule $module
+     * @param string $owner
+     */
+    public function removeModule(ProjectModule $module, $owner = 'user')
+    {
+        if ($this->modules[$module->getUniqueId()][$owner]) {
+            Logger::info("Remove module: " . $module->getUniqueId() . ", owner = $owner");
+
+            $handlers = $this->moduleTypeHandlers[$module->getType()];
+
+            if ($handlers) {
+                foreach ($handlers as $handler) {
+                    $handler($module, sizeof($this->modules[$module->getType()]) == 1, true, $owner);
+                }
+            }
+
+            unset($this->modules[$module->getUniqueId()][$owner]);
+
+            if (!$this->modules[$module->getUniqueId()]) {
+                unset($this->modules[$module->getUniqueId()]);
+            }
+        }
+    }
+
+    /**
+     * @return ProjectModule[]
+     */
+    public function getModules()
+    {
+        $result = [];
+
+        foreach ($this->modules as $owner => $modules) {
+            $result[] = arr::first($modules);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $toDir
+     */
+    public function copyModuleFiles($toDir)
+    {
+        foreach ($this->getModules() as $module) {
+            if (fs::isFile($module->getId())) {
+                FileUtils::copyFile($module->getId(), $toDir ."/". fs::name($module->getId()));
+            }
+        }
     }
 
     /**

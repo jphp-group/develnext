@@ -2,11 +2,13 @@
 namespace ide\project\behaviours;
 
 use develnext\lexer\inspector\PHPInspector;
+use Error;
 use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
+use ide\project\ProjectModule;
 use ide\utils\FileUtils;
 use ide\zip\JarArchive;
 use php\gui\layout\UXHBox;
@@ -40,11 +42,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
      * @var array
      */
     protected $globalUseImports = [];
-
-    /**
-     * @var array
-     */
-    protected $externalJarLibraries = [];
 
     /**
      * @var UXVBox
@@ -118,7 +115,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     public function doClose()
     {
         $this->inspectorThreadPool->shutdown();
-        $this->externalJarLibraries = [];
         $this->inspector->free();
 
         $this->uiSettings = null;
@@ -179,7 +175,23 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     }
 
     public function isByteCodeEnabled() {
-        return $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE);
+        return $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, true);
+    }
+
+    protected function collectZipLibraries()
+    {
+        $result = [];
+
+        foreach ($this->project->getModules() as $module) {
+            switch ($module->getType()) {
+                case 'zipfile':
+                case 'jarfile':
+                    $result[] = fs::abs($module->getId());
+                    break;
+            }
+        }
+
+        return $result;
     }
 
     public function doCompile($env, callable $log = null)
@@ -190,7 +202,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
             $scope = new Environment(null, Environment::HOT_RELOAD);
             $scope->importClass(FileUtils::class);
 
-            $jarLibraries = $this->externalJarLibraries;
+            $zipLibraries = $this->collectZipLibraries();
 
             $generatedDirectory = $this->project->getSrcFile('', true);
             $dirs = [$this->project->getSrcFile('')];
@@ -203,11 +215,11 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 }
             }
 
-            $scope->execute(function () use ($jarLibraries, $generatedDirectory, $dirs, &$includedFiles) {
+            $scope->execute(function () use ($zipLibraries, $generatedDirectory, $dirs, &$includedFiles) {
                 ob_implicit_flush(true);
 
-                spl_autoload_register(function ($name) use ($jarLibraries, $generatedDirectory, $dirs, &$includedFiles) {
-                    echo("Try class '$name' auto load");
+                spl_autoload_register(function ($name) use ($zipLibraries, $generatedDirectory, $dirs, &$includedFiles) {
+                    echo("Try class '$name' auto load\n");
 
                     foreach ($dirs as $dir) {
                         $filename = "$dir/$name.php";
@@ -226,7 +238,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                         }
                     }
 
-                    foreach ($jarLibraries as $file) {
+                    foreach ($zipLibraries as $file) {
                         if (!fs::exists($file)) {
                             echo "SKIP $file, is not exists.\n";
                             continue;
@@ -255,6 +267,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
                             return;
                         } catch (IOException $e) {
+                            //echo "[ERROR] {$e->getMessage()}\n";
                             // nop.
                         }
                     }
@@ -311,7 +324,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 }
             });
 
-            foreach ($this->externalJarLibraries as $library) {
+            foreach ($zipLibraries as $library) {
                 if (!fs::exists($library)) {
                     continue;
                 }
@@ -324,7 +337,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                     }
 
                     if (fs::ext($entry->getName()) == 'php') {
-                        $compiled = new File($generatedDirectory, '/' . FileUtils::stripExtension($entry->getName()) . ".phb");
+                        $compiled = new File($generatedDirectory, '/' . fs::pathNoExt($entry->getName()) . ".phb");
 
                         if (!$compiled->exists()) {
                             if ($compiled->getParentFile() && !$compiled->getParentFile()->isDirectory()) {
@@ -342,7 +355,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                                             $module = new Module($stream, false);
                                             $module->dump($compiled, true);
                                             return true;
-                                        } catch (\Error $e) {
+                                        } catch (Error $e) {
                                             if ($log) {
                                                 $log("[ERROR] Unable to compile '{$className}', {$e->getMessage()}, on line {$e->getLine()}");
                                                 return false;
@@ -366,15 +379,10 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
-    public function addExternalJarLibrary($file)
-    {
-        $this->externalJarLibraries[FileUtils::hashName($file)] = $file;
-    }
-
     public function doUpdateSettings(CommonProjectControlPane $editor = null)
     {
         if ($this->uiSettings) {
-            $this->uiByteCodeCheckbox->selected = $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, false);
+            $this->uiByteCodeCheckbox->selected = $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, true);
         }
     }
 

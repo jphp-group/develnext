@@ -134,11 +134,11 @@ Name: "czech"; MessagesFile: "compiler:Languages\\Czech.isl"
 Name: "japanese"; MessagesFile: "compiler:Languages\\Japanese.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "{$project->getName()}\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Run]
 Filename: "{app}\\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
@@ -220,9 +220,10 @@ OUT
 
             $dialog->setOnExitProcess(function ($code) use ($finished, $issPath, $project) {
                 $issPath = File::of($issPath);
-                $issPath->delete();
 
                 if ($code == 0) {
+                    $issPath->delete();
+
                     $exe = $this->getBuildPath($project) . '/Setup.exe';
                     File::of($exe)->renameTo($this->getBuildPath($project) . '/' . $project->getName() . 'Setup.exe');
 

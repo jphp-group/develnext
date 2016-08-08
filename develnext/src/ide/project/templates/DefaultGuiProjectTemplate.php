@@ -5,6 +5,7 @@ use ide\bundle\std\UIDesktopBundle;
 use ide\project\AbstractProjectTemplate;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\project\behaviours\JavaPlatformBehaviour;
 use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\behaviours\RunBuildProjectBehaviour;
 use ide\project\behaviours\ShareProjectBehaviour;
@@ -47,6 +48,10 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
             $project->register(new PhpProjectBehaviour(), false);
         }
 
+        if (!$project->hasBehaviour(JavaPlatformBehaviour::class)) {
+            $project->register(new JavaPlatformBehaviour(), false);
+        }
+
         if (!$project->hasBehaviour(GuiFrameworkProjectBehaviour::class)) {
             $project->register(new GuiFrameworkProjectBehaviour(), false);
         }
@@ -71,6 +76,7 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
         $bundle = $project->register(new BundleProjectBehaviour());
 
         $project->register(new PhpProjectBehaviour());
+        $project->register(new JavaPlatformBehaviour());
 
         /** @var GuiFrameworkProjectBehaviour $gui */
         $gui = $project->register(new GuiFrameworkProjectBehaviour());

@@ -11,6 +11,7 @@ use ide\library\IdeLibraryBundleResource;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
+use ide\project\ProjectModule;
 use ide\systems\FileSystem;
 use ide\systems\IdeSystem;
 use ide\utils\FileUtils;
@@ -348,26 +349,14 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             }
         });
 
-        $gradle = GradleProjectBehaviour::get();
         $allBundles = $this->fetchAllBundles($env);
 
-        if ($gradle) {
-            $gradle->addJcenterRepository();
-            $gradle->addMavenCentralRepository();
-            $gradle->addMavenLocalRepository();
-            $gradle->addLocalLibRepository();
-
-            foreach ($allBundles as $bundle) {
-                if ($log) {
-                    $log(':apply-bundle "' . $bundle->getName() . '"');
-                }
-
-                $bundle->applyForGradle($gradle);
+        foreach ($allBundles as $bundle) {
+            if ($log) {
+                $log(':apply-bundle "' . $bundle->getName() . '"');
             }
 
-            foreach ($allBundles as $bundle) {
-                $bundle->onPreCompile($this->project, $env, $log);
-            }
+            $bundle->onPreCompile($this->project, $env, $log);
         }
 
         $this->doPreCompileUseImports($env, $log);

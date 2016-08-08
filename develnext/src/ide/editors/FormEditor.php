@@ -1280,7 +1280,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $modules = $this->config->get('modules');
 
-        $modules = Str::split($modules, '|');
+        $modules = str::split($modules, '|');
 
         $result = [];
 
@@ -1320,7 +1320,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         foreach ($modules as $module) {
             $module = Str::trim($module);
-            $this->modules[$module] = FileSystem::fetchEditor(Ide::get()->getOpenedProject()->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY . "/$module"), true);
+            $this->modules[$module] = FileSystem::fetchEditor(
+                Ide::get()->getOpenedProject()->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY . "/$module"), true
+            );
         }
 
         return $this->modules;

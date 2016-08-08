@@ -5,14 +5,15 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.KeyCombination;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.fxmisc.richtext.StyledTextArea;
 
 public class CodeAreaContextMenu extends ContextMenu {
-    protected final MenuItem pasteItem = new MenuItem("Вставить");
-    protected final MenuItem copyItem = new MenuItem("Копировать");
-    protected final MenuItem cutItem = new MenuItem("Вырезать");
-    protected final MenuItem selectAllItem = new MenuItem("Выделить все");
+    protected final MenuItem pasteItem = new MenuItem("Paste");
+    protected final MenuItem copyItem = new MenuItem("Copy");
+    protected final MenuItem cutItem = new MenuItem("Cut");
+    protected final MenuItem selectAllItem = new MenuItem("Select All");
 
     private final StyledTextArea codeArea;
 
@@ -22,18 +23,23 @@ public class CodeAreaContextMenu extends ContextMenu {
 
         this.codeArea = codeArea;
 
+        cutItem.setAccelerator(KeyCombination.valueOf("Ctrl + X"));
         cutItem.setOnAction(event -> {
             codeArea.cut();
         });
 
+        copyItem.setAccelerator(KeyCombination.valueOf("Ctrl + C"));
         copyItem.setOnAction(event -> {
             codeArea.copy();
         });
 
+        pasteItem.setAccelerator(KeyCombination.valueOf("Ctrl + V"));
         pasteItem.setOnAction(event -> {
             codeArea.paste();
         });
 
+
+        selectAllItem.setAccelerator(KeyCombination.valueOf("Ctrl + A"));
         selectAllItem.setOnAction(event -> {
             codeArea.selectAll();
         });

@@ -69,7 +69,9 @@ class BuildSuccessForm extends AbstractIdeForm
 
         $this->onRun = function () use ($pathToProgram) {
             try {
-                $result = (new Process($pathToProgram, $this->buildPath, Ide::get()->makeEnvironment()))->start();
+                $this->showPreloader();
+                $result = (new Process($pathToProgram, $this->buildPath, Ide::get()->makeEnvironment()))->startAndWait();
+                $this->hidePreloader();
 
                 /*$exit = $result->getExitValue();
 

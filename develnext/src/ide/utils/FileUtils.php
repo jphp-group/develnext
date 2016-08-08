@@ -76,8 +76,8 @@ class FileUtils
 
     public static function adaptName($name)
     {
-        $name = Str::replace($name, '\\', DIRECTORY_SEPARATOR);
-        $name = Str::replace($name, '/', DIRECTORY_SEPARATOR);
+        $name = Str::replace($name, '\\', fs::separator());
+        $name = Str::replace($name, '/', fs::separator());
 
         return $name;
     }

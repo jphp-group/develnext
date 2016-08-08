@@ -7,6 +7,7 @@ use ide\forms\BuildProgressForm;
 use ide\forms\BuildProjectForm;
 use ide\forms\BuildSuccessForm;
 use ide\Ide;
+use ide\Logger;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\Project;
@@ -187,9 +188,9 @@ class WindowsApplicationBuildType extends AbstractBuildType
     function getBuildPath(Project $project, $libs = false)
     {
         if ($libs) {
-            return $project->getRootDir() . '/build/libs';
+            return $project->getRootDir() . '/build/dist/';
         } else {
-            return $project->getRootDir() . '/build/install/' . $project->getName();
+            return $project->getRootDir() . '/build/dist/';
         }
     }
 
@@ -203,63 +204,35 @@ class WindowsApplicationBuildType extends AbstractBuildType
      */
     function onExecute(Project $project, $finished = true)
     {
-        $ide = Ide::get();
+        FileUtils::deleteDirectory($this->getBuildPath($project));
 
         $config = $this->getConfig();
+
+        $config['l4j'] = true;
+        AntOneJarBuildType::makeAntBuildFile($project, $config);
 
         $dialog = new BuildProgressForm();
         $dialog->show();
 
-        ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'gradle installDist', function ($success) use ($ide, $project, $dialog, $config) {
-            if ($success) {
-                $commands = [$ide->getGradleProgram(), 'clean'];
+        $jreHome = Ide::get()->getJrePath();
+        $launch4j = Ide::get()->getLaunch4JProgram();
 
-                if ($config['oneJar']) {
-                    $commands[] = 'splitConfig';
-                    $commands[] = 'jar';
-                }
+        if (!$launch4j) {
+            UXDialog::showAndWait('Невозможно собрать исполняемый файл, не найдена утилита Launch4j', 'ERROR');
 
-                $commands[] = 'installDist';
+            return false;
+        }
 
-                /** @var GradleProjectBehaviour $gradle */
-                $gradle = $project->getBehaviour(GradleProjectBehaviour::class);
+        /*if ($jreHome && $config['jre']) {
+            $alert = new UXAlert('INFORMATION');
+            $alert->contentText = 'Копируем Java VM, это может занять некоторое время ...';
+            $alert->show();
+            $this->copyJre($project);
+            $alert->hide();
+        }*/
 
-                OneJarBuildType::appendJarTasks($gradle->getConfig(), $config['oneJar']);
-
-                $process = new Process($commands, $project->getRootDir(), $ide->makeEnvironment());
-                $process = $process->start();
-
-                $dialog->watch([
-                    $process,
-                    function () use ($project, $config) {
-                        FileUtils::deleteDirectory($this->getBuildPath($project) . "/bin");
-                        $libPath = File::of($this->getBuildPath($project) . "/lib");
-
-                        if ($config['oneJar']) {
-                            FileUtils::scan($libPath, function ($filename) {
-                                $file = File::of($filename);
-
-                                if (!Str::startsWith($file->getName(), "dn-compile")) {
-                                    $file->delete();
-                                }
-                            });
-                        }
-
-                        return $this->makeExecutableFile($project);
-                    },
-                ]);
-            } else {
-                $dialog->stopWithError();
-            }
-        });
-
-        $dialog->setOnExitProcess(function ($exitValue) use ($project, $dialog, $finished, $config) {
-            $configPath = $this->getLaunch4jConfigPath($project);
-            $configPath->delete();
-
-            if ($config['oneJar']) {
-                FileUtils::deleteDirectory($this->getBuildPath($project) . '/lib');
-            }
+        $onExitProcess = function ($exitValue) use ($project, $dialog, $finished) {
+            Logger::info("Finish executing: exitValue = $exitValue");
 
             if ($exitValue == 0) {
                 if ($finished) {
@@ -270,12 +243,31 @@ class WindowsApplicationBuildType extends AbstractBuildType
                     }
 
                     $dialog = new BuildSuccessForm();
-                    $dialog->setBuildPath($configPath->getParent());
-                    $dialog->setOpenDirectory($configPath->getParent());
-                    $dialog->setRunProgram("{$configPath->getParent()}/{$project->getName()}.exe");
+                    $dialog->setBuildPath($this->getBuildPath($project));
+                    $dialog->setOpenDirectory($this->getBuildPath($project));
+                    $dialog->setRunProgram("{$this->getBuildPath($project)}/{$project->getName()}.exe");
 
                     $dialog->showAndWait();
                 }
+            }
+        };
+        $dialog->setOnExitProcess($onExitProcess);
+
+        ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'ant jar launch4j', function ($success) use ($project, $dialog, $config) {
+            if ($success) {
+                $args = [Ide::get()->getApacheAntProgram(), $config['oneJar'] ? 'onejar' : 'jar', 'launch4j'];
+
+                if ($config['jre']) {
+                    $args[] = 'copy-jre';
+                }
+
+                $process = new Process($args, $project->getRootDir(), Ide::get()->makeEnvironment());
+
+                $process = $process->start();
+
+                $dialog->watchProcess($process);
+            } else {
+                $dialog->stopWithError();
             }
         });
     }
