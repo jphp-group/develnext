@@ -1,0 +1,75 @@
+<project name="#NAME#" basedir=".">
+    <!-- set global properties for this build -->
+    <property name="name" location="#NAME#"/>
+    <property name="build" location="build"/>
+    <property name="dist" location="build/dist"/>
+    <property name="launch4j.dir" location="#LAUNCH4J_DIR#" />
+    <property name="jre.dir" location="#JRE_DIR#" />
+
+    <taskdef name="launch4j"
+             classname="net.sf.launch4j.ant.Launch4jTask"
+             classpath="${launch4j.dir}/launch4j.jar
+        :${launch4j.dir}/lib/xstream.jar" />
+
+    <target name="init">
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="jar" depends="init" description="generate the distribution">
+        <mkdir dir="${dist}/lib"/>
+
+        <jar destfile="${dist}/lib/dn-compiled-module.jar" encoding="UTF-8" level="7">
+            #JAR_CONTENT#
+        </jar>
+    </target>
+
+    <target name="dist" depends="jar" description="">
+        #DIST_CONTENT#
+    </target>
+
+    <target name="onejar" depends="dist">
+        <jar destfile="${dist}/#NAME#.jar" duplicate="preserve" level="7" encoding="UTF-8">
+            <zipgroupfileset dir="${dist}/lib">
+                <include name="**/*.jar"/>
+            </zipgroupfileset>
+            <fileset dir="${dist}/gen" />
+
+            <exclude name="JPHP-INF/sdk/**" />
+
+            <manifest>
+                <attribute name="Main-Class" value="php.runtime.launcher.Launcher" />
+            </manifest>
+        </jar>
+
+        <delete dir="${dist}/gen" failonerror="false" />
+        <delete dir="${dist}/lib" failonerror="false" />
+    </target>
+
+    <target name="clean" description="clean up">
+        <delete dir="${build}"/>
+    </target>
+
+    <target name="copy-jre">
+        <mkdir dir="${dist}/jre" />
+        <copy todir="${dist}/jre" >
+            <fileset dir="${jre.dir}" includes="**"/>
+        </copy>
+    </target>
+
+    <target name="launch4j">
+        <launch4j>
+            <config headerType="gui" outfile="${dist}/#NAME#.exe"
+                    dontWrapJar="#L4J_DONT_WRAP_JAR#" jarPath="#L4J_JAR_FILE#" chdir="."
+                    downloadUrl="http://java.com/download">
+                <classPath mainClass="php.runtime.launcher.Launcher">
+                    <cp>lib/*</cp>
+                </classPath>
+                <jre minVersion="1.8.0" path="#L4J_JRE_PATH#" runtimeBits="64/32">
+                    <opt>-Dfile.encoding=UTF-8</opt>
+                </jre>
+            </config>
+        </launch4j>
+        <delete file="#L4J_JAR_FILE#" failonerror="false" />
+        <delete dir="${dist}/gen" failonerror="false" />
+    </target>
+</project>
