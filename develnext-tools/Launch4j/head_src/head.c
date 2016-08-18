@@ -55,6 +55,8 @@ struct
 	int foundJava;
 	BOOL bundledJreAsFallback;
 	BOOL corruptedJreFound;
+	char originalJavaMinVer[STR];
+	char originalJavaMaxVer[STR];
 	char javaMinVer[STR];
 	char javaMaxVer[STR];
 	char foundJavaVer[STR];
@@ -64,6 +66,7 @@ struct
 
 struct
 {
+	char mainClass[_MAX_PATH];
 	char cmd[_MAX_PATH];
 	char args[MAX_ARGS];
 } launcher;
@@ -309,6 +312,29 @@ BOOL regQueryValue(const char* regPath, unsigned char* buffer,
 	return result;
 }
 
+void formatJavaVersion(char* version, const char* originalVersion)
+{
+    char* updatePart = strchr(originalVersion, '_');
+
+    if (updatePart != NULL)
+    {
+        // skip underscore
+        updatePart++;
+
+        if (strlen(updatePart) < 3)
+        {
+            const int majorVersionLength = updatePart - originalVersion;
+            strncpy(version, originalVersion, majorVersionLength);
+            *(version + majorVersionLength) = 0;
+            strcat(version, "0");
+            strcat(version, updatePart);
+            return;
+        }
+    }
+    
+    strcpy(version, originalVersion);
+}
+
 void regSearch(const char* keyName, const int searchType)
 {
 	HKEY hKey;
@@ -329,12 +355,13 @@ void regSearch(const char* keyName, const int searchType)
 	unsigned long versionSize = _MAX_PATH;
 	FILETIME time;
 	char fullKeyName[_MAX_PATH] = {0};
+	char originalVersion[_MAX_PATH] = {0};
 	char version[_MAX_PATH] = {0};
 
 	while (RegEnumKeyEx(
 				hKey,			// handle to key to enumerate
 				x++,			// index of subkey to enumerate
-				version,		// address of buffer for subkey name
+				originalVersion,// address of buffer for subkey name
 				&versionSize,	// address for size of subkey buffer
 				NULL,			// reserved
 				NULL,			// address of buffer for class string
@@ -342,8 +369,9 @@ void regSearch(const char* keyName, const int searchType)
 				&time) == ERROR_SUCCESS)
 	{
 		strcpy(fullKeyName, keyName);
-		appendPath(fullKeyName, version);
+		appendPath(fullKeyName, originalVersion);
 		debug("Check:\t\t%s\n", fullKeyName);
+        formatJavaVersion(version, originalVersion);
 
 		if (strcmp(version, search.javaMinVer) >= 0
 				&& (!*search.javaMaxVer || strcmp(version, search.javaMaxVer) <= 0)
@@ -818,12 +846,12 @@ void createJreSearchError()
 	{
 		loadString(JRE_VERSION_ERR, error.msg);
 		strcat(error.msg, " ");
-		strcat(error.msg, search.javaMinVer);
+		strcat(error.msg, search.originalJavaMinVer);
 	
 		if (*search.javaMaxVer)
 		{
 			strcat(error.msg, " - ");
-			strcat(error.msg, search.javaMaxVer);
+			strcat(error.msg, search.originalJavaMaxVer);
 		}
 	
 		if (search.runtimeBits == USE_64_BIT_RUNTIME
@@ -858,8 +886,10 @@ BOOL jreSearch(const char *exePath, const int pathLen)
 	BOOL result = TRUE;
 
 	search.bundledJreAsFallback = loadBool(BUNDLED_JRE_AS_FALLBACK);
-	loadString(JAVA_MIN_VER, search.javaMinVer);
-	loadString(JAVA_MAX_VER, search.javaMaxVer);
+	loadString(JAVA_MIN_VER, search.originalJavaMinVer);
+	formatJavaVersion(search.javaMinVer, search.originalJavaMinVer);
+	loadString(JAVA_MAX_VER, search.originalJavaMaxVer);
+    formatJavaVersion(search.javaMaxVer, search.originalJavaMaxVer);
 
 	if (search.bundledJreAsFallback)
 	{
@@ -941,13 +971,12 @@ void setMainClassAndClassPath(const char *exePath, const int pathLen)
 {
 	char classPath[MAX_ARGS] = {0};
 	char expandedClassPath[MAX_ARGS] = {0};
-	char mainClass[STR] = {0};
 	char jar[_MAX_PATH] = {0};
 	char fullFileName[_MAX_PATH] = {0};
 	const BOOL wrapper = loadBool(WRAPPER);
 	loadString(JAR, jar);
 
-	if (loadString(MAIN_CLASS, mainClass))
+	if (loadString(MAIN_CLASS, launcher.mainClass))
 	{
 		if (!loadString(CLASSPATH, classPath))
 		{
@@ -1004,7 +1033,7 @@ void setMainClassAndClassPath(const char *exePath, const int pathLen)
 
 		*(launcher.args + strlen(launcher.args) - 1) = 0;
 		strcat(launcher.args, "\" ");
-		strcat(launcher.args, mainClass);
+		strcat(launcher.args, launcher.mainClass);
 	}
 	else if (wrapper)
 	{
@@ -1165,3 +1194,19 @@ BOOL execute(const BOOL wait, DWORD *dwExitCode)
 	*dwExitCode = -1;
 	return FALSE;
 }
+
+const char* getJavaHome()
+{
+	return search.foundJavaHome;
+}
+
+const char* getMainClass()
+{
+	return launcher.mainClass;	
+}
+
+const char* getLauncherArgs()
+{
+    return launcher.args;    
+}
+

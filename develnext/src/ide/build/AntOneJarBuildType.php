@@ -5,6 +5,7 @@ use ide\forms\BuildProgressForm;
 use ide\forms\BuildSuccessForm;
 use ide\Ide;
 use ide\Logger;
+use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\Project;
 use ide\systems\ProjectSystem;
 use ide\utils\FileUtils;
@@ -60,7 +61,15 @@ class AntOneJarBuildType extends AbstractBuildType
 
         $jarContent = '';
         foreach ([$project->getSrcDirectory(), $project->getSrcGeneratedDirectory()] as $src) {
-            $jarContent .= "\t<fileset dir='$src' includes='/*/**' excludes='.debug/ **/*.source **/*.sourcemap **/*.axml'/>\n";
+            $excludes = ".debug/ **/*.source **/*.sourcemap **/*.axml";
+
+            if ($php = PhpProjectBehaviour::get()) {
+                if ($php->isByteCodeEnabled()) {
+                    $excludes .= " **/*.php";
+                }
+            }
+
+            $jarContent .= "\t<fileset dir='$src' includes='/*/**' excludes='$excludes'/>\n";
         }
 
         $content = str::replace($content, '#JAR_CONTENT#', $jarContent);
@@ -91,15 +100,17 @@ class AntOneJarBuildType extends AbstractBuildType
             if ($icoFile->isFile()) {
                 $content = str::replace($content, '#L4J_ICON_FILE#', $icoFile);
             } else {
-                $content = str::replace($content, '#L4J_ICON_FILE#', '');
+                $content = str::replace($content, 'icon="#L4J_ICON_FILE#"', '');
             }
         } else {
-            $content = str::replace($content, '#L4J_ICON_FILE#', '');
+            $content = str::replace($content, 'icon="#L4J_ICON_FILE#"', '');
         }
 
         if (!$config['l4j']) {
             $content = Regex::of('\\<launch4j\\>.*\\<\\/launch4j\\>', 's')->with($content)->replaceGroup(0, '');
         }
+
+
 
         $project->copyModuleFiles($project->getRootDir() . "/build/dist/lib");
 

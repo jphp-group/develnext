@@ -60,7 +60,7 @@
         <launch4j>
             <config headerType="gui" outfile="${dist}/#NAME#.exe"
                     dontWrapJar="#L4J_DONT_WRAP_JAR#" jarPath="#L4J_JAR_FILE#" chdir="."
-                    downloadUrl="http://java.com/download">
+                    downloadUrl="http://java.com/download" icon="#L4J_ICON_FILE#">
                 <classPath mainClass="php.runtime.launcher.Launcher">
                     <cp>lib/*</cp>
                 </classPath>

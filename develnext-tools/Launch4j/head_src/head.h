@@ -28,10 +28,13 @@
 	THE SOFTWARE.
 */
 
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0501
+#endif // _WIN32_WINNT
+
 #ifndef _LAUNCH4J_HEAD__INCLUDED_
 #define _LAUNCH4J_HEAD__INCLUDED_
 
-#define _WIN32_WINNT 0x0501
 #define WIN32_LEAN_AND_MEAN		// VC - Exclude rarely-used stuff from Windows headers
 
 // Windows Header Files:
@@ -51,7 +54,7 @@
 #include <process.h>
 
 #define LAUNCH4j "Launch4j"
-#define VERSION "3.8"
+#define VERSION "3.9"
 
 #define NO_JAVA_FOUND 0
 #define FOUND_JRE 1
@@ -102,6 +105,7 @@ BOOL loadBool(const int resID);
 int loadInt(const int resID);
 BOOL regQueryValue(const char* regPath, unsigned char* buffer,
 		unsigned long bufferLength);
+void formatJavaVersion(char* version, const char* originalVersion);
 void regSearch(const char* keyName, const int searchType);
 BOOL isJavaHomeValid(const char* keyName, const int searchType);
 BOOL isLauncherPathValid(const char* path);
@@ -132,5 +136,8 @@ void setCommandLineArgs(const char *lpCmdLine);
 int prepare(const char *lpCmdLine);
 void closeProcessHandles();
 BOOL execute(const BOOL wait, DWORD *dwExitCode);
+const char* getJavaHome();
+const char* getMainClass();
+const char* getLauncherArgs();
 
 #endif // _LAUNCH4J_HEAD__INCLUDED_
