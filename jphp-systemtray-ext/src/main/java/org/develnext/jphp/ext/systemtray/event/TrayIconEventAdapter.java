@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.systemtray.event;
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.input.MouseButton;
@@ -136,7 +137,7 @@ public class TrayIconEventAdapter extends EventProvider<TrayIcon> {
         }
 
         public void mouseClicked(MouseEvent e) {
-            eventHandler.handle(convertToJavaFx(target, javafx.scene.input.MouseEvent.MOUSE_CLICKED, e));
+            Platform.runLater(() -> eventHandler.handle(convertToJavaFx(target, javafx.scene.input.MouseEvent.MOUSE_CLICKED, e)));
         }
     }
 
@@ -147,7 +148,7 @@ public class TrayIconEventAdapter extends EventProvider<TrayIcon> {
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            eventHandler.handle(convertToJavaFx(target, javafx.scene.input.MouseEvent.MOUSE_MOVED, e));
+            Platform.runLater(() -> eventHandler.handle(convertToJavaFx(target, javafx.scene.input.MouseEvent.MOUSE_MOVED, e)));
         }
     }
 
@@ -159,7 +160,7 @@ public class TrayIconEventAdapter extends EventProvider<TrayIcon> {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            eventHandler.handle(convertToJavaFx(target, javafx.scene.input.MouseEvent.MOUSE_ENTERED, e));
+            Platform.runLater(() -> eventHandler.handle(convertToJavaFx(target, javafx.scene.input.MouseEvent.MOUSE_ENTERED, e)));
         }
     }
 
@@ -171,7 +172,7 @@ public class TrayIconEventAdapter extends EventProvider<TrayIcon> {
 
         @Override
         public void mouseExited(MouseEvent e) {
-            eventHandler.handle(convertToJavaFx(target, javafx.scene.input.MouseEvent.MOUSE_EXITED, e));
+            Platform.runLater(() -> eventHandler.handle(convertToJavaFx(target, javafx.scene.input.MouseEvent.MOUSE_EXITED, e)));
         }
     }
 }

@@ -24,7 +24,7 @@ class UXNodeWrapper
      *
      * @param $node
      */
-    public function __construct(UXNode $node)
+    public function __construct($node)
     {
         $this->node = $node;
     }

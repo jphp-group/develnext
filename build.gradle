@@ -227,6 +227,7 @@ project(':develnext') {
         provided project(':develnext-bundles/dn-sqlite-bundle')
         provided project(':develnext-bundles/dn-mysql-bundle')
         provided project(':develnext-bundles/dn-game2d-bundle')
+        provided project(':develnext-bundles/dn-systemtray-bundle')
 
         // stubs.
         compile project(':develnext-stubs/dn-php-sdk')

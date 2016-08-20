@@ -113,7 +113,10 @@ abstract class AbstractModule extends AbstractScript
 
         $events = [];
 
-        foreach ($methods as $method) {
+        $eventBinder = new EventBinder($this, $handler);
+        $eventBinder->load();
+
+        /*foreach ($methods as $method) {
             $comment = $method->getDocComment();
 
             $scanner = new Scanner($comment);
@@ -135,7 +138,7 @@ abstract class AbstractModule extends AbstractScript
                     $this->bind($event, [$handler, $methodName]);
                 }
             }
-        }
+        }*/
     }
 
     public function bind($event, callable $handler, $group = 'general')

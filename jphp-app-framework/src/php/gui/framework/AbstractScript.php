@@ -1,6 +1,7 @@
 <?php
 namespace php\gui\framework;
 
+use php\gui\event\UXEvent;
 use php\gui\UXForm;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
@@ -171,11 +172,15 @@ abstract class AbstractScript
             return null;
         }
 
-        $e = new ScriptEvent($this, $this->_context);
-        $e->sender->form = $this->_context instanceof UXForm ? $this->_context : null;
+        if (sizeof($args) == 1 && $args[0] instanceof UXEvent) {
+            $e = $args[0];
+        } else {
+            $e = new ScriptEvent($this, $this->_context);
+            $e->sender->form = $this->_context instanceof UXForm ? $this->_context : null;
 
-        foreach ($args as $name => $code) {
-            $e->{$name} = $code;
+            foreach ($args as $name => $code) {
+                $e->{$name} = $code;
+            }
         }
 
         foreach ((array) $this->handlers[$eventType] as $handler) {

@@ -5,10 +5,12 @@ use ide\forms\FontPropertyEditorForm;
 use ide\forms\ImagePropertyEditorForm;
 use ide\Ide;
 use php\gui\event\UXMouseEvent;
+use php\gui\framework\AbstractScript;
 use php\gui\text\UXFont;
 use php\gui\UXImage;
 use php\gui\UXImageArea;
 use php\gui\UXImageView;
+use php\gui\UXNode;
 use php\lib\String;
 use php\xml\DomElement;
 
@@ -61,6 +63,11 @@ class ImagePropertyEditor extends TextPropertyEditor
         $project = Ide::get()->getOpenedProject();
 
         $target = $this->designProperties->target;
+
+        if (!($target instanceof UXNode)) {
+            $target->{$this->code} = $value;
+            return;
+        }
 
         if ($value) {
             $file = $project->getFile("src/$value");
