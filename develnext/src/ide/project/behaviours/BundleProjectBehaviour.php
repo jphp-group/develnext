@@ -446,13 +446,28 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     /**
      * @param $env
-     * @param $class
+     * @param string $class
      * @return bool
      */
     public function hasBundle($env, $class)
     {
+        if ($class instanceof AbstractBundle) $class = reflect::typeOf($class);
+
         if ($bundle = $this->bundles[$env][$class]) {
             return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $class
+     * @return bool
+     */
+    public function hasBundleInAnyEnvironment($class)
+    {
+        foreach ($this->bundles as $env => $group) {
+            if ($this->hasBundle($env, $class)) return true;
         }
 
         return false;
@@ -482,6 +497,36 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         }
 
         return $result;
+    }
+
+    /**
+     * @param bool $hidden
+     * @return IdeLibraryBundleResource[]
+     */
+    public function getPublicBundleResources($hidden = false)
+    {
+        $result = [];
+
+        /** @var IdeLibraryBundleResource $resource */
+        foreach (Ide::get()->getLibrary()->getResources('bundles') as $resource) {
+            if (!$resource->isHidden() || $hidden) {
+                $result[] = $resource;
+            }
+        }
+
+        return $result;
+    }
+
+    public function getResourceOfBundle(AbstractBundle $bundle)
+    {
+        /** @var IdeLibraryBundleResource $resource */
+        foreach (Ide::get()->getLibrary()->getResources('bundles') as $resource) {
+            if (reflect::typeOf($resource->getBundle()) == reflect::typeOf($bundle)) {
+                return $resource;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -517,6 +562,8 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
      */
     public function addBundle($env, $class, $canRemove = true)
     {
+        if ($class instanceof AbstractBundle) $class = reflect::typeOf($class);
+
         if (!$this->bundles[$env][$class]) {
             unset($this->bundles[Project::ENV_ALL][$class]);
 
@@ -544,6 +591,8 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
      */
     public function removeBundle($class, $force = false)
     {
+        if ($class instanceof AbstractBundle) $class = reflect::typeOf($class);
+
         $removed = false;
 
         if (!$force && $this->bundlesCannotBeRemoved[$class]) {
@@ -618,9 +667,9 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     {
         $dialog = new BundleCheckListForm($this);
 
-        if ($dialog->showDialog() && $dialog->getResult() !== null) {
-            $classes = arr::keys($dialog->getResult());
-            $this->setBundles($classes);
+        if ($dialog->showDialog() || true) {
+            /*$classes = arr::keys($dialog->getResult());
+            $this->setBundles($classes);*/
 
             $this->doUpdateSettings();
             $this->doSave();
@@ -640,7 +689,9 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
             /** @var AbstractBundle $bundle */
             foreach ($bundles as $bundle) {
-                $uiItem = new UXButton($bundle->getName());
+                $resource = $this->getResourceOfBundle($bundle);
+
+                $uiItem = new UXButton($resource ? $resource->getName() : (new \ReflectionClass($bundle))->getShortName());
                 $uiItem->graphic = ico('bundle16');
                 $uiItem->classes->add('dn-simple-button');
                 $uiItem->tooltipText = $bundle->getDescription();

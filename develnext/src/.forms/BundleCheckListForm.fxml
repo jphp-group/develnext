@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
@@ -7,9 +8,9 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="581.0" prefWidth="777.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="750.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox spacing="10.0">
                <children>
@@ -27,23 +28,100 @@
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
-            <ListView id="list" prefHeight="299.0" prefWidth="560.0" styleClass="dn-simple-list" VBox.vgrow="ALWAYS" />
-            <Separator prefWidth="200.0" />
-            <HBox prefHeight="35.0" prefWidth="560.0" spacing="10.0">
+            <HBox spacing="10.0" VBox.vgrow="ALWAYS">
                <children>
-                  <Button id="saveButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-ok" text="Сохранить">
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                     <padding>
-                        <Insets left="15.0" right="15.0" />
-                     </padding>
-                  </Button>
-                  <Button id="cancelButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Отмена">
-                     <padding>
-                        <Insets left="15.0" right="15.0" />
-                     </padding>
-                  </Button>
+                  <TabPane id="tabs" prefWidth="300.0" side="LEFT" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                      <Tab text="Все">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="293.0" prefWidth="518.0" />
+                        </content>
+                      </Tab>
+                      <Tab text="Игровые">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        </content>
+                      </Tab>
+                        <Tab text="Интернет, сеть">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                          </content>
+                        </Tab>
+                        <Tab text="Базы данных">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                          </content>
+                        </Tab>
+                        <Tab text="Системные">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                          </content>
+                        </Tab>
+                        <Tab text="Другое">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                          </content>
+                        </Tab>
+                    </tabs>
+                  </TabPane>
+                  <AnchorPane id="content" minWidth="350.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="420.0" prefViewportWidth="350.0" style="-fx-background-color: transparent;" styleClass="dn-web" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <content>
+                              <VBox layoutX="-18.0" layoutY="81.0" spacing="15.0" styleClass="dn-web" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <HBox id="dialogHeader" spacing="10.0">
+                                       <children>
+                                          <ImageView id="iconImage" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
+                                          <VBox HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <Label id="titleLabel" text="Title">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
+                                                <Label id="descriptionLabel" text="Description text" textFill="#757575" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="35.0" spacing="10.0">
+                                       <children>
+                                          <Button id="addButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Подключить к проекту">
+                                             <padding>
+                                                <Insets left="15.0" right="15.0" />
+                                             </padding>
+                                             <styleClass>
+                                                <String fx:value="icon-plus" />
+                                                <String fx:value="flat-button" />
+                                             </styleClass>
+                                          </Button>
+                                          <Label id="installedLabel" styleClass="icon-ok" text="Добавлено в проект" textFill="#949494" visible="false" />
+                                       </children>
+                                    </HBox>
+                                    <HBox id="excludePane" alignment="CENTER_LEFT" prefHeight="35.0" spacing="10.0">
+                                       <children>
+                                          <Button id="removeButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Отключить">
+                                             <padding>
+                                                <Insets left="15.0" right="15.0" />
+                                             </padding>
+                                             <styleClass>
+                                                <String fx:value="flat-button" />
+                                                <String fx:value="icon-trash" />
+                                             </styleClass>
+                                          </Button>
+                                          <Label text="Удаляет пакет расширения из проекта" textFill="#949494" />
+                                       </children>
+                                    </HBox>
+                                    <WebView id="fullDescription" prefHeight="-1.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                                 </padding>
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                     </children></AnchorPane>
                </children>
             </HBox>
          </children>

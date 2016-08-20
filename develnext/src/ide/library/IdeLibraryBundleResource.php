@@ -2,6 +2,7 @@
 namespace ide\library;
 use ide\bundle\AbstractBundle;
 use ide\Logger;
+use ide\utils\FileUtils;
 use php\desktop\Runtime;
 use php\lib\fs;
 
@@ -15,6 +16,23 @@ class IdeLibraryBundleResource extends IdeLibraryResource
      * @var AbstractBundle
      */
     protected $bundle;
+
+    /**
+     * @return string
+     */
+    public function getGroup()
+    {
+        return $this->config->get('group', 'other');
+    }
+
+    /**
+     * @return string
+     */
+    public function getFullDescription()
+    {
+        $file = $this->config->get('descriptionFile', null);
+        return $file ? FileUtils::get('res://' . $file) : null;
+    }
 
     /**
      * @return string

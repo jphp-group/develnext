@@ -16,7 +16,7 @@ class SaveProjectForLibraryCommand extends AbstractProjectCommand
 {
     public function getName()
     {
-        return 'Добавить проект в библиотеку';
+        return 'Сохранить проект в библиотеке';
     }
 
     public function getIcon()
@@ -29,10 +29,10 @@ class SaveProjectForLibraryCommand extends AbstractProjectCommand
         return true;
     }
 
-    public function getCategory()
+    /*public function getCategory()
     {
         return 'library';
-    }
+    }*/
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {

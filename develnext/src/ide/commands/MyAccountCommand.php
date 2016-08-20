@@ -89,10 +89,10 @@ class MyAccountCommand extends AbstractCommand
         }
     }
 
-    public function getIcon()
+    /*public function getIcon()
     {
         return 'icons/account16.png';
-    }
+    }*/
 
     public function makeMenuItem()
     {
@@ -105,11 +105,12 @@ class MyAccountCommand extends AbstractCommand
         $btn->text = $this->getName();
         $btn->font = $btn->font->withBold(); //UXFont::of($btn->font->family, $btn->font->size, 'BOLD');
         $btn->classes->addAll(['flat-button']);
+        $btn->paddingLeft = $btn->paddingRight = 20;
 
         $this->accountButton = $btn;
         $this->accountLabel = new UXLabel();
         $this->accountLabel->textColor = 'gray';
-        $this->accountLabel->paddingLeft = 2;
+        $this->accountLabel->paddingLeft = 4;
 
         $this->accountImage = new UXImageArea();
         $this->accountImage->size = [32, 32];

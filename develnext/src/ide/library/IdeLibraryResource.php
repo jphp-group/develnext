@@ -3,6 +3,7 @@ namespace ide\library;
 use Files;
 use ide\Ide;
 use ide\Logger;
+use ide\ui\MenuViewable;
 use php\io\File;
 use php\io\IOException;
 use php\lang\IllegalStateException;
@@ -15,7 +16,7 @@ use ide\utils\FileUtils;
  * Class IdeLibraryResource
  * @package ide\library
  */
-abstract class IdeLibraryResource
+abstract class IdeLibraryResource implements MenuViewable
 {
     /**
      * @var string
@@ -179,4 +180,16 @@ abstract class IdeLibraryResource
     {
         // ...
     }
+
+    function getIcon()
+    {
+        return $this->config->get('icon');
+    }
+
+    function getMenuCount()
+    {
+        return -1;
+    }
+
+
 }

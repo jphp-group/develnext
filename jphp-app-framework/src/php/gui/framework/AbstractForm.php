@@ -369,6 +369,18 @@ abstract class AbstractForm extends UXForm
 
     protected function applyConfig()
     {
+        if ($this->_config->has('form.minWidth')) {
+            $this->minWidth = $this->_config->get('form.minWidth', 0);
+        }
+
+        if ($this->_config->has('form.minHeight')) {
+            $this->minHeight = $this->_config->get('form.minHeight', 0);
+        }
+
+        if ($this->layout->minHeight >= 0) {
+            $this->minHeight = $this->layout->minHeight;
+        }
+
         if ($this->_config->has('form.style')) {
             try {
                 $this->style = $this->_config->get('form.style');

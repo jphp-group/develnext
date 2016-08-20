@@ -259,7 +259,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $wrap = new UXVBox([$title, $uiUuid]);
         $wrap->spacing = 5;
 
-        $editor->addSettingsPane($wrap);
+        //$editor->addSettingsPane($wrap);
     }
 
     public function doReindex(ProjectIndexer $indexer)

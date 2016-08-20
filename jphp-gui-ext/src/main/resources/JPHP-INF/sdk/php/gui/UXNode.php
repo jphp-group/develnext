@@ -144,6 +144,11 @@ abstract class UXNode
     public $visible = true;
 
     /**
+     * @var bool
+     */
+    public $managed = true;
+
+    /**
      * --RU--
      * Доступность
      * @var bool
