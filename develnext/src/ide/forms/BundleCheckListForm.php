@@ -108,15 +108,22 @@ class BundleCheckListForm extends AbstractIdeForm
             $tabList->on('action', function () use ($tabList) {
                 $this->display($tabList->selectedItem);
             });
+
             $tabList->setDescriptionGetter(function (IdeLibraryBundleResource $resource) {
                 $text = $this->groups[$resource->getGroup()];
+                return $text;
+            });
+
+            $tabList->setNameGetter(function (IdeLibraryBundleResource $resource) {
+                $text = $resource->getName();
 
                 if ($this->behaviour->hasBundleInAnyEnvironment($resource->getBundle())) {
-                    $text = "✔ $text";
+                    $text = "$text ✔";
                 }
 
                 return $text;
             });
+
             $tabList->setIconGetter(function (IdeLibraryBundleResource $resource) {
                 return $this->groupIcons[$resource->getGroup()];
             });
@@ -148,7 +155,23 @@ class BundleCheckListForm extends AbstractIdeForm
             $this->tabLists[$resource->getGroup()]->add($resource);
         }
 
-        $this->display(null);
+        if ($this->getResult() instanceof IdeLibraryBundleResource) {
+            $this->display($this->getResult());
+
+            uiLater(function () {
+                foreach ($this->tabLists['all']->items as $i => $res) {
+                    if ($this->getResult() == $res) {
+                        $this->tabLists['all']->selectedIndex = $i;
+                        $this->tabLists['all']->focusedIndex = $i;
+                        $this->tabLists['all']->scrollTo($i);
+                    }
+                }
+            });
+
+            return;
+        } else {
+            $this->display(null);
+        }
 
         uiLater(function () {
             $this->tabLists['all']->selectedIndex = 0;
@@ -199,7 +222,7 @@ class BundleCheckListForm extends AbstractIdeForm
         if ($this->displayResource) {
             if (MessageBoxForm::confirm('Вы уверены, что хотите добавить этот пакет к проекту?')) {
                 $this->behaviour->addBundle(Project::ENV_ALL, $this->displayResource->getBundle());
-                $this->toast('Пакет расширения подключен к проекту');
+                //$this->toast('Пакет расширения подключен к проекту');
                 $this->update();
             }
         }

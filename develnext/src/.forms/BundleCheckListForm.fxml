@@ -85,6 +85,7 @@
                                           </VBox>
                                        </children>
                                     </HBox>
+                                    <Separator prefWidth="200.0" />
                                     <HBox alignment="CENTER_LEFT" prefHeight="35.0" spacing="10.0">
                                        <children>
                                           <Button id="addButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Подключить к проекту">
@@ -96,7 +97,7 @@
                                                 <String fx:value="flat-button" />
                                              </styleClass>
                                           </Button>
-                                          <Label id="installedLabel" styleClass="icon-ok" text="Добавлено в проект" textFill="#949494" visible="false" />
+                                          <Label id="installedLabel" styleClass="icon-ok" text="Добавлено в проект" />
                                        </children>
                                     </HBox>
                                     <HBox id="excludePane" alignment="CENTER_LEFT" prefHeight="35.0" spacing="10.0">

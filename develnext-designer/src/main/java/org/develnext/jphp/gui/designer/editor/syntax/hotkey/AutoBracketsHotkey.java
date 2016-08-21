@@ -21,6 +21,37 @@ public class AutoBracketsHotkey extends AbstractHotkey {
         char nextCh = area.getText().length() >= pos + 1 ? area.getText(pos, pos + 1).charAt(0) : '\0';
 
         switch (ch) {
+            case "[":
+                if (nextCh == ']') break;
+            case "(":
+                if (nextCh == ')') break;
+            case "{":
+                if (nextCh == '}') break;
+
+                if (!(nextCh == '\0' || Character.isWhitespace(nextCh))) {
+                    return false;
+                }
+                break;
+
+            case ")":
+                String text = area.getText();
+                int check = 0;
+
+                for (int i = 0; i < text.length(); i++) {
+                    char c = text.charAt(i);
+
+                    if (c == ')') check--;
+                    if (c == '(') check++;
+
+                    if (check < 0) return false;
+                }
+
+                if (check != 0) return false;
+                break;
+        }
+
+
+        switch (ch) {
             case "{":
                 if (keyEvent.getCode() == KeyCode.OPEN_BRACKET) {
                     addClosed = '}';

@@ -1,9 +1,18 @@
 <?php
 
 /**
+ * Delay execution in seconds.
  * @param int $seconds
  */
 function sleep($seconds)
+{
+}
+
+/**
+ * Delay execution in microseconds.
+ * @param int $micro_seconds
+ */
+function usleep($micro_seconds)
 {
 }
 
@@ -480,5 +489,43 @@ function serialize($value)
  * @return mixed
  */
 function unserialize($string)
+{
+}
+
+/**
+ * @return string
+ */
+function getcwd()
+{
+}
+
+/**
+ * @param string $varname
+ * @return string
+ */
+function getenv($varname)
+{
+}
+
+/**
+ * @param string $setting
+ * @return bool
+ */
+function putenv($setting)
+{
+}
+
+/**
+ * @param string $mode
+ * @return string
+ */
+function php_uname($mode = "a")
+{
+}
+
+/**
+ * @return string
+ */
+function phpversion()
 {
 }

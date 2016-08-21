@@ -663,9 +663,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         return $this->bundleConfigs[get_class($bundle)];
     }
 
-    public function showBundleCheckListDialog()
+    public function showBundleCheckListDialog(IdeLibraryBundleResource $resource = null)
     {
         $dialog = new BundleCheckListForm($this);
+        $dialog->setResult($resource);
 
         if ($dialog->showDialog() || true) {
             /*$classes = arr::keys($dialog->getResult());
@@ -692,15 +693,21 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 $resource = $this->getResourceOfBundle($bundle);
 
                 $uiItem = new UXButton($resource ? $resource->getName() : (new \ReflectionClass($bundle))->getShortName());
-                $uiItem->graphic = ico('bundle16');
-                $uiItem->classes->add('dn-simple-button');
+                $uiItem->graphic = ($resource && $resource->getIcon()) ? Ide::get()->getImage($resource->getIcon(), [16, 16]) : ico('bundle16');
+                $uiItem->padding = [7, 12];
+                $uiItem->classes->add('dn-simple-toggle-button');
                 $uiItem->tooltipText = $bundle->getDescription();
+                $uiItem->on('action', function () use ($resource) {
+                    $this->showBundleCheckListDialog($resource);
+                });
 
                 $this->uiPackages->add($uiItem);
             }
 
             $addButton = new UXButton();
             $addButton->graphic = ico('edit16');
+            $addButton->classes->add('flat-button');
+            $addButton->text = 'Изменить';
             $addButton->on('action', function () {
                 $this->showBundleCheckListDialog();
             });
