@@ -105,7 +105,7 @@ class BundleCheckListForm extends AbstractIdeForm
             $tab->graphic = Ide::get()->getImage($this->groupIcons[$code]);
 
             $tabList = new ListMenu();
-            $tabList->on('action', function () use ($tabList) {
+            $tabList->on('click', function () use ($tabList) {
                 $this->display($tabList->selectedItem);
             });
 
@@ -230,13 +230,15 @@ class BundleCheckListForm extends AbstractIdeForm
 
     public function update()
     {
+        $displayResource = $this->displayResource;
+
         foreach ($this->tabLists as $list) {
             $selected = $list->selectedIndex;
             $list->update();
             $list->selectedIndex = $selected;
         }
 
-        $this->display($this->displayResource);
+        $this->display($displayResource);
     }
 
     /**

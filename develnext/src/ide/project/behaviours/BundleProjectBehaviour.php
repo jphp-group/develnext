@@ -353,7 +353,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
         foreach ($allBundles as $bundle) {
             if ($log) {
-                $log(':apply-bundle "' . $bundle->getName() . '"');
+                $log(':apply-bundle "' . reflect::typeOf($bundle) . '"');
             }
 
             $bundle->onPreCompile($this->project, $env, $log);

@@ -309,6 +309,9 @@ class FormElementTypePane
             }
 
             $button->tooltipText = $element->getName();
+            if ($element->getElementClass()) {
+                $button->tooltipText .= "\n{$element->getElementClass()}";
+            }
 
             if ($element instanceof ObjectListEditorItem) {
                 $button->tooltipText .= ": "  . $element->element->getName();
@@ -325,6 +328,9 @@ class FormElementTypePane
             }
 
             $smallButton->tooltipText = $element->getName();
+            if ($element->getElementClass()) {
+                $smallButton->tooltipText .= "\n{$element->getElementClass()}";
+            }
 
             if ($element instanceof ObjectListEditorItem) {
                 $smallButton->tooltipText .= ": "  . $element->element->getName();
