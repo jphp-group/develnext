@@ -1,0 +1,5 @@
+
+bundle/http/HttpResponse.php
+bundle/http/HttpAsyncResponse.php
+bundle/http/HttpClient.php
+bundle/http/HttpDownloader.php

@@ -17,6 +17,7 @@ include 'develnext-lexer';
 include 'jphp-gui-richtext-ext';
 
 include 'develnext-bundles/dn-orientdb-bundle'
+include 'develnext-bundles/dn-httpclient-bundle'
 include 'develnext-bundles/dn-jsoup-bundle'
 include 'develnext-bundles/dn-mail-bundle'
 include 'develnext-bundles/dn-sql-bundle'

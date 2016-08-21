@@ -221,6 +221,7 @@ project(':develnext') {
 
         // bundles.
         //compile project(':develnext-bundles/dn-orientdb-bundle')
+        provided project(':develnext-bundles/dn-httpclient-bundle')
         provided project(':develnext-bundles/dn-jsoup-bundle')
         provided project(':develnext-bundles/dn-mail-bundle')
         provided project(':develnext-bundles/dn-sql-bundle')
