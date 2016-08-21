@@ -5,7 +5,11 @@
                 <variant value="HH:mm">Часы, Минуты</variant>
                 <variant value="HH:mm:ss">Часы, Минуты, Секунды</variant>
                 <variant value="HH:mm dd.MM.YYYY">Часы, Минуты + Дата</variant>
+                <variant value="HH:mm dd.MM.YY">Часы, Минуты + Дата (короткий год)</variant>
                 <variant value="HH:mm:ss dd.MM.YYYY">Часы, Минуты, Секунды + Дата</variant>
+                <variant value="HH:mm:ss dd.MM.YY">Часы, Минуты, Секунды + Дата (короткий год)</variant>
+                <variant value="dd.MM.YYYY">Дата</variant>
+                <variant value="dd.MM.YY">Дата (короткий год)</variant>
             </variants>
         </property>
     </properties>
