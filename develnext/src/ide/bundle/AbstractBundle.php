@@ -27,8 +27,15 @@ abstract class AbstractBundle
      */
     protected $bundleDirectory = null;
 
-    abstract function getName();
-    abstract function getDescription();
+    /**
+     * @deprecated
+     */
+    function getName() {}
+
+    /**
+     * @deprecated
+     */
+    function getDescription() {}
 
     /**
      * @return array

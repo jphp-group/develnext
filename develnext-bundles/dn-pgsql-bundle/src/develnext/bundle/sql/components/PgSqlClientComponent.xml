@@ -1,0 +1,22 @@
+<element extends="develnext\bundle\sql\components\SqlClientComponent">
+    <init>
+        <property code="host" value="localhost" />
+        <property code="port" value="5432" />
+        <property code="username" value="postgres" />
+        <property code="currentSchema" value="public" />
+    </init>
+
+    <properties group="connection" title="Подключение" sort="500">
+        <property code="host" name="Хост (host)" editor="text" />
+        <property code="port" name="Порт (port)" editor="integer" />
+        <property code="currentSchema" name="Schema" editor="text" />
+        <property code="database" name="Имя базы" editor="text" />
+        <property code="username" name="Логин" editor="text" />
+        <property code="password" name="Пароль" editor="text" />
+        <property code="useSSL" name="SSL" editor="boolean" />
+
+        <property code="loginTimeout" name="Логин таймаут" editor="integer" tooltip="В секундах" />
+        <property code="socketTimeout" name="Сокет таймаут" editor="integer" tooltip="В секундах" />
+        <property code="connectTimeout" name="Таймаут соединения" editor="integer" tooltip="В секундах" />
+    </properties>
+</element>
