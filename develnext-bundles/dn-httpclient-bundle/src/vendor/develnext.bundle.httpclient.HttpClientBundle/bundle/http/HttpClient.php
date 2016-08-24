@@ -2,6 +2,7 @@
 namespace bundle\http;
 
 use php\format\JsonProcessor;
+use php\framework\Logger;
 use php\gui\framework\AbstractScript;
 use php\io\File;
 use php\io\FileStream;
@@ -262,8 +263,28 @@ class HttpClient extends AbstractScript
     public function execute($url, $method = 'GET', $data = null)
     {
         $connect = null;
+        $body = null;
 
-        $this->_lock->synchronize(function () use (&$connect, $url, $method, $data) {
+        $this->_lock->synchronize(function () use (&$connect, &$body, $url, $method, $data) {
+            $existsBody = false;
+
+            switch ($method) {
+                case 'PUT':
+                case 'POST':
+                case 'PATCH':
+                    $existsBody = true;
+                    break;
+
+                default:
+                    $data = Flow::of((array)$this->data)->append((array)$data)->withKeys()->toArray();
+
+                    if ($data) {
+                        $url .= "?" . $this->formatUrlencode($data);
+                    }
+
+                    break;
+            }
+
             $proxy = null;
 
             if (!is_array($this->cookies)) {
@@ -279,7 +300,8 @@ class HttpClient extends AbstractScript
                 $proxy = new Proxy($this->proxyType, $proxyHost, $proxyPort);
             }
 
-            $connect = URLConnection::create("{$this->baseUrl}{$url}", $proxy);
+            $url = "{$this->baseUrl}{$url}";
+            $connect = URLConnection::create($url, $proxy);
             $connect->connectTimeout = $this->connectTimeout;
             $connect->followRedirects = $this->followRedirects;
             $connect->readTimeout = $this->readTimeout;
@@ -293,48 +315,44 @@ class HttpClient extends AbstractScript
 
             $connect->setRequestProperty('User-Agent', $this->userAgent);
 
-            $body = '';
-            switch ($this->requestType) {
-                case 'JSON':
-                    $connect->setRequestProperty('Content-Type', "application/json; charset=UTF-8");
-                    $data = Flow::of((array)$this->data)->append((array)$data)->withKeys()->toArray();
-                    $body = (new JsonProcessor())->format($data);
-                    break;
+            if ($existsBody) {
+                switch ($this->requestType) {
+                    case 'JSON':
+                        $connect->setRequestProperty('Content-Type', "application/json; charset=UTF-8");
+                        $data = Flow::of((array)$this->data)->append((array)$data)->withKeys()->toArray();
+                        $body = (new JsonProcessor())->format($data);
+                        break;
 
-                case 'TEXT':
-                    $connect->setRequestProperty('Content-Type', 'text/html');
-                    $body = $data !== null ? "$data" : "$this->data";
-                    break;
+                    case 'TEXT':
+                        $connect->setRequestProperty('Content-Type', 'text/html');
+                        $body = $data !== null ? "$data" : "$this->data";
+                        break;
 
-                case 'URLENCODE':
-                    $connect->setRequestProperty('Cache-Control', 'no-cache');
-                    $connect->setRequestProperty('Content-Type', 'application/x-www-form-urlencoded');
+                    case 'URLENCODE':
+                        $connect->setRequestProperty('Cache-Control', 'no-cache');
+                        $connect->setRequestProperty('Content-Type', 'application/x-www-form-urlencoded');
 
-                    if (!is_array($this->data)) {
-                        $this->data = self::textToArray($this->data);
-                    }
+                        if (!is_array($this->data)) {
+                            $this->data = self::textToArray($this->data);
+                        }
 
-                    $data = Flow::of((array)$this->data)->append((array)$data)->withKeys()->toArray();
+                        $data = Flow::of((array)$this->data)->append((array)$data)->withKeys()->toArray();
 
-                    $body = $this->formatUrlencode($data);
-                    break;
+                        $body = $this->formatUrlencode($data);
+                        break;
 
-                case 'MULTIPART':
-                    $connect->setRequestProperty('Cache-Control', 'no-cache');
-                    $connect->setRequestProperty('Content-Type', 'multipart/form-data;boundary=' . $this->_boundary);
+                    case 'MULTIPART':
+                        $connect->setRequestProperty('Cache-Control', 'no-cache');
+                        $connect->setRequestProperty('Content-Type', 'multipart/form-data;boundary=' . $this->_boundary);
 
-                    if (!is_array($this->data)) {
-                        $this->data = self::textToArray($this->data);
-                    }
+                        if (!is_array($this->data)) {
+                            $this->data = self::textToArray($this->data);
+                        }
 
-                    $data = Flow::of((array)$this->data)->append((array)$data)->withKeys()->toArray();
-                    $body = $this->formatMultipart($data);
-                    break;
-            }
-
-            if ($body) {
-                $connect->setRequestProperty('Content-Length', str::length($body));
-                $connect->getOutputStream()->write($body);
+                        $data = Flow::of((array)$this->data)->append((array)$data)->withKeys()->toArray();
+                        $body = $this->formatMultipart($data);
+                        break;
+                }
             }
 
             $cookie = [];
@@ -342,18 +360,28 @@ class HttpClient extends AbstractScript
                 $value = urlencode($value);
                 $cookie[] = "$name=$value";
             }
-            $connect->setRequestProperty('Cookie', str::join($cookie, '&'));
+
+            if ($cookie) {
+                $connect->setRequestProperty('Cookie', str::join($cookie, '&'));
+            }
 
             foreach ($this->headers as $name => $value) {
                 $connect->setRequestProperty($name, $value);
             }
+
+            Logger::debug("Request {$method} -> {$url}");
         });
 
-        return $this->connect($connect);
+        return $this->connect($connect, $body);
     }
 
-    protected function connect(URLConnection $connection)
+    protected function connect(URLConnection $connection, $body)
     {
+        if ($body) {
+            $connection->setRequestProperty('Content-Length', str::length($body));
+            $connection->getOutputStream()->write($body);
+        }
+
         $response = new HttpResponse();
 
         try {
@@ -368,7 +396,7 @@ class HttpClient extends AbstractScript
         switch ($this->responseType) {
             case 'JSON':
                 $data = $inStream->readFully();
-                $body = (new JsonProcessor())->parse($data);
+                $body = (new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS))->parse($data);
                 break;
 
             case 'TEXT':

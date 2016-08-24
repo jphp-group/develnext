@@ -2,6 +2,7 @@
 namespace develnext\bundle\httpclient;
 
 use develnext\bundle\httpclient\components\HttpClientComponent;
+use develnext\bundle\httpclient\components\HttpDownloaderComponent;
 use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
 use ide\formats\ScriptModuleFormat;
@@ -25,6 +26,7 @@ class HttpClientBundle extends AbstractJarBundle
 
         if ($format) {
             $format->register(new HttpClientComponent());
+            $format->register(new HttpDownloaderComponent());
         }
     }
 
@@ -36,6 +38,7 @@ class HttpClientBundle extends AbstractJarBundle
 
         if ($format) {
             $format->unregister(new HttpClientComponent());
+            $format->unregister(new HttpDownloaderComponent());
         }
     }
 }

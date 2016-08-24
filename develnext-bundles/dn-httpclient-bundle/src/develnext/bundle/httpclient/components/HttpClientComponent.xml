@@ -14,9 +14,9 @@
         <property code="requestType" name="Тип запроса" editor="enum" tooltip="Тип данных для http запроса">
             <variants>
                 <variant value="JSON">Json</variant>
-                <variant value="URLENCODE">Простая форма</variant>
-                <variant value="MULTIPART">Форма с файлами</variant>
-                <variant value="TEXT">Текст</variant>
+                <variant value="URLENCODE">Простая форма (form/urlencoded)</variant>
+                <variant value="MULTIPART">Форма с файлами (multipart)</variant>
+                <variant value="TEXT">Текст (raw)</variant>
             </variants>
         </property>
         <property code="responseType" name="Тип ответа" editor="enum" tooltip="Тип данных для http ответа">

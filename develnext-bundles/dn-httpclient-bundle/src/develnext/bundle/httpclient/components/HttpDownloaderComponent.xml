@@ -1,0 +1,25 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="threadCount" value="4" />
+    </init>
+
+    <properties group="general">
+        <property code="urls" name="Ссылки для загрузки" editor="text" tooltip="Список ссылок для загрузки, кажая ссылка на новой строке" />
+        <property code="destDirectory" name="Папка для сохранения" editor="text" />
+        <property code="useTempFile" name="Временный файл" editor="boolean" tooltip="Загружать во фременный файл и только после полной загрузки размещать файл" />
+
+        <property code="threadCount" name="Максимум потоков" editor="integer" />
+
+        <property code="breakOnError" name="Останавливать при ошибке" editor="boolean" tooltip="Останавливать загрузку всех файлов, если возникла ошибка загрузки" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="done" name="Завершено" kind="ObjectEvent" icon="icons/finished16.png" />
+        <eventType code="successAll" name="Завершено успешно" kind="ObjectEvent" icon="icons/ok16.png" />
+
+        <eventType code="progress" name="Прогресс загрузки" kind="ObjectEvent" icon="icons/progressbar16.png" />
+
+        <eventType code="successOne" name="Успешная загрузка" kind="ObjectEvent" icon="icons/ok16.png" />
+        <eventType code="errorOne" name="Ошибка загрузки" kind="ObjectEvent" icon="icons/error16.png" />
+    </eventTypes>
+</element>

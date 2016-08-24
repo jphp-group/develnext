@@ -16,6 +16,7 @@ use php\lib\fs;
 use php\lib\str;
 use php\time\Time;
 use php\util\Scanner;
+use php\util\SharedValue;
 
 define('DEVELNEXT_PROJECT_DEBUG', true);
 
@@ -49,12 +50,15 @@ class DebugClassLoader extends ClassLoader
      */
     protected $ignoreCacheFiles = [];
 
+    protected $_lock;
+
     /**
      * DebugClassLoader constructor.
      */
     public function __construct()
     {
         $this->cacheDir = "./.dn/cache/";
+        $this->_lock = new SharedValue();
 
         if (!fs::exists($this->cacheDir) && !fs::makeDir($this->cacheDir)) {
             $this->cacheDir = null;
@@ -148,7 +152,6 @@ class DebugClassLoader extends ClassLoader
         } catch (IOException $e) {
             ;
         }
-
         // echo "[DEBUG] require '$filename', $t ms ($this->allTime ms)\n";
     }
 

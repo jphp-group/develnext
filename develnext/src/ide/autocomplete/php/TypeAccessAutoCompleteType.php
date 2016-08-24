@@ -156,6 +156,10 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                         continue;
                     }
 
+                    if (sizeof($method->arguments) > 0) {
+                        continue;
+                    }
+
                     $name = str::lowerFirst(str::sub($method->name, 3));
 
                     $result[$name] = $p = new PropertyAutoCompleteItem(
@@ -233,8 +237,16 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
 
             if ($this->typeData['getters']) {
                 if (!$method->data['non-getter']) {
-                    if ((str::startsWith($method->name, 'get') || str::startsWith($method->name, 'set')) && str::length($method->name) > 3) {
-                        continue;
+                    if (str::startsWith($method->name, 'get') && str::length($method->name) > 3) {
+                        if (sizeof($method->arguments) == 0) {
+                            continue;
+                        }
+                    }
+
+                    if (str::startsWith($method->name, 'set') && str::length($method->name) > 3) {
+                        if (sizeof($method->arguments) == 1) {
+                            continue;
+                        }
                     }
                 }
             }

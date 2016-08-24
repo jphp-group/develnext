@@ -163,10 +163,10 @@ abstract class AbstractScript
 
     /**
      * @param string $eventType
-     * @param ...$args
+     * @param array $args
      * @return ScriptEvent
      */
-    public function trigger($eventType, ...$args)
+    public function trigger($eventType, $args = [])
     {
         if ($this->disabled) {
             return null;
@@ -178,7 +178,7 @@ abstract class AbstractScript
             $e = new ScriptEvent($this, $this->_context);
             $e->sender->form = $this->_context instanceof UXForm ? $this->_context : null;
 
-            foreach ($args as $name => $code) {
+            foreach ((array)$args as $name => $code) {
                 $e->{$name} = $code;
             }
         }
