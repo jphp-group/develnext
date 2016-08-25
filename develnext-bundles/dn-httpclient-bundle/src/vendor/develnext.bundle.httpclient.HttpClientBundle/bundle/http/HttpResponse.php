@@ -76,6 +76,7 @@ class HttpResponse
     }
 
     /**
+     * Returns header value.
      * @param string $name
      * @return mixed
      */
@@ -85,6 +86,7 @@ class HttpResponse
     }
 
     /**
+     * Returns Content-Type header value.
      * @param string $contentType
      * @return string
      */
@@ -98,6 +100,7 @@ class HttpResponse
     }
 
     /**
+     * Content-Length header value, returns -1 if it does not exist.
      * @param int $size
      * @return int
      */
@@ -120,6 +123,7 @@ class HttpResponse
     }
 
     /**
+     * Return array of Set-Cookie header.
      * @param array $data
      * @return array
      */
@@ -130,22 +134,17 @@ class HttpResponse
                 return $this->cookies;
             }
 
-            $cookies = $this->header('Cookie');
+            $cookies = $this->header('Set-Cookie');
             $result = [];
 
-            foreach (str::split($cookies, '&', 500) as $cookie) {
-                list($name, $value) = str::split($cookie, '=', 2);
-                $value = urldecode($value);
+            if (!is_array($cookies)) $cookies = [$cookies];
 
-                if (isset($result[$name])) {
-                    if (is_array($result[$name])) {
-                        $result[$name][] = $value;
-                    } else {
-                        $result[$name] = [$result[$name], $value];
-                    }
-                } else {
-                    $result[$name] = $value;
-                }
+            foreach ($cookies as $cookie) {
+                list($name, $value) = str::split($cookie, '=', 2);
+
+                $values = str::split($value, ';', 10);
+
+                $result[$name] = urldecode($values[0]);
             }
 
             return $this->cookies = $result;
@@ -166,38 +165,66 @@ class HttpResponse
         }
     }
 
+    /**
+     * Check http code >= 200 and <= 399
+     * @return bool
+     */
     public function isSuccess()
     {
         $statusCode = $this->statusCode();
         return $statusCode >= 200 && $statusCode <= 399;
     }
 
+    /**
+     * Check http code >= 400
+     * @return bool
+     */
     public function isFail()
     {
         $statusCode = $this->statusCode();
         return $statusCode >= 400;
     }
 
+    /**
+     * Check http code >= 400
+     * @return bool
+     */
     public function isError()
     {
         return $this->isFail();
     }
 
+    /**
+     * Check http code is 404
+     * @return bool
+     */
     public function isNotFound()
     {
         return $this->statusCode() == 404;
     }
 
+    /**
+     * Check http code is 403
+     * @return bool
+     */
     public function isAccessDenied()
     {
         return $this->statusCode() == 403;
     }
 
+    /**
+     * Check http code is 405
+     * @return bool
+     */
     public function isInvalidMethod()
     {
         return $this->statusCode() == 405;
     }
 
+    /**
+     * Check http code >= 500
+     * @return bool
+     */
     public function isServerError()
     {
         return $this->statusCode() >= 500;
