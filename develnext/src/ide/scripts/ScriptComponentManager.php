@@ -60,18 +60,22 @@ class ScriptComponentManager
             $type = $json['ideType'];
 
             if ($type) {
-                $type = new $type();
-                $container = new ScriptComponentContainer($type, FileUtils::stripExtension(File::of($path)->getName()));
-                $container->setConfigPath($path);
+                if (class_exists($type)) {
+                    $type = new $type();
+                    $container = new ScriptComponentContainer($type, FileUtils::stripExtension(File::of($path)->getName()));
+                    $container->setConfigPath($path);
 
-                $container->setX((int)$json['x']);
-                $container->setY((int)$json['y']);
+                    $container->setX((int)$json['x']);
+                    $container->setY((int)$json['y']);
 
-                foreach ((array)$json['properties'] as $key => $value) {
-                    $container->__set($key, $value);
+                    foreach ((array)$json['properties'] as $key => $value) {
+                        $container->__set($key, $value);
+                    }
+
+                    return $container;
+                } else {
+                    throw new \Exception("Component type is not found");
                 }
-
-                return $container;
             }
         }
 
@@ -167,18 +171,22 @@ class ScriptComponentManager
                     $y = (int)$data['y'];
 
                     if ($id && $type) {
-                        $component = new ScriptComponentContainer(new $type, $id);
-                        $component->setConfigPath($filename);
-                        $component->setX($x);
-                        $component->setY($y);
+                        if (class_exists($type)) {
+                            $component = new ScriptComponentContainer(new $type, $id);
+                            $component->setConfigPath($filename);
+                            $component->setX($x);
+                            $component->setY($y);
 
-                        if (is_array($data['properties'])) {
-                            foreach ($data['properties'] as $key => $value) {
-                                $component->{$key} = $value;
+                            if (is_array($data['properties'])) {
+                                foreach ($data['properties'] as $key => $value) {
+                                    $component->{$key} = $value;
+                                }
                             }
-                        }
 
-                        $this->add($component);
+                            $this->add($component);
+                        } else {
+                            //throw new \Exception("Component '$type' is not registered in ide");
+                        }
                     }
 
                 } catch (ProcessorException $e) {

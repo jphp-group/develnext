@@ -261,7 +261,7 @@ class ScriptModuleEditor extends FormEditor
 
         $indexFile = FileUtils::stripExtension($this->codeFile) . ".json";
 
-        if (Files::exists($indexFile)) {
+        if (fs::exists($indexFile)) {
             $json = Json::fromFile($indexFile);
             $this->properties = (array) $json['properties'];
         }
@@ -275,10 +275,15 @@ class ScriptModuleEditor extends FormEditor
 
         foreach ($files as $file) {
             if (Str::endsWith($file, '.json')) {
-                $container = $this->manager->loadContainer($file);
+                try {
+                    $container = $this->manager->loadContainer($file);
 
-                if ($container) {
-                    $this->addContainer($container);
+                    if ($container) {
+                        $this->addContainer($container);
+                    }
+                } catch (\Exception $e) {
+                    $this->setIncorrectFormat(true);
+                    return false;
                 }
             }
         }

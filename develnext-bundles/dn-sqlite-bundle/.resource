@@ -5,3 +5,4 @@ group=database
 icon=develnext/bundle/sqlite/sqlite.png
 
 class=develnext\\bundle\\sql\\SqliteBundle
+author=DevelNext

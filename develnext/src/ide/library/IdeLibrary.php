@@ -157,7 +157,7 @@ class IdeLibrary
 
         $path = "$this->defaultDirectory/$category/$name";
 
-        if (!$rewrite && Files::exists("$path.resource")) {
+        if (!$rewrite && fs::exists("$path.resource")) {
             return null;
         } else {
             fs::delete("$path.resource");

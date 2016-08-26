@@ -1,6 +1,7 @@
 <?php
 namespace php\gui\framework;
 
+use php\gui\effect\UXDropShadowEffect;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXForm;
 use php\gui\UXLabel;
@@ -37,7 +38,7 @@ class Preloader extends UXAnchorPane
         $this->visible = false;
 
         $this->position = [0, 0];
-        $this->opacity = 0.6;
+        $this->opacity = 0.52;
         $this->visible = false;
 
         $indicator = new UXProgressIndicator();
@@ -49,6 +50,7 @@ class Preloader extends UXAnchorPane
         if ($text) {
             $label = new UXLabel($text);
             $label->text = $text;
+            //$label->effects->add(new UXDropShadowEffect());
             $this->add($label);
         }
 

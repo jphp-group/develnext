@@ -5,3 +5,4 @@ group=network
 icon=develnext/bundle/httpclient/http32.png
 
 class=develnext\\bundle\\httpclient\\HttpClientBundle
+author=DevelNext

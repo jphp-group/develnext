@@ -5,15 +5,19 @@ use ide\bundle\AbstractBundle;
 use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
+use ide\IdeConfiguration;
 use ide\library\IdeLibraryBundleResource;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\Project;
 use ide\ui\ListMenu;
+use php\compress\ZipFile;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXButton;
 use php\gui\UXCheckbox;
+use php\gui\UXDialog;
+use php\gui\UXFileChooser;
 use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
@@ -21,7 +25,10 @@ use php\gui\UXListView;
 use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXWebView;
+use php\lang\Thread;
+use php\lib\fs;
 use php\lib\reflect;
+use php\lib\str;
 
 /**
  * Class BundleCheckListForm
@@ -105,6 +112,7 @@ class BundleCheckListForm extends AbstractIdeForm
             $tab->graphic = Ide::get()->getImage($this->groupIcons[$code]);
 
             $tabList = new ListMenu();
+            $tabList->setNameThin(true);
             $tabList->on('click', function () use ($tabList) {
                 $this->display($tabList->selectedItem);
             });
@@ -150,6 +158,10 @@ class BundleCheckListForm extends AbstractIdeForm
     {
         $this->checkboxes = [];
 
+        foreach ($this->tabLists as $list) {
+            $list->clear();
+        }
+
         foreach ($this->behaviour->getPublicBundleResources() as $resource) {
             $this->tabLists['all']->add($resource);
             $this->tabLists[$resource->getGroup()]->add($resource);
@@ -184,6 +196,75 @@ class BundleCheckListForm extends AbstractIdeForm
             $checkbox->selected = $this->behaviour->hasBundle(Project::ENV_ALL, reflect::typeOf($bundle));
             $this->list->items->add([$checkbox, $bundle]);
         }*/
+    }
+
+    /**
+     * @event addBundle.action
+     */
+    public function addBundle()
+    {
+        $dialog = new UXFileChooser();
+        $dialog->extensionFilters = [['description' => 'Пакеты для DevelNext (*.dnbundle)', 'extensions' => ['*.dnbundle']]];
+
+        if ($file = $dialog->showOpenDialog()) {
+            $zip = new ZipFile($file);
+
+            try {
+                $config = new IdeConfiguration($zip->getEntryStream('.resource'), 'UTF-8');
+
+                if (!$config->toArray()) {
+                    UXDialog::showAndWait('Поврежденный или некорректный пакет расширений');
+                    $zip->close();
+                } else {
+                    $this->showPreloader();
+
+                    (new Thread(function () use ($zip, $file) {
+                        try {
+                            $code = fs::nameNoExt($file);
+
+                            $resource = Ide::get()->getLibrary()->makeResource('bundles', $code, true);
+                            $path = fs::parent($resource->getPath()) . "/" . $code;
+
+                            foreach ($zip->getEntryNames() as $name) {
+                                if ($entry = $zip->getEntry($name)) {
+                                    if ($name == '.resource') {
+                                        fs::makeFile($resource->getPath() . ".resource");
+                                        fs::copy($zip->getEntryStream($name), $resource->getPath() . ".resource");
+                                    } else {
+                                        if (str::startsWith($name, "bundle/")) {
+                                            $to = $path . "/" . str::sub($name, 7);
+
+                                            if ($entry->isDirectory()) {
+                                                fs::makeDir($to);
+                                            } else {
+                                                fs::ensureParent($to);
+                                                fs::copy($zip->getEntryStream($name), $to);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Ide::get()->getLibrary()->update();
+
+                            uiLater(function () use ($resource) {
+                                $this->hidePreloader();
+                                $this->doShowing();
+
+                                $resource = Ide::get()->getLibrary()->findResource('bundles', $resource->getPath());
+                                $this->display($resource);
+
+                                $this->toast('Пакет успешно добавлен в IDE');
+                            });
+                        } finally {
+                            $zip->close();
+                        }
+                    }))->start();
+                }
+            } finally {
+
+            }
+        }
     }
 
     /**
@@ -255,12 +336,22 @@ class BundleCheckListForm extends AbstractIdeForm
         }
     }
 
+    /**
+     * @event deleteBundle.action
+     */
+    public function deleteBundle()
+    {
+        if (MessageBoxForm::confirmDelete($this->displayResource->getName())) {
+            Ide::get()->getLibrary()->delete($this->displayResource);
+            $this->doShowing();
+        }
+    }
+
     public function display(IdeLibraryBundleResource $resource = null)
     {
         $this->displayResource = $resource;
 
         if ($resource) {
-            $this->content->show();
             $this->titleLabel->text = $resource->getName();
             $this->descriptionLabel->text = $resource->getDescription();
 
@@ -271,16 +362,23 @@ class BundleCheckListForm extends AbstractIdeForm
 
             if (!$description) $description = '<span style="color:gray">Информации о содержимом нет.</span>';
 
-            $description = "<style>i { font-style: italic !important; } ul { padding-left: 0; margin-left: 10px; } li { line-height: 20px; color: gray; }</style><h3>Пакет содержит</h3> $description";
+            $description = "<style>* {line-height: 19px;} h3 { margin: 0; padding: 0; padding-bottom: 5px; } i { font-style: italic !important; } ul { margin: 0; padding: 0; padding-left: 0; margin-left: 10px; } li {  color: gray; }</style><h3>Пакет содержит</h3> $description";
+
+            $description .= "<br><h3>Свойства</h3>
+                        <div>Автор: {$resource->getAuthor()}<br>
+                        Версия: {$resource->getVersion()}<br>
+                        Класс: <code>" . reflect::typeOf($resource->getBundle()) . "</code></div>";
 
             $description = "<div style='font: 12px Tahoma;'>$description</div>";
+
             $this->fullDescription->engine->loadContent($description, 'text/html');
 
-            if ($this->behaviour->hasBundleInAnyEnvironment($resource->getBundle())) {
+            if ($installed = $this->behaviour->hasBundleInAnyEnvironment($resource->getBundle())) {
                 $this->addButton->hide();
                 $this->addButton->managed = false;
 
                 $this->installedLabel->show();
+                $this->installedLabel->managed = true;
 
                 $this->excludePane->show();
                 $this->excludePane->managed = true;
@@ -289,10 +387,15 @@ class BundleCheckListForm extends AbstractIdeForm
                 $this->addButton->managed = true;
 
                 $this->installedLabel->hide();
+                $this->installedLabel->managed = false;
 
                 $this->excludePane->hide();
                 $this->excludePane->managed = false;
             }
+
+            $this->deleteBundle->managed = ($this->deleteBundle->visible = !$resource->isEmbedded() && !$installed);
+
+            $this->content->show();
         } else {
             $this->content->hide();
         }

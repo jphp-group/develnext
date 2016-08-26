@@ -15,6 +15,8 @@ class ListMenu extends UXListView
     protected $nameGetter = null;
     protected $iconGetter = null;
 
+    protected $nameThin = false;
+
     public function __construct()
     {
         parent::__construct();
@@ -27,7 +29,21 @@ class ListMenu extends UXListView
         });
     }
 
+    /**
+     * @return boolean
+     */
+    public function isNameThin()
+    {
+        return $this->nameThin;
+    }
 
+    /**
+     * @param boolean $nameThin
+     */
+    public function setNameThin($nameThin)
+    {
+        $this->nameThin = $nameThin;
+    }
 
     public function getDescriptionOfItem(MenuViewable $item)
     {
@@ -80,6 +96,10 @@ class ListMenu extends UXListView
 
         $titleName = new UXLabel($this->getNameOfItem($page));
         $titleName->classes->add('dn-list-menu-title');
+
+        if ($this->isNameThin()) {
+            $titleName->style = '-fx-font-weight: normal;';
+        }
 
         $titleDescription = new UXLabel($this->getDescriptionOfItem($page));
         $titleDescription->classes->add('dn-list-menu-description');

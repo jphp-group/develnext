@@ -92,7 +92,7 @@ abstract class IdeLibraryResource implements MenuViewable
      */
     public function getName()
     {
-        return $this->config->get('name') ?: FileUtils::stripExtension(File::of($this->path)->getName());
+        return $this->config->get('name') ?: fs::pathNoExt(File::of($this->path)->getName());
     }
 
     /**
@@ -109,7 +109,7 @@ abstract class IdeLibraryResource implements MenuViewable
      */
     public function getAuthor()
     {
-        return $this->config->get('author');
+        return $this->config->get('author', 'Unknown');
     }
 
     /**
@@ -141,7 +141,7 @@ abstract class IdeLibraryResource implements MenuViewable
      */
     public function getVersion()
     {
-        return $this->config->get('version');
+        return $this->config->get('version', '1.0');
     }
 
     /**
@@ -159,8 +159,14 @@ abstract class IdeLibraryResource implements MenuViewable
 
     public function delete()
     {
-        if (!fs::delete($this->getPath())) {
-            Logger::error("Unable to delete {$this->getPath()}");
+        if (fs::isDir($this->getPath())) {
+            if (!FileUtils::deleteDirectory($this->getPath())) {
+                Logger::error("Unable to delete {$this->getPath()}");
+            }
+        } else {
+            if (!fs::delete($this->getPath())) {
+                Logger::error("Unable to delete {$this->getPath()}");
+            }
         }
 
         if (!fs::delete("{$this->getPath()}.resource")) {

@@ -5,3 +5,4 @@ group=database
 icon=develnext/bundle/pgsql/pgsql.png
 
 class=develnext\\bundle\\sql\\PgSqlBundle
+author=DevelNext
