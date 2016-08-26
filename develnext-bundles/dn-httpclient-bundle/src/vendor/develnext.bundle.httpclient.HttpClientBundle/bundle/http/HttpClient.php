@@ -12,6 +12,7 @@ use php\lang\Thread;
 use php\lib\fs;
 use php\lib\str;
 use php\net\Proxy;
+use php\net\SocketException;
 use php\net\URL;
 use php\net\URLConnection;
 use php\time\Time;
@@ -410,9 +411,18 @@ class HttpClient extends AbstractScript
         }
 
         $response->body($body);
-        $response->statusCode($connection->responseCode);
-        $response->statusMessage($connection->responseMessage);
-        $response->headers($connection->getHeaderFields());
+
+        try {
+            $response->statusCode($connection->responseCode);
+            $response->statusMessage($connection->responseMessage);
+            $response->headers($connection->getHeaderFields());
+        } catch (IOException $e) {
+            $response->statusCode(400);
+            $response->statusMessage($e->getMessage());
+        } catch (SocketException $e) {
+            $response->statusCode(400);
+            $response->statusMessage($e->getMessage());
+        }
 
         if ($response->isSuccess()) {
             uiLater(function () use ($response) {

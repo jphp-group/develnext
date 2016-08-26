@@ -142,6 +142,14 @@ class AccurateTimer
         $this->active = true;
     }
 
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
+
     public function reset()
     {
         $this->_lastTick = Time::millis();

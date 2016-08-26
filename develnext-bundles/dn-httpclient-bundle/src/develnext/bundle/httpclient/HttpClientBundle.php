@@ -1,6 +1,8 @@
 <?php
 namespace develnext\bundle\httpclient;
 
+use bundle\http\HttpChecker;
+use develnext\bundle\httpclient\components\HttpCheckerComponent;
 use develnext\bundle\httpclient\components\HttpClientComponent;
 use develnext\bundle\httpclient\components\HttpDownloaderComponent;
 use ide\bundle\AbstractBundle;
@@ -26,6 +28,7 @@ class HttpClientBundle extends AbstractJarBundle
 
         if ($format) {
             $format->register(new HttpClientComponent());
+            $format->register(new HttpCheckerComponent());
             $format->register(new HttpDownloaderComponent());
         }
     }
@@ -38,6 +41,7 @@ class HttpClientBundle extends AbstractJarBundle
 
         if ($format) {
             $format->unregister(new HttpClientComponent());
+            $format->unregister(new HttpCheckerComponent());
             $format->unregister(new HttpDownloaderComponent());
         }
     }
