@@ -33,7 +33,7 @@ class DocCommand extends AbstractCommand
 
     public function getIcon()
     {
-        return 'icons/help16.png';
+        return 'icons/help16.gif';
     }
 
     public function getAccelerator()

@@ -93,7 +93,7 @@ class IniStorage extends AbstractStorage
             }
 
         } catch (IOException $e) {
-            $this->trigger('error', $e);
+            $this->trigger('error', ['error' => $e]);
             return false;
         }
     }
@@ -136,7 +136,7 @@ class IniStorage extends AbstractStorage
                 $stream->close();
             }
         } catch (IOException $e) {
-            $this->trigger('error', $e);
+            $this->trigger('error', ['error' => $e]);
             return false;
         }
     }

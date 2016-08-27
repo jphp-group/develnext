@@ -33,7 +33,7 @@ class DocFormat extends AbstractFormat
 
     public function getIcon()
     {
-        return "icons/help16.png";
+        return "icons/help16.gif";
     }
 
     /**
