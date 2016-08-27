@@ -1,7 +1,7 @@
 <element extends="ide\scripts\elements\AbstractComponent">
     <init>
-        <property code="inputNode" value="textField" />
-        <property code="actionNode" value="button" />
+        <property code="inputNode" value="" />
+        <property code="actionNode" value="" />
     </init>
 
     <properties group="binding" title="Взаимодействие">

@@ -173,7 +173,8 @@ class HttpDownloader extends AbstractScript
                 }
             }
 
-            $fileName = $this->destDirectory ? "$this->destDirectory/$fileName" : $fileName;
+            $fileName = fs::normalize($this->destDirectory ? "$this->destDirectory/$fileName" : $fileName);
+
             $this->_urlStats->set($url, [
                 'url' => $url, 'response' => $response, 'file' => $fileName, 'size' => $contentLength, 'progress' => 0, 'status' => 'DOWNLOADING'
             ]);
@@ -373,11 +374,15 @@ class HttpDownloader extends AbstractScript
 
 
                 if ($countDone->setAndGet(function ($v) { return $v+1; }) == sizeof($urls)) {
-                    uiLater(function () {
-                        if ($this->_failedFiles->isEmpty()) {
-                            $this->trigger('successAll');
-                        }
-                    });
+                    if (!$this->_break) {
+                        uiLater(function () {
+                            if ($this->_failedFiles->isEmpty()) {
+                                $this->trigger('successAll');
+                            }
+                        });
+                    } else {
+                        // ...
+                    }
 
                     uiLater(function () {
                         $this->trigger('done');
@@ -411,6 +416,14 @@ class HttpDownloader extends AbstractScript
     public function isBusy()
     {
         return $this->_busy;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBreak()
+    {
+        return $this->_break;
     }
 
     /**

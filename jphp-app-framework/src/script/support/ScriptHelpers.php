@@ -14,6 +14,10 @@ trait ScriptHelpers
      */
     protected function _fetchHelpers($input)
     {
+        if (!$input) {
+            return [];
+        }
+
         if ($input instanceof UXNode) {
             return [$input];
         } else if (is_array($input) && Items::first($input) instanceof UXNode) {
