@@ -11,7 +11,8 @@ gradlew.bat bundle
 `Для остальных ОС`
 
 ```
-gralew bundle
+chmod +x gradlew
+./gradlew bundle
 ```
 
 После выполнения команды, бандл соберется в папке `build` с расширением `.dnbundle`,
