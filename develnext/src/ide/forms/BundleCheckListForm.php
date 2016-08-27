@@ -254,7 +254,9 @@ class BundleCheckListForm extends AbstractIdeForm
                                 $resource = Ide::get()->getLibrary()->findResource('bundles', $resource->getPath());
                                 $this->display($resource);
 
-                                $this->toast('Пакет успешно добавлен в IDE');
+                                UXDialog::showAndWait('Для завершения установки пакета перезапустите DevelNext!');
+
+                                //$this->toast('Пакет успешно добавлен в IDE');
                             });
                         } finally {
                             $zip->close();

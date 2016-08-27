@@ -55,6 +55,8 @@ class AntOneJarBuildType extends AbstractBuildType
 
     public static function makeAntBuildFile(Project $project, array $config)
     {
+        $project->copyModuleFiles($project->getRootDir() . "/build/dist/lib");
+
         $content = FileUtils::get('res://ide/build/ant/buildDist.xml');
         $content = str::replace($content, '#NAME#', $project->getName());
         $content = str::replace($content, '#JRE_DIR#', Ide::get()->getJrePath());
@@ -111,13 +113,21 @@ class AntOneJarBuildType extends AbstractBuildType
         }
 
 
-
-        $project->copyModuleFiles($project->getRootDir() . "/build/dist/lib");
-
         $extList = '';
+        $oneJarContent = [];
 
         foreach ($project->getModules() as $module) {
             if ($module->getType() == 'jarfile') {
+                $name = fs::name($module->getId());
+
+                if ($php = PhpProjectBehaviour::get()) {
+                    $excl = $php->isByteCodeEnabled() ? '**/*.php' : '';
+                } else {
+                    $excl = '';
+                }
+
+                $oneJarContent[] = "<zipfileset src='\${dist}/lib/{$name}' excludes='JPHP-INF/sdk/** $excl' />";
+
                 try {
                     $zipFile = new ZipFile($module->getId());
                     if ($extContent = $zipFile->getEntryContent('META-INF/services/php.runtime.ext.support.Extension')) {
@@ -131,6 +141,8 @@ class AntOneJarBuildType extends AbstractBuildType
                 }
             }
         }
+
+        $content = str::replace($content, '#ONE_JAR_CONTENT#', str::join($oneJarContent, " "));
 
         FileUtils::put($project->getRootDir() . "/build.xml", $content);
         FileUtils::put($project->getRootDir() . '/build/dist/gen/META-INF/services/php.runtime.ext.support.Extension', $extList);

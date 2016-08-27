@@ -20,7 +20,7 @@ public class AutoBracketsHotkey extends AbstractHotkey {
         String ch = area.getText(pos - 1, pos);
         char nextCh = area.getText().length() >= pos + 1 ? area.getText(pos, pos + 1).charAt(0) : '\0';
 
-        switch (ch) {
+        /*switch (ch) {
             case "[":
                 if (nextCh == ']') break;
             case "(":
@@ -28,7 +28,7 @@ public class AutoBracketsHotkey extends AbstractHotkey {
             case "{":
                 if (nextCh == '}') break;
 
-                if (!(nextCh == '\0' || Character.isWhitespace(nextCh))) {
+                if (!(nextCh == '\0' || Character.isSpaceChar(nextCh))) {
                     return false;
                 }
                 break;
@@ -48,7 +48,7 @@ public class AutoBracketsHotkey extends AbstractHotkey {
 
                 if (check != 0) return false;
                 break;
-        }
+        }*/
 
 
         switch (ch) {

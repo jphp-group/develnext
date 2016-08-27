@@ -1,5 +1,8 @@
 package org.develnext.jphp.ext.javafx.support.event;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.web.WebEngine;
 import org.develnext.jphp.ext.javafx.support.EventProvider;

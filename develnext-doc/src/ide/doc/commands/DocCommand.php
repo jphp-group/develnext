@@ -23,7 +23,7 @@ class DocCommand extends AbstractCommand
 
     public function getName()
     {
-        return 'Помощь';
+        return 'Справка';
     }
 
     public function getCategory()
@@ -44,7 +44,7 @@ class DocCommand extends AbstractCommand
     protected function makeSearchInputUi()
     {
         $input = new UXTextField();
-        $input->promptText = 'поиск решений';
+        $input->promptText = 'поиск в справке';
         $input->width = 170;
         $input->maxHeight = 999;
         $input->font = UXFont::of($input->font->family, 15);
@@ -55,10 +55,12 @@ class DocCommand extends AbstractCommand
     public function makeUiForRightHead()
     {
         $button = $this->makeGlyphButton();
-        //$button->text = $this->getName();
+        $button->text = $this->getName();
         $button->maxHeight = 999;
+        $button->padding = [0, 15];
+
         //$button->style = '-fx-font-weight: bold;';
-        $button->width = 35;
+        //$button->width = 35;
 
         $searchButton = new UXButton();
         $searchButton->classes->addAll(['icon-flat-search']);
@@ -94,7 +96,7 @@ class DocCommand extends AbstractCommand
 
         $searchButton->on('action', $searchHandle);
 
-        $ui = new UXHBox([$input, $searchButton, $button]);
+        $ui = new UXHBox([$searchButton, $input, $button]);
         $ui->spacing = 5;
         $ui->fillHeight = true;
 

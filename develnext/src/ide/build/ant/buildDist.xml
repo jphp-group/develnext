@@ -29,12 +29,9 @@
 
     <target name="onejar" depends="dist">
         <jar destfile="${dist}/#NAME#.jar" duplicate="preserve" level="7" encoding="UTF-8">
-            <zipgroupfileset dir="${dist}/lib">
-                <include name="**/*.jar"/>
-            </zipgroupfileset>
             <fileset dir="${dist}/gen" />
-
-            <exclude name="JPHP-INF/sdk/**" />
+            <zipfileset src="${dist}/lib/dn-compiled-module.jar" />
+            #ONE_JAR_CONTENT#
 
             <manifest>
                 <attribute name="Main-Class" value="php.runtime.launcher.Launcher" />
