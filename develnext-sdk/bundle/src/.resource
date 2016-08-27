@@ -1,8 +1,13 @@
-name=Windows
-description=Пакет для выполнения системных Windows функций и команд
-descriptionFile=develnext/bundle/windows/description.html
-group=system
-icon=develnext/bundle/windows/windows32.png
+name=My Bundle
+description=Description text of my bundle
+descriptionFile=develnext/bundle/my/description.html
 
-class=develnext\\bundle\\windows\\WindowsBundle
-author=Ts.Saltan, DevelNext
+# system, game, network, database, other
+group=other
+
+# .data/img path to icon of bundle
+icon=develnext/bundle/my/icon32.png
+
+# full class name of bundle
+class=develnext\\bundle\\my\\MyBundle
+author=Unknown

@@ -52,6 +52,7 @@ class HttpChecker extends AbstractScript
 
         $this->client = new HttpClient();
         $this->client->userAgent = 'Http Checker 1.0';
+        $this->client->readTimeout = 15000;
     }
 
     /**
@@ -148,7 +149,7 @@ class HttpChecker extends AbstractScript
      */
     public function isOffline()
     {
-        return !$this->available;
+        return $this->available === false;
     }
 
     /**
@@ -156,6 +157,11 @@ class HttpChecker extends AbstractScript
      */
     public function isOnline()
     {
-        return $this->available;
+        return $this->available === true;
+    }
+
+    public function isUnknown()
+    {
+        return $this->available === null;
     }
 }

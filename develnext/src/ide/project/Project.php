@@ -237,6 +237,18 @@ class Project
     }
 
     /**
+     * @param callable $callback
+     */
+    public function eachSrcFile(callable $callback)
+    {
+        fs::scan($this->getSrcFile(''), function ($filename) use ($callback) {
+            $file = $this->getAbsoluteFile($filename);
+
+            return $callback($file, $file->getRelativePath($this->getSrcDirectory())) === true;
+        });
+    }
+
+    /**
      * @param string $srcDirectory
      */
     public function setSrcDirectory($srcDirectory)

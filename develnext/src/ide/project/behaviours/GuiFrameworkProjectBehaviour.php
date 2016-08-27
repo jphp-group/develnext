@@ -283,7 +283,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     {
         $withSourceMap = $env == Project::ENV_DEV;
 
-        $this->actionManager->compile($this->project->getFile('src/'), function ($filename) use ($log) {
+        $this->actionManager->compile($this->project->getSrcFile(''), $this->project->getSrcFile('', true), function ($filename) use ($log) {
             $name = $this->project->getAbsoluteFile($filename)->getRelativePath();
 
             if ($log) {
@@ -450,7 +450,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $file->addLink($sources);
         }
 
-        if (!$sources->exists() && !fs::exists("$sources.source")) {
+        if (!$sources->exists()) {
             $this->createModule($rel);
         }
     }
@@ -473,7 +473,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $form->addLink($sources);
         }
 
-        if (!$sources->exists() && !fs::exists("$sources.source")) {
+        if (!$sources->exists()) {
             Logger::warn("Source file of the '$rel' form not found - $sources, will be create ...");
             $this->createForm($rel);
         }

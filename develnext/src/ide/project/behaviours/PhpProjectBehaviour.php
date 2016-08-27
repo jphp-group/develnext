@@ -8,6 +8,7 @@ use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
+use ide\project\ProjectFile;
 use ide\project\ProjectModule;
 use ide\utils\FileUtils;
 use ide\zip\JarArchive;
@@ -124,6 +125,13 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     public function doOpen()
     {
+        $this->project->eachSrcFile(function (ProjectFile $file) {
+            if (str::endsWith($file, '.php.source')) {
+                FileUtils::copyFile($file, fs::pathNoExt($file));
+                fs::delete($file);
+            }
+        });
+
         $gradle = GradleProjectBehaviour::get();
 
         if ($gradle) {
@@ -205,7 +213,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
             $zipLibraries = $this->collectZipLibraries();
 
             $generatedDirectory = $this->project->getSrcFile('', true);
-            $dirs = [$this->project->getSrcFile('')];
+            $dirs = [$generatedDirectory, $this->project->getSrcFile('')];
 
             $includedFiles = [];
 
@@ -274,8 +282,16 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 });
             });
 
-            foreach ($dirs as $dir) {
-                fs::scan($dir, function ($filename) use ($log, $scope, $useByteCode, $generatedDirectory, $dir, &$includedFiles) {
+            foreach ($dirs as $i => $dir) {
+                fs::scan($dir, function ($filename) use ($log, $scope, $i, $useByteCode, $generatedDirectory, $dir, &$includedFiles) {
+                    $relativePath = FileUtils::relativePath($dir, $filename);
+
+                    if ($i == 1) { // ignore src files if they exist in src_generated dir.
+                        if (fs::exists($this->project->getSrcFile($relativePath, true))) {
+                            return;
+                        }
+                    }
+
                     if (str::endsWith($filename, '.php')) {
                         if ($includedFiles[FileUtils::hashName($filename)]) {
                             return;
@@ -287,7 +303,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                             $log(":compile $filename");
                         }
 
-                        $relativePath = FileUtils::relativePath($dir, $filename);
                         $compiledFile = new File($generatedDirectory, '/' . fs::pathNoExt($relativePath) . '.phb');
 
                         if ($compiledFile->getParentFile() && !$compiledFile->getParentFile()->isDirectory()) {

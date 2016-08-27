@@ -152,7 +152,7 @@ class CodeEditor extends AbstractEditor
         parent::__construct($file);
 
         $this->mode = $mode;
-        $this->sourceFile = $mode == 'php';
+        //$this->sourceFile = $mode == 'php';
 
         if (self::USE_NEW_EDITOR) {
             switch ($mode) {

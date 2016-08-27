@@ -290,8 +290,16 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             $prevImports = $imports;
 
             if ($imports) {
-                FileUtils::scan($this->project->getFile('src/app'), function ($filename) use ($imports, $log, $withSourceMap) {
-                    if (str::endsWith($filename, '.php') && fs::isFile("$filename.source")) {
+                fs::scan($this->project->getSrcFile('app'), function ($filename) use ($imports, $log, $withSourceMap) {
+                    if (str::endsWith($filename, '.php')) {
+                        $genFilename = $this->project->getSrcFile(FileUtils::relativePath($this->project->getSrcFile(''), $filename), true);
+
+                        if (!fs::exists($genFilename)) {
+                            FileUtils::copyFile($filename, $genFilename);
+                        }
+
+                        $filename = $genFilename;
+
                         $filename = fs::normalize($filename);
                         $file = $this->project->getAbsoluteFile($filename);
 
@@ -337,16 +345,16 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
         //FileUtils::deleteDirectory($this->project->getFile(self::VENDOR_DIRECTORY));
 
-        FileUtils::scan($this->project->getSrcFile(''), function ($filename) {
+        fs::scan($this->project->getSrcFile(''), function ($filename) {
             if (str::endsWith($filename, '.php.sourcemap')) {
                 fs::delete($filename);
             }
 
-            if (str::endsWith($filename, '.php.source')) {
+            /*if (str::endsWith($filename, '.php.source')) {
                 //$this->tryFileChange("$filename.php.source", function () use ($filename) {
                 FileUtils::copyFile($filename, fs::pathNoExt($filename)); // rewrite from origin.
                 //});
-            }
+            }*/
         });
 
         $allBundles = $this->fetchAllBundles($env);

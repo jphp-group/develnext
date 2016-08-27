@@ -133,16 +133,12 @@ class SourceEventManager
 
     public function loadContent()
     {
-        if (fs::exists("$this->file.source")) {
-            return FileUtils::get("$this->file.source");
-        }
-
         return FileUtils::get($this->file);
     }
 
     public function save($content)
     {
-        FileUtils::put("$this->file.source", $content);
+        FileUtils::put("$this->file", $content);
     }
 
     /**
@@ -430,10 +426,6 @@ class SourceEventManager
         $this->classBeginLine = -1;
 
         $file = $this->file;
-
-        if (fs::exists("$file.source")) {
-            $file = "$file.source";
-        }
 
         try {
             $tokenizer = new SourceTokenizer($file, $this->file, 'UTF-8');

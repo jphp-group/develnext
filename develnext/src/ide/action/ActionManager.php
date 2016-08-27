@@ -49,28 +49,33 @@ class ActionManager
 
     /**
      * @param $directory
+     * @param string $outDirectory
      * @param callable $log
      * @param bool $withSourceMap
      */
-    public function compile($directory, callable $log = null, $withSourceMap = false)
+    public function compile($directory, $outDirectory, callable $log = null, $withSourceMap = false)
     {
-        FileUtils::scan($directory, function ($filename) use ($log, $withSourceMap) {
-            if (Str::equalsIgnoreCase(fs::ext($filename), 'source')) {
-                $phpFile = fs::pathNoExt($filename);
-                $actionFile = $phpFile . '.axml';
+        var_dump($outDirectory);
 
-                if (!fs::exists($phpFile)) {
-                    FileUtils::copyFile($filename, $phpFile);
-                }
+        fs::scan($directory, function ($filename) use ($log, $directory, $outDirectory, $withSourceMap) {
+            if (fs::ext($filename) == 'php') {
+                $newFile = $outDirectory . "/" . FileUtils::relativePath($directory, $filename);
+                $actionFile = $filename . '.axml';
 
                 if (fs::exists($actionFile)) {
+                    fs::ensureParent($newFile);
+
+                    if (!fs::exists($newFile)) {
+                        FileUtils::copyFile($filename, $newFile);
+                    }
+
                     $script = new ActionScript(null, $this);
                     $script->load($actionFile);
 
-                    $count = $script->compile($filename, $phpFile, $withSourceMap);
+                    $count = $script->compile($filename, $newFile, $withSourceMap);
 
                     if ($log && $count) {
-                        $log($phpFile);
+                        $log($newFile);
                     }
                 }
             }

@@ -60,7 +60,7 @@ class AntOneJarBuildType extends AbstractBuildType
         $content = str::replace($content, '#JRE_DIR#', Ide::get()->getJrePath());
 
         $jarContent = '';
-        foreach ([$project->getSrcDirectory(), $project->getSrcGeneratedDirectory()] as $src) {
+        foreach ([$project->getSrcGeneratedDirectory(), $project->getSrcDirectory()] as $src) {
             $excludes = ".debug/ **/*.source **/*.sourcemap **/*.axml";
 
             if ($php = PhpProjectBehaviour::get()) {

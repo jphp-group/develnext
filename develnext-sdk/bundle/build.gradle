@@ -2,7 +2,8 @@
 
 apply plugin: 'java'
 
-def name = 'dn-windows-bundle'
+// Name of bundle
+def name = 'dn-my-bundle'
 
 repositories {
     mavenCentral()
