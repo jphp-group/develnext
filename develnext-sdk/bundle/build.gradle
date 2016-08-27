@@ -1,0 +1,49 @@
+// Copy this to your bundle directory and rename to build.gradle
+
+apply plugin: 'java'
+
+def name = 'dn-windows-bundle'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url "https://jitpack.io" }
+    maven { url 'http://maven.develnext.org' }
+}
+
+dependencies {
+    // maven jar dependencies.
+}
+
+// --------------------------------------------------------- //
+
+sourceSets {
+    main.resources.srcDirs = ['src']
+}
+
+jar {
+    exclude '.resource'
+}
+
+task bundle(type: Zip, dependsOn: ['clean', 'jar']) {
+    println project.buildDir
+
+    from (configurations.runtime.allArtifacts.files) {
+        into ("bundle/")
+    }
+
+    from (configurations.runtime) {
+        into ("bundle/")
+    }
+
+    from ("src/.resource") {
+        into ("")
+    }
+
+    archiveName = "${name}.dnbundle"
+    destinationDir project.buildDir
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = 2.12;
+}
