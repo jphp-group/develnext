@@ -1,10 +1,10 @@
 <?php
 namespace script;
 
-use ide\Logger;
 use php\concurrent\TimeoutException;
 use php\desktop\SystemTray;
 use php\desktop\TrayIcon;
+use php\framework\Logger;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractScript;
 use php\gui\UXApplication;
