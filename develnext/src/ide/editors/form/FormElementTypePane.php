@@ -309,12 +309,12 @@ class FormElementTypePane
             }
 
             $button->tooltipText = $element->getName();
-            if ($element->getElementClass()) {
-                $button->tooltipText .= "\n{$element->getElementClass()}";
-            }
+
 
             if ($element instanceof ObjectListEditorItem) {
-                $button->tooltipText .= ": "  . $element->element->getName();
+                $button->tooltipText .= ": " . $element->element->getName();
+            } else if ($element->getElementClass()) {
+                $button->tooltipText .= "\n{$element->getElementClass()}";
             }
 
             $smallButton->classes->add('dn-simple-toggle-button');
@@ -328,12 +328,12 @@ class FormElementTypePane
             }
 
             $smallButton->tooltipText = $element->getName();
-            if ($element->getElementClass()) {
-                $smallButton->tooltipText .= "\n{$element->getElementClass()}";
-            }
+
 
             if ($element instanceof ObjectListEditorItem) {
                 $smallButton->tooltipText .= ": "  . $element->element->getName();
+            } else if ($element->getElementClass()) {
+                $smallButton->tooltipText .= "\n{$element->getElementClass()}";
             }
 
             $vbox->add($button);

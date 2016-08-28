@@ -141,10 +141,8 @@ class UXNodeWrapper
 
             case 'destroy':
                 $this->node->observer('parent')->addListener(function ($old, $new) use ($handler) {
-                    if (!$new) {
-                        if (!$this->node->isFree()) {
-                            $handler(UXEvent::makeMock($this->node));
-                        }
+                    if (!$new && $old) {
+                        $handler(UXEvent::makeMock($this->node));
                     }
                 });
 

@@ -75,7 +75,7 @@ class ActionManager
                     $count = $script->compile($filename, $newFile, $withSourceMap);
 
                     if ($log && $count) {
-                        $log($newFile);
+                        $log(FileUtils::relativePath($directory, $filename));
                     }
                 }
             }
