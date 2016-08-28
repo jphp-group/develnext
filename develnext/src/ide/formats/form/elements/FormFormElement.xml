@@ -47,7 +47,7 @@
         <eventType code="close" name="Закрытие" kind="WindowEvent" />
 
         <eventType code="keyDown" name="Нажатие клавиши" kind="KeyParamEvent" icon="icons/key16.png" />
-        <eventType code="keyUp" name="Отжатие клавишы" kind="KeyParamEvent" icon="icons/key16.png" />
+        <eventType code="keyUp" name="Отжатие клавиши" kind="KeyParamEvent" icon="icons/key16.png" />
         <eventType code="keyPress" name="Клавиатура" kind="KeyEvent" icon="icons/keyboard16.png" />
 
         <eventType code="scroll" name="Прокрутка" kind="ScrollParamEvent" icon="icons/scroll16.png" />

@@ -5,3 +5,4 @@ group=network
 icon=develnext/bundle/mail/mail32.png
 
 class=develnext\\bundle\\mail\\MailBundle
+author=DevelNext

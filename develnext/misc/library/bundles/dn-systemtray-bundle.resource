@@ -5,3 +5,4 @@ group=system
 icon=develnext/bundle/trayIcon/systemTray.png
 
 class=develnext\\bundle\\systemtray\\SystemTrayBundle
+author=DevelNext

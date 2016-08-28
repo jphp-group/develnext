@@ -5,3 +5,4 @@ group=game
 icon=develnext/bundle/game2d/game2d.png
 
 class=develnext\\bundle\\game2d\\Game2DBundle
+author=DevelNext
