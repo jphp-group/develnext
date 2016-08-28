@@ -663,6 +663,18 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
+     * @return array
+     */
+    public function getSourceDirectories()
+    {
+        if ($gradle = GradleProjectBehaviour::get()) {
+            return arr::toList($gradle->getConfig()->getSourceSets('main.resources.srcDirs'));
+        } else {
+            return ['src', 'src_generated/'];
+        }
+    }
+
+    /**
      * @param AbstractBundle $bundle
      * @return Configuration
      */

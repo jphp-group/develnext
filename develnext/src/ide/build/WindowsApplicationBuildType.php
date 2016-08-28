@@ -209,7 +209,6 @@ class WindowsApplicationBuildType extends AbstractBuildType
         $config = $this->getConfig();
 
         $config['l4j'] = true;
-        AntOneJarBuildType::makeAntBuildFile($project, $config);
 
         $dialog = new BuildProgressForm();
         $dialog->show();
@@ -255,6 +254,8 @@ class WindowsApplicationBuildType extends AbstractBuildType
 
         ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'ant jar launch4j', function ($success) use ($project, $dialog, $config) {
             if ($success) {
+                AntOneJarBuildType::makeAntBuildFile($project, $config);
+
                 $args = [Ide::get()->getApacheAntProgram(), $config['oneJar'] ? 'onejar' : 'jar', 'launch4j'];
 
                 if ($config['jre']) {

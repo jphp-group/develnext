@@ -48,7 +48,7 @@ class RunBuildProjectBehaviour extends AbstractProjectBehaviour
         if ($gradle = GradleProjectBehaviour::get()) {
             return arr::toList($gradle->getConfig()->getSourceSets('main.resources.srcDirs'));
         } else {
-            return ['src', 'src_generated/'];
+            return ['src_generated/', 'src'];
         }
     }
 

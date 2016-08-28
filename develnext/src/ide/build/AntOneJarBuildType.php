@@ -5,7 +5,9 @@ use ide\forms\BuildProgressForm;
 use ide\forms\BuildSuccessForm;
 use ide\Ide;
 use ide\Logger;
+use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\behaviours\PhpProjectBehaviour;
+use ide\project\behaviours\RunBuildProjectBehaviour;
 use ide\project\Project;
 use ide\systems\ProjectSystem;
 use ide\utils\FileUtils;
@@ -13,6 +15,7 @@ use php\compress\ZipFile;
 use php\io\File;
 use php\io\IOException;
 use php\lang\Process;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
 use php\util\Regex;
@@ -62,7 +65,16 @@ class AntOneJarBuildType extends AbstractBuildType
         $content = str::replace($content, '#JRE_DIR#', Ide::get()->getJrePath());
 
         $jarContent = '';
-        foreach ([$project->getSrcGeneratedDirectory(), $project->getSrcDirectory()] as $src) {
+
+        $classPaths = [$project->getSrcGeneratedDirectory(), $project->getSrcDirectory()];
+
+        if ($bundleBehaviour = BundleProjectBehaviour::get()) {
+            $classPaths = $bundleBehaviour->getSourceDirectories();
+        }
+
+        print_r($classPaths);
+
+        foreach ($classPaths as $src) {
             $excludes = ".debug/ **/*.source **/*.sourcemap **/*.axml";
 
             if ($php = PhpProjectBehaviour::get()) {
@@ -71,7 +83,7 @@ class AntOneJarBuildType extends AbstractBuildType
                 }
             }
 
-            $jarContent .= "\t<fileset dir='$src' includes='/*/**' excludes='$excludes'/>\n";
+            $jarContent .= "\t<fileset dir='$src' includes='/*/**' excludes='$excludes' erroronmissingdir='false'/>\n";
         }
 
         $content = str::replace($content, '#JAR_CONTENT#', $jarContent);
@@ -158,8 +170,6 @@ class AntOneJarBuildType extends AbstractBuildType
     function onExecute(Project $project, $finished = true)
     {
         FileUtils::deleteDirectory($this->getBuildPath($project));
-        $this->makeAntBuildFile($project, $this->getConfig());
-
         $dialog = new BuildProgressForm();
         $dialog->show();
 
@@ -190,6 +200,8 @@ class AntOneJarBuildType extends AbstractBuildType
 
         ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'ant onejar', function ($success) use ($project, $dialog) {
             if ($success) {
+                $this->makeAntBuildFile($project, $this->getConfig());
+
                 $process = new Process([Ide::get()->getApacheAntProgram(), 'onejar'], $project->getRootDir(), Ide::get()->makeEnvironment());
 
                 $process = $process->start();
