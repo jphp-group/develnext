@@ -24,6 +24,7 @@ use php\gui\UXButton;
 use php\gui\UXCheckbox;
 use php\gui\UXLabel;
 use php\gui\UXNode;
+use php\io\File;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\reflect;
@@ -340,7 +341,12 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     public function doPreCompile($env, callable $log = null)
     {
         $generatedDirectory = $this->project->getSrcFile('', true);
-        fs::clean($generatedDirectory);
+        $result = fs::clean($generatedDirectory);
+
+        if ($result['error']) {
+            throw new \Exception("Unable to clean src_generated directory, files = [" . str::join($result['error'], ', ') . "]");
+        }
+
         fs::makeDir($generatedDirectory);
 
         //FileUtils::deleteDirectory($this->project->getFile(self::VENDOR_DIRECTORY));

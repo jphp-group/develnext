@@ -169,6 +169,7 @@ class FileUtils
     public static function copyFile($origin, $dest)
     {
         try {
+            //Logger::warn("Copy $origin -> $dest");
             fs::ensureParent($dest);
 
             $time = Time::millis();

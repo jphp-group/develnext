@@ -10,6 +10,7 @@ use ide\misc\AbstractCommand;
 use ide\project\behaviours\RunBuildProjectBehaviour;
 use ide\project\Project;
 use ide\project\ProjectConsoleOutput;
+use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
@@ -199,6 +200,10 @@ class ExecuteProjectCommand extends AbstractCommand
         $project->trigger('execute');
 
         if ($project) {
+            if ($editor = FileSystem::getSelectedEditor()) {
+                $editor->save();
+            }
+
             $this->processDialog = $dialog = new BuildProgressForm();
             //$dialog->removeHeader();
             $dialog->reduceHeader();

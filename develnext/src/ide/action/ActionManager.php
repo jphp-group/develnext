@@ -55,8 +55,6 @@ class ActionManager
      */
     public function compile($directory, $outDirectory, callable $log = null, $withSourceMap = false)
     {
-        var_dump($outDirectory);
-
         fs::scan($directory, function ($filename) use ($log, $directory, $outDirectory, $withSourceMap) {
             if (fs::ext($filename) == 'php') {
                 $newFile = $outDirectory . "/" . FileUtils::relativePath($directory, $filename);
@@ -65,17 +63,19 @@ class ActionManager
                 if (fs::exists($actionFile)) {
                     fs::ensureParent($newFile);
 
-                    if (!fs::exists($newFile)) {
-                        FileUtils::copyFile($filename, $newFile);
-                    }
-
                     $script = new ActionScript(null, $this);
                     $script->load($actionFile);
 
-                    $count = $script->compile($filename, $newFile, $withSourceMap);
+                    if (!$script->isEmpty()) {
+                        if (!fs::exists($newFile)) {
+                            FileUtils::copyFile($filename, $newFile);
+                        }
 
-                    if ($log && $count) {
-                        $log(FileUtils::relativePath($directory, $filename));
+                        $count = $script->compile($newFile, null, $withSourceMap);
+
+                        if ($log) {
+                            $log(FileUtils::relativePath($directory, $filename) . " ($count)");
+                        }
                     }
                 }
             }

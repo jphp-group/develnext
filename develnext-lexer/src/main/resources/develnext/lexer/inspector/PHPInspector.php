@@ -133,41 +133,45 @@ class PHPInspector extends AbstractInspector
         $result = ['classes' => [], 'functions' => []];
 
         try {
-            $tokenizer = new Tokenizer(new Context($stream, $moduleName));
-            $analyzer = new SyntaxAnalyzer(Environment::current(), $tokenizer);
+            try {
+                $tokenizer = new Tokenizer(new Context($stream, $moduleName));
+                $analyzer = new SyntaxAnalyzer(Environment::current(), $tokenizer);
 
-            foreach ($analyzer->getClasses() as $class) {
-                if ($unload) {
-                    $this->removeType($class->getFulledName());
-                } else {
-                    $this->putType($t = $this->makeType($class));
-                    $result['classes'][] = $t;
+                foreach ($analyzer->getClasses() as $class) {
+                    if ($unload) {
+                        $this->removeType($class->getFulledName());
+                    } else {
+                        $this->putType($t = $this->makeType($class));
+                        $result['classes'][] = $t;
+                    }
                 }
-            }
 
-            foreach ($analyzer->getFunctions() as $function) {
-                if ($unload) {
-                    $this->removeFunction($function->getFulledName());
-                } else {
-                    $this->putFunction($f = $this->makeFunction($function));
-                    $result['functions'][] = $f;
+                foreach ($analyzer->getFunctions() as $function) {
+                    if ($unload) {
+                        $this->removeFunction($function->getFulledName());
+                    } else {
+                        $this->putFunction($f = $this->makeFunction($function));
+                        $result['functions'][] = $f;
+                    }
                 }
-            }
 
-            return $result;
-        } catch (JavaException $e) {
-            if ($e->isNullPointerException() || $e->isIllegalArgumentException()) {
-                Ide::get()->sendError($e, 'php-inspector');
+                return $result;
+            } catch (JavaException $e) {
+                if ($e->isNullPointerException() || $e->isIllegalArgumentException()) {
+                    Ide::get()->sendError($e, 'php-inspector');
+                    return false;
+                }
+
+                throw $e;
+            } catch (\ParseError $e) {
+                if (is_string($path)) {
+                    Logger::warn("Unable to load php source $moduleName");
+                }
+
+                //Logger::error($e);
+
                 return false;
             }
-
-            throw $e;
-        } catch (\ParseError $e) {
-            if (is_string($path)) {
-                Logger::warn("Unable to load php source $moduleName");
-            }
-
-            return false;
         } finally {
             if (!($path instanceof Stream)) {
                 $stream->close();

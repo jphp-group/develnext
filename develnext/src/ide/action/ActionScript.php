@@ -226,6 +226,27 @@ class ActionScript
         return $imports->withKeys()->toArray();
     }
 
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        /** @var DomElement $domClass */
+        foreach ($this->document->findAll('/root/class') as $domClass) {
+            $className = $domClass->getAttribute('name');
+
+            /** @var DomElement $domMethod */
+            foreach ($domClass->findAll("/root/class[@name='$className']/method") as $domMethod) {
+                /** @var DomElement $domAction */
+                foreach ($domMethod->findAll('*') as $domAction) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public function compile($file, $outputFile = null, $withSourceMap = false)
     {
         if (!$outputFile) {

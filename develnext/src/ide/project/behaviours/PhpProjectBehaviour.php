@@ -157,21 +157,23 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     public function doPreCompile($env, callable $log = null)
     {
-        $directory = $this->project->getFile("src");
+        $directories = [$this->project->getSrcFile(""), $this->project->getSrcFile("", true)];
 
         $cacheIgnore = [];
 
-        fs::scan($directory, function ($filename) use ($directory, $log, &$cacheIgnore) {
-            $name = FileUtils::relativePath($directory, $filename);
+        foreach ($directories as $directory) {
+            fs::scan($directory, function ($filename) use ($directory, $log, &$cacheIgnore) {
+                $name = FileUtils::relativePath($directory, $filename);
 
-            if (fs::ext($name) == 'php') {
-                $cacheIgnore[] = $name;
+                if (fs::ext($name) == 'php') {
+                    $cacheIgnore[] = $name;
 
-                $file = 'bytecode/' . fs::pathNoExt($name) . '.phb';
+                    $file = 'bytecode/' . fs::pathNoExt($name) . '.phb';
 
-                $this->project->clearIdeCache($file);
-            }
-        });
+                    $this->project->clearIdeCache($file);
+                }
+            });
+        }
 
         FileUtils::put($this->project->getIdeCacheFile('bytecode/.cacheignore'), str::join($cacheIgnore, "\n"));
 
