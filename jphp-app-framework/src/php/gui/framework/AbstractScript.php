@@ -172,7 +172,9 @@ abstract class AbstractScript
             return null;
         }
 
-        if (sizeof($args) == 1 && $args[0] instanceof UXEvent) {
+        if ($args instanceof UXEvent) {
+            $e = $args;
+        } else if (is_array($args) && sizeof($args) == 1 && $args[0] instanceof UXEvent) {
             $e = $args[0];
         } else {
             $e = new ScriptEvent($this, $this->_context);
