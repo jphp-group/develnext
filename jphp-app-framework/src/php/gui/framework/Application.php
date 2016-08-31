@@ -184,6 +184,15 @@ class Application
     private $formOriginCache = [];
 
     /**
+     * @param string $name
+     */
+    public function __cleanCacheForm($name)
+    {
+        unset($this->formCache[$name]);
+        unset($this->formOriginCache[$name]);
+    }
+
+    /**
      * @param $name
      * @return AbstractForm
      * @return-dynamic app\forms\$0

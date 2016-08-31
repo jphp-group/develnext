@@ -294,7 +294,7 @@ abstract class AbstractForm extends UXForm
             }
 
             $form->show();
-            $this->free();
+            $this->hide();
         }
     }
 
@@ -307,6 +307,8 @@ abstract class AbstractForm extends UXForm
                 $module->free();
             }
         }
+
+        $this->_app->__cleanCacheForm($this->getName());
 
         Logger::debug("Form '{$this->getName()}' is destroyed");
     }
