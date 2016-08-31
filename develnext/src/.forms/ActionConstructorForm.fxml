@@ -60,7 +60,7 @@
                                     </Button>
                                     <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <CheckBox id="useDefaultCheckbox" mnemonicParsing="false" text="Использовать этот редактор по-умолчанию" />
+                                          <CheckBox id="useDefaultCheckbox" mnemonicParsing="false" text="Использовать этот редактор по умолчанию" />
                                        </children>
                                     </HBox>
                                  </children>

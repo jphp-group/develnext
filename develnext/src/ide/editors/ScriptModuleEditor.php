@@ -245,7 +245,7 @@ class ScriptModuleEditor extends FormEditor
                 $label->free();
             }
         } else {
-            $label = new UXLabel('Добавьте сюда компонентов для модуля.');
+            $label = new UXLabel('Добавьте сюда компоненты для модуля.');
             $label->classes->add('dn-title');
             $label->textColor = 'gray';
             $label->mouseTransparent = true;

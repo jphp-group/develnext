@@ -310,7 +310,7 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                 new StatementAutoCompleteItem('use', 'Подключение класса', 'use '),
                 new StatementAutoCompleteItem('switch', 'Множественное условие', 'switch (#)'),
                 new StatementAutoCompleteItem('case', 'Если от множественного условия', 'case (#)'),
-                new StatementAutoCompleteItem('default', 'По-умолчанию в множественном условии switch', 'default: '),
+                new StatementAutoCompleteItem('default', 'По умолчанию в множественном условии switch', 'default: '),
                 new StatementAutoCompleteItem('global', 'Глобальная переменная', 'global $'),
                 new StatementAutoCompleteItem('const', 'Объявление константы', 'const '),
                 new StatementAutoCompleteItem('var', 'Объявление переменной класса', 'var '),

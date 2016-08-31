@@ -24,7 +24,7 @@ class GlowEffectBehaviourSpec extends AbstractEffectBehaviourSpec
      */
     public function getName()
     {
-        return 'Рассеянное свячение (Glow)';
+        return 'Рассеянное свечение (Glow)';
     }
 
     /**
@@ -32,7 +32,7 @@ class GlowEffectBehaviourSpec extends AbstractEffectBehaviourSpec
      */
     public function getDescription()
     {
-        return 'Добавляет изображению эффект рассеяного свячения';
+        return 'Добавляет изображению эффект рассеяного свечения';
     }
 
     /**

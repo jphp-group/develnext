@@ -7,9 +7,9 @@
             </variants>
         </property>
 
-        <property name="Тип фигуры" code="fixtureType" editor="enum" tooltip="От фигуры объекта зависит просчет столкновений, по-умолчанию означает использовать фигуру спрайта">
+        <property name="Тип фигуры" code="fixtureType" editor="enum" tooltip="От фигуры объекта зависит просчет столкновений, по умолчанию означает использовать фигуру спрайта">
             <variants>
-                <variant value="INHERITED">[По-умолчанию]</variant>
+                <variant value="INHERITED">[По умолчанию]</variant>
                 <variant value="RECTANGLE">Прямоугольник</variant>
                 <variant value="ELLIPSE">Эллипс, овал</variant>
             </variants>

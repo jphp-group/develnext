@@ -26,7 +26,7 @@ class ToggleButtonFormElement extends LabeledFormElement
 {
     public function getName()
     {
-        return 'Кнопка переключатель';
+        return 'Кнопка-переключатель';
     }
 
     public function getElementClass()

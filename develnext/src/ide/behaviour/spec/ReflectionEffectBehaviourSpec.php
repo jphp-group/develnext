@@ -30,7 +30,7 @@ class ReflectionEffectBehaviourSpec extends AbstractEffectBehaviourSpec
      */
     public function getDescription()
     {
-        return 'Добавляет объекту зеркальное отражение с низу.';
+        return 'Добавляет объекту зеркальное отражение снизу.';
     }
 
     /**

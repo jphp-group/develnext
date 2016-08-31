@@ -632,7 +632,7 @@ class SetDefaultCommand extends AbstractCommand
 
     public function getName()
     {
-        return 'Использовать по-умолчанию';
+        return 'Использовать по умолчанию';
     }
 
     public function makeUiForHead()

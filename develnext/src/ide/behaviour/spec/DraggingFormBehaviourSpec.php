@@ -34,7 +34,7 @@ class DraggingFormBehaviourSpec extends AbstractBehaviourSpec
      */
     public function getDescription()
     {
-        return 'Возможность такскать форму с помощью мышки через объект';
+        return 'Возможность таскать форму с помощью мышки через объект';
     }
 
     /**
