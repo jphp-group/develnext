@@ -33,6 +33,7 @@ class DoubleArrayPropertyEditor extends ElementPropertyEditor
     {
         $handle = function () {
             $this->applyValue([$this->firstField->text, $this->secondField->text], false);
+            $this->refreshDesign();
         };
 
         foreach (['firstField', 'secondField'] as $name) {
@@ -70,10 +71,11 @@ class DoubleArrayPropertyEditor extends ElementPropertyEditor
 
     /**
      * @param $value
+     * @param bool $noRefreshDesign
      */
-    public function updateUi($value)
+    public function updateUi($value, $noRefreshDesign = false)
     {
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
 
         $this->firstField->text = (double) $value[0];
         $this->secondField->text = (double) $value[1];

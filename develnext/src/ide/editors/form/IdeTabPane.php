@@ -308,10 +308,10 @@ class IdeTabPane
         }
     }
 
-    public function updateProperties($target)
+    public function updateProperties($target, array $properties = null)
     {
         if ($this->propertiesPane) {
-            $this->propertiesPane->update($target);
+            $this->propertiesPane->update($target, $properties);
         }
     }
 

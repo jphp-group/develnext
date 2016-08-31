@@ -48,13 +48,13 @@ class TableViewColumnsPropertyEditor extends TextPropertyEditor
         return parent::getNormalizedValue($value);
     }
 
-    public function updateUi($value)
+    public function updateUi($value, $noRefreshDesign = false)
     {
         $value = Flow::of($value)->map(function (UXTableColumn $column) {
             return $column->id;
         })->toString(',');
 
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
     }
 
     public function applyValue($value, $updateUi = true)

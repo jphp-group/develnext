@@ -1273,7 +1273,8 @@ public class UXDesigner extends BaseObject {
 
             sizeText = new Label();
             sizeText.setMouseTransparent(true);
-            sizeText.setStyle("-fx-background-color: #fffe85; -fx-padding: 1px 10px;");
+            sizeText.setStyle("-fx-background-color: #fffe85; -fx-padding: 1px 7px;");
+            sizeText.setPrefHeight(20);
 
             area.getChildren().addAll(sizeText);
 
@@ -1359,7 +1360,7 @@ public class UXDesigner extends BaseObject {
             border.setWidth(rtPoint.getLayoutX() - ltPoint.getLayoutX() - ptW - 1);
             border.setHeight(rbPoint.getLayoutY() - ltPoint.getLayoutY() - ptH - 1);
 
-            double sizeTextY = y - sizeText.getBoundsInLocal().getHeight() - POINT_SIZE;
+            double sizeTextY = y - sizeText.getPrefHeight() - POINT_SIZE;
 
             if (sizeTextY < 0) {
                 sizeTextY = y + border.getHeight() + POINT_SIZE;

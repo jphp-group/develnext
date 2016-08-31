@@ -39,11 +39,11 @@ class FontPropertyEditor extends TextPropertyEditor
         return $value;
     }
 
-    public function updateUi($value)
+    public function updateUi($value, $noRefreshDesign = false)
     {
         if ($value instanceof UXFont) {
             /** @var UXFont $value */
-            parent::updateUi("$value->family, $value->size, $value->style");
+            parent::updateUi("$value->family, $value->size, $value->style", $noRefreshDesign);
 
             $this->textField->font = UXFont::of($value->name, $this->textField->font->size);
         }

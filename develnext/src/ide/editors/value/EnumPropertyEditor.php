@@ -127,10 +127,11 @@ class EnumPropertyEditor extends TextPropertyEditor
 
     /**
      * @param $value
+     * @param bool $noRefreshDesign
      */
-    public function updateUi($value)
+    public function updateUi($value, $noRefreshDesign = false)
     {
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
 
         $i = 0;
         $this->choiceBox->selectedIndex = -1;

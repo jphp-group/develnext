@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\form;
 
+use ide\editors\value\ElementPropertyEditor;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\designer\UXDesignProperties;
 use php\gui\layout\UXAnchorPane;
@@ -82,12 +83,23 @@ class IdePropertiesPane
         }
     }
 
-    public function update($target)
+    public function update($target, array $properties = null)
     {
         if ($this->properties) {
-            foreach ($this->properties as $properties) {
-                $properties->target = $target;
-                $properties->update();
+            foreach ($this->properties as $group) {
+                $group->target = $target;
+
+                if ($properties) {
+                    foreach ($properties as $one) {
+                        $editor = $group->getEditorByCode($one);
+
+                        if ($editor instanceof ElementPropertyEditor) {
+                            $editor->updateUi($editor->getValue(), true);
+                        }
+                    }
+                } else {
+                    $group->update();
+                }
             }
         }
     }

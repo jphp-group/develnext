@@ -40,7 +40,7 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
 
         $this->textField->on('keyUp', function () {
             if ($this->textField->editable) {
-                $this->updateUi($this->textField->text, false);
+                $this->updateUi($this->textField->text, false, false);
                 $this->applyValue($this->textField->text, false);
             }
         });
@@ -62,11 +62,12 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
 
     /**
      * @param $value
+     * @param bool $noRefreshDesign
      * @param bool $setText
      */
-    public function updateUi($value, $setText = true)
+    public function updateUi($value, $noRefreshDesign = false, $setText = true)
     {
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
 
         if ($setText && $this->textField) {
             $this->textField->text = $value;

@@ -253,7 +253,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $confFile = $phpFile;
         }
 
-        $phpFile  .= '.php';
+        $phpFile .= '.php';
         $confFile .= '.conf';
 
         if ($file instanceof ProjectFile) {
@@ -301,25 +301,25 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->switchToDesigner(true);
         }));
 
-       /* $this->codeEditor->register(AbstractCommand::make('На весь экран', 'icons/fullScreenEnable16.png', function () {
-            $fullScreen = Ide::get()->getUserConfigValue(get_class($this) . ".codeEditorFullScreen", true);
+        /* $this->codeEditor->register(AbstractCommand::make('На весь экран', 'icons/fullScreenEnable16.png', function () {
+             $fullScreen = Ide::get()->getUserConfigValue(get_class($this) . ".codeEditorFullScreen", true);
 
-            Ide::get()->setUserConfigValue(get_class($this) . ".codeEditorFullScreen", !$fullScreen);
+             Ide::get()->setUserConfigValue(get_class($this) . ".codeEditorFullScreen", !$fullScreen);
 
-            if ($this->tabs->selectedTab === $this->codeTab) {
-                $this->switchToDesigner();
+             if ($this->tabs->selectedTab === $this->codeTab) {
+                 $this->switchToDesigner();
 
-                uiLater(function () {
-                    $this->switchToSmallSource();
-                });
-            } else {
-                $this->switchToDesigner(true);
+                 uiLater(function () {
+                     $this->switchToSmallSource();
+                 });
+             } else {
+                 $this->switchToDesigner(true);
 
-                uiLater(function () {
-                    $this->switchToSource();
-                });
-            }
-        }));*/
+                 uiLater(function () {
+                     $this->switchToSource();
+                 });
+             }
+         }));*/
 
         $this->codeEditor->register(AbstractCommand::make('Совместное редактирование', 'icons/layoutHorizontal16.png', function () {
             Ide::get()->setUserConfigValue(get_class($this) . ".multipleEditor", true);
@@ -1018,9 +1018,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $project = Ide::get()->getOpenedProject();
 
         if ($project) {
-            $index = (array) $project->getIndexer()->get($this->file, '_objects');
+            $index = (array)$project->getIndexer()->get($this->file, '_objects');
 
-            return (int) $index[$id]['version'];
+            return (int)$index[$id]['version'];
         }
 
         return -1;
@@ -1227,7 +1227,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         if ($data) {
             $dividerPositions = Flow::of(Str::split($data, ','))->map(function ($el) {
-                return (double) Str::trim($el);
+                return (double)Str::trim($el);
             })->toArray();
         }
 
@@ -1477,6 +1477,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $designPane->position = [0, 0];
             $designPane->onResize(function () {
                 $this->designer->update();
+
+                // update form properties.
+                if (!$this->designer->getSelectedNodes()) {
+                    $this->updateProperties($this, ['size']);
+                }
             });
 
             $this->markerNode = $designPane;
@@ -1522,7 +1527,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $this->designer = new UXDesigner($this->layout);
-        $this->designer->onAreaMouseUp(function ($e) { $this->_onAreaMouseUp($e); } );
+        $this->designer->onAreaMouseUp(function ($e) {
+            $this->_onAreaMouseUp($e);
+        });
         $this->designer->onNodeClick(function ($e) {
             $this->_onNodeClick($e);
         });
@@ -1619,7 +1626,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     protected function makeContextMenu()
     {
         $this->contextMenu = new ContextMenu($this, $this->format->getContextCommands());
-        $this->contextMenu->setFilter(function ()  {
+        $this->contextMenu->setFilter(function () {
             return $this->layout->focused || $this->contextMenu->getRoot()->visible || $this->layout->findFocusedNode();
         });
 
@@ -1937,7 +1944,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             if ($node instanceof UXNode) {
                 $node->data('-factory-version', $version = $node->data('-factory-version') + 1);
-               // Logger::debug("Change object factory version '$targetId', set version = $version");
+                // Logger::debug("Change object factory version '$targetId', set version = $version");
             }
         });
 
@@ -1952,7 +1959,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
-    protected function updateProperties($node)
+    protected function updateProperties($node, array $onlyProperties = [])
     {
         if ($node instanceof UXNode) {
             $factoryId = $node->data('-factory-id');
@@ -1970,7 +1977,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             $editor = new SimpleTextPropertyEditor(function () use ($factoryId) {
                 return $factoryId;
-            }, function () {});
+            }, function () {
+            });
             $editor->setReadOnly(true);
             $properties->addProperty('prototype', 'factoryId', 'Прототип', $editor);
             $properties->addProperty('general', 'position', 'Позиция (X, Y)', new DoubleArrayPropertyEditor());
@@ -1993,33 +2001,42 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 $this->propertiesPane->addProperties($properties);
             }
         } else {
-            $this->leftPaneUi->showEventListPane();
-            $this->leftPaneUi->showBehaviourPane();
-            if ($this->eventManager) {
-                $this->eventManager->load();
+            if (!$onlyProperties) {
+                $this->leftPaneUi->showEventListPane();
+                $this->leftPaneUi->showBehaviourPane();
+                if ($this->eventManager) {
+                    $this->eventManager->load();
+                }
             }
 
             $element = $this->format->getFormElement($node);
-            $properties = $element ? static::fetchElementProperties($element) : null;
 
-            if ($this->propertiesPane) {
-                $this->propertiesPane->clearProperties();
-            }
+            if (!$onlyProperties) {
+                $properties = $element ? static::fetchElementProperties($element) : null;
 
-            $this->trigger('updateNode:before', [$node, $properties]);
+                if ($this->propertiesPane) {
+                    $this->propertiesPane->clearProperties();
+                }
 
-            if ($this->propertiesPane) {
-                $this->propertiesPane->addProperties($properties);
-            }
+                $this->trigger('updateNode:before', [$node, $properties]);
 
-            if ($this->eventListPane) {
-                $this->eventListPane->setEventTypes($element ? $element->getEventTypes() : []);
+                if ($this->propertiesPane) {
+                    $this->propertiesPane->addProperties($properties);
+                }
+
+                if ($this->eventListPane) {
+                    $this->eventListPane->setEventTypes($element ? $element->getEventTypes() : []);
+                }
             }
         }
 
-        $this->trigger('updateNode:after', [$node, $properties]);
+        //$this->trigger('updateNode:after', [$node, $properties]);
 
-        $this->leftPaneUi->update($this->getNodeId($node), $element ? $element->getTarget($node) : $node);
+        if ($onlyProperties) {
+            $this->leftPaneUi->updateProperties($element ? $element->getTarget($node) : $node, $onlyProperties);
+        } else {
+            $this->leftPaneUi->update($this->getNodeId($node), $element ? $element->getTarget($node) : $node);
+        }
     }
 
     public function jumpToClassMethod($class, $method)

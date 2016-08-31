@@ -2,6 +2,7 @@
 namespace ide\editors\value;
 
 use ide\editors\FormEditor;
+use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
 use ide\systems\FileSystem;
 use php\gui\designer\UXDesignPropertyEditor;
@@ -74,11 +75,13 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     abstract public function makeUi();
 
     /**
-     * @param $value
+     * ...
      */
-    public function updateUi($value)
+    public function refreshDesign()
     {
         waitAsync(100, function () {
+            Logger::debug("Refresh Design");
+
             $editor = FileSystem::getSelectedEditor();
 
             if ($editor instanceof FormEditor) {
@@ -103,6 +106,17 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
                 }
             }
         });
+    }
+
+    /**
+     * @param $value
+     * @param bool $noRefreshDesign
+     */
+    public function updateUi($value, $noRefreshDesign = false)
+    {
+        if (!$noRefreshDesign) {
+            $this->refreshDesign();
+        }
     }
 
     /**
@@ -144,7 +158,7 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     public function update(UXTableCell $cell, $empty)
     {
         $cell->graphic = $this->content;
-        $this->updateUi($this->getNormalizedValue($this->getValue()));
+        $this->updateUi($this->getNormalizedValue($this->getValue()), true);
     }
 
     public function setAsFormConfigProperty($defaultValue, $realCode = null)
@@ -267,7 +281,7 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
         return $this;
     }
 
-    public function applyValue($value, $updateUi = true)
+    public function applyValue($value, $updateUi = true, $noRefreshDesign = false)
     {
         $value = $this->getNormalizedValue($value);
 
@@ -283,7 +297,7 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             $this->designProperties->triggerChange();
 
             if ($updateUi) {
-                $this->updateUi($value);
+                $this->updateUi($value, $noRefreshDesign);
             }
         } catch (IllegalArgumentException $e) {
             ;

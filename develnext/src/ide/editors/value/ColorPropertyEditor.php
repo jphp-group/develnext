@@ -93,10 +93,11 @@ class ColorPropertyEditor extends ElementPropertyEditor
 
     /**
      * @param $value
+     * @param bool $noRefreshDesign
      */
-    public function updateUi($value)
+    public function updateUi($value, $noRefreshDesign = false)
     {
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
 
         if ($value && !($value instanceof UXColor)) {
             $value = UXColor::of($value);

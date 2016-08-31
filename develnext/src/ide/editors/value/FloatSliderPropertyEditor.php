@@ -105,9 +105,9 @@ class FloatSliderPropertyEditor extends ElementPropertyEditor
         return (double) $value;
     }
 
-    public function updateUi($value, $setText = true)
+    public function updateUi($value, $noRefreshDesign = false, $setText = true)
     {
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
 
         $this->slider->value = $value;
         $this->label->text = num::format($value, "###.##");
@@ -132,7 +132,7 @@ class FloatSliderPropertyEditor extends ElementPropertyEditor
         $this->textField->style = "-fx-background-insets: 0; -fx-background-color: -fx-control-inner-background; -fx-background-radius: 0; -fx-font-size: 11px;";
 
         $this->textField->on('keyUp', function () {
-            $this->updateUi($this->textField->text, false);
+            $this->updateUi($this->textField->text, false, false);
             $this->applyValue($this->textField->text, false);
         });
 

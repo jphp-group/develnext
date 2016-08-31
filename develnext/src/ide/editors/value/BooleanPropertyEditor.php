@@ -33,7 +33,7 @@ class BooleanPropertyEditor extends ElementPropertyEditor
 
         $checkbox->on('mouseUp', function () {
             $this->applyValue($this->checkbox->selected, false);
-            $this->updateUi($this->checkbox->selected, false);
+            $this->updateUi($this->checkbox->selected, false, false);
         });
 
         return new UXHBox([$checkbox, $label]);
@@ -53,11 +53,12 @@ class BooleanPropertyEditor extends ElementPropertyEditor
 
     /**
      * @param $value
+     * @param bool $noRefreshDesign
      * @param bool $updateCheckbox
      */
-    public function updateUi($value, $updateCheckbox = true)
+    public function updateUi($value, $noRefreshDesign = false, $updateCheckbox = true)
     {
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
         $this->label->text = $value ? 'Да' : 'Нет';
 
         if ($updateCheckbox) {

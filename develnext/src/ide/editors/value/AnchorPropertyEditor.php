@@ -75,10 +75,11 @@ class AnchorPropertyEditor extends ElementPropertyEditor
 
     /**
      * @param $value
+     * @param bool $noRefreshDesign
      */
-    public function updateUi($value)
+    public function updateUi($value, $noRefreshDesign = false)
     {
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
 
         foreach ($value as $name => $el) {
             $this->checkboxes[$name]->selected = $el;

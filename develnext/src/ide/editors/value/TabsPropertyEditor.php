@@ -61,9 +61,9 @@ class TabsPropertyEditor extends TextPropertyEditor
         return 'tabs';
     }
 
-    public function updateUi($value)
+    public function updateUi($value, $noRefreshDesign = false)
     {
-        parent::updateUi(Str::join(Flow::of($value)->map(function (UXTab $it) { return $it->text; }), ', '));
+        parent::updateUi(Str::join(Flow::of($value)->map(function (UXTab $it) { return $it->text; }), ', '), $noRefreshDesign);
     }
 
     public function applyValue($value, $updateUi = true)

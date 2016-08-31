@@ -1,5 +1,6 @@
 package org.develnext.jphp.gui.designer.classes;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -94,6 +95,20 @@ public class UXDesignProperties extends BaseObject {
             PropertyTableView content = (PropertyTableView) titledPane.getContent();
             content.update();
         }
+    }
+
+    @Signature
+    public UXDesignPropertyEditor getEditorByCode(String name) {
+        for (TitledPane titledPane : groups.values()) {
+            PropertyTableView content = (PropertyTableView) titledPane.getContent();
+            UXDesignPropertyEditor editor = content.findEditorByCode(name);
+
+            if (editor != null) {
+                return editor;
+            }
+        }
+
+        return null;
     }
 
     @Signature
@@ -258,6 +273,16 @@ public class UXDesignProperties extends BaseObject {
             for (PropertyValue item : items) {
                 getItems().add(item);
             }
+        }
+
+        public UXDesignPropertyEditor findEditorByCode(String name) {
+            for (PropertyValue value : getItems()) {
+                if (name.equals(value.getEditor().getCode())) {
+                    return value.getEditor();
+                }
+            }
+
+            return null;
         }
     }
 

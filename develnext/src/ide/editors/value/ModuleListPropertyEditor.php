@@ -46,13 +46,13 @@ class ModuleListPropertyEditor extends TextPropertyEditor
         return parent::getNormalizedValue($value);
     }
 
-    public function updateUi($value)
+    public function updateUi($value, $noRefreshDesign = false)
     {
         if (is_array($value)) {
             $value = Str::join($value, '|');
         }
 
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
     }
 
     public function applyValue($value, $updateUi = true)

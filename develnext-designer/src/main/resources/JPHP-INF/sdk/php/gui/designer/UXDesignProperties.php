@@ -75,6 +75,14 @@ class UXDesignProperties
     }
 
     /**
+     * @param string $code
+     * @return UXDesignPropertyEditor
+     */
+    public function getEditorByCode($code)
+    {
+    }
+
+    /**
      * @param $groupCode
      */
     public function updateOne($groupCode)

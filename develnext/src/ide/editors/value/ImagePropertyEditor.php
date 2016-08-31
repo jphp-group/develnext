@@ -56,9 +56,9 @@ class ImagePropertyEditor extends TextPropertyEditor
         return $result;
     }
 
-    public function updateUi($value)
+    public function updateUi($value, $noRefreshDesign = false)
     {
-        parent::updateUi($value);
+        parent::updateUi($value, $noRefreshDesign);
 
         $project = Ide::get()->getOpenedProject();
 
