@@ -7,6 +7,7 @@ use php\gui\layout\UXAnchorPane;
 use php\gui\UXApplication;
 use php\gui\UXImageView;
 use php\gui\UXLabel;
+use script\TimerScript;
 
 /**
  * Class FormNamedBlock
@@ -71,10 +72,12 @@ class FormNamedBlock extends UXAnchorPane
             if ($new) {
                 $new->add($label);
 
-                uiLater(function () {
+                $v = function () {
                     $this->updateLabelY();
                     $this->updateLabelX();
-                });
+                };
+                uiLater($v);
+                TimerScript::executeAfter(100, $v); // fix bug!
             } else {
                 uiLater(function () use ($label) {
                     $label->free();
