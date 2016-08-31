@@ -10,6 +10,7 @@ use ide\project\ProjectModule;
 use ide\utils\FileUtils;
 use php\compress\ArchiveEntry;
 use php\compress\ArchiveInputStream;
+use php\compress\ZipFile;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
@@ -66,6 +67,41 @@ abstract class AbstractJarBundle extends AbstractBundle
         }
 
         return $result;
+    }
+
+    public function onAdd(Project $project, AbstractBundle $owner = null)
+    {
+        parent::onAdd($project, $owner);
+
+        if ($this->bundleDirectory) {
+            $nameDirectory = fs::name($this->bundleDirectory);
+
+            if (fs::isFile($file = $this->bundleDirectory . "/$nameDirectory.jar")) {
+                $zipFile = new ZipFile($file);
+                try {
+                    $vendorDirectory = $this->getVendorDirectory() . "/";
+
+                    foreach ($zipFile->getEntryNames() as $name) {
+                        if ($name == "$vendorDirectory.vendor") {
+                            continue;
+                        }
+
+                        if (str::startsWith($name, $vendorDirectory)) {
+                            $zipEntry = $zipFile->getEntry($name);
+
+                            if ($zipEntry->isDirectory()) {
+                                continue;
+                            }
+
+                            $this->copyVendorResource(FileUtils::relativePath($vendorDirectory, $name));
+                        }
+                    }
+
+                } finally {
+                    $zipFile->close();
+                }
+            }
+        }
     }
 
 
