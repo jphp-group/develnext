@@ -73,7 +73,9 @@ class TabsPropertyEditor extends TextPropertyEditor
         $items = [];
 
         while ($scanner->hasNextLine()) {
-            $items[] = $scanner->nextLine();
+            $line = $scanner->nextLine();
+
+            $items[] = $line;
         }
 
         $list = $this->designProperties->target->{$this->code};
@@ -90,9 +92,10 @@ class TabsPropertyEditor extends TextPropertyEditor
             $diff = sizeof($items) - $list->count;
 
             if ($diff > 0) {
-                for ($i = 0; $i < $diff; $i++) {
+                $count = $list->count + $diff;
+                for ($i = $list->count; $i < $count; $i++) {
                     $object = new UXTab();
-                    $object->text = $items[$list->count + $i];
+                    $object->text = $items[$i];
                     $object->content = new UXAnchorPane();
 
                     $list->add($object);
