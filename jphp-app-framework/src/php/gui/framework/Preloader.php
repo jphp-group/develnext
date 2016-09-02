@@ -21,6 +21,16 @@ class Preloader extends UXAnchorPane
     protected $pane;
 
     /**
+     * @var UXLabel
+     */
+    protected $label;
+
+    /**
+     * @var UXProgressIndicator
+     */
+    protected $indicator;
+
+    /**
      * Preloader constructor.
      * @param UXParent $pane
      * @param string $text
@@ -41,17 +51,17 @@ class Preloader extends UXAnchorPane
         $this->opacity = 0.52;
         $this->visible = false;
 
-        $indicator = new UXProgressIndicator();
+        $this->indicator = $indicator = new UXProgressIndicator();
         $indicator->progress = -1;
         $indicator->size = [48, 48];
 
         $label = null;
 
+        $this->label = $label = new UXLabel($text);
+        $this->add($label);
+
         if ($text) {
-            $label = new UXLabel($text);
             $label->text = $text;
-            //$label->effects->add(new UXDropShadowEffect());
-            $this->add($label);
         }
 
         $this->watch('width', function () use ($pane, $indicator, $label, $text) {
@@ -78,6 +88,13 @@ class Preloader extends UXAnchorPane
         $pane->add($this);
     }
 
+    public function setText($text)
+    {
+        $this->label->text = $text;
+        $this->label->x = $this->pane->width / 2 - $this->label->font->calculateTextWidth($text) / 2;
+        $this->label->y = $this->indicator->y + $this->indicator->height + 5;
+    }
+
     public function show()
     {
         parent::show();
@@ -92,5 +109,14 @@ class Preloader extends UXAnchorPane
         if ($preloader) {
             $preloader->free();
         }
+    }
+
+    /**
+     * @param UXNode $pane
+     * @return Preloader
+     */
+    static function getPreloader(UXNode $pane)
+    {
+        return $pane->data('--preloader');
     }
 }

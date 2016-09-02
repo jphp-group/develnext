@@ -625,9 +625,14 @@ abstract class AbstractForm extends UXForm
 
     public function showPreloader($text = '')
     {
-        $this->hidePreloader();
+        $preloader = Preloader::getPreloader($this->layout);
 
-        $preloader = new Preloader($this->layout, $text);
+        if ($preloader) {
+            $preloader->setText($text);
+        } else {
+            $preloader = new Preloader($this->layout, $text);
+        }
+
         $preloader->show();
     }
 
