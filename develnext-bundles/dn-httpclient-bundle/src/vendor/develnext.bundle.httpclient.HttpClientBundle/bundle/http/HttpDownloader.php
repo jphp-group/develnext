@@ -52,6 +52,11 @@ class HttpDownloader extends AbstractScript
     public $threadCount = 4;
 
     /**
+     * @var int
+     */
+    public $bufferSize = 8192;
+
+    /**
      * @var array
      */
     public $urls = [];
@@ -194,7 +199,7 @@ class HttpDownloader extends AbstractScript
                     uiLater(function () use ($contentLength, $progress, $url, $fileName, $response) {
                         $this->trigger('progress', ['url' => $url, 'response' => $response, 'file' => $fileName, 'max' => $contentLength, 'progress' => $progress]);
                     });
-                });
+                }, $this->bufferSize);
             } catch (IOException $e) {
                 $this->checkBreak();
                 $response->statusCode(400);
@@ -316,10 +321,28 @@ class HttpDownloader extends AbstractScript
         while ($this->_busy) ;
     }
 
+    /**
+     * @var bool
+     */
+    protected $lazyStart = false;
+
+    /**
+     * Start downloading.
+     * --RU--
+     * Стартовать загрузку.
+     */
     public function start()
     {
         if ($this->_busy) {
-            throw new \Exception("Cannot download, downloader is busy, use stopAndWait() method to stop it before start.");
+            if ($this->lazyStart) return;
+
+            $this->lazyStart = true;
+
+            $this->stopAsync(function () {
+                $this->start();
+                $this->lazyStart = false;
+            });
+            //throw new \Exception("Cannot download, downloader is busy, use stopAndWait() method to stop it before start.");
         }
 
         new HttpResponse();
