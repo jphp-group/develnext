@@ -545,6 +545,15 @@ class PHPInspector extends AbstractInspector
         return parent::findType(str::lower($name), $withDynamic);
     }
 
+    /**
+     * @param $name
+     * @return TypeEntry[]
+     */
+    public function findTypeByShortName($name)
+    {
+        return $this->typesByShort[str::lower($name)];
+    }
+
     public function findMethod(TypeEntry $type = null, $name)
     {
         if ($method = parent::findMethod($type, str::lower($name))) {
@@ -587,6 +596,7 @@ class PHPInspector extends AbstractInspector
     public function putType(TypeEntry $entry)
     {
         $this->types[str::lower($entry->fulledName)] = $entry;
+        $this->typesByShort[str::lower(fs::name($entry->fulledName))] = $entry;
     }
 
     public function putFunction(FunctionEntry $entry)

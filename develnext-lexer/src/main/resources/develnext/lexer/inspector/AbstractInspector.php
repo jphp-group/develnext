@@ -25,6 +25,11 @@ abstract class AbstractInspector
     /**
      * @var TypeEntry[]
      */
+    protected $typesByShort = [];
+
+    /**
+     * @var TypeEntry[]
+     */
     protected $dynamicTypes = [];
 
     /**
@@ -126,6 +131,7 @@ abstract class AbstractInspector
     public function putType(TypeEntry $entry)
     {
         $this->types[$entry->fulledName] = $entry;
+        $this->typesByShort[fs::name($entry->fulledName)] = $entry;
     }
 
     public function putFunction(FunctionEntry $entry)
@@ -229,6 +235,15 @@ abstract class AbstractInspector
         } else {
             return $this->types[$name];
         }
+    }
+
+    /**
+     * @param $name
+     * @return TypeEntry
+     */
+    public function findTypeByShortName($name)
+    {
+        return $this->typesByShort[$name];
     }
 
     /**

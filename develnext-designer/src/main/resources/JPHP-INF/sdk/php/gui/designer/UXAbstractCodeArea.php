@@ -4,6 +4,12 @@ namespace php\gui\designer;
 use php\gui\UXControl;
 use php\gui\UXPopupWindow;
 
+/**
+ * Class UXAbstractCodeArea
+ * @package php\gui\designer
+ *
+ * events: paste, beforeChange, afterChange
+ */
 class UXAbstractCodeArea extends UXControl
 {
     /**

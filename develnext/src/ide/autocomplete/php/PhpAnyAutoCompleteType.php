@@ -45,7 +45,7 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
         $this->kind = $kind;
     }
 
-    protected function appendUseClass(UXAbstractCodeArea $area, $use)
+    public static function appendUseClass(UXAbstractCodeArea $area, $use)
     {
         $useString = "use " . $use . ";";
 
@@ -105,43 +105,11 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
             }
         }
 
-        if ($this->appendUseClass($insert->getArea(), $insert->getValue())) {
+        if (self::appendUseClass($insert->getArea(), $insert->getValue())) {
             $insert->setValue(fs::name($insert->getValue()));
         } else {
             $insert->setValue("\\" . "{$insert->getValue()}");
         }
-
-        /*if ($regex->find()) {
-            $insert->setBeforeText($regex->replaceGroup(0, "use " . $insert->getValue() . ";" . "\n" . $regex->group(0)));
-            $insert->setValue(fs::name($insert->getValue()));
-        } else {
-            $regex = Regex::of('namespace[ ]+([0-9\\_a-z\\\\]+\\;)', Regex::DOTALL | Regex::CASE_INSENSITIVE)->with($text);
-
-            if ($regex->find()) {
-                $insert->setBeforeText($regex->replaceGroup(0, $regex->group(0) . "\n\nuse " . $insert->getValue() . ";" . "\n"));
-                $insert->setValue(fs::name($insert->getValue()));
-            } else {
-                $regex = Regex::of('namespace[ ]+([0-9\\_a-z\\\\]+[ \\r\\t\\n]+\\{)', Regex::DOTALL | Regex::CASE_INSENSITIVE)->with($text);
-
-                if ($regex->find()) {
-                    $insert->setBeforeText($regex->replaceGroup(0, $regex->group(0) . "\n\nuse " . $insert->getValue() . ";" . "\n"));
-                    $insert->setValue(fs::name($insert->getValue()));
-                } else {
-                    $regex = Regex::of('(\\<\\?)', Regex::DOTALL | Regex::CASE_INSENSITIVE)->with($text);
-
-                    if ($regex->find()) {
-                        $insert->setBeforeText($regex->replaceGroup(0, $regex->group(0) . "\nuse " . $insert->getValue() . ";" . "\n"));
-                        $insert->setValue(fs::name($insert->getValue()));
-                    } else {
-                        $insert->setValue("\\" . "{$insert->getValue()}");
-                    }
-                }
-            }
-        }
-
-        /*$text = $insert->getArea()->text;
-
-        $insert->setBeforeText()*/
     }
 
     /**
@@ -192,24 +160,6 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
 
                 $c->setContent($type->data['content']);
             }
-
-            /*foreach ($bundle->fetchAllBundles(Project::ENV_ALL) as $one) {
-                if ($one instanceof AbstractJarBundle) {
-                    foreach ($one->getUseImports() as $import) {
-                        $name = fs::name($import);
-
-                        $result[$name] = new ConstantAutoCompleteItem(
-                            $name,
-                            $import,
-                            function (AutoCompleteInsert $insert) use ($import) {
-                                $insert->setValue($import);
-                                $this->insertClassName($insert);
-                            },
-                            'icons/class16.png'
-                        );
-                    }
-                }
-            } */
 
             foreach ($context->getGlobalRegion()->getValues('use') as $one) {
                 $name = fs::name($one['name']);

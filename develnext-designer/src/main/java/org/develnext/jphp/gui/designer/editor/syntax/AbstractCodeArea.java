@@ -50,6 +50,7 @@ abstract public class AbstractCodeArea extends CodeArea {
 
     private EventHandler<ActionEvent> onBeforeChange;
     private EventHandler<ActionEvent> onAfterChange;
+    private EventHandler<ActionEvent> onPaste;
 
     public AbstractCodeArea() {
         super();
@@ -117,6 +118,23 @@ abstract public class AbstractCodeArea extends CodeArea {
         registerHotkey(new BackspaceHotkey());
 
         setStylesheet(null);
+    }
+
+    @Override
+    public void paste() {
+        super.paste();
+
+        if (onPaste != null) {
+            onPaste.handle(new ActionEvent(this, this));
+        }
+    }
+
+    public EventHandler<ActionEvent> getOnPaste() {
+        return onPaste;
+    }
+
+    public void setOnPaste(EventHandler<ActionEvent> onPaste) {
+        this.onPaste = onPaste;
     }
 
     public double getLineHeight() {

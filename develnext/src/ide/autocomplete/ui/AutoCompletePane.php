@@ -1,13 +1,16 @@
 <?php
 namespace ide\autocomplete\ui;
 
+use develnext\lexer\inspector\entry\TypeEntry;
 use ide\autocomplete\AutoComplete;
 use ide\autocomplete\AutoCompleteInsert;
 use ide\autocomplete\AutoCompleteItem;
 use ide\autocomplete\AutoCompleteType;
 use ide\autocomplete\MethodAutoCompleteItem;
+use ide\autocomplete\php\PhpAnyAutoCompleteType;
 use ide\autocomplete\PropertyAutoCompleteItem;
 use ide\autocomplete\VariableAutoCompleteItem;
+use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
 use php\gui\designer\UXAbstractCodeArea;
@@ -18,6 +21,7 @@ use php\gui\layout\UXVBox;
 use php\gui\paint\UXColor;
 use php\gui\text\UXFont;
 use php\gui\UXApplication;
+use php\gui\UXClipboard;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
@@ -29,6 +33,7 @@ use php\lib\Char;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Flow;
+use php\util\Regex;
 use script\TimerScript;
 use timer\AccurateTimer;
 
@@ -103,6 +108,40 @@ class AutoCompletePane
         $this->area->observer('focused')->addListener(function ($old, $new) {
             if (!$new) {
                 $this->hide();
+            }
+        });
+
+        $this->area->on('paste', function () {
+            $text = UXClipboard::getText();
+
+            if ($text) {
+                $reg = Regex::of('([a-z0-9_]+)\\:\\:|new[ ]+([a-z0-9_]+)', 'ig')->with($text);
+
+                /** @var TypeEntry[] $types */
+                $types = [];
+
+                while ($reg->find()) {
+                    $class = $reg->group(1) ?: $reg->group(2);
+                    $type = $this->complete->getInspector()->findTypeByShortName($class);
+
+                    if ($type) {
+                        if (!Regex::of('use[ ]+' . Regex::quote($type->fulledName))->with($this->area->text)->find()) {
+                            $types[$class] = $type;
+                        }
+                    }
+                }
+
+                if ($types) {
+                    $done = MessageBoxForm::confirm(
+                        'В тексте есть неподключенные классы (' . str::join(arr::keys($types), ', ') . '), хотите их подключить?'
+                    );
+
+                    if ($done) {
+                        foreach ($types as $type) {
+                            PhpAnyAutoCompleteType::appendUseClass($this->area, $type->fulledName);
+                        }
+                    }
+                }
             }
         });
 
@@ -226,7 +265,8 @@ class AutoCompletePane
      */
     protected $showTimer;
 
-    public function show($x, $y) {
+    public function show($x, $y)
+    {
         if ($this->showTimer) {
             $this->showTimer->free();
         }
@@ -256,7 +296,8 @@ class AutoCompletePane
         });
     }
 
-    public function hide() {
+    public function hide()
+    {
         UXApplication::runLater(function () {
             $this->shown = false;
 
@@ -371,7 +412,8 @@ class AutoCompletePane
             $ch = $text[$i];
 
             if (Char::isPrintable($ch)
-                && (Char::isLetterOrDigit($ch)) || $ch == '_') {
+                && (Char::isLetterOrDigit($ch)) || $ch == '_'
+            ) {
                 $string .= $ch;
             } else {
                 if ($onlyName /*&& $ch != '$'*/) { // todo refactor for $
@@ -581,8 +623,12 @@ class AutoCompletePane
                 return 0;
             }
 
-            if ($one->getName() == $prefix) { return -1; }
-            if ($two->getName() == $prefix) { return 1; }
+            if ($one->getName() == $prefix) {
+                return -1;
+            }
+            if ($two->getName() == $prefix) {
+                return 1;
+            }
 
             if (str::startsWith($one->getName(), $prefix) && str::startsWith($two->getName(), $prefix)) {
                 // nop.

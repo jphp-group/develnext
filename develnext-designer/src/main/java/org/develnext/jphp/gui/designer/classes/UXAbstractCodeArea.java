@@ -40,6 +40,18 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
                     return target.getOnAfterChange();
                 }
             });
+
+            setHandler("paste", new Handler() {
+                @Override
+                public void set(AbstractCodeArea target, EventHandler eventHandler) {
+                    target.setOnPaste(eventHandler);
+                }
+
+                @Override
+                public EventHandler get(AbstractCodeArea target) {
+                    return target.getOnPaste();
+                }
+            });
         }
 
         @Override
