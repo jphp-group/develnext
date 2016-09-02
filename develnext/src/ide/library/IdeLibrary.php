@@ -110,6 +110,8 @@ class IdeLibrary
                             $this->resources[$code][] = $resource;
                         } catch (\Exception $e) {
                             Logger::exception("Failed to register ($code) resource '$path'", $e);
+                        } catch (\Error $e) {
+                            Logger::exception("Failed to register ($code) resource '$path'", $e);
                         }
                     }
                 });
