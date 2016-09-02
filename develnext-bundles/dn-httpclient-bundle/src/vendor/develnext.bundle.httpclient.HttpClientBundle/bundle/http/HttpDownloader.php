@@ -158,7 +158,7 @@ class HttpDownloader extends AbstractScript
             $contentLength = $response->contentLength();
 
             if ($fileName == null) {
-                $fileName = fs::name($url);
+                $fileName = urldecode(fs::name($url));
 
                 $contentDisposition = $response->header('Content-Disposition');
 
