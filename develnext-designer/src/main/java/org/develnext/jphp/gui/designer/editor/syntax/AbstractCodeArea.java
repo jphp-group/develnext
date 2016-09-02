@@ -180,7 +180,7 @@ abstract public class AbstractCodeArea extends CodeArea {
 
         InputMap<KeyEvent> inputMap = InputMap.sequence(
                 InputMap.consume(eventPattern, keyEvent -> {
-                    if (!keyEvent.isShortcutDown()) {
+                    if (!keyEvent.isShortcutDown() || hotkey.isAllowShortcutDown()) {
                         if (hotkey.apply(this, keyEvent)) {
                             if (hotkey.isAffectsUndoManager()) {
                                 this.getUndoManager().mark();

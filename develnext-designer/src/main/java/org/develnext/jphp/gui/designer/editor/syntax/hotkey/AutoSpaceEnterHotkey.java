@@ -37,7 +37,7 @@ public class AutoSpaceEnterHotkey extends AbstractHotkey {
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
 
-            if (Character.isSpaceChar(c) || c == '*') {
+            if (Character.isSpaceChar(c) || (c == '*' && !text.trim().endsWith("*/"))) {
                 prefix.append(c);
                 continue;
             }
@@ -50,7 +50,9 @@ public class AutoSpaceEnterHotkey extends AbstractHotkey {
         if (text.trim().endsWith("/**")) {
             try {
                 Paragraph<Collection<String>, Collection<String>> nextParagraph = area.getParagraph(currentParagraph + 1);
-                if (!nextParagraph.getText().trim().startsWith("*")) {
+                String nextParagraphText = nextParagraph.getText();
+
+                if (!nextParagraphText.trim().startsWith("*")) {
                     offset = -(prefix.length() + 3);
 
                     prefix.append(" *").append(" " + prefix.toString()).append("/");

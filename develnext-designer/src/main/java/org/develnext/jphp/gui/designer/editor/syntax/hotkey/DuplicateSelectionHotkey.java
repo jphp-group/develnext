@@ -41,4 +41,9 @@ public class DuplicateSelectionHotkey extends AbstractHotkey {
     public KeyCombination.Modifier[] getDefaultKeyCombination() {
         return new KeyCombination.Modifier[] { KeyCombination.CONTROL_DOWN };
     }
+
+    @Override
+    public boolean isAllowShortcutDown() {
+        return true;
+    }
 }

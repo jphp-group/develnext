@@ -35,4 +35,8 @@ abstract public class AbstractHotkey {
     public int hashCode() {
         return uid.hashCode();
     }
+
+    public boolean isAllowShortcutDown() {
+        return false;
+    }
 }

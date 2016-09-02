@@ -9,6 +9,24 @@ public class AutoBracketsHotkey extends AbstractHotkey {
         return !Character.isLetterOrDigit(ch);
     }
 
+    protected boolean isInvalidCase(char ch, char nextCh) {
+        boolean isNeedClosedBracket = false;
+
+        if (ch == '(' && nextCh != ')') {
+            isNeedClosedBracket = true;
+        } else if (ch == '[' && nextCh != ']') {
+            isNeedClosedBracket = true;
+        }
+
+        if (isNeedClosedBracket) {
+            if (!(nextCh == '\0' || Character.isSpaceChar(nextCh) || nextCh == '\n' || nextCh == '\r' || nextCh == '\t')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public boolean apply(AbstractCodeArea area, KeyEvent keyEvent) {
         char addClosed = '\0';
@@ -20,36 +38,9 @@ public class AutoBracketsHotkey extends AbstractHotkey {
         String ch = area.getText(pos - 1, pos);
         char nextCh = area.getText().length() >= pos + 1 ? area.getText(pos, pos + 1).charAt(0) : '\0';
 
-        /*switch (ch) {
-            case "[":
-                if (nextCh == ']') break;
-            case "(":
-                if (nextCh == ')') break;
-            case "{":
-                if (nextCh == '}') break;
-
-                if (!(nextCh == '\0' || Character.isSpaceChar(nextCh))) {
-                    return false;
-                }
-                break;
-
-            case ")":
-                String text = area.getText();
-                int check = 0;
-
-                for (int i = 0; i < text.length(); i++) {
-                    char c = text.charAt(i);
-
-                    if (c == ')') check--;
-                    if (c == '(') check++;
-
-                    if (check < 0) return false;
-                }
-
-                if (check != 0) return false;
-                break;
-        }*/
-
+        if (isInvalidCase(ch.charAt(0), nextCh)) {
+            return false;
+        }
 
         switch (ch) {
             case "{":
