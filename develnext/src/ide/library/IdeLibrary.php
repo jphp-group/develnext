@@ -101,13 +101,16 @@ class IdeLibrary
                     if (Str::endsWith($filename, '.resource')) {
                         $path = fs::pathNoExt($filename);
 
-                        Logger::info("Add library resource $filename, type = $type[type]");
+                        Logger::info("Add library ($code) resource $filename, type = $type[type]");
 
                         /** @var IdeLibraryResource $resource */
-                        $resource = new $type['type']($path);
-                        $resource->onRegister($this);
-
-                        $this->resources[$code][] = $resource;
+                        try {
+                            $resource = new $type['type']($path);
+                            $resource->onRegister($this);
+                            $this->resources[$code][] = $resource;
+                        } catch (\Exception $e) {
+                            Logger::exception("Failed to register ($code) resource '$path'", $e);
+                        }
                     }
                 });
             }
