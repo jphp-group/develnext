@@ -108,6 +108,7 @@ class Preloader extends UXAnchorPane
 
         if ($preloader) {
             $preloader->free();
+            $pane->data('--preloader', null);
         }
     }
 

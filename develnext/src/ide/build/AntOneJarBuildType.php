@@ -9,6 +9,7 @@ use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\behaviours\RunBuildProjectBehaviour;
 use ide\project\Project;
+use ide\project\ProjectFile;
 use ide\systems\ProjectSystem;
 use ide\utils\FileUtils;
 use php\compress\ZipFile;
@@ -112,7 +113,13 @@ class AntOneJarBuildType extends AbstractBuildType
             }
 
             if ($icoFile->isFile()) {
-                $content = str::replace($content, '#L4J_ICON_FILE#', $icoFile);
+                // fix windres.exe bug.
+                $tmpIconFile = File::createTemp(str::uuid(), '.ico');
+                $tmpIconFile->deleteOnExit();
+
+                fs::copy($icoFile, $tmpIconFile);
+
+                $content = str::replace($content, '#L4J_ICON_FILE#', $tmpIconFile);
             } else {
                 $content = str::replace($content, 'icon="#L4J_ICON_FILE#"', '');
             }

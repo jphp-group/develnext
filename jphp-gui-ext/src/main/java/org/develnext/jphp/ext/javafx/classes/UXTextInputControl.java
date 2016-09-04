@@ -1,14 +1,13 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
-import php.runtime.annotation.Reflection.Abstract;
-import php.runtime.annotation.Reflection.Name;
-import php.runtime.annotation.Reflection.Property;
+import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
@@ -73,5 +72,10 @@ public class UXTextInputControl<T extends TextInputControl> extends UXControl {
     @Override
     public T getWrappedObject() {
         return (T) super.getWrappedObject();
+    }
+
+    @Getter
+    public IndexRange getSelection() {
+        return getWrappedObject().getSelection();
     }
 }

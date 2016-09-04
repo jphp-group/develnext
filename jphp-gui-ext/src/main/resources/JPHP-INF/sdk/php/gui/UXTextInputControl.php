@@ -24,6 +24,12 @@ abstract class UXTextInputControl extends UXControl
     public $font;
 
     /**
+     * array(start, end, length).
+     * @var array
+     */
+    public $selection;
+
+    /**
      * @readonly
      * @var string
      */

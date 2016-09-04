@@ -34,6 +34,42 @@ class KeyInputRuleBehaviour extends AbstractBehaviour
     protected function applyImpl($target)
     {
         if ($target instanceof UXTextInputControl) {
+            $target->observer('text')->addListener(function ($old, $new) use ($target) {
+                $changed = false;
+
+                if (str::trim($this->allowedSymbols)) {
+                    $allowedSymbols = str::trim($this->allowedSymbols);
+
+                    $text = '';
+
+                    for ($i = 0; $i < str::length($new); $i++) {
+                        $character = $new[$i];
+
+                        if (!$this->matchCase) {
+                            $allowedSymbols = str::lower($allowedSymbols);
+                            $character = str::lower($character);
+                        }
+
+                        if (str::contains($allowedSymbols, $character)) {
+                            $text .= $character;
+                        } else {
+                            $changed = true;
+                        }
+                    }
+
+                    $new = $text;
+                }
+
+                if ($this->maxLength > 0 && str::length($new) > $this->maxLength) {
+                    $new = str::sub($new, 0, $this->maxLength);
+                    $changed = true;
+                }
+
+                if ($changed) {
+                    $target->text = $new;
+                }
+            });
+
             $target->on('keyPress', function (UXKeyEvent $e) use ($target) {
                 switch ($e->codeName) {
                     case 'Enter':
@@ -47,7 +83,9 @@ class KeyInputRuleBehaviour extends AbstractBehaviour
                         return;
                 }
 
-                if ($this->maxLength > 0 && str::length($target->text) >= $this->maxLength) {
+                $length = str::length($target->text) - $target->selection['length'];
+
+                if ($this->maxLength > 0 && $length >= $this->maxLength) {
                     $e->consume();
                 }
 

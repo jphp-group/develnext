@@ -53,7 +53,7 @@ class Notifications
     static function error($title, $message)
     {
         if ($message == "Validation") {
-            return "Введите корректные данные"; // TODO improve this
+            return self::show($title, "Введите корректные данные", "ERROR");
         }
 
         return self::show($title, $message, 'ERROR');

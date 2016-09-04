@@ -280,6 +280,7 @@ public final class TrayNotification {
     public void dismiss() {
         if (isTrayShowing()) {
             animator().playDismissAnimation();
+            //onDismissed();
         }
     }
 
