@@ -75,7 +75,7 @@
                   <Insets left="15.0" right="15.0" />
                </padding>
             </Button>
-            <Label prefHeight="24.0" text="Выбрать файл или архив с проектоми и открыть" textFill="#6f6f6f" />
+            <Label prefHeight="24.0" text="Выбрать файл или zip-архив с проектом и открыть" textFill="#6f6f6f" />
          </children>
       </HBox>
    </children>

@@ -39,7 +39,7 @@ class DisplaceActionType extends AbstractSimpleActionType
             'object' => 'Объект',
             'duration' => 'Продолжительность анимации (млсек, 1 сек = 1000 млсек)',
             'x' => 'Смещение по X',
-            'y' => 'Спещение по Y',
+            'y' => 'Смещение по Y',
             'continue' => 'Не ждать окончания анимации'
         ];
     }
