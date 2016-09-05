@@ -1,5 +1,6 @@
 <?php
 namespace ide\utils;
+use ide\misc\SeparatorCommand;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use ide\misc\AbstractCommand;
@@ -26,12 +27,19 @@ class UiUtils
     {
         $pane = $horizontal ? new UXHBox() : new UXVBox();
 
+        if ($pane instanceof UXHBox) {
+            $pane->alignment = 'CENTER_LEFT';
+        } else {
+            $pane->alignment = 'CENTER';
+        }
+
         /** @var AbstractCommand $command */
         foreach ($commands as $name => $command) {
-            if ($command == '-') {
+            if ($command == '-' || $command instanceof SeparatorCommand) {
                 $ui = new UXSeparator();
                 $ui->orientation = 'VERTICAL';
                 $ui->width = 5;
+                $ui->paddingLeft = 3;
                 $ui->maxSize = [20, 20];
             } else {
                 if (!$command->getName() && !$command->getIcon()) {

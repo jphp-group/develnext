@@ -33,7 +33,7 @@ public class PhpCodeArea extends AbstractCodeArea {
 
     public PhpCodeArea() {
         super();
-        setStylesheet(AbstractCodeArea.class.getResource("PhpCodeArea.css").toExternalForm());
+        setStylesheet(AbstractCodeArea.class.getResource("PhpCodeArea.DevelStudio.css").toExternalForm());
     }
 
     private static Collection<String> getStyleOfToken(Token token) {

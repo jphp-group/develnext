@@ -24,7 +24,6 @@
 }
 
 .syntax-text-area .text.semicolon {
-    -fx-font-weight: bold;
 }
 
 .syntax-text-area .text.control, .syntax-text-area .text.operator {

@@ -387,10 +387,9 @@ class CodeEditor extends AbstractEditor
         $this->ui = $ui = new UXAnchorPane();
 
         $commandPane = UiUtils::makeCommandPane($this->commands);
-        $commandPane->padding = 3;
+        $commandPane->padding = 5;
         $commandPane->spacing = 4;
         $commandPane->fillHeight = true;
-        $commandPane->height = 30;
 
         if ($this->commands) {
             $ui->add($commandPane);
@@ -404,7 +403,7 @@ class CodeEditor extends AbstractEditor
         UXAnchorPane::setAnchor($scrollPane, 0);
 
         $commandPane->bottomAnchor = null;
-        $scrollPane->topAnchor = 30;
+        $scrollPane->topAnchor = 35;
 
         $resize = function () {
             $this->refreshUi();
