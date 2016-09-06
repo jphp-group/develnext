@@ -6,9 +6,11 @@ use ide\autocomplete\php\PhpAutoComplete;
 use ide\autocomplete\ui\AutoCompletePane;
 use ide\editors\menu\ContextMenu;
 use ide\forms\AbstractIdeForm;
+use ide\forms\CodeEditorSettingsForm;
 use ide\forms\FindTextDialogForm;
 use ide\forms\MessageBoxForm;
 use ide\forms\ReplaceTextDialogForm;
+use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
@@ -194,6 +196,8 @@ class CodeEditor extends AbstractEditor
             $php = PhpProjectBehaviour::get();
             $this->autoComplete = new AutoCompletePane($this->textArea, new PhpAutoComplete($php->getInspector()));
         }
+
+        $this->resetSettings();
     }
 
     public function close($save = true)
@@ -315,6 +319,19 @@ class CodeEditor extends AbstractEditor
         $value = str::replace($value, "\t", str::repeat(" ", 4));
         $this->textArea->text = $value;
     }
+
+    public function open($param = null)
+    {
+        parent::open($param);
+
+        $this->resetSettings();
+    }
+
+    public function refresh()
+    {
+        parent::refresh();
+    }
+
 
     public function load($resetHistory = true)
     {
@@ -466,6 +483,7 @@ class CodeEditor extends AbstractEditor
 
         $this->register(AbstractCommand::makeSeparator());
 
+
         $this->register(AbstractCommand::makeWithText('Найти', 'icons/search16.png', function () {
             $this->executeCommand('find');
         }));
@@ -473,6 +491,15 @@ class CodeEditor extends AbstractEditor
         $this->register(AbstractCommand::makeWithText('Заменить', 'icons/replace16.png', function () {
             $this->executeCommand('replace');
             $this->save();
+        }));
+
+
+        $this->register(AbstractCommand::makeSeparator());
+
+        $this->register(AbstractCommand::makeWithText('Настройки', 'icons/settings16.png', function () {
+            $settingsForm = new CodeEditorSettingsForm();
+            $settingsForm->setEditor($this);
+            $settingsForm->showAndWait();
         }));
     }
 
@@ -606,6 +633,124 @@ class CodeEditor extends AbstractEditor
         waitAsync(250, function () use ($beginLine) {
             $this->textArea->estimatedScrollY = ($this->textArea->lineHeight) * $beginLine;
         });
+    }
+
+    /**
+     * @return string
+     */
+    public function getMode()
+    {
+        return $this->mode;
+    }
+
+    /**
+     * Reset default settings.
+     */
+    public function resetSettings()
+    {
+        $this->setHighlight(self::getCurrentHighlight($this->mode));
+        $this->setFontSize(self::getCurrentFontSize($this->mode));
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setHighlight($name)
+    {
+        $file = self::getHighlightFile($this->mode, $name);
+
+        if ($file->isFile()) {
+            $this->textArea->setStylesheet(FileUtils::urlPath($file));
+        }
+    }
+
+    /**
+     * @param int $size
+     */
+    public function setFontSize($size)
+    {
+        $this->textArea->style = "-fx-font-size: {$size}px";
+    }
+
+    /**
+     * @param $lang
+     * @param $size
+     */
+    public static function setCurrentFontSize($lang, $size)
+    {
+        Ide::get()->setUserConfigValue(__CLASS__ . '#' . $lang . '.fontSize', $size);
+    }
+
+    /**
+     * @return int
+     */
+    public static function getCurrentFontSize($lang)
+    {
+        $value = (float) Ide::get()->getUserConfigValue(__CLASS__ . '#' . $lang . '.fontSize', 14.5);
+
+        if ($value < 8) $value = 8;
+        if ($value > 20) $value = 20;
+
+        return $value;
+    }
+
+    /**
+     * @param string $lang
+     * @return \php\io\File[]
+     */
+    public static function getHighlightFiles($lang)
+    {
+        $dir = Ide::getOwnFile('highlights');
+
+        if (Ide::get()->isDevelopment() && fs::isDir(Ide::getOwnFile('misc/highlights'))) {
+            $dir = Ide::getOwnFile('misc/highlights');
+        }
+
+        $dir = "$dir/$lang";
+
+        return File::of($dir)->findFiles(function (File $directory, $name) {
+            return fs::ext($name) == 'css';
+        });
+    }
+
+    /**
+     * @param $lang
+     * @param $name
+     * @return File
+     */
+    public static function getHighlightFile($lang, $name)
+    {
+        $dir = Ide::getOwnFile('highlights');
+
+        if (Ide::get()->isDevelopment() && fs::isDir(Ide::getOwnFile('misc/highlights'))) {
+            $dir = Ide::getOwnFile('misc/highlights');
+        }
+
+        return File::of("$dir/$lang/$name.css");
+    }
+
+    /**
+     * @param string $lang
+     * @return string
+     */
+    public static function getCurrentHighlight($lang)
+    {
+        $value = Ide::get()->getUserConfigValue(__CLASS__ . '#' . $lang . '.highlight', 'DevelNext-Dark');
+
+        if (!self::getHighlightFile($lang, $value)->isFile()) {
+            return 'DevelNext-Dark';
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param $lang
+     * @param $value
+     */
+    public static function setCurrentHighlight($lang, $value)
+    {
+        Ide::get()->setUserConfigValue(__CLASS__ . '#' . $lang . '.highlight', $value);
     }
 }
 

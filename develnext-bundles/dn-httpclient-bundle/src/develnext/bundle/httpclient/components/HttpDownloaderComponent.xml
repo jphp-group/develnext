@@ -14,12 +14,12 @@
     </properties>
 
     <eventTypes>
-        <eventType code="done" name="Завершено" kind="ObjectEvent" icon="icons/finished16.png" />
-        <eventType code="successAll" name="Завершено успешно" kind="ObjectEvent" icon="icons/ok16.png" />
+        <eventType code="done" name="Выполнено все" kind="ObjectEvent" icon="icons/finished16.png" />
+        <eventType code="successAll" name="Выполнено все успешно" kind="ObjectEvent" icon="icons/ok16.png" />
 
-        <eventType code="progress" name="Прогресс загрузки" kind="ObjectEvent" icon="icons/progressbar16.png" />
+        <eventType code="progress" name="Прогресс одной загрузки" kind="ObjectEvent" icon="icons/progressbar16.png" />
 
-        <eventType code="successOne" name="Успешная загрузка" kind="ObjectEvent" icon="icons/ok16.png" />
-        <eventType code="errorOne" name="Ошибка загрузки" kind="ObjectEvent" icon="icons/error16.png" />
+        <eventType code="successOne" name="Выполнена одна загрузка" kind="ObjectEvent" icon="icons/ok16.png" />
+        <eventType code="errorOne" name="Ошибка одной загрузки" kind="ObjectEvent" icon="icons/error16.png" />
     </eventTypes>
 </element>

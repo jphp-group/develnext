@@ -246,4 +246,9 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
     public void selectAll() {
         getWrappedObject().selectAll();
     }
+
+    @Signature
+    public void setStylesheet(String filename) {
+        getWrappedObject().setStylesheet(filename);
+    }
 }

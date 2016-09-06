@@ -23,7 +23,6 @@
 
 .syntax-text-area .lineno .text {
     -fx-font-style: normal;
-    -fx-font: 14px 'Consolas';
 }
 
 .syntax-text-area .context-menu .text {

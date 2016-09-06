@@ -803,6 +803,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         //$this->designer->unselectAll();
 
         $this->eventManager->load();
+        $this->codeEditor->open();
 
         $this->refresh();
         $this->leftPaneUi->refresh();
@@ -880,6 +881,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 $this->refreshNode($node);
             }
         });
+
+        $this->codeEditor->refresh();
 
         Logger::info("Finish refresh");
     }

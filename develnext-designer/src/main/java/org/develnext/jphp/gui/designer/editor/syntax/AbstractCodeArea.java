@@ -52,6 +52,8 @@ abstract public class AbstractCodeArea extends CodeArea {
     private EventHandler<ActionEvent> onAfterChange;
     private EventHandler<ActionEvent> onPaste;
 
+    private double fontSize;
+
     public AbstractCodeArea() {
         super();
         setTabSize(4);
@@ -118,6 +120,14 @@ abstract public class AbstractCodeArea extends CodeArea {
         registerHotkey(new BackspaceHotkey());
 
         setStylesheet(null);
+    }
+
+    public double getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(double fontSize) {
+        this.fontSize = fontSize;
     }
 
     @Override

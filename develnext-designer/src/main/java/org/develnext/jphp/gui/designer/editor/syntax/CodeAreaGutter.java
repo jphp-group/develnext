@@ -97,8 +97,7 @@ public class CodeAreaGutter implements IntFunction<Node> {
         List<CodeAreaGutterNote> notes = getNotes(idx + 1);
 
         Label lineNo = new Label();
-        lineNo.setFont(DEFAULT_FONT);
-        lineNo.setTextFill(DEFAULT_TEXT_FILL);
+        //lineNo.setTextFill(DEFAULT_TEXT_FILL);
         lineNo.setPadding(DEFAULT_INSETS);
         lineNo.getStyleClass().add("lineno");
 
@@ -116,7 +115,9 @@ public class CodeAreaGutter implements IntFunction<Node> {
             label.getStyleClass().add("note");
 
             if (note != null) {
-                label.setTooltip(new Tooltip(note.getHint()));
+                Tooltip tooltip = new Tooltip(note.getHint());
+                tooltip.setStyle("-fx-text-fill: yellow");
+                label.setTooltip(tooltip);
                 label.getStyleClass().addAll(note.getStyleClass());
             } else {
                 label.getStyleClass().add("empty");

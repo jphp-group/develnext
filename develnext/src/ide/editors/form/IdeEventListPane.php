@@ -339,7 +339,10 @@ class IdeEventListPane
                 if ($this->contextEditor) {
                     $actionConstructor->setContextEditor($this->contextEditor);
                 }
+
                 $actionConstructor->showAndWait($this->actionEditor, $selectedClass, $selectedMethod);
+
+                $this->codeEditor->resetSettings();
 
                 if ($actionConstructor->getResult()) {
                     if ($actionConstructor->getLiveCode() != $this->codeEditor->getValue()) {

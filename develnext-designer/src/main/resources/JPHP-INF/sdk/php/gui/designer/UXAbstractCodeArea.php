@@ -151,4 +151,11 @@ class UXAbstractCodeArea extends UXControl
     public function replaceText($from, $to, $text)
     {
     }
+
+    /**
+     * @param string $filename
+     */
+    public function setStylesheet($filename)
+    {
+    }
 }

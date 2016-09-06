@@ -59,6 +59,23 @@ class FileUtils
     }
 
     /**
+     * @param string $filename
+     * @return string
+     */
+    public static function urlPath($filename)
+    {
+        $filename = fs::abs($filename);
+
+        $filename = str::replace($filename, '\\', '/');
+
+        if (!str::startsWith($filename, "file:///")) {
+            $filename = "file:///$filename";
+        }
+
+        return $filename;
+    }
+
+    /**
      * @param $name
      *
      * @return string
