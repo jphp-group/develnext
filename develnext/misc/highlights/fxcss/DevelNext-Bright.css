@@ -1,0 +1,64 @@
+.syntax-text-area {
+    -fx-background-color: #fffdf5;
+    -fx-background-fill: #fdffe6;
+    -fx-cursor: text;
+}
+
+.syntax-text-area .paragraph-box:has-caret {
+    -fx-background-color: #fcfad9;
+}
+
+.syntax-text-area .text {
+    -fx-fill: #333334;
+}
+
+.syntax-text-area .gutter .lineno {
+    -fx-text-fill: #8c8c8c;
+    -fx-fill: #8c8c8c;
+    -fx-background-fill: #8c8c8c;
+}
+
+.syntax-text-area .gutter {
+    -fx-border-color: white;
+    -fx-background-color: #ececec;
+    -fx-border-width: 0 1px 0 0;
+    -fx-padding: 0 3 0 3;
+}
+
+.syntax-text-area .caret {
+    -fx-stroke: #2f2f2f;
+}
+
+.syntax-text-area .text.control, .syntax-text-area .text.operator, .syntax-text-area .text.semicolon {
+    -fx-fill: #c21c18;
+}
+
+.syntax-text-area .text.comment {
+    -fx-fill: #9e9e9e;
+    -fx-font-style: italic;
+}
+
+.syntax-text-area .text.keyword, .syntax-text-area .text.selector {
+    -fx-fill: #385192;
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .text.pseudo-class {
+    -fx-fill: #6994dc;
+}
+
+.styled-text-area .text.attribute {
+    -fx-fill: #238125;
+}
+
+.syntax-text-area .text.string {
+    -fx-fill: #7f5b2f;
+}
+
+.styled-text-area .text.color {
+    -fx-fill: #324aff;
+}
+
+.syntax-text-area .text.number {
+    -fx-fill: #324aff;
+}
