@@ -83,7 +83,7 @@ abstract class AbstractFormElementTag
 
     static function escapeText($text)
     {
-        if (str::startsWith($text, '%')) {
+        if ($text[0] == '%' || $text[0] == '$' || $text[0] == '\\' || $text[0] == '@') {
             return "\\$text";
         }
 
