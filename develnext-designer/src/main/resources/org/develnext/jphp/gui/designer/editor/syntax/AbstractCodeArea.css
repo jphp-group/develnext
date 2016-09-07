@@ -8,6 +8,12 @@
     src: url('/ConsolasBold.ttf');
 }
 
+
+@font-face {
+    font-family: 'ConsolasItalic';
+    src: url('/ConsolasItalic.ttf');
+}
+
 .syntax-text-area {
     -fx-font: 16px 'Consolas';
 }
