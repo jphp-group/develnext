@@ -206,6 +206,7 @@ project(':jphp-app-framework') {
 
 project(':develnext') {
     dependencies {
+        compile project(':develnext-launcher')
         compile project(':develnext-designer')
         compile project(':jphp-gui-richtext-ext')
         compile project(':jphp-app-framework')

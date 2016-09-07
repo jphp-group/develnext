@@ -13,6 +13,7 @@ include 'develnext-doc';
 include 'develnext-store';
 include 'develnext-control';
 include 'develnext-lexer';
+include 'develnext-launcher';
 
 include 'jphp-gui-richtext-ext';
 
