@@ -72,6 +72,7 @@ class FileUtils
             $filename = "file:///$filename";
         }
 
+        $filename = str::replace($filename, ' ', '%20');
         return $filename;
     }
 
