@@ -74,7 +74,18 @@ installDist.doLast {
             if (!name.equals(el.getName())) {
                 println "Rename '" + el.file.parent + "/" + name + "' file"
 
-                el.file.renameTo(file(el.file.parent + "/" + name));
+                if (name == "develnext-launcher.jar") {
+                    copy {
+                        from el.file
+                        into "$project.buildDir/install/$project.name"
+                        rename(/develnext-launcher-.*\.jar/, "DevelNext.jar")
+                    }
+
+                    el.file.delete();
+                    el.file.deleteOnExit();
+                } else {
+                    el.file.renameTo(file(el.file.parent + "/" + name));
+                }
             }
         }
     }

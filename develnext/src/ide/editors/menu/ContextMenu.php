@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\menu;
 
+use action\Geometry;
 use ide\editors\AbstractEditor;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
@@ -145,6 +146,11 @@ class ContextMenu
         $this->groups[$code] = $menuItem;
     }
 
+    protected function isCursorInPopup()
+    {
+        return Geometry::hasPoint($this->root, Mouse::x(), Mouse::y()) || !$this->root->visible;
+    }
+
     public function addCommand(AbstractCommand $command)
     {
         if ($command->withBeforeSeparator()) {
@@ -164,8 +170,10 @@ class ContextMenu
         $menuItem->on('action', function ($e) use ($command, $menuItem) {
             $filter = $this->filter;
 
-            if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
-                $command->onExecute($e, $this->editor);
+            if ($this->isCursorInPopup()) {
+                if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
+                    $command->onExecute($e, $this->editor);
+                }
             }
         });
 
@@ -199,8 +207,10 @@ class ContextMenu
         $menuItem->on('action', function ($e) use ($command, $menuItem) {
             $filter = $this->filter;
 
-            if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
-                $command->onExecute($e, $this->editor);
+            if ($this->isCursorInPopup()) {
+                if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
+                    $command->onExecute($e, $this->editor);
+                }
             }
         });
 
