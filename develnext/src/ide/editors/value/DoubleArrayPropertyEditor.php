@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\value;
 
+use ide\utils\UiUtils;
 use php\gui\layout\UXHBox;
 use php\gui\UXLabel;
 use php\gui\UXSpinner;
@@ -66,6 +67,9 @@ class DoubleArrayPropertyEditor extends ElementPropertyEditor
         if ($this->tooltip) {
             $this->firstField->tooltipText = $tooltip;
             $this->secondField->tooltipText = $tooltip;
+
+            UiUtils::setWatchingFocusable($this->firstField->tooltip);
+            UiUtils::setWatchingFocusable($this->secondField->tooltip);
         }
     }
 

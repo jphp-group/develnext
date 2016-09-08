@@ -2,6 +2,7 @@
 namespace ide\editors\value;
 
 use ide\Ide;
+use ide\utils\UiUtils;
 use php\gui\layout\UXHBox;
 use php\gui\UXCheckbox;
 use php\gui\UXComboBox;
@@ -69,6 +70,7 @@ class AnchorPropertyEditor extends ElementPropertyEditor
         if ($this->tooltip) {
             foreach ($this->checkboxes as $box) {
                 $box->tooltipText = $tooltip;
+                UiUtils::setWatchingFocusable($box->tooltip);
             }
         }
     }

@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\value;
 use ide\Ide;
+use ide\utils\UiUtils;
 use php\desktop\Mouse;
 use php\gui\UXLabel;
 use php\gui\UXLabelEx;
@@ -162,6 +163,9 @@ class FloatSliderPropertyEditor extends ElementPropertyEditor
 
         $this->slider->tooltipText = $tooltip;
         $this->textField->tooltipText = $tooltip;
+
+        UiUtils::setWatchingFocusable($this->slider->tooltip);
+        UiUtils::setWatchingFocusable($this->textField->tooltip);
     }
 
 

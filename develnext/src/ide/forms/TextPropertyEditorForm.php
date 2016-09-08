@@ -4,6 +4,7 @@ namespace ide\forms;
 use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
+use ide\utils\UiUtils;
 use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\UXButton;
@@ -28,11 +29,7 @@ class TextPropertyEditorForm extends AbstractIdeForm
     {
         parent::init();
 
-        $this->watch('focused', function ($self, $prop, $old, $new) {
-            if (!$new) {
-                $this->hide();
-            }
-        });
+        UiUtils::setUiHidingOnUnfocus($this);
     }
 
     /**

@@ -12,9 +12,9 @@ public class AutoBracketsHotkey extends AbstractHotkey {
     protected boolean isInvalidCase(char ch, char nextCh) {
         boolean isNeedClosedBracket = false;
 
-        if (ch == '(' && nextCh != ')') {
+        if (ch == '(' && nextCh != ')' && nextCh != ']' && nextCh != '}') {
             isNeedClosedBracket = true;
-        } else if (ch == '[' && nextCh != ']') {
+        } else if (ch == '[' && nextCh != ']' && nextCh != ')' && nextCh != '}') {
             isNeedClosedBracket = true;
         }
 

@@ -2,6 +2,7 @@
 namespace ide\editors\value;
 
 use ide\editors\common\FormListEditor;
+use ide\utils\UiUtils;
 use php\gui\UXNode;
 use php\gui\UXTooltip;
 use php\xml\DomElement;
@@ -47,6 +48,7 @@ class FormPropertyEditor extends ElementPropertyEditor
         if ($this->tooltip) {
             $tooltip = new UXTooltip();
             $tooltip->text = $this->tooltip;
+            UiUtils::setWatchingFocusable($tooltip);
 
             $this->listEditor->getUi()->tooltip = $tooltip;
         }

@@ -40,6 +40,7 @@ use ide\project\ProjectFile;
 use ide\project\ProjectIndexer;
 use ide\systems\FileSystem;
 use ide\ui\Notifications;
+use ide\utils\UiUtils;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
@@ -357,6 +358,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $tooltip = new UXTooltip();
         $tooltip->text = (new File($this->file))->getPath();
+        UiUtils::setWatchingFocusable($tooltip);
 
         return $tooltip;
     }

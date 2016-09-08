@@ -3,6 +3,7 @@ namespace ide\editors\value;
 
 use ide\editors\common\ObjectListEditor;
 use ide\forms\TextPropertyEditorForm;
+use ide\utils\UiUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXHBox;
 use php\gui\UXButton;
@@ -52,6 +53,7 @@ class ObjectPropertyEditor extends ElementPropertyEditor
         if ($this->tooltip) {
             $tooltip = new UXTooltip();
             $tooltip->text = $this->tooltip;
+            UiUtils::setWatchingFocusable($tooltip);
 
             $this->objectListEditor->getUi()->tooltip = $tooltip;
         }

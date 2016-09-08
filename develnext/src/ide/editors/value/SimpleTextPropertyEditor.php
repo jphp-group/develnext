@@ -2,6 +2,7 @@
 namespace ide\editors\value;
 
 use ide\forms\TextPropertyEditorForm;
+use ide\utils\UiUtils;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXHBox;
@@ -55,6 +56,7 @@ class SimpleTextPropertyEditor extends ElementPropertyEditor
         if ($this->tooltip && $this->textField) {
             $tooltip = new UXTooltip();
             $tooltip->text = $this->tooltip;
+            UiUtils::setWatchingFocusable($tooltip);
 
             $this->textField->tooltip = $tooltip;
         }

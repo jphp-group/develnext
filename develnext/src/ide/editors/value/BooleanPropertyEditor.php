@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\value;
 
+use ide\utils\UiUtils;
 use php\gui\layout\UXHBox;
 use php\gui\UXCheckbox;
 use php\gui\UXLabel;
@@ -44,7 +45,7 @@ class BooleanPropertyEditor extends ElementPropertyEditor
         parent::setTooltip($tooltip);
 
         if ($this->tooltip) {
-            $tooltip = UXTooltip::of($tooltip);
+            $tooltip = UiUtils::tooltip($tooltip);
 
             $this->label->tooltip = $tooltip;
             $this->checkbox->tooltip = $tooltip;

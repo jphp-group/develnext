@@ -1,5 +1,6 @@
 <?php
 namespace ide\editors\value;
+use ide\utils\UiUtils;
 use php\gui\UXButton;
 use php\gui\UXChoiceBox;
 use php\lib\Items;
@@ -108,6 +109,7 @@ class EnumPropertyEditor extends TextPropertyEditor
         parent::setTooltip($tooltip);
 
         $this->choiceBox->tooltipText = $tooltip;
+        UiUtils::setWatchingFocusable($this->choiceBox->tooltip);
     }
 
     public function getNormalizedValue($value)

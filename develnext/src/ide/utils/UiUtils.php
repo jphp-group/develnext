@@ -1,13 +1,17 @@
 <?php
 namespace ide\utils;
+use ide\Logger;
 use ide\misc\SeparatorCommand;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use ide\misc\AbstractCommand;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXVBox;
+use php\gui\UXNode;
 use php\gui\UXProgressIndicator;
 use php\gui\UXSeparator;
+use php\gui\UXTooltip;
+use php\gui\UXWindow;
 
 /**
  * Class UiUtils
@@ -67,5 +71,59 @@ class UiUtils
         }
 
         return $pane;
+    }
+
+    /**
+     * @var UXNode|UXWindow
+     */
+    private static $lastFocusedUi = null;
+
+
+    /**
+     * @param UXNode|UXWindow|UXTooltip $ui
+     */
+    static function setWatchingFocusable($ui)
+    {
+        if ($ui instanceof UXTooltip) {
+            $ui->on('show', function () use ($ui) {
+                if (self::$lastFocusedUi instanceof UXWindow) {
+                    self::$lastFocusedUi->toFront();
+                }
+            });
+            return;
+        }
+
+        $ui->observer('focused')->addListener(function ($old, $new) use ($ui) {
+            if ($new) {
+                self::$lastFocusedUi = $ui;
+            } else {
+                self::$lastFocusedUi = null;
+            }
+        });
+    }
+
+    /**
+     * @param UXNode|UXWindow $ui
+     */
+    static function setUiHidingOnUnfocus($ui)
+    {
+        self::setWatchingFocusable($ui);
+
+        $ui->observer('focused')->addListener(function ($old, $new) use ($ui) {
+            if (!$new) {
+
+                waitAsync(200, function () use ($ui) {
+                    $ui->hide();
+                });
+            }
+        });
+    }
+
+    static function tooltip($text)
+    {
+        $tooltip = UXTooltip::of($text);
+        self::setWatchingFocusable($tooltip);
+
+        return $tooltip;
     }
 }
