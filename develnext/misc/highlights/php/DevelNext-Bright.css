@@ -1,5 +1,5 @@
 .syntax-text-area {
-    -fx-background-color: #fffdf5;
+    -fx-background-color: white;
     -fx-background-fill: #fdffe6;
     -fx-cursor: text;
 }
@@ -9,7 +9,7 @@
 }
 
 .syntax-text-area .text {
-    -fx-fill: #333334;
+    -fx-fill: #181818;
 }
 
 .syntax-text-area .gutter .lineno {
@@ -30,7 +30,7 @@
 }
 
 .syntax-text-area .text.control, .syntax-text-area .text.operator, .syntax-text-area .text.semicolon {
-    -fx-fill: #c21c18;
+    -fx-fill: #e5130e;
 }
 
 .syntax-text-area .text.comment {
@@ -39,8 +39,8 @@
 }
 
 .syntax-text-area .text.keyword {
-    -fx-fill: #385192;
-    -fx-font-weight: bold;
+    -fx-fill: #344b88;
+    /*-fx-font-weight: bold;*/
 }
 
 .syntax-text-area .text.string {
@@ -52,6 +52,6 @@
 }
 
 .syntax-text-area .text.variable {
-    -fx-fill: #285b1d;
+    -fx-fill: #2c5f1f;
     /*-fx-font-weight: bold;*/
 }
