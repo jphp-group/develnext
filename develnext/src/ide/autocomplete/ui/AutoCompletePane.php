@@ -243,6 +243,8 @@ class AutoCompletePane
                         $this->list->items->clear();
                         $this->list->items->addAll($items);
                         $this->list->selectedIndex = 0;
+                        $this->list->focusedIndex = 0;
+                        $this->list->scrollTo(0);
 
                         //Logger::debug("Autocomplete list updated.");
                     }
@@ -351,6 +353,8 @@ class AutoCompletePane
                 $selected = Items::first($this->list->selectedItems);
 
                 $prefix = $this->getString(true);
+                $suffix = str::sub($this->area->text, $this->area->caretPosition,
+                    min(str::length($this->area->text), $this->area->caretPosition + 40));
 
                 $insert = $selected->getInsert();
                 Logger::debug("Insert to caret: " . $insert);
@@ -368,6 +372,24 @@ class AutoCompletePane
                         $insert = str::replace($insert, '#', '');
                     }
                 }
+
+                $word = $altCaret ? str::sub($insert, 0, str::length($insert) + $altCaret) : $insert;
+
+                $cut = 0;
+
+                for ($k = 0; $k < str::length($suffix); $k++) {
+                    if ($word[str::length($word) - $k - 1] == $suffix[$k]) {
+                        $cut++;
+                    } else {
+                        break;
+                    }
+                }
+
+                if ($cut) {
+                    $insert = str::sub($word, 0, str::length($word) - $cut);
+                    $altCaret = 0;
+                }
+
 
                 $this->area->caretPosition -= str::length($prefix);
                 $this->area->deleteText($this->area->caretPosition, $this->area->caretPosition + str::length($prefix));
@@ -619,30 +641,34 @@ class AutoCompletePane
         }
 
         $items = $flow->sort(function (AutoCompleteItem $one, AutoCompleteItem $two) use ($prefix) {
-            if ($one->getName() == $two->getName()) {
+            $prefix = str::lower($prefix);
+            $oneName = str::lower($one->getName());
+            $twoName = str::lower($two->getName());
+
+            if ($oneName == $twoName) {
                 return 0;
             }
 
-            if ($one->getName() == $prefix) {
+            if ($oneName == $prefix) {
                 return -1;
             }
-            if ($two->getName() == $prefix) {
+            if ($twoName == $prefix) {
                 return 1;
             }
 
-            if (str::startsWith($one->getName(), $prefix) && str::startsWith($two->getName(), $prefix)) {
+            if (str::startsWith($oneName, $prefix) && str::startsWith($twoName, $prefix)) {
                 // nop.
             } else {
-                if (str::startsWith($one->getName(), $prefix)) {
+                if (str::startsWith($oneName, $prefix)) {
                     return -1;
                 }
 
-                if (str::startsWith($two->getName(), $prefix)) {
+                if (str::startsWith($twoName, $prefix)) {
                     return 1;
                 }
             }
 
-            return Str::compare($one->getName(), $two->getName());
+            return Str::compare($oneName, $twoName);
         });
 
         if (arr::first($items) == $prefix && sizeof($items) < 2) {

@@ -179,6 +179,19 @@ class ActionConstructorForm extends AbstractIdeForm
         $tabOne = $this->tabs->tabs[0]->text;
         $tabTwo = $this->tabs->tabs[1]->text;
 
+        $tabChange = function () {
+            uiLater(function () {
+                if ($this->tabs->selectedIndex == 1) {
+                    $this->liveCodeEditor->requestFocus();
+                }
+
+                Ide::get()->setUserConfigValue(CodeEditor::class . '.tabIndex', $this->tabs->selectedIndex);
+            });
+        };
+
+        $this->tabs->tabs[0]->on('change', $tabChange);
+        $this->tabs->tabs[1]->on('change', $tabChange);
+
         $this->timer = new TimerScript(1, true, function () use ($tabOne, $tabTwo) {
             $this->tabs->tabs[0]->text = "$tabOne (" . $this->list->items->count . ")";
             $split = Flow::of(str::split($this->getLiveCode(), "\n"))->find(function ($it) {
@@ -484,6 +497,8 @@ class ActionConstructorForm extends AbstractIdeForm
             });*/
         });
 
+        $this->tabs->selectedIndex = Ide::get()->getUserConfigValue(CodeEditor::class . '.tabIndex', 0);
+
         $this->buildActionTypePane($this->editor);
 
         $editor->makeSnapshot();
@@ -501,7 +516,7 @@ class ActionConstructorForm extends AbstractIdeForm
         $this->userData = new \stdClass(); // hack!
         $this->userData->self = $this;
 
-        $this->tabs->selectedIndex = self::$globalTabSelectedIndex;
+        //$this->tabs->selectedIndex = self::$globalTabSelectedIndex;
 
         $this->timer->start();
 

@@ -1273,7 +1273,7 @@ public class UXDesigner extends BaseObject {
 
             sizeText = new Label();
             sizeText.setMouseTransparent(true);
-            sizeText.setStyle("-fx-background-color: #fffe85; -fx-padding: 1px 7px;");
+            sizeText.setStyle("-fx-background-color: #fffe85; -fx-padding: 1px 7px; -fx-font-size: 1em; -fx-text-fill: black;");
             sizeText.setPrefHeight(20);
 
             area.getChildren().addAll(sizeText);

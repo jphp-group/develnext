@@ -1463,7 +1463,13 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     protected function makeDesigner($fullArea = false)
     {
         $area = new UXAnchorPane();
-        $area->classes->add('FormEditor');
+
+        if (!$fullArea) {
+            $area->classes->add('FormEditor');
+        } else {
+            $area->classes->remove('FormEditor');
+        }
+
         //$area->backgroundColor = 'green';
 
         $viewer = new UXScrollPane($area);
