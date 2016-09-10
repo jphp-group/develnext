@@ -132,7 +132,7 @@
 
 .dn-autocomplete-description .title {
     -fx-font-weight: bold;
-    -fx-font-size: 1.1em;
+    -fx-font-size: 1em;
 }
 .dn-autocomplete-description .description {
     -fx-text-fill: gray;

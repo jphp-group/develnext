@@ -179,6 +179,9 @@ class ActionConstructorForm extends AbstractIdeForm
         $tabOne = $this->tabs->tabs[0]->text;
         $tabTwo = $this->tabs->tabs[1]->text;
 
+        $this->tabs->tabs[0]->graphic = ico('wizard16');
+        $this->tabs->tabs[1]->graphic = ico('phpFile16');
+
         $tabChange = function () {
             uiLater(function () {
                 if ($this->tabs->selectedIndex == 1) {
@@ -193,17 +196,22 @@ class ActionConstructorForm extends AbstractIdeForm
         $this->tabs->tabs[1]->on('change', $tabChange);
 
         $this->timer = new TimerScript(1, true, function () use ($tabOne, $tabTwo) {
-            $this->tabs->tabs[0]->text = "$tabOne (" . $this->list->items->count . ")";
-            $split = Flow::of(str::split($this->getLiveCode(), "\n"))->find(function ($it) {
+            $this->tabs->tabs[0]->text = $this->list->items->count ? "$tabOne *" : $tabOne;
+            if ($this->list->items->count) {
+                $this->tabs->tabs[0]->style = '-fx-text-fill: black;';
+            } else {
+                $this->tabs->tabs[0]->style = '-fx-text-fill: silver;';
+            }
+            /*$split = Flow::of(str::split($this->getLiveCode(), "\n"))->find(function ($it) {
                 $regex = Regex::of("\\/\\/ \\+Actions\\:[ ]+?[0-9]+?[ ]+?//")->with($it);
                 $it = $regex->replace("");
 
                 $it = str::trim($it);
 
                 return !!$it;
-            })->toArray();
+            })->toArray(); */
 
-            $this->tabs->tabs[1]->text = "$tabTwo (" . sizeof($split) . ")";
+            //$this->tabs->tabs[1]->text = "$tabTwo (" . sizeof($split) . ")";
         });
 
         UXApplication::runLater(function () {
