@@ -179,7 +179,7 @@ class ActionConstructorForm extends AbstractIdeForm
         $tabOne = $this->tabs->tabs[0]->text;
         $tabTwo = $this->tabs->tabs[1]->text;
 
-        $this->timer = new TimerScript(1000, true, function () use ($tabOne, $tabTwo) {
+        $this->timer = new TimerScript(1, true, function () use ($tabOne, $tabTwo) {
             $this->tabs->tabs[0]->text = "$tabOne (" . $this->list->items->count . ")";
             $split = Flow::of(str::split($this->getLiveCode(), "\n"))->find(function ($it) {
                 $regex = Regex::of("\\/\\/ \\+Actions\\:[ ]+?[0-9]+?[ ]+?//")->with($it);
@@ -463,6 +463,8 @@ class ActionConstructorForm extends AbstractIdeForm
 
     public function showAndWait(ActionEditor $editor = null, $class = null, $method = null)
     {
+        $this->editor = $editor;
+
         uiLater(function () {
             $this->constructorSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
             $this->useDefaultCheckbox->selected = Ide::get()->getUserConfigValue(CodeEditor::class . '.editorOnDoubleClick') == "constructor";
@@ -482,18 +484,16 @@ class ActionConstructorForm extends AbstractIdeForm
             });*/
         });
 
-        $this->buildActionTypePane($editor);
+        $this->buildActionTypePane($this->editor);
 
         $editor->makeSnapshot();
 
-        $this->editor = $editor;
         $this->editor->load();
 
         $this->class = $class;
         $this->method= $method;
 
         $actions = $editor->findMethod($class, $method);
-
         $this->list->items->clear();
         $this->list->items->addAll($actions);
 

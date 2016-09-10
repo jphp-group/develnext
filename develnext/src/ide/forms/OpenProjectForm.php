@@ -38,6 +38,8 @@ use php\gui\UXListView;
 use php\gui\UXTabPane;
 use php\gui\UXTextField;
 use php\io\File;
+use php\lang\Thread;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
@@ -241,52 +243,60 @@ class OpenProjectForm extends AbstractIdeForm
     {
         $this->projectListHelper->clear();
 
-        $projectDirectory = File::of(Ide::get()->getUserConfigValue('projectDirectory'));
+        $th = new Thread(function () {
+            $projectDirectory = File::of(Ide::get()->getUserConfigValue('projectDirectory'));
 
-        $projects = [];
+            $projects = [];
 
-        foreach ($projectDirectory->findFiles() as $file) {
-            if ($file->isDirectory()) {
-                $project = Items::first($file->findFiles(function (File $directory, $name) {
-                    return Str::endsWith($name, '.dnproject');
-                }));
+            foreach ($projectDirectory->findFiles() as $file) {
+                if ($file->isDirectory()) {
+                    $project = arr::first($file->findFiles(function (File $directory, $name) {
+                        return Str::endsWith($name, '.dnproject');
+                    }));
 
-                if ($project) {
-                    $projects[] = $project;
+                    if ($project) {
+                        $projects[] = $project;
+                    }
                 }
             }
-        }
 
-        Items::sort($projects, function (File $a, File $b) {
-            if ($a->lastModified() === $b->lastModified()) {
-                return 0;
-            }
+            arr::sort($projects, function (File $a, File $b) {
+                if ($a->lastModified() === $b->lastModified()) {
+                    return 0;
+                }
 
-            return $a->lastModified() > $b->lastModified() ? -1 : 1;
-        });
-
-        foreach ($projects as $project) {
-            /** @var File $project */
-            $config = ProjectConfig::createForFile($project);
-            $template = $config->getTemplate();
-
-            $one = new ImageBox(72, 48);
-            $one->data('file', $project);
-            $one->data('name', fs::pathNoExt($project->getName()));
-            $one->setTitle(fs::pathNoExt($project->getName()));
-            $one->setImage(Ide::get()->getImage($template ? $template->getIcon32() : 'icons/question32.png')->image);
-
-            $one->on('click', function (UXMouseEvent $e) {
-                $fix = $e;
-                UXApplication::runLater(function () use ($e) {
-                    $this->doProjectListClick($e);
-                });
+                return $a->lastModified() > $b->lastModified() ? -1 : 1;
             });
 
-            $this->projectListHelper->add($one);
-        }
+            foreach ($projects as $project) {
+                /** @var File $project */
+                $config = ProjectConfig::createForFile($project);
+                $template = $config->getTemplate();
 
-        $this->pathField->text = $projectDirectory;
+                uiLater(function () use ($project, $template) {
+                    $one = new ImageBox(72, 48);
+                    $one->data('file', $project);
+                    $one->data('name', fs::pathNoExt($project->getName()));
+                    $one->setTitle(fs::pathNoExt($project->getName()));
+                    $one->setImage(Ide::get()->getImage($template ? $template->getIcon32() : 'icons/question32.png')->image);
+
+                    $one->on('click', function (UXMouseEvent $e) {
+                        $fix = $e;
+                        UXApplication::runLater(function () use ($e) {
+                            $this->doProjectListClick($e);
+                        });
+                    });
+
+                    $this->projectListHelper->add($one);
+                });
+            }
+
+            uiLater(function () use ($projectDirectory) {
+                $this->pathField->text = $projectDirectory;
+            });
+        });
+
+        $th->start();
     }
 
     public function updateLibrary()
@@ -294,57 +304,74 @@ class OpenProjectForm extends AbstractIdeForm
         $this->libraryList->items->clear();
         $this->embeddedLibraryList->items->clear();
 
-        $libraryResources = Ide::get()->getLibrary()->getResources('projects');
+        $th = new Thread(function () {
+            $libraryResources = Ide::get()->getLibrary()->getResources('projects');
 
-        foreach ($libraryResources as $resource) {
-            if (!$resource->isEmbedded()) {
-                $this->libraryList->items->add($resource);
-            } else {
-                $this->embeddedLibraryList->items->add($resource);
+            foreach ($libraryResources as $resource) {
+                uiLater(function () use ($resource) {
+                    if (!$resource->isEmbedded()) {
+                        $this->libraryList->items->add($resource);
+                    } else {
+                        $this->embeddedLibraryList->items->add($resource);
+                    }
+                });
             }
-        }
 
-        $this->embeddedLibraryList->selectedIndex = 0;
-        $this->libraryList->selectedIndex = 0;
+            uiLater(function () {
+                $this->embeddedLibraryList->selectedIndex = 0;
+                $this->libraryList->selectedIndex = 0;
+            });
+        });
+
+        $th->start();
     }
 
     public function updateShared()
     {
-        if (Ide::accountManager()->isAuthorized()) {
-            if ($pane = $this->sharedPane->lookup('#need_auth')) {
-                $pane->free();
-            }
-
-            $this->sharedList->items->clear();
-
-            $preloader = new Preloader($this->sharedPane);
-            $preloader->show();
-
-            Ide::service()->projectArchive()->getListAsync(0, 100, function (ServiceResponse $response) use ($preloader) {
-                $preloader->hide();
-
-                if ($response->isSuccess()) {
-                    $this->sharedList->items->setAll($response->data());
-                } else {
-                    $this->sharedList->items->setAll([$response]);
+        waitAsync(600, function () {
+            if (Ide::accountManager()->isAuthorized()) {
+                if ($pane = $this->sharedPane->lookup('#need_auth')) {
+                    $pane->free();
                 }
-            });
-        } else {
-            if (!$this->sharedPane->lookup('#need_auth')) {
-                $pane = new NeedAuthPane();
-                $pane->id = 'need_auth';
 
-                UXAnchorPane::setAnchor($pane, 3);
+                $this->sharedList->items->clear();
 
-                $this->sharedPane->add($pane);
+                $preloader = new Preloader($this->sharedPane);
+                $preloader->show();
+
+                Ide::service()->projectArchive()->getListAsync(0, 100, function (ServiceResponse $response) use ($preloader) {
+                    $preloader->hide();
+
+                    uiLater(function () use ($response) {
+                        if ($response->isSuccess()) {
+                            // for performance.
+                            foreach ($response->data() as $one) {
+                                uiLater(function () use ($one) {
+                                    $this->sharedList->items->add($one);
+                                });
+                            }
+                        } else {
+                            $this->sharedList->items->setAll([$response]);
+                        }
+                    });
+                });
+            } else {
+                if (!$this->sharedPane->lookup('#need_auth')) {
+                    $pane = new NeedAuthPane();
+                    $pane->id = 'need_auth';
+
+                    UXAnchorPane::setAnchor($pane, 3);
+
+                    $this->sharedPane->add($pane);
+                }
             }
-        }
+        });
     }
 
     /**
      * @event showing
      */
-    public function doShow()
+    public function doShowing()
     {
         $this->update();
         $this->updateLibrary();

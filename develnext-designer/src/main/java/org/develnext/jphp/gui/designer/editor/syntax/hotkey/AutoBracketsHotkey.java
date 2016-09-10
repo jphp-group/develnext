@@ -19,7 +19,10 @@ public class AutoBracketsHotkey extends AbstractHotkey {
         }
 
         if (isNeedClosedBracket) {
-            if (!(nextCh == '\0' || Character.isSpaceChar(nextCh) || nextCh == '\n' || nextCh == '\r' || nextCh == '\t')) {
+            if (!(nextCh == '\0' || Character.isSpaceChar(nextCh)
+                    || nextCh == '\n' || nextCh == '\r' || nextCh == '\t'
+                    || nextCh == ';' || nextCh == ',' || nextCh == ':'
+            )) {
                 return true;
             }
         }
