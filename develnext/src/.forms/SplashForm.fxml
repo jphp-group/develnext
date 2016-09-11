@@ -27,7 +27,11 @@
       </Label>
       <HBox layoutY="370" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" style="-fx-background-color: #1e4e7a;" alignment="CENTER">
          <children>
+<<<<<<< cc6302eb552aa34141394ee6a2f3ca2b000a975e
             <Label id="tip" style="-fx-padding: 10px 10px; -fx-font-style: normal; -fx-font-size: 14px;" text="Если у проекта нет главной формы, используйте модуль загрузчик для действий при старте" textAlignment="CENTER" textFill="white">
+=======
+            <Label id="tip" style="-fx-padding: 10px 10px; -fx-font-style: normal; -fx-font-size: 13px;" text="Если у проекта нет главной формы, используйте модуль загрузчик для действий при старте" textAlignment="CENTER" textFill="white">
+>>>>>>> Upd
             </Label>
          </children>
       </HBox>

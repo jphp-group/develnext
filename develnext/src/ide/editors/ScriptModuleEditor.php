@@ -509,6 +509,11 @@ class ScriptModuleEditor extends FormEditor
         $this->save();
 
         $this->updateEmptyLabel();
+
+        waitAsync(100, function () {
+            $this->designer->update();
+        });
+
         return $node;
     }
 

@@ -129,6 +129,7 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
     from(installDir) {
         exclude('*.sh')
         exclude('DevelNext')
+        exclude('DevelNext.jar')
         exclude('bin/develnext')
         exclude('tools/apache-ant/bin/ant')
         //exclude('tools/gradle/bin/gradle')
@@ -141,6 +142,7 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
     from(installDir) {
         include('*.sh')
         include('DevelNext')
+        include('DevelNext.jar')
         include('bin/develnext')
         include('tools/apache-ant/bin/ant')
         //include('tools/gradle/bin/gradle')
@@ -255,6 +257,7 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
     from(installDir) {
         exclude('*.sh')
         exclude('DevelNext')
+        exclude('DevelNext.jar')
         exclude('bin/develnext')
         exclude('tools/apache-ant/bin/ant')
         //exclude('tools/gradle/bin/gradle')
@@ -267,6 +270,7 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
     from(installDir) {
         include('*.sh')
         include('DevelNext')
+        include('DevelNext.jar')
         include('bin/develnext')
         include('tools/apache-ant/bin/ant')
         //include('tools/gradle/bin/gradle')

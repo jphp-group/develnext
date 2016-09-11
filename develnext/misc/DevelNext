@@ -1,22 +1,26 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 echo "-----------------------"
 echo "Start DevelNext ..."
 echo "-----------------------"
 
-APP_HOME=$(dirname "$(readlink -f "$0")")
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
+APP_HOME=$(dirname "$(realpath "$0")")
 
 echo "App Home = $APP_HOME"
 
 JAVA_HOME="$APP_HOME/tools/jre"
 JAVA_BIN="$JAVA_HOME/bin/java"
 
-JVM_OPTS=" -Xms256M -Xmx1024M -XX:ReservedCodeCacheSize=150m -XX:+UseConcMarkSweepGC"
-JVM_OPTS="$JVM_OPTS -Dsun.io.useCanonCaches=false -Djava.net.preferIPv4Stack=true"
-JVM_OPTS="$JVM_OPTS -Dfile.encoding=UTF-8 -Ddevelnext.launcher=root"
-echo "-----------------------" 
-
 
 cd "$APP_HOME"
 
-exec "$JAVA_BIN" $JVM_OPTS "-Ddevelnext.path=$APP_HOME" -cp "./lib/*" php.runtime.launcher.Launcher $*
+OUTPUT=$(exec "$JAVA_BIN" -jar DevelNext.jar)
+
+echo $OUTPUT
+echo ""
+echo "---------------------"
+echo "DevelNext has been started."

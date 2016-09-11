@@ -1763,6 +1763,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->leftPaneUi->refreshObjectTreeList($this->getNodeId($node));
         }
 
+        waitAsync(100, function () {
+            $this->designer->update();
+        });
+
         return $node;
     }
 
