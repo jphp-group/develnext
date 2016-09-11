@@ -64,6 +64,7 @@ class AntOneJarBuildType extends AbstractBuildType
         $content = FileUtils::get('res://ide/build/ant/buildDist.xml');
         $content = str::replace($content, '#NAME#', $project->getName());
         $content = str::replace($content, '#JRE_DIR#', Ide::get()->getJrePath());
+        $content = str::replace($content, '#BASE_DIR#', $project->getRootDir());
 
         $jarContent = '';
 
@@ -76,7 +77,7 @@ class AntOneJarBuildType extends AbstractBuildType
         print_r($classPaths);
 
         foreach ($classPaths as $src) {
-            $excludes = ".debug/ **/*.source **/*.sourcemap **/*.axml";
+            $excludes = ".debug/** **/*.source **/*.sourcemap **/*.axml";
 
             if ($php = PhpProjectBehaviour::get()) {
                 if ($php->isByteCodeEnabled()) {
@@ -84,7 +85,7 @@ class AntOneJarBuildType extends AbstractBuildType
                 }
             }
 
-            $jarContent .= "\t<fileset dir='$src' includes='/*/**' excludes='$excludes' erroronmissingdir='false'/>\n";
+            $jarContent .= "\t<fileset dir='$src' excludes='$excludes' erroronmissingdir='false'/>\n";
         }
 
         $content = str::replace($content, '#JAR_CONTENT#', $jarContent);

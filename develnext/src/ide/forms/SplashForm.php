@@ -97,9 +97,13 @@ class SplashForm extends AbstractIdeForm
     {
         $this->tip->text = SplashTipSystem::get();
 
-        if (Ide::get()->isDevelopment()) {
+        if (Ide::get()->isDevelopment() && Ide::get()->isWindows()) {
             $this->opacity = 0.05;
         }
+
+        uiLater(function () {
+            $this->toFront();
+        });
     }
 
     /**

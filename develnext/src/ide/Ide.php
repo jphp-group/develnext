@@ -236,17 +236,12 @@ class Ide extends Application
                     return;
                 }
 
-                $this->splash = $splash = new SplashForm();
+                /*$this->splash = $splash = new SplashForm();
                 $splash->show();
+                $splash->requestFocus();*/
 
                 TimerScript::executeAfter(1000, function () {
-                    $this->registerAll();
 
-                    foreach ($this->extensions as $extension) {
-                        $extension->onIdeStart();
-                    }
-
-                    $this->trigger('start', []);
                 });
             },
             function () {
@@ -257,9 +252,6 @@ class Ide extends Application
                 $this->serviceManager = new ServiceManager();
 
                 $this->serviceManager->on('privateEnable', function () {
-                    /*UXApplication::runLater(function () {
-                        Notifications::showAccountWelcome();
-                    });*/
                     $this->accountManager->updateAccount();
                 });
 
@@ -270,6 +262,14 @@ class Ide extends Application
                 $this->serviceManager->updateStatus();
 
                 $this->accountManager = new AccountManager();
+
+                $this->registerAll();
+
+                foreach ($this->extensions as $extension) {
+                    $extension->onIdeStart();
+                }
+
+                $this->trigger('start', []);
             }
         );
     }
@@ -439,6 +439,10 @@ class Ide extends Application
 
         if ($this->isWindows() || $this->isLinux()) {
             $jrePath = new File($path, '/jre');
+
+            if ($this->isLinux() && (new File($path, '/jreLinux'))->isDirectory()) {
+                $jrePath = new File($path, '/jreLinux');
+            }
         } else {
             $jrePath = null;
         }

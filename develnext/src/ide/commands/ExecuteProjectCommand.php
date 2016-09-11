@@ -256,11 +256,11 @@ class ExecuteProjectCommand extends AbstractCommand
                         Ide::get()->getMainForm()->hideBottom();
                     });
 
-                    $dialog->setOnExitProcess(function ($exitValue) use ($dialog) {
+                    $dialog->setOnExitProcess(function ($exitValue, $hasError) use ($dialog) {
                         $this->stopButton->enabled = false;
                         $this->startButton->enabled = true;
 
-                        if (!$exitValue && $dialog->closeAfterDoneCheckbox->selected) {
+                        if (!$exitValue && !$hasError && $dialog->closeAfterDoneCheckbox->selected) {
                             Ide::get()->getMainForm()->hideBottom();
                         }
                     });

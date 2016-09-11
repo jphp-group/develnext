@@ -78,6 +78,7 @@ class FormNamedBlock extends UXAnchorPane
                 };
                 uiLater($v);
                 TimerScript::executeAfter(100, $v); // fix bug!
+                TimerScript::executeAfter(1000, $v); // fix bug!
             } else {
                 uiLater(function () use ($label) {
                     $label->free();

@@ -12,7 +12,7 @@
    <children>
       <Label layoutX="54.0" layoutY="14.0" prefHeight="17.0" prefWidth="533.0" text="Сборка завершена" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="13.0">
          <font>
-            <Font name="Tahoma Bold" size="12.0" />
+            <Font name="System Bold" size="12.0" />
          </font>
       </Label>
       <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
@@ -24,7 +24,7 @@
                   <Font name="System Bold" size="12.0" />
                </font>
             </Button>
-            <Button id="openButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="142.0" styleClass="icon-open" text="Открыть папку" />
+            <Button id="openButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="172.0" styleClass="icon-open" text="Открыть папку" />
             <Button id="exitButton" alignment="CENTER" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="32.0" prefWidth="111.0" styleClass="icon-exit" text="Закрыть">
                <HBox.margin>
                   <Insets left="190.0" />

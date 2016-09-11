@@ -9,6 +9,7 @@ use ide\forms\FontPropertyEditorForm;
 use ide\forms\TextPropertyEditorForm;
 use ide\systems\FileSystem;
 use ide\systems\RefactorSystem;
+use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\text\UXFont;
 use php\gui\UXList;
@@ -30,6 +31,24 @@ class IdPropertyEditor extends TextPropertyEditor
         $this->textField->on('click', function (UXMouseEvent $e) {
             if ($e->clickCount >= 2) {
                 $this->showDialog($e->screenX, $e->screenY);
+            }
+        });
+
+        $this->getEditorForm()->on('show', function () {
+            uiLater(function () {
+                $this->getEditorForm()->textArea->selectEnd();
+                $this->getEditorForm()->textArea->deselect();
+            });
+        }, __CLASS__);
+
+        $this->getEditorForm()->textArea->on('keyUp', function (UXKeyEvent $e) {
+            if ($e->codeName == 'Enter') {
+                $e->consume();
+
+                uiLater(function () {
+                    $this->getEditorForm()->textArea->text = str::trimRight($this->getEditorForm()->textArea->text);
+                    $this->getEditorForm()->actionApply();
+                });
             }
         });
 

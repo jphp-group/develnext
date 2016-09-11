@@ -334,10 +334,13 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
             });
         }
 
+        $hasError = false;
         $scanner = new Scanner($process->getError());
 
         while ($scanner->hasNextLine()) {
             $line = $scanner->nextLine();
+
+            $hasError = true;
 
             UXApplication::runLater(function () use ($line) {
                 $this->addConsoleLine($line, 'red');
@@ -358,7 +361,7 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
             }
         });
 
-        $func = function() use ($self, $exitValue, $onExit) {
+        $func = function() use ($self, $exitValue, $onExit, $hasError) {
             if ($exitValue) {
                 $self->addConsoleLine('');
                 $self->addConsoleLine('(!) Ошибка запуска, что-то пошло не так', 'red');
@@ -367,21 +370,21 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
             }
 
             if ($onExit) {
-                $nextProcess = $onExit($exitValue);
+                $nextProcess = $onExit($exitValue, $hasError);
 
                 if ($nextProcess) {
                     return;
                 }
             }
 
-            if (!$exitValue && $self->closeAfterDoneCheckbox->selected) {
+            if (!$exitValue && !$hasError && $self->closeAfterDoneCheckbox->selected) {
                 $self->hide();
             }
 
             $onExitProcess = $this->onExitProcess;
 
             if ($onExitProcess) {
-                $onExitProcess($exitValue);
+                $onExitProcess($exitValue, $hasError);
 
                 Ide::get()->setUserConfigValue('builder.closeAfterDone', $this->closeAfterDoneCheckbox->selected);
             }

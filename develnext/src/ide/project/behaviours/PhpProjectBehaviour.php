@@ -247,7 +247,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                             return;
                         }
                     }
-
                     foreach ($zipLibraries as $file) {
                         if (!fs::exists($file)) {
                             echo "SKIP $file, is not exists.\n";
@@ -257,7 +256,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                         try {
                             $name = str::replace($name, '\\', '/');
 
-                            $url = new URL("jar:file:/$file!/$name.php");
+                            $url = new URL("jar:file:///$file!/$name.php");
 
                             $conn = $url->openConnection();
                             $stream = $conn->getInputStream();
@@ -277,7 +276,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
                             return;
                         } catch (IOException $e) {
-                            //echo "[ERROR] {$e->getMessage()}\n";
+                            echo "[ERROR] {$e->getMessage()}\n";
                             // nop.
                         }
                     }

@@ -1,8 +1,11 @@
 package org.develnext.jphp.ext.gui.desktop;
 
 import org.develnext.jphp.ext.gui.desktop.classes.*;
+import org.develnext.jphp.ext.gui.desktop.classes.Robot;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.env.CompileScope;
+
+import java.awt.*;
 
 public class GuiDesktopExtension extends JavaFXExtension {
     public static final String NS = "php\\desktop";
@@ -19,5 +22,7 @@ public class GuiDesktopExtension extends JavaFXExtension {
         registerClass(scope, org.develnext.jphp.ext.gui.desktop.classes.Runtime.class);
 
         registerWrapperClass(scope, java.awt.Robot.class, Robot.class);
+        registerWrapperClass(scope, Desktop.class, UXDesktop.class);
+
     }
 }

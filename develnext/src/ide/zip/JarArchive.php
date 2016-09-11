@@ -56,7 +56,7 @@ class JarArchive
      */
     public function getEntryStream($name)
     {
-        $url = new URL("jar:file:/$this->file!/$name");
+        $url = new URL("jar:file:///$this->file!/$name");
 
         $conn = $url->openConnection();
         return $conn->getInputStream();

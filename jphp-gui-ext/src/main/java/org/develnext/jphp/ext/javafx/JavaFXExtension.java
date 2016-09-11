@@ -214,8 +214,6 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Alert.class, UXAlert.class);
         registerWrapperClass(scope, TrayNotification.class, UXTrayNotification.class);
 
-        registerWrapperClass(scope, Desktop.class, UXDesktop.class);
-
         registerWrapperClass(scope, Media.class, UXMedia.class);
         registerWrapperClass(scope, MediaPlayer.class, UXMediaPlayer.class);
 

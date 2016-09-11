@@ -44,8 +44,14 @@ class Application
     /** @var string */
     protected $mainFormClass = '';
 
+    /** @var string */
+    protected $splashFormClass = '';
+
     /** @var AbstractForm[] */
     protected $forms = [];
+
+    /** @var AbstractForm */
+    protected $splash;
 
     /**
      * @var AbstractFactory[]
@@ -421,8 +427,12 @@ class Application
         /*if ($this->getNamespace()) {    TODO Remove It
             $class = $this->getNamespace() . '\\forms\\' . $class;
         }  */
-
         $this->mainFormClass = $class;
+    }
+
+    public function setSplashFormClass($class)
+    {
+        $this->splashFormClass = $class;
     }
 
     public function loadModules()
@@ -459,6 +469,10 @@ class Application
             $this->setMainFormClass($this->config->get('app.mainForm'));
         }
 
+        if ($this->config->get('app.splashForm')) {
+            $this->setSplashFormClass($this->config->get('app.splashForm'));
+        }
+
         if ($this->config->has('app.implicitExit')) {
             UXApplication::setImplicitExit($this->config->get('app.implicitExit'));
         }
@@ -488,13 +502,14 @@ class Application
     public function launch(callable $handler = null, callable $after = null)
     {
         $mainFormClass = $this->mainFormClass;
+        $splashFormClass = $this->splashFormClass;
         $showMainForm  = $this->config->getBoolean('app.showMainForm') && $mainFormClass;
 
         /*if (!class_exists($mainFormClass)) {    TODO Remove it
             throw new Exception("Unable to start the application without the main form class or the class '$mainFormClass' not found");
         }*/
 
-        UXApplication::launch(function(UXForm $mainForm) use ($mainFormClass, $showMainForm, $handler, $after) {
+        $onStart = function () use ($mainFormClass, $splashFormClass, $showMainForm, $handler, $after) {
             static::$instance = $this;
 
             if ($handler) {
@@ -509,24 +524,49 @@ class Application
                 $module->apply($this);
             }
 
-            $this->mainForm = $mainFormClass ? $this->getForm($mainFormClass, $mainForm) : null;
-
-            if ($showMainForm && $this->mainForm) {
-                $this->mainForm->show();
-            }
-
             $this->launched = true;
 
-            if ($after) {
-                $after();
+            $startMain = function () use ($mainFormClass, $showMainForm, $after) {
+                $this->mainForm = $mainFormClass ? $this->getForm($mainFormClass) : null;
+
+                if ($showMainForm && $this->mainForm) {
+                    $this->mainForm->show();
+                }
+
+                if ($after) {
+                    $after();
+                }
+
+                if (Stream::exists('res://.debug/bootstrap.php')) {
+                    include 'res://.debug/bootstrap.php';
+                }
+
+                Logger::info("Application start is done.");
+            };
+
+            if ($splashFormClass) {
+                $this->splash = $this->getForm($splashFormClass);
+
+                if ($this->splash) {
+                    Logger::info("Show splash screen ($splashFormClass)");
+
+                    /** @var AbstractForm $form */
+                    $form = $this->splash;
+                    $form->alwaysOnTop = true;
+                    $form->show();
+                    $form->toFront();
+
+                    uiLater(function () use ($form, $startMain) {
+                        waitAsync(1000, $startMain);
+                    });
+                    return;
+                }
             }
 
-            if (Stream::exists('res://.debug/bootstrap.php')) {
-                include 'res://.debug/bootstrap.php';
-            }
+            $startMain();
+        };
 
-            Logger::info("Application start is done.");
-        });
+        UXApplication::launch($onStart);
     }
 
     /**
