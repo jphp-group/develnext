@@ -339,7 +339,7 @@ class MainForm extends AbstractIdeForm
 
             $height = $this->layout->height;
 
-            $content->height = Ide::get()->getUserConfigValue('mainForm.consoleHeight', 350);
+            $content->height = (int) Ide::get()->getUserConfigValue('mainForm.consoleHeight', 350);
 
             $content->observer('height')->addListener(function ($old, $new) use ($content) {
                 if (!$content->isFree()) {
@@ -351,7 +351,7 @@ class MainForm extends AbstractIdeForm
 
             $this->bottomSpoiler->add($content);
 
-            $percent = ($content->height * 100 / $height) / 100;
+            $percent = (($content->height + 4) * 100 / $height) / 100;
 
             $this->contentSplit->dividerPositions = [1 - $percent, $percent];
         } else {
