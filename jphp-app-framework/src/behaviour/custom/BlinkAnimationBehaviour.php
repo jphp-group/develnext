@@ -22,6 +22,11 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
     public $minOpacity = 0.3;
 
     /**
+     * @var float
+     */
+    public $maxOpacity = 1.0;
+
+    /**
      * @param mixed $target
      */
     protected function applyImpl($target)
@@ -45,7 +50,7 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
                         if ($target->opacity > $this->minOpacity) {
                             $target->opacity = $this->minOpacity;
                         } else {
-                            $target->opacity = 1;
+                            $target->opacity = $this->maxOpacity;
                         }
                     }
                 }
@@ -55,7 +60,7 @@ class BlinkAnimationBehaviour extends AnimationBehaviour
 
     protected function _fadeOutCallback()
     {
-        Animation::fadeIn($this->_target, $this->duration, function () {
+        Animation::fadeTo($this->_target, $this->duration, $this->maxOpacity, function () {
             $this->_fadeInCallback();
         });
     }
