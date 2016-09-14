@@ -14,12 +14,12 @@
       <Label layoutX="14.0" layoutY="14.0" prefHeight="17.0" prefWidth="214.0" text="Шрифт:" />
       <Label layoutX="14.0" layoutY="68.0" prefHeight="17.0" prefWidth="150.0" text="Размер:" AnchorPane.rightAnchor="275.0" />
       <Separator layoutX="14.0" layoutY="56.0" prefHeight="33.0" prefWidth="319.0" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
-      <Button id="applyButton" defaultButton="true" layoutX="14.0" layoutY="152.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Применить" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="14.0">
+      <Button id="applyButton" defaultButton="true" layoutX="14.0" layoutY="152.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" text="Применить" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="14.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Button id="cancelButton" cancelButton="true" layoutX="113.0" layoutY="152.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Отмена" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="115.0">
+      <Button id="cancelButton" cancelButton="true" layoutX="153.0" layoutY="152.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" text="Отмена" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="145.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
