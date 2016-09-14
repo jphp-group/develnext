@@ -116,7 +116,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     public function doClose()
     {
         $this->inspectorThreadPool->shutdown();
-        $this->inspector->free();
+        //$this->inspector->free();
 
         $this->uiSettings = null;
         $this->uiByteCodeCheckbox = null;

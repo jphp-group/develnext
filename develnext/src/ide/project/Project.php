@@ -1049,6 +1049,12 @@ class Project
         $this->ideConfigs = [];
         $this->tree->clear(true);
 
+        foreach ($this->inspectors as $inspector) {
+            $inspector->free();
+        }
+
+        $this->inspectors = [];
+
         $this->inspectorLoaderThreadPoll->shutdown();
     }
 

@@ -3,6 +3,7 @@ namespace ide\commands;
 
 use ide\editors\AbstractEditor;
 use ide\forms\OpenProjectForm;
+use ide\Ide;
 use ide\misc\AbstractCommand;
 
 /**
@@ -44,6 +45,6 @@ class OpenProjectCommand extends AbstractCommand
             $dialog = new OpenProjectForm();
         }
 
-        $dialog->showDialog();
+        $dialog->showAndWait();
     }
 }

@@ -262,5 +262,6 @@ abstract class AbstractInspector
         $this->dynamicTypes = [];
         $this->dynamicReturnTypes = [];
         $this->functions = [];
+        $this->typesByShort = [];
     }
 }

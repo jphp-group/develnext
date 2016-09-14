@@ -52,6 +52,13 @@ class MessageBoxForm extends AbstractIdeForm
         $this->buttons = $buttons;
     }
 
+    protected function init()
+    {
+        parent::init();
+
+        $this->owner = Ide::get()->getMainForm();
+    }
+
     public function isChecked()
     {
         return $this->flag->selected;
