@@ -667,7 +667,7 @@ class IdeEventListPane
         $selected = Items::first($this->uiList->selectedItems);
 
         if ($selected) {
-            if (MessageBoxForm::confirmDelete('событие ' . $selected['type']['name'])) {
+            if (MessageBoxForm::confirmDelete('событие ' . $selected['type']['name'], $this)) {
                 if ($bind = $this->manager->removeBind($this->targetId, $selected['eventCode'])) {
                     if ($this->actionEditor) {
                         $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);

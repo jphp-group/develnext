@@ -139,7 +139,7 @@ abstract class AbstractEditorsProjectControlPane extends AbstractProjectControlP
 
                     $file = $editor->getFile();
 
-                    if (!MessageBoxForm::confirmDelete($editor->getTitle())) {
+                    if (!MessageBoxForm::confirmDelete($editor->getTitle(), $this->ui)) {
                         return true;
                     }
 

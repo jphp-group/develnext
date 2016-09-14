@@ -16,6 +16,10 @@ class AbstractIdeForm extends AbstractForm
     {
         parent::__construct($origin);
 
+        if (Ide::isCreated()) {
+            $this->owner = Ide::get()->getMainForm();
+        }
+
         Logger::info("Create form " . get_class($this));
 
         $this->on('show', function () {

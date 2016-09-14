@@ -104,7 +104,7 @@ class UpdateAvailableForm extends AbstractIdeForm
      */
     public function doCancel(UXEvent $e)
     {
-        $dialog = new MessageBoxForm('Вы уверены, что не хотите обновится до новой версии?', ['Да, обновиться позже', 'Отмена']);
+        $dialog = new MessageBoxForm('Вы уверены, что не хотите обновится до новой версии?', ['Да, обновиться позже', 'Отмена'], $this);
 
         if ($dialog->showDialog() && $dialog->getResultIndex() == 1) {
             $e->consume();

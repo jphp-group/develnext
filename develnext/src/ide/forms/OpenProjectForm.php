@@ -167,7 +167,7 @@ class OpenProjectForm extends AbstractIdeForm
                 }
             }
 
-            if (!MessageBoxForm::confirmDelete($what)) {
+            if (!MessageBoxForm::confirmDelete($what, $this)) {
                 return true;
             }
 
@@ -210,7 +210,7 @@ class OpenProjectForm extends AbstractIdeForm
 
         $deleteLink = new UXHyperlink('Удалить');
         $deleteLink->on('click', function () use ($item, $name) {
-            if (MessageBoxForm::confirmDelete($name)) {
+            if (MessageBoxForm::confirmDelete($name, $this)) {
                 $response = Ide::service()->projectArchive()->delete($item['id']);
 
                 if ($response->isSuccess()) {
@@ -509,7 +509,7 @@ class OpenProjectForm extends AbstractIdeForm
         $selected = $listView->selectedItem;
 
         if ($selected) {
-            if (MessageBoxForm::confirmDelete($selected->getName())) {
+            if (MessageBoxForm::confirmDelete($selected->getName(), $this)) {
                 Ide::get()->getLibrary()->delete($selected);
                 $this->updateLibrary();
                 $listView->selectedIndex = -1;

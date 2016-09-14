@@ -43,13 +43,15 @@ class MessageBoxForm extends AbstractIdeForm
     /**
      * @param string $text
      * @param array $buttons
+     * @param null $owner
      */
-    public function __construct($text, array $buttons)
+    public function __construct($text, array $buttons, $owner = null)
     {
         parent::__construct();
 
         $this->text = $text;
         $this->buttons = $buttons;
+        $this->owner = $owner instanceof UXNode ? $owner->form : $owner;
     }
 
     protected function init()
@@ -131,28 +133,29 @@ class MessageBoxForm extends AbstractIdeForm
         $this->centerOnScreen();
     }
 
-    static function confirm($message)
+    static function confirm($message, $owner = null)
     {
-        $dialog = new static($message, ['Да', 'Нет, отмена']);
+        $dialog = new static($message, ['Да', 'Нет, отмена'], $owner);
 
         return $dialog->showDialog() && $dialog->getResultIndex() == 0;
     }
 
-    static function confirmDelete($what)
+    static function confirmDelete($what, $owner = null)
     {
         if (is_array($what)) {
             $what = str::join($what, ", ");
         }
 
-        $dialog = new static("Вы уверены, что хотите удалить '$what'?", ['Да, удалить', 'Нет']);
+        $dialog = new static("Вы уверены, что хотите удалить '$what'?", ['Да, удалить', 'Нет'], $owner);
 
         return $dialog->showDialog() && $dialog->getResultIndex() == 0;
     }
 
 
-    static function confirmExit()
+    static function confirmExit($owner = null)
     {
-        $dialog = new static("Вы уверены, что хотите выйти?", ['Да, выйти', 'Нет']);
+        $dialog = new static("Вы уверены, что хотите выйти?", ['Да, выйти', 'Нет'], $owner);
+
         return $dialog->showDialog() && $dialog->getResultIndex() == 0;
     }
 }

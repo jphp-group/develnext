@@ -113,7 +113,7 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
      */
     public function doDelete()
     {
-        $msg = new MessageBoxForm('Вы уверены, что хотите удалить из общего доступа этот проект?', ['Да, удалить', 'Нет, отмена']);
+        $msg = new MessageBoxForm('Вы уверены, что хотите удалить из общего доступа этот проект?', ['Да, удалить', 'Нет, отмена'], $this);
 
         if ($msg->showDialog() && $msg->getResultIndex() == 1) {
             return;
@@ -150,7 +150,7 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
     public function doReupload()
     {
         if ($this->data['canWrite'] || !isset($this->data['canWrite'])) {
-            $msg = new MessageBoxForm('Вы уверены, что хотите перезаписать ранее загруженный проект? (ссылка останется прежней)', ['Да, перезалить', 'Нет, отмена']);
+            $msg = new MessageBoxForm('Вы уверены, что хотите перезаписать ранее загруженный проект? (ссылка останется прежней)', ['Да, перезалить', 'Нет, отмена'], $this);
 
             if ($msg->showDialog() && $msg->getResultIndex() == 1) {
                 return;

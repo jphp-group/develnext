@@ -303,7 +303,7 @@ class BundleCheckListForm extends AbstractIdeForm
     public function doInstall()
     {
         if ($this->displayResource) {
-            if (MessageBoxForm::confirm('Вы уверены, что хотите добавить этот пакет к проекту?')) {
+            if (MessageBoxForm::confirm('Вы уверены, что хотите добавить этот пакет к проекту?', $this)) {
                 $this->behaviour->addBundle(Project::ENV_ALL, $this->displayResource->getBundle());
                 //$this->toast('Пакет расширения подключен к проекту');
                 $this->update();
@@ -343,7 +343,7 @@ class BundleCheckListForm extends AbstractIdeForm
      */
     public function deleteBundle()
     {
-        if (MessageBoxForm::confirmDelete($this->displayResource->getName())) {
+        if (MessageBoxForm::confirmDelete('пакет расширений ' . $this->displayResource->getName(), $this)) {
             Ide::get()->getLibrary()->delete($this->displayResource);
             $this->doShowing();
         }

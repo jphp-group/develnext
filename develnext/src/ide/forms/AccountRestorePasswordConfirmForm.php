@@ -36,7 +36,7 @@ class AccountRestorePasswordConfirmForm extends AbstractOnlineIdeForm
      */
     public function doCancel()
     {
-        if (MessageBoxForm::confirmExit()) {
+        if (MessageBoxForm::confirmExit($this)) {
             $this->hide();
         }
     }

@@ -230,7 +230,7 @@ class TableViewColumnsEditorForm extends AbstractIdeForm
         /** @var UXTableColumn $item */
         $item = $this->list->selectedItem;
 
-        if (MessageBoxForm::confirmDelete("Колонку {$item->id}")) {
+        if (MessageBoxForm::confirmDelete("Колонку {$item->id}", $this)) {
             $this->getResult()->remove($item);
             $this->doShowing();
         }
@@ -241,7 +241,7 @@ class TableViewColumnsEditorForm extends AbstractIdeForm
      */
     public function doClear()
     {
-        if (MessageBoxForm::confirm('Вы уверены, что хотите удалить все колонки?')) {
+        if (MessageBoxForm::confirm('Вы уверены, что хотите удалить все колонки?', $this)) {
             $this->getResult()->clear();
             $this->doShowing();
         }

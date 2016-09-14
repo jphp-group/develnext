@@ -40,6 +40,8 @@ class BuildProjectForm extends AbstractIdeForm
 
     protected function init()
     {
+        parent::init();
+
         $this->icon->image = Ide::get()->getImage('icons/box32.png')->image;
 
         $this->list->setCellFactory(function (UXListCell $cell, AbstractBuildType $item = null, $empty) {

@@ -133,7 +133,8 @@ class AutoCompletePane
 
                 if ($types) {
                     $done = MessageBoxForm::confirm(
-                        'В тексте есть неподключенные классы (' . str::join(arr::keys($types), ', ') . '), хотите их подключить?'
+                        'В тексте есть неподключенные классы (' . str::join(arr::keys($types), ', ') . '), хотите их подключить?',
+                        $this->area
                     );
 
                     if ($done) {

@@ -58,7 +58,7 @@ class RegisterForm extends AbstractOnlineIdeForm
      */
     public function actionCancel()
     {
-        $msg = new MessageBoxForm('Вы уверены, что хотите выйти из регистрации?', ['Да, выйти', 'Нет']);
+        $msg = new MessageBoxForm('Вы уверены, что хотите выйти из регистрации?', ['Да, выйти', 'Нет'], $this);
 
         if ($msg->showDialog() && $msg->getResultIndex() == 0) {
             $this->hide();

@@ -181,12 +181,13 @@ abstract class AbstractSimpleActionType extends AbstractActionType
     static protected $showDialogCache = [];
 
     /**
+     * @param $owner
      * @param Action $action
      * @param $userData
      * @param bool $asNew
      * @return bool
      */
-    function showDialog(Action $action, $userData = null, $asNew = false)
+    function showDialog($owner, Action $action, $userData = null, $asNew = false)
     {
         if (!$this->attributes()) {
             return true;
@@ -199,6 +200,7 @@ abstract class AbstractSimpleActionType extends AbstractActionType
             Logger::trace();
 
             $dialog = new ActionArgumentsDialog();
+            $dialog->owner = $owner;
 
             $dialog->userData = $userData;
             $dialog->setAction($action, $asNew);

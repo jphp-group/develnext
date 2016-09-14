@@ -157,7 +157,7 @@ class ShareProjectArea extends AbstractFormArea
      */
     public function doReUploadButtonAction()
     {
-        if (!MessageBoxForm::confirm('Вы точно хотите загрузить изменения в проекте на develnext.org?')) {
+        if (!MessageBoxForm::confirm('Вы точно хотите загрузить изменения в проекте на develnext.org?', $this)) {
             return;
         }
 
@@ -194,7 +194,7 @@ class ShareProjectArea extends AbstractFormArea
             return;
         }
 
-        if (!MessageBoxForm::confirm('Вы точно хотите загрузить проект на develnext.org?')) {
+        if (!MessageBoxForm::confirm('Вы точно хотите загрузить проект на develnext.org?', $this)) {
             return;
         }
 

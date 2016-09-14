@@ -805,7 +805,7 @@ class ActionConstructorForm extends AbstractIdeForm
                 /** @var AbstractSimpleActionType $type */
                 $type = $action->getType();
 
-                if ($type->showDialog($action, $self->contextEditor)) {
+                if ($type->showDialog($this, $action, $self->contextEditor)) {
                     $self->list->update();
                     $self->list->selectedIndex = $index;
 
@@ -821,7 +821,7 @@ class ActionConstructorForm extends AbstractIdeForm
 
         $action = new Action($actionType);
 
-        if ($actionType->showDialog($action, $self->contextEditor, true)) {
+        if ($actionType->showDialog($this, $action, $self->contextEditor, true)) {
             $editor = $self->editor;
             $editor->addAction($action, $self->class, $self->method);
 

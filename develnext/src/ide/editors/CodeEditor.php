@@ -542,7 +542,7 @@ class CodeEditor extends AbstractEditor
                 return null;
             }
 
-            if (!$silent && MessageBoxForm::confirm('Больше ничего не найдено, начать сначала?')) {
+            if (!$silent && MessageBoxForm::confirm('Больше ничего не найдено, начать сначала?', $this->textArea)) {
                 $this->findDialogLastIndex = 0;
                 $dialog->show();
                 $this->_findSearchText($dialog, $text, $options);

@@ -230,7 +230,7 @@ class ProjectTree
                     $this->contextMenu->addCommand(new SimpleSingleCommand('Удалить', 'icons/delete16.png', function () use ($item) {
                         $file = $item->getFile();
 
-                        if (!MessageBoxForm::confirmDelete($file)) {
+                        if (!MessageBoxForm::confirmDelete($file, $this->tree)) {
                             return;
                         }
 

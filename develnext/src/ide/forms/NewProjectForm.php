@@ -63,7 +63,7 @@ class NewProjectForm extends AbstractIdeForm
             $resource = Items::first($this->templateList->selectedItems);
 
             if ($resource instanceof IdeLibraryResource) {
-                $msg = new MessageBoxForm("Вы уверены, что хотите удалить проект {$resource->getName()} из библиотеки?", ['Да, удалить', 'Нет']);
+                $msg = new MessageBoxForm("Вы уверены, что хотите удалить проект {$resource->getName()} из библиотеки?", ['Да, удалить', 'Нет'], $this);
 
                 if ($msg->showDialog() && $msg->getResultIndex() == 0) {
                     Ide::get()->getLibrary()->delete($resource);
