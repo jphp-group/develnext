@@ -6,6 +6,7 @@ use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
+use php\lib\fs;
 use php\lib\Str;
 
 /**
@@ -53,8 +54,26 @@ class ProjectExporter
      */
     public function removeFile($file)
     {
+        if (fs::isDir($file)) {
+            $this->removeDirectory($file);
+            return;
+        }
+
         $file = $this->project->getAbsoluteFile($file);
         unset($this->files[$file->getRelativePath()]);
+    }
+
+    /**
+     * @param $dir
+     */
+    public function removeDirectory($dir)
+    {
+        $file = $this->project->getAbsoluteFile($dir);
+
+        fs::scan($file, function ($filename) {
+            $file = $this->project->getAbsoluteFile($filename);
+            unset($this->files[$file->getRelativePath()]);
+        });
     }
 
     /**

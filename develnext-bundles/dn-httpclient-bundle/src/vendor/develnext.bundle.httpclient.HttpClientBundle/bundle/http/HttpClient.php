@@ -7,6 +7,7 @@ use php\gui\framework\AbstractScript;
 use php\io\File;
 use php\io\FileStream;
 use php\io\IOException;
+use php\io\MemoryStream;
 use php\io\Stream;
 use php\lang\Thread;
 use php\lib\fs;
@@ -390,6 +391,10 @@ class HttpClient extends AbstractScript
             $inStream = $connection->getInputStream();
         } catch (IOException $e) {
             $inStream = $connection->getErrorStream();
+        } catch (SocketException $e) {
+            $response->statusCode(500);
+            $response->statusMessage($e->getMessage());
+            $inStream = new MemoryStream();
         }
 
         $body = null;
@@ -413,14 +418,16 @@ class HttpClient extends AbstractScript
         $response->body($body);
 
         try {
-            $response->statusCode($connection->responseCode);
-            $response->statusMessage($connection->responseMessage);
-            $response->headers($connection->getHeaderFields());
+            if ($response->statusCode() != 500) {
+                $response->statusCode($connection->responseCode);
+                $response->statusMessage($connection->responseMessage);
+                $response->headers($connection->getHeaderFields());
+            }
         } catch (IOException $e) {
-            $response->statusCode(400);
+            $response->statusCode(500);
             $response->statusMessage($e->getMessage());
         } catch (SocketException $e) {
-            $response->statusCode(400);
+            $response->statusCode(500);
             $response->statusMessage($e->getMessage());
         }
 
