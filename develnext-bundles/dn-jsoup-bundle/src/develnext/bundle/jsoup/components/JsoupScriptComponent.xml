@@ -1,6 +1,6 @@
 <element extends="ide\scripts\elements\AbstractComponent">
     <init>
-        <property code="url" value="http://develnext.org/" />
+        <property code="url" value="" />
         <property code="timeout" value="15000" />
         <property code="method" value="GET" />
         <property code="followRedirects" value="1" />

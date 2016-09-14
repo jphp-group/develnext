@@ -106,7 +106,7 @@ class JsoupScript extends AbstractScript
      */
     protected function applyImpl($target)
     {
-        if ($this->autoParse) {
+        if ($this->autoParse && $this->_url) {
             $this->parseAsync();
         }
 
