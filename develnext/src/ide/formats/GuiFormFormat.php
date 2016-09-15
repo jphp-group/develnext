@@ -110,6 +110,11 @@ class GuiFormFormat extends AbstractFormFormat
 {
     const REFACTOR_ELEMENT_ID_TYPE = 'GUI_FORM_FORMAT_ELEMENT_ID';
 
+    /**
+     * @var GuiFormDumper
+     */
+    protected $dumper;
+
     function __construct()
     {
         $this->requireFormat(new PhpCodeFormat());
@@ -128,6 +133,8 @@ class GuiFormFormat extends AbstractFormFormat
         $this->registerRefactor();
 
         $this->registerDone();
+
+        $this->dumper = new GuiFormDumper($this->formElementTags);
     }
 
     public function getIcon()
@@ -197,7 +204,7 @@ class GuiFormFormat extends AbstractFormFormat
      */
     public function createEditor($file)
     {
-        return new FormEditor($file, new GuiFormDumper($this->formElementTags));
+        return new FormEditor($file, $this->dumper);
     }
 
     private function registerRefactor()
@@ -233,5 +240,14 @@ class GuiFormFormat extends AbstractFormFormat
                 return $result;
             }
         });
+    }
+
+    public function register($any)
+    {
+        parent::register($any);
+
+        if ($this->dumper) {
+            $this->dumper->setFormElementTags($this->formElementTags);
+        }
     }
 }

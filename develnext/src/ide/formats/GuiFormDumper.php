@@ -71,6 +71,14 @@ class GuiFormDumper extends AbstractFormDumper
         $this->xml = new XmlProcessor();
     }
 
+    /**
+     * @param form\AbstractFormElementTag[] $formElementTags
+     */
+    public function setFormElementTags($formElementTags)
+    {
+        $this->formElementTags = $formElementTags;
+    }
+
     public function fetchFormFile(FormEditor $editor)
     {
         $xml = $this->xml;
