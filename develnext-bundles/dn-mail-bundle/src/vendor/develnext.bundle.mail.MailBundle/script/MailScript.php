@@ -120,6 +120,8 @@ class MailScript extends AbstractScript
             }
 
             return $r;
+        } else if ($email instanceof Email) {
+            return $email;
         } else {
             throw new IllegalArgumentException("Passed email argument is nod valid, it must be array of Email instance");
         }
