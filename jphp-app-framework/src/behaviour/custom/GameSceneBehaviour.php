@@ -142,9 +142,6 @@ class GameSceneBehaviour extends AbstractBehaviour
 
         $layout = $form->layout;
 
-
-        Logger::warn(get_class($this->_target));
-
         if ($this->_target instanceof UXWindow) {
             if (!$cashed) {
                 $form->makeVirtualLayout();
