@@ -113,7 +113,10 @@ abstract class AbstractFormFormat extends AbstractFormat
     {
         if ($any instanceof AbstractFormElement) {
             $element = $this->formElements[get_class($any)];
-            $element->unregister();
+
+            if ($element) {
+                $element->unregister();
+            }
 
             unset($this->formElements[get_class($any)]);
         } elseif ($any instanceof AbstractMenuCommand) {
