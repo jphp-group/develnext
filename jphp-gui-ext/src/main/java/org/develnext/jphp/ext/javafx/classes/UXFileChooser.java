@@ -129,6 +129,10 @@ public class UXFileChooser extends BaseWrapper<FileChooser> {
 
     @Signature
     public File showOpenDialog(@Nullable Window window) {
+        if (getWrappedObject().getInitialDirectory() != null && !getWrappedObject().getInitialDirectory().isDirectory()) {
+            getWrappedObject().setInitialDirectory(null);
+        }
+
         File file = getWrappedObject().showOpenDialog(window);
 
         if (file != null) {
@@ -144,6 +148,10 @@ public class UXFileChooser extends BaseWrapper<FileChooser> {
 
     @Signature
     public File showSaveDialog(@Nullable Window window) {
+        if (getWrappedObject().getInitialDirectory() != null && !getWrappedObject().getInitialDirectory().isDirectory()) {
+            getWrappedObject().setInitialDirectory(null);
+        }
+
         File file = getWrappedObject().showSaveDialog(window);
 
         if (file != null) {
@@ -155,6 +163,10 @@ public class UXFileChooser extends BaseWrapper<FileChooser> {
 
     @Signature
     public List<File> showOpenMultipleDialog(@Nullable Window window) {
+        if (getWrappedObject().getInitialDirectory() != null && !getWrappedObject().getInitialDirectory().isDirectory()) {
+            getWrappedObject().setInitialDirectory(null);
+        }
+
         List<File> files = getWrappedObject().showOpenMultipleDialog(window);
 
         if (files == null) {
