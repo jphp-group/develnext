@@ -287,7 +287,8 @@ abstract class AbstractService
 
                 return new ServiceResponse([
                     'status' => 'error',
-                    'message' => 'ConnectionRefused'
+                    'message' => 'ConnectionRefused',
+                    'data' => $e->getMessage()
                 ]);
             } catch (ProcessorException $e) {
                 throw new ServiceInvalidResponseException($e->getMessage(), 0, $e);
@@ -296,7 +297,8 @@ abstract class AbstractService
 
                 return new ServiceResponse([
                     'status' => 'error',
-                    'message' => 'ConnectionFailed'
+                    'message' => 'ConnectionFailed',
+                    'data' => $e->getMessage()
                 ]);
             }
         } finally {
