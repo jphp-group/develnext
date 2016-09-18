@@ -259,7 +259,7 @@ class IdeEventListPane
         if ($request && !$editorType) {
             $buttons = ['constructor' => 'Конструктор', 'php' => 'PHP редактор'];
 
-            $dialog = new MessageBoxForm('Какой использовать редактор для редактирования событий?', $buttons);
+            $dialog = new MessageBoxForm('Какой использовать редактор для редактирования событий?', $buttons, $this->ui);
 
             UXApplication::runLater(function () use ($dialog) {
                 $dialog->toast('Используйте "Конструктор" если вы новичок!');
@@ -667,7 +667,7 @@ class IdeEventListPane
         $selected = Items::first($this->uiList->selectedItems);
 
         if ($selected) {
-            if (MessageBoxForm::confirmDelete('событие ' . $selected['type']['name'], $this)) {
+            if (MessageBoxForm::confirmDelete('событие ' . $selected['type']['name'], $this->ui)) {
                 if ($bind = $this->manager->removeBind($this->targetId, $selected['eventCode'])) {
                     if ($this->actionEditor) {
                         $this->actionEditor->removeMethod($bind['className'], $bind['methodName']);

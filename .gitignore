@@ -19,3 +19,6 @@ build/
 
 gradle.properties
 secret.asc
+
+develnext/misc/library/bundles/*/*.jar
+develnext/launcher/DevelNext.exe

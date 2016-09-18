@@ -13,6 +13,7 @@ use php\gui\UXForm;
 use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXNode;
+use php\gui\UXWindow;
 use php\lib\str;
 
 /**
@@ -51,7 +52,7 @@ class MessageBoxForm extends AbstractIdeForm
 
         $this->text = $text;
         $this->buttons = $buttons;
-        $this->owner = $owner instanceof UXNode ? $owner->form : $owner;
+        $this->owner = $owner instanceof UXNode ? $owner->form : ($owner instanceof UXWindow ? $owner : $this->owner);
     }
 
     protected function init()
