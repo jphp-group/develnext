@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
@@ -31,14 +32,14 @@ public class UXForm extends UXWindow {
         @Property StageStyle style();
 
         @Property boolean iconified();
-        @Property boolean resizable();
+        //@Property boolean resizable(); see below.
 
         @Property boolean alwaysOnTop();
         @Property boolean maximized();
 
         @Property ObservableList<Image> icons();
 
-        void show();
+        //void show();
 
         void toBack();
         void toFront();
@@ -78,6 +79,26 @@ public class UXForm extends UXWindow {
         Scene scene = new Scene(layout);
 
         getWrappedObject().setScene(scene);
+    }
+
+    @Getter
+    protected boolean getResizable() {
+        return getWrappedObject().isResizable();
+    }
+
+    private void fixResizeBug() {
+        getWrappedObject().sizeToScene();
+    }
+
+    @Setter
+    protected void setResizable(Environment env, boolean value) {
+        if (!value) {
+            getWrappedObject().setResizable(value);
+        } else {
+            getWrappedObject().setResizable(value);
+        }
+
+        fixResizeBug();
     }
 
     @Setter
@@ -160,7 +181,16 @@ public class UXForm extends UXWindow {
     @Signature
     public void showAndWait() {
         if (!getWrappedObject().isShowing()) {
+            fixResizeBug();
+            Platform.runLater(this::fixResizeBug);
             getWrappedObject().showAndWait();
         }
+    }
+
+    @Signature
+    public void show() {
+        fixResizeBug();
+        getWrappedObject().show();
+        fixResizeBug();
     }
 }

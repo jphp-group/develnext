@@ -53,6 +53,7 @@ class UXForm extends UXWindow
     /**
      * --RU--
      * Стиль окна.
+     *
      * DECORATED, UNDECORATED, TRANSPARENT, UTILITY, UNIFIED
      * @var string
      */
@@ -71,6 +72,16 @@ class UXForm extends UXWindow
      * @var bool
      */
     public $transparent = false;
+
+    /**
+     * @var bool
+     */
+    public $resizable = true;
+
+    /**
+     * @var bool
+     */
+    public $iconified = false;
 
     /**
      * --RU--
