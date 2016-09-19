@@ -131,9 +131,8 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
         }
     }
 
-
     @Getter
-    protected Pane getLayout(Environment env) {
+    public Pane getLayout(Environment env) {
         Memory data = data("~~virtual-layout");
 
         if (data.isNotNull()) {
@@ -145,7 +144,7 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Setter
-    protected void setLayout(Environment env, Pane pane) {
+    public void setLayout(Environment env, Pane pane) {
         if (getWrappedObject().getScene() == null) {
             throw new IllegalStateException("Unable to set layout");
         }

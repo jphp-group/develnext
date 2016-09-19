@@ -86,10 +86,12 @@ class CursorBindBehaviour extends AbstractBehaviour
                 if ($this->enabled) {
                     $target->toFront();
 
-                    if ($this->hideOrigin) {
-                        $target->form->cursor = 'NONE';
-                    } else {
-                        $target->form->cursor = 'DEFAULT';
+                    if ($target->form) {
+                        if ($this->hideOrigin) {
+                            $target->form->cursor = 'NONE';
+                        } else {
+                            $target->form->cursor = 'DEFAULT';
+                        }
                     }
 
                     if (class_exists(Mouse::class)) {

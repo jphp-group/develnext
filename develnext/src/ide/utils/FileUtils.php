@@ -231,7 +231,9 @@ class FileUtils
 
         $time = Time::millis() - $time;
 
-        UiUtils::checkIO("{$time}ms, deleteDirectory(): $directory");
+        if ($time > 10) {
+            UiUtils::checkIO("{$time}ms, deleteDirectory(): $directory");
+        }
 
         return !fs::exists($directory);
     }
@@ -273,7 +275,9 @@ class FileUtils
             }
         } finally {
             $time = Time::millis() - $time;
-            UiUtils::checkIO("{$time}ms, put(): $filename");
+            if ($time > 10) {
+                UiUtils::checkIO("{$time}ms, put(): $filename");
+            }
         }
     }
 
@@ -286,7 +290,10 @@ class FileUtils
 
             $time = Time::millis() - $time;
 
-            UiUtils::checkIO("{$time}ms, get(): $filename");
+            if ($time > 10) {
+                UiUtils::checkIO("{$time}ms, get(): $filename");
+            }
+
             return $data;
         } catch (IOException $e) {
             Logger::warn("Unable te get file content, message = {$e->getMessage()}, {$filename}");

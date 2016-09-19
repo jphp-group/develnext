@@ -552,11 +552,16 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
 
     @Getter(hiddenInDebugInfo = true)
     protected UXForm getForm(Environment env) {
-        if (getWrappedObject().getScene() == null) {
+        Scene scene = getWrappedObject().getScene();
+        if (scene == null) {
             return null;
         }
 
-        Window window = getWrappedObject().getScene().getWindow();
+        Window window = scene.getWindow();
+
+        if (window == null && scene.getUserData() instanceof Window) {
+            window = (Window) scene.getUserData();
+        }
 
         if (window instanceof Stage) {
             return new UXForm(env, (Stage) window);

@@ -103,9 +103,7 @@ class ProjectConfig
             $file->createNewFile(true);
         }
 
-        Stream::tryAccess($this->configPath, function (Stream $stream) {
-            $this->processor->formatTo($this->document, $stream);
-        }, 'w+');
+        FileUtils::put($this->configPath, $this->processor->format($this->document));
 
         $configFile = File::of($this->configPath);
         $newConfigFile = File::of($this->configPath . '.tmp');
