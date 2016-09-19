@@ -2,6 +2,7 @@
 namespace ide\project\templates;
 
 use ide\bundle\std\UIDesktopBundle;
+use ide\editors\FormEditor;
 use ide\project\AbstractProjectTemplate;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
@@ -98,7 +99,10 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
             $gui->setMainForm('MainForm');
 
             FileSystem::open($mainModule);
-            FileSystem::open($mainForm);
+            /** @var FormEditor $editor */
+            $editor = FileSystem::open($mainForm);
+            $editor->addModule('MainModule');
+            $editor->saveConfig();
         });
 
         return $project;

@@ -563,6 +563,8 @@ class IdeEventListPane
                     $eventContextMenu->getRoot()->showByNode($constructorLink, 0, 18);
                 });
 
+                $phpLink = new UXHyperlink('php');
+
                 $name = new UXLabel($eventType['name']);
                 $name->font = $name->font->withBold();
 

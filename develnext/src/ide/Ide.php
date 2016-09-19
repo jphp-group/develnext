@@ -252,6 +252,9 @@ class Ide extends Application
                 });
             },
             function () {
+
+                $this->setOpenedProject(null);
+
                 foreach ($this->afterShow as $handle) {
                     $handle();
                 }

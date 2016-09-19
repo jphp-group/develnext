@@ -222,6 +222,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function doCreate()
     {
         $this->setAppUuid(str::uuid());
+
+
         //FileSystem::open('~project');
     }
 

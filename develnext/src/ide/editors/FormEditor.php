@@ -63,6 +63,7 @@ use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXTooltip;
 use php\io\File;
+use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
@@ -547,9 +548,13 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     public function saveConfig()
     {
-        Stream::tryAccess($this->configFile, function (Stream $stream) {
-            $this->config->save($stream);
-        }, 'w+');
+        try {
+            Stream::tryAccess($this->configFile, function (Stream $stream) {
+                $this->config->save($stream);
+            }, 'w+');
+        } catch (IOException $e) {
+            Logger::error("Unable to save config $this->codeFile, {$e->getMessage()}");
+        }
     }
 
     public function save()
@@ -1316,6 +1321,14 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         } else {
             return false;
         }
+    }
+
+    public function addModule($name)
+    {
+        $modules = $this->getModules();
+        $modules[$name] = $name;
+
+        $this->config->set('modules', str::join($modules, '|'));
     }
 
     public function getModuleEditors()
