@@ -1219,6 +1219,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         });
     }
 
+    public function isFullSourceShown()
+    {
+        return ($this->codeTab == $this->tabs->selectedTab);
+    }
+
     public function switchToSmallSource()
     {
         /*$this->switchToSource();
@@ -1925,7 +1930,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->eventListPane->setContextEditor($this);
         $this->eventListPane->on('edit', function ($eventCode, $editor) {
             if ($editor == 'php') {
-                $this->switchToSmallSource();
+                if (!$this->isFullSourceShown()) {
+                    $this->switchToSmallSource();
+                }
             }
         });
 

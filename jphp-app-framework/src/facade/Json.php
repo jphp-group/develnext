@@ -2,6 +2,7 @@
 namespace facade;
 
 use php\format\JsonProcessor;
+use php\io\Stream;
 
 /**
  * Class Json
@@ -38,7 +39,7 @@ abstract class Json
      */
     static function toFile($filename, $data)
     {
-        \Files::put($filename, self::encode($data));
+        Stream::putContents($filename, self::encode($data));
     }
 
     /**
@@ -49,7 +50,7 @@ abstract class Json
     static function fromFile($filename)
     {
         try {
-            return self::decode(\Files::get($filename));
+            return self::decode(Stream::getContents($filename));
         } catch (ProcessorException $e) {
             return null;
         }
