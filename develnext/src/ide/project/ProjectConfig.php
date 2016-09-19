@@ -97,6 +97,12 @@ class ProjectConfig
             $parentFile->mkdirs();
         }
 
+        $file = new File($this->configPath);
+
+        if (!$file->exists()) {
+            $file->createNewFile(true);
+        }
+
         Stream::tryAccess($this->configPath, function (Stream $stream) {
             $this->processor->formatTo($this->document, $stream);
         }, 'w+');

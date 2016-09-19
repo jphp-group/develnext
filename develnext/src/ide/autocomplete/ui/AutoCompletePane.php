@@ -353,6 +353,10 @@ class AutoCompletePane
                 /** @var AutoCompleteItem $selected */
                 $selected = Items::first($this->list->selectedItems);
 
+                if (!$selected) {
+                    return;
+                }
+
                 $prefix = $this->getString(true);
                 $suffix = str::sub($this->area->text, $this->area->caretPosition,
                     min(str::length($this->area->text), $this->area->caretPosition + 40));
