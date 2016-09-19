@@ -129,6 +129,23 @@ class ScriptModuleEditor extends FormEditor
         return $result;
     }
 
+    public function open()
+    {
+        parent::open();
+
+        foreach ($this->manager->getComponents() as $component) {
+            /** @var FormNamedBlock $node */
+            $node = $component->getIdeNode();
+
+            if ($this->format->getFormElement($node)) {
+                $node->setInvalid(false);
+            } else {
+                $node->setInvalid(true);
+            }
+        }
+    }
+
+
     public function refreshInspectorType()
     {
         if ($project = Ide::project()) {

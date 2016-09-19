@@ -9,7 +9,7 @@
         <property code="proxyType" value="DIRECT" />
     </init>
 
-    <properties group="general">
+    <properties>
         <property code="baseUrl" name="Базовый URL" editor="text" tooltip="Базовый url, который будет добавляться ко всем url запросам." />
         <property code="requestType" name="Тип запроса" editor="enum" tooltip="Тип данных для http запроса">
             <variants>

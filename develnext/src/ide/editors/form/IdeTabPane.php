@@ -3,6 +3,7 @@ namespace ide\editors\form;
 use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXHBox;
 use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
 use php\gui\UXApplication;
@@ -77,12 +78,17 @@ class IdeTabPane
 
     /**
      * @param UXNode $node
+     * @param bool $prepend
      */
-    public function addCustomNode(UXNode $node)
+    public function addCustomNode(UXNode $node, $prepend = true)
     {
         $node->maxWidth = 9999;
 
-        $this->ui->children->insert(0, $node);
+        if ($prepend) {
+            $this->ui->children->insert(0, $node);
+        } else {
+            $this->ui->children->insert($this->ui->children->count() - 1, $node);
+        }
     }
 
     /**
@@ -312,6 +318,13 @@ class IdeTabPane
     {
         if ($this->propertiesPane) {
             $this->propertiesPane->update($target, $properties);
+        }
+    }
+
+    public function setPropertiesNode(UXNode $node)
+    {
+        if ($this->propertiesPane) {
+            $this->propertiesPane->setOnlyNode($node);
         }
     }
 

@@ -3,7 +3,7 @@
         <property code="checkInterval" value="10000" />
     </init>
 
-    <properties group="general">
+    <properties>
         <property code="url" name="Сайт (http://)" editor="text" tooltip="" />
         <property code="checkInterval" name="Интервал проверок" editor="integer" tooltip="Интервал в млсек для проверок сайта" />
         <property code="autoStart" name="Автостарт" editor="boolean" />

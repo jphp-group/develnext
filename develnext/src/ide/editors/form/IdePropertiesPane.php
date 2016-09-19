@@ -5,7 +5,9 @@ use ide\editors\value\ElementPropertyEditor;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\designer\UXDesignProperties;
 use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
+use php\gui\UXLabel;
 use php\gui\UXNode;
 
 class IdePropertiesPane
@@ -18,9 +20,27 @@ class IdePropertiesPane
     protected $ui;
 
     /**
+     * @var UXNode
+     */
+    protected $emptyNode;
+
+    /**
+     * @var UXNode
+     */
+    protected $onlyNode;
+
+    /**
      * @var UXDesignProperties[]
      */
     protected $properties = [];
+
+    /**
+     * IdePropertiesPane constructor.
+     */
+    public function __construct()
+    {
+        $this->emptyNode = new UXLabel('Свойств нет.');
+    }
 
     /**
      * @return UXVBox
@@ -43,6 +63,11 @@ class IdePropertiesPane
 
     public function clearProperties()
     {
+        if ($this->onlyNode) {
+            $this->ui->remove($this->onlyNode);
+            $this->onlyNode = null;
+        }
+
         if ($this->properties) {
             foreach ($this->properties as $properties) {
                 foreach ($properties->getGroupPanes() as $pane) {
@@ -83,6 +108,20 @@ class IdePropertiesPane
         }
     }
 
+    public function setEmptyNode(UXNode $node)
+    {
+        $this->emptyNode = $node;
+    }
+
+    public function setOnlyNode(UXNode $node)
+    {
+        $box = new UXHBox([$node]);
+        $box->padding = 10;
+
+        $this->ui->children->setAll([$box]);
+        $this->onlyNode = $box;
+    }
+
     public function update($target, array $properties = null)
     {
         if ($this->properties) {
@@ -101,6 +140,8 @@ class IdePropertiesPane
                     $group->update();
                 }
             }
+        } else {
+            $this->setOnlyNode($this->emptyNode);
         }
     }
 }

@@ -2,11 +2,13 @@
 namespace ide\editors\form;
 
 use ide\Ide;
+use php\gui\effect\UXColorAdjustEffect;
 use php\gui\event\UXEvent;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXApplication;
 use php\gui\UXImageView;
 use php\gui\UXLabel;
+use php\lib\str;
 use script\TimerScript;
 
 /**
@@ -24,6 +26,11 @@ class FormNamedBlock extends UXAnchorPane
      * @var mixed
      */
     protected $icon;
+
+    /**
+     * @var UXImageView
+     */
+    protected $iconNode;
 
     /**
      * @var UXLabel
@@ -45,7 +52,7 @@ class FormNamedBlock extends UXAnchorPane
         $label = new UXLabel($title);
         $label->id = 'title';
         $label->padding = [2, 5];
-        $label->style = '-fx-background-color: #DCDCDC; -fx-border-color: silver; cursor: hand; -fx-border-radius: 2px;';
+        $label->style = '-fx-background-color: #DCDCDC; -fx-border-color: silver; cursor: hand; -fx-border-radius: 2px; -fx-text-fill: black;';
        // $label->mouseTransparent = true;
 
         $this->label = $label;
@@ -170,7 +177,22 @@ class FormNamedBlock extends UXAnchorPane
             $this->add($icon);
         }
 
+        $this->iconNode = $icon;
+
         $this->updateLabelY();
         $this->updateLabelX();
+    }
+
+    public function setInvalid($value)
+    {
+        if ($value) {
+            $effect = new UXColorAdjustEffect();
+            $effect->saturation = -1;
+            $this->iconNode->effects->add($effect);
+            $this->label->style = str::replace($this->label->style, '-fx-text-fill: black', '-fx-text-fill: red');
+        } else {
+            $this->iconNode->effects->clear();
+            $this->label->style = str::replace($this->label->style, '-fx-text-fill: red', '-fx-text-fill: black');
+        }
     }
 }

@@ -57,6 +57,7 @@ use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXCustomNode;
 use php\gui\UXData;
+use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXSplitPane;
 use php\gui\UXTab;
@@ -2071,6 +2072,18 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->leftPaneUi->updateProperties($element ? $element->getTarget($node) : $node, $onlyProperties);
         } else {
             $this->leftPaneUi->update($this->getNodeId($node), $element ? $element->getTarget($node) : $node);
+        }
+
+
+        if (!$element) {
+            $this->leftPaneUi->hideBehaviourPane();
+            $this->leftPaneUi->hideEventListPane();
+
+            $invalidLabel = new UXLabel('Нерабочий компонент');
+            $invalidLabel->textColor = 'gray';
+            $invalidLabel->graphic = ico('invalid16');
+
+            $this->leftPaneUi->setPropertiesNode($invalidLabel);
         }
     }
 

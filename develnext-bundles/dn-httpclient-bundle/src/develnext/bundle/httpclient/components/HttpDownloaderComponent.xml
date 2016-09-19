@@ -3,7 +3,7 @@
         <property code="threadCount" value="4" />
     </init>
 
-    <properties group="general">
+    <properties>
         <property code="urls" name="Ссылки для загрузки" editor="text" tooltip="Список ссылок для загрузки, каждая ссылка на новой строке" />
         <property code="destDirectory" name="Папка для сохранения" editor="text" />
         <property code="useTempFile" name="Временный файл" editor="boolean" tooltip="Загружать во временный файл и только после полной загрузки размещать файл" />
