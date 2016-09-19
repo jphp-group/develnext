@@ -47,11 +47,6 @@ class GuiFormDumper extends AbstractFormDumper
     protected $formElementTagsByTag;
 
     /**
-     * @var UXDesigner
-     */
-    protected $designer;
-
-    /**
      * @var XmlProcessor
      */
     protected $xml;
@@ -114,7 +109,7 @@ class GuiFormDumper extends AbstractFormDumper
 
     public function load(FormEditor $editor)
     {
-        $this->designer = $editor->getDesigner();
+        $designer = $editor->getDesigner();
 
         $loader = new UXLoader();
         /** @var UXAnchorPane $layout */
@@ -143,16 +138,16 @@ class GuiFormDumper extends AbstractFormDumper
 
     public function save(FormEditor $editor)
     {
-        $this->designer = $editor->getDesigner();
+        $designer = $editor->getDesigner();
 
         DataUtils::cleanup($editor->getLayout());
 
         $document = $this->processor->createDocument();
 
-        $element = $this->createElementTag($editor->getLayout(), $document, false);
+        $element = $this->createElementTag($editor, $editor->getLayout(), $document, false);
 
         if ($element == null) {
-            Logger::error("Unable to save editor '{$editor->getTitle()}'");
+            Logger::warn("Unable to save editor '{$editor->getTitle()}'");
             return;
         }
 
@@ -161,7 +156,7 @@ class GuiFormDumper extends AbstractFormDumper
 
         $document->appendChild($element);
 
-        $this->appendImports($this->designer->getNodes(), $document);
+        $this->appendImports($designer->getNodes(), $document);
 
         $stream = null;
 
@@ -222,11 +217,27 @@ class GuiFormDumper extends AbstractFormDumper
         $document->insertBefore($import, $document->getDocumentElement());
     }
 
-    public function createElementTag(UXNode $node, DomDocument $document, $ignoreUnregistered = true)
+    public function createElementTag(FormEditor $editor = null, UXNode $node, DomDocument $document, $ignoreUnregistered = true)
     {
-        if ($ignoreUnregistered && $this->designer
-            && (!$this->designer->isRegisteredNode($node) && !($node instanceof UXData) && !($node instanceof UXCustomNode))) {
+        $designer = $editor ? $editor->getDesigner() : null;
+
+        if ($ignoreUnregistered && $designer
+            && (!$designer->isRegisteredNode($node) && !($node instanceof UXData) && !($node instanceof UXCustomNode))) {
             return null;
+        }
+
+        if ($node->classes->has('x-system-designer-element')) {
+            return null;
+        }
+
+        /*if ($ignoreUnregistered && !$designer) {
+            if ($node instanceof UXData || $node instanceof UXCustomNode) {
+                return null;
+            }
+        }*/
+
+        if (!$this->formElementTags) {
+            Logger::warn("createElementTag() doesn't work properly, tag list is empty");
         }
 
         $factoryId = $node->data('-factory-id');

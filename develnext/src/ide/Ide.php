@@ -49,6 +49,7 @@ use php\io\ResourceStream;
 use php\io\Stream;
 use php\lang\System;
 use php\lang\Thread;
+use php\lang\ThreadPool;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\Items;
@@ -149,6 +150,11 @@ class Ide extends Application
      */
     protected $settings = [];
 
+    /**
+     * @var ThreadPool
+     */
+    private $asyncThreadPool;
+
 
     protected $disableOpenLastProject = false;
 
@@ -165,6 +171,7 @@ class Ide extends Application
         $this->mode = IdeSystem::getMode();
 
         $this->library = new IdeLibrary($this);
+        $this->asyncThreadPool = ThreadPool::createCached();
     }
 
     public function launch()
@@ -272,6 +279,21 @@ class Ide extends Application
                 $this->trigger('start', []);
             }
         );
+    }
+
+    /**
+     * @param callable $callback
+     * @param callable|null $after
+     */
+    public static function async(callable $callback, callable $after = null)
+    {
+        self::get()->asyncThreadPool->execute(function () use ($callback, $after) {
+            $result = $callback();
+
+            if ($after) {
+                $after($result);
+            }
+        });
     }
 
     public function isWindows()
@@ -1287,6 +1309,11 @@ class Ide extends Application
         $shutdownTh->start();
 
         Logger::info("Start IDE shutdown ...");
+
+        (new Thread(function () {
+            Logger::info("Shutdown asyncThreadPool");
+            $this->asyncThreadPool->shutdown();
+        }))->start();
 
         foreach ($this->extensions as $extension) {
             try {

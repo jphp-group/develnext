@@ -1,6 +1,8 @@
 package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
@@ -21,6 +23,8 @@ public class UXTableView extends UXControl<TableView> {
         @Property ObservableList<TableColumn> columns();
         @Property double fixedCellSize();
         @Property boolean tableMenuButtonVisible();
+
+        @Property @Nullable Node placeholder();
     }
 
     public UXTableView(Environment env, TableView wrappedObject) {
@@ -34,6 +38,7 @@ public class UXTableView extends UXControl<TableView> {
     @Signature
     public void __construct() {
         __wrappedObject = new TableView<>();
+        getWrappedObject().setPlaceholder(new Label(""));
     }
 
     @Signature

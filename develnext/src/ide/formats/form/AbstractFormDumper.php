@@ -18,11 +18,12 @@ abstract class AbstractFormDumper
     abstract public function appendImports(array $nodes, DomDocument $document);
 
     /**
+     * @param FormEditor $editor
      * @param UXNode $node
      * @param DomDocument $document
      *
      * @param bool $ignoreUnregistered
      * @return DomElement
      */
-    abstract public function createElementTag(UXNode $node, DomDocument $document, $ignoreUnregistered = true);
+    abstract public function createElementTag(FormEditor $editor = null, UXNode $node, DomDocument $document, $ignoreUnregistered = true);
 }

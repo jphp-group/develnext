@@ -1,6 +1,7 @@
 <?php
 namespace ide\utils;
 
+use ide\Ide;
 use ide\Logger;
 use ide\ui\Notifications;
 use php\gui\UXApplication;
@@ -53,6 +54,8 @@ class FileUtils
      */
     public static function hash($file)
     {
+        UiUtils::checkIO("hash(): $file");
+
         return fs::hash($file, 'SHA-256');
         //return File::of($file)->hash('SHA-256');
        // throw new \Exception("Not implemented");
@@ -162,6 +165,8 @@ class FileUtils
 
     public static function copyDirectory($directory, $newDirectory)
     {
+        UiUtils::checkIO("copyDirectory(): $directory -> $newDirectory");
+
         $directory = File::of($directory);
         $newDirectory = File::of($newDirectory);
 
@@ -186,6 +191,8 @@ class FileUtils
      */
     public static function copyFile($origin, $dest)
     {
+        UiUtils::checkIO("copyFile(): $origin -> $dest");
+
         try {
             //Logger::warn("Copy $origin -> $dest");
             fs::ensureParent($dest);
@@ -217,44 +224,70 @@ class FileUtils
 
     public static function deleteDirectory($directory)
     {
+        $time = Time::millis();
+
         fs::clean($directory);
         fs::delete($directory);
 
+        $time = Time::millis() - $time;
+
+        UiUtils::checkIO("{$time}ms, deleteDirectory(): $directory");
+
         return !fs::exists($directory);
+    }
+
+    public static function putAsync($filename, $content, $encoding = 'UTF-8')
+    {
+        Ide::async(function () use ($filename, $content, $encoding) {
+            self::put($filename, $content, $encoding);
+        });
     }
 
     public static function put($filename, $content, $encoding = 'UTF-8')
     {
         //Logger::debug("Write to file $filename");
+        $time = Time::millis();
 
-        if (!fs::ensureParent($filename)) {
-            Notifications::errorWriteFile($filename);
-            Logger::error("Unable to write $filename, cannot create parent directory");
-            return false;
-        }
-
-        $encodeStr = Str::encode($content, $encoding);
-
-        if ($encodeStr !== false) {
-            try {
-                Stream::putContents($filename, $encodeStr);
-                return true;
-            } catch (IOException $e) {
-                Notifications::errorWriteFile($filename, $e);
-                Logger::error("Unable to write $filename, {$e->getMessage()}");
+        try {
+            if (!fs::ensureParent($filename)) {
+                Notifications::errorWriteFile($filename);
+                Logger::error("Unable to write $filename, cannot create parent directory");
                 return false;
             }
-        } else {
-            Notifications::errorWriteFile($filename);
-            Logger::error("Unable to write $filename, cannot encode string to $encoding");
-            return false;
+
+            $encodeStr = Str::encode($content, $encoding);
+
+            if ($encodeStr !== false) {
+                try {
+                    Stream::putContents($filename, $encodeStr);
+                    return true;
+                } catch (IOException $e) {
+                    Notifications::errorWriteFile($filename, $e);
+                    Logger::error("Unable to write $filename, {$e->getMessage()}");
+                    return false;
+                }
+            } else {
+                Notifications::errorWriteFile($filename);
+                Logger::error("Unable to write $filename, cannot encode string to $encoding");
+                return false;
+            }
+        } finally {
+            $time = Time::millis() - $time;
+            UiUtils::checkIO("{$time}ms, put(): $filename");
         }
     }
 
     public static function get($filename, $encoding = 'UTF-8')
     {
         try {
-            return Str::decode(Stream::getContents($filename), $encoding);
+            $time = Time::millis();
+
+            $data = Str::decode(Stream::getContents($filename), $encoding);
+
+            $time = Time::millis() - $time;
+
+            UiUtils::checkIO("{$time}ms, get(): $filename");
+            return $data;
         } catch (IOException $e) {
             Logger::warn("Unable te get file content, message = {$e->getMessage()}, {$filename}");
             return false;

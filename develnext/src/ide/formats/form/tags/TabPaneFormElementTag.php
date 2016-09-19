@@ -53,7 +53,7 @@ class TabPaneFormElementTag extends AbstractFormElementTag
                     $domContent = $document->createElement('content');
                     $domTab->appendChild($domContent);
 
-                    $domContentSub = $dumper->createElementTag($tab->content, $document, false);
+                    $domContentSub = $dumper->createElementTag(null, $tab->content, $document, false);
                     $domContent->appendChild($domContentSub);
                 }
             }

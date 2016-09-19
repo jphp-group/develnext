@@ -13,6 +13,7 @@ use php\gui\designer\UXDesignProperties;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\layout\UXHBox;
 use php\gui\UXButton;
+use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXPagination;
 use php\gui\UXTableCell;
@@ -81,6 +82,15 @@ class TableViewFormElement extends LabeledFormElement
 
         return $button;
     }
+
+    public function registerNode(UXNode $node)
+    {
+        parent::registerNode($node);
+
+        /** @var UXTableView $node */
+        $node->placeholder = new UXLabel();
+    }
+
 
     public function getDefaultSize()
     {

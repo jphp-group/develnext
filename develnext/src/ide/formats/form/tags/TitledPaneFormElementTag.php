@@ -28,7 +28,7 @@ class TitledPaneFormElementTag extends AbstractFormElementTag
     {
         /** @var UXTitledPane $node */
         if ($node->content) {
-            $el = $dumper->createElementTag($node->content, $document, false);
+            $el = $dumper->createElementTag(null, $node->content, $document, false);
 
             if ($el !== null) {
                 $contentTag = $document->createElement('content');

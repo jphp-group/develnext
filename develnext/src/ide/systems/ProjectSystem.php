@@ -302,12 +302,20 @@ class ProjectSystem
     {
         $project = Ide::get()->getOpenedProject();
 
+        FileSystem::saveAll();
+
         if ($project) {
             Ide::get()->trigger('closeProject', [$project]);
         }
 
         if ($project) {
             $project->close($save);
+        }
+
+        foreach (FileSystem::getOpened() as $hash => $info) {
+            //if ($project && $project->isContainsFile($info['file'])) {
+            FileSystem::close($info['file'], $save);
+            //}
         }
 
         Cache::clear();
@@ -320,11 +328,6 @@ class ProjectSystem
 
         static::clear();
 
-        foreach (FileSystem::getOpened() as $hash => $info) {
-            //if ($project && $project->isContainsFile($info['file'])) {
-            FileSystem::close($info['file'], $save);
-            //}
-        }
 
         Ide::get()->setOpenedProject(null);
 

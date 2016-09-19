@@ -36,6 +36,10 @@ class TableViewFormElementTag extends AbstractFormElementTag
         /** @var UXTableView $node */
         parent::writeContent($node, $element, $document, $dumper);
 
+        $placeholderTag = $document->createElement('placeholder');
+        $placeholderTag->appendChild($document->createElement('Label'));
+        $element->appendChild($placeholderTag);
+
         if ($node->constrainedResizePolicy) {
             $tag = $document->createElement('columnResizePolicy');
             $tag->setAttribute('xmlns:fx', "http://javafx.com/fxml");

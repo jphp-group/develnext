@@ -7,6 +7,7 @@ use php\gui\layout\UXHBox;
 use ide\misc\AbstractCommand;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXVBox;
+use php\gui\UXApplication;
 use php\gui\UXNode;
 use php\gui\UXProgressIndicator;
 use php\gui\UXSeparator;
@@ -125,5 +126,12 @@ class UiUtils
         self::setWatchingFocusable($tooltip);
 
         return $tooltip;
+    }
+
+    static function checkIO($message)
+    {
+        if (UXApplication::isUiThread()) {
+            Logger::warn("IO operation in UI Thread, $message");
+        }
     }
 }

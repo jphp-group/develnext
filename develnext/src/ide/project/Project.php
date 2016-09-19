@@ -192,7 +192,7 @@ class Project
     public function doTick()
     {
         $file = $this->getIdeFile("ide.lock");
-        FileUtils::put($file, Time::millis());
+        FileUtils::putAsync($file, Time::millis());
     }
 
     public function getProjectFile()

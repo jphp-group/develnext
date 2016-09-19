@@ -76,6 +76,11 @@ class UXTableView extends UXControl
     public $focusedItem = null;
 
     /**
+     * @var UXNode|UXLabel
+     */
+    public $placeholder;
+
+    /**
      * ...
      */
     public function update()

@@ -32,7 +32,7 @@ class ScrollPaneFormElementTag extends AbstractFormElementTag
             $domContent = $document->createElement('content');
             $element->appendChild($domContent);
 
-            $domContentSub = $dumper->createElementTag($node->content, $document, false);
+            $domContentSub = $dumper->createElementTag(null, $node->content, $document, false);
             $domContent->appendChild($domContentSub);
         }
     }

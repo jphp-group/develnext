@@ -52,6 +52,7 @@ import java.util.List;
 
 @Namespace(GuiDesignerExtension.NS)
 public class UXDesigner extends BaseObject {
+    public static final String SYSTEM_ELEMENT_CSS_CLASS = "x-system-designer-element";
     public static final int AREA_BLOCK_SIZE = 1024;
 
     public enum SnapType {DOTS, GRID, HIDDEN}
@@ -110,6 +111,7 @@ public class UXDesigner extends BaseObject {
             double height = area.getHeight();
 
             dots = new AnchorPane();
+            dots.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
             dots.resize(width, height);
             dots.setMouseTransparent(true);
 
@@ -122,6 +124,7 @@ public class UXDesigner extends BaseObject {
                 for (int J = 0; J < heightBlocks; J++) {
                     if (snapshot == null) {
                         Canvas canvas = new Canvas(AREA_BLOCK_SIZE, AREA_BLOCK_SIZE);
+                        canvas.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
 
                         if (J == heightBlocks - 1) {
                             canvas.setHeight(height % AREA_BLOCK_SIZE);
@@ -170,6 +173,7 @@ public class UXDesigner extends BaseObject {
                         dots.getChildren().add(canvas);
                     } else {
                         ImageView imageView = new ImageView(snapshot);
+                        imageView.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
                         imageView.setMouseTransparent(true);
                         imageView.setPreserveRatio(false);
                         Rectangle2D viewPort = new Rectangle2D(0, 0, AREA_BLOCK_SIZE, AREA_BLOCK_SIZE);
@@ -973,6 +977,11 @@ public class UXDesigner extends BaseObject {
     }
 
     @Signature
+    public void unregisterAll() {
+        nodes.clear();
+    }
+
+    @Signature
     public void registerNode(final Node node) {
         if (nodes.containsKey(node)) {
             throw new RuntimeException("Node already registered");
@@ -1262,6 +1271,7 @@ public class UXDesigner extends BaseObject {
             area.getChildren().addAll(tPoint, bPoint, lPoint, rPoint);
 
             border = new Rectangle();
+            border.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
             border.setVisible(false);
             border.setMouseTransparent(true);
             border.setFill(Color.TRANSPARENT);
@@ -1272,6 +1282,7 @@ public class UXDesigner extends BaseObject {
             area.getChildren().addAll(border);
 
             sizeText = new Label();
+            sizeText.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
             sizeText.setMouseTransparent(true);
             sizeText.setStyle("-fx-background-color: #fffe85; -fx-padding: 1px 7px; -fx-font-size: 1em; -fx-text-fill: black;");
             sizeText.setPrefHeight(20);
@@ -1409,6 +1420,7 @@ public class UXDesigner extends BaseObject {
                     pointSize, pointSize,
                     Paint.valueOf(locked ? "gray" : (dots ? "blue" : "black"))
             );
+            rectangle.getStyleClass().addAll(SYSTEM_ELEMENT_CSS_CLASS);
 
             if (dots) {
                 rectangle.setMouseTransparent(true);

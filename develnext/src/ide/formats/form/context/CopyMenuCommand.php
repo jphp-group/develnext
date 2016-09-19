@@ -7,11 +7,13 @@ use ide\editors\menu\AbstractMenuCommand;
 use ide\formats\AbstractFormFormat;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
+use ide\Logger;
 use php\gui\framework\DataUtils;
 use php\gui\UXClipboard;
 use php\gui\UXMenuItem;
 use php\gui\UXNode;
 use php\lib\items;
+use php\lib\reflect;
 use php\xml\XmlProcessor;
 
 /**
@@ -119,7 +121,7 @@ class CopyMenuCommand extends AbstractMenuCommand
             $document->appendChild($rootElement);
 
             foreach ($nodes as $node) {
-                $nodeElement = $editor->getFormDumper()->createElementTag($node, $document);
+                $nodeElement = $editor->getFormDumper()->createElementTag($editor, $node, $document);
 
                 if ($nodeElement != null) {
                     $wrapElement = $document->createElement('node');
@@ -133,6 +135,8 @@ class CopyMenuCommand extends AbstractMenuCommand
                     //$wrapElement->setAttributes(DataUtils::get($node)->toArray());
 
                     $rootElement->appendChild($wrapElement);
+                } else {
+                    Logger::error("Unable to copy " . reflect::typeOf($node) . ", cannot create element tag");
                 }
             }
 

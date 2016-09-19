@@ -38,7 +38,7 @@ class AnchorPaneFormElementTag extends AbstractFormElementTag
                 continue;
             }
 
-            $el = $dumper->createElementTag($child, $document);
+            $el = $dumper->createElementTag(null, $child, $document);
 
             if ($el !== null) {
                 $childrenTag->appendChild($el);

@@ -153,6 +153,13 @@ class UXDesigner
     }
 
     /**
+     * Unregister all nodes.
+     */
+    public function unregisterAll()
+    {
+    }
+
+    /**
      * @param UXNode $node
      * @param bool $enabled
      */
