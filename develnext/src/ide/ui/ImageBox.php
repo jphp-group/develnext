@@ -95,4 +95,12 @@ class ImageBox extends UXVBox implements StreamLoadableBehaviour
     {
         $this->imageArea->image = $content;
     }
+
+    /**
+     * @param string $tooltip
+     */
+    public function setTooltip($tooltip)
+    {
+        $this->titleLabel->tooltipText = $tooltip;
+    }
 }

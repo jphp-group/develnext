@@ -279,6 +279,7 @@ class OpenProjectForm extends AbstractIdeForm
                     $one->data('name', fs::pathNoExt($project->getName()));
                     $one->setTitle(fs::pathNoExt($project->getName()));
                     $one->setImage(Ide::get()->getImage($template ? $template->getIcon32() : 'icons/question32.png')->image);
+                    $one->setTooltip(fs::nameNoExt($project->getName()));
 
                     $one->on('click', function (UXMouseEvent $e) {
                         $fix = $e;

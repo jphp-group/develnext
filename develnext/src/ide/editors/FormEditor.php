@@ -2075,7 +2075,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
 
-        if (!$element) {
+        if (!$element && !$factoryId) {
             $this->leftPaneUi->hideBehaviourPane();
             $this->leftPaneUi->hideEventListPane();
 

@@ -19,6 +19,15 @@ class UXCanvas extends UXNode
     }
 
     /**
+     * Alias of getGraphicsContext().
+     *
+     * @return UXGraphicsContext
+     */
+    public function gc()
+    {
+    }
+
+    /**
      * @param string $format png, gif, etc.
      * @param Stream|File|string $output
      * @param callable $callback (bool $success)

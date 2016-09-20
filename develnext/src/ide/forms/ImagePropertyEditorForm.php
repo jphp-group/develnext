@@ -9,6 +9,9 @@ use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\systems\Cache;
 use ide\systems\DialogSystem;
+use ide\ui\FlowListViewDecorator;
+use ide\ui\ImageBox;
+use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
@@ -19,12 +22,16 @@ use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
 use php\gui\paint\UXColor;
 use php\gui\UXApplication;
+use php\gui\UXButton;
 use php\gui\UXFileChooser;
 use php\gui\UXImage;
 use php\gui\UXImageArea;
 use php\gui\UXLabel;
 use php\gui\UXLabelEx;
+use php\gui\UXNode;
+use php\gui\UXTextField;
 use php\io\File;
+use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
 use php\util\Flow;
@@ -36,6 +43,8 @@ use php\util\Flow;
  * @property UXAnchorPane $imageView
  * @property UXFlowPane $gallery
  * @property UXAnchorPane $onlineSearchPane
+ * @property UXTextField $projectQueryField
+ * @property UXButton $projectSearchButton
  */
 class ImagePropertyEditorForm extends AbstractIdeForm
 {
@@ -54,9 +63,39 @@ class ImagePropertyEditorForm extends AbstractIdeForm
     /** @var UXFileChooser */
     protected $dialog;
 
+    /**
+     * @var FlowListViewDecorator
+     */
+    protected $projectGallery;
+
     protected function init()
     {
         parent::init();
+
+        $this->gallery->backgroundColor = 'white';
+        $this->projectGallery = new FlowListViewDecorator($this->gallery);
+        $this->projectGallery->replaceInParent();
+
+        $this->projectGallery->on('beforeRemove', function (array $nodes) {
+            if (!MessageBoxForm::confirmDelete('выделенные изображения', $this)) {
+                return true;
+            }
+
+            return false;
+        });
+
+        $this->projectGallery->on('remove', function (array $nodes) {
+            /** @var UXNode $node */
+            foreach ($nodes as $node) {
+                $file = $node->data('file');
+
+                if (!fs::delete($file)) {
+                    Notifications::errorDeleteFile($file);
+                }
+            }
+
+            $this->updateGallery();
+        });
 
         $this->searchPaneArea = new IconSearchPaneArea();
         $this->searchPaneArea->on('action', function ($file) {
@@ -92,58 +131,52 @@ class ImagePropertyEditorForm extends AbstractIdeForm
         }
     }
 
-    public function updateGallery()
+    public function updateGallery($searchQuery = '')
     {
-        $this->gallery->children->clear();
+        $this->projectGallery->clear();
 
         $project = Ide::get()->getOpenedProject();
+        $searchQuery = str::lower($searchQuery);
 
-        FileUtils::scan($project->getFile('src/.data'), function ($filename) use ($project) {
-            $file = $project->getAbsoluteFile($filename);
+        if ($project) {
+            Ide::async(function () use ($project, $searchQuery) {
+                fs::scan($project->getFile('src/.data'), function ($filename) use ($project, $searchQuery) {
+                    $file = $project->getAbsoluteFile($filename);
 
-            if (!$file->isFile()) {
-                return;
-            }
+                    if (!$file->isFile()) {
+                        return;
+                    }
 
-            $ext = str::lower(FileUtils::getExtension($filename));
+                    $ext = str::lower(fs::ext($filename));
 
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-                $item = new UXImageArea(Cache::getImage($filename));
+                    if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                        $name = str::lower(fs::name($filename));
 
-                $item->size = [72, 72];
+                        if ($searchQuery && !str::contains($name, $searchQuery)) {
+                            return;
+                        }
 
-                $item->centered = true;
-                $item->stretch = true;
-                $item->smartStretch = true;
-                $item->proportional = true;
+                        uiLater(function () use ($filename, $file) {
+                            $one = new ImageBox(72, 72);
+                            $one->setImage(Cache::getImage($filename));
+                            $one->setTitle($file->getName());
+                            $one->setTooltip($file->getPath());
+                            $one->data('file', $filename);
 
-                $pane = new UXVBox();
-                $pane->size = $item->size;
-                $pane->padding = 8;
-                $pane->classes->add('dn-list-item');
+                            $one->on('click', function (UXMouseEvent $e) use ($file) {
+                                $this->setResult($file->getRelativePath('src'));
 
-                $pane->children->add($item);
+                                if ($e->clickCount >= 2) {
+                                    $this->hide();
+                                }
+                            });
 
-                $nameLabel = new UXLabelEx($file->getName());
-                $nameLabel->paddingTop = 5;
-                $nameLabel->width = $item->width;
-                $nameLabel->tooltipText = $file;
-
-                $pane->children->add($nameLabel);
-
-                $pane->on('click', function (UXMouseEvent $e) use ($file) {
-                    $this->setResult($file->getRelativePath('src'));
-
-                    if ($e->clickCount >= 2) {
-                        $this->hide();
+                            $this->projectGallery->add($one);
+                        });
                     }
                 });
-
-                UXApplication::runLater(function () use ($pane) {
-                    $this->gallery->children->add($pane);
-                });
-            }
-        });
+            });
+        }
     }
 
     public function setResult($path)
@@ -234,6 +267,15 @@ class ImagePropertyEditorForm extends AbstractIdeForm
     }
 
     /**
+     * @event projectQueryField.keyUp
+     * @event projectSearchButton.action
+     */
+    public function doSearchInProject()
+    {
+        $this->updateGallery($this->projectQueryField->text);
+    }
+
+    /**
      * @event clearButton.action
      */
     public function actionClear()
@@ -246,7 +288,7 @@ class ImagePropertyEditorForm extends AbstractIdeForm
      */
     public function actionShow()
     {
-        $this->updateGallery();
+        $this->updateGallery($this->projectQueryField->text);
         $this->updateOnlineGallery();
     }
 

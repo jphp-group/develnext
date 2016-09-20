@@ -10,86 +10,124 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="250.0" minWidth="350.0" prefHeight="576.0" prefWidth="680.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <TabPane layoutX="14.0" layoutY="16.0" prefHeight="462.0" prefWidth="652.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
-        <tabs>
-          <Tab text="Изображение">
-               <content>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                     <children>
-                        <AnchorPane id="imageView" prefHeight="200.0" prefWidth="200.0" style="-fx-border-style: dashed; -fx-border-color: gray;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="53.0" />
-                        <Button id="loadButton" layoutY="12.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" styleClass="icon-open" text="Загрузить новое">
-                           <padding>
-                              <Insets left="15.0" right="15.0" />
-                           </padding></Button>
-                     </children>
-                  </AnchorPane>
-               </content>
-            </Tab>
-          <Tab text="Поиск в проекте">
-               <content>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                     <children>
-                        <ScrollPane hbarPolicy="NEVER" layoutX="7.0" layoutY="25.0" prefHeight="380.0" prefWidth="652.0" style="-fx-border-width: 0; -fx-border-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="53.0">
-                           <content>
-                              <FlowPane id="gallery" alignment="TOP_CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="125.0" prefWidth="637.0" vgap="10.0">
-                                 <padding>
-                                    <Insets bottom="10.0" top="10.0" />
-                                 </padding>
-                              </FlowPane>
-                           </content>
-                        </ScrollPane>
-                        <Button id="addToGalleryButton" layoutY="12.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" styleClass="icon-plus" text="Добавить">
-                           <padding>
-                              <Insets left="15.0" right="15.0" />
-                           </padding></Button>
-                     </children>
-                  </AnchorPane>
-               </content>
-            </Tab>
-            <Tab style="-fx-font-weight: bold;" styleClass="icon-flat-search" text="Поиск иконок">
-              <content>
-                <AnchorPane id="onlineSearchPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-              </content>
-            </Tab>
-        </tabs>
-      </TabPane>
-      <HBox layoutX="14.0" layoutY="530.0" prefHeight="32.0" prefWidth="652.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
-         <children>
-            <Button id="applyButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" styleClass="icon-ok" text="Выбрать">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-               <padding>
-                  <Insets left="15.0" right="15.0" />
-               </padding>
-            </Button>
-            <Button id="cancelButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" text="Отмена">
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-               <padding>
-                  <Insets left="15.0" right="15.0" />
-               </padding>
-            </Button>
-            <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <Button id="clearButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="31.0" text="Очистить">
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                     <padding>
-                        <Insets left="15.0" right="15.0" />
-                     </padding>
-                  </Button>
-               </children>
-            </HBox>
-         </children>
-      </HBox>
-      <TextField id="pathField" layoutX="14.0" layoutY="487.0" prefHeight="32.0" prefWidth="652.0" promptText="путь к файлу jpg, png или gif" AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
-   </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="250.0" minWidth="350.0" prefHeight="576.0"
+            prefWidth="680.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <TabPane layoutX="14.0" layoutY="16.0" prefHeight="462.0" prefWidth="652.0" tabClosingPolicy="UNAVAILABLE"
+                 AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0"
+                 AnchorPane.topAnchor="14.0">
+            <tabs>
+                <Tab text="Изображение">
+                    <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                            <children>
+                                <AnchorPane id="imageView" prefHeight="200.0" prefWidth="200.0"
+                                            style="-fx-border-style: dashed; -fx-border-color: gray;"
+                                            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="53.0"/>
+                                <Button id="loadButton" layoutY="12.0" maxWidth="1.7976931348623157E308"
+                                        mnemonicParsing="false" prefHeight="31.0" styleClass="icon-open"
+                                        text="Загрузить новое">
+                                    <padding>
+                                        <Insets left="15.0" right="15.0"/>
+                                    </padding>
+                                </Button>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Поиск в проекте">
+                    <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                            <children>
+                                <HBox layoutX="10.0" layoutY="12.0" prefHeight="39.0" prefWidth="630.0" spacing="10.0"
+                                      AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0"
+                                      AnchorPane.topAnchor="15.0">
+                                    <children>
+                                        <Button id="projectSearchButton" maxHeight="1.7976931348623157E308"
+                                                mnemonicParsing="false" styleClass="icon-flat-search">
+                                            <padding>
+                                                <Insets left="15.0" right="15.0"/>
+                                            </padding>
+                                        </Button>
+                                        <TextField id="projectQueryField" prefHeight="39.0" prefWidth="379.0"
+                                                   promptText="введите ключевые слова для поиска" HBox.hgrow="ALWAYS">
+                                            <font>
+                                                <Font size="18.0"/>
+                                            </font>
+                                        </TextField>
+
+                                        <Button id="addToGalleryButton" maxWidth="1.7976931348623157E308"
+                                                mnemonicParsing="false" prefHeight="39.0" styleClass="icon-plus"
+                                                text="Добавить">
+                                            <padding>
+                                                <Insets left="15.0" right="15.0"/>
+                                            </padding>
+                                        </Button>
+                                    </children>
+                                </HBox>
+
+                                <FlowPane id="gallery" alignment="TOP_LEFT" columnHalignment="CENTER" hgap="10.0"
+                                          prefHeight="125.0" prefWidth="637.0" vgap="10.0" AnchorPane.bottomAnchor="0.0"
+                                          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                          AnchorPane.topAnchor="65.0">
+                                    <padding>
+                                        <Insets bottom="10.0" top="10.0"/>
+                                    </padding>
+                                </FlowPane>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab style="-fx-font-weight: bold;" styleClass="icon-flat-search" text="Поиск иконок">
+                    <content>
+                        <AnchorPane id="onlineSearchPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                    prefWidth="200.0"/>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+        <HBox layoutX="14.0" layoutY="530.0" prefHeight="32.0" prefWidth="652.0" spacing="10.0"
+              AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
+            <children>
+                <Button id="applyButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" prefHeight="31.0" styleClass="icon-ok" text="Выбрать">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                    <cursor>
+                        <Cursor fx:constant="HAND"/>
+                    </cursor>
+                    <padding>
+                        <Insets left="15.0" right="15.0"/>
+                    </padding>
+                </Button>
+                <Button id="cancelButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" prefHeight="31.0" text="Отмена">
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                    <padding>
+                        <Insets left="15.0" right="15.0"/>
+                    </padding>
+                </Button>
+                <HBox alignment="TOP_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Button id="clearButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                prefHeight="31.0" text="Очистить">
+                            <HBox.margin>
+                                <Insets/>
+                            </HBox.margin>
+                            <padding>
+                                <Insets left="15.0" right="15.0"/>
+                            </padding>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </HBox>
+        <TextField id="pathField" layoutX="14.0" layoutY="487.0" prefHeight="32.0" prefWidth="652.0"
+                   promptText="путь к файлу jpg, png или gif" AnchorPane.bottomAnchor="57.0"
+                   AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0"/>
+    </children>
 </AnchorPane>

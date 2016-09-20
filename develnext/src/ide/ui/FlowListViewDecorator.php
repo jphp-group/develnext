@@ -204,6 +204,19 @@ class FlowListViewDecorator implements \Countable
         $this->initMenu();
     }
 
+    public function replaceInParent()
+    {
+        if ($parent = $this->pane->parent) {
+            $newPane = $this->getPane();
+
+            $newPane->size = $this->pane->size;
+            $newPane->position = $this->pane->position;
+            $newPane->anchors = $this->pane->anchors;
+
+            $parent->children->replace($this->pane, $newPane);
+        }
+    }
+
     /**
      * @param string $id
      */

@@ -1,6 +1,7 @@
 <?php
 namespace php\gui;
 use php\gui\paint\UXColor;
+use php\gui\text\UXFont;
 
 /**
  * Class UXGraphicsContext
@@ -8,6 +9,55 @@ use php\gui\paint\UXColor;
  */
 class UXGraphicsContext
 {
+    /**
+     * @var UXFont
+     */
+    public $font;
+
+    /**
+     * @var float
+     */
+    public $globalAlpha = 1.0;
+
+    /***
+     * SRC_OVER, SRC_ATOP, ADD, MULTIPLY, SCREEN, OVERLAY, DARKEN, LIGHTEN, COLOR_DODGE, COLOR_BURN
+     * @var string
+     */
+    public $globalBlendMode = null;
+
+    /**
+     * Fills the path with the current fill paint.
+     */
+    public function fill()
+    {
+    }
+
+    /**
+     * Fills the given string of text at position x, y
+     * with the current fill paint attribute.
+     *
+     * @param string $text
+     * @param double $x
+     * @param double $y
+     * @param float|int $maxWidth
+     */
+    public function fillText($text, $x, $y, $maxWidth = 0)
+    {
+    }
+
+    /**
+     * Draws the given string of text at position x, y
+     * with the current fill paint attribute.
+     *
+     * @param string $text
+     * @param double $x
+     * @param double $y
+     * @param float|int $maxWidth
+     */
+    public function strokeText($text, $x, $y, $maxWidth = 0)
+    {
+    }
+
     /**
      * @param $x
      * @param $y

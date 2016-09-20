@@ -50,6 +50,11 @@ public class UXCanvas<T extends Canvas> extends UXNode<Canvas> {
         return new UXGraphicsContext(env, getWrappedObject().getGraphicsContext2D());
     }
 
+    @Signature
+    public UXGraphicsContext gc(Environment env) {
+        return getGraphicsContext(env);
+    }
+
     private static BufferedImage imageToBufferedImage(Image image) {
         BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = bufferedImage.createGraphics();
