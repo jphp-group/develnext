@@ -1969,8 +1969,13 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 Logger::warn("Unable to call deleteSelf() of behaviour spec class, node not found, targetId = $targetId");
             }
         });
+
         $this->behaviourPane->on('add', function () {
             $this->reindex();
+
+            if ($this->designer->pickedNode) {
+                $this->refreshNode($this->designer->pickedNode);
+            }
         });
 
         $ui->addBehaviourPane($this->behaviourPane);

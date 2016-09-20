@@ -177,7 +177,7 @@ public class UXDesigner extends BaseObject {
                         Rectangle2D viewPort = new Rectangle2D(0, 0, AREA_BLOCK_SIZE, AREA_BLOCK_SIZE);
 
                         //imageView.setFitWidth(AREA_BLOCK_SIZE);
-                       // imageView.setFitHeight(AREA_BLOCK_SIZE);
+                        // imageView.setFitHeight(AREA_BLOCK_SIZE);
 
                         if (J == heightBlocks - 1) {
                             double hh = height % AREA_BLOCK_SIZE;
@@ -1070,11 +1070,11 @@ public class UXDesigner extends BaseObject {
                 if (intersectedNode != null && intersectedNode != node && isWithChildrenNode(intersectedNode)) {
                     //return;
                 } else { */
-                    if (onNodeClick != null) {
-                        if (onNodeClick.callAny(e).toBoolean()) {
-                            return;
-                        }
+                if (onNodeClick != null) {
+                    if (onNodeClick.callAny(e).toBoolean()) {
+                        return;
                     }
+                }
                 //}
 
                 if (!dragged) {
@@ -1503,39 +1503,47 @@ public class UXDesigner extends BaseObject {
                     border.setVisible(false);
                     resizePoint = null;
 
-                    final double centerX = getCenterX(node);
-                    final double centerY = getCenterY(node);
+                    Effect effect = node.getEffect();
+                    node.setEffect(null);
 
-                    Bounds bounds = node.getBoundsInLocal();
+                    try {
+                        final double centerX = getCenterX(node);
+                        final double centerY = getCenterY(node);
 
-                    if (resizeW != bounds.getWidth()) {
-                        if (resizeX == nodeX) {
-                            if (AnchorPane.getRightAnchor(node) != null) {
-                                double offset = resizeW - bounds.getWidth();
-                                AnchorPane.setRightAnchor(node, AnchorPane.getRightAnchor(node) - offset);
-                            }
-                        } else {
-                            if (AnchorPane.getLeftAnchor(node) != null) {
-                                AnchorPane.setLeftAnchor(node, (double) resizeX);
-                            }
-                        }
-                    }
+                        Bounds bounds = node.getBoundsInLocal();
+                        Bounds borderBounds = border.getBoundsInLocal();
 
-                    if (resizeH != bounds.getHeight()) {
-                        if (resizeY == nodeY) {
-                            if (AnchorPane.getBottomAnchor(node) != null) {
-                                double offset = resizeH - bounds.getHeight();
-                                AnchorPane.setBottomAnchor(node, AnchorPane.getBottomAnchor(node) - offset);
-                            }
-                        } else {
-                            if (AnchorPane.getTopAnchor(node) != null) {
-                                AnchorPane.setTopAnchor(node, (double) resizeY);
+                        if (resizeW != bounds.getWidth()) {
+                            if (resizeX == nodeX) {
+                                if (AnchorPane.getRightAnchor(node) != null) {
+                                    double offset = resizeW - bounds.getWidth();
+                                    AnchorPane.setRightAnchor(node, AnchorPane.getRightAnchor(node) - offset);
+                                }
+                            } else {
+                                if (AnchorPane.getLeftAnchor(node) != null) {
+                                    AnchorPane.setLeftAnchor(node, (double) resizeX);
+                                }
                             }
                         }
-                    }
 
-                    resizeNode(node, resizeW, resizeH);
-                    node.relocate(resizeX - centerX, resizeY - centerY);
+                        if (resizeH != bounds.getHeight()) {
+                            if (resizeY == nodeY) {
+                                if (AnchorPane.getBottomAnchor(node) != null) {
+                                    double offset = resizeH - bounds.getHeight();
+                                    AnchorPane.setBottomAnchor(node, AnchorPane.getBottomAnchor(node) - offset);
+                                }
+                            } else {
+                                if (AnchorPane.getTopAnchor(node) != null) {
+                                    AnchorPane.setTopAnchor(node, (double) resizeY);
+                                }
+                            }
+                        }
+
+                        resizeNode(node, resizeW, resizeH);
+                        node.relocate(resizeX - centerX, resizeY - centerY);
+                    } finally {
+                        node.setEffect(effect);
+                    }
 
 
                     if (onChanged != null) {

@@ -104,6 +104,10 @@ public class Panel extends AnchorPane {
     }
 
     public void setBorderRadius(double radius) {
+        if (radius < 0) {
+            radius = 0;
+        }
+
         this.borderRadius = new CornerRadii(radius);
         updateBorder();
     }
@@ -117,6 +121,10 @@ public class Panel extends AnchorPane {
     }
 
     public void setBorderWidth(double value) {
+        if (value < 0) {
+            value = 0;
+        }
+
         borderWidths = new BorderWidths(value);
         updateBorder();
     }

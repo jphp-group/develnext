@@ -346,6 +346,9 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             return;
         }
 
+        Effect effect = getWrappedObject().getEffect();
+        getWrappedObject().setEffect(null);
+
         Bounds bounds = getBoundsInParent();
 
         Border border = parent instanceof Region ? ((Region) parent).getBorder() : null;
@@ -391,6 +394,8 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
                 setBottomAnchor(Memory.NULL);
             }
         }
+
+        getWrappedObject().setEffect(effect);
     }
 
     @Setter

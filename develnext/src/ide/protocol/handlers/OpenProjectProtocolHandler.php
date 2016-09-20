@@ -41,18 +41,20 @@ class OpenProjectProtocolHandler extends AbstractProtocolHandler
         if ($uid) {
             Ide::get()->disableOpenLastProject();
 
-            uiLater(function () use ($uid) {
-                Ide::service()->projectArchive()->getAsync($uid, function (ServiceResponse $response) use ($uid) {
-                    if ($response->isSuccess()) {
-                        uiLater(function () use ($response) {
-                            Notifications::show('Обнаружен проект', 'Мы обнаружили ссылку на общедоступный проект, вы можете его открыть.', 'INFORMATION');
-                            $dialog = new SharedProjectDetailForm($response->data()['uid']);
-                            $dialog->showAndWait();
-                        });
-                    } else {
-                        Logger::error("Unable to get project, uid = $uid, {$response->toLog()}");
-                        Notifications::error('Ошибка открытия', 'Ссылка на проект некорректная или он был уже удален.');
-                    }
+            Ide::get()->bind('start', function () use ($uid) {
+                uiLater(function () use ($uid) {
+                    Ide::service()->projectArchive()->getAsync($uid, function (ServiceResponse $response) use ($uid) {
+                        if ($response->isSuccess()) {
+                            uiLater(function () use ($response) {
+                                Notifications::show('Обнаружен проект', 'Мы обнаружили ссылку на общедоступный проект, вы можете его открыть.', 'INFORMATION');
+                                $dialog = new SharedProjectDetailForm($response->data()['uid']);
+                                $dialog->showAndWait();
+                            });
+                        } else {
+                            Logger::error("Unable to get project, uid = $uid, {$response->toLog()}");
+                            Notifications::error('Ошибка открытия', 'Ссылка на проект некорректная или он был уже удален.');
+                        }
+                    });
                 });
             });
         }

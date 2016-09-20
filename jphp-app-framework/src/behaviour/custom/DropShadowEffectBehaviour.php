@@ -26,7 +26,7 @@ class DropShadowEffectBehaviour extends EffectBehaviour
     /**
      * @var UXColor|string
      */
-    protected $_color = 'black';
+    protected $_color = '#b3b3b3';
 
     /**
      * @return UXEffect
