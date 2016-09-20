@@ -1,5 +1,7 @@
 <?php
 namespace php\desktop;
+use php\gui\UXImage;
+use php\gui\UXScreen;
 
 /**
  * Class Robot
@@ -78,6 +80,16 @@ class Robot
      * @param string $keyCombination example Alt + Tab, Alt + Ctrl + Space, Ctrl + S
      */
     public function keyPress($keyCombination)
+    {
+    }
+
+    /**
+     * Make screen shot of screen (primary if null passed).
+     * @param UXScreen|null $screen
+     * @param array $bounds [x, y, width, height]
+     * @return UXImage
+     */
+    public function screenshot(array $bounds = null, UXScreen $screen = null)
     {
     }
 }

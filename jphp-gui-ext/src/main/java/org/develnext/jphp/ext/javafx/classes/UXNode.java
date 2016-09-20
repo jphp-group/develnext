@@ -6,6 +6,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.*;
@@ -16,7 +17,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -345,11 +348,15 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
 
         Bounds bounds = getBoundsInParent();
 
+        Border border = parent instanceof Region ? ((Region) parent).getBorder() : null;
+        Insets borderInsets = border == null ? Insets.EMPTY : border.getInsets();
+
+
         if (value.containsKey("left")) {
             boolean left = value.valueOfIndex("left").toBoolean();
 
             if (left) {
-                setLeftAnchor(DoubleMemory.valueOf(bounds.getMinX()));
+                setLeftAnchor(DoubleMemory.valueOf(bounds.getMinX() - borderInsets.getLeft()));
             } else {
                 setLeftAnchor(Memory.NULL);
             }
@@ -359,7 +366,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             boolean top = value.valueOfIndex("top").toBoolean();
 
             if (top) {
-                setTopAnchor(DoubleMemory.valueOf(bounds.getMinY()));
+                setTopAnchor(DoubleMemory.valueOf(bounds.getMinY() - borderInsets.getTop()));
             } else {
                 setTopAnchor(Memory.NULL);
             }
@@ -369,7 +376,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             boolean right = value.valueOfIndex("right").toBoolean();
 
             if (right) {
-                setRightAnchor(DoubleMemory.valueOf(parentBounds.getWidth() - bounds.getMaxX()));
+                setRightAnchor(DoubleMemory.valueOf(parentBounds.getWidth() - bounds.getMaxX() - borderInsets.getRight()));
             } else {
                 setRightAnchor(Memory.NULL);
             }
@@ -379,7 +386,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             boolean bottom = value.valueOfIndex("bottom").toBoolean();
 
             if (bottom) {
-                setBottomAnchor(DoubleMemory.valueOf(parentBounds.getHeight() - bounds.getMaxY()));
+                setBottomAnchor(DoubleMemory.valueOf(parentBounds.getHeight() - bounds.getMaxY() - borderInsets.getBottom()));
             } else {
                 setBottomAnchor(Memory.NULL);
             }

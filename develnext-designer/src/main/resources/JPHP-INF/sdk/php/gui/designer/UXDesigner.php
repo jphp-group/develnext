@@ -252,4 +252,13 @@ class UXDesigner
     public function addSelectionControl(UXNode $node)
     {
     }
+
+    /**
+     * @param UXNode $node
+     * @param double $x
+     * @param double $y
+     */
+    public function relocateNode(UXNode $node, $x, $y)
+    {
+    }
 }

@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
@@ -13,8 +14,13 @@ import php.runtime.ext.core.classes.stream.Stream;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 @Reflection.Name(JavaFXExtension.NS + "UXImage")
 public class UXImage extends BaseWrapper<Image> {
@@ -66,6 +72,27 @@ public class UXImage extends BaseWrapper<Image> {
         }
     }
 
+
+    @Signature
+    public int getPixelARGB(int x, int y) {
+        PixelReader pixelReader = getWrappedObject().getPixelReader();
+        try {
+            return pixelReader == null ? -1 : pixelReader.getArgb(x, y);
+        } catch (IndexOutOfBoundsException e) {
+            return -1;
+        }
+    }
+
+    @Signature
+    public boolean isError() {
+        return getWrappedObject().isError();
+    }
+
+    @Signature
+    public boolean isBackgroundLoading() {
+        return getWrappedObject().isBackgroundLoading();
+    }
+
     @Signature
     public static Image ofUrl(String url) {
         return new Image(url);
@@ -74,5 +101,38 @@ public class UXImage extends BaseWrapper<Image> {
     @Signature
     public static Image ofUrl(String url, boolean background) {
         return new Image(url, background);
+    }
+
+    @Signature
+    public void save(OutputStream stream) throws IOException {
+        save(stream, "png");
+    }
+
+    public static BufferedImage convertToCompatible(BufferedImage image) {
+        GraphicsEnvironment ge =
+                GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        GraphicsConfiguration gc = gd.getDefaultConfiguration();
+
+        BufferedImage compatible =
+                gc.createCompatibleImage(image.getWidth(),
+                        image.getHeight());
+
+        if (compatible.getType() == image.getType())
+            return image;
+
+        ColorConvertOp op = new ColorConvertOp(
+                image.getColorModel().getColorSpace(),
+                compatible.getColorModel().getColorSpace(),null);
+
+        return op.filter(image,compatible);
+    }
+
+    @Signature
+    public void save(OutputStream stream, String format) throws IOException {
+        BufferedImage image = SwingFXUtils.fromFXImage(this.getWrappedObject(), null);
+        image = convertToCompatible(image);
+
+        ImageIO.write(image, format, stream);
     }
 }

@@ -3,9 +3,12 @@ namespace script;
 
 use behaviour\SetTextBehaviour;
 use php\desktop\Robot;
+use php\framework\Logger;
 use php\gui\framework\AbstractScript;
 use php\gui\framework\behaviour\PositionableBehaviour;
 use php\gui\framework\behaviour\TextableBehaviour;
+use php\gui\UXImage;
+use php\gui\UXScreen;
 
 /**
  * Class RobotScript
@@ -35,6 +38,8 @@ class RobotScript extends AbstractScript implements PositionableBehaviour, SetTe
     protected function applyImpl($target)
     {
          if (!$this->robot) {
+             Logger::error("OS is not supported the Robot features");
+
              $this->disabled = true;
          }
     }
@@ -70,45 +75,88 @@ class RobotScript extends AbstractScript implements PositionableBehaviour, SetTe
         $this->setY($xy[1]);
     }
 
+    /**
+     * @param string $button
+     */
     public function mouseClick($button = 'PRIMARY')
     {
         if ($this->robot) $this->robot->mouseClick($button);
     }
 
+    /**
+     * @param string $button
+     */
     public function mouseDown($button = 'PRIMARY')
     {
         if ($this->robot) $this->robot->mouseDown($button);
     }
 
+    /**
+     * @param string $button
+     */
     public function mouseUp($button = 'PRIMARY')
     {
         if ($this->robot) $this->robot->mouseUp($button);
     }
 
+    /**
+     * @param int $wheelAmt
+     */
     public function mouseScroll($wheelAmt)
     {
         if ($this->robot) $this->robot->mouseScroll($wheelAmt);
     }
 
+    /**
+     * @param string $text
+     */
     public function type($text)
     {
         if ($this->robot) $this->robot->type($text);
     }
 
+    /**
+     * @param string $keyCombination
+     */
     public function keyDown($keyCombination)
     {
         if ($this->robot) $this->robot->keyDown($keyCombination);
     }
 
+    /**
+     * @param string $keyCombination
+     */
     public function keyUp($keyCombination)
     {
         if ($this->robot) $this->robot->keyUp($keyCombination);
     }
 
+    /**
+     * @param string $keyCombination
+     */
     public function keyPress($keyCombination)
     {
         if ($this->robot) $this->robot->keyPress($keyCombination);
     }
+
+    /**
+     * Make screenshot of screen (primary if null passed).
+     * --RU--
+     * Создать скриншот экрана (главного экрана, если ничего не передать или передать null).
+     *
+     * @param UXScreen|null $screen
+     * @param array $bounds [x, y, width, height]
+     * @return UXImage
+     */
+    public function screenshot(array $bounds = null, UXScreen $screen = null)
+    {
+        if ($this->robot) {
+            return $this->robot->screenshot($bounds, $screen);
+        }
+
+        return null;
+    }
+
 
     function setTextBehaviour($text)
     {

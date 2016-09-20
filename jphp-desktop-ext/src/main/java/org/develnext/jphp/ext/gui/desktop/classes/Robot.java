@@ -1,11 +1,16 @@
 package org.develnext.jphp.ext.gui.desktop.classes;
 
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.image.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
+import javafx.stage.Screen;
 import org.develnext.jphp.ext.gui.desktop.GuiDesktopExtension;
+import org.develnext.jphp.ext.javafx.classes.UXScreen;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
+import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Setter;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.common.StringUtils;
@@ -200,13 +205,27 @@ public class Robot extends BaseWrapper<java.awt.Robot> {
         }
     }
 
-    /*@Signature
-    public javafx.scene.image.Image snapshot() {
-        BufferedImage capture = getWrappedObject().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+    @Signature
+    public Image screenshot() {
+        return screenshot(null);
+    }
 
-        WritableImage wimg = new WritableImage(capture.getWidth(), capture.getHeight());
-        SwingFXUtils.toFXImage(capture, wimg);
+    @Signature
+    public Image screenshot(@Nullable Rectangle2D bounds) {
+        return screenshot(bounds, null);
+    }
 
-        return wimg;
-    }*/
+    @Signature
+    public Image screenshot(@Nullable Rectangle2D bounds, @Nullable Screen screen) {
+        screen = screen == null ? Screen.getPrimary() : screen;
+        bounds = bounds == null ? screen.getVisualBounds() : bounds;
+
+        return screenshotArea((int) bounds.getMinX(), (int) bounds.getMinY(), (int) bounds.getWidth(), (int) bounds.getHeight());
+    }
+
+    protected Image screenshotArea(int x, int y, int width, int height) {
+        BufferedImage capture = getWrappedObject().createScreenCapture(new Rectangle(x, y, width, height));
+
+        return SwingFXUtils.toFXImage(capture, null);
+    }
 }

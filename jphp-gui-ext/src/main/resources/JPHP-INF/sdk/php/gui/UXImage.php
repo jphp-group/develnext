@@ -2,6 +2,7 @@
 namespace php\gui;
 
 use php\gui\paint\UXColor;
+use php\io\File;
 use php\io\Stream;
 
 /**
@@ -40,8 +41,8 @@ class UXImage {
 
     /**
      * Возвращает цвет пикселя картинки.
-     * @param $x
-     * @param $y
+     * @param int $x
+     * @param int $y
      * @return UXColor
      */
     public function getPixelColor($x, $y)
@@ -49,9 +50,45 @@ class UXImage {
     }
 
     /**
+     * Возвращает цвет пикселя картинки в формате argb.
+     * @param int $x
+     * @param int $y
+     * @return int
+     */
+    public function getPixelARGB($x, $y)
+    {
+    }
+
+    /**
      * Отменяет загрузку картинки.
      */
     public function cancel() {}
+
+    /**
+     * @return bool
+     */
+    public function isError()
+    {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBackgroundLoading()
+    {
+    }
+
+    /**
+     * Save image to file or stream in passed format, by default png.
+     * --RU--
+     * Сохранить изображение в файл или поток в переданном формате, по-умолчанию png.
+     *
+     * @param string|Stream|File $to
+     * @param string $format
+     */
+    public function save($to, $format = 'png')
+    {
+    }
 
     /**
      * Создает новую картинку из URL.

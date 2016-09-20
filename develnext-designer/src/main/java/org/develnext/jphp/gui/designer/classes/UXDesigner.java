@@ -7,10 +7,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.geometry.BoundingBox;
-import javafx.geometry.Bounds;
-import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
+import javafx.geometry.*;
+import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
@@ -751,13 +749,17 @@ public class UXDesigner extends BaseObject {
         node.resize(width, height);
     }
 
-    protected void relocateNode(Node node, double x, double y) {
+    @Signature
+    public void relocateNode(Node node, double x, double y) {
+        Border border = node.getParent() instanceof Region ? ((Region) node.getParent()).getBorder() : null;
+        Insets borderInsets = border == null ? Insets.EMPTY : border.getInsets();
+
         if (AnchorPane.getLeftAnchor(node) != null) {
-            AnchorPane.setLeftAnchor(node, x);
+            AnchorPane.setLeftAnchor(node, x - borderInsets.getLeft());
         }
 
         if (AnchorPane.getTopAnchor(node) != null) {
-            AnchorPane.setTopAnchor(node, y);
+            AnchorPane.setTopAnchor(node, y - borderInsets.getTop());
         }
 
         if (AnchorPane.getRightAnchor(node) != null) {

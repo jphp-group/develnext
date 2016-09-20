@@ -10,6 +10,7 @@ use ide\project\templates\DefaultGuiProjectTemplate;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
+use php\desktop\Robot;
 use php\gui\designer\UXDesigner;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyboardManager;
