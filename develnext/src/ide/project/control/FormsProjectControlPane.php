@@ -45,7 +45,7 @@ class FormsProjectControlPane extends AbstractEditorsProjectControlPane
 
     public function getDescription()
     {
-        return "Формы и окна проекта";
+        return "Формы и окна";
     }
 
     public function getIcon()

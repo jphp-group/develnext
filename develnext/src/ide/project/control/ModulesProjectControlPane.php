@@ -19,7 +19,7 @@ class ModulesProjectControlPane extends AbstractEditorsProjectControlPane
 
     public function getDescription()
     {
-        return "Модули и скрипты проекта";
+        return "Модули и скрипты";
     }
 
     public function getIcon()

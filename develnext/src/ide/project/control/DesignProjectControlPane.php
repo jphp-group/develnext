@@ -41,7 +41,7 @@ class DesignProjectControlPane extends AbstractProjectControlPane
 
     public function getDescription()
     {
-        return "CSS стиль и дизайн проекта";
+        return "CSS стиль и дизайн";
     }
 
     public function getIcon()

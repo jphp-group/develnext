@@ -2,6 +2,7 @@ package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -17,6 +18,8 @@ import php.runtime.reflection.ClassEntity;
 
 @Name(JavaFXExtension.NS + "UXForm")
 public class UXForm extends UXWindow {
+    private EventHandler<WindowEvent> fixResizeBugEventFilter = windowEvent -> fixResizeBug();
+
     interface WrappedInterface {
         @Property String title();
 
@@ -98,7 +101,8 @@ public class UXForm extends UXWindow {
             getWrappedObject().setResizable(value);
         }
 
-        fixResizeBug();
+        getWrappedObject().removeEventFilter(WindowEvent.WINDOW_SHOWN, fixResizeBugEventFilter);
+        getWrappedObject().addEventFilter(WindowEvent.WINDOW_SHOWN, fixResizeBugEventFilter);
     }
 
     @Setter
@@ -181,16 +185,12 @@ public class UXForm extends UXWindow {
     @Signature
     public void showAndWait() {
         if (!getWrappedObject().isShowing()) {
-            fixResizeBug();
-            Platform.runLater(this::fixResizeBug);
             getWrappedObject().showAndWait();
         }
     }
 
     @Signature
     public void show() {
-        fixResizeBug();
         getWrappedObject().show();
-        fixResizeBug();
     }
 }

@@ -51,7 +51,7 @@ class CommonProjectControlPane extends AbstractProjectControlPane
 
     public function getDescription()
     {
-        return "Главные настройки проекта";
+        return "Главные настройки";
     }
 
     public function getIcon()
