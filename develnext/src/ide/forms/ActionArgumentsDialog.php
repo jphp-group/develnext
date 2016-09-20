@@ -91,18 +91,34 @@ class ActionArgumentsDialog extends AbstractIdeForm
 
         items::first($this->argumentEditors)->requestUiFocus();
 
-        UXApplication::runLater(function () {
-            $height = 0;
-            foreach ($this->box->children as $line) {
-                $height += $line->height + $this->box->spacing;
-            }
+        $v = function () {
+            $this->fitHeight();
+        };
 
-            if ($height > 0) {
-                $height -= $this->box->spacing;
-            }
+        UXApplication::runLater($v);
+    }
 
-            $this->height = $height + 180;
-        });
+    protected function fitHeight()
+    {
+        $height = 0;
+        foreach ($this->box->children as $line) {
+            $height += $line->height + $this->box->spacing;
+        }
+
+        if ($height > 0) {
+            $height -= $this->box->spacing;
+        }
+
+        $this->height = $height + 180;
+    }
+
+    /**
+     * @event show
+     * @event showing
+     */
+    public function doShowing()
+    {
+        $this->fitHeight();
     }
 
     public function addHelpText($text)
