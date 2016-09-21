@@ -18,6 +18,7 @@
                 <variant value="TEXT">[TEXT] Редактирование</variant>
                 <variant value="WAIT">[WAIT] Ожидание</variant>
                 <variant value="MOVE">[MOVE] Перемещение</variant>
+                <variant value="CROSSHAIR">[CROSSHAIR] Крестик</variant>
                 <variant value="NONE">[NONE] Отсутствует</variant>
             </variants>
         </property>
@@ -42,10 +43,13 @@
         <eventType code="mouseDown" name="Нажатие мышки" kind="MouseParamEvent" icon="icons/mouse16.png" />
         <eventType code="mouseUp" name="Отжатие мышки" kind="MouseParamEvent" icon="icons/mouse16.png" />
 
-        <eventType code="mouseMove" name="Движение мышки" kind="MouseEvent" icon="icons/mouse16.png" />
+
+        <eventType code="mouseDrag" name="Таскание курсора" kind="MouseEvent" icon="icons/drag16.png" />
+        <eventType code="mouseMove" name="Движение курсора" kind="MouseEvent" icon="icons/cursor16.png" />
 
         <eventType code="mouseEnter" name="Курсор на объекте" kind="MouseEvent" icon="icons/cursor16.png" />
         <eventType code="mouseExit" name="Курсор вне объекта" kind="MouseEvent" icon="icons/cursor16.png" />
+
 
         <eventType code="globalKeyDown" name="Глобальное нажатие" kind="GlobalKeyParamEvent" icon="icons/keyGlobal16.png" />
         <eventType code="globalKeyUp" name="Глобальное отжатие" kind="GlobalKeyParamEvent" icon="icons/keyGlobal16.png" />
