@@ -75,6 +75,10 @@ abstract class SqlClient extends AbstractScript
         if (!$this->isOpened()) {
             try {
                 $this->client = $this->buildClient();
+                if (!$this->client) {
+                    return;
+                }
+
                 $this->client->transactionIsolation = $this->getTransactionIsolation();
 
             } catch (SqlException $e) {
