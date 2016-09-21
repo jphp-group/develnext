@@ -18,7 +18,7 @@ JAVA_BIN="$JAVA_HOME/bin/java"
 
 cd "$APP_HOME"
 
-OUTPUT=$(exec "$JAVA_BIN" -jar DevelNext.jar)
+OUTPUT=$(exec "$JAVA_BIN" -jar "$APP_HOME/DevelNext.jar")
 
 echo $OUTPUT
 echo ""
