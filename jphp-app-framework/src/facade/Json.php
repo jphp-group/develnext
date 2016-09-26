@@ -2,6 +2,7 @@
 namespace facade;
 
 use php\format\JsonProcessor;
+use php\io\IOException;
 use php\io\Stream;
 
 /**
@@ -51,6 +52,8 @@ abstract class Json
     {
         try {
             return self::decode(Stream::getContents($filename));
+        } catch (IOException $e) {
+            return null;
         } catch (ProcessorException $e) {
             return null;
         }

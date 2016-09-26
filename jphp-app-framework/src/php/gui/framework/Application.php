@@ -455,7 +455,7 @@ class Application
                 }
             }
         } catch (IOException $e) {
-            ;
+            Logger::error("Unable to load modules, {$e->getMessage()}");
         }
     }
 

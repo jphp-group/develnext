@@ -2,6 +2,7 @@
 namespace ide\commands;
 
 use ide\editors\AbstractEditor;
+use ide\editors\FormEditor;
 use ide\forms\BuildProgressForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
@@ -59,6 +60,12 @@ class CreateFormProjectCommand extends AbstractCommand
                 }
 
                 $file = $guiBehaviour->createForm($name);
+
+                /** @var FormEditor $editor */
+                $editor = FileSystem::fetchEditor($file);
+                $editor->getConfig()->set("form.title", $name);
+                $editor->saveConfig();
+
                 FileSystem::open($file);
 
                 if (!$guiBehaviour->getMainForm() && sizeof($guiBehaviour->getFormEditors()) < 2) {

@@ -328,8 +328,6 @@ class HttpDownloader extends AbstractScript
 
     /**
      * Start downloading.
-     * --RU--
-     * Стартовать загрузку.
      */
     public function start()
     {
