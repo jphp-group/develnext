@@ -13,6 +13,7 @@
         <property code="baseUrl" name="Базовый URL" editor="text" tooltip="Базовый url, который будет добавляться ко всем url запросам." />
         <property code="requestType" name="Тип запроса" editor="enum" tooltip="Тип данных для http запроса">
             <variants>
+                <variant value="NONE">Пустота</variant>
                 <variant value="JSON">Json</variant>
                 <variant value="URLENCODE">Простая форма (form/urlencoded)</variant>
                 <variant value="MULTIPART">Форма с файлами (multipart)</variant>

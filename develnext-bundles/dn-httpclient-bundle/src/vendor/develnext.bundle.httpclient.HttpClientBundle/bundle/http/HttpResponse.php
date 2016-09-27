@@ -1,5 +1,6 @@
 <?php
 namespace bundle\http;
+use php\io\Stream;
 use php\lib\arr;
 use php\lib\str;
 
@@ -21,7 +22,7 @@ class HttpResponse
 
     /**
      * @param mixed $data
-     * @return mixed|string|array
+     * @return mixed|string|array|Stream
      */
     public function body($data = null)
     {
@@ -33,7 +34,7 @@ class HttpResponse
     }
 
     /**
-     * @param mixed $responseCode
+     * @param int $responseCode
      * @return int
      */
     public function statusCode($responseCode = null)
@@ -46,8 +47,8 @@ class HttpResponse
     }
 
     /**
-     * @param mixed $statusMessage
-     * @return int
+     * @param string $statusMessage
+     * @return string
      */
     public function statusMessage($statusMessage = null)
     {

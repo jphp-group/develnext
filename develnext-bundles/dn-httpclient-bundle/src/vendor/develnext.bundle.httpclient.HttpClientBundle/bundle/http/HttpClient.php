@@ -303,7 +303,9 @@ class HttpClient extends AbstractScript
             }
 
             $url = "{$this->baseUrl}{$url}";
+
             $connect = URLConnection::create($url, $proxy);
+
             $connect->connectTimeout = $this->connectTimeout;
             $connect->followRedirects = $this->followRedirects;
             $connect->readTimeout = $this->readTimeout;
@@ -319,6 +321,9 @@ class HttpClient extends AbstractScript
 
             if ($existsBody) {
                 switch ($this->requestType) {
+                    case 'NONE':
+                        break;
+
                     case 'JSON':
                         $connect->setRequestProperty('Content-Type', "application/json; charset=UTF-8");
                         $data = Flow::of((array)$this->data)->append((array)$data)->withKeys()->toArray();

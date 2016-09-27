@@ -123,6 +123,7 @@ class HttpDownloader extends AbstractScript
     {
         $this->client = new HttpClient();
         $this->client->responseType = 'STREAM';
+        $this->client->requestType = 'NONE';
 
         $this->_downloadedFiles = new SharedStack();
         $this->_progressFiles = new SharedMap();
@@ -158,6 +159,8 @@ class HttpDownloader extends AbstractScript
             $contentLength = $response->contentLength();
 
             if ($fileName == null) {
+                $url = str::split($url, '?')[0];
+
                 $fileName = urldecode(fs::name($url));
 
                 $contentDisposition = $response->header('Content-Disposition');
@@ -606,8 +609,16 @@ class HttpDownloader extends AbstractScript
         while ($scanner->hasNextLine()) {
             $line = $scanner->nextLine();
 
+            $posEq = str::pos($line, '=');
+            $posQ = str::pos($line, '?');
+
             if (str::trim($line)) {
-                list($key, $value) = str::split($line, '=', 2);
+                if ($posEq < $posQ) {
+                    list($key, $value) = str::split($line, '=', 2);
+                } else {
+                    $key = $line;
+                    $value = null;
+                }
 
                 if ($value) {
                     $result[$key] = $trimValues ? str::trim($value) : $value;
