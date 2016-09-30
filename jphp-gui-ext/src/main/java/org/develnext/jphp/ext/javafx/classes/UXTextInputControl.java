@@ -43,6 +43,7 @@ public class UXTextInputControl<T extends TextInputControl> extends UXControl {
         void insertText(int index, String text);
         void replaceSelection(String replacement);
         void replaceText(int start, int end, String text);
+        void deleteText(int start, int end);
 
         void paste();
         void positionCaret(int pos);
@@ -59,6 +60,11 @@ public class UXTextInputControl<T extends TextInputControl> extends UXControl {
         void selectPositionCaret(int pos);
         void selectPreviousWord();
         void selectRange(int anchor, int caretPosition);
+
+        void undo();
+        void redo();
+        void cancelEdit();
+        void commitValue();
     }
 
     public UXTextInputControl(Environment env, T wrappedObject) {
@@ -77,5 +83,10 @@ public class UXTextInputControl<T extends TextInputControl> extends UXControl {
     @Getter
     public IndexRange getSelection() {
         return getWrappedObject().getSelection();
+    }
+
+    @Setter
+    protected void setSelectedText(String value) {
+        getWrappedObject().replaceSelection(value);
     }
 }

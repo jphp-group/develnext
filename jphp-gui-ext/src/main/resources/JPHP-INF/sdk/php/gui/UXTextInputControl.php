@@ -30,7 +30,6 @@ abstract class UXTextInputControl extends UXControl
     public $selection;
 
     /**
-     * @readonly
      * @var string
      */
     public $selectedText;
@@ -88,6 +87,9 @@ abstract class UXTextInputControl extends UXControl
      */
     public function extendSelection($pos) {}
 
+    /**
+     * Deselect all.
+     */
     public function deselect() {}
 
     /**
@@ -117,4 +119,32 @@ abstract class UXTextInputControl extends UXControl
      * @param int $pos
      */
     public function positionCaret($pos) {}
+
+    /**
+     * Undo changes.
+     */
+    public function undo()
+    {
+    }
+
+    /**
+     * Redo changes.
+     */
+    public function redo()
+    {
+    }
+
+    /**
+     * Commit the current text and convert it to a value.
+     */
+    public function commitValue()
+    {
+    }
+
+    /**
+     * If the field is currently being edited, this call will set text to the last commited value.
+     */
+    public function cancelEdit()
+    {
+    }
 }
