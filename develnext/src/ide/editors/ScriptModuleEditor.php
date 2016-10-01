@@ -337,7 +337,7 @@ class ScriptModuleEditor extends FormEditor
                 $this->actionEditor->renameMethod($bind['className'], $bind['methodName'], $bind['newMethodName']);
             }
 
-            $this->codeEditor->load();
+            $this->codeEditor->loadContentToArea();
             $this->reindex();
 
             $this->leftPaneUi->updateEventList($newId);
@@ -406,7 +406,7 @@ class ScriptModuleEditor extends FormEditor
         }
 
         if ($container && $container->id && $this->eventManager->removeBinds($container->id)) {
-            $this->codeEditor->load();
+            $this->codeEditor->loadContentToArea();
         }
 
         if ($container && $container->id) {

@@ -2,8 +2,10 @@
 namespace ide\project;
 
 use ide\formats\AbstractFileTemplate;
+use ide\Logger;
 use ide\utils\FileUtils;
 use php\io\File;
+use php\io\FileStream;
 use php\io\IOException;
 use php\io\Stream;
 use php\lib\Str;
@@ -176,9 +178,14 @@ class ProjectFile extends File
                 $parent->mkdirs();
             }
 
-            Stream::tryAccess(parent::getPath(), function (Stream $stream) use ($content, $template, $override) {
+            try {
+                $stream = new FileStream(parent::getPath(), 'w+');
                 $template->apply(($override || $this->isGenerated()) ? null : $content, $stream);
-            }, 'w+');
+            } catch (IOException $e) {
+                Logger::error("Unable to apply template to " . parent::getPath());
+            } finally {
+                if (isset($stream)) $stream->close();
+            }
         }
     }
 

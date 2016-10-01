@@ -224,6 +224,9 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                         // function
                     }
                     break;
+
+                default:
+                    var_dump($token->getTypeName());
             }
         }
 
@@ -359,6 +362,36 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
         }
 
 
+        $codeText = str::join($code, "\n");
+        $regexOfVars = Regex::of('\\$([a-z\\_][a-z0-9\\_]{0,})[ ]+\\=[ ]+(.+?)(\\;)', Regex::CASE_INSENSITIVE | Regex::MULTILINE);
+
+        $r = $regexOfVars->with($codeText);
+
+        //var_dump(str::join($code, "\n"));
+
+        while ($r->find()) {
+            $varName = $r->group(1);
+
+            if (!$vars[$varName] || $vars[$varName] == 'mixed') {
+                $expression = $r->group(2);
+
+                $types = $this->complete->identifyType("; " . $expression . "->", $region);
+
+                foreach ($types as $type) {
+                    if (str::startsWith($type, "~dynamic ")) {
+                        $vars[$varName] = str::sub($type, 9);
+
+                        $region->setValue([
+                            'name' => $varName,
+                            'type' => str::sub($type, 9)
+                        ], 'variable');
+
+                        break;
+                    }
+                }
+            }
+        }
+
         foreach ($code as $one) {
             if (str::trim($one) && str::contains($one, '$')) {
                 $regexOfComment = Regex::of('\\/\\*\\*[ ]+\\@var[ ]+([a-z0-9_\\\\]+)[ ]+\\$([a-z0-9_]+)', Regex::CASE_INSENSITIVE | Regex::DOTALL);
@@ -400,32 +433,6 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                             'name' => $varName,
                             'type' => $type,
                         ], 'variable');
-                    }
-                }
-
-                $regexOfVars = Regex::of('\\$([a-z][a-z0-9\\_]{0,})[ ]+\\=[ ]+(.+?)(\\;)', Regex::CASE_INSENSITIVE | Regex::DOTALL);
-                $r = $regexOfVars->with($one);
-
-                while ($r->find()) {
-                    $varName = $r->group(1);
-
-                    if (!$vars[$varName] || $vars[$varName] == 'mixed') {
-                        $expression = $r->group(2);
-
-                        $types = $this->complete->identifyType("; " . $expression . "->", $region);
-
-                        foreach ($types as $type) {
-                            if (str::startsWith($type, "~dynamic ")) {
-                                $vars[$varName] = str::sub($type, 9);
-
-                                $region->setValue([
-                                    'name' => $varName,
-                                    'type' => str::sub($type, 9)
-                                ], 'variable');
-
-                                break;
-                            }
-                        }
                     }
                 }
 

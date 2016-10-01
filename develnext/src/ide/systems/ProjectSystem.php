@@ -1,5 +1,6 @@
 <?php
 namespace ide\systems;
+
 use ide\forms\MainForm;
 use ide\forms\MessageBoxForm;
 use ide\forms\OpenProjectForm;
@@ -192,7 +193,6 @@ class ProjectSystem
     static function create(AbstractProjectTemplate $template, $path)
     {
         static::clear();
-
         $parent = File::of($path)->getParent();
 
         if (!($parent = self::checkDirectory($parent))) {
@@ -202,19 +202,25 @@ class ProjectSystem
 
         $path = $parent . "/" . File::of($parent)->getName();
 
-        $project = Project::createForFile($path);
-        $project->setTemplate($template);
+        try {
+            $project = Project::createForFile($path);
+            $project->setTemplate($template);
 
-        $template->makeProject($project);
-        Ide::get()->setOpenedProject($project);
+            $template->makeProject($project);
+            Ide::get()->setOpenedProject($project);
 
-        $project->create();
-        $project->recover();
-        $project->open();
+            $project->create();
+            $project->recover();
+            $project->open();
 
-        Ide::get()->trigger('openProject', [$project]);
+            Ide::get()->trigger('openProject', [$project]);
 
-        static::save();
+            static::save();
+        } catch (IOException $e) {
+            ProjectSystem::close(false);
+            Ide::get()->getMainForm()->hidePreloader();
+            Notifications::error("Ошибка создания проекта", "Возможно к папке проекта нет доступа или нет места на диске");
+        }
     }
 
     /**
@@ -233,40 +239,47 @@ class ProjectSystem
 
             $file = File::of($fileName);
 
-            $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
+            try {
+                $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
 
-            if ($project->isOpenedInOtherIde()) {
-                if ($showDialogAlreadyOpened) {
-                    $msg = new MessageBoxForm('Данный проект уже открыт в другом экземпляре среды!', ['ОК, открыть другой проект', 'Выход']);
-                    $msg->showDialog();
+                if ($project->isOpenedInOtherIde()) {
+                    if ($showDialogAlreadyOpened) {
+                        $msg = new MessageBoxForm('Данный проект уже открыт в другом экземпляре среды!', ['ОК, открыть другой проект', 'Выход']);
+                        $msg->showDialog();
 
-                    if ($msg->getResultIndex() == 0) {
-                        uiLater(function () {
-                            $dialog = new OpenProjectForm();
-                            $dialog->showDialog();
-                        });
+                        if ($msg->getResultIndex() == 0) {
+                            uiLater(function () {
+                                $dialog = new OpenProjectForm();
+                                $dialog->showDialog();
+                            });
+                        }
                     }
+
+                    FileSystem::open('~welcome');
+                    Ide::get()->getMainForm()->hidePreloader();
+                    return;
                 }
 
-                FileSystem::open('~welcome');
+                Ide::get()->setOpenedProject($project);
+
+                $project->load();
+                $project->recover();
+
+                FileSystem::open('~project');
+
+                $project->open();
+
                 Ide::get()->getMainForm()->hidePreloader();
-                return;
+
+                Ide::get()->trigger('openProject', [$project]);
+
+                Logger::info("Finish opening project.");
+            } catch (IOException $e) {
+                ProjectSystem::close(false);
+                Ide::get()->getMainForm()->hidePreloader();
+
+                Notifications::error("Ошибка открытия проекта", "Возможно к папке проекта нет доступа или нет места на диске");
             }
-
-            Ide::get()->setOpenedProject($project);
-
-            $project->load();
-            $project->recover();
-
-            FileSystem::open('~project');
-
-            $project->open();
-
-            Ide::get()->getMainForm()->hidePreloader();
-
-            Ide::get()->trigger('openProject', [$project]);
-
-            Logger::info("Finish opening project.");
         } catch (InvalidProjectFormatException $e) {
             Ide::get()->getMainForm()->hidePreloader();
             ProjectSystem::closeWithWelcome(false);

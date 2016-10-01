@@ -33,11 +33,6 @@ class UXGraphicsContext
     public $globalBlendMode = null;
 
     /**
-     * @var UXEffect
-     */
-    public $effect;
-
-    /**
      * @var double
      */
     public $lineWidth;
@@ -263,16 +258,6 @@ class UXGraphicsContext
      * @param float|int $maxWidth
      */
     public function strokeText($text, $x, $y, $maxWidth = 0)
-    {
-    }
-
-    /**
-     * @param $x
-     * @param $y
-     * @param $w
-     * @param $h
-     */
-    public function clearRect($x, $y, $w, $h)
     {
     }
 

@@ -677,7 +677,7 @@ class IdeEventListPane
 
                     AccurateTimer::executeAfter(100, function () use ($selected, $bind) {
                         if ($this->codeEditor) {
-                            $this->codeEditor->load(false);
+                            $this->codeEditor->loadContentToArea(false);
                         }
 
                         $this->manager->load();
@@ -704,7 +704,7 @@ class IdeEventListPane
 
             uiLater(function () use ($code) {
                 if ($this->codeEditor) {
-                    $this->codeEditor->load(false);
+                    $this->codeEditor->loadContentToArea(false);
                 }
 
                 $this->manager->load();
@@ -731,7 +731,7 @@ class IdeEventListPane
 
             uiLater(function () use ($code, $type) {
                 if ($this->codeEditor) {
-                    $this->codeEditor->load(false);
+                    $this->codeEditor->loadContentToArea(false);
                 }
 
                 $this->manager->load();

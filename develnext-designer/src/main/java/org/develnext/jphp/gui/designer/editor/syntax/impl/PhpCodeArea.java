@@ -9,7 +9,7 @@ import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.CodeAreaGutterNote;
 import org.develnext.lexer.php.PHPLexer;
 import org.develnext.lexer.php.PHPParser;
-import org.fxmisc.richtext.StyleSpansBuilder;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 import php.runtime.env.Context;
 import php.runtime.env.Environment;
 import php.runtime.env.handler.ExceptionHandler;

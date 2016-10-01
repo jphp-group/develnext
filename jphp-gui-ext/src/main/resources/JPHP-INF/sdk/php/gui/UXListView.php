@@ -88,6 +88,11 @@ class UXListView extends UXControl
     public $focusedItem = null;
 
     /**
+     * @var string
+     */
+    public $itemsText;
+
+    /**
      * Скролить к индексу.
      * @param int $index
      */

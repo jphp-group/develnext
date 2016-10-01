@@ -129,6 +129,11 @@ class CodeEditor extends AbstractEditor
     protected $findDialogLastIndex = 0;
 
     /**
+     * @var bool
+     */
+    protected $contentLoaded = false;
+
+    /**
      * @return boolean
      */
     public function isSourceFile()
@@ -325,6 +330,7 @@ class CodeEditor extends AbstractEditor
         parent::open($param);
 
         $this->resetSettings();
+        $this->loadContentToArea();
     }
 
     public function refresh()
@@ -332,26 +338,17 @@ class CodeEditor extends AbstractEditor
         parent::refresh();
     }
 
-
-    public function load($resetHistory = true)
+    public function loadContentToArea($resetHistory = true)
     {
+        $this->contentLoaded = true;
+
         if (!$this->file) {
             return;
         }
 
         $caret = $this->textArea->caretPosition;
 
-        if ($this->isSourceFile()) {
-            $sourceFile = "$this->file.source";
-
-            if (fs::exists($sourceFile)) {
-                $file = $sourceFile;
-            } else {
-                $file = $this->file;
-            }
-        } else {
-            $file = $this->file;
-        }
+        $file = $this->file;
 
         Logger::info("Start load file $file");
 
@@ -373,8 +370,52 @@ class CodeEditor extends AbstractEditor
         Logger::info("Finish load file $file");
     }
 
+    public function load($resetHistory = true)
+    {
+        if (!$this->file) {
+            return;
+        }
+
+        //$caret = $this->textArea->caretPosition;
+
+        /*if ($this->isSourceFile()) {
+            $sourceFile = "$this->file.source";
+
+            if (fs::exists($sourceFile)) {
+                $file = $sourceFile;
+            } else {
+                $file = $this->file;
+            }
+        } else {
+            $file = $this->file;
+        }*/
+
+        //Logger::info("Start load file $file");
+
+        /*try {
+            $content = FileUtils::get($file);
+        } catch (IOException $e) {
+            $content = '';
+            Logger::warn("Unable to load $file: {$e->getMessage()}");
+        }
+
+        $this->setValue($content);
+
+        if ($resetHistory) {
+            $this->textArea->forgetHistory();
+        }
+
+        $this->textArea->caretPosition = $caret;
+
+        Logger::info("Finish load file $file");*/
+    }
+
     public function save()
     {
+        if (!$this->contentLoaded) {
+            return;
+        }
+
         if (!$this->file) {
             return;
         }

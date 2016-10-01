@@ -558,16 +558,24 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
-    public function save()
+    public function saveFormFile()
     {
         $this->formDumper->save($this);
-
-        $this->saveOthers();
-        $this->saveConfig();
 
         if ($this->factory) {
             $this->factory->reload();
         }
+    }
+
+    public function save()
+    {
+        $this->saveOthers();
+        $this->saveConfig();
+
+        $this->saveFormFile();
+        /*if ($this->factory) {
+            $this->factory->reload();
+        }*/
     }
 
     public function close($save = true)
@@ -1012,7 +1020,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->actionEditor->renameMethod($bind['className'], $bind['methodName'], $bind['newMethodName']);
         }
 
-        $this->codeEditor->load();
+        $this->codeEditor->loadContentToArea();
         $node->id = $newId;
 
         $this->reindex();
@@ -1080,7 +1088,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
 
             if ($this->eventManager->removeBinds($nodeId)) {
-                $this->codeEditor->load();
+                $this->codeEditor->loadContentToArea();
             }
 
             foreach ($this->behaviourManager->getBehaviours($nodeId) as $one) {
@@ -1825,7 +1833,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->eventManager->addUseImports($imports);
 
         waitAsync(100, function () {
-            $this->codeEditor->load();
+            $this->codeEditor->loadContentToArea();
         });
     }
 
@@ -1834,13 +1842,13 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->eventManager->insertCodeToMethod($class, $method, $code);
 
         waitAsync(100, function () {
-            $this->codeEditor->load();
+            $this->codeEditor->loadContentToArea();
         });
     }
 
     protected function _onChanged()
     {
-        $this->save();
+        $this->saveFormFile();
         $this->_onNodePick();
     }
 

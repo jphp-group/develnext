@@ -28,7 +28,7 @@ public class UXGraphicsContext extends BaseWrapper<GraphicsContext> {
         @Property double globalAlpha();
         @Property BlendMode globalBlendMode();
         @Property FillRule fillRule();
-        @Property Effect effect();
+        /*@Property Effect effect();*/
 
         @Property double lineWidth();
         @Property StrokeLineCap lineCap();

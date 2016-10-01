@@ -16,6 +16,12 @@ class UXComboBox extends UXComboBoxBase
     public $items;
 
     /**
+     * Список в виде текста.
+     * @var string
+     */
+    public $itemsText;
+
+    /**
      * Выбранный элемент.
      * @var mixed
      */

@@ -99,7 +99,6 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Font.class, UXFont.class);
         registerWrapperClass(scope, Color.class, UXColor.class);
         registerWrapperClass(scope, Image.class, UXImage.class);
-        registerWrapperClass(scope, GraphicsContext.class, UXGraphicsContext.class);
 
         registerWrapperClass(scope, Window.class, UXWindow.class);
         registerWrapperClass(scope, Stage.class, UXForm.class);
@@ -216,6 +215,8 @@ public class JavaFXExtension extends Extension {
 
         registerWrapperClass(scope, Media.class, UXMedia.class);
         registerWrapperClass(scope, MediaPlayer.class, UXMediaPlayer.class);
+
+        registerWrapperClass(scope, GraphicsContext.class, UXGraphicsContext.class);
 
         registerClass(scope, UXDialog.class);
         registerClass(scope, UXClipboard.class);

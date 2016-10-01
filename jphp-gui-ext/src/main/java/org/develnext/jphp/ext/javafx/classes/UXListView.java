@@ -14,12 +14,15 @@ import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.control.ListViewEx;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
+import php.runtime.common.StringUtils;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
+import php.runtime.memory.StringMemory;
 import php.runtime.reflection.ClassEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 @Reflection.Name(JavaFXExtension.NS + "UXListView")
 public class UXListView extends UXControl<ListView> {
@@ -185,6 +188,22 @@ public class UXListView extends UXControl<ListView> {
         getWrappedObject().setItems(items);
     }
 
+
+    @Getter
+    protected String getItemsText() {
+        return StringUtils.join(getWrappedObject().getItems(), "\n");
+    }
+
+    @Setter
+    protected void setItemsText(String value) {
+        Scanner scanner = new Scanner(value);
+
+        getWrappedObject().getItems().clear();
+
+        while (scanner.hasNextLine()) {
+            getWrappedObject().getItems().add(scanner.nextLine());
+        }
+    }
 
     static class DragListCell extends ListCell {
         private final ImageView imageView = new ImageView();

@@ -243,7 +243,7 @@ class GameSpriteEditor extends AbstractEditor
         $canvas->size = [$this->spec->frameWidth * sizeof($files), $this->spec->frameHeight];
 
         $gc = $canvas->getGraphicsContext();
-        $gc->setFillColor(null);
+        $gc->fillColor = null;
         $gc->clearRect(0, 0, $canvas->size[0], $canvas->size[1]);
 
         foreach ($files as $i => $file) {

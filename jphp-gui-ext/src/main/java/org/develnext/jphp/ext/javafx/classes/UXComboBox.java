@@ -9,10 +9,13 @@ import javafx.util.Callback;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
+import php.runtime.common.StringUtils;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.ForeachIterator;
 import php.runtime.reflection.ClassEntity;
+
+import java.util.Scanner;
 
 @Name(JavaFXExtension.NS + "UXComboBox")
 public class UXComboBox extends UXComboBoxBase {
@@ -88,6 +91,22 @@ public class UXComboBox extends UXComboBoxBase {
         }
 
         getWrappedObject().getEditor().setText(value);
+    }
+
+    @Getter
+    protected String getItemsText() {
+        return StringUtils.join(getWrappedObject().getItems(), "\n");
+    }
+
+    @Setter
+    protected void setItemsText(String value) {
+        Scanner scanner = new Scanner(value);
+
+        getWrappedObject().getItems().clear();
+
+        while (scanner.hasNextLine()) {
+            getWrappedObject().getItems().add(scanner.nextLine());
+        }
     }
 
     @Signature

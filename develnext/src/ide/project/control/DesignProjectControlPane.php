@@ -148,7 +148,7 @@ class DesignProjectControlPane extends AbstractProjectControlPane
         $editor = new CodeEditor($file, 'fxcss');
         $editor->registerDefaultCommands();
 
-        $editor->load();
+        $editor->loadContentToArea();
         $this->editor = $editor;
 
         $this->reloadStylesheet();

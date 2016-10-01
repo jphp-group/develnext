@@ -12,6 +12,7 @@ import org.develnext.jphp.core.tokenizer.token.expr.CommaToken;
 import org.develnext.jphp.core.tokenizer.token.expr.OperatorExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.ValueExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.operator.DynamicAccessExprToken;
+import org.develnext.jphp.core.tokenizer.token.expr.operator.KeyValueExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.value.*;
 import org.develnext.jphp.core.tokenizer.token.stmt.*;
 import org.develnext.lexer.jphp.DevelNextLexerExtension;
@@ -136,7 +137,7 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
                 }
 
                 if (token instanceof OperatorExprToken) {
-                    if (!(token instanceof DynamicAccessExprToken)) {
+                    if (!(token instanceof DynamicAccessExprToken || token instanceof KeyValueExprToken)) {
                         break;
                     }
                 }

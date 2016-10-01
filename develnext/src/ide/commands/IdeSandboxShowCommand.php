@@ -53,7 +53,7 @@ class IdeSandboxShowCommand extends AbstractCommand
         $editor = new CodeEditor(IdeSystem::getFile("sandbox.php"), 'php');
         $editor->setSourceFile(false);
         $editor->registerDefaultCommands();
-        $editor->load();
+        $editor->loadContentToArea();
 
         if (!$editor->getValue()) {
             $editor->setValue("<?\n");

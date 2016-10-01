@@ -4,8 +4,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
-import org.fxmisc.richtext.Paragraph;
-import org.fxmisc.richtext.TwoDimensional;
+import org.fxmisc.richtext.model.Paragraph;
+import org.fxmisc.richtext.model.TwoDimensional;
 
 import java.util.Collection;
 

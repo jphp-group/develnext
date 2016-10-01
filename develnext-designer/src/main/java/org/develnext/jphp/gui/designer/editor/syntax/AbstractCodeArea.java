@@ -17,16 +17,21 @@ import org.fxmisc.flowless.VirtualFlow;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.PopupAlignment;
-import org.fxmisc.richtext.StyleSpans;
-import org.fxmisc.richtext.StyleSpansBuilder;
+import org.fxmisc.richtext.model.RichTextChange;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.fxmisc.wellbehaved.event.EventPattern;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
+import org.reactfx.util.Try;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 import static org.fxmisc.wellbehaved.event.EventPattern.keyReleased;
@@ -75,9 +80,14 @@ abstract public class AbstractCodeArea extends CodeArea {
         executor = Executors.newSingleThreadExecutor();
 
         richChanges()
-                .filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
+                .filter(new Predicate<RichTextChange<Collection<String>, Collection<String>>>() {
+                    @Override
+                    public boolean test(RichTextChange<Collection<String>, Collection<String>> ch) {
+                        return !ch.getInserted().equals(ch.getRemoved());
+                    }
+                }) // XXX
                 .successionEnds(Duration.ofMillis(200))
-                .supplyTask(this::computeHighlightingAsync)
+                .supplyTask(AbstractCodeArea.this::computeHighlightingAsync)
                 .awaitLatest(richChanges())
                 .filterMap(t -> {
                     if (t.isSuccess()) {
@@ -263,7 +273,7 @@ abstract public class AbstractCodeArea extends CodeArea {
 
     public void setText(String text) {
         clear();
-        replaceText(0, 0, text);
+        appendText(text);
     }
 
     public int getTabSize() {

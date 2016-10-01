@@ -145,6 +145,8 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                     $description = "$description (interface)";
                 } elseif ($type->kind == 'TRAIT') {
                     $description = "$description (trait)";
+                } elseif ($type->abstract) {
+                    $description = "$description (abstract)";
                 }
 
                 $result[$name] = $c = new ConstantAutoCompleteItem(
