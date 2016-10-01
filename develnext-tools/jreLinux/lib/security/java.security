@@ -74,6 +74,7 @@ security.provider.6=sun.security.jgss.SunProvider
 security.provider.7=com.sun.security.sasl.Provider
 security.provider.8=org.jcp.xml.dsig.internal.dom.XMLDSigRI
 security.provider.9=sun.security.smartcardio.SunPCSC
+security.provider.10=sun.security.mscapi.SunMSCAPI
 
 #
 # Sun Provider SecureRandom seed source.
@@ -126,7 +127,7 @@ securerandom.source=file:/dev/random
 # This is a comma-separated list of algorithm and/or algorithm:provider
 # entries.
 #
-securerandom.strongAlgorithms=NativePRNGBlocking:SUN
+securerandom.strongAlgorithms=Windows-PRNG:SunMSCAPI,SHA1PRNG:SUN
 
 #
 # Class to instantiate as the javax.security.auth.login.Configuration
@@ -221,6 +222,7 @@ package.access=sun.,\
                jdk.nashorn.internal.,\
                jdk.nashorn.tools.,\
                com.sun.activation.registries.,\
+               com.sun.java.accessibility.,\
                com.sun.browser.,\
                com.sun.glass.,\
                com.sun.javafx.,\
@@ -279,6 +281,7 @@ package.definition=sun.,\
                    jdk.nashorn.internal.,\
                    jdk.nashorn.tools.,\
                    com.sun.activation.registries.,\
+                   com.sun.java.accessibility.,\
                    com.sun.browser.,\
                    com.sun.glass.,\
                    com.sun.javafx.,\
