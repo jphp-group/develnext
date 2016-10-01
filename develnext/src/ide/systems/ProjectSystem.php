@@ -154,36 +154,42 @@ class ProjectSystem
 
         $importer = new ProjectImporter($file);
 
-        $importer->extract($projectDir);
+        try {
+            $importer->extract($projectDir);
 
-        $files = File::of($projectDir)->findFiles(function (File $dir, $name) {
-            return (Str::endsWith($name, '.dnproject'));
-        });
+            $files = File::of($projectDir)->findFiles(function (File $dir, $name) {
+                return (Str::endsWith($name, '.dnproject'));
+            });
 
-        if (!$files) {
-            UXDialog::show('В архиве не обнаружен файл проекта', 'ERROR');
-            return;
-        }
-
-        $file = File::of(Items::first($files));
-
-        if ($newName) {
-            $files = [File::of($file->getParent() . "/$newName.dnproject")];
-
-            $file->renameTo(Items::first($files));
-        }
-
-        AccurateTimer::executeAfter(1000, function () use ($projectDir, $files, $file, $afterOpen) {
-            ProjectSystem::open($projectDir . "/" . Items::first($files)->getName());
-
-            Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива", 3000);
-
-            Logger::info("Finish importing project.");
-
-            if ($afterOpen) {
-                $afterOpen();
+            if (!$files) {
+                UXDialog::show('В архиве не обнаружен файл проекта', 'ERROR');
+                return;
             }
-        });
+
+            $file = File::of(Items::first($files));
+
+            if ($newName) {
+                $files = [File::of($file->getParent() . "/$newName.dnproject")];
+
+                $file->renameTo(Items::first($files));
+            }
+
+            AccurateTimer::executeAfter(1000, function () use ($projectDir, $files, $file, $afterOpen) {
+                ProjectSystem::open($projectDir . "/" . Items::first($files)->getName());
+
+                Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива", 3000);
+
+                Logger::info("Finish importing project.");
+
+                if ($afterOpen) {
+                    $afterOpen();
+                }
+            });
+        } catch (IOException $e) {
+            self::close(false);
+            Ide::get()->getMainForm()->hidePreloader();
+            Notifications::error("Ошибка открытия проекта", "Возможно к папке проекта нет доступа или нет места на диске");
+        }
     }
 
     /**

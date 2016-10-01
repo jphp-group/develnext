@@ -180,4 +180,11 @@ class UXList implements Iterator, Countable, ArrayAccess
     public function offsetUnset($offset)
     {
     }
+
+    /**
+     * @param callable $callback
+     */
+    public function addListener(callable $callback)
+    {
+    }
 }

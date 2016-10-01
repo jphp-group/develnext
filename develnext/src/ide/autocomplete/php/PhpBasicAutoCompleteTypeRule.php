@@ -362,12 +362,11 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
         }
 
 
-        $codeText = str::join($code, "\n");
-        $regexOfVars = Regex::of('\\$([a-z\\_][a-z0-9\\_]{0,})[ ]+\\=[ ]+(.+?)(\\;)', Regex::CASE_INSENSITIVE | Regex::MULTILINE);
+        $codeText = str::join($code, "\r\n");
+        $regexOfVars = Regex::of('\\$([a-z\\_][a-z0-9\\_]{0,})[ ]+\\=[ ]+(.+?)(\\;|(\\)[\\r\\n\\t ]+\\{))', Regex::CASE_INSENSITIVE | Regex::MULTILINE | Regex::DOTALL);
 
         $r = $regexOfVars->with($codeText);
 
-        //var_dump(str::join($code, "\n"));
 
         while ($r->find()) {
             $varName = $r->group(1);

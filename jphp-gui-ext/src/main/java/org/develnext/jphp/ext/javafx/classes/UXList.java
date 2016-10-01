@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
@@ -7,6 +8,7 @@ import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
+import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.lang.ForeachIterator;
 import php.runtime.lang.spl.ArrayAccess;
@@ -257,5 +259,12 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         }
 
         return Memory.NULL;
+    }
+
+    @Signature
+    public void addListener(Invoker invoker) {
+        getWrappedObject().addListener((ListChangeListener<T>) c -> {
+            invoker.callAny();
+        });
     }
 }

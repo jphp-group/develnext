@@ -84,22 +84,62 @@ class DataUtils
      */
     public static function cleanup(UXParent $parent)
     {
+        $nodes = self::_cleanup($parent);
+
+        foreach ($nodes as $node) {
+            $node->free();
+        }
+    }
+
+    /**
+     * @param UXParent $parent
+     * @param array $exists
+     * @return UXData[]
+     */
+    private static function _cleanup(UXParent $parent, array &$exists = [])
+    {
         if (UXApplication::isUiThread()) {
+            $result = [];
+
             foreach ($parent->childrenUnmodifiable as $node) {
                 if ($node instanceof UXData) {
+                    $id = $node->id;
+
+                    if ($exists[$id]) {
+                        $result[] = $node;
+                        continue;
+                    }
+
                     $nd = static::getNode($parent, $node);
 
-                    if (!$nd) {
-                        $parent->children->remove($node);
+                    if (!$nd || $nd->parent !== $node->parent) {
+                        $result[] = $node;
+                    } else {
+                        $exists[$id] = true;
                     }
                 } else if ($node instanceof UXTitledPane) {
                     if ($node->content instanceof UXParent) {
-                        static::cleanup($node->content);
+                        $result += static::_cleanup($node->content, $exists);
+                    }
+                } else if ($node instanceof UXScrollPane) {
+                    if ($node->content instanceof UXParent) {
+                        $result += static::_cleanup($node->content, $exists);
+                    }
+                } else if ($node instanceof UXTabPane) {
+                    foreach ($node->tabs as $tab) {
+                        if ($tab->content instanceof UXParent) {
+                            $result += static::_cleanup($tab->content, $exists);
+                        }
                     }
                 } else if ($node instanceof UXParent) {
-                    static::cleanup($node);
+                    $result += static::_cleanup($node, $exists);
                 }
             }
+
+            return $result;
+        } else {
+            Logger::warn("Unable to cleanup() in non-ui thread.");
+            return [];
         }
     }
 
@@ -177,10 +217,8 @@ class DataUtils
     {
         $data = static::get($node);
 
-        $parent = $data->parent;
-
-        if (isset($parent->children)) {
-            $parent->children->remove($data);
+        if ($data) {
+            $data->free();
         }
     }
 }

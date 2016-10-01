@@ -104,11 +104,6 @@ class ActionConstructorForm extends AbstractIdeForm
      */
     protected $context;
 
-    /**
-     * @var TimerScript
-     */
-    protected $timer;
-
     protected static $tabSelectedIndex = -1;
     protected static $globalTabSelectedIndex = 0;
 
@@ -195,23 +190,12 @@ class ActionConstructorForm extends AbstractIdeForm
         $this->tabs->tabs[0]->on('change', $tabChange);
         $this->tabs->tabs[1]->on('change', $tabChange);
 
-        $this->timer = new TimerScript(1, true, function () use ($tabOne, $tabTwo) {
+        waitAsync(1, function () use ($tabOne, $tabTwo) {
+
+        });
+
+        $this->list->items->addListener(function () use ($tabOne, $tabTwo) {
             $this->tabs->tabs[0]->text = $this->list->items->count ? "$tabOne *" : $tabOne;
-            if ($this->list->items->count) {
-                $this->tabs->tabs[0]->style = '-fx-text-fill: black;';
-            } else {
-                $this->tabs->tabs[0]->style = '-fx-text-fill: silver;';
-            }
-            /*$split = Flow::of(str::split($this->getLiveCode(), "\n"))->find(function ($it) {
-                $regex = Regex::of("\\/\\/ \\+Actions\\:[ ]+?[0-9]+?[ ]+?//")->with($it);
-                $it = $regex->replace("");
-
-                $it = str::trim($it);
-
-                return !!$it;
-            })->toArray(); */
-
-            //$this->tabs->tabs[1]->text = "$tabTwo (" . sizeof($split) . ")";
         });
 
         UXApplication::runLater(function () {
@@ -525,8 +509,6 @@ class ActionConstructorForm extends AbstractIdeForm
         $this->userData->self = $this;
 
         //$this->tabs->selectedIndex = self::$globalTabSelectedIndex;
-
-        $this->timer->start();
 
         $this->setOnlyIcons(Ide::get()->getUserConfigValue(get_class($this) . ".onlyIcons", $this->isOnlyIcons()));
 
@@ -863,8 +845,6 @@ class ActionConstructorForm extends AbstractIdeForm
         parent::hide();
 
         Ide::get()->setUserConfigValue(get_class($this) . ".dividerPositions", $this->constructorSplitPane->dividerPositions);
-
-        $this->timer->stop();
 
         if ($this->editor) {
             $this->editor->cacheData = [];

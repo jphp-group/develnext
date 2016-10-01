@@ -6,6 +6,7 @@ use php\compress\ArchiveInputStream;
 use php\compress\ArchiveOutputStream;
 use php\io\File;
 use php\io\Stream;
+use php\lib\fs;
 use php\lib\Items;
 
 class ProjectImporter
