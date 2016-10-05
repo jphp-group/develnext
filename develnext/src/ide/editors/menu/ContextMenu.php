@@ -167,15 +167,17 @@ class ContextMenu
             $menuItem->style .= ';' . $this->style;
         }
 
-        $menuItem->on('action', function ($e) use ($command, $menuItem) {
-            $filter = $this->filter;
+        if ($menuItem instanceof UXMenuItem) {
+            $menuItem->on('action', function ($e) use ($command, $menuItem) {
+                $filter = $this->filter;
 
-            if ($this->isCursorInPopup()) {
-                if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
-                    $command->onExecute($e, $this->editor);
+                if ($this->isCursorInPopup()) {
+                    if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
+                        $command->onExecute($e, $this->editor);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         $this->root->items->add($menuItem);
 
@@ -188,9 +190,12 @@ class ContextMenu
     {
         $command->setContextMenu($this);
 
-        $menuItem = new UXMenuItem($command->getName(), Ide::get()->getImage($command->getIcon()));
-        $menuItem->accelerator = $command->getAccelerator();
-        $menuItem->userData = $command;
+        $menuItem = $command->makeMenuItem();
+
+        if ($menuItem instanceof UXMenuItem) {
+            $menuItem->accelerator = $command->getAccelerator();
+            $menuItem->userData = $command;
+        }
 
         if ($this->cssClass) {
             $menuItem->classes->add("$this->cssClass-item");
@@ -204,15 +209,17 @@ class ContextMenu
             $menuItem->visible = false;
         }
 
-        $menuItem->on('action', function ($e) use ($command, $menuItem) {
-            $filter = $this->filter;
+        if ($menuItem instanceof UXMenuItem) {
+            $menuItem->on('action', function ($e) use ($command, $menuItem) {
+                $filter = $this->filter;
 
-            if ($this->isCursorInPopup()) {
-                if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
-                    $command->onExecute($e, $this->editor);
+                if ($this->isCursorInPopup()) {
+                    if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
+                        $command->onExecute($e, $this->editor);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         $menu = $this->root;
 
@@ -224,9 +231,13 @@ class ContextMenu
             }
         }
 
+        if ($command->withBeforeSeparator()) {
+            $menu->items->add(UXMenuItem::createSeparator());
+        }
+
         $menu->items->add($menuItem);
 
-        if ($command->withSeparator()) {
+        if ($command->withSeparator() || $command->withAfterSeparator()) {
             $menu->items->add(UXMenuItem::createSeparator());
         }
     }
@@ -262,6 +273,17 @@ class ContextMenu
         });
     }
 
+    public function show(UXNode $node)
+    {
+        if ($this->root->visible) {
+            $this->root->hide();
+        }
+
+        uiLater(function () use ($node) {
+            $this->root->show($node->form, Mouse::x(), Mouse::y());
+        });
+    }
+
     /**
      * Link context menu to node.
      * @param UXNode $node
@@ -270,13 +292,7 @@ class ContextMenu
     {
         $handle = function (UXMouseEvent $e) use ($node) {
             if ($e->button == 'SECONDARY') {
-                if ($this->root->visible) {
-                    $this->root->hide();
-                }
-
-                uiLater(function () use ($node) {
-                    $this->root->show($node->form, Mouse::x(), Mouse::y());
-                });
+                $this->show($node);
             }
         };
 

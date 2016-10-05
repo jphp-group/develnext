@@ -1036,6 +1036,8 @@ class Project
         Logger::info("Close project ...");
         $this->trigger(__FUNCTION__);
 
+        FileSystem::setClickOnAddTab(null);
+
         $this->tickTimer->stop();
 
         $file = $this->getIdeFile("ide.lock");

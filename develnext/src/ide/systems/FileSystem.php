@@ -39,6 +39,11 @@ class FileSystem
     static protected $addTab;
 
     /**
+     * @var callable
+     */
+    static protected $addTabClick;
+
+    /**
      * @var UXTab[]
      */
     static protected $openedTabs = [];
@@ -376,9 +381,11 @@ class FileSystem
                 uiLater(function () use ($mainForm, $path, $fileTabPane, $param) {
                     $tab = $fileTabPane->selectedTab;
 
-                    Logger::info("Opening selected tab '$tab->text'");
+                    if ($tab) {
+                        Logger::info("Opening selected tab '$tab->text'");
 
-                    static::_openEditor($tab->userData, $param);
+                        static::_openEditor($tab->userData, $param);
+                    }
                 });
             };
 
@@ -425,6 +432,19 @@ class FileSystem
         }
     }
 
+    static function setClickOnAddTab(callable $callback = null)
+    {
+        self::$addTabClick = $callback;
+
+        if (self::$addTab) {
+            if ($callback) {
+                self::showAddTab();
+            } else {
+                self::hideAddTab();
+            }
+        }
+    }
+
     private static function addTab(UXTab $tab)
     {
         /** @var UXTabPane $fileTabPane */
@@ -464,7 +484,9 @@ class FileSystem
             $button->classes->add('dn-add-tab-button');
             $tab->style = '-fx-cursor: hand; -fx-padding: 1px 0px;';
 
-            $showMenu = function () use ($button) {
+            /*$showMenu = function (UXMouseEvent $event) use ($button) {
+                call_user_func(self::$addTabClick);
+
                 $contextMenu = new UXContextMenu();
 
                 // @var UXMenu $menu
@@ -475,12 +497,17 @@ class FileSystem
                 }
 
                 $contextMenu->showByNode($button, 24, 24);
-            };
-            $button->on('click', $showMenu);
+            };*/
+            $button->on('click', function ($e) {
+                call_user_func(self::$addTabClick, $e);
+            });
+
             static::$addTab = $tab;
         }
 
-        $fileTabPane->tabs->add(static::$addTab);
-        static::$addTab->draggable = false;
+        if (self::$addTabClick) {
+            $fileTabPane->tabs->add(static::$addTab);
+            static::$addTab->draggable = false;
+        }
     }
 }

@@ -23,6 +23,8 @@ use ide\editors\common\ObjectListEditorItem;
 use ide\editors\FactoryEditor;
 use ide\editors\FormEditor;
 use ide\editors\GameSpriteEditor;
+use ide\editors\menu\AbstractMenuCommand;
+use ide\editors\menu\ContextMenu;
 use ide\editors\ProjectEditor;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\form\AbstractFormElement;
@@ -54,9 +56,13 @@ use ide\systems\FileSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
+use php\gui\event\UXEvent;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXLabel;
+use php\gui\UXMenu;
+use php\gui\UXMenuItem;
+use php\gui\UXNode;
 use php\gui\UXTextField;
 use php\io\File;
 use php\io\IOException;
@@ -65,6 +71,88 @@ use php\lib\fs;
 use php\lib\Str;
 use php\util\Configuration;
 use php\util\Regex;
+
+class GuiFrameworkProjectBehaviour_ProjectTreeMenuCommand extends AbstractMenuCommand
+{
+    /**
+     * @var UXMenu
+     */
+    protected $menu;
+    /**
+     * @var GuiFrameworkProjectBehaviour
+     */
+    private $gui;
+
+    /**
+     * GuiFrameworkProjectBehaviour_ProjectTreeMenuCommand constructor.
+     */
+    public function __construct(GuiFrameworkProjectBehaviour $gui)
+    {
+        $this->menu = new UXMenu();
+        $this->gui = $gui;
+    }
+
+    public function withBeforeSeparator()
+    {
+        return true;
+    }
+
+    public function makeMenuItem()
+    {
+        $menu = $this->menu;
+        $menu->text = $this->getName();
+        $menu->graphic = Ide::get()->getImage($this->getIcon());
+
+        return $menu;
+    }
+
+    public function getIcon()
+    {
+        return 'icons/dirs16.png';
+    }
+
+
+    public function getName()
+    {
+        return "Весь проект";
+    }
+
+    public function onExecute($e = null, AbstractEditor $editor = null)
+    {
+
+    }
+
+    /**
+     * @param UXMenu|UXMenuItem $item
+     * @param AbstractEditor|null $editor
+     */
+    public function onBeforeShow($item, AbstractEditor $editor = null)
+    {
+        $menu = $this->menu;
+        $menu->items->clear();
+
+        foreach ([$this->gui->getFormEditors(), $this->gui->getModuleEditors(), $this->gui->getSpriteEditors()] as $i => $editors) {
+            if ($i > 0 && $editors) {
+                $menu->items->add(UXMenuItem::createSeparator());
+            }
+
+            /** @var AbstractEditor[] $editors */
+            foreach ($editors as $editor) {
+                $menuItem = new UXMenuItem($editor->getTitle(), Ide::get()->getImage($editor->getIcon()));
+                $menu->items->add($menuItem);
+
+                if (FileSystem::isOpened($editor->getFile())) {
+                    $menuItem->style = '-fx-text-fill: blue;';
+                }
+
+                $menuItem->on('action', function () use ($editor) {
+                    FileSystem::open($editor->getFile());
+                });
+            }
+        }
+    }
+
+}
 
 /**
  * Class GuiFrameworkProjectBehaviour
@@ -146,12 +234,23 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         //WatcherSystem::addListener([$this, 'doWatchFile']);
 
-        Ide::get()->registerCommand(new CreateFormProjectCommand());
-        Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
+        $addMenu = new ContextMenu();
+
+        FileSystem::setClickOnAddTab(function (UXEvent $e) use ($addMenu) {
+            $addMenu->show($e->sender);
+        });
+
+        $addMenu->addCommand(new CreateFormProjectCommand());
+        $addMenu->addCommand(new CreateScriptModuleProjectCommand());
+        $addMenu->addCommand(new CreateGameSpriteProjectCommand());
+        $addMenu->add(new GuiFrameworkProjectBehaviour_ProjectTreeMenuCommand($this));
+
+        //Ide::get()->registerCommand(new CreateFormProjectCommand());
+        //Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
         //Ide::get()->registerCommand(new CreateFactoryProjectCommand());
 
         //Ide::get()->registerCommand(new CreateGameObjectPrototypeProjectCommand());
-        Ide::get()->registerCommand(new CreateGameSpriteProjectCommand());
+        //Ide::get()->registerCommand(new CreateGameSpriteProjectCommand());
 
         Ide::get()->registerSettings(new FormEditorSettings());
 

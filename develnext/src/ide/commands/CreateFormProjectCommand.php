@@ -4,6 +4,7 @@ namespace ide\commands;
 use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\forms\BuildProgressForm;
+use ide\forms\InputMessageBoxForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
@@ -16,6 +17,7 @@ use php\lang\Process;
 use php\lib\fs;
 use php\lib\Str;
 use php\time\Time;
+use php\util\Regex;
 
 class CreateFormProjectCommand extends AbstractCommand
 {
@@ -43,7 +45,12 @@ class CreateFormProjectCommand extends AbstractCommand
             /** @var GuiFrameworkProjectBehaviour $guiBehaviour */
             $guiBehaviour = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
 
-            $name = UXDialog::input('Придумайте название для формы');
+            $dialog = new InputMessageBoxForm('Создание новой формы', 'Введите название для новой формы', '* Только латинские буквы, цифры и _');
+            $dialog->setPattern(new Regex('^[a-z\\_]{1}[a-z0-9\\_]{0,60}$', 'i'), 'Данное название некорректное');
+
+            $dialog->showDialog();
+            $name = $dialog->getResult();
+
 
             if ($name !== null) {
                 $name = str::trim($name);

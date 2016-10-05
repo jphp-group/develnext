@@ -346,8 +346,8 @@ class HttpDownloader extends AbstractScript
             //throw new \Exception("Cannot download, downloader is busy, use stopAndWait() method to stop it before start.");
         }
 
-        new HttpResponse();
-        new HttpAsyncResponse();
+        //new HttpResponse();
+        //new HttpAsyncResponse();
 
         $this->_startTime = Time::seconds();
         $this->_downloadedBytes = 0;

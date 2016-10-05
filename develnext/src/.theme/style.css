@@ -144,6 +144,11 @@
     -fx-text-fill: gray;
 }
 
+.dn-tooltip-error {
+    -fx-background-color: #b71c0f;
+    -fx-text-fill: #ffece0;
+}
+
 .account-menu {
     -fx-padding: 5px;
 }

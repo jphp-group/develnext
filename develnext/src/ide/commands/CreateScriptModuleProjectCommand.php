@@ -5,6 +5,7 @@ use Dialog;
 use Files;
 use ide\editors\AbstractEditor;
 use ide\forms\BuildProgressForm;
+use ide\forms\InputMessageBoxForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
@@ -17,6 +18,7 @@ use php\io\File;
 use php\lang\Process;
 use php\lib\Str;
 use php\time\Time;
+use php\util\Regex;
 
 class CreateScriptModuleProjectCommand extends AbstractCommand
 {
@@ -41,7 +43,11 @@ class CreateScriptModuleProjectCommand extends AbstractCommand
         $project = $ide->getOpenedProject();
 
         if ($project) {
-            $name = UXDialog::input('Придумайте название для модуля скриптов');
+            $dialog = new InputMessageBoxForm('Создание нового модуля', 'Введите название для нового модуля', '* Только латинские буквы, цифры и _');
+            $dialog->setPattern(new Regex('^[a-z\\_]{1}[a-z0-9\\_]{0,60}$', 'i'), 'Данное название некорректное');
+
+            $dialog->showDialog();
+            $name = $dialog->getResult();
 
             if ($name !== null) {
                 $name = str::trim($name);

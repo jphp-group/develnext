@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="499.0" spacing="15.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox id="dialogHeader" spacing="10.0">
+         <children>
+            <VBox HBox.hgrow="ALWAYS">
+               <children>
+                  <Label id="titleLabel" text="Title">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <Separator prefWidth="200.0" />
+      <VBox id="dialogContainer" spacing="10.0">
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" />
+         </padding>
+         <children>
+            <Label id="qLabel" text="Введите текст подтверждения:" />
+            <TextField id="edit" prefHeight="36.0" prefWidth="520.0" />
+         </children>
+      </VBox>
+      <Separator prefWidth="200.0" />
+      <HBox id="dialogFooter" alignment="CENTER_RIGHT" prefHeight="35.0" spacing="10.0">
+         <children>
+            <Label id="helpLabel" maxWidth="1.7976931348623157E308" text="Long help text" textFill="#949494" HBox.hgrow="ALWAYS" />
+            <Button id="cancelButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Отмена">
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
+            </Button>
+            <Button id="saveButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-ok" text="Далее">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+</VBox>

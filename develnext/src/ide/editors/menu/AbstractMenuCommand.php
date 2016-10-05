@@ -3,6 +3,7 @@ namespace ide\editors\menu;
 
 use ide\editors\AbstractEditor;
 use ide\misc\AbstractCommand;
+use php\gui\UXMenu;
 use php\gui\UXMenuItem;
 use php\lang\IllegalStateException;
 
@@ -46,7 +47,11 @@ abstract class AbstractMenuCommand extends AbstractCommand
         return $this->makeGlyphButton();
     }
 
-    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    /**
+     * @param UXMenuItem|UXMenu $item
+     * @param AbstractEditor|null $editor
+     */
+    public function onBeforeShow($item, AbstractEditor $editor = null)
     {
         // nop.
     }
