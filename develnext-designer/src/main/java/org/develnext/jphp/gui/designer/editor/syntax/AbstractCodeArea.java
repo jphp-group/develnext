@@ -79,6 +79,12 @@ abstract public class AbstractCodeArea extends CodeArea {
 
         executor = Executors.newSingleThreadExecutor();
 
+        /*richChanges()
+                .filter(ch -> !ch.getInserted().equals(ch.getRemoved())) // XXX
+                .subscribe(change -> {
+                    setStyleSpans(0, computeHighlighting(getText()));
+                });*/
+
         richChanges()
                 .filter(new Predicate<RichTextChange<Collection<String>, Collection<String>>>() {
                     @Override
@@ -86,7 +92,7 @@ abstract public class AbstractCodeArea extends CodeArea {
                         return !ch.getInserted().equals(ch.getRemoved());
                     }
                 }) // XXX
-                .successionEnds(Duration.ofMillis(200))
+                .successionEnds(Duration.ofMillis(100))
                 .supplyTask(AbstractCodeArea.this::computeHighlightingAsync)
                 .awaitLatest(richChanges())
                 .filterMap(t -> {
