@@ -3,6 +3,9 @@ package org.develnext.jphp.gui.designer.editor.syntax.hotkey;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
+import org.fxmisc.richtext.model.Paragraph;
+
+import java.util.Collection;
 
 public class AutoBracketsHotkey extends AbstractHotkey {
     protected boolean isCharForQuote(char ch) {
@@ -45,28 +48,53 @@ public class AutoBracketsHotkey extends AbstractHotkey {
             return false;
         }
 
+        Paragraph<Collection<String>, Collection<String>> paragraph = area.getParagraph(area.getCurrentParagraph());
+
+        int s1_count = 0;
+        int s2_count = 0;
+        int s3_count = 0;
+
+        int q1_count = 0;
+        int q2_count = 0;
+
+        for (int i = 0; i < paragraph.length(); i++) {
+            char c = paragraph.charAt(i);
+
+            if (c == '(') s1_count++;
+            if (c == ')') s1_count--;
+
+            if (c == '[') s2_count++;
+            if (c == ']') s2_count--;
+
+            if (c == '{') s3_count++;
+            if (c == '}') s3_count--;
+
+            if (c == '"') q2_count++;
+            if (c == '\'') q1_count++;
+        }
+
         switch (ch) {
             case "{":
-                if (keyEvent.getCode() == KeyCode.OPEN_BRACKET) {
+                if (keyEvent.getCode() == KeyCode.OPEN_BRACKET && s3_count != 0) {
                     addClosed = '}';
                 }
                 break;
 
             case "[":
-                if (keyEvent.getCode() == KeyCode.OPEN_BRACKET) {
+                if (keyEvent.getCode() == KeyCode.OPEN_BRACKET && s2_count != 0) {
                     addClosed = ']';
                 }
                 break;
 
             case "(":
-                if (keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey()) {
+                if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey()) && s1_count != 0) {
                     addClosed = ')';
                 }
 
                 break;
 
             case "\"":
-                if (keyEvent.getCode() == KeyCode.QUOTE) {
+                if (keyEvent.getCode() == KeyCode.QUOTE && q2_count % 2 != 0) {
                     if (area.getText().length() >= pos + 1 && area.getText().charAt(pos) == ch.charAt(0)) {
                         area.replaceText(pos, pos + 1, "");
                     } else if (isCharForQuote(nextCh)) {
@@ -76,7 +104,7 @@ public class AutoBracketsHotkey extends AbstractHotkey {
 
                 break;
             case "'":
-                if (keyEvent.getCode() == KeyCode.QUOTE) {
+                if (keyEvent.getCode() == KeyCode.QUOTE && q1_count % 2 != 0) {
                     if (area.getText().length() >= pos + 1 && area.getText().charAt(pos) == ch.charAt(0)) {
                         area.replaceText(pos, pos + 1, "");
                     } else if (isCharForQuote(nextCh)) {
@@ -89,9 +117,24 @@ public class AutoBracketsHotkey extends AbstractHotkey {
             case "}":
             case "]":
             case ")":
+
+
                 if (area.getText().length() >= pos + 1 &&
                         (keyEvent.getCode() == KeyCode.CLOSE_BRACKET || keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey())) {
                     if (area.getText().charAt(pos) == ch.charAt(0)) {
+
+                        if (ch.equals(")") && s1_count == 0) {
+                            break;
+                        }
+
+                        if (ch.equals("]") && s2_count == 0) {
+                            break;
+                        }
+
+                        if (ch.equals("}") && s3_count == 0) {
+                            break;
+                        }
+
                         area.replaceText(pos, pos + 1, "");
                     }
                 }
