@@ -5,14 +5,45 @@ use ide\Ide;
 use ide\Logger;
 use php\gui\framework\AbstractForm;
 use php\gui\UXScreen;
+use php\lang\IllegalArgumentException;
 
 trait SavableFormMixin
 {
+    protected $lockSizes = false;
+
     /**
-     * @event SavableFormMixin:showing
+     * @return boolean
+     */
+    public function isLockSizes()
+    {
+        return $this->lockSizes;
+    }
+
+    /**
+     * @param boolean $lockSizes
+     */
+    public function setLockSizes($lockSizes)
+    {
+        $this->lockSizes = $lockSizes;
+    }
+
+    /**
+     * @event SavableFormMixin:show
      */
     public function doSavableFormMixinShow()
     {
+        waitAsync(200, function () {
+            $this->setLockSizes(false);
+        });
+    }
+
+    /**
+     * @event SavableFormMixin:showing
+     */
+    public function doSavableFormMixinShowing()
+    {
+        $this->lockSizes = true;
+
         /** @var $this AbstractForm */
         $class = get_class($this);
 
@@ -50,16 +81,35 @@ trait SavableFormMixin
         Logger::debug("Init window $class, size = [$this->width, $this->height], position = [$this->x, $this->y]");
 
         if ($this->resizable) {
-            uiLater(function () use ($config) {
-                /** @var $this AbstractForm */
-                $this->width = $config->get("width", $this->width);
-                $this->height = $config->get("height", $this->height);
-            });
+            if (!$this->data('--SavableFormMixin-init')) {
+                $this->data('--SavableFormMixin-init', true);
+
+                $this->observer('width')->addListener(function ($_, $new) use ($config) {
+                    /** @var $this AbstractForm */
+                    $w = $config->get("width", $this->width);
+
+                    if ($new != $w && $this->isLockSizes()) {
+                        $this->width = $w;
+                    }
+                });
+
+                $this->observer('height')->addListener(function ($_, $new) use ($config) {
+                    /** @var $this AbstractForm */
+                    $h = $config->get("height", $this->height);
+
+                    if ($new != $h && $this->isLockSizes()) {
+                        $this->height = $h;
+                    }
+                });
+            }
+            //uiLater($f);
         }
 
         $screen = UXScreen::getPrimary();
 
         if ($this->height < 50) {
+            $this->setLockSizes(false);
+
             uiLater(function () {
                 /** @var $this AbstractForm */
                 $this->height = 300;
@@ -67,6 +117,8 @@ trait SavableFormMixin
         }
 
         if ($this->width < 70) {
+            $this->setLockSizes(false);
+
             uiLater(function () {
                 /** @var $this AbstractForm */
                 $this->width = 400;
@@ -103,5 +155,7 @@ trait SavableFormMixin
         if ($this->resizable) {
             $config->set("maximized", $this->maximized);
         }
+
+        $this->setLockSizes(false);
     }
 }

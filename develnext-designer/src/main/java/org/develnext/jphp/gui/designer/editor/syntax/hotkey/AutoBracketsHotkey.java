@@ -75,19 +75,19 @@ public class AutoBracketsHotkey extends AbstractHotkey {
 
         switch (ch) {
             case "{":
-                if (keyEvent.getCode() == KeyCode.OPEN_BRACKET && s3_count != 0) {
+                if (keyEvent.getCode() == KeyCode.OPEN_BRACKET && s3_count > 0) {
                     addClosed = '}';
                 }
                 break;
 
             case "[":
-                if (keyEvent.getCode() == KeyCode.OPEN_BRACKET && s2_count != 0) {
+                if (keyEvent.getCode() == KeyCode.OPEN_BRACKET && s2_count > 0) {
                     addClosed = ']';
                 }
                 break;
 
             case "(":
-                if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey()) && s1_count != 0) {
+                if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey()) && s1_count > 0) {
                     addClosed = ')';
                 }
 

@@ -16,6 +16,7 @@ use ide\editors\menu\ContextMenu;
 use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
+use ide\Logger;
 use ide\marker\ArrowPointMarker;
 use ide\marker\target\ActionTypeMarketTarget;
 use ide\marker\target\CancelButtonMarkerTarget;
