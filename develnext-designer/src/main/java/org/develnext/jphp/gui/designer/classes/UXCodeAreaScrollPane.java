@@ -8,7 +8,9 @@ import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.StyledTextArea;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Namespace;
+import php.runtime.annotation.Reflection.Setter;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.lang.IObject;
@@ -31,5 +33,25 @@ public class UXCodeAreaScrollPane extends UXRegion<VirtualizedScrollPane<Abstrac
         } else {
             throw new IllegalArgumentException("Invalid text area");
         }
+    }
+
+    @Getter
+    public double getScrollX() {
+        return getWrappedObject().estimatedScrollXProperty().getValue();
+    }
+
+    @Setter
+    public void setScrollX(double value) {
+        getWrappedObject().estimatedScrollXProperty().setValue(value);
+    }
+
+    @Getter
+    public double getScrollY() {
+        return getWrappedObject().estimatedScrollYProperty().getValue();
+    }
+
+    @Setter
+    public void setScrollY(double value) {
+        getWrappedObject().estimatedScrollYProperty().setValue(value);
     }
 }

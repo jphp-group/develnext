@@ -103,6 +103,11 @@ class CodeEditor extends AbstractEditor
     protected $textArea;
 
     /**
+     * @var UXCodeAreaScrollPane
+     */
+    protected $textAreaScrollPane;
+
+    /**
      * @var AutoCompletePane
      */
     protected $autoComplete;
@@ -330,7 +335,17 @@ class CodeEditor extends AbstractEditor
         parent::open($param);
 
         $this->resetSettings();
-        $this->loadContentToArea();
+
+        if (!$this->file) {
+            $this->loadContentToArea();
+        } else {
+            $hash = str::hash($this->getValue(), 'SHA-256');
+            $fHash = fs::hash($this->file, 'SHA-256');
+
+            if ($hash != $fHash) {
+                $this->loadContentToArea();
+            }
+        }
     }
 
     public function refresh()
@@ -347,6 +362,7 @@ class CodeEditor extends AbstractEditor
         }
 
         $caret = $this->textArea->caretPosition;
+        list($sX, $sY) = [$this->textAreaScrollPane->scrollX, $this->textAreaScrollPane->scrollY];
 
         $file = $this->file;
 
@@ -366,6 +382,8 @@ class CodeEditor extends AbstractEditor
         }
 
         $this->textArea->caretPosition = $caret;
+        $this->textAreaScrollPane->scrollX = $sX;
+        $this->textAreaScrollPane->scrollY = $sY;
 
         Logger::info("Finish load file $file");
     }
@@ -453,7 +471,7 @@ class CodeEditor extends AbstractEditor
             $ui->add($commandPane);
         }
 
-        $scrollPane = new UXCodeAreaScrollPane($this->textArea);
+        $this->textAreaScrollPane = $scrollPane = new UXCodeAreaScrollPane($this->textArea);
 
         $ui->add($scrollPane);
 

@@ -300,6 +300,9 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                 new StatementAutoCompleteItem('break', 'Выйти из цикла или switch', 'break;'),
                 new StatementAutoCompleteItem('continue', 'К следующей итерации цикла', 'continue;'),
                 new StatementAutoCompleteItem('echo', 'Распечатать в вывод консоли', 'echo '),
+                new StatementAutoCompleteItem('and', 'Логическое И', 'and'),
+                new StatementAutoCompleteItem('or', 'Логическое ИЛИ', 'or'),
+                new StatementAutoCompleteItem('xor', '', 'xor'),
             ];
         }
 

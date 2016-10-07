@@ -92,7 +92,7 @@ abstract public class AbstractCodeArea extends CodeArea {
                         return !ch.getInserted().equals(ch.getRemoved());
                     }
                 }) // XXX
-                .successionEnds(Duration.ofMillis(100))
+                .successionEnds(Duration.ofMillis(200))
                 .supplyTask(AbstractCodeArea.this::computeHighlightingAsync)
                 .awaitLatest(richChanges())
                 .filterMap(t -> {
@@ -280,6 +280,8 @@ abstract public class AbstractCodeArea extends CodeArea {
     public void setText(String text) {
         clear();
         appendText(text);
+
+        applyHighlighting(computeHighlighting(text));
     }
 
     public int getTabSize() {

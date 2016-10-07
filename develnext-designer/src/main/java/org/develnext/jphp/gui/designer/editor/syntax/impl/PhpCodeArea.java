@@ -11,6 +11,7 @@ import org.develnext.jphp.core.tokenizer.token.Token;
 import org.develnext.jphp.core.tokenizer.token.expr.BraceExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.CommaToken;
 import org.develnext.jphp.core.tokenizer.token.expr.OperatorExprToken;
+import org.develnext.jphp.core.tokenizer.token.expr.operator.*;
 import org.develnext.jphp.core.tokenizer.token.expr.value.*;
 import org.develnext.jphp.core.tokenizer.token.stmt.StmtToken;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
@@ -46,6 +47,14 @@ public class PhpCodeArea extends AbstractCodeArea {
     }
 
     private static Collection<String> getStyleOfToken(Token token) {
+        if (token instanceof SemicolonToken) {
+            return Collections.singletonList("semicolon");
+        }
+
+        if (token instanceof ColonToken || token instanceof CommaToken || token instanceof BraceExprToken) {
+            return Collections.singletonList("control");
+        }
+
         if (token instanceof CommentToken) {
             return Collections.singletonList("comment");
         }
@@ -63,20 +72,24 @@ public class PhpCodeArea extends AbstractCodeArea {
         }
 
         if (token instanceof StmtToken
-                || token instanceof BooleanExprToken || token instanceof NullExprToken || token instanceof NewExprToken) {
+                || token instanceof BooleanExprToken || token instanceof NullExprToken || token instanceof NewExprToken
+                || token instanceof SelfExprToken || token instanceof StaticExprToken || token instanceof ParentExprToken
+                || token instanceof EmptyExprToken || token instanceof IssetExprToken || token instanceof DieExprToken
+                || token instanceof UnsetExprToken || token instanceof InstanceofExprToken || token instanceof CloneExprToken
+                || token instanceof BooleanAnd2ExprToken || token instanceof BooleanOr2ExprToken || token instanceof BooleanXorExprToken
+                || token instanceof OpenTagToken) {
             return Collections.singletonList("keyword");
         }
 
-        if (token instanceof ColonToken || token instanceof CommaToken || token instanceof BraceExprToken) {
-            return Collections.singletonList("control");
+        if (token instanceof NameToken) {
+            switch (token.getWord().toLowerCase()) {
+                case "array":
+                    return Collections.singletonList("keyword");
+            }
         }
 
         if (token instanceof OperatorExprToken) {
             return Collections.singletonList("operator");
-        }
-
-        if (token instanceof SemicolonToken) {
-            return Collections.singletonList("semicolon");
         }
 
         return Collections.emptyList();
