@@ -100,7 +100,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         }
 
         while (iterator.next()) {
-            env.invokeMethod(this, "add", iterator.getValue());
+            env.invokeMethod(this, "add", iterator.getValue().toImmutable());
         }
     }
 
@@ -113,7 +113,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         env.invokeMethod(this, "clear");
 
         while (iterator.next()) {
-            env.invokeMethod(this, "add", iterator.getValue());
+            env.invokeMethod(this, "add", iterator.getValue().toImmutable());
         }
     }
 

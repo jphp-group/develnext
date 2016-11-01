@@ -362,7 +362,10 @@ class CodeEditor extends AbstractEditor
         }
 
         $caret = $this->textArea->caretPosition;
-        list($sX, $sY) = [$this->textAreaScrollPane->scrollX, $this->textAreaScrollPane->scrollY];
+
+        if ($this->textAreaScrollPane) {
+            list($sX, $sY) = [$this->textAreaScrollPane->scrollX, $this->textAreaScrollPane->scrollY];
+        }
 
         $file = $this->file;
 
@@ -382,8 +385,11 @@ class CodeEditor extends AbstractEditor
         }
 
         $this->textArea->caretPosition = $caret;
-        $this->textAreaScrollPane->scrollX = $sX;
-        $this->textAreaScrollPane->scrollY = $sY;
+
+        if ($this->textAreaScrollPane) {
+            $this->textAreaScrollPane->scrollX = $sX;
+            $this->textAreaScrollPane->scrollY = $sY;
+        }
 
         Logger::info("Finish load file $file");
     }

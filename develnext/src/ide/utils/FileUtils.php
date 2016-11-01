@@ -203,8 +203,9 @@ class FileUtils
 
             if ($size < 1024 * 1024 * 32) {
                 Stream::putContents($dest, fs::get($origin));
+                $result = $size;
             } else {
-                fs::copy($origin, $dest);
+                $result = fs::copy($origin, $dest);
             }
 
             if (UXApplication::isUiThread()) {
@@ -215,7 +216,7 @@ class FileUtils
                 }
             }
             //Stream::putContents($dest, fs::get($origin));
-            return 0;
+            return $result;
         } catch (IOException $e) {
             Logger::warn("Unable copy $origin to $dest, {$e->getMessage()}");
             return -1;
