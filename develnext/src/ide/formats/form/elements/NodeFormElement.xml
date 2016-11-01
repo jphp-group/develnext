@@ -51,13 +51,13 @@
         <eventType code="mouseExit" name="Курсор вне объекта" kind="MouseEvent" icon="icons/cursor16.png" />
 
 
-        <eventType code="globalKeyDown" name="Глобальное нажатие" kind="GlobalKeyParamEvent" icon="icons/keyGlobal16.png" />
-        <eventType code="globalKeyUp" name="Глобальное отжатие" kind="GlobalKeyParamEvent" icon="icons/keyGlobal16.png" />
-        <eventType code="globalKeyPress" name="Глобальная клавиатура" kind="GlobalKeyParamEvent" icon="icons/keyboardGlobal16.png" />
+        <eventType code="globalKeyDown" name="Нажатие" kind="GlobalKeyParamEvent" icon="icons/keyGlobal16.png" />
+        <eventType code="globalKeyUp" name="Отжатие" kind="GlobalKeyParamEvent" icon="icons/keyGlobal16.png" />
+        <eventType code="globalKeyPress" name="Клавиатура" kind="GlobalKeyParamEvent" icon="icons/keyboardGlobal16.png" />
 
-        <eventType code="keyDown" name="Нажатие клавиши" kind="KeyParamEvent" icon="icons/key16.png" />
-        <eventType code="keyUp" name="Отжатие клавиши" kind="KeyParamEvent" icon="icons/key16.png" />
-        <eventType code="keyPress" name="Клавиатура" kind="KeyEvent" icon="icons/keyboard16.png" />
+        <eventType code="keyDown" name="Нажатие (при фокусе)" kind="KeyParamEvent" icon="icons/key16.png" />
+        <eventType code="keyUp" name="Отжатие (при фокусе)" kind="KeyParamEvent" icon="icons/key16.png" />
+        <eventType code="keyPress" name="Клавиатура (при фокусе)" kind="KeyEvent" icon="icons/keyboard16.png" />
 
         <eventType code="scroll" name="Прокрутка" kind="ScrollParamEvent" icon="icons/scroll16.png" />
 
