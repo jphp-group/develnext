@@ -645,6 +645,34 @@ class CodeEditor extends AbstractEditor
                 $result = $this->_findSearchText($this->getReplaceDialog(), $text, $options, true);
                 break;
 
+            case 'REPLACE_ALL':
+                if (MessageBoxForm::confirm('Вы уверены, что хотите заменить все?')) {
+                    $result = $this->_findSearchText($this->getReplaceDialog(), $text, $options, true);
+
+                    if (!$result) {
+                        UXDialog::showAndWait('Ничего не найдено.');
+                        break;
+                    }
+
+                    $pos = $this->textArea->caretPosition;
+                    $scrollX = $this->textAreaScrollPane->scrollX;
+                    $scrollY = $this->textAreaScrollPane->scrollY;
+
+                    if ($options['case']) {
+                        $this->textArea->text = str::replace($this->textArea->text, $text, $newText);
+                    } else {
+                        $this->textArea->text = str_ireplace($text, $newText, $this->textArea->text);
+                    }
+
+                    $this->textArea->caretPosition = $pos;
+                    $this->textAreaScrollPane->scrollX = $scrollX;
+                    $this->textAreaScrollPane->scrollY = $scrollY;
+                } else {
+                    $this->getReplaceDialog()->setResult($text);
+                    $this->showReplaceDialog();
+                }
+                break;
+
             case 'REPLACE':
                 if (!$this->textArea->selectedText) {
                     UXDialog::showAndWait('Ничего не найдено.');

@@ -65,12 +65,16 @@
                         <Insets left="15.0" right="15.0" />
                      </padding>
                   </Button>
+                  <Button id="replaceAllButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-ok" text="Заменить все">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
                   <Button id="cancelButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Отмена">
                      <padding>
                         <Insets left="15.0" right="15.0" />
                      </padding>
                   </Button>
-                  <Label text="Поиск по тексту исходников" textFill="#949494" />
                </children>
             </HBox>
          </children>

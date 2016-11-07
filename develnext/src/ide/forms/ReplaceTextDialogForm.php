@@ -98,6 +98,15 @@ class ReplaceTextDialogForm extends AbstractIdeForm
     }
 
     /**
+     * @event replaceAllButton.action
+     */
+    public function doReplaceAll()
+    {
+        $onSearch = $this->onSearch;
+        $onSearch($this->inputField->text, $this->replaceField->text, $this->getOptions(), 'REPLACE_ALL');
+    }
+
+    /**
      * @event skipButton.action
      */
     public function doSkip()

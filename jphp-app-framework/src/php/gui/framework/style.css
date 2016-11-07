@@ -1,3 +1,29 @@
+.root {
+    /***************************************************************************
+     *                                                                         *
+     * The main color palette from which the rest of the colors are derived.   *
+     *                                                                         *
+     **************************************************************************/
+
+    /* A light grey that is the base color for objects.  Instead of using
+     * -fx-base directly, the sections in this file will typically use -fx-color.
+     */
+    -fx-base: #ececec;
+    -fx-accent: #c5c5c5;
+    -fx-default-button: #1c67b1;
+
+    -fx-focus-color: #2788d3;
+    -fx-faint-focus-color: #039ED322;
+
+    -fx-body-color: linear-gradient(to bottom,
+                        ladder(
+                                -fx-color,
+                                derive(-fx-color,8%) 85%,
+                                derive(-fx-color,10%) 90%
+                        ),
+                        derive(-fx-color,-3%));
+}
+
 /*******************************************************************************
  *                                                                             *
  * Hyperlink                                                                   *
@@ -7,19 +33,18 @@
 .hyperlink {
     -fx-padding: 0; /*0.166667em 0.25em 0.166667em 0.25em;*/ /* 2 3 2 3 */
     -fx-content-display: LEFT;
-    -fx-text-fill: -fx-text-background-color;
     -fx-border-color: transparent;
     -fx-border-width: 0px;
 }
 .hyperlink,
 .hyperlink:hover,
 .hyperlink:hover:visited {
-    -fx-text-fill: -fx-accent;
+    -fx-text-fill: -fx-default-button;
 }
 .hyperlink:armed,
 .hyperlink:visited,
 .hyperlink:hover:armed {
-    -fx-text-fill: -fx-accent;
+    -fx-text-fill: -fx-default-button;
 }
 .hyperlink:hover,
 .hyperlink:hover:visited {
@@ -91,4 +116,8 @@
 .nav .nav-hint-total {
     -fx-text-fill: gray;
     -fx-font-weight: bold;
+}
+
+.button, .combo-box-base, .list-view, .text-area, .text-field, .tab-header-area, .tab-pane, .tab-header-background {
+    -fx-background-radius: 2px;
 }

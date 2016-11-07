@@ -4,12 +4,15 @@ namespace ide\editors\form;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\designer\UXDesigner;
 use php\gui\layout\UXHBox;
+use php\gui\UXButton;
 use php\gui\UXLabel;
+use php\gui\UXNode;
 use php\gui\UXSeparator;
 use php\gui\UXTextField;
 use php\gui\UXToggleButton;
 use php\gui\UXToggleGroup;
 use php\lang\IllegalArgumentException;
+use php\lib\str;
 
 class IdeActionsPane extends UXHBox
 {
@@ -142,6 +145,60 @@ class IdeActionsPane extends UXHBox
         $this->setSnapType($designer->snapType);
         $this->setSnapSizeX($designer->snapSizeX);
         $this->setSnapSizeY($designer->snapSizeY);
+
+        $this->makeAlignPane();
+    }
+
+    protected function makeAlignPane()
+    {
+        $this->add(new UXSeparator('VERTICAL'));
+
+        foreach (['left', 'right', 'top', 'bottom', 'center', 'middle'] as $align) {
+            $btn = new UXButton();
+            $btn->tooltipText = 'Alignment (' . str::upperFirst($align) . ")";
+            $btn->graphic = ico('align' . str::upperFirst($align) . '16');
+            $btn->on('click', function () use ($align) {
+                foreach ($this->designer->getSelectedNodes() as $node) {
+                    if ($this->designer->getNodeLock($node)) continue;
+
+                    call_user_func([$this, 'alignTo' . $align], $node);
+                }
+
+                $this->designer->update();
+            });
+
+            $this->add($btn);
+        }
+    }
+
+    public function alignToLeft(UXNode $node)
+    {
+        $node->x = 0;
+    }
+
+    public function alignToTop(UXNode $node)
+    {
+        $node->y = 0;
+    }
+
+    public function alignToRight(UXNode $node)
+    {
+        $node->x = $node->parent->width - $node->boundsInParent['width'];
+    }
+
+    public function alignToBottom(UXNode $node)
+    {
+        $node->y = $node->parent->height - $node->boundsInParent['height'];
+    }
+
+    public function alignToCenter(UXNode $node)
+    {
+        $node->x = round($node->parent->width / 2 - $node->boundsInParent['width'] / 2);
+    }
+
+    public function alignToMiddle(UXNode $node)
+    {
+        $node->y = round($node->parent->height / 2 - $node->boundsInParent['height'] / 2);
     }
 
     public function setSnapType($type)
