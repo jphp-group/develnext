@@ -9,7 +9,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="692.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox layoutX="14.0" layoutY="525.0" prefHeight="34.0" prefWidth="692.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="193.0">
+      <HBox alignment="CENTER_LEFT" layoutX="14.0" layoutY="525.0" prefHeight="34.0" prefWidth="692.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="193.0">
          <children>
             <Button id="saveButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="43.0" styleClass="icon-ok" text="Сохранить">
                <font>
@@ -26,7 +26,7 @@
                <padding>
                   <Insets left="15.0" right="15.0" />
                </padding></Button>
-            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="ALWAYS" />
+            <CheckBox id="useDefaultCheckbox" mnemonicParsing="false" text="Использовать этот редактор по умолчанию" />
          </children>
       </HBox>
       <TabPane id="tabs" layoutX="14.0" layoutY="14.0" prefHeight="675.0" prefWidth="872.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="59.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
@@ -37,15 +37,15 @@
                      <children>
                         <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <HBox minHeight="34.0" prefHeight="34.0" spacing="5.0">
+                              <HBox minHeight="30.0" prefHeight="30.0" spacing="5.0">
                                  <children>
                                     <Pane prefHeight="30.0" prefWidth="0.0" />
-                                    <Button id="clearButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="34.0" styleClass="icon-trash" text="Удалить все">
+                                    <Button id="clearButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" styleClass="icon-trash" text="Удалить все">
                                        <padding>
                                           <Insets left="15.0" right="15.0" />
                                        </padding>
                                     </Button>
-                                    <Button id="convertButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="34.0" styleClass="icon-convert" text="Перевести в код">
+                                    <Button id="convertButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" styleClass="icon-convert" text="Перевести в код">
                                        <padding>
                                           <Insets left="15.0" right="15.0" />
                                        </padding>
@@ -53,16 +53,11 @@
                                           <Insets />
                                        </HBox.margin>
                                     </Button>
-                                    <Button id="previewButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="34.0" styleClass="icon-php" text="Как это выглядит в коде?">
+                                    <Button id="previewButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" styleClass="icon-php" text="Как это выглядит в коде?">
                                        <padding>
                                           <Insets left="15.0" right="15.0" />
                                        </padding>
                                     </Button>
-                                    <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <CheckBox id="useDefaultCheckbox" mnemonicParsing="false" text="Использовать этот редактор по умолчанию" />
-                                       </children>
-                                    </HBox>
                                  </children>
                                  <padding>
                                     <Insets right="5.0" />
