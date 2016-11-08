@@ -2,7 +2,7 @@ apply plugin: 'application'
 
 project.version = '1.0'
 
-project.ext.distVersion = System.getProperty("version");
+project.ext.distVersion = System.getProperty("version", "SNAPSHOT");
 
 repositories {
     mavenLocal()
@@ -26,6 +26,11 @@ run {
 }
 
 jar.archiveName = 'DevelNext.jar'
+
+clean {
+    delete = [] //clear out existing files to delete
+    delete 'build/install', 'build/libs', 'build/tmp', 'build/resources', 'build/scripts'
+}
 
 manifest {
     attributes 'Main-Class': 'php.runtime.launcher.Launcher'
@@ -93,7 +98,7 @@ installDist.doLast {
 
 task distWindowsPatch(type: Zip, dependsOn: ['clean', 'distPatch']) {
     from "$project.buildDir/install/$project.name"
-    archiveName "DevelNext.WindowsPatch.zip"
+    archiveName "DevelNext.WindowsPatch-${project.ext.distVersion}.zip"
 
     doLast {
         def issFile = "$project.rootDir/develnext/windowsSetup/innopatchsetup.iss".replace("\\", "/")
@@ -104,19 +109,10 @@ task distWindowsPatch(type: Zip, dependsOn: ['clean', 'distPatch']) {
 
         buildISS(issFile)
 
-        def uploadPath = System.getProperty("uploadPath", "E:/Upload/YandexDisk")
+        file("$project.buildDir/distributions/DevelNext.WindowsPatch-${project.ext.distVersion}.exe").delete()
 
-        if (new File(uploadPath).isDirectory()) {
-            copy {
-                from "$project.buildDir/distributions/DevelNext.WindowsPatch.exe"
-                into "$uploadPath"
-            }
-
-            copy {
-                from distWindowsPatch.archivePath
-                into "$uploadPath"
-            }
-        }
+        file("$project.buildDir/distributions/DevelNext.WindowsPatch.exe")
+                .renameTo(file("$project.buildDir/distributions/DevelNext.WindowsPatch-${project.ext.distVersion}.exe"))
     }
 }
 
@@ -124,7 +120,7 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
     def installDir = "$project.buildDir/install/$project.name"
 
     compression = Compression.GZIP
-    archiveName "DevelNext.LinuxPatch.tar.gz"
+    archiveName "DevelNext.LinuxPatch-${project.ext.distVersion}.tar.gz"
 
     from(installDir) {
         exclude('*.sh')
@@ -167,7 +163,7 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
 }
 
 
-task distPatch(dependsOn: ['clean', 'installDist']) {
+task distPatch(dependsOn: ['installDist']) {
     doLast {
         if (System.properties['os.name'].toLowerCase().contains('windows')) {
             exec {
@@ -226,7 +222,7 @@ task distIde(dependsOn: ['installDist']) {
     }
 }
 
-task distIdeWindowsSetup(dependsOn: ['distIdeWindows']) {
+task distIdeWindowsSetup(dependsOn: ['clean', 'distIdeWindows']) {
     doLast {
         def issFile = "$project.rootDir/develnext/windowsSetup/innosetup.iss".replace("\\", "/")
 
@@ -236,23 +232,19 @@ task distIdeWindowsSetup(dependsOn: ['distIdeWindows']) {
 
         buildISS(issFile);
 
-        def uploadPath = System.getProperty("uploadPath", "E:/Upload/YandexDisk")
 
-        if (new File(uploadPath).isDirectory()) {
-            copy {
-                from "$project.buildDir/distributions/DevelNextSetup.exe"
-                into "$uploadPath"
-                rename "DevelNextSetup.exe", "DevelNextSetup-${project.ext.distVersion}.exe"
-            }
-        }
+        file("$project.buildDir/distributions/DevelNextSetup-${project.ext.distVersion}.exe").delete()
+
+        file("$project.buildDir/distributions/DevelNextSetup.exe")
+                .renameTo(file("$project.buildDir/distributions/DevelNextSetup-${project.ext.distVersion}.exe"))
     }
 }
 
-task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
+task distIdeLinuxSetup(type: Tar, dependsOn: ['clean', 'distIdeLinux']) {
     def installDir = "$project.buildDir/install/$project.name"
 
     compression = Compression.GZIP
-    archiveName "DevelNextLinux.tar.gz"
+    archiveName "DevelNextLinux-${project.ext.distVersion}.tar.gz"
 
     from(installDir) {
         exclude('*.sh')
@@ -281,16 +273,8 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['distIdeLinux']) {
 
         fileMode = 0755
     }
+}
 
-    doLast {
-        def uploadPath = System.getProperty("uploadPath", "E:/Upload/YandexDisk")
+task distAll(dependsOn: ['distWindowsPatch', 'distLinuxPatch', 'distIdeWindowsSetup', 'distIdeLinuxSetup']) {
 
-        if (new File(uploadPath).isDirectory()) {
-            copy {
-                from distIdeLinuxSetup.archivePath
-                into "$uploadPath"
-                rename "DevelNextLinux.tar.gz", "DevelNextLinux-${project.ext.distVersion}.tar.gz"
-            }
-        }
-    }
 }
