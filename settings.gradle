@@ -2,6 +2,7 @@
 include 'develnext-designer';
 
 include 'jphp-gui-ext',
+        'jphp-gui-controlfx-ext',
         'jphp-desktop-ext',
         'jphp-app-framework',
         'jphp-game-ext',
@@ -27,6 +28,7 @@ include 'develnext-bundles/dn-mysql-bundle'
 include 'develnext-bundles/dn-pgsql-bundle'
 include 'develnext-bundles/dn-game2d-bundle'
 include 'develnext-bundles/dn-systemtray-bundle'
+include 'develnext-bundles/dn-controlfx-bundle'
 
 // stubs
 include 'develnext-stubs/dn-php-sdk'

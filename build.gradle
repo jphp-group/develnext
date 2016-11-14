@@ -231,6 +231,7 @@ project(':develnext') {
         provided project(':develnext-bundles/dn-pgsql-bundle')
         provided project(':develnext-bundles/dn-game2d-bundle')
         provided project(':develnext-bundles/dn-systemtray-bundle')
+        provided project(':develnext-bundles/dn-controlfx-bundle')
 
         // stubs.
         compile project(':develnext-stubs/dn-php-sdk')
