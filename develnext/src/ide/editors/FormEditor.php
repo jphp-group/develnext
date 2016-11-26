@@ -29,6 +29,7 @@ use ide\formats\form\SourceEventManager;
 use ide\formats\FormFormat;
 use ide\formats\GuiFormFormat;
 use ide\formats\PhpCodeFormat;
+use ide\forms\InputMessageBoxForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;

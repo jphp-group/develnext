@@ -6,6 +6,7 @@ use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
 use ide\project\ProjectFile;
+use ide\utils\FileUtils;
 use php\io\File;
 use php\lang\IllegalStateException;
 use php\lang\NotImplementedException;
@@ -57,6 +58,15 @@ abstract class AbstractFormat
         fs::delete($path);
     }
 
+    public function duplicate($path, $toPath)
+    {
+        if (fs::isDir($path)) {
+            FileUtils::copyDirectory($path, $toPath);
+        } else {
+            fs::copy($path, $toPath);
+        }
+    }
+
     /**
      * @param $file
      * @return AbstractEditor
@@ -81,6 +91,24 @@ abstract class AbstractFormat
     public function createBlank(Project $project, $file, array $options)
     {
         throw new IllegalStateException("Unable to create blank file");
+    }
+
+    /**
+     * @return bool
+     */
+    public function availableCreateDialog()
+    {
+        return false;
+    }
+
+    /**
+     * @param string $name
+     * @return null|string
+     * @throws \Exception
+     */
+    public function showCreateDialog($name = '')
+    {
+        throw new \Exception(reflect::typeOf($this) . " edit has no implementation of createDialog()");
     }
 
     /**

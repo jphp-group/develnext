@@ -95,16 +95,19 @@ use ide\formats\form\tags\TitledPaneFormElementTag;
 use ide\formats\form\tags\ToggleButtonFormElementTag;
 use ide\formats\form\tags\TreeViewFormElementTag;
 use ide\formats\form\tags\WebViewFormElementTag;
+use ide\forms\InputMessageBoxForm;
 use ide\forms\SetMainFormForm;
 use ide\Ide;
 use ide\Logger;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\project\ProjectFile;
 use ide\systems\FileSystem;
 use ide\systems\RefactorSystem;
 use ide\utils\FileUtils;
 use php\gui\UXNode;
 use php\io\File;
 use php\lib\fs;
+use php\util\Regex;
 
 class GuiFormFormat extends AbstractFormFormat
 {
@@ -204,6 +207,30 @@ class GuiFormFormat extends AbstractFormFormat
         fs::delete("$path/$name.behaviour");
     }
 
+    public function duplicate($path, $toPath)
+    {
+        parent::duplicate($path, $toPath);
+
+        $name = fs::nameNoExt($path);
+        $toName = fs::nameNoExt($toPath);
+
+        $parent = File::of($path)->getParent();
+        $toParent = File::of($toPath)->getParent();
+
+        $path = $parent . '/../app/forms/';
+        $toPath = $toParent . '/../app/forms/';
+
+        if (fs::isFile("$parent/$name.conf")) {
+            FileUtils::copyFile("$parent/$name.conf", "$toParent/$toName.conf");
+        }
+
+        foreach (['php', 'php.source', 'php.axml', 'behaviour'] as $ext) {
+            if (fs::isFile("$path/$name.$ext")) {
+                FileUtils::copyFile("$path/$name.$ext", "$toPath/$toName.$ext");
+            }
+        }
+    }
+
 
     /**
      * @param $file
@@ -212,7 +239,17 @@ class GuiFormFormat extends AbstractFormFormat
      */
     public function createEditor($file)
     {
-        return new FormEditor($file, $this->dumper);
+        if ($file instanceof ProjectFile) {
+            $name = fs::nameNoExt($file);
+            $sources = $file->getProject()->getSrcFile("app/forms/$name.php");
+
+            if ($sources->exists()) {
+                $file->addLink($sources);
+            }
+        }
+
+        $editor = new FormEditor($file, $this->dumper);
+        return $editor;
     }
 
     private function registerRefactor()
@@ -257,5 +294,21 @@ class GuiFormFormat extends AbstractFormFormat
         if ($this->dumper) {
             $this->dumper->setFormElementTags($this->formElementTags);
         }
+    }
+
+    public function availableCreateDialog()
+    {
+        return true;
+    }
+
+
+    public function showCreateDialog($name = '')
+    {
+        $dialog = new InputMessageBoxForm('Создание новой формы', 'Введите название для новой формы', '* Только латинские буквы, цифры и _');
+        $dialog->setResult($name);
+        $dialog->setPattern(new Regex('^[a-z\\_]{1}[a-z0-9\\_]{0,60}$', 'i'), 'Данное название некорректное');
+
+        $dialog->showDialog();
+        return $dialog->getResult();
     }
 }

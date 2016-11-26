@@ -62,6 +62,14 @@ class ProjectFile extends File
         $this->project = $project;
     }
 
+    /**
+     * @return Project
+     */
+    public function getProject()
+    {
+        return $this->project;
+    }
+
     public function isChanged()
     {
         return $this->syncTime != parent::lastModified();

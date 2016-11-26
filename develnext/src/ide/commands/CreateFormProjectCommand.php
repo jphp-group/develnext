@@ -3,6 +3,7 @@ namespace ide\commands;
 
 use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
+use ide\formats\GuiFormFormat;
 use ide\forms\BuildProgressForm;
 use ide\forms\InputMessageBoxForm;
 use ide\forms\MessageBoxForm;
@@ -45,12 +46,8 @@ class CreateFormProjectCommand extends AbstractCommand
             /** @var GuiFrameworkProjectBehaviour $guiBehaviour */
             $guiBehaviour = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
 
-            $dialog = new InputMessageBoxForm('Создание новой формы', 'Введите название для новой формы', '* Только латинские буквы, цифры и _');
-            $dialog->setPattern(new Regex('^[a-z\\_]{1}[a-z0-9\\_]{0,60}$', 'i'), 'Данное название некорректное');
-
-            $dialog->showDialog();
-            $name = $dialog->getResult();
-
+            $format = $ide->getRegisteredFormat(GuiFormFormat::class);
+            $name = $format->showCreateDialog();
 
             if ($name !== null) {
                 $name = str::trim($name);

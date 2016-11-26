@@ -41,9 +41,9 @@ public class KeyboardManager {
     protected AnimationTimer timer = new AnimationTimer() {
         @Override
         public void handle(long now) {
-            if (pressHandlers.isEmpty()) {
+            /*if (pressHandlers.isEmpty()) {
                 return;
-            }
+            }   */
 
             trigger(true);
         }

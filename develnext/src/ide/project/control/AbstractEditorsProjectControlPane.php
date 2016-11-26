@@ -49,6 +49,38 @@ class AbstractEditorsProjectControlPaneEditCommand extends AbstractMenuCommand
     }
 }
 
+class AbstractEditorsProjectControlPaneCloneCommand extends AbstractMenuCommand
+{
+    /**
+     * @var AbstractEditorsProjectControlPane
+     */
+    protected $pane;
+
+    /**
+     * AbstractEditorsProjectControlPaneEditCommand constructor.
+     * @param AbstractEditorsProjectControlPane $pane
+     */
+    public function __construct(AbstractEditorsProjectControlPane $pane)
+    {
+        $this->pane = $pane;
+    }
+
+    public function getName()
+    {
+        return 'Клонировать';
+    }
+
+    public function getIcon()
+    {
+        return 'icons/copy16.png';
+    }
+
+    public function onExecute($e = null, AbstractEditor $editor = null)
+    {
+        $this->pane->doClone();
+    }
+}
+
 /**
  * Class AbstractEditorsProjectControlPane
  * @package ide\project\control
@@ -80,6 +112,27 @@ abstract class AbstractEditorsProjectControlPane extends AbstractProjectControlP
     {
         if ($this->getSelectedItem() instanceof AbstractEditor) {
             FileSystem::open($this->getSelectedItem());
+        }
+    }
+
+    public function doClone()
+    {
+        if ($this->getSelectedItem() instanceof AbstractEditor) {
+
+            /** @var AbstractEditor $editor */
+            $editor = $this->getSelectedItem();
+
+            if ($editor->getFormat()->availableCreateDialog()) {
+                $name = $editor->getFormat()->showCreateDialog();
+
+                if ($name !== null) {
+                    $ext = fs::ext($editor->getFile());
+                    $newFile = fs::parent($editor->getFile()) . "/$name" . ($ext ? ".$ext" : "");
+
+                    $editor->getFormat()->duplicate($editor->getFile(), $newFile);
+                    $this->refresh();
+                }
+            }
         }
     }
 
@@ -127,9 +180,10 @@ abstract class AbstractEditorsProjectControlPane extends AbstractProjectControlP
     {
         $pane = new FlowListViewDecorator();
         $pane->setEmptyListText($this->getName() . '. Список пуст.');
-        $pane->setMultipleSelection(false);
+        $pane->setMultipleSelection(true);
 
         $pane->addMenuCommand(new AbstractEditorsProjectControlPaneEditCommand($this));
+        $pane->addMenuCommand(new AbstractEditorsProjectControlPaneCloneCommand($this));
 
         $pane->on('beforeRemove', function (array $nodes) {
             foreach ($nodes as $node) {
@@ -219,6 +273,14 @@ abstract class AbstractEditorsProjectControlPane extends AbstractProjectControlP
             $this->doEdit();
         });
 
+        $cloneButton = new UXButton('Клонировать');
+        $cloneButton->classes->add('icon-copy');
+        $cloneButton->maxHeight = 999;
+        $cloneButton->enabled = false;
+        $cloneButton->on('action', function () {
+            $this->doClone();
+        });
+
         $delButton = new UXButton();
         $delButton->classes->add('icon-trash2');
         $delButton->maxHeight = 999;
@@ -229,12 +291,13 @@ abstract class AbstractEditorsProjectControlPane extends AbstractProjectControlP
             $this->list->removeBySelections();
         });
 
-        $this->list->on('select', function ($nodes) use ($delButton, $editButton) {
+        $this->list->on('select', function ($nodes) use ($delButton, $editButton, $cloneButton) {
             $delButton->enabled = !!$nodes;
-            $editButton->enabled = !!$nodes;
+            $editButton->enabled = sizeof($nodes) == 1;
+            $cloneButton->enabled = sizeof($nodes) == 1;
         });
 
-        $ui = new UXHBox([$addButton, new UXSeparator('VERTICAL'), $editButton, $delButton]);
+        $ui = new UXHBox([$addButton, new UXSeparator('VERTICAL'), $editButton, $cloneButton, $delButton]);
         $ui->spacing = 5;
         $ui->minHeight = 30;
 

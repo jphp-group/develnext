@@ -6,8 +6,11 @@ use ide\editors\form\FormNamedBlock;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\form\context\DeleteMenuCommand;
 use ide\formats\form\context\SelectAllMenuCommand;
+use ide\forms\InputMessageBoxForm;
 use ide\Ide;
+use ide\Logger;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\project\ProjectFile;
 use ide\scripts\AbstractScriptComponent;
 use ide\scripts\elements\DirectoryChooserScriptComponent;
 use ide\scripts\elements\FileChooserScriptComponent;
@@ -25,6 +28,7 @@ use ide\utils\FileUtils;
 use php\io\File;
 use php\lib\fs;
 use php\lib\Str;
+use php\util\Regex;
 
 /**
  * Class ScriptModuleFormat
@@ -69,7 +73,18 @@ class ScriptModuleFormat extends AbstractFormFormat
      */
     public function createEditor($file)
     {
-        return new ScriptModuleEditor($file);
+        if ($file instanceof ProjectFile) {
+            $name = fs::name($file);
+            $sources = $file->getProject()->getSrcFile("app/modules/$name.php");
+
+            if ($sources->exists()) {
+                $file->addLink($sources);
+            }
+        }
+
+        $editor = new ScriptModuleEditor($file);
+
+        return $editor;
     }
 
     public function getIcon()
@@ -139,5 +154,37 @@ class ScriptModuleFormat extends AbstractFormFormat
             $project->getSrcFile("app/modules/" . fs::name($path) . '.behaviour')->delete();
             $project->getSrcFile("app/modules/" . fs::name($path) . '.php.axml')->delete();
         }
+    }
+
+    public function duplicate($path, $toPath)
+    {
+        parent::duplicate($path, $toPath);
+
+        if ($project = Ide::project()) {
+            foreach (['json', 'php', 'php.source', 'behaviour', 'php.axml'] as $ext) {
+                $file = $project->getSrcFile("app/modules/" . fs::name($path) . '.' . $ext);
+
+                if (fs::isFile($file)) {
+                    $toFile = $project->getSrcFile("app/modules/" . fs::name($toPath) . '.' . $ext);
+                    FileUtils::copyFile($file, $toFile);
+                }
+            }
+        }
+    }
+
+
+    public function availableCreateDialog()
+    {
+        return true;
+    }
+
+    public function showCreateDialog($name = '')
+    {
+        $dialog = new InputMessageBoxForm('Создание нового модуля', 'Введите название для нового модуля', '* Только латинские буквы, цифры и _');
+        $dialog->setResult($name);
+        $dialog->setPattern(new Regex('^[a-z\\_]{1}[a-z0-9\\_]{0,60}$', 'i'), 'Данное название некорректное');
+
+        $dialog->showDialog();
+        return $dialog->getResult();
     }
 }

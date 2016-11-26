@@ -4,6 +4,7 @@ namespace ide\commands;
 use Dialog;
 use Files;
 use ide\editors\AbstractEditor;
+use ide\formats\ScriptModuleFormat;
 use ide\forms\BuildProgressForm;
 use ide\forms\InputMessageBoxForm;
 use ide\Ide;
@@ -42,11 +43,7 @@ class CreateGameSpriteProjectCommand extends AbstractCommand
         $project = $ide->getOpenedProject();
 
         if ($project) {
-            $dialog = new InputMessageBoxForm('Создание нового спрайта', 'Введите название для нового спрайта', '* Только латинские буквы, цифры и _');
-            $dialog->setPattern(new Regex('^[a-z\\_]{1}[a-z0-9\\_]{0,60}$', 'i'), 'Данное название некорректное');
-
-            $dialog->showDialog();
-            $name = $dialog->getResult();
+            $name = $ide->getRegisteredFormat(ScriptModuleFormat::class)->showCreateDialog();
 
             if ($name !== null) {
                 $name = str::trim($name);
