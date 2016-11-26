@@ -15,7 +15,6 @@ import php.runtime.reflection.ClassEntity;
 public class UXRating extends UXControl<Rating> {
     interface WrappedInterface {
         @Property int max();
-        @Property("value") int rating();
         @Property Orientation orientation();
         @Property boolean partialRating();
         @Property boolean updateOnHover();
@@ -42,5 +41,15 @@ public class UXRating extends UXControl<Rating> {
     @Signature
     public void __construct(int max, int rating) {
         __wrappedObject = new Rating(max, rating);
+    }
+
+    @Reflection.Setter
+    public void setValue(double value) {
+        getWrappedObject().setRating(value);
+    }
+
+    @Reflection.Getter
+    public double getValue() {
+        return getWrappedObject().getRating();
     }
 }

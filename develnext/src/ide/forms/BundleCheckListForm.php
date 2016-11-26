@@ -84,7 +84,7 @@ class BundleCheckListForm extends AbstractIdeForm
         'network' => 'icons/web16.png',
         'database' => 'icons/database16.png',
         'system' => 'icons/system16.png',
-        'other' => null,
+        'other' => 'icons/blocks16.png',
     ];
 
     /**

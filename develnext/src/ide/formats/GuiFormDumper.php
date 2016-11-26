@@ -8,6 +8,7 @@ use ide\formats\form\AbstractFormElementTag;
 use ide\formats\form\tags\CloneFormElementTag;
 use ide\Ide;
 use ide\Logger;
+use ide\misc\EventHandlerBehaviour;
 use ide\utils\FileUtils;
 use php\format\ProcessorException;
 use php\gui\designer\UXDesigner;
@@ -31,6 +32,8 @@ use ReflectionClass;
 
 class GuiFormDumper extends AbstractFormDumper
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var XmlProcessor
      */
@@ -124,6 +127,8 @@ class GuiFormDumper extends AbstractFormDumper
 
             if ($layout instanceof UXPane) {
                 $editor->setLayout($layout);
+
+                $this->trigger('load', [$editor, $layout]);
             } else {
                 throw new IOException();
             }
@@ -138,6 +143,8 @@ class GuiFormDumper extends AbstractFormDumper
 
     public function save(FormEditor $editor)
     {
+        $this->trigger('save', [$editor]);
+
         $designer = $editor->getDesigner();
 
         DataUtils::cleanup($editor->getLayout());
@@ -215,6 +222,8 @@ class GuiFormDumper extends AbstractFormDumper
 
         $import = $document->createProcessingInstruction('import', 'org.develnext.jphp.ext.game.support.*');
         $document->insertBefore($import, $document->getDocumentElement());
+
+        $this->trigger('appendImports', [$nodes, $document]);
     }
 
     public function createElementTag(FormEditor $editor = null, UXNode $node, DomDocument $document, $ignoreUnregistered = true)

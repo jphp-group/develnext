@@ -1,6 +1,8 @@
 <?php
 namespace ide\project\templates;
 
+use develnext\bundle\controlfx\ControlFXBundle;
+use develnext\bundle\game2d\Game2DBundle;
 use ide\bundle\std\UIDesktopBundle;
 use ide\editors\FormEditor;
 use ide\project\AbstractProjectTemplate;
@@ -91,6 +93,8 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
         $project->on('create', function () use ($gui, $bundle) {
             $bundle->addBundle(Project::ENV_ALL, UIDesktopBundle::class, false);
+            $bundle->addBundle(Project::ENV_ALL, ControlFXBundle::class);
+//            $bundle->addBundle(Project::ENV_ALL, Game2DBundle::class);
 
             $appModule  = $gui->createModule('AppModule');
             $mainModule = $gui->createModule('MainModule');

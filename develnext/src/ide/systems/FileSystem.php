@@ -18,6 +18,7 @@ use php\gui\UXTab;
 use php\gui\UXMenu;
 use php\gui\UXTabPane;
 use php\io\File;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\Items;
 
@@ -508,6 +509,33 @@ class FileSystem
         if (self::$addTabClick) {
             $fileTabPane->tabs->add(static::$addTab);
             static::$addTab->draggable = false;
+        }
+    }
+
+    /**
+     * Open next tab (it's for Ctrl + Tab)
+     */
+    public static function openNext()
+    {
+        Logger::info("Open next...");
+
+        /** @var UXTabPane $fileTabPane */
+        $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+
+        $index = $fileTabPane->selectedIndex;
+
+        if ($index >= $fileTabPane->tabs->count-1 || (self::$addTab && $index >= $fileTabPane->tabs->count-2)) {
+            $index = 0;
+        } else {
+            $index += 1;
+        }
+
+        $nextTab = $fileTabPane->tabs[$index];
+
+        if ($nextTab && $nextTab->userData instanceof AbstractEditor) {
+            static::open($nextTab->userData->getFile());
+        } else {
+            Logger::warn("Unable to open next tab, index = $index, tab = $nextTab");
         }
     }
 }

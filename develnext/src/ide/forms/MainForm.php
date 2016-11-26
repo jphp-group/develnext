@@ -116,9 +116,17 @@ class MainForm extends AbstractIdeForm
         $tabPane->id = 'fileTabPane';
         $tabPane->tabClosingPolicy = 'ALL_TABS';
 
+        $tabPane->on('keyDown', function (UXEvent $e) {
+            $e->consume();
+        });
+
         if ($pane) {
             UXAnchorPane::setAnchor($pane, 0);
             $parent->add($pane);
+
+            $pane->on('keyDown', function (UXEvent $e) {
+                $e->consume();
+            });
         } else {
             $parent->add($tabPane);
         }

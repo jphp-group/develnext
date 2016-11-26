@@ -45,6 +45,7 @@ use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXEvent;
+use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\DataUtils;
@@ -803,6 +804,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->elementTypePane->resetConfigurable(get_class($this));
         $this->elementTypePane->setElements($this->format->getFormElements());
+        $this->elementTypePane->resetConfigurable(get_class($this));
 
         if ($this->prototypeTypePane) {
             $gui = GuiFrameworkProjectBehaviour::get();
@@ -1152,6 +1154,16 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $tabs = new UXTabPane();
         $tabs->side = 'LEFT';
         $tabs->tabClosingPolicy = 'UNAVAILABLE';
+
+        $tabs->observer('focused')->addListener(function ($_, $new) {
+            if ($new) {
+                $this->designer->requestFocus();
+            }
+        });
+
+        $tabs->on('keyDown', function (UXKeyEvent $e) {
+            $e->consume();
+        });
 
         $codeTab = new UXTab();
         $codeTab->text = 'Исходный код';

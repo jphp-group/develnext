@@ -137,6 +137,14 @@ class GuiFormFormat extends AbstractFormFormat
         $this->dumper = new GuiFormDumper($this->formElementTags);
     }
 
+    /**
+     * @return GuiFormDumper
+     */
+    public function getDumper()
+    {
+        return $this->dumper;
+    }
+
     public function getIcon()
     {
         return 'icons/window16.png';
@@ -144,7 +152,7 @@ class GuiFormFormat extends AbstractFormFormat
 
     public function getTitle($path)
     {
-        return FileUtils::stripExtension(parent::getTitle($path));
+        return fs::nameNoExt(parent::getTitle($path));
     }
 
     protected function registerRelocationCommands()
@@ -170,7 +178,7 @@ class GuiFormFormat extends AbstractFormFormat
     {
         parent::delete($path);
 
-        $name = FileUtils::stripExtension(File::of($path)->getName());
+        $name = fs::nameNoExt($path);
 
         if (!$silent) {
             if ($behaviour = GuiFrameworkProjectBehaviour::get()) {

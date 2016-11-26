@@ -27,6 +27,7 @@ use php\format\ProcessorException;
 use php\gui\designer\UXPhpCodeArea;
 use php\gui\event\UXDragEvent;
 use php\gui\event\UXEvent;
+use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXAnchorPane;
@@ -210,6 +211,12 @@ class ActionConstructorForm extends AbstractIdeForm
         });
 
         $this->liveCodeEditor = $liveCodeEditor = new CodeEditor(null, 'php');
+        $this->liveCodeEditor->getTextArea()->on('keyUp', function (UXKeyEvent $e) {
+            if ($e->codeName == 'Enter' && $e->controlDown) {
+                $this->actionSave();
+            }
+        }, __CLASS__);
+
         $liveCodeEditor->registerDefaultCommands();
 
         $liveCodeView = $liveCodeEditor->makeUi();

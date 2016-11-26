@@ -1,5 +1,6 @@
 <?php
 namespace ide\editors\form;
+
 use ide\editors\common\ObjectListEditorItem;
 use ide\editors\menu\ContextMenu;
 use ide\formats\form\AbstractFormElement;
@@ -11,18 +12,23 @@ use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXVBox;
 use php\gui\text\UXFont;
 use php\gui\UXButton;
+use php\gui\UXButtonBase;
 use php\gui\UXComboBox;
 use php\gui\UXDialog;
 use php\gui\UXLabel;
+use php\gui\UXLabeled;
 use php\gui\UXNode;
 use ide\formats\FormFormat;
 use php\gui\layout\UXScrollPane;
 use php\gui\UXSplitPane;
+use php\gui\UXTextField;
 use php\gui\UXTitledPane;
 use php\gui\UXToggleButton;
 use php\gui\UXToggleGroup;
 use php\gui\UXTooltip;
+use php\lib\arr;
 use php\lib\Number;
+use php\lib\str;
 
 /**
  * Class FormElementTypePane
@@ -83,6 +89,11 @@ class FormElementTypePane
     protected $viewSelect;
 
     /**
+     * @var UXTextField
+     */
+    protected $searchField;
+
+    /**
      * @param AbstractFormElement[]|AbstractScriptComponent[]|ObjectListEditorItem[] $elements
      * @param bool $selectable
      * @param UXToggleGroup $toggleGroup
@@ -119,7 +130,6 @@ class FormElementTypePane
         $this->toggleGroup->selected = null;
 
         $head = $this->layout->children[0];
-
         $this->layout->children->clear();
 
         $this->layout->add($head);
@@ -142,12 +152,19 @@ class FormElementTypePane
         foreach ($groups as $name => $elements) {
             $this->createGroupUi($name, $elements);
         }
+
+        $text = $this->searchField->text;
+        $this->searchField->text = "";
+        $this->searchField->text = $text;
     }
 
     public function resetConfigurable($id)
     {
         $this->setOnlyIcons(Ide::get()->getUserConfigValue(get_class($this) . ".$id.onlyIcons", $this->isOnlyIcons()));
         $this->setOpenedGroups(Ide::get()->getUserConfigArrayValue(get_class($this) . ".$id.openedGroups", $this->getOpenedGroups()));
+
+        $searchQuery = Ide::get()->getUserConfigValue(get_class($this) . ".$id.searchQuery", "");
+        $this->searchField->text = $searchQuery;
     }
 
     public function applyConfigure($id)
@@ -157,6 +174,8 @@ class FormElementTypePane
         $this->on('change', function () use ($id) {
             Ide::get()->setUserConfigValue(get_class($this) . ".$id.onlyIcons", $this->isOnlyIcons());
             Ide::get()->setUserConfigValue(get_class($this) . ".$id.openedGroups", $this->getOpenedGroups());
+
+            Ide::get()->setUserConfigValue(get_class($this) . ".$id.searchQuery", $this->searchField->text);
         }, __CLASS__);
     }
 
@@ -208,7 +227,7 @@ class FormElementTypePane
     public function setOpenedGroups(array $groups)
     {
         foreach ($this->tiledPanes as $group => $pane) {
-           $pane->expanded = in_array($group, $groups) || isset($groups[$group]);
+            $pane->expanded = in_array($group, $groups) || isset($groups[$group]);
         }
     }
 
@@ -226,6 +245,13 @@ class FormElementTypePane
             $pane->content = $value ? $pane->data('fbox') : $pane->data('vbox');
         }
 
+        foreach ($this->layout->children as $box) {
+            if ($box->userData == 'searchResult') {
+                $box->content = $value ? $box->data('fbox') : $box->data('vbox');
+                break;
+            }
+        }
+
         $this->trigger('change');
 
         if ($this->viewSelect && $updateUi) {
@@ -236,6 +262,90 @@ class FormElementTypePane
     public function isOnlyIcons()
     {
         return $this->onlyIcons;
+    }
+
+    protected function findElements($query)
+    {
+        $result = [];
+        $query = str::trim(str::lower($query));
+
+        if (!$query) {
+            return [];
+        }
+
+        foreach ($this->tiledPanes as $pane) {
+            /** @var UXVBox|UXFlowPane $box */
+            $box = $pane->content;
+
+            foreach ($box->children as $one) {
+                if ($one instanceof UXButtonBase) {
+                    $text = str::lower($one->tooltipText);
+
+                    $score = 0;
+
+                    if (str::startsWith($text, $query)) {
+                        $score += 1000;
+                    }
+
+                    if (str::length($query) > 2) {
+                        $score += 100 * str::count($text, $query);
+                    }
+
+                    if ($pos = (str::pos($text, $query) + 1)) {
+                        $score += 100 - $pos;
+                    }
+
+                    if ($score > 0) {
+                        $result[] = [
+                            'score' => $score,
+                            'element' => $one->userData
+                        ];
+                    }
+                }
+            }
+        }
+
+        $result = arr::sort($result, function ($a, $b) {
+            if ($a['score'] == $b['score']) return 0;
+            return $a['score'] > $b['score'] ? -1 : 1;
+        });
+
+        return flow($result)->map(function ($el) {
+            return $el['element'];
+        })->toArray();
+    }
+
+    protected function loadSearchResultUi(array $result, $notFound = false)
+    {
+        $uiBox = null;
+
+        foreach ($this->layout->children as $box) {
+            if ($box->userData == 'searchResult') {
+                $box->free();
+                break;
+            }
+        }
+
+        if ($notFound) {
+            $label = new UXLabel('Ничего не найдено.');
+            $label->padding = 10;
+
+            $pane = new UXTitledPane('Результаты поиска', $label);
+            $pane->padding = [1, 3];
+        } else {
+            $pane = $this->makeGroupUi('Результаты поиска', $result);
+        }
+
+        if ($pane) {
+            $pane->font = UXFont::of($pane->font->family, $pane->font->size, 'BOLD');
+            $pane->textColor = 'gray';
+            $pane->animated = false;
+            $pane->expanded = true;
+
+            $pane->paddingBottom = 15;
+            $pane->userData = 'searchResult';
+            $this->layout->children->insert(1, $pane);
+        }
     }
 
     protected function createHeaderUi()
@@ -257,6 +367,21 @@ class FormElementTypePane
               */
             $this->unselectedButton = null;
 
+            $this->searchField = $searchField = new UXTextField();
+            $searchField->promptText = 'Поиск компонентов';
+            $searchField->maxWidth = 10000;
+
+            $searchField->observer('text')->addListener(function () use ($searchField) {
+                $query = $searchField->text;
+
+                $result = $this->findElements($query);
+                $this->loadSearchResultUi($result, $query && !$result);
+
+                uiLater(function () {
+                    $this->trigger('change');
+                });
+            });
+
             $this->viewSelect = $typeSelect = new UXComboBox(['Иконки + текст', 'Только иконки']);
             $typeSelect->maxWidth = 10000;
             $typeSelect->selectedIndex = 0;
@@ -266,15 +391,16 @@ class FormElementTypePane
             });
 
             $vbox->add($typeSelect);
+            $vbox->add($searchField);
 
             $this->layout->add($vbox);
         }
     }
 
-    protected function createGroupUi($group, $elements)
+    protected function makeGroupUi($group, $elements, callable $buttonCreateCallback = null)
     {
         if (!$elements) {
-            return;
+            return null;
         }
 
         $vbox = new UXVBox();
@@ -331,13 +457,18 @@ class FormElementTypePane
 
 
             if ($element instanceof ObjectListEditorItem) {
-                $smallButton->tooltipText .= ": "  . $element->element->getName();
+                $smallButton->tooltipText .= ": " . $element->element->getName();
             } else if ($element->getElementClass()) {
                 $smallButton->tooltipText .= "\n{$element->getElementClass()}";
             }
 
             $vbox->add($button);
             $fbox->add($smallButton);
+
+            if ($buttonCreateCallback) {
+                $buttonCreateCallback($button);
+                $buttonCreateCallback($smallButton);
+            }
 
             $this->buttons[] = $button;
             $this->buttons[] = $smallButton;
@@ -351,13 +482,17 @@ class FormElementTypePane
         $pane->expanded = true;
         $pane->padding = [1, 3];
 
-        /*$pane->observer('expanded')->addListener(function () {
-            $this->trigger('change');
-        }); */
+        return $pane;
+    }
 
-        $this->tiledPanes[$group] = $pane;
+    protected function createGroupUi($group, $elements)
+    {
+        $pane = $this->makeGroupUi($group, $elements);
 
-        $this->layout->add($pane);
+        if ($pane) {
+            $this->tiledPanes[$group] = $pane;
+            $this->layout->add($pane);
+        }
     }
 
     public function setContextMenu(ContextMenu $contextMenu)
@@ -370,6 +505,8 @@ class FormElementTypePane
             });
         }
 
-        $contextMenu->getRoot()->on('hide', function () { $this->clearSelected(); });
+        $contextMenu->getRoot()->on('hide', function () {
+            $this->clearSelected();
+        });
     }
 }

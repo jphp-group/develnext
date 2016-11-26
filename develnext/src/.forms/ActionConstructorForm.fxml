@@ -37,15 +37,15 @@
                      <children>
                         <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <HBox minHeight="30.0" prefHeight="30.0" spacing="5.0">
+                              <HBox minHeight="27.0" prefHeight="25.0" spacing="5.0">
                                  <children>
-                                    <Pane prefHeight="30.0" prefWidth="0.0" />
-                                    <Button id="clearButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" styleClass="icon-trash" text="Удалить все">
+                                    <Pane prefHeight="27.0" prefWidth="0.0" />
+                                    <Button id="clearButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="27.0" styleClass="icon-trash" text="Удалить все">
                                        <padding>
                                           <Insets left="15.0" right="15.0" />
                                        </padding>
                                     </Button>
-                                    <Button id="convertButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" styleClass="icon-convert" text="Перевести в код">
+                                    <Button id="convertButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="27.0" styleClass="icon-convert" text="Перевести в код">
                                        <padding>
                                           <Insets left="15.0" right="15.0" />
                                        </padding>
@@ -53,7 +53,7 @@
                                           <Insets />
                                        </HBox.margin>
                                     </Button>
-                                    <Button id="previewButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" styleClass="icon-php" text="Как это выглядит в коде?">
+                                    <Button id="previewButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="27.0" styleClass="icon-php" text="Как это выглядит в коде?">
                                        <padding>
                                           <Insets left="15.0" right="15.0" />
                                        </padding>

@@ -139,6 +139,14 @@ class CodeEditor extends AbstractEditor
     protected $contentLoaded = false;
 
     /**
+     * @return UXAbstractCodeArea|UXSyntaxTextArea
+     */
+    public function getTextArea()
+    {
+        return $this->textArea;
+    }
+
+    /**
      * @return boolean
      */
     public function isSourceFile()

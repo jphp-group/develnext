@@ -1,0 +1,9 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="max" name="Максимум" editor="integer" tooltip="Количество звезд в рейтинге" />
+        <property code="value" name="Значение" editor="float" tooltip="Значение рейтинга по-умолчанию" />
+
+        <property code="partialRating" name="Частичный" editor="boolean" tooltip="Значение рейтинга может быть не целым" />
+        <property code="updateOnHover" name="Менять при наведении" editor="boolean" tooltip="Менять рейтинг при наведении курсором" />
+    </properties>
+</element>

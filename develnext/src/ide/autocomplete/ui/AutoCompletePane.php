@@ -115,13 +115,13 @@ class AutoCompletePane
             $text = UXClipboard::getText();
 
             if ($text) {
-                $reg = Regex::of('([a-z0-9_]+)\\:\\:|new[ ]+([a-z0-9_]+)', 'ig')->with($text);
+                $reg = Regex::of('([a-z0-9_]+)\\:\\:|new[ ]+([a-z0-9_]+)|([\w\d\_]+)[ ]+\$', 'ig')->with($text);
 
                 /** @var TypeEntry[] $types */
                 $types = [];
 
                 while ($reg->find()) {
-                    $class = $reg->group(1) ?: $reg->group(2);
+                    $class = $reg->group(1) ?: ($reg->group(2) ?: $reg->group(3));
                     $type = $this->complete->getInspector()->findTypeByShortName($class);
 
                     if ($type) {

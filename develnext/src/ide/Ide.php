@@ -30,6 +30,8 @@ use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\desktop\SystemTray;
 use php\desktop\TrayIcon;
+use php\gui\event\UXKeyboardManager;
+use php\gui\event\UXKeyEvent;
 use php\gui\framework\Application;
 use php\gui\JSException;
 use php\gui\layout\UXAnchorPane;
@@ -68,8 +70,6 @@ use timer\AccurateTimer;
  */
 class Ide extends Application
 {
-    const JPHP_VERSION = '0.7.2';
-
     use EventHandlerBehaviour;
 
     /** @var string */
@@ -1213,6 +1213,14 @@ class Ide extends Application
         if (!fs::isDir($ideConfig->get('projectDirectory'))) {
             $ideConfig->set('projectDirectory', File::of(System::getProperty('user.home') . '/DevelNextProjects/'));
         }
+
+
+        $manager = new UXKeyboardManager($this->getMainForm());
+        $manager->onDown('Ctrl+Tab', function (UXKeyEvent $e) {
+            uiLater(function () {
+                FileSystem::openNext();
+            });
+        });
 
         $this->afterShow(function () {
             $projectFile = $this->getUserConfigValue('lastProject');
