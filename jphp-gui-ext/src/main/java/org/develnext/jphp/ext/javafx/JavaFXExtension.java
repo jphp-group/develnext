@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -115,6 +116,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Region.class, UXRegion.class);
         registerWrapperClass(scope, Control.class, UXControl.class);
 
+        registerWrapperClass(scope, Group.class, UXGroup.class);
         registerWrapperClass(scope, Pane.class, UXPane.class);
         registerWrapperClass(scope, AnchorPane.class, UXAnchorPane.class);
         registerWrapperClass(scope, org.develnext.jphp.ext.javafx.support.control.Panel.class, UXPanel.class);

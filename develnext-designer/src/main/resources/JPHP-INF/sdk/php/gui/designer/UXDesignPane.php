@@ -10,6 +10,11 @@ use php\gui\layout\UXAnchorPane;
 class UXDesignPane extends UXAnchorPane
 {
     /**
+     * @var float
+     */
+    public $zoom = 1.0;
+
+    /**
      * @var int
      */
     public $borderWidth = 8;

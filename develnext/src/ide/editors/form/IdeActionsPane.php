@@ -3,8 +3,10 @@ namespace ide\editors\form;
 
 use ide\misc\EventHandlerBehaviour;
 use php\gui\designer\UXDesigner;
+use php\gui\designer\UXDesignPane;
 use php\gui\layout\UXHBox;
 use php\gui\UXButton;
+use php\gui\UXComboBox;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXSeparator;
@@ -16,6 +18,7 @@ use php\lib\str;
 
 class IdeActionsPane extends UXHBox
 {
+    protected $zoomSelect;
     use EventHandlerBehaviour;
 
     /**
@@ -53,7 +56,12 @@ class IdeActionsPane extends UXHBox
      */
     protected $snapYInput;
 
-    public function __construct(UXDesigner $designer)
+    /**
+     * @var UXDesignPane
+     */
+    private $designPane;
+
+    public function __construct(UXDesigner $designer, UXDesignPane $designPane)
     {
         parent::__construct();
 
@@ -105,7 +113,7 @@ class IdeActionsPane extends UXHBox
         $ui->add($emptyButton);
         $ui->add(new UXSeparator('VERTICAL'));
 
-        $xTitle = new UXLabel('Сетка X:');
+        $xTitle = new UXLabel('Сетка [X,Y]:');
         $xTitle->maxHeight = 999;
         $xInput = $this->snapXInput = new UXTextField();
         $xInput->width = 40;
@@ -124,8 +132,8 @@ class IdeActionsPane extends UXHBox
         $ui->add($xTitle);
         $ui->add($xInput);
 
-        $yTitle = new UXLabel('Сетка Y:');
-        $yTitle->maxHeight = 999;
+        /*$yTitle = new UXLabel('Сетка Y:');
+        $yTitle->maxHeight = 999; */
         $yInput = $this->snapYInput = new UXTextField();
         $yInput->width = 40;
         $yInput->maxHeight = 999;
@@ -139,14 +147,43 @@ class IdeActionsPane extends UXHBox
             }
         });
 
-        $ui->add($yTitle);
+        //$ui->add($yTitle);
         $ui->add($yInput);
 
         $this->setSnapType($designer->snapType);
         $this->setSnapSizeX($designer->snapSizeX);
         $this->setSnapSizeY($designer->snapSizeY);
 
+        $this->makeZoomPane();
         $this->makeAlignPane();
+        $this->designPane = $designPane;
+    }
+
+    protected function makeZoomPane()
+    {
+        $this->add(new UXSeparator('VERTICAL'));
+        $this->add($label = new UXLabel("Масштаб:"));
+        $label->maxHeight = 999;
+
+        $zoomSelect = $this->zoomSelect = new UXComboBox();
+        $zoomList = [10, 25, 33, 50, 67, 75, 100, 125, 150, 200, 300, 400, 500];
+
+        $this->zoomSelect->visibleRowCount = sizeof($zoomList);
+
+        foreach ($zoomList as $zoom) {
+            $this->zoomSelect->items->add("$zoom%");
+        }
+
+        $this->zoomSelect->value = "100%";
+        $this->zoomSelect->width = 75;
+
+        $this->zoomSelect->on('action', function () use ($zoomSelect, $zoomList) {
+            $zoom = round($zoomList[$zoomSelect->selectedIndex] / 100, 2);
+            $this->designPane->zoom = $zoom;
+            $this->trigger('change');
+        });
+
+        $this->add($this->zoomSelect);
     }
 
     protected function makeAlignPane()
@@ -239,6 +276,10 @@ class IdeActionsPane extends UXHBox
         if (isset($config['snapSizeY'])) {
             $this->setSnapSizeY($config['snapSizeY']);
         }
+
+        if (isset($config['zoom'])) {
+            $this->setZoom($config['zoom']);
+        }
     }
 
     public function getConfig()
@@ -247,12 +288,30 @@ class IdeActionsPane extends UXHBox
             'snapType'  => $this->getSnapType(),
             'snapSizeX' => $this->getSnapSizeX(),
             'snapSizeY' => $this->getSnapSizeY(),
+            'zoom'      => $this->getZoom(),
         ];
     }
 
     public function getSnapType()
     {
         return $this->designer->snapType;
+    }
+
+    public function getZoom()
+    {
+        return $this->designPane->zoom * 100;
+    }
+
+    public function setZoom($zoom)
+    {
+        if ($zoom < 10) {
+            $zoom = 100;
+        }
+
+        $this->lockHandles();
+        $this->zoomSelect->value = "$zoom%";
+        $this->designPane->zoom = $zoom / 100;
+        $this->unlockHandles();
     }
 
     public function setSnapSizeX($x)

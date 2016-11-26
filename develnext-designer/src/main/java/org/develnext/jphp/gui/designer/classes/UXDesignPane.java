@@ -4,7 +4,9 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -13,6 +15,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
+import javafx.scene.transform.Scale;
 import org.develnext.jphp.ext.javafx.classes.layout.UXAnchorPane;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import php.runtime.annotation.Reflection;
@@ -37,6 +40,8 @@ public class UXDesignPane extends UXAnchorPane {
     protected Invoker onResize = null;
 
     protected AnchorPane topBorders = new AnchorPane();
+    private double zoom = 1.0;
+    private Scale scale;
 
     public UXDesignPane(Environment env, AnchorPane wrappedObject) {
         super(env, wrappedObject);
@@ -57,6 +62,16 @@ public class UXDesignPane extends UXAnchorPane {
 
         //topBorders.setLayoutX(-borderWidth/2);
         //topBorders.setLayoutY(-borderWidth/2);
+
+        scale = new Scale();
+        getWrappedObject().getTransforms().add(scale);
+
+        getChildren().addListener(new ListChangeListener() {
+            @Override
+            public void onChanged(Change c) {
+                setZoom(zoom);
+            }
+        });
 
         getWrappedObject().getChildren().addListener((ListChangeListener<Node>) c -> {
             Platform.runLater(this::update);
@@ -121,8 +136,8 @@ public class UXDesignPane extends UXAnchorPane {
 
         getWrappedObject().setOnMouseDragged(event -> {
             if (startDragPoint != null) {
-                double hOffset = event.getScreenX() - startDragPoint.getX();
-                double vOffset = event.getScreenY() - startDragPoint.getY();
+                double hOffset = (event.getScreenX() - startDragPoint.getX()) / zoom;
+                double vOffset = (event.getScreenY() - startDragPoint.getY()) / zoom;
 
                 Pane node = (Pane) getWrappedObject().getChildren().get(0);
 
@@ -179,6 +194,19 @@ public class UXDesignPane extends UXAnchorPane {
         double height = getHeight();
 
         return y > height - borderWidth && y < height;
+    }
+
+    @Setter
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
+
+        scale.setX(zoom);
+        scale.setY(zoom);
+    }
+
+    @Getter
+    public double getZoom() {
+        return this.zoom;
     }
 
     @Getter

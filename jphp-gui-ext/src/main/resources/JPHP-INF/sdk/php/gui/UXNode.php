@@ -95,6 +95,21 @@ abstract class UXNode
     public $translateZ;
 
     /**
+     * @var double
+     */
+    public $scaleX;
+
+    /**
+     * @var double
+     */
+    public $scaleY;
+
+    /**
+     * @var double
+     */
+    public $scaleZ;
+
+    /**
      * --RU--
      * Экранная позция по X
      * @var double

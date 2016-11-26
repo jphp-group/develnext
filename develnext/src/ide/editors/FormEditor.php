@@ -59,6 +59,7 @@ use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXCustomNode;
 use php\gui\UXData;
+use php\gui\UXGroup;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXSplitPane;
@@ -1132,9 +1133,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
-    protected function makeActionsUi()
+    protected function makeActionsUi(UXDesignPane $designPane)
     {
-        $this->actionsPane = $ui = new IdeActionsPane($this->designer);
+        $this->actionsPane = $ui = new IdeActionsPane($this->designer, $designPane);
 
         $ui->on('change', function () {
             $this->save();
@@ -1519,11 +1520,14 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->selectForm();
         });
 
+        $designPane = new UXDesignPane();
+
         if (!$fullArea) {
+            $viewer->content = new UXGroup([$area]);
             $viewer->fitToWidth = true;
             $viewer->fitToHeight = true;
 
-            $designPane = new UXDesignPane();
+            $designPane->zoom = 1;
             $designPane->size = $this->layout->size;
             $designPane->position = [0, 0];
             $designPane->onResize(function () {
@@ -1658,7 +1662,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         UXSplitPane::setResizeWithParent($scrollPane, false);
 
-        $actions = $this->makeActionsUi();
+        $actions = $this->makeActionsUi($designPane);
 
         if ($actions) {
             $wrap = new UXVBox([$actions, $this->viewerAndEvents]);
