@@ -86,6 +86,14 @@ class ColorPropertyEditor extends ElementPropertyEditor
         return new UXHBox([$this->colorPicker, $this->dialogButton]);
     }
 
+    public function setTooltip($tooltip)
+    {
+        parent::setTooltip($tooltip);
+
+        $this->colorPicker->tooltipText = $tooltip;
+    }
+
+
     public function applyValue($value, $updateUi = true)
     {
         parent::applyValue($value, $updateUi);

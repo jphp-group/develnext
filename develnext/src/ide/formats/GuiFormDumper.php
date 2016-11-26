@@ -235,7 +235,7 @@ class GuiFormDumper extends AbstractFormDumper
             return null;
         }
 
-        if ($node->classes->has('x-system-designer-element')) {
+        if ($node->classes->has('x-system-designer-element') || $node->classes->has('x-system-element')) {
             return null;
         }
 

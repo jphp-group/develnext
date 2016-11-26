@@ -1043,8 +1043,15 @@ public class UXDesigner extends BaseObject {
                         double dx = localPoint.getX() - startPoint.getX();
                         double dy = localPoint.getY() - startPoint.getY();
 
-                        double x = sel.node.getLayoutX() + dx;
-                        double y = sel.node.getLayoutY() + dy;
+                        Bounds bounds = sel.node.getBoundsInParent();
+                        Bounds layoutBounds = sel.node.getLayoutBounds();
+
+                        double diffW = bounds.getWidth() - layoutBounds.getWidth();
+                        double diffH = bounds.getHeight() - layoutBounds.getHeight();
+                        sel.dragView.setUserData(new Insets(diffH, 0, 0, diffW));
+
+                        double x = bounds.getMinX() + dx;
+                        double y = bounds.getMinY() + dy;
 
                         if (!e.isAltDown() && snapSizeX > 1 && snapSizeY > 1 && snapEnabled) {
                             x = Math.round((x / snapSizeX)) * snapSizeX;
@@ -1124,7 +1131,17 @@ public class UXDesigner extends BaseObject {
                         selection.node.setMouseTransparent(false);
                         selection.node.setCursor(Cursor.DEFAULT);
 
-                        selection.drag(selection.dragView.getLayoutX(), selection.dragView.getLayoutY(), false);
+                        Object userData = selection.dragView.getUserData();
+
+                        double x = selection.dragView.getLayoutX();
+                        double y = selection.dragView.getLayoutY();
+
+                        if (userData instanceof Insets) {
+                            x += ((Insets) userData).getLeft();
+                            y += ((Insets) userData).getTop();
+                        }
+
+                        selection.drag(x, y, false);
                         relocateNode(selection.node, selection.dragView.getLayoutX(), selection.dragView.getLayoutY());
 
                         selection.update();
@@ -1285,9 +1302,13 @@ public class UXDesigner extends BaseObject {
 
             sizeText = new Label();
             sizeText.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
-            sizeText.setMouseTransparent(true);
+            //sizeText.setMouseTransparent(true);
             sizeText.setStyle("-fx-background-color: #fffe85; -fx-padding: 1px 7px; -fx-font-size: 1em; -fx-text-fill: black;");
             sizeText.setPrefHeight(20);
+
+            sizeText.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> sizeText.setOpacity(0.01));
+            sizeText.addEventFilter(MouseEvent.MOUSE_EXITED, event -> sizeText.setOpacity(1.0));
+            sizeText.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> sizeText.setVisible(false));
 
             area.getChildren().addAll(sizeText);
 

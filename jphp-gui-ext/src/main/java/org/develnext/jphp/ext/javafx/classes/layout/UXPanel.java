@@ -1,7 +1,9 @@
 package org.develnext.jphp.ext.javafx.classes.layout;
 
+import javafx.geometry.Pos;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.support.control.Panel;
 import php.runtime.annotation.Reflection;
@@ -13,6 +15,12 @@ import php.runtime.reflection.ClassEntity;
 @Reflection.Name(JavaFXExtension.NS + "layout\\UXPanel")
 public class UXPanel<T extends Panel> extends UXAnchorPane<Panel> {
     interface WrappedInterface {
+        @Property String title();
+        @Property Color titleColor();
+        @Property Font titleFont();
+        @Property double titleOffset();
+        @Property Pos titlePosition();
+
         @Property @Nullable Color borderColor();
         @Property double borderWidth();
         @Property double borderRadius();
@@ -36,5 +44,17 @@ public class UXPanel<T extends Panel> extends UXAnchorPane<Panel> {
     @SuppressWarnings("unchecked")
     public T getWrappedObject() {
         return (T) super.getWrappedObject();
+    }
+
+    @Override
+    @Reflection.Setter
+    public void setBackgroundColor(@Nullable Color color) {
+        getWrappedObject().setBackgroundColor(color);
+    }
+
+    @Override
+    @Reflection.Getter
+    public Color getBackgroundColor() {
+        return getWrappedObject().getBackgroundColor();
     }
 }

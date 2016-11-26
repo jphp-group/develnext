@@ -7,8 +7,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Border;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 
@@ -31,47 +33,15 @@ public class LabelEx extends Label {
 
         setMnemonicParsing(false);
 
-        textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                LabelEx.this.updateAutoSize();
-            }
-        });
-
-        fontProperty().addListener(new ChangeListener<Font>() {
-            @Override
-            public void changed(ObservableValue<? extends Font> observable, Font oldValue, Font newValue) {
-                LabelEx.this.updateAutoSize();
-            }
-        });
-
-        prefWidthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                LabelEx.this.updateAutoSize();
-            }
-        });
-
-        prefHeightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                LabelEx.this.updateAutoSize();
-            }
-        });
-
-        graphicProperty().addListener(new ChangeListener<Node>() {
-            @Override
-            public void changed(ObservableValue<? extends Node> observable, Node oldValue, Node newValue) {
-                LabelEx.this.updateAutoSize();
-            }
-        });
-
-        autoSizeTypeProperty().addListener(new ChangeListener<AutoSizeType>() {
-            @Override
-            public void changed(ObservableValue<? extends AutoSizeType> observable, AutoSizeType oldValue, AutoSizeType newValue) {
-                updateAutoSize();
-            }
-        });
+        textProperty().addListener((observable, oldValue, newValue) -> LabelEx.this.updateAutoSize());
+        fontProperty().addListener((observable, oldValue, newValue) -> LabelEx.this.updateAutoSize());
+        prefWidthProperty().addListener((observable, oldValue, newValue) -> LabelEx.this.updateAutoSize());
+        prefHeightProperty().addListener((observable, oldValue, newValue) -> LabelEx.this.updateAutoSize());
+        graphicProperty().addListener((observable, oldValue, newValue) -> LabelEx.this.updateAutoSize());
+        autoSizeTypeProperty().addListener((observable, oldValue, newValue) -> updateAutoSize());
+        styleProperty().addListener((observable, oldValue, newValue) -> updateAutoSize());
+        borderProperty().addListener((observable, oldValue, newValue) -> updateAutoSize());
+        paddingProperty().addListener((observable, oldValue, newValue) -> updateAutoSize());
     }
 
     public AutoSizeType getAutoSizeType() {
@@ -94,7 +64,7 @@ public class LabelEx extends Label {
                     Node graphic = getGraphic();
 
                     if (getAutoSizeType() == AutoSizeType.ALL || getAutoSizeType() == AutoSizeType.HORIZONTAL) {
-                        double width = UXFont.calculateTextWidth(getText(), LabelEx.this.getFont());
+                        double width = getTextAutoWidth();
 
                         if (graphic != null) {
                             width += graphic.getLayoutBounds().getWidth() + getGraphicTextGap();
@@ -105,7 +75,7 @@ public class LabelEx extends Label {
 
                     if (getAutoSizeType() == AutoSizeType.ALL || getAutoSizeType() == AutoSizeType.VERTICAL) {
                         setPrefHeight(Math.max(
-                                UXFont.getLineHeight(LabelEx.this.getFont()),
+                                getTextAutoHeight(),
                                 graphic == null ? 0 : graphic.getLayoutBounds().getHeight()
                         ));
                     }
@@ -120,6 +90,38 @@ public class LabelEx extends Label {
         }
 
         return autoSize;
+    }
+
+    protected double getTextAutoWidth() {
+        double width = UXFont.calculateTextWidth(getText(), LabelEx.this.getFont());
+
+        Insets padding = getPadding();
+        if (padding != null) {
+            width += padding.getLeft() + padding.getRight();
+        }
+
+        Border border = getBorder();
+        if (border != null) {
+            width += border.getInsets().getLeft() + border.getInsets().getRight();
+        }
+
+        return width;
+    }
+
+    protected double getTextAutoHeight() {
+        double height = UXFont.getLineHeight(LabelEx.this.getFont());
+
+        Insets padding = getPadding();
+        if (padding != null) {
+            height += padding.getTop() + padding.getBottom();
+        }
+
+        Border border = getBorder();
+        if (border != null) {
+            height += border.getInsets().getTop() + border.getInsets().getBottom();
+        }
+
+        return height;
     }
 
     public final void setAutoSize(boolean value) {

@@ -1,4 +1,17 @@
 <element extends="NodeFormElement">
+    <properties group="title" title="Заголовок">
+        <property code="title" name="Текст" editor="text" />
+        <property code="titleColor" name="Цвет заголовка" editor="color" />
+        <property code="titleFont" name="Шрифт заголовка" editor="font" />
+        <property code="titleOffset" name="Смещение заголовка" editor="integer" />
+        <property code="titlePosition" name="Позиция заголовка" editor="enum">
+            <variants>
+                <variant value="TOP_LEFT">Левая</variant>
+                <variant value="TOP_CENTER">Центральная</variant>
+                <variant value="TOP_RIGHT">Правая</variant>
+            </variants>
+        </property>
+    </properties>
     <properties>
         <property code="backgroundColor" name="Цвет фона" editor="color" />
         <property code="borderWidth" name="Размер окантовки" editor="float" />

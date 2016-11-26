@@ -41,6 +41,10 @@ public class KeyboardManager {
     protected AnimationTimer timer = new AnimationTimer() {
         @Override
         public void handle(long now) {
+            if (pressHandlers.isEmpty()) {
+                return;
+            }
+
             trigger(true);
         }
     };
@@ -157,9 +161,25 @@ public class KeyboardManager {
         KeyCombination.Modifier[] modifiersArray = modifiers.toArray(new KeyCombination.Modifier[modifiers.size()]);
 
         for (Map.Entry<KeyCode, KeyEvent> entry : keys.entrySet()) {
-            KeyCode code = entry.getKey();
+            KeyCode code;
 
-            KeyCodeCombination keyCombination = new KeyCodeCombination(code, modifiersArray);
+            try {
+                code = entry.getKey();
+            } catch (IllegalStateException e) {
+                continue;
+            }
+
+            if (code == null || code == KeyCode.UNDEFINED) {
+                continue;
+            }
+
+            KeyCodeCombination keyCombination;
+            try {
+                keyCombination = new KeyCodeCombination(code, modifiersArray);
+            } catch (IllegalArgumentException e) {
+                continue;
+            }
+
             trigger(keyCombination, down);
 
             if (modifiersArray.length > 0) {

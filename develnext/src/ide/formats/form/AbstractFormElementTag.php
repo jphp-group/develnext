@@ -43,13 +43,13 @@ abstract class AbstractFormElementTag
         // TODO.
     }
 
-    protected function writeFontForContent($node, DomElement $element, DomDocument $document)
+    protected function writeFontForContent($node, DomElement $element, DomDocument $document, $property = 'font')
     {
         /** @var UXNode $node */
-        $font = $node->font;
+        $font = $node->{$property};
 
         if ($font /*&& ($font->family !== 'System' || $font->size != 12 || $font->style !== 'Regular')*/) {  // always write font.
-            $domFontProperty = $document->createElement('font');
+            $domFontProperty = $document->createElement($property);
 
             $domFont = $document->createElement('Font');
             $domFont->setAttribute('name', $font->name);

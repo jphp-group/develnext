@@ -33,6 +33,14 @@ class PanelFormElementTag extends AbstractFormElementTag
         $element->setAttribute('layoutX', $node->x);
         $element->setAttribute('layoutY', $node->y);
 
+        if ($node->title) {
+            $element->setAttribute('title', $node->title);
+        }
+
+        $element->setAttribute('titlePosition', $node->titlePosition);
+        $element->setAttribute('titleOffset', $node->titleOffset);
+        $element->setAttribute('titleColor', $node->titleColor->getWebValue());
+
         if ($node->backgroundColor) {
             $element->setAttribute('backgroundColor', $node->backgroundColor->getWebValue());
         }
@@ -44,5 +52,10 @@ class PanelFormElementTag extends AbstractFormElementTag
         $element->setAttribute('borderWidth', $node->borderWidth);
         $element->setAttribute('borderStyle', $node->borderStyle);
         $element->setAttribute('borderRadius', $node->borderRadius);
+    }
+
+    public function writeContent($node, DomElement $element, DomDocument $document, AbstractFormDumper $dumper)
+    {
+        $this->writeFontForContent($node, $element, $document, 'titleFont');
     }
 }
