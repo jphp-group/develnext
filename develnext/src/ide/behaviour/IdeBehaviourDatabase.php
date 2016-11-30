@@ -88,6 +88,10 @@ class IdeBehaviourDatabase
             /** @var AbstractBehaviour $tmp */
             $tmp = new $type();
 
+            if (!($tmp instanceof AbstractBehaviour)) {
+                throw new IdeException("$type must be instanceof " . AbstractBehaviour::class);
+            }
+
             if ($code = $tmp->getCode()) {
                 $this->specsByCode[$code] = $spec;
             }

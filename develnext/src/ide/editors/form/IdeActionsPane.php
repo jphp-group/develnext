@@ -116,7 +116,7 @@ class IdeActionsPane extends UXHBox
         $xTitle = new UXLabel('Сетка [X,Y]:');
         $xTitle->maxHeight = 999;
         $xInput = $this->snapXInput = new UXTextField();
-        $xInput->width = 40;
+        $xInput->width = 35;
         $xInput->maxHeight = 999;
         $xInput->text = $this->designer->snapSizeX;
 
@@ -135,7 +135,7 @@ class IdeActionsPane extends UXHBox
         /*$yTitle = new UXLabel('Сетка Y:');
         $yTitle->maxHeight = 999; */
         $yInput = $this->snapYInput = new UXTextField();
-        $yInput->width = 40;
+        $yInput->width = 35;
         $yInput->maxHeight = 999;
         $yInput->text = $this->designer->snapSizeY;
 

@@ -168,11 +168,6 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
-    public void setCursor() {
-        getWrappedObject().getScene().setCursor(Cursor.SW_RESIZE);
-    }
-
-    @Signature
     public void add(Environment env, Node node) {
         ObservableList<Node> children = getChildren(env);
 

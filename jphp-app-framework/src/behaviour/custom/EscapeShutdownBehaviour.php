@@ -23,8 +23,8 @@ class EscapeShutdownBehaviour extends AbstractBehaviour
                     return;
                 }
 
-                if ($self->enabled && $e->codeName == 'Esc' && $target->form) {
-                    $target->form->hide();
+                if ($self->enabled && $e->codeName == 'Esc' && $target->window) {
+                    $target->window->hide();
                 }
             }, __CLASS__);
         } elseif ($target instanceof UXForm)  {

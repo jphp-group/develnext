@@ -7,6 +7,7 @@ use php\gui\event\UXKeyEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\UXForm;
 use php\gui\UXNode;
+use php\gui\UXWindow;
 use script\TimerScript;
 
 class GridMovementBehaviour extends AbstractBehaviour
@@ -168,8 +169,8 @@ class GridMovementBehaviour extends AbstractBehaviour
         $form = null;
 
         if ($target instanceof UXNode) {
-            $form = $target->form;
-        } elseif ($target instanceof UXForm) {
+            $form = $target->window;
+        } elseif ($target instanceof UXWindow) {
             $form = $target;
         }
 

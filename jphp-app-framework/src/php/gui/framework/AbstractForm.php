@@ -20,6 +20,7 @@ use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
 use php\gui\UXParent;
+use php\gui\UXPopupWindow;
 use php\gui\UXScreen;
 use php\gui\UXTooltip;
 use php\gui\UXWindow;
@@ -82,6 +83,11 @@ abstract class AbstractForm extends UXForm
     protected $standaloneFactory;
 
     /**
+     * @var UXPopupWindow
+     */
+    protected $widget;
+
+    /**
      * @param UXForm $origin
      * @param bool $loadEvents
      * @param bool $loadBehaviours
@@ -121,6 +127,32 @@ abstract class AbstractForm extends UXForm
         }
 
         Logger::debug("Form '{$this->getName()}' is created.");
+    }
+
+    protected function makeAsWidget()
+    {
+        $this->widget = new UXPopupWindow();
+        $layout = $this->layout;
+
+        $this->x = -1000;
+        $this->y = -1000;
+        $this->style = 'UTILITY';
+        $this->makeVirtualLayout();
+
+        $this->widget->layout = $layout;
+    }
+
+    /**
+     * @return UXPopupWindow
+     * @throws Exception
+     */
+    public function widget()
+    {
+        if (!$this->widget) {
+            throw new Exception("Window is not a widget");
+        }
+
+        return $this->widget;
     }
 
     public function loadBehaviours()
@@ -208,8 +240,8 @@ abstract class AbstractForm extends UXForm
         if ($parent instanceof UXParent || $parent instanceof UXWindow) {
             $parent->children->add($instance);
         } else {
-            if ($initiator->form) {
-                $initiator->form->add($instance);
+            if ($initiator->window) {
+                $initiator->window->add($instance);
             } else {
                 Logger::error("Unable to create '$id' clone from destroyed prototype");
             }
@@ -266,11 +298,16 @@ abstract class AbstractForm extends UXForm
 
     public function show()
     {
-        parent::show();
+        if ($this->widget) {
+            parent::show();
+            $this->widget->show($this, $this->widget->x, $this->widget->y);
+        } else {
+            parent::show();
 
-        if ($this->_config && $this->_config->get('form.maximized')) {
-            $this->maximized = true;
-            $this->maximize();
+            if ($this->_config && $this->_config->get('form.maximized')) {
+                $this->maximized = true;
+                $this->maximize();
+            }
         }
     }
 
@@ -385,7 +422,13 @@ abstract class AbstractForm extends UXForm
 
         if ($this->_config->has('form.style')) {
             try {
-                $this->style = $this->_config->get('form.style');
+                $style = $this->_config->get('form.style');
+
+                if ($style == 'WIDGET') {
+                    $this->makeAsWidget();
+                } else {
+                    $this->style = $style;
+                }
             } catch (Exception $e) {
                 $this->style = 'DECORATED';
             }
@@ -767,7 +810,8 @@ abstract class AbstractForm extends UXForm
         return parent::__get($name);
     }
 
-    public function __isset($name) {
+    public function __isset($name)
+    {
         foreach ($this->_modules as $module) {
             if ($module->disabled) {
                 continue;

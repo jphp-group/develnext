@@ -54,7 +54,7 @@ class CursorBindBehaviour extends AbstractBehaviour
             $target->mouseTransparent = $this->enabled;
 
             if ($this->hideOrigin) {
-                $target->form->cursor = 'NONE';
+                $target->scene->cursor = 'NONE';
             }
 
             if ($this->enabled) {
@@ -86,11 +86,11 @@ class CursorBindBehaviour extends AbstractBehaviour
                 if ($this->enabled) {
                     $target->toFront();
 
-                    if ($target->form) {
+                    if ($target->scene) {
                         if ($this->hideOrigin) {
-                            $target->form->cursor = 'NONE';
+                            $target->scene->cursor = 'NONE';
                         } else {
-                            $target->form->cursor = 'DEFAULT';
+                            $target->scene->cursor = 'DEFAULT';
                         }
                     }
 
@@ -109,8 +109,8 @@ class CursorBindBehaviour extends AbstractBehaviour
             });
             $this->_timer->start();
 
-            $target->form->addEventFilter('mouseMove', $handler);
-            $target->form->addEventFilter('mouseDrag', $handler);
+            $target->window->addEventFilter('mouseMove', $handler);
+            $target->window->addEventFilter('mouseDrag', $handler);
         }
     }
 

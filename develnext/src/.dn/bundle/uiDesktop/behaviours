@@ -8,6 +8,7 @@ ide\behaviour\spec\GlowEffectBehaviourSpec
 ide\behaviour\spec\ColorAdjustEffectBehaviourSpec
 ide\behaviour\spec\SepiaToneEffectBehaviourSpec
 
+ide\behaviour\spec\WidgetFormBehaviourSpec
 ide\behaviour\spec\DraggingFormBehaviourSpec
 ide\behaviour\spec\DraggingBehaviourSpec
 ide\behaviour\spec\EscapeShutdownBehaviourSpec

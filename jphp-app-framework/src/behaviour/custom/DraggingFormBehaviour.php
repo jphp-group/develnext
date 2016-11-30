@@ -47,20 +47,20 @@ class DraggingFormBehaviour extends AbstractBehaviour
                 if ($e->button == 'PRIMARY') {
                     if ($this->opacityEnabled) {
                         if ($this->animated) {
-                            Animation::fadeTo($target->form, 300, $this->opacity);
+                            Animation::fadeTo($target->window, 300, $this->opacity);
                         } else {
-                            $target->form->opacity = $this->opacity;
+                            $target->window->opacity = $this->opacity;
                         }
                     }
 
-                    $pos->set([$e->screenX - $target->form->x, $e->screenY - $target->form->y]);
+                    $pos->set([$e->screenX - $target->window->x, $e->screenY - $target->window->y]);
                 }
             }, __CLASS__);
 
-            $move = function (UXMouseEvent $e)use ($pos, $target) {
+            $move = function (UXMouseEvent $e) use ($pos, $target) {
                 if ($pos->get()) {
-                    $target->form->x = $e->screenX - $pos->get()[0];
-                    $target->form->y = $e->screenY - $pos->get()[1];
+                    $target->window->x = $e->screenX - $pos->get()[0];
+                    $target->window->y = $e->screenY - $pos->get()[1];
                 }
             };
 
@@ -72,9 +72,9 @@ class DraggingFormBehaviour extends AbstractBehaviour
 
                     if ($this->opacityEnabled) {
                         if ($this->animated) {
-                            Animation::fadeTo($target->form, 300, 1);
+                            Animation::fadeTo($target->window, 300, 1);
                         } else {
-                            $target->form->opacity = 1;
+                            $target->window->opacity = 1;
                         }
                     }
                 }

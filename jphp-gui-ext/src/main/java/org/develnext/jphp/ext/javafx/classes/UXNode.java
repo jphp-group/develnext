@@ -582,6 +582,26 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
         return null;
     }
 
+    @Getter(hiddenInDebugInfo = true)
+    protected UXWindow getWindow(Environment env) {
+        Scene scene = getWrappedObject().getScene();
+        if (scene == null) {
+            return null;
+        }
+
+        Window window = scene.getWindow();
+
+        if (window == null && scene.getUserData() instanceof Window) {
+            window = (Window) scene.getUserData();
+        }
+
+        if (window != null) {
+            return new UXWindow(env, window);
+        }
+
+        return null;
+    }
+
     @Signature
     public UXImage snapshot(Environment env) {
         SnapshotParameters snapParams = new SnapshotParameters();

@@ -129,6 +129,13 @@ abstract class AbstractEditorsProjectControlPane extends AbstractProjectControlP
                     $ext = fs::ext($editor->getFile());
                     $newFile = fs::parent($editor->getFile()) . "/$name" . ($ext ? ".$ext" : "");
 
+                    if (fs::exists($newFile))
+                    {
+                        UXDialog::showAndWait("Введенное имя '$name' уже занято, введите другое.", 'WARNING');
+                        $this->doClone();
+                        return;
+                    }
+
                     $editor->getFormat()->duplicate($editor->getFile(), $newFile);
                     $this->refresh();
                 }

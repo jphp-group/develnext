@@ -64,7 +64,7 @@ class UXNodeWrapper
 
     protected function bindGlobalKey($event, callable $_handler, $group)
     {
-        $form = $this->node->form;
+        $form = $this->node->window;
 
         if ($form) {
             $manager = $form->data(UXKeyboardManager::class);
@@ -110,7 +110,7 @@ class UXNodeWrapper
             }
         } else {
             TimerScript::executeWhile(function () {
-                return $this->node->form;
+                return $this->node->window;
             }, function () use ($event, $_handler, $group) {
                 $this->bindGlobalKey($event, $_handler, $group);
             });

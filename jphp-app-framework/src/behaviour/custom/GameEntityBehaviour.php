@@ -137,11 +137,11 @@ class GameEntityBehaviour extends AbstractBehaviour
         if (!$sceneBehaviour) {
             $sceneBehaviour = GameSceneBehaviour::get($parent);
 
-            if (!$sceneBehaviour && $this->_target->form) {
-                $sceneBehaviour = GameSceneBehaviour::get($this->_target->form);
+            if (!$sceneBehaviour && $this->_target->window) {
+                $sceneBehaviour = GameSceneBehaviour::get($this->_target->window);
 
                 if (!$sceneBehaviour) {
-                    $sceneBehaviour = $this->_target->form->layout->data('--game-scene');
+                    $sceneBehaviour = $this->_target->window->layout->data('--game-scene');
                 }
             }
         }

@@ -18,6 +18,7 @@
                 <variant value="UNDECORATED">Без рамок</variant>
                 <variant value="TRANSPARENT">Прозрачный</variant>
                 <variant value="UTILITY">Утилита</variant>
+                <variant value="WIDGET">Виджет</variant>
             </variants>
         </property>
         <property code="form.modality" name="Модальность" editor="boolean" formConfig="1" defaultValue="0" />

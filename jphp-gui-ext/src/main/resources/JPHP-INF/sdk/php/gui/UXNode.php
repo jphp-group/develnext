@@ -61,6 +61,13 @@ abstract class UXNode
 
     /**
      * --RU--
+     * Окно компонента
+     * @var UXWindow
+     */
+    public $window;
+
+    /**
+     * --RU--
      * Позиция по X.
      *
      * @var double
