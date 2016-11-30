@@ -1001,13 +1001,17 @@ public class UXDesigner extends BaseObject {
 
         EventHandler<MouseEvent> onDragDetected = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
-                if (getNodeLock(node) || e.getButton() != MouseButton.PRIMARY) {
+                if (e.getButton() != MouseButton.PRIMARY) {
                     return;
                 }
 
-                dragged = true;
-
                 for (final Selection selection : selections.values()) {
+                    if (getNodeLock(selection.getNode())) {
+                        continue;
+                    }
+
+                    dragged = true;
+
                     SnapshotParameters snapParams = new SnapshotParameters();
                     snapParams.setFill(Color.TRANSPARENT);
 
@@ -1032,11 +1036,15 @@ public class UXDesigner extends BaseObject {
 
         EventHandler<MouseEvent> onMouseDragged = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
-                if (getNodeLock(node) || e.getButton() != MouseButton.PRIMARY) {
+                if (e.getButton() != MouseButton.PRIMARY) {
                     return;
                 }
 
                 for (Selection sel : selections.values()) {
+                    if (getNodeLock(sel.getNode())) {
+                        continue;
+                    }
+
                     Point2D localPoint = sel.parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
                     if (localPoint != null) {
@@ -1126,26 +1134,27 @@ public class UXDesigner extends BaseObject {
 
         EventHandler<MouseEvent> onMouseReleased = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
-                if (!getNodeLock(node) && dragged) {
+                if (dragged) {
                     for (Selection selection : selections.values()) {
                         selection.node.setMouseTransparent(false);
                         selection.node.setCursor(Cursor.DEFAULT);
 
-                        Object userData = selection.dragView.getUserData();
+                        if (!getNodeLock(selection.node)) {
+                            Object userData = selection.dragView.getUserData();
 
-                        double x = selection.dragView.getLayoutX();
-                        double y = selection.dragView.getLayoutY();
+                            double x = selection.dragView.getLayoutX();
+                            double y = selection.dragView.getLayoutY();
 
-                        if (userData instanceof Insets) {
-                            x += ((Insets) userData).getLeft();
-                            y += ((Insets) userData).getTop();
+                            if (userData instanceof Insets) {
+                                x += ((Insets) userData).getLeft();
+                                y += ((Insets) userData).getTop();
+                            }
+
+                            selection.drag(x, y, false);
+                            relocateNode(selection.node, selection.dragView.getLayoutX(), selection.dragView.getLayoutY());
                         }
 
-                        selection.drag(x, y, false);
-                        relocateNode(selection.node, selection.dragView.getLayoutX(), selection.dragView.getLayoutY());
-
                         selection.update();
-
                         selection.parent.getChildren().remove(selection.dragView);
                     }
 

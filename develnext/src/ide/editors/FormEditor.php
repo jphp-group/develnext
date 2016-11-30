@@ -443,6 +443,20 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 $type->extends[str::lower($_name)] = $e = new ExtendTypeEntry($_name, ['weak' => true, 'interface' => true]);
             }
 
+            $typeBehaviours = $this->behaviourManager->getBehaviours(null);
+
+            foreach ($typeBehaviours as $one) {
+                $spec = $this->behaviourManager->getBehaviourSpec($one);
+
+                if ($spec) {
+                    $type->properties[$one->getCode()] = $prop = new TypePropertyEntry();
+                    $prop->name = $one->getCode();
+                    $prop->data['content']['DEF'] = $spec->getName();
+                    $prop->data['icon'] = $spec->getIcon();
+                    $prop->data['type'][] = $spec->getType();
+                }
+            }
+
             foreach ($this->getObjectList() as $el) {
                 $type->properties[$el->value] = $prop = new TypePropertyEntry();
                 $prop->name = $el->value;

@@ -14,6 +14,8 @@ import javafx.scene.layout.Border;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 
+import java.util.Scanner;
+
 public class LabelEx extends Label {
     public enum AutoSizeType { ALL, HORIZONTAL, VERTICAL }
 
@@ -110,6 +112,18 @@ public class LabelEx extends Label {
 
     protected double getTextAutoHeight() {
         double height = UXFont.getLineHeight(LabelEx.this.getFont());
+
+        int count = 0;
+
+        Scanner scanner = new Scanner(getText());
+        while (scanner.hasNextLine()) {
+            count++;
+            scanner.nextLine();
+        }
+
+        if (count > 1) {
+            height *= count;
+        }
 
         Insets padding = getPadding();
         if (padding != null) {

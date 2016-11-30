@@ -1,5 +1,19 @@
 <behaviour extends="BehaviourSpec">
     <properties>
-
+        <property name="Позиция" code="position" editor="enum" tooltip="Начальная позиция виджета на экране">
+            <variants>
+                <variant value="TOP_LEFT">Верх, лево</variant>
+                <variant value="TOP_CENTER">Верх, центр</variant>
+                <variant value="TOP_RIGHT">Верх, право</variant>
+                <variant value="MIDDLE_LEFT">Середина, лево</variant>
+                <variant value="CENTER">Центр</variant>
+                <variant value="MIDDLE_RIGHT">Середина, право</variant>
+                <variant value="BOTTOM_LEFT">Низ, лево</variant>
+                <variant value="BOTTOM_CENTER">Низ, центр</variant>
+                <variant value="BOTTOM_RIGHT">Низ, право</variant>
+            </variants>
+        </property>
+        <property name="Смещение X" code="offsetX" editor="integer" tooltip="Смещение по-горизонтали" />
+        <property name="Смещение Y" code="offsetY" editor="integer" tooltip="Смещение по-вертикали" />
     </properties>
 </behaviour>

@@ -1,0 +1,6 @@
+<behaviour extends="AnimationBehaviourSpec">
+    <properties>
+        <property name="Анимировать" code="animated" editor="boolean" tooltip="Плавное изменение масштаба объекта" />
+        <property name="Масштаб" code="scale" editor="floatSlider" min="0" max="10" tooltip="Уровень масштаба для пульсации от 0 до 10, 1 = 100%, 1.5 = 150%, 2 = 200%" />
+    </properties>
+</behaviour>
