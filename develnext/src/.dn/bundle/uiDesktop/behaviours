@@ -25,3 +25,4 @@ ide\behaviour\spec\RandomMovementAnimationBehaviourSpec
 ide\behaviour\spec\VibrationAnimationBehaviourSpec
 ide\behaviour\spec\FadeAnimationBehaviourSpec
 ide\behaviour\spec\PulseAnimationBehaviourSpec
+ide\behaviour\spec\ScaleAnimationBehaviourSpec

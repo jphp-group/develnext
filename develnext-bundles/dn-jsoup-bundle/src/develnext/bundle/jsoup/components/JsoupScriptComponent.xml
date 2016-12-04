@@ -7,6 +7,7 @@
         <property code="userAgent" value="Simple Bot v1.0" />
         <property code="autoParse" value="1" />
         <property code="autoCookies" value="0" />
+        <property code="proxyType" value="DIRECT" />
     </init>
 
     <properties group="general">
@@ -31,6 +32,15 @@
         <property code="ignoreContentTypes" name="Игнор. тип контента" editor="boolean" tooltip="Обрабатывать ли данные даже при http ответах, говорящих об ошибках" />
         <property code="autoParse" name="Автопарсинг" editor="boolean" tooltip="Автоматически запускать парсинг при смене URL" />
         <property code="autoCookies" name="Сохранять куки" editor="boolean" tooltip="Сохранять переданные сайтом cookies для последующих запросов" />
+
+        <property code="proxyType" name="Тип прокси" editor="enum">
+            <variants>
+                <variant value="DIRECT">DIRECT</variant>
+                <variant value="HTTP">HTTP</variant>
+                <variant value="SOCKS">SOCKS</variant>
+            </variants>
+        </property>
+        <property code="proxy" name="Прокси" editor="text" tooltip="ip:port" />
     </properties>
 
     <properties group="data" title="Данные запроса" sort="1500">

@@ -9,6 +9,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
+import javafx.print.PrinterJob;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.effect.BlendMode;
@@ -52,51 +53,105 @@ import java.util.TreeSet;
 @Name(JavaFXExtension.NS + "UXNode")
 public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventable {
     interface WrappedInterface {
-        @Property double baselineOffset();
-        @Property BlendMode blendMode();
-        @Property @Nullable Effect effect();
-        @Property(hiddenInDebugInfo = true) @Nullable Node clip();
-        @Property(hiddenInDebugInfo = true) Orientation contentBias();
-        @Property(hiddenInDebugInfo = true) DepthTest depthTest();
-        @Property String id();
-        @Property(hiddenInDebugInfo = true) double opacity();
+        @Property
+        double baselineOffset();
 
-        @Property double rotate();
+        @Property
+        BlendMode blendMode();
 
-        @Property double scaleX();
-        @Property double scaleY();
-        @Property double scaleZ();
+        @Property
+        @Nullable
+        Effect effect();
 
-        @Property String style();
+        @Property(hiddenInDebugInfo = true)
+        @Nullable
+        Node clip();
 
-        @Property double translateX();
-        @Property double translateY();
-        @Property double translateZ();
+        @Property(hiddenInDebugInfo = true)
+        Orientation contentBias();
 
-        @Property boolean cache();
+        @Property(hiddenInDebugInfo = true)
+        DepthTest depthTest();
+
+        @Property
+        String id();
+
+        @Property(hiddenInDebugInfo = true)
+        double opacity();
+
+        @Property
+        double rotate();
+
+        @Property
+        double scaleX();
+
+        @Property
+        double scaleY();
+
+        @Property
+        double scaleZ();
+
+        @Property
+        String style();
+
+        @Property
+        double translateX();
+
+        @Property
+        double translateY();
+
+        @Property
+        double translateZ();
+
+        @Property
+        boolean cache();
+
         //@Property boolean disable();
-        @Property boolean disabled();
-        @Property boolean focused();
-        @Property boolean focusTraversable();
-        @Property boolean hover();
-        @Property boolean managed();
-        @Property boolean mouseTransparent();
-        @Property boolean pickOnBounds();
-        @Property boolean pressed();
-        @Property boolean resizable();
-        @Property boolean visible();
+        @Property
+        boolean disabled();
 
-        @Property("classes") ObservableList<String> styleClass();
+        @Property
+        boolean focused();
+
+        @Property
+        boolean focusTraversable();
+
+        @Property
+        boolean hover();
+
+        @Property
+        boolean managed();
+
+        @Property
+        boolean mouseTransparent();
+
+        @Property
+        boolean pickOnBounds();
+
+        @Property
+        boolean pressed();
+
+        @Property
+        boolean resizable();
+
+        @Property
+        boolean visible();
+
+        @Property("classes")
+        ObservableList<String> styleClass();
 
         //@Property(hiddenInDebugInfo = true) @Nullable Object userData();
 
         boolean contains(double localX, double localY);
 
         void relocate(double x, double y);
+
         void resize(double width, double height);
+
         void startFullDrag();
 
         void toBack();
+
         void toFront();
 
         void requestFocus();
@@ -258,7 +313,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
 
     @Getter(hiddenInDebugInfo = true)
     protected double[] getPosition() {
-        return new double[] { getX(), getY() };
+        return new double[]{getX(), getY()};
     }
 
     @Setter
@@ -272,7 +327,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     @Getter(hiddenInDebugInfo = true)
     protected double[] getSize() {
         Bounds bounds = getWrappedObject().getLayoutBounds();
-        return new double[] { bounds.getWidth(), bounds.getHeight() };
+        return new double[]{bounds.getWidth(), bounds.getHeight()};
     }
 
     @Setter
@@ -340,7 +395,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     @Setter
     public void setAnchorFlags(ArrayMemory value) {
         Parent parent = getWrappedObject().getParent();
-        Bounds parentBounds = parent == null ? null: parent.getLayoutBounds();
+        Bounds parentBounds = parent == null ? null : parent.getLayoutBounds();
 
         if (parent == null) {
             return;
@@ -503,7 +558,7 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             return null;
         }
 
-        return new double[] {pt.getX(), pt.getY()};
+        return new double[]{pt.getX(), pt.getY()};
     }
 
     @Signature

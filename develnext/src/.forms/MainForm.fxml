@@ -21,7 +21,7 @@
                             <menus>
                                 <Menu id="menuProject" mnemonicParsing="false" text="Проект"/>
                                 <!-- <Menu id="menuSettings" mnemonicParsing="false" text="Настройки"/> -->
-                                <Menu id="menuLibrary" mnemonicParsing="false" text="Библиотека"/>
+                                <!-- <Menu id="menuLibrary" mnemonicParsing="false" text="Библиотека"/> -->
                                 <Menu id="menuAccount" text="Аккаунт" visible="false"/>
                                 <Menu id="menuRun" text="Запуск"/>
                                 <Menu id="menuHelp" text="Помощь"/>

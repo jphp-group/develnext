@@ -5,6 +5,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.Event;
+import javafx.print.PrinterJob;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
 import netscape.javascript.JSObject;

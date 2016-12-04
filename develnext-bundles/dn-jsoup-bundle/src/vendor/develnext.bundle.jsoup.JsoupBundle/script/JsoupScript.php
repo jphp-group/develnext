@@ -13,6 +13,7 @@ use php\jsoup\Elements;
 use php\jsoup\Jsoup;
 use php\lang\Thread;
 use php\lib\str;
+use php\net\Proxy;
 use php\util\Flow;
 use php\util\Scanner;
 
@@ -32,6 +33,17 @@ class JsoupScript extends AbstractScript
      * @var string
      */
     public $method = 'GET';
+
+    /**
+     * HTTP, SOCKS,
+     * @var string
+     */
+    public $proxyType = 'HTTP';
+
+    /**
+     * @var string
+     */
+    public $proxy;
 
     /**
      * @var string
@@ -146,6 +158,13 @@ class JsoupScript extends AbstractScript
 
         if ($this->referrer) {
             $connection->referrer($this->referrer);
+        }
+
+
+        if ($this->proxy) {
+            list($proxyHost, $proxyPort) = str::split($this->proxy, ':', 2);
+            $proxy = new Proxy($this->proxyType, $proxyHost, $proxyPort);
+            $connection->proxy($proxy);
         }
 
         $connection->timeout($this->timeout);

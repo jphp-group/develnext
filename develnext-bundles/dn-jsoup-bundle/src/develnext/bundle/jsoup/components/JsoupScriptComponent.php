@@ -16,12 +16,12 @@ class JsoupScriptComponent extends AbstractScriptComponent
      */
     public function getName()
     {
-        return 'Web парсер (Jsoup)';
+        return 'Парсер HTML';
     }
 
     public function getIcon()
     {
-        return 'develnext/bundle/jsoup/html16.png';
+        return 'develnext/bundle/jsoup/target16.png';
     }
 
     public function getIdPattern()
