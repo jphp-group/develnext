@@ -33,7 +33,7 @@
                                 <Insets/>
                             </opaqueInsets>
                         </MenuBar>
-                        <HBox id="headPane" alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="988.0" spacing="4.0">
+                        <HBox id="headPane" alignment="CENTER_LEFT" prefHeight="44.0" prefWidth="988.0" spacing="4.0">
                             <padding>
                                 <Insets bottom="6.0" left="6.0" right="6.0" top="6.0"/>
                             </padding>

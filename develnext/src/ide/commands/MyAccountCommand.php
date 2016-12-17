@@ -9,6 +9,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\marker\ArrowPointMarker;
 use ide\misc\AbstractCommand;
+use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXPanel;
 use php\gui\text\UXFont;
 use php\gui\UXApplication;
@@ -24,11 +25,6 @@ class MyAccountCommand extends AbstractCommand
      * @var UXButton
      */
     protected $accountButton;
-
-    /**
-     * @var UXLabel
-     */
-    protected $accountLabel;
 
     /**
      * @var UXImageArea
@@ -108,25 +104,23 @@ class MyAccountCommand extends AbstractCommand
         $btn->paddingLeft = $btn->paddingRight = 20;
 
         $this->accountButton = $btn;
-        $this->accountLabel = new UXLabel();
-        $this->accountLabel->textColor = 'gray';
-        $this->accountLabel->paddingLeft = 4;
 
         $this->accountImage = new UXImageArea();
-        $this->accountImage->size = [32, 32];
         $this->accountImage->centered = true;
         $this->accountImage->proportional = true;
         $this->accountImage->stretch = true;
         $this->accountImage->smartStretch = true;
-        $this->accountImage->position = [1, 1];
+        $this->accountImage->position = [0, 0];
 
         $panel = new UXPanel();
         $panel->add($this->accountImage);
         $panel->borderWidth = 1;
         $panel->borderColor = 'silver';
-        $panel->size = [32, 32];
+        $panel->maxHeight = 999;
+        $panel->width = 30;
 
         $this->accountImagePanel = $panel;
+        UXAnchorPane::setAnchor($this->accountImage, 0);
 
         return [$panel, $btn, new UXSeparator('VERTICAL')];
     }

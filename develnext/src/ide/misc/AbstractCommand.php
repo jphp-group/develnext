@@ -65,6 +65,19 @@ abstract class AbstractCommand
         return 'project';
     }
 
+    public function makeAction()
+    {
+        return function () {
+            $this->onExecute();
+
+            $project = Ide::project();
+
+            if ($project) {
+                $project->update();
+            }
+        };
+    }
+
     public function makeGlyphButton()
     {
         $button = new UXButton();
@@ -75,17 +88,9 @@ abstract class AbstractCommand
         }
 
         $button->graphic = Ide::get()->getImage($this->getIcon());
-        $button->padding = [4, 5];
+        $button->maxHeight = 9999;
 
-        $button->on('action', function () {
-            $this->onExecute();
-
-            $project = Ide::project();
-
-            if ($project) {
-                $project->update();
-            }
-        });
+        $button->on('action', $this->makeAction());
 
         return $button;
     }
@@ -96,15 +101,7 @@ abstract class AbstractCommand
         $item->graphic = Ide::get()->getImage($this->getIcon());
         $item->accelerator = $this->getAccelerator();
 
-        $item->on('action', function () {
-            $this->onExecute();
-
-            $project = Ide::project();
-
-            if ($project) {
-                $project->update();
-            }
-        });
+        $item->on('action', $this->makeAction());
 
         return $item;
     }

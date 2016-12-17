@@ -883,7 +883,7 @@ class Ide extends Application
 
                 foreach ($headUi as $ui) {
                     if ($ui instanceof UXButton) {
-                        $ui->padding = 8;
+                        $ui->maxHeight = 9999;
                     } else if ($ui instanceof UXSeparator) {
                         $ui->paddingLeft = 4;
                         $ui->paddingRight = 2;
@@ -909,7 +909,7 @@ class Ide extends Application
 
                 foreach ($headRightUi as $ui) {
                     if ($ui instanceof UXButton) {
-                        $ui->padding = 8;
+                        $ui->maxHeight = 999;
                     } else if ($ui instanceof UXSeparator) {
                         $ui->paddingLeft = 4;
                         $ui->paddingRight = 2;

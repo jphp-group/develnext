@@ -380,7 +380,7 @@ class OpenProjectForm extends AbstractIdeForm
     }
 
     /**
-     * @event openButton.click
+     * @event openButton.action
      */
     public function doOpenButtonClick()
     {

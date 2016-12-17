@@ -128,6 +128,8 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, Labeled.class, UXLabeled.class);
         registerWrapperClass(scope, ButtonBase.class, UXButtonBase.class);
         registerWrapperClass(scope, Button.class, UXButton.class);
+        registerWrapperClass(scope, MenuButton.class, UXMenuButton.class);
+        registerWrapperClass(scope, SplitMenuButton.class, UXSplitMenuButton.class);
         registerWrapperClass(scope, FlatButton.class, UXFlatButton.class);
         registerWrapperClass(scope, ToggleGroup.class, UXToggleGroup.class);
         registerWrapperClass(scope, ToggleButton.class, UXToggleButton.class);

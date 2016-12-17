@@ -5,6 +5,8 @@ use ide\editors\AbstractEditor;
 use ide\forms\OpenProjectForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
+use php\gui\UXMenuItem;
+use php\gui\UXSplitMenuButton;
 
 /**
  * Class OpenProjectCommand
@@ -34,7 +36,29 @@ class OpenProjectCommand extends AbstractCommand
 
     public function makeUiForHead()
     {
-        return $this->makeGlyphButton();
+        $button = $this->makeGlyphButton();
+
+        $split = new UXSplitMenuButton($button->text, $button->graphic);
+        $split->maxHeight = 9999;
+        $split->tooltipText = $button->tooltipText;
+        $split->on('action', $this->makeAction());
+
+        $dialog = new OpenProjectForm();
+
+        $openItem = new UXMenuItem('Открыть проект из файла');
+        $openItem->on('action', [$dialog, 'doOpenButtonClick']);
+        $split->items->add($openItem);
+
+        $openUrlItem = new UXMenuItem('Открыть проект по ссылке', ico('hyperlink16'));
+        //$split->items->add($openUrlItem);
+
+        $split->items->add(UXMenuItem::createSeparator());
+
+        $item = $this->makeMenuItem();
+        $item->text = 'Все проекты';
+        $split->items->add($item);
+
+        return $split;
     }
 
     public function onExecute($e = null, AbstractEditor $editor = null)
