@@ -34,7 +34,11 @@ class IdeFormFactory extends AbstractFactory
         $this->factoryName = $formName;
         $this->file = $path;
 
-        parent::__construct($path);
+        try {
+            parent::__construct($path);
+        } catch (IOException $e) {
+            Logger::exception($e->getMessage(), $e);
+        }
     }
 
     /**

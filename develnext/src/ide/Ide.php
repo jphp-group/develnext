@@ -25,6 +25,7 @@ use ide\systems\FileSystem;
 use ide\systems\IdeSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
+use ide\tool\IdeToolManager;
 use ide\ui\LazyLoadingImage;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
@@ -141,6 +142,11 @@ class Ide extends Application
     protected $library;
 
     /**
+     * @var IdeToolManager
+     */
+    protected $toolManager;
+
+    /**
      * @var boolean
      */
     protected $idle = false;
@@ -171,6 +177,8 @@ class Ide extends Application
         $this->mode = IdeSystem::getMode();
 
         $this->library = new IdeLibrary($this);
+        $this->toolManager = new IdeToolManager();
+
         $this->asyncThreadPool = ThreadPool::createCached();
     }
 
@@ -320,6 +328,14 @@ class Ide extends Application
     public function getLibrary()
     {
         return $this->library;
+    }
+
+    /**
+     * @return IdeToolManager
+     */
+    public function getToolManager()
+    {
+        return $this->toolManager;
     }
 
     /**

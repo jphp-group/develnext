@@ -88,11 +88,14 @@ abstract class AbstractForm extends UXForm
     protected $widget;
 
     /**
+     * @var string
+     */
+    private $resourcePath;
+
+    /**
      * @param UXForm $origin
      * @param bool $loadEvents
      * @param bool $loadBehaviours
-     * @throws Exception
-     * @throws IllegalStateException
      */
     public function __construct(UXForm $origin = null, $loadEvents = true, $loadBehaviours = true)
     {
@@ -127,6 +130,12 @@ abstract class AbstractForm extends UXForm
         }
 
         Logger::debug("Form '{$this->getName()}' is created.");
+    }
+
+    protected static function getResourcePathByClassName()
+    {
+        $class = get_called_class();
+        return 'res:///' . str::replace($class, '\\', '/');
     }
 
     protected function makeAsWidget()
@@ -172,7 +181,7 @@ abstract class AbstractForm extends UXForm
         if (!$this->standaloneFactory) {
             $this->standaloneFactory = new StandaloneFactory(
                 $this,
-                static::DEFAULT_PATH . $this->getResourceName() . '.fxml',
+                $this->getResourcePath() . '.fxml',
                 $this->behaviourManager,
                 $this->eventBinder
             );
@@ -387,7 +396,16 @@ abstract class AbstractForm extends UXForm
         return $module;
     }
 
-    protected function getResourceName()
+    /**
+     * For overriding.
+     * @return string
+     */
+    protected function getResourcePath()
+    {
+        return static::DEFAULT_PATH . $this->getResourceName();
+    }
+
+    private function getResourceName()
     {
         $class = get_class($this);
 
@@ -514,7 +532,7 @@ abstract class AbstractForm extends UXForm
     protected function loadConfig($path = null, $applyConfig = true)
     {
         if ($path === null) {
-            $path = static::DEFAULT_PATH . $this->getResourceName() . '.conf';
+            $path = $this->getResourcePath() . '.conf';
         }
 
         try {
@@ -572,7 +590,7 @@ abstract class AbstractForm extends UXForm
     {
         $loader = new UXLoader();
 
-        $path = static::DEFAULT_PATH . $this->getResourceName() . '.fxml';
+        $path = $this->getResourcePath() . '.fxml';
 
         Stream::tryAccess($path, function (Stream $stream) use ($loader) {
             try {

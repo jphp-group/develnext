@@ -219,6 +219,8 @@ project(':develnext') {
         compile project(':jphp-parser')
         compile project(':develnext-doc')
         compile project(':develnext-store')
+        compile project(':develnext-java-platform')
+        compile project(':develnext-js-platform')
 
         if (new File("./develnext-control/build.gradle").exists()) {
             compile project(':develnext-control')

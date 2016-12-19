@@ -700,7 +700,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     public function reloadClones()
     {
         if ($this->factory) {
-            $this->factory->reload();
+            if ($this->getConfig()->get('withPrototypes')) {
+                $this->factory->reload();
+            }
         }
 
         $gui = GuiFrameworkProjectBehaviour::get();

@@ -284,6 +284,7 @@ class ProjectSystem
                 ProjectSystem::close(false);
                 Ide::get()->getMainForm()->hidePreloader();
 
+                Logger::exception("Unable to open project", $e);
                 Notifications::error("Ошибка открытия проекта", "Возможно к папке проекта нет доступа или нет места на диске");
             }
         } catch (InvalidProjectFormatException $e) {

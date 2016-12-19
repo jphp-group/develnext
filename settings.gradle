@@ -13,6 +13,8 @@ include 'jphp-gui-ext',
 include 'develnext-doc';
 include 'develnext-store';
 include 'develnext-control';
+include 'develnext-java-platform';
+include 'develnext-js-platform';
 include 'develnext-lexer';
 include 'develnext-launcher';
 
