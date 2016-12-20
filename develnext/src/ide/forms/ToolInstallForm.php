@@ -72,7 +72,7 @@ class ToolInstallForm extends AbstractIdeForm
         $installer = $this->installer;
 
         $this->title = "Установка " . $installer->getTool()->getName();
-        $this->titleLabel = "Установка " . $installer->getTool()->getName();
+        $this->titleLabel->text = "Установка " . $installer->getTool()->getName();
         $this->icon->image = ico('setup32')->image;
     }
 }

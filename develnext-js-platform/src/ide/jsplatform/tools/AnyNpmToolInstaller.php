@@ -31,8 +31,15 @@ class AnyNpmToolInstaller extends AbstractToolInstaller
 
                 $this->triggerProgress('installing', 10);
 
+                $p = 10;
+
                 while ($scanner->hasNextLine()) {
                     $this->triggerMessage($scanner->nextLine());
+
+                    $p += 10;
+                    if ($p <= 90) {
+                        $this->triggerProgress('installing', $p);
+                    }
                 }
 
                 $done--;

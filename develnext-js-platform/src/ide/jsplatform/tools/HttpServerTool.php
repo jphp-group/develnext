@@ -7,7 +7,7 @@ use php\lang\Process;
 use php\lib\arr;
 use php\lib\fs;
 
-class GulpTool extends AbstractTool
+class HttpServerTool extends AbstractTool
 {
     /**
      * @param array $args
@@ -16,7 +16,7 @@ class GulpTool extends AbstractTool
      */
     public function execute(array $args, $workDirectory = null)
     {
-        arr::unshift($args, $this->getBinPath() . '/gulp.js');
+        arr::unshift($args, $this->getBinPath() . '/http-server');
 
         return $this->manager->execute('node', $args);
     }
@@ -26,7 +26,7 @@ class GulpTool extends AbstractTool
      */
     public function getName()
     {
-        return 'gulp';
+        return 'http-server';
     }
 
     /**
@@ -35,7 +35,7 @@ class GulpTool extends AbstractTool
     public function getBinPath()
     {
         if ($this->manager->has('npm')) {
-            return $this->manager->get('npm')->getBinPath() . '/node_modules/gulp/bin';
+            return $this->manager->get('npm')->getBinPath() . '/node_modules/http-server/bin';
         }
 
         return parent::getBinPath();
@@ -48,7 +48,7 @@ class GulpTool extends AbstractTool
     {
         $npmTool = $this->manager->get('npm');
 
-        return $npmTool->isAvailable() && fs::isDir($npmTool->getBinPath() . '/node_modules/gulp');
+        return $npmTool->isAvailable() && fs::isDir($npmTool->getBinPath() . '/node_modules/http-server');
     }
 
     /**

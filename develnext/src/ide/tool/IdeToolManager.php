@@ -119,10 +119,11 @@ class IdeToolManager
     /**
      * @param $toolName
      * @param array $args
+     * @param null $workDirectory
      * @return Process
      * @throws IdeException
      */
-    public function execute($toolName, array $args = [])
+    public function execute($toolName, array $args = [], $workDirectory = null)
     {
         $tool = $this->get($toolName);
 
@@ -136,7 +137,7 @@ class IdeToolManager
 
         Logger::info("Execute '$toolName' with args = [" . str::join($args, ', ') . "]");
 
-        return $tool->execute($args);
+        return $tool->execute($args, $workDirectory);
     }
 
     /**

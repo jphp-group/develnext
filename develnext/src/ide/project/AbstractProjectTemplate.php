@@ -6,7 +6,11 @@ abstract class AbstractProjectTemplate
     abstract public function getName();
     abstract public function getDescription();
 
-    abstract public function getIcon();
+    public function getIcon()
+    {
+        return $this->getIcon32();
+    }
+
     abstract public function getIcon32();
 
     /**

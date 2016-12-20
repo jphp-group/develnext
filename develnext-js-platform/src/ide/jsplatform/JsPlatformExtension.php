@@ -8,6 +8,7 @@ use ide\forms\ToolInstallForm;
 use ide\Ide;
 use ide\jsplatform\tools\ElectronTool;
 use ide\jsplatform\tools\GulpTool;
+use ide\jsplatform\tools\HttpServerTool;
 use ide\jsplatform\tools\NodeTool;
 use ide\jsplatform\tools\NpmTool;
 use ide\Logger;
@@ -24,16 +25,22 @@ use php\util\Scanner;
  */
 class JsPlatformExtension extends AbstractExtension
 {
+    public function getDependencies()
+    {
+        return [
+            HttpClientBundle::class
+        ];
+    }
+
     public function onRegister()
     {
-        IdeSystem::getLoader()->addClassPath((new HttpClientBundle())->getVendorDirectory());
-
         $toolManager = Ide::get()->getToolManager();
 
         $toolManager->register(new NodeTool('6.9.2'));
         $toolManager->register(new NpmTool());
         $toolManager->register(new GulpTool('3.9.1'));
         $toolManager->register(new ElectronTool());
+        $toolManager->register(new HttpServerTool('0.9.0'));
     }
 
     public function onIdeShutdown()
@@ -45,9 +52,9 @@ class JsPlatformExtension extends AbstractExtension
     {
         $toolManager = Ide::get()->getToolManager();
 
-        /*$toolManager->install(['node', 'npm', 'gulp', 'electron'], function ($success) use ($toolManager) {
+        $toolManager->install(['node', 'npm', 'gulp', 'electron'], function ($success) use ($toolManager) {
 
-        });*/
+        });
 
         /*$install->on('progress', function ($status, $progress) {
             var_dump($status, $progress);

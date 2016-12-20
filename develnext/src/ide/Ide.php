@@ -4,6 +4,7 @@ namespace ide;
 use Files;
 use ide\account\AccountManager;
 use ide\account\ServiceManager;
+use ide\bundle\AbstractBundle;
 use ide\editors\AbstractEditor;
 use ide\editors\value\ElementPropertyEditor;
 use ide\formats\AbstractFormat;
@@ -1138,6 +1139,37 @@ class Ide extends Application
         return $this->accountManager;
     }
 
+    public function registerExtension($extension)
+    {
+        if (is_string($extension)) {
+            $extension = new $extension();
+        }
+
+        if (isset($this->extensions[reflect::typeOf($extension)])) {
+            return;
+        }
+
+        Logger::info("Register IDE extension " . reflect::typeOf($extension));
+
+        if (!($extension instanceof AbstractExtension)) {
+            throw new IdeException("Unable to add extension " . reflect::typeOf($extension) . ", is not correct type");
+        }
+
+        $this->extensions[reflect::typeOf($extension)] = $extension;
+
+        foreach ((array) $extension->getDependencies() as $class) {
+            $dep = new $class();
+
+            if ($dep instanceof AbstractBundle) {
+                IdeSystem::getLoader()->addClassPath($dep->getVendorDirectory());
+            } else {
+                $this->registerExtension($extension);
+            }
+        }
+
+        $extension->onRegister();
+    }
+
     public function registerAll()
     {
         $this->cleanup();
@@ -1145,17 +1177,7 @@ class Ide extends Application
         $extensions = $this->getInternalList('.dn/extensions');
 
         foreach ($extensions as $extension) {
-            Logger::info("Register IDE extension $extension");
-
-            /** @var AbstractExtension $extension */
-            $extension = new $extension();
-
-            if (!($extension instanceof AbstractExtension)) {
-                throw new IdeException("Unable to add extension " . get_class($extension) . ", is not correct type");
-            }
-
-            $this->extensions[get_class($extension)] = $extension;
-            $extension->onRegister();
+            $this->registerExtension($extension);
         }
 
         $valueEditors = $this->getInternalList('.dn/propertyValueEditors');
