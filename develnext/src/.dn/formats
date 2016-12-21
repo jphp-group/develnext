@@ -1,10 +1,4 @@
 ide\formats\WelcomeFormat
-ide\formats\ProjectFormat
-ide\formats\GuiFormFormat
 ide\formats\ScriptFormat
-ide\formats\ScriptModuleFormat
-ide\formats\PrototypeFormat
 ide\formats\PhpCodeFormat
 ide\formats\CssCodeFormat
-ide\formats\GameSpriteFormat
-ide\formats\FactoryFormat

@@ -1,6 +1,7 @@
 <?php
 namespace ide\jsplatform\project\behaviours;
 
+use ide\formats\ProjectFormat;
 use ide\formats\SimpleFileTemplate;
 use ide\project\AbstractProjectBehaviour;
 
@@ -17,6 +18,8 @@ class PhaserJsBehaviour extends AbstractProjectBehaviour
 
         $this->project->setSrcDirectory('src');
         $this->project->setSrcGeneratedDirectory('src_generated');
+
+        $this->project->registerFormat(new ProjectFormat());
     }
 
     public function doOpen()

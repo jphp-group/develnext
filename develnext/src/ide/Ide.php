@@ -8,6 +8,7 @@ use ide\bundle\AbstractBundle;
 use ide\editors\AbstractEditor;
 use ide\editors\value\ElementPropertyEditor;
 use ide\formats\AbstractFormat;
+use ide\formats\IdeFormatOwner;
 use ide\forms\MainForm;
 use ide\forms\SplashForm;
 use ide\library\IdeLibrary;
@@ -73,6 +74,7 @@ use timer\AccurateTimer;
 class Ide extends Application
 {
     use EventHandlerBehaviour;
+    use IdeFormatOwner;
 
     /** @var string */
     private $OS;
@@ -734,30 +736,6 @@ class Ide extends Application
         return $this->settings;
     }
 
-    /**
-     * @param AbstractFormat $format
-     */
-    public function registerFormat(AbstractFormat $format)
-    {
-        $class = get_class($format);
-
-        if (isset($this->formats[$class])) {
-            return;
-        }
-
-        $this->formats[$class] = $format;
-
-        $createCommand = $format->createBlankCommand();
-
-        if ($createCommand) {
-            $this->registerCommand($createCommand, 'create');
-        }
-
-        foreach ($format->getRequireFormats() as $el) {
-            $this->registerFormat($el);
-        }
-    }
-
     /***
      * @param AbstractNavigation $nav
      */
@@ -985,16 +963,6 @@ class Ide extends Application
     }
 
     /**
-     * @param $class
-     *
-     * @return AbstractFormat
-     */
-    public function getRegisteredFormat($class)
-    {
-        return $this->formats[$class];
-    }
-
-    /**
      * @param string $path
      *
      * @param array $size
@@ -1049,8 +1017,17 @@ class Ide extends Application
      */
     public function getFormat($path)
     {
+        if ($project = $this->getOpenedProject()) {
+            /** @var AbstractFormat $format */
+            foreach (arr::reverse($project->getRegisteredFormats()) as $format) {
+                if ($format->isValid($path)) {
+                    return $format;
+                }
+            }
+        }
+
         /** @var AbstractFormat $format */
-        foreach (Items::reverse($this->formats) as $format) {
+        foreach (arr::reverse($this->formats) as $format) {
             if ($format->isValid($path)) {
                 return $format;
             }

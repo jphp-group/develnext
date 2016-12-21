@@ -80,6 +80,7 @@ class IdeToolManager
 
     public function install(array $tools, callable $callback)
     {
+        /** @var callable $run */
         $run = null;
         $run = function () use (&$tools, &$run, $callback) {
             if (!$tools) {

@@ -4,6 +4,8 @@ use develnext\lexer\inspector\AbstractInspector;
 use Exception;
 use Files;
 use ide\formats\AbstractFileTemplate;
+use ide\formats\AbstractFormat;
+use ide\formats\IdeFormatOwner;
 use ide\forms\MainForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
@@ -38,6 +40,8 @@ use script\TimerScript;
  */
 class Project
 {
+    use IdeFormatOwner;
+
     const ENV_ALL  = 'all';
     const ENV_DEV  = 'dev';
     const ENV_PROD = 'prod';

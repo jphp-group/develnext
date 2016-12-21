@@ -34,7 +34,11 @@ use ide\formats\form\elements\GamePaneFormElement;
 use ide\formats\form\elements\SpriteViewFormElement;
 use ide\formats\form\FormEditorSettings;
 use ide\formats\form\FormProjectTreeNavigation;
+use ide\formats\GameSpriteFormat;
+use ide\formats\GuiFormFormat;
 use ide\formats\module\ModuleProjectTreeNavigation;
+use ide\formats\ProjectFormat;
+use ide\formats\ScriptModuleFormat;
 use ide\formats\sprite\IdeSpriteManager;
 use ide\formats\sprite\SpriteProjectTreeNavigation;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
@@ -233,6 +237,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
 
         //WatcherSystem::addListener([$this, 'doWatchFile']);
+
+        $this->project->registerFormat(new ProjectFormat());
+        $this->project->registerFormat(new GuiFormFormat());
+        $this->project->registerFormat(new ScriptModuleFormat());
+        $this->project->registerFormat(new GameSpriteFormat());
 
         $addMenu = new ContextMenu();
 
