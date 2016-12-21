@@ -50,6 +50,10 @@ use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
+use ide\project\control\DesignProjectControlPane;
+use ide\project\control\FormsProjectControlPane;
+use ide\project\control\ModulesProjectControlPane;
+use ide\project\control\SpritesProjectControlPane;
 use ide\project\Project;
 use ide\project\ProjectExporter;
 use ide\project\ProjectFile;
@@ -238,10 +242,19 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         //WatcherSystem::addListener([$this, 'doWatchFile']);
 
-        $this->project->registerFormat(new ProjectFormat());
+        $this->project->registerFormat($projectFormat = new ProjectFormat());
         $this->project->registerFormat(new GuiFormFormat());
         $this->project->registerFormat(new ScriptModuleFormat());
         $this->project->registerFormat(new GameSpriteFormat());
+
+        $projectFormat->addControlPanes([
+            new CommonProjectControlPane(),
+            new DesignProjectControlPane(),
+
+            new FormsProjectControlPane(),
+            new ModulesProjectControlPane(),
+            new SpritesProjectControlPane(),
+        ]);
 
         $addMenu = new ContextMenu();
 

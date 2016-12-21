@@ -51,29 +51,25 @@ class ProjectEditor extends AbstractEditor
     /**
      * ProjectEditor constructor.
      * @param string $file
+     * @param AbstractProjectControlPane[] $controlPanes
      */
-    public function __construct($file)
+    public function __construct($file, array $controlPanes = [])
     {
         parent::__construct($file);
 
-        foreach (Ide::get()->getInternalList('.dn/projectControlPanes') as $one) {
-            if (class_exists($one)) {
-                $pane = new $one();
-
-                if ($pane instanceof AbstractProjectControlPane) {
-                    $this->controlPanes[$one] = $pane;
-                    $pane->on('updateCount', function () {
-                        $this->menu->refresh();
-                    });
-                } else {
-                    Logger::error("Unable to register $one control pane, class is not instance of AbstractProjectControlPane");
-                }
-            } else {
-                Logger::error("Unable to register $one control pane, class not found.");
-            }
+        foreach ($controlPanes as $pane) {
+            $this->addControlPane($pane);
         }
     }
 
+    public function addControlPane(AbstractProjectControlPane $pane)
+    {
+        $this->controlPanes[reflect::typeOf($pane)] = $pane;
+
+        $pane->on('updateCount', function () {
+            $this->menu->refresh();
+        });
+    }
 
     public function getTitle()
     {

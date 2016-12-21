@@ -223,6 +223,7 @@ class ProjectSystem
 
             static::save();
         } catch (IOException $e) {
+            Logger::exception("Unable to create project", $e);
             ProjectSystem::close(false);
             Ide::get()->getMainForm()->hidePreloader();
             Notifications::error("Ошибка создания проекта", "Возможно к папке проекта нет доступа или нет места на диске");

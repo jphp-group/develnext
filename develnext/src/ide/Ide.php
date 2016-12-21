@@ -74,7 +74,9 @@ use timer\AccurateTimer;
 class Ide extends Application
 {
     use EventHandlerBehaviour;
-    use IdeFormatOwner;
+    use IdeFormatOwner {
+        getRegisteredFormat as _getRegisteredFormat;
+    }
 
     /** @var string */
     private $OS;
@@ -83,11 +85,6 @@ class Ide extends Application
      * @var SplashForm
      */
     protected $splash;
-
-    /**
-     * @var AbstractFormat[]
-     */
-    protected $formats = [];
 
     /**
      * @var AbstractProjectTemplate[]
@@ -1008,6 +1005,17 @@ class Ide extends Application
         }
 
         return $result;
+    }
+
+    public function getRegisteredFormat($class)
+    {
+        if ($project = $this->getOpenedProject()) {
+            if ($format = $project->getRegisteredFormat($class)) {
+               return $format;
+            }
+        }
+
+        return $this->_getRegisteredFormat($class);
     }
 
     /**

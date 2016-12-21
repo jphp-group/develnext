@@ -2,6 +2,7 @@
 namespace ide\jsplatform\project\behaviours;
 
 use ide\Ide;
+use ide\jsplatform\formats\JavaScriptCodeFormat;
 use ide\project\AbstractProjectBehaviour;
 use php\lang\Process;
 
@@ -19,6 +20,8 @@ class JsPlatformBehaviour extends AbstractProjectBehaviour
     {
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('close', [$this, 'doClose']);
+
+        $this->project->registerFormat(new JavaScriptCodeFormat());
     }
 
     public function doOpen()

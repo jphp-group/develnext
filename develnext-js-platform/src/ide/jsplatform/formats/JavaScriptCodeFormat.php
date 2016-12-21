@@ -14,7 +14,10 @@ class JavaScriptCodeFormat extends AbstractFormat
      */
     public function createEditor($file)
     {
-        return new CodeEditor($file, 'js');
+        $editor = new CodeEditor($file, 'js');
+        $editor->registerDefaultCommands();
+
+        return $editor;
     }
 
     /**

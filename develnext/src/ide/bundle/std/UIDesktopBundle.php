@@ -15,9 +15,9 @@ use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
 use ide\formats\GuiFormFormat;
 use ide\Ide;
+use ide\Logger;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\Project;
-use php\framework\Logger;
 use php\game\event\UXCollisionEvent;
 use php\gui\animation\UXAnimationTimer;
 use php\gui\animation\UXKeyFrame;
@@ -128,6 +128,8 @@ class UIDesktopBundle extends AbstractJarBundle
 
         if ($format) {
             $format->registerInternalList('.dn/bundle/uiDesktop/formComponents');
+        } else {
+            Logger::error("Unable to register components, GuiFormFormat is not found.");
         }
 
         if ($bDatabase = IdeBehaviourDatabase::get()) {

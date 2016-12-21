@@ -5,6 +5,7 @@ use ide\jsplatform\project\behaviours\JsPlatformBehaviour;
 use ide\jsplatform\project\behaviours\PhaserJsBehaviour;
 use ide\project\AbstractProjectTemplate;
 use ide\project\Project;
+use ide\systems\FileSystem;
 
 class JsGameProjectTemplate extends AbstractProjectTemplate
 {

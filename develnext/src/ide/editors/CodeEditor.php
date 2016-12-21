@@ -23,6 +23,7 @@ use php\gui\designer\UXAbstractCodeArea;
 use php\gui\designer\UXCodeAreaScrollPane;
 use php\gui\designer\UXCssCodeArea;
 use php\gui\designer\UXFxCssCodeArea;
+use php\gui\designer\UXJavaScriptCodeArea;
 use php\gui\designer\UXPhpCodeArea;
 use php\gui\designer\UXSyntaxAutoCompletion;
 use php\gui\designer\UXSyntaxTextArea;
@@ -186,6 +187,10 @@ class CodeEditor extends AbstractEditor
 
                 case 'fxcss':
                     $this->textArea = new UXFxCssCodeArea();
+                    break;
+
+                case 'js':
+                    $this->textArea = new UXJavaScriptCodeArea();
                     break;
             }
         } else {

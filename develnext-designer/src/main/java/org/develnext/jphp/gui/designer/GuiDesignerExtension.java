@@ -5,6 +5,7 @@ import org.develnext.jphp.gui.designer.classes.*;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.impl.CssCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.impl.FxCssCodeArea;
+import org.develnext.jphp.gui.designer.editor.syntax.impl.JavaScriptCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.impl.PhpCodeArea;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.InlineCssTextArea;
@@ -31,6 +32,7 @@ public class GuiDesignerExtension extends JavaFXExtension {
         registerWrapperClass(scope, CssCodeArea.class, UXCssCodeArea.class);
         registerWrapperClass(scope, FxCssCodeArea.class, UXFxCssCodeArea.class);
         registerWrapperClass(scope, PhpCodeArea.class, UXPhpCodeArea.class);
+        registerWrapperClass(scope, JavaScriptCodeArea.class, UXJavaScriptCodeArea.class);
 
         registerClass(scope, FileSystemWatcher.WrapWatchKey.class);
         registerClass(scope, FileSystemWatcher.class);
