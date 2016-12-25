@@ -1,5 +1,5 @@
 <?php
-namespace develnext\bundle\hotkey\components;
+namespace develnext\bundle\systemtray\components;
 
 use ide\scripts\AbstractScriptComponent;
 use script\HotKeyScript;
@@ -16,7 +16,7 @@ class HotKeyComponent extends AbstractScriptComponent
      */
     public function getName()
     {
-        return 'Горачая клавиша';
+        return 'Горячая клавиша';
     }
 
     public function getIcon()
