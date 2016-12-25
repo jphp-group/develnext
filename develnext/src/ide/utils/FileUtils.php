@@ -306,4 +306,12 @@ class FileUtils
     {
         return self::hashName($oneName) == self::hashName($twoName);
     }
+
+    public static function replaceInFile($fileName, $what, $to)
+    {
+        $content = FileUtils::get($fileName);
+        $content = str_replace($what, $to, $content);
+
+        FileUtils::put($fileName, $content);
+    }
 }

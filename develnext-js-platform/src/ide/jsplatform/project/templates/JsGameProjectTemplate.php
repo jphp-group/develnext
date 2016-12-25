@@ -4,6 +4,7 @@ namespace ide\jsplatform\project\templates;
 use ide\jsplatform\project\behaviours\JsPlatformBehaviour;
 use ide\jsplatform\project\behaviours\PhaserJsBehaviour;
 use ide\project\AbstractProjectTemplate;
+use ide\project\behaviours\ShareProjectBehaviour;
 use ide\project\Project;
 use ide\systems\FileSystem;
 
@@ -33,6 +34,7 @@ class JsGameProjectTemplate extends AbstractProjectTemplate
     {
         $project->register(new JsPlatformBehaviour());
         $project->register(new PhaserJsBehaviour());
+        $project->register(new ShareProjectBehaviour());
 
         $project->setIgnoreRules([
             '*.log', '*.tmp', '*.min\\.js'
@@ -51,6 +53,10 @@ class JsGameProjectTemplate extends AbstractProjectTemplate
 
         if (!$project->hasBehaviour(PhaserJsBehaviour::class)) {
             $project->register(new PhaserJsBehaviour(), false);
+        }
+
+        if (!$project->hasBehaviour(ShareProjectBehaviour::class)) {
+            $project->register(new ShareProjectBehaviour(), false);
         }
     }
 }

@@ -162,11 +162,18 @@ class ScriptModuleFormat extends AbstractFormFormat
 
         if ($project = Ide::project()) {
             foreach (['json', 'php', 'php.source', 'behaviour', 'php.axml'] as $ext) {
+                $name = fs::name($path);
+                $toName = fs::name($toPath);
+
                 $file = $project->getSrcFile("app/modules/" . fs::name($path) . '.' . $ext);
 
                 if (fs::isFile($file)) {
                     $toFile = $project->getSrcFile("app/modules/" . fs::name($toPath) . '.' . $ext);
                     FileUtils::copyFile($file, $toFile);
+
+                    if ($ext == 'php' || $ext == 'php.source') {
+                        FileUtils::replaceInFile($toFile, "class $name extends", "class $toName extends");
+                    }
                 }
             }
         }

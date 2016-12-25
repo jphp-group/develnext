@@ -145,6 +145,10 @@ class GuiFormFormat extends AbstractFormFormat
         foreach (['php', 'php.source', 'php.axml', 'behaviour'] as $ext) {
             if (fs::isFile("$path/$name.$ext")) {
                 FileUtils::copyFile("$path/$name.$ext", "$toPath/$toName.$ext");
+
+                if ($ext == 'php' || $ext == 'php.source') {
+                    FileUtils::replaceInFile("$toPath/$toName.$ext", "class $name extends", "class $toName extends");
+                }
             }
         }
     }
