@@ -1,7 +1,0 @@
-#!/bin/bash
-
-gradle clean
-gradle distIdeWindowsSetup
-
-gradle clean
-gradle distIdeLinuxSetup

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+./gradlew clean
+./gradlew distIdeWindowsSetup
+
+./gradlew clean
+./gradlew distIdeLinuxSetup
