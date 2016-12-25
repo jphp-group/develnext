@@ -1,5 +1,5 @@
 <?php
-namespace develnext\bundle\systemtray\components;
+namespace develnext\bundle\hotkey\components;
 
 use ide\scripts\AbstractScriptComponent;
 use script\HotKeyScript;
