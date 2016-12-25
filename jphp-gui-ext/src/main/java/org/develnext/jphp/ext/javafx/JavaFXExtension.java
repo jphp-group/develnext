@@ -29,6 +29,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
@@ -219,6 +220,8 @@ public class JavaFXExtension extends Extension {
 
         registerWrapperClass(scope, Media.class, UXMedia.class);
         registerWrapperClass(scope, MediaPlayer.class, UXMediaPlayer.class);
+        registerWrapperClass(scope, MediaView.class, UXMediaView.class);
+        registerWrapperClass(scope, MediaViewBox.class, UXMediaViewBox.class);
 
         registerWrapperClass(scope, GraphicsContext.class, UXGraphicsContext.class);
 

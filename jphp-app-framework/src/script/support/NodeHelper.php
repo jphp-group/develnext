@@ -67,6 +67,14 @@ class NodeHelper {
         return !!$this->root;
     }
 
+    /**
+     * @return UXNode
+     */
+    public function getRoot()
+    {
+        return $this->root;
+    }
+
     public function bindAction(callable $handle)
     {
         $root = $this->root;

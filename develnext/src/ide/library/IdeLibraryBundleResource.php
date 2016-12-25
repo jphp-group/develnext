@@ -46,7 +46,15 @@ class IdeLibraryBundleResource extends IdeLibraryResource
     {
         parent::onRegister($library);
 
-        Runtime::addJar($this->getPath() . "/" . fs::name($this->getPath()) . ".jar");
+        $file = ($this->getPath() . "/" . fs::name($this->getPath()) . ".jar");
+
+        if (!fs::isFile($file)) {
+            Logger::warn("$file is not exists for bundle registration");
+        }
+
+        Runtime::addJar($file);
+
+        Logger::debug("Add bundle jar '$file'");
 
         $class = $this->config->get('class');
 

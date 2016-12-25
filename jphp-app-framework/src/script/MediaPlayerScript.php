@@ -1,13 +1,20 @@
 <?php
 namespace script;
 
+use action\Element;
 use behaviour\StreamLoadableBehaviour;
+use php\framework\Logger;
 use php\gui\framework\AbstractScript;
 use php\gui\framework\behaviour\TextableBehaviour;
 use php\gui\framework\behaviour\ValuableBehaviour;
 use php\gui\UXMedia;
 use php\gui\UXMediaPlayer;
+use php\gui\UXMediaView;
+use php\gui\UXMediaViewBox;
+use php\lib\reflect;
 use php\lib\str;
+use script\support\NodeHelper;
+use script\support\ScriptHelpers;
 
 /**
  * Class MediaPlayerScript
@@ -24,6 +31,8 @@ use php\lib\str;
  */
 class MediaPlayerScript extends AbstractScript implements TextableBehaviour, ValuableBehaviour, StreamLoadableBehaviour
 {
+    use ScriptHelpers;
+
     /**
      * @var bool
      */
@@ -68,6 +77,11 @@ class MediaPlayerScript extends AbstractScript implements TextableBehaviour, Val
      * @var TimerScript
      */
     private $_stateTimer;
+
+    /**
+     * @var UXMediaViewBox
+     */
+    private $_view;
 
     /**
      * MediaPlayerScript constructor.
@@ -118,6 +132,10 @@ class MediaPlayerScript extends AbstractScript implements TextableBehaviour, Val
         $this->setMute($this->_mute);
         $this->setLoop($this->_loop);
         $this->setBalance($this->_balance);
+
+        if ($this->_view) {
+            $this->_view->player = $this->_player;
+        }
     }
 
     /**
@@ -129,6 +147,8 @@ class MediaPlayerScript extends AbstractScript implements TextableBehaviour, Val
         if ($this->autoplay) {
             $this->play();
         }
+
+        $this->setView($this->_view);
     }
 
     /**
@@ -381,5 +401,43 @@ class MediaPlayerScript extends AbstractScript implements TextableBehaviour, Val
     function appendObjectValue($value)
     {
         $this->positionMs += $value;
+    }
+
+    /**
+     * @return UXMediaViewBox
+     */
+    public function getView()
+    {
+        return $this->_view;
+    }
+
+    /**
+     * @param UXMediaViewBox $view
+     */
+    public function setView($view)
+    {
+        if (!$view) {
+            $view = null;
+        }
+
+        $this->_view = $view;
+
+        if ($this->isApplied()) {
+            if (is_string($this->_view)) {
+                $this->_eachHelper($this->_view, function (NodeHelper $node) {
+                    $this->_view = $node->getRoot();
+                });
+            }
+
+            if ($this->_view instanceof UXMediaViewBox || $this->_view instanceof UXMediaView) {
+                return;
+            }
+
+            $view = is_string($view) ? $view : reflect::typeOf($view);
+
+            Logger::error("Media player cannot use '$view' as view of media content.");
+
+            $this->_view = null;
+        }
     }
 }

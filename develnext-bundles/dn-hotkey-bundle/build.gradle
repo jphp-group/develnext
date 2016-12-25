@@ -1,0 +1,16 @@
+
+project.version = ''
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+sourceSets {
+    main.resources.srcDirs = ['src']
+}
+
+dependencies {
+    compile project(':jphp-desktop-hotkey-ext')
+}

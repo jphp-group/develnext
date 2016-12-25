@@ -204,3 +204,10 @@
     -fx-font-size: 12px;
     -fx-font-style: italic !important;
 }
+
+.media-view {
+    -fx-border-color: #2b3436;
+    -fx-border-style: dashed;
+    -fx-border-width: 2;
+    -fx-background-color: #1c67b1;
+}

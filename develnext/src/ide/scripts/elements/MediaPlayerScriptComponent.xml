@@ -15,6 +15,10 @@
         <property code="rate" name="Скорость" editor="floatSlider" min="0" max="8" tooltip="Скорость воспроизведения от 0.0 до 8.0" />
     </properties>
 
+    <properties group="binding" title="Взаимодействие">
+        <property code="view" name="Видео плеер" editor="object" tooltip="Укажите компонент для вывода видео" />
+    </properties>
+
     <eventTypes>
         <eventType code="play" name="Воспроизведение" kind="ObjectEvent" icon="icons/audioPlay16.png" />
         <eventType code="pause" name="Пауза" kind="ObjectEvent" icon="icons/audioPause16.png" />

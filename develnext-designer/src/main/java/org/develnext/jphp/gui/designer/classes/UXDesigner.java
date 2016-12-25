@@ -26,6 +26,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
@@ -714,6 +715,12 @@ public class UXDesigner extends BaseObject {
         if (node instanceof ImageView) {
             ((ImageView) node).setFitWidth(width);
             ((ImageView) node).setFitHeight(height);
+            return;
+        }
+
+        if (node instanceof MediaView) {
+            ((MediaView) node).setFitWidth(width);
+            ((MediaView) node).setFitHeight(height);
             return;
         }
 

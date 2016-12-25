@@ -10,6 +10,7 @@ use ide\project\templates\DefaultGuiProjectTemplate;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
+use php\desktop\HotKeyManager;
 use php\desktop\Robot;
 use php\gui\designer\UXDesigner;
 use php\gui\event\UXEvent;
@@ -21,6 +22,7 @@ use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXAlert;
+use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXForm;
 use php\gui\UXImage;
@@ -34,6 +36,7 @@ use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXTextArea;
 use php\gui\UXTreeView;
+use php\lang\System;
 use php\lib\str;
 use script\TimerScript;
 
@@ -130,6 +133,11 @@ class MainForm extends AbstractIdeForm
         } else {
             $parent->add($tabPane);
         }
+
+        /*$hotkeyManager = new HotKeyManager();
+        $hotkeyManager->register('control shift PLUS', function () {
+            System::halt(1);
+        }); */
     }
 
     /**

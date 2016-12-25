@@ -15,6 +15,7 @@ ide\formats\form\elements\ComboBoxFormElement
 ide\formats\form\elements\ListViewFormElement
 ide\formats\form\elements\TreeViewFormElement
 ide\formats\form\elements\ImageViewFormElement
+ide\formats\form\elements\MediaViewFormElement
 
 ide\formats\form\elements\ProgressBarFormElement
 ide\formats\form\elements\SliderFormElement
@@ -81,3 +82,4 @@ ide\formats\form\tags\PaginationFormElementTag
 ide\formats\form\tags\TableViewFormElementTag
 ide\formats\form\tags\RadioGroupPaneFormElementTag
 ide\formats\form\tags\TreeViewFormElementTag
+ide\formats\form\tags\MediaViewFormElementTag

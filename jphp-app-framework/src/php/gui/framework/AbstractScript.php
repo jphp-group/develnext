@@ -60,6 +60,11 @@ class ScriptEvent extends \stdClass
 abstract class AbstractScript
 {
     /**
+     * @var bool
+     */
+    private $applied = false;
+
+    /**
      * @hidden
      * @var bool
      */
@@ -116,12 +121,21 @@ abstract class AbstractScript
         $this->_context = $target;
 
         if (!$this->disabled) {
+            $this->applied = true;
             $this->applyImpl($target);
 
             uiLater(function () {
                 $this->trigger('construct');
             });
         }
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isApplied()
+    {
+        return $this->applied;
     }
 
     /**

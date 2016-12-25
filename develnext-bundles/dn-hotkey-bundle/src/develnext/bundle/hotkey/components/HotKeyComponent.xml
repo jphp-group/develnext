@@ -1,0 +1,13 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="key" value="" />
+    </init>
+
+    <properties>
+        <property code="key" name="Сочетание клавиш" editor="text" tooltip="Сочетание горячих клавиш, например Ctrl + Shift + K или Alt + F7" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="action" name="Выполнение" kind="ObjectEvent" icon="icons/ok16.png" />
+    </eventTypes>
+</element>

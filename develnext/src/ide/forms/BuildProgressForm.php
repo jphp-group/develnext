@@ -325,25 +325,27 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
         $input = $process->getInput();
 
         $scanner = new Scanner($process->getInput());
+        $scannerErr = new Scanner($process->getError());
+
+        $hasError = false;
+
+        (new Thread(function() use ($scannerErr, &$hasError) {
+            while ($scannerErr->hasNextLine()) {
+                $line = $scannerErr->nextLine();
+
+                $hasError = true;
+
+                UXApplication::runLater(function () use ($line) {
+                    $this->addConsoleLine($line, 'red');
+                });
+            }
+        }))->start();
 
         while ($scanner->hasNextLine()) {
             $line = $scanner->nextLine();
 
             uiLater(function() use ($line) {
                 $this->addConsoleLine($line);
-            });
-        }
-
-        $hasError = false;
-        $scanner = new Scanner($process->getError());
-
-        while ($scanner->hasNextLine()) {
-            $line = $scanner->nextLine();
-
-            $hasError = true;
-
-            UXApplication::runLater(function () use ($line) {
-                $this->addConsoleLine($line, 'red');
             });
         }
 

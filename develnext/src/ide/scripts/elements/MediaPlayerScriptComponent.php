@@ -24,12 +24,12 @@ class MediaPlayerScriptComponent extends AbstractScriptComponent
 
     public function getDescription()
     {
-        return 'Скрипт для проигрывания музыки и звуков';
+        return 'Скрипт для проигрывания медиа контента';
     }
 
     public function getPlaceholder(ScriptComponentContainer $container)
     {
-        $text = 'Плеер';
+        $text = 'Медиа Плеер';
         return $text;
     }
 
@@ -48,7 +48,7 @@ class MediaPlayerScriptComponent extends AbstractScriptComponent
 
     public function getIcon()
     {
-        return 'icons/audio16.png';
+        return 'icons/media16.png';
     }
 
     public function isOrigin($any)
