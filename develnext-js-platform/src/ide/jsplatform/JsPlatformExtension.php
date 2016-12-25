@@ -52,10 +52,6 @@ class JsPlatformExtension extends AbstractExtension
     {
         $toolManager = Ide::get()->getToolManager();
 
-        $toolManager->install(['node', 'npm', 'gulp', 'electron'], function ($success) use ($toolManager) {
-
-        });
-
         /*$install->on('progress', function ($status, $progress) {
             var_dump($status, $progress);
         });*/

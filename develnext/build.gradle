@@ -187,8 +187,19 @@ task distPatch(dependsOn: ['installDist']) {
 
 task distIdeWindows(dependsOn: ['distIde']) {
     doLast {
-        delete "$project.buildDir/install/$project.name/tools/jreLinux"
+        delete "$project.buildDir/install/$project.name/tools/jre"
+        delete "$project.buildDir/install/$project.name/tools/Launch4j"
         delete "$project.buildDir/install/$project.name/tools/Launch4jLinux"
+
+        copy {
+            from "$project.rootDir/develnext-tools/jre"
+            into "$project.buildDir/install/$project.name/tools/jre"
+        }
+
+        copy {
+            from "$project.rootDir/develnext-tools/Launch4j"
+            into "$project.buildDir/install/$project.name/tools/Launch4j"
+        }
     }
 }
 
@@ -196,7 +207,17 @@ task distIdeLinux(dependsOn: ['distIde']) {
     doLast {
         delete "$project.buildDir/install/$project.name/tools/jre"
         delete "$project.buildDir/install/$project.name/tools/Launch4j"
-        file("$project.buildDir/install/$project.name/tools/jreLinux").renameTo(file("$project.buildDir/install/$project.name/tools/jre"))
+        delete "$project.buildDir/install/$project.name/tools/Launch4jLinux"
+
+        copy {
+            from "$project.rootDir/develnext-tools/jreLinux"
+            into "$project.buildDir/install/$project.name/tools/jre"
+        }
+
+        copy {
+            from "$project.rootDir/develnext-tools/Launch4jLinux"
+            into "$project.buildDir/install/$project.name/tools/Launch4jLinux"
+        }
     }
 }
 
@@ -208,6 +229,10 @@ task distIde(dependsOn: ['installDist']) {
             from "$project.rootDir/develnext-tools"
             into "$project.buildDir/install/$project.name/tools"
             exclude "gradle"
+            exclude "jre"
+            exclude "jreLinux"
+            exclude "Launch4j"
+            exclude "Launch4jLinux"
         }
 
         copy {
