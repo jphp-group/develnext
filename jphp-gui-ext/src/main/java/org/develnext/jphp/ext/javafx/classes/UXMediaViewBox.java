@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.classes.layout.UXAnchorPane;
@@ -11,6 +12,8 @@ import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
+
+import java.io.File;
 
 @Reflection.Name(JavaFXExtension.NS + "UXMediaViewBox")
 public class UXMediaViewBox extends UXPanel<MediaViewBox> {
@@ -32,5 +35,49 @@ public class UXMediaViewBox extends UXPanel<MediaViewBox> {
     @Signature
     public void __construct() {
         __wrappedObject = new MediaViewBox();
+    }
+
+    @Signature
+    public void open(String fileName) {
+        open(fileName, true);
+    }
+
+    @Signature
+    public void open(String fileName, boolean autoPlay) {
+        getWrappedObject().setMediaPlayer(new MediaPlayer(new Media(new File(fileName).toURI().toString())));
+
+        if (autoPlay) {
+            play();
+        }
+    }
+
+    @Signature
+    public boolean play() {
+        if (getWrappedObject().getMediaPlayer() == null) {
+            return false;
+        }
+
+        getWrappedObject().getMediaPlayer().play();
+        return true;
+    }
+
+    @Signature
+    public boolean stop() {
+        if (getWrappedObject().getMediaPlayer() == null) {
+            return false;
+        }
+
+        getWrappedObject().getMediaPlayer().stop();
+        return true;
+    }
+
+    @Signature
+    public boolean pause() {
+        if (getWrappedObject().getMediaPlayer() == null) {
+            return false;
+        }
+
+        getWrappedObject().getMediaPlayer().pause();
+        return true;
     }
 }
