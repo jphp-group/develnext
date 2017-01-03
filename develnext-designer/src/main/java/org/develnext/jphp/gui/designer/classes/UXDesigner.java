@@ -38,6 +38,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.develnext.jphp.ext.javafx.classes.UXImage;
 import org.develnext.jphp.ext.javafx.classes.shape.UXPolygon;
+import org.develnext.jphp.ext.javafx.support.control.*;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -1028,11 +1029,11 @@ public class UXDesigner extends BaseObject {
                     selection.dragView.getChildren().setAll(new ImageView(selection.node.snapshot(snapParams, null)));
                     selection.dragView.setStyle("-fx-opacity: 0.7; -fx-border-width: 1px; -fx-border-color: black; -fx-border-style: dashed; -fx-background-color: transparent");
 
-                    selection.node.setEffect(effect);
-
                     selection.parent.getChildren().add(selection.dragView);
 
                     selection.dragView.startFullDrag();
+
+                    selection.node.setEffect(effect);
                 }
 
                 e.consume();
@@ -1063,10 +1064,13 @@ public class UXDesigner extends BaseObject {
 
                         double diffW = bounds.getWidth() - layoutBounds.getWidth();
                         double diffH = bounds.getHeight() - layoutBounds.getHeight();
-                        sel.dragView.setUserData(new Insets(diffH, 0, 0, diffW));
 
-                        double x = bounds.getMinX() + dx;
-                        double y = bounds.getMinY() + dy;
+                        if (sel.node.getEffect() == null) {
+                            sel.dragView.setUserData(new Insets(diffH, 0, 0, diffW));
+                        }
+
+                        double x = sel.node.getLayoutX() + dx;
+                        double y = sel.node.getLayoutY() + dy;
 
                         if (!e.isAltDown() && snapSizeX > 1 && snapSizeY > 1 && snapEnabled) {
                             x = Math.round((x / snapSizeX)) * snapSizeX;
@@ -1158,7 +1162,7 @@ public class UXDesigner extends BaseObject {
                             }
 
                             selection.drag(x, y, false);
-                            relocateNode(selection.node, selection.dragView.getLayoutX(), selection.dragView.getLayoutY());
+                            relocateNode(selection.node, x, y);
                         }
 
                         selection.update();
