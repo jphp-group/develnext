@@ -1,5 +1,6 @@
 package org.develnext.jphp.gui.designer.classes;
 
+import javafx.scene.control.ScrollPane;
 import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.ext.javafx.classes.layout.UXScrollPane;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;

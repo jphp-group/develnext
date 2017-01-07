@@ -4,6 +4,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.fxmisc.richtext.model.Paragraph;
+import org.fxmisc.richtext.model.StyledText;
 
 import java.util.Collection;
 
@@ -48,7 +49,7 @@ public class AutoBracketsHotkey extends AbstractHotkey {
             return false;
         }
 
-        Paragraph<Collection<String>, Collection<String>> paragraph = area.getParagraph(area.getCurrentParagraph());
+        Paragraph<Collection<String>, StyledText<Collection<String>>, Collection<String>> paragraph = area.getParagraph(area.getCurrentParagraph());
 
         int s1_count = 0;
         int s2_count = 0;

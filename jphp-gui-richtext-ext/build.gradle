@@ -11,6 +11,5 @@ project.version = '1.0'
 dependencies {
     compile "org.develnext.jphp:jphp-runtime:$rootProject.ext.jphpVersion"
     compile project(':jphp-gui-ext')
-
-    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.7-M2'
+    compile project(':develnext-designer')
 }

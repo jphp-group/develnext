@@ -28,11 +28,56 @@ import php.runtime.lang.exception.BaseParseError;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 
 public class PhpCodeArea extends AbstractCodeArea {
+    public static final List<String> SEMICOLON = Collections.singletonList("semicolon");
+    public static final List<String> CONTROL = Collections.singletonList("control");
+    public static final List<String> COMMENT = Collections.singletonList("comment");
+    public static final List<String> STRING = Collections.singletonList("string");
+    public static final List<String> NUMBER = Collections.singletonList("number");
+    public static final List<String> VARIABLE = Collections.singletonList("variable");
+    public static final List<String> KEYWORD = Collections.singletonList("keyword");
+    public static final List<String> OPERATOR = Collections.singletonList("operator");
+
+    public static final Map<Class<? extends Token>, List<String>> tokenStyles = new HashMap<Class<? extends Token>, List<String>>(){{
+        put(SemicolonToken.class, SEMICOLON);
+
+        put(ColonToken.class, CONTROL);
+        put(CommaToken.class, CONTROL);
+        put(BraceExprToken.class, CONTROL);
+
+        put(CommentToken.class, COMMENT);
+
+        put(StringExprToken.class, STRING);
+
+        put(IntegerExprToken.class, NUMBER);
+        put(DoubleExprToken.class, NUMBER);
+
+        put(VariableExprToken.class, VARIABLE);
+
+        put(StmtToken.class, KEYWORD);
+        put(BooleanExprToken.class, KEYWORD);
+        put(NullExprToken.class, KEYWORD);
+        put(NewExprToken.class, KEYWORD);
+        put(SelfExprToken.class, KEYWORD);
+        put(StaticExprToken.class, KEYWORD);
+        put(ParentExprToken.class, KEYWORD);
+        put(EmptyExprToken.class, KEYWORD);
+        put(IssetExprToken.class, KEYWORD);
+        put(DieExprToken.class, KEYWORD);
+        put(UnsetExprToken.class, KEYWORD);
+        put(InstanceofExprToken.class, KEYWORD);
+        put(CloneExprToken.class, KEYWORD);
+        put(BooleanAnd2ExprToken.class, KEYWORD);
+        put(BooleanOr2ExprToken.class, KEYWORD);
+        put(BooleanXorExprToken.class, KEYWORD);
+        put(OpenTagToken.class, KEYWORD);
+
+        put(OperatorExprToken.class, OPERATOR);
+    }};
+
     private final BaseErrorListener errorListener = new BaseErrorListener() {
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
@@ -47,52 +92,37 @@ public class PhpCodeArea extends AbstractCodeArea {
     }
 
     private static Collection<String> getStyleOfToken(Token token) {
-        if (token instanceof SemicolonToken) {
-            return Collections.singletonList("semicolon");
-        }
+        List<String> result;
 
-        if (token instanceof ColonToken || token instanceof CommaToken || token instanceof BraceExprToken) {
-            return Collections.singletonList("control");
-        }
+        Class<?> cls = token.getClass();
+        boolean first = true;
 
-        if (token instanceof CommentToken) {
-            return Collections.singletonList("comment");
-        }
+        do {
+            result = tokenStyles.get(cls);
 
-        if (token instanceof StringExprToken) {
-            return Collections.singletonList("string");
-        }
+            cls = cls.getSuperclass();
 
-        if (token instanceof IntegerExprToken || token instanceof DoubleExprToken) {
-            return Collections.singletonList("number");
-        }
+            if (result != null && !first) {
+                tokenStyles.put(token.getClass(), result);
+            }
 
-        if (token instanceof VariableExprToken) {
-            return Collections.singletonList("variable");
-        }
+            if (!Token.class.isAssignableFrom(cls)) {
+                break;
+            }
 
-        if (token instanceof StmtToken
-                || token instanceof BooleanExprToken || token instanceof NullExprToken || token instanceof NewExprToken
-                || token instanceof SelfExprToken || token instanceof StaticExprToken || token instanceof ParentExprToken
-                || token instanceof EmptyExprToken || token instanceof IssetExprToken || token instanceof DieExprToken
-                || token instanceof UnsetExprToken || token instanceof InstanceofExprToken || token instanceof CloneExprToken
-                || token instanceof BooleanAnd2ExprToken || token instanceof BooleanOr2ExprToken || token instanceof BooleanXorExprToken
-                || token instanceof OpenTagToken) {
-            return Collections.singletonList("keyword");
-        }
+            first = false;
+        } while (result == null);
 
-        if (token instanceof NameToken) {
-            switch (token.getWord().toLowerCase()) {
-                case "array":
-                    return Collections.singletonList("keyword");
+        if (result == null) {
+            if (token instanceof NameToken) {
+                switch (token.getWord().toLowerCase()) {
+                    case "array":
+                        return KEYWORD;
+                }
             }
         }
 
-        if (token instanceof OperatorExprToken) {
-            return Collections.singletonList("operator");
-        }
-
-        return Collections.emptyList();
+        return result == null ? Collections.emptyList() : result;
     }
 
     protected Thread lastCheckThread = null;

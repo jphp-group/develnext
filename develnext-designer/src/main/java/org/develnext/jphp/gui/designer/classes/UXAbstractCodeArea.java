@@ -6,6 +6,7 @@ import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.fxmisc.richtext.model.Paragraph;
+import org.fxmisc.richtext.model.StyledText;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
@@ -202,7 +203,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
             return;
         }
 
-        Paragraph<Collection<String>, Collection<String>> paragraph = getWrappedObject().getParagraph(line);
+        Paragraph<Collection<String>, StyledText<Collection<String>>, Collection<String>> paragraph = getWrappedObject().getParagraph(line);
 
         String text = paragraph.getText();
 

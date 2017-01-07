@@ -2,15 +2,12 @@ package org.develnext.jphp.ext.javafx.richtext.classes;
 
 import javafx.scene.control.IndexRange;
 import javafx.stage.PopupWindow;
-import org.develnext.jphp.ext.javafx.classes.UXControl;
 import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.ext.javafx.richtext.RichTextExtension;
 import org.fxmisc.richtext.InlineCssTextArea;
-import org.fxmisc.richtext.StyledTextArea;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
-import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
 import java.util.HashMap;

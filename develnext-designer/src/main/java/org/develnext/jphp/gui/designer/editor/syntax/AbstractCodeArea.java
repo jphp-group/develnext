@@ -20,6 +20,7 @@ import org.fxmisc.richtext.PopupAlignment;
 import org.fxmisc.richtext.model.RichTextChange;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.wellbehaved.event.EventPattern;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
@@ -86,9 +87,9 @@ abstract public class AbstractCodeArea extends CodeArea {
                 });*/
 
         richChanges()
-                .filter(new Predicate<RichTextChange<Collection<String>, Collection<String>>>() {
+                .filter(new Predicate<RichTextChange<Collection<String>, StyledText<Collection<String>>, Collection<String>>>() {
                     @Override
-                    public boolean test(RichTextChange<Collection<String>, Collection<String>> ch) {
+                    public boolean test(RichTextChange<Collection<String>, StyledText<Collection<String>>, Collection<String>> ch) {
                         return !ch.getInserted().equals(ch.getRemoved());
                     }
                 }) // XXX
