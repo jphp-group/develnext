@@ -1,3 +1,6 @@
 [submodule "-f"]
 	path = develnext-control
 	url = git@bitbucket.org:develnext/develnext-control.git
+[submodule "3rd-party/RichTextFX"]
+	path = 3rd-party/RichTextFX
+	url = https://github.com/TomasMikula/RichTextFX
