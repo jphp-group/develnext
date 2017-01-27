@@ -4,3 +4,6 @@
 [submodule "3rd-party/RichTextFX"]
 	path = 3rd-party/RichTextFX
 	url = https://github.com/TomasMikula/RichTextFX
+[submodule "3rd-party/jphp"]
+	path = 3rd-party/jphp
+	url = https://github.com/jphp-compiler/jphp
