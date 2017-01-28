@@ -28,6 +28,7 @@ use php\gui\UXListView;
 use php\gui\UXPopupWindow;
 use php\gui\UXSeparator;
 use php\gui\UXWebView;
+use php\lang\IllegalArgumentException;
 use php\lib\arr;
 use php\lib\Char;
 use php\lib\Items;
@@ -397,7 +398,11 @@ class AutoCompletePane
 
 
                 $this->area->caretPosition -= str::length($prefix);
-                $this->area->deleteText($this->area->caretPosition, $this->area->caretPosition + str::length($prefix));
+                try {
+                    $this->area->deleteText($this->area->caretPosition, $this->area->caretPosition + str::length($prefix));
+                } catch (IllegalArgumentException $e) {
+                    ; // nop TODO fix bug (hotfix)
+                }
 
                 $this->area->insertToCaret($insert);
                 $this->area->caretPosition += $altCaret;

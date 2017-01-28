@@ -570,7 +570,7 @@ class Ide extends Application
      * @param string $key
      * @param mixed $def
      *
-     * @return string
+     * @return array
      */
     public function getUserConfigArrayValue($key, $def = [])
     {

@@ -133,6 +133,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
     @Setter
     public void setCaretPosition(int value) {
         getWrappedObject().moveTo(value);
+        getWrappedObject().requestFollowCaret();
     }
 
     @Getter
@@ -157,12 +158,20 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
 
     @Signature
     public void undo() {
-        getWrappedObject().undo();
+        try {
+            getWrappedObject().undo();
+        } catch (IllegalArgumentException e) {
+            ;//nop hotfix
+        }
     }
 
     @Signature
     public void redo() {
-        getWrappedObject().redo();
+        try {
+            getWrappedObject().redo();
+        } catch (IllegalArgumentException e) {
+            ;// nop hotfix
+        }
     }
 
     @Signature
@@ -193,6 +202,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
     @Signature
     public void jumpToLine(int line, int pos) {
         getWrappedObject().moveTo(getWrappedObject().position(line, pos).toOffset());
+        getWrappedObject().requestFollowCaret();
     }
 
     @Signature
@@ -216,6 +226,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
         }
 
         getWrappedObject().moveTo(getWrappedObject().position(line, pos).toOffset());
+        getWrappedObject().requestFollowCaret();
     }
 
     @Signature

@@ -80,7 +80,7 @@ public class UXRichTextArea extends UXRegion<InlineCssTextArea> {
 
     @Setter
     public void setCaretPosition(int value) {
-        getWrappedObject().positionCaret(value);
+        getWrappedObject().moveTo(value);
     }
 
     @Getter

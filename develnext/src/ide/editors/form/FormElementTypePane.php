@@ -18,7 +18,6 @@ use php\gui\UXDialog;
 use php\gui\UXLabel;
 use php\gui\UXLabeled;
 use php\gui\UXNode;
-use ide\formats\FormFormat;
 use php\gui\layout\UXScrollPane;
 use php\gui\UXSplitPane;
 use php\gui\UXTextField;
@@ -422,7 +421,7 @@ class FormElementTypePane
             }
 
             $button->classes->add('dn-simple-toggle-button');
-            $button->height = 18;
+            $button->height = 16;
             $button->maxWidth = 10000;
             $button->alignment = 'BASELINE_LEFT';
             $button->userData = $element;
