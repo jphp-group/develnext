@@ -7,3 +7,6 @@
 [submodule "3rd-party/jphp"]
 	path = 3rd-party/jphp
 	url = https://github.com/jphp-compiler/jphp
+[submodule "3rd-party/DockFX"]
+	path = 3rd-party/DockFX
+	url = https://github.com/develnext/DockFX
