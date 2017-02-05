@@ -7,6 +7,8 @@ namespace php\gui;
  * Класс для отображения всплывающих диалогов с кнопками.
  *
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 class UXAlert
 {

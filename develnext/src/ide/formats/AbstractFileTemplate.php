@@ -1,6 +1,7 @@
 <?php
 namespace ide\formats;
 
+use ide\Logger;
 use php\io\Stream;
 use php\lib\Str;
 

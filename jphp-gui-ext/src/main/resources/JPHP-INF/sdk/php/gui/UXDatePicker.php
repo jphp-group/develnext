@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXDatePicker
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXDatePicker extends UXComboBoxBase
 {
+
+
     /**
      * @readonly
      * @var UXTextField

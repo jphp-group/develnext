@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXSeparator
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXSeparator extends UXControl
 {

@@ -150,15 +150,15 @@ class ScriptModuleEditor extends FormEditor
     {
         if ($project = Ide::project()) {
             $type = new TypeEntry();
-            $type->fulledName = $className = "app\\modules\\" . $this->getTitle();
+            $type->fulledName = $className = "{$project->getPackageName()}\\modules\\" . $this->getTitle();
 
             foreach ($this->getModules() as $name) {
-                $name = "mixin:app\\modules\\$name";
+                $name = "mixin:{$project->getPackageName()}\\modules\\$name";
                 $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($name, ['weak' => true, 'public' => true]);
             }
 
             foreach ($this->getFormEditors() as $one) {
-                $name = "mixin:app\\forms\\" . $one->getTitle();
+                $name = "mixin:{$project->getPackageName()}\\forms\\" . $one->getTitle();
                 $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($name, ['weak' => true, 'public' => true]);
             }
 
@@ -176,10 +176,10 @@ class ScriptModuleEditor extends FormEditor
             }
 
             $type = new TypeEntry();
-            $type->fulledName = "mixin:app\\modules\\" . $this->getTitle();
+            $type->fulledName = "mixin:{$project->getPackageName()}\\modules\\" . $this->getTitle();
 
             foreach ($this->getModules() as $name) {
-                $name = "mixin:app\\modules\\$name";
+                $name = "mixin:{$project->getPackageName()}\\modules\\$name";
                 $type->extends[str::lower($name)] = $e = new ExtendTypeEntry($name, ['weak' => true, 'public' => true]);
             }
 

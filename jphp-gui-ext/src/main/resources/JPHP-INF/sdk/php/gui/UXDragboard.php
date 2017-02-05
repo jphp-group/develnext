@@ -4,9 +4,13 @@ namespace php\gui;
 /**
  * Class UXDragboard
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 class UXDragboard
 {
+
+
     /** @var UXImage */
     public $dragView = null;
 

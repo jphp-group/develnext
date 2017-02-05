@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXTab
  * @package php\gui
+ * @packages gui, javafx
  *
  * Events: close, closeRequest, change
  */

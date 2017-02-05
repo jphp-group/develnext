@@ -4,6 +4,7 @@ namespace php\gui\paint;
 /**
  * Class UXColor
  * @package php\gui\paint
+ * @packages gui, javafx
  */
 class UXColor
 {

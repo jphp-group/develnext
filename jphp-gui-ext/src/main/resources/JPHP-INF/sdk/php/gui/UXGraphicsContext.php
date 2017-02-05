@@ -7,9 +7,13 @@ use php\gui\text\UXFont;
 /**
  * Class UXGraphicsContext
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 class UXGraphicsContext
 {
+
+
     /**
      * @readonly
      * @var UXCanvas

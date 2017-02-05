@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXTreeItem
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXTreeItem
 {

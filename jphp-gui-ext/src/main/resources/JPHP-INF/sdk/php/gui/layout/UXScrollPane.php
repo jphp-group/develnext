@@ -7,6 +7,7 @@ use php\gui\UXNode;
 /**
  * Class UXScrollPane
  * @package php\gui\layout
+ * @packages gui, javafx
  */
 class UXScrollPane extends UXControl
 {

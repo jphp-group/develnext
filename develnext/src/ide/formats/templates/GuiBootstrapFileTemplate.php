@@ -11,6 +11,7 @@ class GuiBootstrapFileTemplate extends AbstractFileTemplate
 {
     protected $beforeCode = '';
     protected $afterCode = '';
+    protected $innerCode = '';
 
     /**
      * @return array
@@ -19,6 +20,7 @@ class GuiBootstrapFileTemplate extends AbstractFileTemplate
     {
         return [
             'BEFORE_CODE' => $this->beforeCode,
+            'INNER_CODE'  => $this->innerCode,
             'AFTER_CODE'  => $this->afterCode,
         ];
     }
@@ -53,5 +55,21 @@ class GuiBootstrapFileTemplate extends AbstractFileTemplate
     public function setAfterCode($afterCode)
     {
         $this->afterCode = $afterCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInnerCode()
+    {
+        return $this->innerCode;
+    }
+
+    /**
+     * @param string $innerCode
+     */
+    public function setInnerCode($innerCode)
+    {
+        $this->innerCode = $innerCode;
     }
 }

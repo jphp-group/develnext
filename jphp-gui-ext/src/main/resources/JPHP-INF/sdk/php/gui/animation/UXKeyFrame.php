@@ -4,6 +4,8 @@ namespace php\gui\animation;
 /**
  * Class UXKeyFrame
  * @package php\gui\animation
+ *
+ * @packages gui, javafx
  */
 class UXKeyFrame
 {

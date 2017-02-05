@@ -3,6 +3,12 @@ namespace php\gui;
 
 use php\gui\paint\UXColor;
 
+/**
+ * Class UXFlatButton
+ * @package php\gui
+ *
+ * @packages gui, javafx
+ */
 class UXFlatButton extends UXButtonBase
 {
     /**

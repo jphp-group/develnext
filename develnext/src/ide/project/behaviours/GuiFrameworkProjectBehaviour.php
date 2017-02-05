@@ -230,6 +230,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('recover', [$this, 'doRecover']);
         $this->project->on('create', [$this, 'doCreate']);
         $this->project->on('open', [$this, 'doOpen']);
+        $this->project->on('save', [$this, 'doSave']);
         $this->project->on('close', [$this, 'doClose']);
         $this->project->on('updateTree', [$this, 'doUpdateTree']);
         $this->project->on('preCompile', [$this, 'doPreCompile']);
@@ -423,7 +424,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $values = [];
 
         foreach ($modules as $module) {
-            $values[] = 'app\\modules\\'
+            $values[] = $this->project->getPackageName() . '\\modules\\'
                 . Str::replace(FileUtils::relativePath($this->project->getFile(self::SCRIPTS_DIRECTORY), $module), '/', '\\');
         }
 
@@ -463,6 +464,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                     break;
             }
         } */
+    }
+
+    public function doSave()
+    {
+        $this->saveBootstrapScript();
     }
 
     public function doOpen()
@@ -529,7 +535,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->_recoverDirectories();
 
-        $this->project->defineFile('src/JPHP-INF/.bootstrap', new GuiBootstrapFileTemplate());
+        $this->saveBootstrapScript();
         $this->project->defineFile('src/JPHP-INF/launcher.conf', new GuiLauncherConfFileTemplate());
         $this->project->defineFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
 
@@ -546,6 +552,45 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                 }
             }
         }
+    }
+
+    public function saveBootstrapScript($incExtension = ['php', 'phb'])
+    {
+        $template = new GuiBootstrapFileTemplate();
+
+        $code = "";
+
+        Logger::info("Save bootstrap script ...");
+
+        $dirs = [];
+
+        if ($this->project->getSrcGeneratedDirectory()) {
+            $dirs[] = $this->project->getSrcFile('.inc', true);
+        }
+
+        if ($this->project->getSrcDirectory()) {
+            $dirs[] = $this->project->getSrcFile('.inc', false);
+        }
+
+        foreach ($dirs as $dir) {
+            fs::scan($dir, function ($filename) use (&$code, $dir, $incExtension) {
+                $ext = fs::ext($filename);
+
+                if (in_array($ext, $incExtension)) {
+                    $name = fs::name(fs::parent($dir));
+                    $file = $this->project->getAbsoluteFile($filename);
+
+                    $code .= "include 'res://" . $file->getRelativePath($name) . "'; \n";
+
+                    Logger::debug("Add '{$file->getRelativePath('src')}' to bootstrap script.");
+                }
+            });
+        }
+
+        $template->setInnerCode($code);
+
+        $this->project->defineFile('src/JPHP-INF/.bootstrap', $template, true);
+
     }
 
     public function updateScriptManager()
@@ -652,7 +697,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $file = $this->project->getFile("src/.scripts/$name");
 
         $template = new PhpClassFileTemplate($name, 'AbstractModule');
-        $template->setNamespace('app\\modules');
+        $template->setNamespace("{$this->project->getPackageName()}\\modules");
         $template->setImports([
             'php\\gui\\framework\\AbstractModule'
         ]);
@@ -660,7 +705,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $sources = $file->findLinkByExtension('php');
 
         if (!$sources) {
-            $sources = $this->project->createFile("src/app/modules/$name.php", $template);
+            $sources = $this->project->createFile("src/{$this->project->getPackageName()}/modules/$name.php", $template);
             $file->addLink($sources);
         } else {
             if (!$sources->exists()) {
@@ -809,7 +854,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $form = $this->project->createFile("src/.forms/$name.fxml", new GuiFormFileTemplate());
 
         $template = new PhpClassFileTemplate($name, 'AbstractForm');
-        $template->setNamespace('app\\forms');
+        $template->setNamespace("{$this->project->getPackageName()}\\forms");
         $template->setImports([
             'php\\gui\\framework\\AbstractForm'
         ]);
@@ -817,7 +862,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $sources = $form->findLinkByExtension('php');
 
         if (!$sources) {
-            $sources = $this->project->createFile("src/app/forms/$name.php", $template);
+            $sources = $this->project->createFile("src/{$this->project->getPackageName()}/forms/$name.php", $template);
             $form->addLink($sources);
         } else {
             if (!$sources->exists()) {
@@ -961,7 +1006,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $modules = Json::fromFile($this->project->getFile("src/.system/modules.json"));
 
             foreach ((array)$modules["modules"] as $module) {
-                $name = str::replace($module, "app\\modules\\", "");
+                $name = str::replace($module, "{$this->project->getPackageName()}\\modules\\", "");
                 $this->project->makeDirectory("src/.scripts/$name");
             }
         } catch (IOException $e) {

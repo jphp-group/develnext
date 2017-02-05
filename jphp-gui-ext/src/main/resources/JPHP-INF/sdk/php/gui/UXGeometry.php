@@ -1,8 +1,16 @@
 <?php
 namespace php\gui;
 
+/**
+ * Class UXGeometry
+ * @package php\gui
+ *
+ * @packages gui, javafx
+ */
 abstract class UXGeometry
 {
+
+
     /**
      * @param float $x1
      * @param float $y1

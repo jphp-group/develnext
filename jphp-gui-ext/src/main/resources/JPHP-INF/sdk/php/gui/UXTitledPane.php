@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXTitledPane
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXTitledPane extends UXLabeled
 {

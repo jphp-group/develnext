@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXTableColumn
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXTableColumn
 {

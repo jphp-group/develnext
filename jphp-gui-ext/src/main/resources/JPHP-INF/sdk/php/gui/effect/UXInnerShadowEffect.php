@@ -3,6 +3,11 @@ namespace php\gui\effect;
 
 use php\gui\paint\UXColor;
 
+/**
+ * Class UXInnerShadowEffect
+ * @package php\gui\effect
+ * @packages gui, javafx
+ */
 class UXInnerShadowEffect extends UXEffect
 {
     /**

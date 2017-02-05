@@ -7,6 +7,7 @@ use php\gui\UXParent;
 /**
  * Class UXRegion
  * @package php\gui\layout
+ * @packages gui, javafx
  */
 class UXRegion extends UXParent
 {

@@ -12,6 +12,8 @@ class TypeEntry extends AbstractEntry
     public $fulledName = '';
     public $namespace = '';
 
+    public $packages = [];
+
     public $final = false;
     public $abstract = false;
 

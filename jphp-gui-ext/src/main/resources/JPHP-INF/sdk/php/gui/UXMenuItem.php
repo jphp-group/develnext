@@ -5,9 +5,12 @@ use php\gui\event\UXEvent;
 /**
  * Class UXMenuItem
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXMenuItem
 {
+
+
     /**
      * @var string
      */

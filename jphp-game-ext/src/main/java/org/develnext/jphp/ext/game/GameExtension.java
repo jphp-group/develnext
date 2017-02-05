@@ -17,6 +17,11 @@ public class GameExtension extends JavaFXExtension {
     }
 
     @Override
+    public String[] getPackageNames() {
+        return new String[] { "game", "javafx" };
+    }
+
+    @Override
     public void onRegister(CompileScope scope) {
         registerMemoryOperation(Vec2dMemoryOperation.class);
 

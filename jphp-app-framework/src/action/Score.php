@@ -1,6 +1,12 @@
 <?php
 namespace action;
 
+use php\gui\layout\UXRegion;
+use php\gui\UXControl;
+use php\gui\UXNode;
+use php\gui\UXParent;
+use php\lang\Module;
+
 /**
  * Class Score
  * @package action

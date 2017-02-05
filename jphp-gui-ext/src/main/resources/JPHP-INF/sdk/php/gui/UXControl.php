@@ -5,9 +5,12 @@ use php\gui\layout\UXRegion;
 /**
  * Class UXControl
  * @package php\gui
+ * @packages gui, javafx
  */
 abstract class UXControl extends UXRegion
 {
+
+
     /**
      * Подсказка (тултип).
      * @var UXTooltip

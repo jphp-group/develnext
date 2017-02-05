@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXMedia
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXMedia
 {
+
+
     /**
      * @readonly
      * @var int in millis

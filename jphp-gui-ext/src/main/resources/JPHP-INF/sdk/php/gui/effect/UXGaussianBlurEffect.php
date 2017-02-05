@@ -1,6 +1,11 @@
 <?php
 namespace php\gui\effect;
 
+/**
+ * Class UXGaussianBlurEffect
+ * @package php\gui\effect
+ * @packages gui, javafx
+ */
 class UXGaussianBlurEffect extends UXEffect
 {
     /**

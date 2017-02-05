@@ -6,9 +6,13 @@ use php\gui\text\UXFont;
 /**
  * Class UXLabeled
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 abstract class UXLabeled extends UXControl
 {
+
+
     /**
      * Выравнивание для контейнеров.
      * @var string

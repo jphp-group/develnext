@@ -5,6 +5,7 @@ use php\gui\text\UXFont;
 /**
  * Class UXTextInputControl
  * @package php\gui
+ * @packages gui, javafx
  */
 abstract class UXTextInputControl extends UXControl
 {

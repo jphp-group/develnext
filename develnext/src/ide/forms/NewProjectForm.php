@@ -35,6 +35,7 @@ use php\util\Regex;
  * @property UXListView $templateList
  * @property UXTextField $pathField
  * @property UXTextField $nameField
+ * @property UXTextField $packageField
  *
  * Class NewProjectForm
  * @package ide\forms
@@ -200,6 +201,14 @@ class NewProjectForm extends AbstractIdeForm
             return;
         }
 
+        $package = str::trim($this->packageField->text);
+
+        $regex = new Regex('^[a-z\\_]{2,15}$');
+
+        if (!$regex->test($package)) {
+            UXDialog::show("Введите корректный код для проекта\n* От 2 до 15 символов, только маленькие английские буквы и '_'.", 'ERROR');
+            return;
+        }
 
         if ($template instanceof IdeLibraryResource) {
             ProjectSystem::import($template->getPath(), "$path/$name", $name);
@@ -216,9 +225,9 @@ class NewProjectForm extends AbstractIdeForm
 
             ProjectSystem::close();
 
-            uiLater(function () use ($template, $filename) {
+            uiLater(function () use ($template, $filename, $package) {
                 app()->getMainForm()->showPreloader('Создание проекта ...');
-                ProjectSystem::create($template, $filename);
+                ProjectSystem::create($template, $filename, $package);
                 app()->getMainForm()->hidePreloader();
             });
         }

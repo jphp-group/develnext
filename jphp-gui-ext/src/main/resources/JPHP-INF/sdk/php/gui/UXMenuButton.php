@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXMenuButton
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXMenuButton extends UXButtonBase
 {
+
+
     /**
      * List of UXMenuItem
      * @var UXList

@@ -7,6 +7,7 @@ use php\gui\text\UXFont;
 /**
  * Class UXPanel
  * @package php\gui\layout
+ * @packages gui, javafx
  */
 class UXPanel extends UXAnchorPane
 {

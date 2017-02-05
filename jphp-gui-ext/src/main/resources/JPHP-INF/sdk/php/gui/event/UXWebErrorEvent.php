@@ -7,6 +7,7 @@ use php\lang\JavaException;
 /**
  * Class UXWebErrorEvent
  * @package php\gui\event
+ * @packages gui, javafx
  */
 class UXWebErrorEvent extends UXEvent
 {

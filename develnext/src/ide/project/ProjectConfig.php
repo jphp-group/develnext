@@ -179,6 +179,14 @@ class ProjectConfig
     }
 
     /**
+     * @return string
+     */
+    public function getPackageName()
+    {
+        return $this->getProperty('packageName') ?: 'app';
+    }
+
+    /**
      * @return null|Time
      */
     public function getCreatedAt()
@@ -449,5 +457,7 @@ class ProjectConfig
 
         $domProject->setAttribute('name', $project->getName());
         $domProject->setAttribute('template', get_class($project->getTemplate()));
+        $domProject->setAttribute('packageName', $project->getPackageName());
+
     }
 }

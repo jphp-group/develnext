@@ -4,9 +4,13 @@ namespace php\gui;
 /**
  * Class UXImageView
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 class UXImageView extends UXNode
 {
+
+
     /**
      * @var UXImage
      */

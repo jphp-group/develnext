@@ -1,9 +1,6 @@
 repositories {
+    mavenLocal()
     mavenCentral()
-
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
 }
 
 dependencies {
@@ -14,5 +11,6 @@ dependencies {
     //compile 'com.fifesoft:rstaui:2.5.7'
     //compile 'com.fifesoft:autocomplete:2.5.8'
 
+    compile group: 'org.dockfx', name: 'DockFX', version: '1.0-SNAPSHOT'
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '1.0.0-SNAPSHOT'
 }

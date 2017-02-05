@@ -6,6 +6,7 @@ use php\io\Stream;
 /**
  * Class UXFont
  * @package php\gui\text
+ * @packages gui, javafx
  */
 class UXFont
 {

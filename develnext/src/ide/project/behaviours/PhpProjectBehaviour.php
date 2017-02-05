@@ -392,6 +392,10 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                     }
                 }
             }
+
+            if ($gui = GuiFrameworkProjectBehaviour::get()) {
+                $gui->saveBootstrapScript(['phb']);
+            }
         }
     }
 

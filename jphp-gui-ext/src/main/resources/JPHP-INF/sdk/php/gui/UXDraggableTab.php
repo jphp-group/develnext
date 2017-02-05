@@ -4,9 +4,13 @@ namespace php\gui;
 /**
  * Class UXDraggableTab
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 class UXDraggableTab extends UXTab
 {
+
+
     /**
      * @var bool
      */

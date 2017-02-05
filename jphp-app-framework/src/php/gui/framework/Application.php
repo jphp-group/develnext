@@ -26,6 +26,8 @@ use php\util\Configuration;
 /**
  * Class Application
  * @package php\gui\framework
+ *
+ * @packages gui, app
  */
 class Application
 {
@@ -104,6 +106,8 @@ class Application
 
         $this->loadModules();
     }
+
+
 
     /**
      * @return string
@@ -201,7 +205,7 @@ class Application
     /**
      * @param $name
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function minimizeForm($name)
     {
@@ -215,7 +219,7 @@ class Application
     /**
      * @param $name
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function restoreForm($name)
     {
@@ -230,7 +234,7 @@ class Application
      * @param $name
      * @param UXForm $origin
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function getForm($name, UXForm $origin = null)
     {
@@ -245,7 +249,7 @@ class Application
      * @param $name
      * @param UXForm|null $origin
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function getOriginForm($name, UXForm $origin = null)
     {
@@ -263,7 +267,7 @@ class Application
      * @param bool $loadBehaviours
      * @param bool $cache
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function getNewForm($name, UXForm $origin = null, $loadEvents = true, $loadBehaviours = true, $cache = true)
     {
@@ -294,7 +298,7 @@ class Application
     /**
      * @param $name
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function showForm($name)
     {
@@ -314,7 +318,7 @@ class Application
     /**
      * @param $name
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function showFormAndWait($name)
     {
@@ -330,7 +334,7 @@ class Application
     /**
      * @param $name
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function showNewForm($name)
     {
@@ -346,7 +350,7 @@ class Application
     /**
      * @param $name
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function showNewFormAndWait($name)
     {
@@ -359,7 +363,7 @@ class Application
     /**
      * @param $name
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function hideForm($name)
     {
@@ -407,7 +411,7 @@ class Application
 
     /**
      * @return null|AbstractModule
-     * @return-dynamic app\modules\AppModule
+     * @return-dynamic $package\modules\AppModule
      */
     public function appModule()
     {

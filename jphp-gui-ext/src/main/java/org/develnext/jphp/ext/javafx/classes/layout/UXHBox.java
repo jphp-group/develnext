@@ -16,7 +16,7 @@ import php.runtime.reflection.ClassEntity;
 import java.util.List;
 
 @Reflection.Name(JavaFXExtension.NS + "layout\\UXHBox")
-public class UXHBox extends UXPane<HBox> {
+public class UXHBox<T extends HBox> extends UXPane<T> {
     interface WrappedInterface {
         @Property double spacing();
         @Property Pos alignment();
@@ -25,7 +25,7 @@ public class UXHBox extends UXPane<HBox> {
         void requestLayout();
     }
 
-    public UXHBox(Environment env, HBox wrappedObject) {
+    public UXHBox(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 

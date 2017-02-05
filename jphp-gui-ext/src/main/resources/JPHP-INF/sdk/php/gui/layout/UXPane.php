@@ -8,6 +8,7 @@ use php\gui\UXParent;
 /**
  * Class UXPane
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXPane extends UXRegion
 {

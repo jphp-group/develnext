@@ -41,9 +41,15 @@
          <font>
             <Font name="System Bold" size="12.0" />
          </font></Label>
-      <TextField id="nameField" layoutX="26.0" layoutY="96.0" prefHeight="25.0" prefWidth="548.0" AnchorPane.leftAnchor="26.0" AnchorPane.rightAnchor="26.0">
+      <TextField id="nameField" layoutX="26.0" layoutY="96.0" prefHeight="31.0" prefWidth="352.0" AnchorPane.leftAnchor="26.0" AnchorPane.rightAnchor="222.0">
          <font>
             <Font size="15.0" />
          </font></TextField>
+      <TextField id="packageField" layoutX="392.0" layoutY="96.0" prefHeight="31.0" prefWidth="183.0" text="app" AnchorPane.rightAnchor="25.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </TextField>
+      <Label layoutX="392.0" layoutY="72.0" prefHeight="24.0" prefWidth="183.0" text="Код проекта:" AnchorPane.rightAnchor="25.0" />
    </children>
 </AnchorPane>

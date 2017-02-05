@@ -8,9 +8,12 @@ use php\gui\text\UXFont;
 /**
  * Class UXPagination
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXPagination extends UXFlowPane
 {
+
+
     /**
      * @var int
      */

@@ -5,6 +5,8 @@ use php\gui\UXList;
 /**
  * Class UXTimeline
  * @package php\gui\animation
+ *
+ * @packages gui, javafx
  */
 class UXTimeline extends UXAnimation
 {

@@ -18,6 +18,7 @@ use develnext\lexer\token\VariableExprToken;
 use develnext\lexer\Tokenizer;
 use ide\autocomplete\AutoCompleteRegion;
 use ide\autocomplete\AutoCompleteTypeRule;
+use ide\Ide;
 use ide\Logger;
 use php\gui\framework\Application;
 use php\gui\text\UXFont;
@@ -39,6 +40,10 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
     protected function fetchDynamicType(FunctionEntry $method, CallExprToken $token)
     {
         if ($dynamic = $method->data['returnDynamic']) {
+            $project = Ide::project();
+
+            $dynamic = str::replace($dynamic, '$package', $project ? $project->getPackageName() : 'app');
+
             /** @var ExprStmtToken $param */
             foreach ($token->getParameters() as $i => $param) {
                 $dynamic = str::replace($dynamic, "\${$i}", $param->getExprString());

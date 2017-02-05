@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXComboBoxBase
  * @package php\gui
+ * @packages gui, javafx
  *
  * @method show()
  * @method hide()
@@ -12,6 +13,8 @@ namespace php\gui;
  */
 class UXComboBoxBase extends UXControl
 {
+
+
     /**
      * @var bool
      */

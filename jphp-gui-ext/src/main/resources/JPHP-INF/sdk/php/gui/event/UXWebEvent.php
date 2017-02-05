@@ -6,6 +6,7 @@ use php\gui\UXNode;
 /**
  * Class UXWebEvent
  * @package php\gui\event
+ * @packages gui, javafx
  */
 class UXWebEvent extends UXEvent
 {

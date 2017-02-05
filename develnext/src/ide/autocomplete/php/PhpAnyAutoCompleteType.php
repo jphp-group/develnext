@@ -12,11 +12,13 @@ use ide\autocomplete\PropertyAutoCompleteItem;
 use ide\autocomplete\StatementAutoCompleteItem;
 use ide\autocomplete\VariableAutoCompleteItem;
 use ide\bundle\AbstractJarBundle;
+use ide\editors\CodeEditor;
 use ide\editors\common\CodeTextArea;
 use ide\Ide;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\Project;
 use php\gui\designer\UXAbstractCodeArea;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
 use php\util\Regex;
@@ -91,21 +93,27 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
         return true;
     }
 
-    protected function insertClassName(AutoCompleteInsert $insert)
+    protected function insertClassName(AutoCompleteInsert $insert, $package = null)
     {
-        $regex = Regex::of('use[ ]+([0-9\\_a-z\\\\]+)', Regex::DOTALL | Regex::CASE_INSENSITIVE);
+        $regex = Regex::of('use[ ]+([0-9\\,\\ \\_a-z\\\\]+)', Regex::DOTALL | Regex::CASE_INSENSITIVE);
         $regex = $regex->with($text = $insert->getArea()->text);
 
-        while ($regex->find()) {
-            $name = $regex->group(1);
+        $use = $package ?: $insert->getValue();
 
-            if (str::equalsIgnoreCase($name, $insert->getValue())) {
-                $insert->setValue(fs::name($insert->getValue()));
-                return;
+        while ($regex->find()) {
+            $names = $regex->group(1);
+
+            foreach (str::split($names, ',') as $name) {
+                $name = str::trim($name);
+
+                if (str::equalsIgnoreCase($name, $use)) {
+                    $insert->setValue(fs::name($insert->getValue()));
+                    return;
+                }
             }
         }
 
-        if (self::appendUseClass($insert->getArea(), $insert->getValue())) {
+        if (self::appendUseClass($insert->getArea(), $use)) {
             $insert->setValue(fs::name($insert->getValue()));
         } else {
             $insert->setValue("\\" . "{$insert->getValue()}");
@@ -137,6 +145,7 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
 
                 $import = $type->fulledName;
                 $name = fs::name($import);
+
                 $description = $import;
 
                 $style = '';
@@ -149,12 +158,25 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                     $description = "$description (abstract)";
                 }
 
+                if ($type->packages) {
+                    $description = "$description, packages: " . str::join($type->packages, ', ');
+                }
+
                 $result[$name] = $c = new ConstantAutoCompleteItem(
                     $name,
                     $description,
-                    function (AutoCompleteInsert $insert) use ($import) {
+                    function (AutoCompleteInsert $insert) use ($import, $type) {
                         $insert->setValue($import);
-                        $this->insertClassName($insert);
+
+                        $package = null;
+
+                        if (CodeEditor::getImportType('php') == 'package') {
+                            if ($type->packages) {
+                                $package = arr::first($type->packages);
+                            }
+                        }
+
+                        $this->insertClassName($insert, $package);
                     },
                     'icons/class16.png',
                     $style

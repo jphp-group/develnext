@@ -3,6 +3,11 @@ namespace php\gui\effect;
 
 use php\gui\paint\UXColor;
 
+/**
+ * Class UXGlowEffect
+ * @package php\gui\effect
+ * @packages gui, javafx
+ */
 class UXGlowEffect extends UXEffect
 {
     /**

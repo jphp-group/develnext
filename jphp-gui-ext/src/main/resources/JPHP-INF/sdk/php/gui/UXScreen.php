@@ -5,9 +5,12 @@ namespace php\gui;
 /**
  * Class UXScreen
  * @package php\gui
+ * @packages gui, javafx
  */
 abstract class UXScreen
 {
+
+
     /**
      * @readonly
      * @var double

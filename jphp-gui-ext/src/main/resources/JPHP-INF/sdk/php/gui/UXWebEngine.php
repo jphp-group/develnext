@@ -6,6 +6,7 @@ use php\xml\DomDocument;
 /**
  * Class UXWebEngine
  * @package php\gui
+ * @packages gui, javafx
  */
 abstract class UXWebEngine
 {

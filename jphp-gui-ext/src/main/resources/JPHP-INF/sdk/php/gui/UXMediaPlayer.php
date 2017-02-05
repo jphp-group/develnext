@@ -5,9 +5,12 @@ namespace php\gui;
 /**
  * Class UXMediaPlayer
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXMediaPlayer
 {
+
+
     /**
      * @var double form -1.0 to 1.0
      */

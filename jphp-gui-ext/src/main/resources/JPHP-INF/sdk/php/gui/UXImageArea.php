@@ -6,9 +6,13 @@ use php\gui\text\UXFont;
 /**
  * Class UXImageArea
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 class UXImageArea extends UXCanvas
 {
+
+
     /**
      * Центроровано.
      * @var bool

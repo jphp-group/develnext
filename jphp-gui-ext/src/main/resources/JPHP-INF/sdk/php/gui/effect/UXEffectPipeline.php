@@ -6,6 +6,7 @@ use Iterator;
 /**
  * Class UXEffectPipeline
  * @package php\gui\effect
+ * @packages gui, javafx
  */
 class UXEffectPipeline implements Iterator, Countable, \ArrayAccess
 {

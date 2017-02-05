@@ -433,13 +433,13 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         if ($project = Ide::project()) {
             $type = new TypeEntry();
-            $type->fulledName = "app\\forms\\" . $this->getTitle();
+            $type->fulledName = $project->getPackageName() . "\\forms\\" . $this->getTitle();
 
             foreach ($this->getModules() as $name) {
-                $_name = "mixin:app\\modules\\$name";
+                $_name = "mixin:{$project->getPackageName()}\\modules\\$name";
                 $type->extends[str::lower($_name)] = $e = new ExtendTypeEntry($_name, ['weak' => true, 'public' => true]);
 
-                $_name = "app\\modules\\$name";
+                $_name = $project->getPackageName() . "\\modules\\$name";
                 $type->extends[str::lower($_name)] = $e = new ExtendTypeEntry($_name, ['weak' => true, 'interface' => true]);
             }
 
@@ -487,7 +487,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
 
             $type = new TypeEntry();
-            $type->fulledName = "mixin:app\\forms\\" . $this->getTitle();
+            $type->fulledName = "mixin:{$project->getPackageName()}\\forms\\" . $this->getTitle();
 
             foreach ($this->getObjectList() as $el) {
                 $type->properties[$el->value] = $prop = new TypePropertyEntry();

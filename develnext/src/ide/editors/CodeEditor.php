@@ -788,6 +788,15 @@ class CodeEditor extends AbstractEditor
     }
 
     /**
+     * @param string $lang
+     * @param string $value
+     */
+    public static function setImportType($lang, $value)
+    {
+        Ide::get()->setUserConfigValue(__CLASS__ . '#' . $lang . '.importType', $value);
+    }
+
+    /**
      * @return int
      */
     public static function getCurrentFontSize($lang)
@@ -846,6 +855,17 @@ class CodeEditor extends AbstractEditor
         if (!self::getHighlightFile($lang, $value)->isFile()) {
             return 'DevelNext-Dark';
         }
+
+        return $value;
+    }
+
+    /**
+     * @param string $lang
+     * @return string
+     */
+    public static function getImportType($lang)
+    {
+        $value = Ide::get()->getUserConfigValue(__CLASS__ . '#' . $lang . '.importType', 'simple');
 
         return $value;
     }

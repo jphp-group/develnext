@@ -18,6 +18,11 @@ public class ControlFXExtension extends Extension {
     }
 
     @Override
+    public String[] getPackageNames() {
+        return new String[] { "gui", "javafx" };
+    }
+
+    @Override
     public void onRegister(CompileScope scope) {
         registerWrapperClass(scope, Rating.class, UXRating.class);
         registerWrapperClass(scope, ToggleSwitch.class, UXToggleSwitch.class);

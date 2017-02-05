@@ -6,9 +6,12 @@ use php\io\Stream;
 /**
  * Class UXLoader
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXLoader
 {
+
+
     /**
      * @var string
      */

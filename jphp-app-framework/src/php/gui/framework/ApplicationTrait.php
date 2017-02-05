@@ -16,7 +16,7 @@ trait ApplicationTrait
 
     /**
      * @return null|AbstractModule
-     * @return-dynamic app\modules\AppModule
+     * @return-dynamic $package\modules\AppModule
      */
     public function appModule()
     {
@@ -26,7 +26,7 @@ trait ApplicationTrait
     /**
      * @param string $name
      * @return AbstractForm
-     * @return-dynamic app\forms\$0
+     * @return-dynamic $package\forms\$0
      */
     public function form($name)
     {

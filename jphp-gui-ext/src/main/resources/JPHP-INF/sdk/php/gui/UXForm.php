@@ -5,6 +5,8 @@ namespace php\gui;
 /**
  * @package php\gui
  *
+ * @packages gui, javafx
+ *
  * @property double $maxHeight
  * @property double $maxWidth
  * @property double $minHeight
@@ -16,6 +18,8 @@ namespace php\gui;
  */
 class UXForm extends UXWindow
 {
+
+
     /**
      * --RU--
      * Заголовок окна.

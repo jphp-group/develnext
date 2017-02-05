@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXChoiceBox
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXChoiceBox extends UXControl
 {
+
+
     /**
      * @var UXList
      */

@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXData
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXData extends UXNode
 {
+
+
     /**
      * @param string $value
      */

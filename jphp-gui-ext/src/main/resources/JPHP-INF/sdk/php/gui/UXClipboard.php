@@ -9,9 +9,12 @@ use php\io\File;
  * Класс для работы с буфером обмена.
  *
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXClipboard
 {
+
+
     private function __construct()
     {
     }

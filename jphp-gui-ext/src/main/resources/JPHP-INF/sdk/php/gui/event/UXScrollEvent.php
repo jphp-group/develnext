@@ -4,6 +4,7 @@ namespace php\gui\event;
 /**
  * Class UXScrollEvent
  * @package php\gui\event
+ * @packages gui, javafx
  */
 class UXScrollEvent extends UXEvent
 {

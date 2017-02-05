@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXTrayNotification
  * @package php\gui
+ * @packages gui, javafx
  *
  * events - click, show, hide
  */

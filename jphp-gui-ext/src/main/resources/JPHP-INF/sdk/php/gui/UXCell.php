@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXCell
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXCell extends UXLabeled
 {
+
+
     /**
      * @var mixed
      */

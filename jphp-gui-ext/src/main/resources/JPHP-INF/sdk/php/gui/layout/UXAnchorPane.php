@@ -7,6 +7,7 @@ use php\gui\UXNode;
 /**
  * Class UXAnchorPane
  * @package php\gui\layout
+ * @packages gui, javafx
  */
 class UXAnchorPane extends UXPane
 {

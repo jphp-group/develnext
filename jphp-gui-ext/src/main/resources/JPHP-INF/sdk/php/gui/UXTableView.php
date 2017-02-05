@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXTableView
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXTableView extends UXControl
 {

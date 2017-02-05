@@ -4,6 +4,7 @@ namespace php\gui\layout;
 /**
  * Class UXFlowPane
  * @package php\gui\layout
+ * @packages gui, javafx
  */
 class UXFlowPane extends UXPane
 {

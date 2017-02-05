@@ -5,6 +5,7 @@ namespace php\gui\shape;
 /**
  * Class UXEllipse
  * @package php\gui\shape
+ * @packages gui, javafx
  */
 class UXEllipse extends UXShape
 {

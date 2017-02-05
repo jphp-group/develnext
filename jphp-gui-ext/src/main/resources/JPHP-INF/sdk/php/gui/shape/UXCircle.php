@@ -4,6 +4,7 @@ namespace php\gui\shape;
 /**
  * Class UXCircle
  * @package php\gui\shape
+ * @packages gui, javafx
  */
 class UXCircle extends UXShape
 {

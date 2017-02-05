@@ -4,6 +4,7 @@ namespace php\gui\effect;
 /**
  * Class UXSepiaToneEffect
  * @package php\gui\effect
+ * @packages gui, javafx
  */
 class UXSepiaToneEffect extends UXEffect
 {

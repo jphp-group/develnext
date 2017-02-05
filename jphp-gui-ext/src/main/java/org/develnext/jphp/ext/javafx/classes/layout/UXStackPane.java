@@ -11,12 +11,12 @@ import php.runtime.reflection.ClassEntity;
 import java.util.List;
 
 @Reflection.Name(JavaFXExtension.NS + "layout\\UXStackPane")
-public class UXStackPane extends UXPane {
+public class UXStackPane<T extends StackPane> extends UXPane<T> {
     interface WrappedInterface {
 
     }
 
-    public UXStackPane(Environment env, StackPane wrappedObject) {
+    public UXStackPane(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 

@@ -4,9 +4,13 @@ namespace php\gui;
 /**
  * Class UXHyperlink
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 class UXHyperlink extends UXButtonBase
 {
+
+
     /**
      * @var bool
      */

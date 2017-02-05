@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXCustomNode
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXCustomNode extends UXNode
 {
+
+
     public function __construct()
     {
     }

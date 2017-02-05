@@ -8,9 +8,14 @@ use Iterator;
 /**
  * Class UXList
  * @package php\gui
+ *
+ *
+ * @packages gui, javafx
  */
 class UXList implements Iterator, Countable, ArrayAccess
 {
+
+
     /**
      * @readonly
      * @var int

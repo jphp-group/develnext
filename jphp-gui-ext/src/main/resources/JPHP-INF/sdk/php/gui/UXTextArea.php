@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXTextArea
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXTextArea extends UXTextInputControl
 {

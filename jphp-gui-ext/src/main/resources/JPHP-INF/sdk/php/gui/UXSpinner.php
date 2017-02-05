@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXSpinner
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXSpinner extends UXControl
 {

@@ -8,6 +8,7 @@ use php\gui\UXWindow;
  *
  * Class UXKeyboardManager
  * @package php\gui\event
+ * @packages gui, javafx
  */
 class UXKeyboardManager
 {

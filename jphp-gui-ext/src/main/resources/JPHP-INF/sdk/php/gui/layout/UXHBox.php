@@ -6,6 +6,7 @@ use php\gui\UXNode;
 /**
  * Class UXHBox
  * @package php\gui\layout
+ * @packages gui, javafx
  */
 class UXHBox extends UXPane
 {

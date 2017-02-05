@@ -8,6 +8,7 @@ use php\lang\IllegalStateException;
 /**
  * Class UXWindow
  * @package php\gui
+ * @packages gui, javafx
  *
  * @property bool $focused
  */

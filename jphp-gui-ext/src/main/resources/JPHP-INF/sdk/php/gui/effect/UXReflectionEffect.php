@@ -4,6 +4,7 @@ namespace php\gui\effect;
 /**
  * Class UXReflectionEffect
  * @package php\gui\effect
+ * @packages gui, javafx
  */
 class UXReflectionEffect extends UXEffect
 {

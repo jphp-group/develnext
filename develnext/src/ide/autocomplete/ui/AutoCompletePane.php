@@ -10,6 +10,7 @@ use ide\autocomplete\MethodAutoCompleteItem;
 use ide\autocomplete\php\PhpAnyAutoCompleteType;
 use ide\autocomplete\PropertyAutoCompleteItem;
 use ide\autocomplete\VariableAutoCompleteItem;
+use ide\editors\CodeEditor;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
@@ -127,7 +128,31 @@ class AutoCompletePane
 
                     if ($type) {
                         if (!Regex::of('use[ ]+' . Regex::quote($type->fulledName))->with($this->area->text)->find()) {
-                            $types[$class] = $type;
+                            $regex = new Regex('use[ ]+([a-z0-9\\_\\,]+)', 'i', $this->area->text);
+
+                            $usePackages = [];
+
+                            if ($regex->find()) {
+                                foreach (str::split($regex->group(1), ',') as $p) {
+                                    $p = str::trim($p);
+                                    $usePackages[$p] = $p;
+                                }
+                            }
+
+                            $exists = false;
+
+                            if ($usePackages) {
+                                foreach ($type->packages as $package) {
+                                    if ($usePackages[$package]) {
+                                        $exists = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!$exists) {
+                                $types[$class] = $type;
+                            }
                         }
                     }
                 }
@@ -140,7 +165,15 @@ class AutoCompletePane
 
                     if ($done) {
                         foreach ($types as $type) {
-                            PhpAnyAutoCompleteType::appendUseClass($this->area, $type->fulledName);
+                            $insert = $type->fulledName;
+
+                            if (CodeEditor::getImportType('php') == 'package') {
+                                if ($type->packages) {
+                                    $insert = arr::first($type->packages);
+                                }
+                            }
+
+                            PhpAnyAutoCompleteType::appendUseClass($this->area, $insert);
                         }
                     }
                 }

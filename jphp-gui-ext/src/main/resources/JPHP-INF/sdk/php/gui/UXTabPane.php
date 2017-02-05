@@ -5,6 +5,7 @@ use php\gui\layout\UXPane;
 /**
  * Class UXTabPane
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXTabPane extends UXControl
 {

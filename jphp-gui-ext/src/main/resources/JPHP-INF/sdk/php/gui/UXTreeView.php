@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXTreeView
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXTreeView extends UXControl
 {

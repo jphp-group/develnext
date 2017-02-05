@@ -382,7 +382,7 @@ abstract class AbstractForm extends UXForm
     /**
      * @param $id
      * @return AbstractModule
-     * @return-dynamic app\modules\$0
+     * @return-dynamic $package\modules\$0
      * @throws Exception
      */
     protected function module($id)

@@ -8,9 +8,12 @@ use php\io\Stream;
 /**
  * Class UXCanvas
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXCanvas extends UXNode
 {
+
+
     /**
      * @return UXGraphicsContext
      */

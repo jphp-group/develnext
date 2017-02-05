@@ -8,9 +8,12 @@ use php\gui\text\UXFont;
 /**
  * Class UXRadioGroupPane
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXRadioGroupPane extends UXVBox
 {
+
+
     /**
      * @var UXList
      */

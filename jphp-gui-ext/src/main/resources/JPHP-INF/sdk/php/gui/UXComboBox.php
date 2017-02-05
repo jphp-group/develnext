@@ -6,9 +6,12 @@ use Traversable;
 /**
  * Class UXComboBox
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXComboBox extends UXComboBoxBase
 {
+
+
     /**
      * Список.
      * @var UXList

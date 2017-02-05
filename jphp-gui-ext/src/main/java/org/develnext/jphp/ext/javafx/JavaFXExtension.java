@@ -72,7 +72,12 @@ public class JavaFXExtension extends Extension {
 
     @Override
     public Status getStatus() {
-        return Status.EXPERIMENTAL;
+        return Status.BETA;
+    }
+
+    @Override
+    public String[] getPackageNames() {
+        return new String[] { "gui", "javafx" };
     }
 
     @Override

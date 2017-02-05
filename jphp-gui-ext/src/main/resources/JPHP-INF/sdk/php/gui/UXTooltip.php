@@ -5,6 +5,7 @@ use php\gui\text\UXFont;
 /**
  * Class UXTooltip
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXTooltip extends UXPopupWindow
 {

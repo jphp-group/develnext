@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXToggleGroup
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXToggleGroup
 {

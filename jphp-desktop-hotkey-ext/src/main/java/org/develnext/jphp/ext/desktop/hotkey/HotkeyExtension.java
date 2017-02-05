@@ -13,6 +13,11 @@ public class HotkeyExtension extends Extension {
     }
 
     @Override
+    public String[] getPackageNames() {
+        return new String[] { "gui", "desktop" };
+    }
+
+    @Override
     public void onRegister(CompileScope scope) {
         registerClass(scope, HotKeyManager.class);
     }

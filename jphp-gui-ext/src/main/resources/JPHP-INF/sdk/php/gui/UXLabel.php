@@ -4,9 +4,13 @@ namespace php\gui;
 /**
  * Class UXLabel
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 class UXLabel extends UXLabeled
 {
+
+
     /**
      * @var UXNode
      */

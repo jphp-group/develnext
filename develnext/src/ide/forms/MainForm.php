@@ -13,6 +13,8 @@ use ide\systems\WatcherSystem;
 use php\desktop\HotKeyManager;
 use php\desktop\Robot;
 use php\gui\designer\UXDesigner;
+use php\gui\dock\UXDockNode;
+use php\gui\dock\UXDockPane;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyboardManager;
 use php\gui\event\UXKeyEvent;
@@ -51,6 +53,8 @@ use script\TimerScript;
  * @property UXVBox $contentVBox
  * @property UXAnchorPane $bottomSpoiler
  * @property UXTabPane $bottomSpoilerTabPane
+ *
+ * @property UXDockPane $dockPane
  */
 class MainForm extends AbstractIdeForm
 {
@@ -133,6 +137,22 @@ class MainForm extends AbstractIdeForm
         } else {
             $parent->add($tabPane);
         }
+
+        /*$properties = new UXDockNode($this->properties, 'Инспектор');
+        $properties->size = [200, 700];
+        $properties->dock($this->dockPane, 'LEFT');
+
+        TimerScript::executeAfter(1000, function () use ($properties) {
+            $this->properties->free();
+            $properties->add($this->properties);
+        });
+
+        $center = new UXDockNode(new UXAnchorPane(), 'Редактор');
+        $center->size = [9000, 800];
+        $center->dock($this->dockPane, 'RIGHT');
+        $center->floatable = false;
+        $center->minimizable = false;*/
+
 
         /*$hotkeyManager = new HotKeyManager();
         $hotkeyManager->register('control shift PLUS', function () {
@@ -246,7 +266,7 @@ class MainForm extends AbstractIdeForm
         $this->layout->add($overlay);*/
 
 
-        $this->projectTabs->tabs[0]->graphic = ico('settings16');
+        //$this->projectTabs->tabs[0]->graphic = ico('settings16');
         //$this->projectTabs->tabs[1]->graphic = ico('tree16');
     }
 

@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXMenu
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXMenu extends UXMenuItem
 {
+
+
     /**
      * @readonly
      * @var UXList of UXMenuItem

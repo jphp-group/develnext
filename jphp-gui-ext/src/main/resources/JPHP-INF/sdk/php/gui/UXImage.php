@@ -8,8 +8,13 @@ use php\io\Stream;
 /**
  * Class UXImage
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
-class UXImage {
+class UXImage
+{
+
+
     /**
      * Ширина картинки.
      * @readonly

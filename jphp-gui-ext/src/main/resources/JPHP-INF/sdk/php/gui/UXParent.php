@@ -5,9 +5,12 @@ namespace php\gui;
 /**
  * Class UXParent
  * @package php\gui
+ * @packages gui, javafx
  */
 abstract class UXParent extends UXNode
 {
+
+
     /**
      * @var UXList
      */

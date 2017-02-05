@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXSplitPane
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXSplitPane extends UXControl
 {

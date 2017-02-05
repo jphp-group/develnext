@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXPopupWindow
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXPopupWindow extends UXWindow
 {
+
+
     /**
      * @var bool
      */

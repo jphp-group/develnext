@@ -6,6 +6,7 @@ use php\io\Stream;
 /**
  * Class UXApplication
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXApplication
 {

@@ -17,6 +17,11 @@ public class SystemTrayExtension extends JavaFXExtension {
     }
 
     @Override
+    public String[] getPackageNames() {
+        return new String[] { "gui", "tray" };
+    }
+
+    @Override
     public void onRegister(CompileScope scope) {
         registerEventProvider(new TrayIconEventAdapter());
 

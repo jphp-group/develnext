@@ -6,6 +6,8 @@ use php\gui\UXNode;
 /**
  * Class UXFadeAnimation
  * @package php\gui\animation
+ *
+ * @packages gui, javafx
  */
 class UXFadeAnimation extends UXAnimation
 {

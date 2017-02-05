@@ -6,9 +6,12 @@ use php\gui\layout\UXPanel;
 /**
  * Class UXMediaViewBox
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXMediaViewBox extends UXPanel
 {
+
+
     /**
      * @var UXMediaPlayer
      */

@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXToggleButton
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXToggleButton extends UXButtonBase
 {

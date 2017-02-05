@@ -29,6 +29,7 @@ use php\lang\JavaException;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
+use php\util\Flow;
 use php\util\Regex;
 use php\util\Scanner;
 
@@ -189,6 +190,20 @@ class PHPInspector extends AbstractInspector
 
         if (str::contains($comment, '@non-getters')) {
             $data['getters'] = false;
+        }
+
+        $data['packages'] = [];
+
+        if (str::contains($comment, '@packages')) {
+            $regex = new Regex('\\@packages[ ]+([a-z0-9\_]+)', 'is', $comment);
+
+            if ($regex->find()) {
+                $packages = str::trim($regex->group(1));
+
+                $packages = str::split($packages, ',');
+                $packages = Flow::of($packages)->map('trim')->toArray();
+                $data['packages'] = $packages;
+            }
         }
 
         $data['content'] = $this->parseDescription($comment);
@@ -421,11 +436,26 @@ class PHPInspector extends AbstractInspector
         }
 
         $entry->constants = [];
+
         foreach ($token->getConstants() as $const) {
-            foreach ($const->getItems() as $one) {
-                $entry->constants[$one->getWord()] = $e = new ConstantEntry();
-                $e->name = $one->getWord();
+            foreach ($const->getItems() as $name => $one) {
+                $entry->constants[$name] = $e = new ConstantEntry();
+                $e->name = $name;
                 $e->value = $one->getExprString();
+            }
+        }
+
+        if ($entry->data['packages']) {
+            foreach ($entry->data['packages'] as $p) {
+                $entry->packages[$p] = $p;
+            }
+        }
+
+        if ($pkg = $entry->constants['__PACKAGE__']) {
+            foreach (str::split($pkg->value, ',') as $p) {
+                $p = str::trim($p);
+
+                $entry->packages[$p] = $p;
             }
         }
 
@@ -547,7 +577,7 @@ class PHPInspector extends AbstractInspector
 
     /**
      * @param $name
-     * @return TypeEntry[]
+     * @return TypeEntry
      */
     public function findTypeByShortName($name)
     {
@@ -597,6 +627,12 @@ class PHPInspector extends AbstractInspector
     {
         $this->types[str::lower($entry->fulledName)] = $entry;
         $this->typesByShort[str::lower(fs::name($entry->fulledName))] = $entry;
+
+        if ($entry->packages) {
+            foreach ($entry->packages as $package) {
+                $this->packages[$package]['classes'][str::lower($entry->fulledName)] = $entry->fulledName;
+            }
+        }
     }
 
     public function putFunction(FunctionEntry $entry)

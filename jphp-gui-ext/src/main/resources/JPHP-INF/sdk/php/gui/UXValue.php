@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXValue
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXValue
 {

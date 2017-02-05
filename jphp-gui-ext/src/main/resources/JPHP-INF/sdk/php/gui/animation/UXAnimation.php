@@ -1,7 +1,12 @@
 <?php
 namespace php\gui\animation;
 
-
+/**
+ * Class UXAnimation
+ * @package php\gui\animation
+ *
+ * @packages gui, javafx
+ */
 abstract class UXAnimation
 {
     /**

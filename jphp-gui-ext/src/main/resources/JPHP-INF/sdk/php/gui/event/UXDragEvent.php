@@ -7,6 +7,7 @@ use php\gui\UXNode;
 /**
  * Class UXDragEvent
  * @package php\gui\event
+ * @packages gui, javafx
  */
 class UXDragEvent extends UXEvent
 {

@@ -7,6 +7,7 @@ use php\gui\UXNode;
 /**
  * Class UXShape
  * @package php\gui\shape
+ * @packages gui, javafx
  */
 abstract class UXShape extends UXNode
 {

@@ -9,9 +9,12 @@ use php\lang\IllegalArgumentException;
 /**
  * Class UXNode
  * @package php\gui
+ * @packages gui, javafx
  */
 abstract class UXNode
 {
+
+
     /**
      * --RU--
      * Идентификатор.

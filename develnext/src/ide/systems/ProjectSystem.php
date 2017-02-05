@@ -195,8 +195,9 @@ class ProjectSystem
     /**
      * @param AbstractProjectTemplate $template
      * @param string $path
+     * @param string $package
      */
-    static function create(AbstractProjectTemplate $template, $path)
+    static function create(AbstractProjectTemplate $template, $path, $package = 'app')
     {
         static::clear();
         $parent = File::of($path)->getParent();
@@ -211,6 +212,7 @@ class ProjectSystem
         try {
             $project = Project::createForFile($path);
             $project->setTemplate($template);
+            $project->setPackageName($package);
 
             $template->makeProject($project);
             Ide::get()->setOpenedProject($project);

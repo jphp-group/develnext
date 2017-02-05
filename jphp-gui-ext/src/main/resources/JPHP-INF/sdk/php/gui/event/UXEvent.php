@@ -6,6 +6,7 @@ use php\gui\UXWindow;
 /**
  * Class Event
  * @package php\gui\event
+ * @packages gui, javafx
  */
 abstract class UXEvent
 {

@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXTableCell
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXTableCell extends UXCell
 {

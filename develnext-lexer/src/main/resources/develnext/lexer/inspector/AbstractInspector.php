@@ -23,6 +23,12 @@ abstract class AbstractInspector
     protected $types = [];
 
     /**
+     * [name1 => [types => [], functions = [], constants = []]]
+     * @var array
+     */
+    protected $packages = [];
+
+    /**
      * @var TypeEntry[]
      */
     protected $typesByShort = [];
@@ -238,6 +244,15 @@ abstract class AbstractInspector
     }
 
     /**
+     * @param string $name
+     * @return array|null
+     */
+    public function findPackage($name)
+    {
+        return $this->packages[$name];
+    }
+
+    /**
      * @param $name
      * @return TypeEntry
      */
@@ -263,5 +278,6 @@ abstract class AbstractInspector
         $this->dynamicReturnTypes = [];
         $this->functions = [];
         $this->typesByShort = [];
+        $this->packages = [];
     }
 }

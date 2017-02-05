@@ -55,6 +55,11 @@ class Project
     /**
      * @var string
      */
+    protected $packageName = 'app';
+
+    /**
+     * @var string
+     */
     protected $rootDir;
 
     /**
@@ -213,6 +218,14 @@ class Project
     }
 
     /**
+     * @return string
+     */
+    public function getPackageName()
+    {
+        return $this->packageName;
+    }
+
+    /**
      * @param string $newName
      * @return bool
      */
@@ -329,17 +342,18 @@ class Project
     /**
      * @param string $file
      * @param AbstractFileTemplate $template
+     * @param bool $override
      */
-    public function defineFile($file, AbstractFileTemplate $template)
+    public function defineFile($file, AbstractFileTemplate $template, $override = false)
     {
         $file = $this->getFile($file);
 
-        if ($file->isNew()) {
+        if ($file->isNew() || $override) {
             $file->setGenerated(true);
             $file->applyTemplate($template);
         }
 
-        $file->updateTemplate();
+        $file->updateTemplate($override);
     }
 
     /**
@@ -807,8 +821,9 @@ class Project
             $dir->mkdirs();
         }
 
-        $this->filesData  = $this->config->createFiles($this);
-        $this->template   = $this->config->getTemplate();
+        $this->filesData   = $this->config->createFiles($this);
+        $this->template    = $this->config->getTemplate();
+        $this->packageName = $this->config->getPackageName();
 
         $this->config->createBehaviours($this);
 
@@ -1025,6 +1040,14 @@ class Project
     public function setTemplate($template)
     {
         $this->template = $template;
+    }
+
+    /**
+     * @param string $packageName
+     */
+    public function setPackageName($packageName)
+    {
+        $this->packageName = $packageName;
     }
 
     /**

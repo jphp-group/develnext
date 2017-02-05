@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXWebView
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXWebView extends UXParent
 {

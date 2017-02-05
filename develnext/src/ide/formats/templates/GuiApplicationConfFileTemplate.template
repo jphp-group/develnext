@@ -5,6 +5,6 @@ app.uuid = #APP_UUID#
 app.version = 1
 
 # APP
-app.namespace = app
+app.namespace = #PROJECT_PACKAGE#
 app.mainForm = #MAIN_FORM#
 app.showMainForm = 1

@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXSlider
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXSlider extends UXControl
 {

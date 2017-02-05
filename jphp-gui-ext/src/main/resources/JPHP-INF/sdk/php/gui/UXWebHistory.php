@@ -4,6 +4,7 @@ namespace php\gui;
 /**
  * Class UXWebHistory
  * @package php\gui
+ * @packages gui, javafx
  */
 abstract class UXWebHistory
 {

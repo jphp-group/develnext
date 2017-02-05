@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXScene
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXScene
 {
+
+
     /**
      * @var UXParent
      */

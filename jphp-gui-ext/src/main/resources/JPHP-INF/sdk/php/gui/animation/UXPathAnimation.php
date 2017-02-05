@@ -4,6 +4,8 @@ namespace php\gui\animation;
 /**
  * Class UXPathAnimation
  * @package php\gui\animation
+ *
+ * @packages gui, javafx
  */
 class UXPathAnimation extends UXAnimation
 {

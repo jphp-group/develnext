@@ -6,6 +6,7 @@ use php\gui\UXList;
 /**
  * Class UXEllipse
  * @package php\gui\shape
+ * @packages gui, javafx
  */
 class UXPolygon extends UXShape
 {

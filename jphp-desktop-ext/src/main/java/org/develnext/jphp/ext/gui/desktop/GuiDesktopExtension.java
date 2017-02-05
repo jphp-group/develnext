@@ -18,6 +18,11 @@ public class GuiDesktopExtension extends JavaFXExtension {
     }
 
     @Override
+    public String[] getPackageNames() {
+        return new String[] { "gui", "desktop" };
+    }
+
+    @Override
     public void onRegister(CompileScope scope) {
         registerClass(scope, Mouse.class);
         registerClass(scope, MouseEx.class);

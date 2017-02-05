@@ -4,6 +4,10 @@ namespace php\framework;
 use php\io\Stream;
 use php\time\Time;
 
+/**
+ * Class Logger
+ * @package php\framework
+ */
 class Logger
 {
     const LEVEL_ERROR = 1;

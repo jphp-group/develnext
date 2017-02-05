@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXMediaView
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXMediaView extends UXNode
 {
+
+
     /**
      * @var UXMediaPlayer
      */

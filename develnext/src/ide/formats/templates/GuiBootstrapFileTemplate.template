@@ -7,6 +7,7 @@ use php\gui\framework\Application;
 #BEFORE_CODE#
 
 $app = new Application();
+#INNER_CODE#
 $app->launch();
 
 #AFTER_CODE#

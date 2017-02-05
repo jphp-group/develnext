@@ -4,9 +4,12 @@ namespace php\gui;
 /**
  * Class UXDialog
  * @package php\gui
+ * @packages gui, javafx
  */
 class UXDialog
 {
+
+
     /**
      * @param $text
      * @param string $type

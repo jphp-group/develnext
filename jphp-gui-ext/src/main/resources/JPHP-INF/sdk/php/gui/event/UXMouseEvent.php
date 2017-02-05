@@ -4,6 +4,7 @@ namespace php\gui\event;
 /**
  * Class UXMouseEvent
  * @package php\gui\event
+ * @packages gui, javafx
  */
 class UXMouseEvent extends UXEvent
 {
