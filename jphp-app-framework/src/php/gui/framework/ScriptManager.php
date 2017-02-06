@@ -14,6 +14,7 @@ use php\xml\XmlProcessor;
 /**
  * Class ScriptManager
  * @package php\gui\framework
+ * @packages gui, javafx
  */
 class ScriptManager
 {

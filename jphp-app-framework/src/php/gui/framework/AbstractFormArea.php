@@ -10,6 +10,8 @@ use php\lib\str;
 /**
  * Class AbstractFormArea
  * @package php\gui\framework
+ *
+ * @packages gui, javafx
  */
 abstract class AbstractFormArea extends UXAnchorPane
 {

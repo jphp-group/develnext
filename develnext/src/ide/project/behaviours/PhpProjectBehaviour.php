@@ -15,12 +15,14 @@ use ide\zip\JarArchive;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXCheckbox;
+use php\gui\UXComboBox;
 use php\gui\UXLabel;
 use php\io\File;
 use php\io\IOException;
 use php\lang\Environment;
 use php\lang\Module;
 use php\lang\ThreadPool;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
 use php\net\URL;
@@ -35,9 +37,15 @@ use php\util\SharedValue;
 class PhpProjectBehaviour extends AbstractProjectBehaviour
 {
     const OPT_COMPILE_BYTE_CODE = 'compileByteCode';
+    const OPT_IMPORT_TYPE_CODE = 'importType';
 
     const SOURCES_DIRECTORY = 'src/app';
     const GENERATED_DIRECTORY = 'src_generated';
+
+    private static $importTypes = [
+        'simple' => 'Имена классов (use namespace\\ClassName)',
+        'package' => 'Имена пакетов (use package)'
+    ];
 
     /**
      * @var array
@@ -63,6 +71,11 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
      * @var ThreadPool
      */
     protected $inspectorThreadPool;
+
+    /**
+     * @var UXComboBox
+     */
+    protected $uiImportTypesSelect;
 
     /**
      * @return int
@@ -100,6 +113,11 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
     }
 
+    public function getImportType()
+    {
+        return $this->getIdeConfigValue(self::OPT_IMPORT_TYPE_CODE, 'simple');
+    }
+
     protected function refreshInspector()
     {
         if ($this->inspector) {
@@ -121,6 +139,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $this->uiSettings = null;
         $this->uiByteCodeCheckbox = null;
         $this->globalUseImports = null;
+        $this->uiImportTypesSelect = null;
     }
 
     public function doOpen()
@@ -150,6 +169,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     {
         if ($this->uiSettings) {
             $this->setIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, $this->uiByteCodeCheckbox->selected);
+            $this->setIdeConfigValue(self::OPT_IMPORT_TYPE_CODE, arr::keys(static::$importTypes)[$this->uiImportTypesSelect->selectedIndex]);
         }
 
         $this->refreshInspector();
@@ -223,6 +243,16 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 foreach ($bundle->fetchAllBundles($env) as $one) {
                     $dirs[] = $one->getProjectVendorDirectory();
                 }
+            }
+
+            foreach ($dirs as $dir) {
+                fs::scan("$dir/.inc/package", function ($filename) {
+                    $ext = fs::ext($filename);
+
+                    if ($ext == 'php') {
+                        include $filename;
+                    }
+                });
             }
 
             $scope->execute(function () use ($zipLibraries, $generatedDirectory, $dirs, &$includedFiles) {
@@ -403,6 +433,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     {
         if ($this->uiSettings) {
             $this->uiByteCodeCheckbox->selected = $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, true);
+            $this->uiImportTypesSelect->value   = static::$importTypes[$this->getImportType()];
         }
     }
 
@@ -412,17 +443,27 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $title->font = $title->font->withBold();
 
         $opts = new UXHBox();
-        $opts->spacing = 5;
+        $opts->spacing = 10;
+        $opts->alignment = 'BOTTOM_LEFT';
 
         $this->uiByteCodeCheckbox = $byteCodeCheckbox = new UXCheckbox('Компилировать в байткод (+ защита от декомпиляции)');
+        $byteCodeCheckbox->padding = 5;
         $this->uiByteCodeCheckbox->on('mouseUp', [$this, 'doSave']);
         $byteCodeCheckbox->tooltipText = 'Компиляция будет происходить только во время итоговой сборки проекта.';
         $opts->add($byteCodeCheckbox);
 
+        $importTitle = new UXLabel('Метод импортирования классов:');
+        $importTypeSelect = new UXComboBox(self::$importTypes);
+
+        $this->uiImportTypesSelect = $importTypeSelect;
+
+        $importTypeSelect->padding = 5;
+        $importTypeSelect->minWidth = 350;
+        $opts->children->insert(0, new UXVBox([$importTitle, $importTypeSelect], 5));
+
         $ui = new UXVBox([$title, $opts]);
         $ui->spacing = 5;
         $this->uiSettings = $ui;
-
 
         $editor->addSettingsPane($ui);
     }

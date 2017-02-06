@@ -14,6 +14,7 @@ use ide\editors\CodeEditor;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
+use ide\project\behaviours\PhpProjectBehaviour;
 use php\gui\designer\UXAbstractCodeArea;
 use php\gui\designer\UXSyntaxTextArea;
 use php\gui\event\UXKeyEvent;
@@ -167,9 +168,11 @@ class AutoCompletePane
                         foreach ($types as $type) {
                             $insert = $type->fulledName;
 
-                            if (CodeEditor::getImportType('php') == 'package') {
-                                if ($type->packages) {
-                                    $insert = arr::first($type->packages);
+                            if ($php = PhpProjectBehaviour::get()) {
+                                if ($php->getImportType() == 'package') {
+                                    if ($type->packages) {
+                                        $insert = arr::first($type->packages);
+                                    }
                                 }
                             }
 

@@ -38,11 +38,6 @@ class CodeEditorSettingsForm extends AbstractIdeForm
      */
     protected $editor;
 
-    private static $importTypes = [
-        'simple' => 'Имена классов (use namespace\\ClassName)',
-        'package' => 'Имена пакетов (use package)'
-    ];
-
     protected function init()
     {
         parent::init();
@@ -68,8 +63,6 @@ class CodeEditorSettingsForm extends AbstractIdeForm
 
         $this->fontSizeSlider->on('mouseUp', $v);
         $this->fontSizeSlider->on('mouseDrag', $v);
-
-        $this->importType->items->setAll(static::$importTypes);
     }
 
     /**
@@ -93,10 +86,6 @@ class CodeEditorSettingsForm extends AbstractIdeForm
         $this->themeList->selected = CodeEditor::getCurrentHighlight($this->lang);
         $this->fontSizeSlider->value = CodeEditor::getCurrentFontSize($this->lang);
         $this->titleLabel->text = 'Настройки редактора ' . $this->lang;
-
-        $importType = CodeEditor::getImportType($this->lang);
-
-        $this->importType->value = static::$importTypes[$importType];
     }
 
     /**
@@ -106,8 +95,6 @@ class CodeEditorSettingsForm extends AbstractIdeForm
     {
         CodeEditor::setCurrentHighlight($this->lang, $this->themeList->selected);
         CodeEditor::setCurrentFontSize($this->lang, $this->fontSizeSlider->value);
-
-        CodeEditor::setImportType($this->lang, arr::keys(static::$importTypes)[$this->importType->selectedIndex]);
 
         $this->hide();
     }

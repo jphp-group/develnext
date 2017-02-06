@@ -43,12 +43,6 @@
             <Separator prefWidth="200.0" />
             <VBox id="dialogContainer" spacing="15.0">
                <children>
-                  <VBox layoutX="20.0" layoutY="10.0" spacing="5.0">
-                     <children>
-                        <Label text="Метод импортирования классов:" />
-                        <ComboBox id="importType" maxWidth="1.7976931348623157E308" prefHeight="35.0" visibleRowCount="20" />
-                     </children>
-                  </VBox>
                   <VBox spacing="5.0">
                      <children>
                         <Label text="Цветовая схема:" />

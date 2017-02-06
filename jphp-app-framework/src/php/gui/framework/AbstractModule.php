@@ -19,6 +19,8 @@ use ReflectionMethod;
  *
  * @non-getters
  * @package php\gui
+ *
+ * @packages gui, javafx
  */
 abstract class AbstractModule extends AbstractScript
 {

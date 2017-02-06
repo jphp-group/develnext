@@ -6,6 +6,7 @@ use Exception;
 use facade\Json;
 use php\format\JsonProcessor;
 use php\framework\Logger;
+use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;
 use php\gui\UXApplication;
@@ -22,6 +23,9 @@ use php\lang\System;
 use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
+use script\storage\AbstractStorage;
+use script\storage\IniStorage;
+use timer\AccurateTimer;
 
 /**
  * Class Application
@@ -78,6 +82,7 @@ class Application
     public function __construct($configPath = null)
     {
        // System::setProperty("prism.lcdtext", "false");
+        $this->definePackage();
 
         if (Stream::exists('res://.debug/preloader.php')) {
             include 'res://.debug/preloader.php';
@@ -107,7 +112,33 @@ class Application
         $this->loadModules();
     }
 
+    private function definePackage()
+    {
+        $package = [
+            AbstractForm::class,
+            AbstractFactory::class,
+            AbstractFormArea::class,
+            AbstractModule::class,
+            AbstractScript::class,
+            AbstractBehaviour::class,
+            Application::class,
+            ApplicationTrait::class,
+            EventBinder::class,
+            Preloader::class,
+            AccurateTimer::class,
+            StandaloneFactory::class,
+            ScriptManager::class,
+            ScriptEvent::class,
+            View::class,
+        ];
 
+        define_package('gui', $package);
+        define_package('javafx', $package);
+
+        define_package('std', [
+            Logger::class, Instances::class
+        ]);
+    }
 
     /**
      * @return string

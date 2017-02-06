@@ -9,6 +9,8 @@ use php\util\Flow;
 /**
  * Class ObjectGroup
  * @package php\gui\framework
+ *
+ * @packages std
  */
 class Instances implements Countable, Iterator, ArrayAccess
 {

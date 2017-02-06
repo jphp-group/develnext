@@ -39,7 +39,13 @@ public class UXVBox<T extends VBox> extends UXPane<VBox> {
 
     @Signature
     public void __construct(List<Node> children) {
+        __construct(children, 0);
+    }
+
+    @Signature
+    public void __construct(List<Node> children, double spacing) {
         __wrappedObject = new VBox(children.toArray(new Node[children.size()]));
+        getWrappedObject().setSpacing(spacing);
     }
 
     @Signature

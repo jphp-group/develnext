@@ -7,6 +7,8 @@ use php\gui\UXLoader;
 /**
  * Class StandaloneFactory
  * @package php\gui\framework
+ *
+ * @packages gui, javafx
  */
 class StandaloneFactory extends AbstractFactory
 {

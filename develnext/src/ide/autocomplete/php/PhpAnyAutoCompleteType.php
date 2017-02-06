@@ -16,6 +16,7 @@ use ide\editors\CodeEditor;
 use ide\editors\common\CodeTextArea;
 use ide\Ide;
 use ide\project\behaviours\BundleProjectBehaviour;
+use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\Project;
 use php\gui\designer\UXAbstractCodeArea;
 use php\lib\arr;
@@ -170,9 +171,11 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
 
                         $package = null;
 
-                        if (CodeEditor::getImportType('php') == 'package') {
-                            if ($type->packages) {
-                                $package = arr::first($type->packages);
+                        if ($php = PhpProjectBehaviour::get()) {
+                            if ($php->getImportType() == 'package') {
+                                if ($type->packages) {
+                                    $package = arr::first($type->packages);
+                                }
                             }
                         }
 

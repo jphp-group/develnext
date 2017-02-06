@@ -23,6 +23,12 @@ use php\xml\DomElement;
 use php\xml\DomNode;
 use php\xml\XmlProcessor;
 
+/**
+ * Class AbstractFactory
+ * @package php\gui\framework
+ *
+ * @packages gui, javafx
+ */
 class AbstractFactory
 {
     const DEFAULT_PATH = 'res://.factories/';

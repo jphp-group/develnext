@@ -5,6 +5,12 @@ use php\game\UXGamePane;
 use php\gui\layout\UXScrollPane;
 use php\gui\UXNode;
 
+/**
+ * Class View
+ * @package php\gui\framework
+ *
+ * @packages gui, javafx
+ */
 class View
 {
     /**

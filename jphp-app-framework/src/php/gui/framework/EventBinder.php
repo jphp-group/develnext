@@ -20,6 +20,7 @@ use ReflectionMethod;
 /**
  * Class EventBinder
  * @package php\gui\framework
+ * @packages gui, javafx
  */
 class EventBinder
 {

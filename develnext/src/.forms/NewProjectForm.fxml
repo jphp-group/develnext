@@ -50,6 +50,6 @@
             <Font size="15.0" />
          </font>
       </TextField>
-      <Label layoutX="392.0" layoutY="72.0" prefHeight="24.0" prefWidth="183.0" text="Код проекта:" AnchorPane.rightAnchor="25.0" />
+      <Label layoutX="392.0" layoutY="72.0" prefHeight="24.0" prefWidth="183.0" text="Имя пакета проекта:" AnchorPane.rightAnchor="25.0" />
    </children>
 </AnchorPane>

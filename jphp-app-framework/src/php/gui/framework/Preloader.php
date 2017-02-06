@@ -12,6 +12,8 @@ use php\gui\UXProgressIndicator;
 /**
  * Class Preloader
  * @package php\gui\framework
+ *
+ * @packages gui, javafx
  */
 class Preloader extends UXAnchorPane
 {

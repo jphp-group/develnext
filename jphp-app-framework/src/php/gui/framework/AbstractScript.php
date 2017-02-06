@@ -12,6 +12,13 @@ use php\xml\DomElement;
 use php\xml\XmlProcessor;
 use ReflectionClass;
 
+/**
+ * Class ScriptEvent
+ * @package php\gui\framework
+ *
+ *
+ * @packages gui, javafx
+ */
 class ScriptEvent extends \stdClass
 {
     /**
@@ -56,6 +63,9 @@ class ScriptEvent extends \stdClass
  * Class AbstractScript
  * @getters
  * @package php\gui\framework
+ *
+ *
+ * @packages gui, javafx
  */
 abstract class AbstractScript
 {

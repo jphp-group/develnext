@@ -18,6 +18,7 @@ use ide\commands\CreateGameSpriteProjectCommand;
 use ide\commands\CreateScriptModuleProjectCommand;
 use ide\commands\ExecuteProjectCommand;
 use ide\editors\AbstractEditor;
+use ide\editors\CodeEditor;
 use ide\editors\common\FormListEditor;
 use ide\editors\common\ObjectListEditorItem;
 use ide\editors\FactoryEditor;
@@ -698,8 +699,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $template = new PhpClassFileTemplate($name, 'AbstractModule');
         $template->setNamespace("{$this->project->getPackageName()}\\modules");
+
         $template->setImports([
-            'php\\gui\\framework\\AbstractModule'
+            'std, gui'
         ]);
 
         $sources = $file->findLinkByExtension('php');
@@ -856,7 +858,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $template = new PhpClassFileTemplate($name, 'AbstractForm');
         $template->setNamespace("{$this->project->getPackageName()}\\forms");
         $template->setImports([
-            'php\\gui\\framework\\AbstractForm'
+            'std, gui'
         ]);
 
         $sources = $form->findLinkByExtension('php');
