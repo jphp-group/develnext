@@ -778,6 +778,10 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
         if (parent instanceof Parent) {
             ObservableList<Node> nodes = ((Parent) parent).getChildrenUnmodifiable();
 
+            if (parent instanceof SplitPane) {
+                nodes = ((SplitPane) parent).getItems();
+            }
+
             for (Node nd : nodes) {
                 if (nd instanceof TitledPane && ((TitledPane) nd).getContent() instanceof Parent) {
                     node = __globalLookup(((TitledPane) nd).getContent(), select);

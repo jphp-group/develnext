@@ -13,6 +13,8 @@ use php\gui\UXScreen;
 /**
  * Class RobotScript
  * @package script
+ *
+ * @packages framework
  */
 class RobotScript extends AbstractScript implements PositionableBehaviour, SetTextBehaviour
 {

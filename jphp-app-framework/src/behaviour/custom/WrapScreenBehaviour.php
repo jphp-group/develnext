@@ -6,6 +6,12 @@ use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\View;
 use php\gui\UXNode;
 
+/**
+ * Class WrapScreenBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class WrapScreenBehaviour extends AbstractBehaviour
 {
     const GAP = 1;

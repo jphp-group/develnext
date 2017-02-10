@@ -5,6 +5,12 @@ use php\gui\framework\AbstractModule;
 use php\gui\framework\AbstractScript;
 use php\lang\Thread;
 
+/**
+ * Class MacroScript
+ * @package script
+ *
+ * @packages framework
+ */
 class MacroScript extends AbstractScript
 {
     /**

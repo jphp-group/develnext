@@ -8,6 +8,12 @@ use php\gui\effect\UXReflectionEffect;
 use php\gui\framework\behaviour\custom\EffectBehaviour;
 use php\gui\paint\UXColor;
 
+/**
+ * Class BloomEffectBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class BloomEffectBehaviour extends EffectBehaviour
 {
     /**

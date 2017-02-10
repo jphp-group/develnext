@@ -5,7 +5,7 @@ use php\gui\UXDialog;
 /**
  * Class Dialog
  *
- * @packages gui, javafx
+ * @packages framework
  */
 class Dialog
 {

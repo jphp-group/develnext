@@ -12,6 +12,12 @@ use php\util\SharedValue;
 use script\TimerScript;
 use timer\AccurateTimer;
 
+/**
+ * Class VibrationAnimationBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class VibrationAnimationBehaviour extends AnimationBehaviour
 {
     /**

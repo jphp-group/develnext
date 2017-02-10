@@ -6,6 +6,12 @@ use php\gui\framework\AbstractScript;
 use php\gui\UXNode;
 use php\gui\UXWindow;
 
+/**
+ * Class ModuleBehaviourManager
+ * @package php\gui\framework\behaviour\custom
+ *
+ * @packages framework
+ */
 class ModuleBehaviourManager extends BehaviourManager
 {
     /**

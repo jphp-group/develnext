@@ -4,6 +4,7 @@ namespace bundle\http;
 /**
  * Class HttpAsyncResponse
  * @package bundle\http
+ * @packages httpclient
  */
 class HttpAsyncResponse
 {

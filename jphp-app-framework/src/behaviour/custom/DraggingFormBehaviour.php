@@ -10,6 +10,12 @@ use php\gui\UXWindow;
 use php\util\SharedValue;
 use script\TimerScript;
 
+/**
+ * Class DraggingFormBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class DraggingFormBehaviour extends AbstractBehaviour
 {
     /**

@@ -26,6 +26,7 @@ class HttpDownloaderBreakException extends \Exception
 /**
  * Class HttpDownloader
  * @package bundle\http
+ * @packages httpclient
  */
 class HttpDownloader extends AbstractScript
 {

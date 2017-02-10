@@ -16,6 +16,12 @@ use php\time\TimeZone;
 use php\util\SharedValue;
 use script\TimerScript;
 
+/**
+ * Class WatchMakerBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class WatchMakerBehaviour extends AbstractBehaviour
 {
     /**

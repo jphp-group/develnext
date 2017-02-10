@@ -17,7 +17,7 @@ use ReflectionClass;
  * @package php\gui\framework
  *
  *
- * @packages gui, javafx
+ * @packages framework
  */
 class ScriptEvent extends \stdClass
 {
@@ -65,7 +65,7 @@ class ScriptEvent extends \stdClass
  * @package php\gui\framework
  *
  *
- * @packages gui, javafx
+ * @packages framework
  */
 abstract class AbstractScript
 {

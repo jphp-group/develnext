@@ -8,6 +8,12 @@ use php\gui\UXNode;
 use php\gui\UXWindow;
 use script\TimerScript;
 
+/**
+ * Class AutoDestroyBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class AutoDestroyBehaviour extends AnimationBehaviour
 {
     /**

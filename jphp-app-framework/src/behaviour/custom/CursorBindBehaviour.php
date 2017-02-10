@@ -8,6 +8,12 @@ use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\UXNode;
 use php\util\SharedValue;
 
+/**
+ * Class CursorBindBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class CursorBindBehaviour extends AbstractBehaviour
 {
     /**

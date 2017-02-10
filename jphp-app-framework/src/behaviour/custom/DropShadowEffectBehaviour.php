@@ -6,6 +6,12 @@ use php\gui\effect\UXEffect;
 use php\gui\framework\behaviour\custom\EffectBehaviour;
 use php\gui\paint\UXColor;
 
+/**
+ * Class DropShadowEffectBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class DropShadowEffectBehaviour extends EffectBehaviour
 {
     /**

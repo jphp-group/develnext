@@ -701,7 +701,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $template->setNamespace("{$this->project->getPackageName()}\\modules");
 
         $template->setImports([
-            'std, gui'
+            'std, gui, framework'
         ]);
 
         $sources = $file->findLinkByExtension('php');
@@ -858,7 +858,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $template = new PhpClassFileTemplate($name, 'AbstractForm');
         $template->setNamespace("{$this->project->getPackageName()}\\forms");
         $template->setImports([
-            'std, gui'
+            'std, gui, framework'
         ]);
 
         $sources = $form->findLinkByExtension('php');

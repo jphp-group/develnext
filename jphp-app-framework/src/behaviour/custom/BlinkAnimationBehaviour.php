@@ -9,6 +9,12 @@ use php\gui\UXWindow;
 use script\TimerScript;
 use timer\AccurateTimer;
 
+/**
+ * Class BlinkAnimationBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class BlinkAnimationBehaviour extends AnimationBehaviour
 {
     /**

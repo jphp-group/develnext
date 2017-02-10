@@ -16,6 +16,8 @@ use php\lang\ThreadPool;
 /**
  * Class FileScript
  * @package script
+ *
+ * @packages framework
  */
 class FileScript extends AbstractScript implements TextableBehaviour, SetTextBehaviour, ValuableBehaviour, StreamLoadableBehaviour
 {

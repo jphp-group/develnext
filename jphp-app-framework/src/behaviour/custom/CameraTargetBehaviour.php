@@ -7,6 +7,12 @@ use php\gui\framework\View;
 use php\gui\layout\UXScrollPane;
 use php\gui\UXNode;
 
+/**
+ * Class CameraTargetBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class CameraTargetBehaviour extends AbstractBehaviour
 {
     /**

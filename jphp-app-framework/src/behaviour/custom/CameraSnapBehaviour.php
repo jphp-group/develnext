@@ -12,6 +12,12 @@ use php\lib\arr;
 use php\lib\reflect;
 use php\lib\str;
 
+/**
+ * Class CameraSnapBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class CameraSnapBehaviour extends AbstractBehaviour
 {
     /**

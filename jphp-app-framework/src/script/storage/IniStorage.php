@@ -9,6 +9,8 @@ use php\util\Scanner;
 /**
  * Class IniStorage
  * @package script\storage
+ *
+ * @packages framework
  */
 class IniStorage extends AbstractStorage
 {

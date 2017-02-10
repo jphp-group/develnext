@@ -7,6 +7,12 @@ use php\gui\effect\UXInnerShadowEffect;
 use php\gui\framework\behaviour\custom\EffectBehaviour;
 use php\gui\paint\UXColor;
 
+/**
+ * Class InnerShadowEffectBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class InnerShadowEffectBehaviour extends EffectBehaviour
 {
     /**

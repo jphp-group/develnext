@@ -6,6 +6,8 @@ use php\gui\framework\Instances;
 /**
  * Class BehaviourManager
  * @package behaviour\custom
+ *
+ * @packages framework
  */
 abstract class BehaviourManager
 {

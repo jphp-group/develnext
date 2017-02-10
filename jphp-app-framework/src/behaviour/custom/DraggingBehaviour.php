@@ -9,6 +9,12 @@ use php\gui\UXNode;
 use php\util\SharedValue;
 use script\TimerScript;
 
+/**
+ * Class DraggingBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class DraggingBehaviour extends AbstractBehaviour
 {
     /**

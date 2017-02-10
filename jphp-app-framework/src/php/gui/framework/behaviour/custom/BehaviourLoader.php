@@ -15,6 +15,8 @@ use php\xml\XmlProcessor;
 /**
  * Class BehaviourLoader
  * @package behaviour\custom
+ *
+ * @packages framework
  */
 class BehaviourLoader
 {

@@ -5,7 +5,7 @@ namespace php\gui\framework;
  * Class ApplicationTrait
  * @package php\gui\framework
  *
- * @packages gui, javafx
+ * @packages framework
  */
 trait ApplicationTrait
 {

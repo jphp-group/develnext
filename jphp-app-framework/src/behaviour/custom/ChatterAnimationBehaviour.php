@@ -10,6 +10,12 @@ use php\lang\IllegalArgumentException;
 use php\util\SharedValue;
 use script\TimerScript;
 
+/**
+ * Class ChatterAnimationBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class ChatterAnimationBehaviour extends AnimationBehaviour
 {
     protected $xValue;

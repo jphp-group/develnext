@@ -16,6 +16,8 @@ use timer\AccurateTimer;
 /**
  * Class TimerScript
  * @package script
+ *
+ * @packages framework
  */
 class TimerScript extends AbstractScript implements ValuableBehaviour
 {

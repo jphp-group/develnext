@@ -14,6 +14,12 @@ use php\util\SharedValue;
 use script\TimerScript;
 use timer\AccurateTimer;
 
+/**
+ * Class RandomMovementAnimationBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class RandomMovementAnimationBehaviour extends AnimationBehaviour
 {
     /**

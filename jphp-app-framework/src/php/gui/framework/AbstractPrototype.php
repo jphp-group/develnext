@@ -4,6 +4,8 @@ namespace php\gui\framework;
 /**
  * Class AbstractPrototype
  * @package php\gui\framework
+ *
+ * @packages framework
  */
 abstract class AbstractPrototype
 {

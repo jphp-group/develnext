@@ -13,6 +13,7 @@ use ide\systems\WatcherSystem;
 use php\desktop\HotKeyManager;
 use php\desktop\Robot;
 use php\gui\designer\UXDesigner;
+use php\gui\designer\UXDirectoryTreeView;
 use php\gui\dock\UXDockNode;
 use php\gui\dock\UXDockPane;
 use php\gui\event\UXEvent;
@@ -46,6 +47,7 @@ use script\TimerScript;
  * @property UXTabPane $fileTabPane
  * @property UXTabPane $projectTabs
  * @property UXVBox $properties
+ * @property UXAnchorPane $directoryTree
  * @property UXTreeView $projectTree
  * @property UXHBox $headPane
  * @property UXHBox $headRightPane
@@ -158,6 +160,22 @@ class MainForm extends AbstractIdeForm
         $hotkeyManager->register('control shift PLUS', function () {
             System::halt(1);
         }); */
+
+        $v = function () {
+            $this->directoryTree->children->clear();
+            $tree = new UXDirectoryTreeView(Ide::project()->getRootDir());
+            $tree->position = [0, 0];
+            $this->directoryTree->add($tree);
+            $tree->root->expanded = true;
+
+            UXAnchorPane::setAnchor($tree, 0);
+        };
+
+        if (Ide::project()) {
+            $v();
+        }
+
+        Ide::get()->bind('openProject', $v);
     }
 
     /**

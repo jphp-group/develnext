@@ -10,7 +10,7 @@ use php\time\Time;
  * Class AccurateTimer
  * @package timer
  *
- * @packages gui, javafx
+ * @packages framework
  */
 class AccurateTimer
 {

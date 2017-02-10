@@ -27,7 +27,7 @@ use php\xml\XmlProcessor;
  * Class AbstractFactory
  * @package php\gui\framework
  *
- * @packages gui, javafx
+ * @packages framework
  */
 class AbstractFactory
 {

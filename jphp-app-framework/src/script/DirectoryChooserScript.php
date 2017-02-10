@@ -21,6 +21,8 @@ use script\support\ScriptHelpers;
 /**
  * Class DirectoryChooserScript
  * @package script
+ *
+ * @packages framework
  */
 class DirectoryChooserScript extends AbstractScript implements TextableBehaviour
 {

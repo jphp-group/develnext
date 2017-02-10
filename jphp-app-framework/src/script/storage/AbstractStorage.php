@@ -7,6 +7,8 @@ use php\lib\str;
 
 /**
  * Class AbstractStorage
+ *
+ * @packages framework
  * @package script\storage
  */
 abstract class AbstractStorage extends AbstractScript

@@ -22,6 +22,8 @@ use script\support\ScriptHelpers;
 /**
  * Class TimerScript
  * @package script
+ *
+ * @packages framework
  */
 class FileChooserScript extends AbstractScript implements TextableBehaviour, SetTextBehaviour, ValuableBehaviour
 {

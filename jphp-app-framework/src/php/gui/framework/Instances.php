@@ -10,7 +10,7 @@ use php\util\Flow;
  * Class ObjectGroup
  * @package php\gui\framework
  *
- * @packages std
+ * @packages framework
  */
 class Instances implements Countable, Iterator, ArrayAccess
 {

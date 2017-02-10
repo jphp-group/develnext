@@ -9,6 +9,12 @@ use php\gui\UXWindow;
 use script\TimerScript;
 use timer\AccurateTimer;
 
+/**
+ * Class FadeAnimationBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class FadeAnimationBehaviour extends AnimationBehaviour
 {
     /**

@@ -28,6 +28,9 @@ use script\support\ScriptHelpers;
  * @property bool $loop
  * @property bool $mute
  * @property string $status
+ *
+ *
+ * @packages framework
  */
 class MediaPlayerScript extends AbstractScript implements TextableBehaviour, ValuableBehaviour, StreamLoadableBehaviour
 {

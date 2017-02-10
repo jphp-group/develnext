@@ -4,6 +4,12 @@ namespace php\gui\framework\behaviour\custom;
 use php\gui\framework\AbstractFactory;
 use php\lang\IllegalArgumentException;
 
+/**
+ * Class FactoryBehaviourManager
+ * @package php\gui\framework\behaviour\custom
+ *
+ * @packages framework
+ */
 class FactoryBehaviourManager extends BehaviourManager
 {
     /**

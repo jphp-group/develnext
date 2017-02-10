@@ -7,6 +7,12 @@ use php\gui\framework\ScriptEvent;
 use php\gui\UXNode;
 use script\TimerScript;
 
+/**
+ * Class RotateAnimationBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class RotateAnimationBehaviour extends AnimationBehaviour
 {
     /**

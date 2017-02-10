@@ -1,0 +1,6 @@
+[classes]
+bundle\http\HttpAsyncResponse
+bundle\http\HttpChecker
+bundle\http\HttpClient
+bundle\http\HttpDownloader
+bundle\http\HttpResponse

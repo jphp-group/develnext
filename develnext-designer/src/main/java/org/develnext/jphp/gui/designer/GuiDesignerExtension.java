@@ -9,6 +9,8 @@ import org.develnext.jphp.gui.designer.editor.syntax.impl.CssCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.impl.FxCssCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.impl.JavaScriptCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.impl.PhpCodeArea;
+import org.develnext.jphp.gui.designer.editor.tree.AbstractDirectoryTreeSource;
+import org.develnext.jphp.gui.designer.editor.tree.DirectoryTreeView;
 import org.dockfx.DockNode;
 import org.dockfx.DockPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -41,6 +43,9 @@ public class GuiDesignerExtension extends JavaFXExtension {
 
         registerWrapperClass(scope, DockPane.class, UXDockPane.class);
         registerWrapperClass(scope, DockNode.class, UXDockNode.class);
+
+        registerWrapperClass(scope, AbstractDirectoryTreeSource.class, UXAbstractDirectoryTreeSource.class);
+        registerWrapperClass(scope, DirectoryTreeView.class, UXDirectoryTreeView.class);
 
 
         registerClass(scope, FileSystemWatcher.WrapWatchKey.class);

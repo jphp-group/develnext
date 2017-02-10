@@ -10,6 +10,8 @@ use php\lib\str;
 /**
  * Class KeyInputRuleBehaviour
  * @package behaviour\custom
+ *
+ * @packages framework
  */
 class KeyInputRuleBehaviour extends AbstractBehaviour
 {

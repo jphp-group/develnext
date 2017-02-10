@@ -8,6 +8,12 @@ use php\gui\UXScreen;
 use php\gui\UXWindow;
 use php\lib\reflect;
 
+/**
+ * Class WidgetFormBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class WidgetFormBehaviour extends AbstractBehaviour
 {
     /**

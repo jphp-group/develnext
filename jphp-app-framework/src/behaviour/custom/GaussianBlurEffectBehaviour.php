@@ -8,6 +8,12 @@ use php\gui\effect\UXInnerShadowEffect;
 use php\gui\framework\behaviour\custom\EffectBehaviour;
 use php\gui\paint\UXColor;
 
+/**
+ * Class GaussianBlurEffectBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class GaussianBlurEffectBehaviour extends EffectBehaviour
 {
     /**

@@ -9,6 +9,12 @@ use php\gui\effect\UXSepiaToneEffect;
 use php\gui\framework\behaviour\custom\EffectBehaviour;
 use php\gui\paint\UXColor;
 
+/**
+ * Class SepiaToneEffectBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class SepiaToneEffectBehaviour extends EffectBehaviour
 {
     /**

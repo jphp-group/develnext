@@ -3,6 +3,12 @@ namespace php\gui;
 
 use php\io\IOException;
 
+/**
+ * Class UXDatePickerWrapper
+ * @package php\gui
+ *
+ * @packages framework
+ */
 class UXDatePickerWrapper extends UXNodeWrapper
 {
     public function applyData(UXData $data)

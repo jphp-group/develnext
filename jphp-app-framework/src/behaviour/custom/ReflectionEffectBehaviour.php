@@ -7,6 +7,12 @@ use php\gui\effect\UXReflectionEffect;
 use php\gui\framework\behaviour\custom\EffectBehaviour;
 use php\gui\paint\UXColor;
 
+/**
+ * Class ReflectionEffectBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class ReflectionEffectBehaviour extends EffectBehaviour
 {
     /**

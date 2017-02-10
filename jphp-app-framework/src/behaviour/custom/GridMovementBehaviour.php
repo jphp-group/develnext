@@ -10,6 +10,12 @@ use php\gui\UXNode;
 use php\gui\UXWindow;
 use script\TimerScript;
 
+/**
+ * Class GridMovementBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class GridMovementBehaviour extends AbstractBehaviour
 {
     /**

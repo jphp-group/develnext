@@ -7,6 +7,8 @@ use php\lib\str;
 /**
  * Class HttpResponse
  * @package bundle\http
+ *
+ * @packages httpclient
  */
 class HttpResponse
 {

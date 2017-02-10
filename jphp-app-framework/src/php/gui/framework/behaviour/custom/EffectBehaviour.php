@@ -5,6 +5,12 @@ namespace php\gui\framework\behaviour\custom;
 use php\gui\effect\UXEffect;
 use php\gui\UXNode;
 
+/**
+ * Class EffectBehaviour
+ * @package php\gui\framework\behaviour\custom
+ *
+ * @packages framework
+ */
 abstract class EffectBehaviour extends AbstractBehaviour
 {
     /**

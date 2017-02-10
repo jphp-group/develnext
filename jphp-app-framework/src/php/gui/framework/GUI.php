@@ -12,6 +12,8 @@ use Traversable;
 /**
  * Class GUI
  * @package php\gui\framework
+ *
+ * @packages framework
  */
 class GUI
 {

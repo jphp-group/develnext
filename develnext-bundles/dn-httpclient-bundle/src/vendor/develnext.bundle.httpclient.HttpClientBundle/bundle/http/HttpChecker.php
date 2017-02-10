@@ -10,6 +10,7 @@ use timer\AccurateTimer;
 /**
  * Class HttpChecker
  * @package bundle\http
+ * @packages httpclient
  */
 class HttpChecker extends AbstractScript
 {

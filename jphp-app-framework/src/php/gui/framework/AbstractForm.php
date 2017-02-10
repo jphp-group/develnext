@@ -42,7 +42,7 @@ use php\gui\framework\Application;
  * Class AbstractForm
  * @package php\gui\framework
  *
- * @packages gui, javafx
+ * @packages framework
  */
 abstract class AbstractForm extends UXForm
 {

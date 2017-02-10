@@ -14,6 +14,12 @@ use php\gui\UXLabel;
 use php\gui\UXWindow;
 use php\lib\reflect;
 
+/**
+ * Class GameSceneBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class GameSceneBehaviour extends AbstractBehaviour
 {
     /**

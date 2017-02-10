@@ -1,6 +1,12 @@
 <?php
 namespace behaviour;
 
+/**
+ * Interface StreamLoadableBehaviour
+ * @package behaviour
+ *
+ * @packages framework
+ */
 interface StreamLoadableBehaviour
 {
     /**

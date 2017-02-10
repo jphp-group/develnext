@@ -8,6 +8,12 @@ use php\gui\UXForm;
 use php\gui\UXNode;
 use php\util\SharedValue;
 
+/**
+ * Class EscapeShutdownBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class EscapeShutdownBehaviour extends AbstractBehaviour
 {
     /**

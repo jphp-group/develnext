@@ -18,6 +18,8 @@ use timer\AccurateTimer;
  * @package behaviour\custom
  *
  * @getters
+ *
+ * @packages framework
  */
 abstract class AbstractBehaviour
 {

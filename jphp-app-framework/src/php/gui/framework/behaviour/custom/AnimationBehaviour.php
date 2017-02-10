@@ -7,6 +7,8 @@ use script\TimerScript;
 /**
  * Class AnimationBehaviour
  * @package behaviour\custom
+ *
+ * @packages framework
  */
 abstract class AnimationBehaviour extends AbstractBehaviour
 {

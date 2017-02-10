@@ -5,6 +5,8 @@ use php\gui\UXApplication;
 
 /**
  * Class App
+ *
+ * @packages framework
  */
 abstract class App
 {

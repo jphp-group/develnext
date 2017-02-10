@@ -9,7 +9,7 @@ use php\gui\UXNode;
  * Class View
  * @package php\gui\framework
  *
- * @packages gui, javafx
+ * @packages framework
  */
 class View
 {

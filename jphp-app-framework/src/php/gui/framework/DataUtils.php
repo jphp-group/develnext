@@ -17,6 +17,8 @@ use php\lib\String;
 /**
  * Class DataUtils
  * @package php\gui\framework
+ *
+ * @packages framework
  */
 class DataUtils
 {

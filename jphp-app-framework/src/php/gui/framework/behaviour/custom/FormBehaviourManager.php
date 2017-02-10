@@ -5,6 +5,12 @@ use php\gui\framework\AbstractForm;
 use php\gui\UXNode;
 use php\lang\IllegalArgumentException;
 
+/**
+ * Class FormBehaviourManager
+ * @package php\gui\framework\behaviour\custom
+ *
+ * @packages framework
+ */
 class FormBehaviourManager extends BehaviourManager
 {
     /**

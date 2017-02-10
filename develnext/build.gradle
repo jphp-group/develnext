@@ -68,28 +68,30 @@ def makeExe = { file ->
     }
 }
 
-installDist.doLast {
-    fileTree("$project.buildDir/install/$project.name/lib").visit { FileVisitDetails el ->
-        def name = el.getName()
-        name = name.replaceAll(/(-[0-9]+|\.[0-9]+|-SNAPSHOT)/, "");
+task prepareDist(dependsOn: ['installDist']) {
+    doLast {
+        fileTree("$project.buildDir/install/$project.name/lib").visit { FileVisitDetails el ->
+            def name = el.getName()
+            name = name.replaceAll(/(-[0-9]+|\.[0-9]+|-SNAPSHOT)/, "");
 
-        if (name.startsWith("develnext-control-")) {
-            el.file.delete();
-        } else {
-            if (!name.equals(el.getName())) {
-                println "Rename '" + el.file.parent + "/" + name + "' file"
+            if (name.startsWith("develnext-control-")) {
+                el.file.delete();
+            } else {
+                if (!name.equals(el.getName())) {
+                    println "Rename '" + el.file.parent + "/" + name + "' file"
 
-                if (name == "develnext-launcher.jar") {
-                    copy {
-                        from el.file
-                        into "$project.buildDir/install/$project.name"
-                        rename(/develnext-launcher-.*\.jar/, "DevelNext.jar")
+                    if (name == "develnext-launcher.jar") {
+                        copy {
+                            from el.file
+                            into "$project.buildDir/install/$project.name"
+                            rename(/develnext-launcher-.*\.jar/, "DevelNext.jar")
+                        }
+
+                        el.file.delete();
+                        el.file.deleteOnExit();
+                    } else {
+                        el.file.renameTo(file(el.file.parent + "/" + name));
                     }
-
-                    el.file.delete();
-                    el.file.deleteOnExit();
-                } else {
-                    el.file.renameTo(file(el.file.parent + "/" + name));
                 }
             }
         }
@@ -163,7 +165,7 @@ task distLinuxPatch(type: Tar, dependsOn: ['clean', 'distPatch']) {
 }
 
 
-task distPatch(dependsOn: ['installDist']) {
+task distPatch(dependsOn: ['prepareDist']) {
     doLast {
         if (System.properties['os.name'].toLowerCase().contains('windows')) {
             exec {
@@ -221,7 +223,7 @@ task distIdeLinux(dependsOn: ['distIde']) {
     }
 }
 
-task distIde(dependsOn: ['installDist']) {
+task distIde(dependsOn: ['prepareDist']) {
     doLast {
         makeExe("$project.rootDir/develnext/launcher/winLauncher.xml")
 

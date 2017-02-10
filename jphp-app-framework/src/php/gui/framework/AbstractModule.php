@@ -20,7 +20,7 @@ use ReflectionMethod;
  * @non-getters
  * @package php\gui
  *
- * @packages gui, javafx
+ * @packages framework
  */
 abstract class AbstractModule extends AbstractScript
 {

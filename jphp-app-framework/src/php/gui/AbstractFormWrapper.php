@@ -4,6 +4,12 @@ namespace php\gui;
 use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
 
+/**
+ * Class AbstractFormWrapper
+ * @package php\gui
+ *
+ * @packages framework
+ */
 class AbstractFormWrapper
 {
     /**

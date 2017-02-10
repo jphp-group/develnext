@@ -21,6 +21,11 @@ use php\util\Flow;
 use php\util\Scanner;
 use php\util\SharedValue;
 
+/**
+ * Class HttpClient
+ * @package bundle\http
+ * @packages httpclient
+ */
 class HttpClient extends AbstractScript
 {
     const CRLF = "\r\n";

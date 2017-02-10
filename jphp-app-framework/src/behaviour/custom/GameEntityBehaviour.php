@@ -15,6 +15,12 @@ use php\lang\IllegalStateException;
 use php\lib\str;
 use script\TimerScript;
 
+/**
+ * Class GameEntityBehaviour
+ * @package behaviour\custom
+ *
+ * @packages framework
+ */
 class GameEntityBehaviour extends AbstractBehaviour
 {
     /**
