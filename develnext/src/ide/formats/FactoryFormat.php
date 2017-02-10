@@ -15,7 +15,7 @@ class FactoryFormat extends GuiFormFormat
         return 'icons/factory16.png';
     }
 
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         return new FactoryEditor($file, new GuiFormDumper($this->formElementTags));
     }

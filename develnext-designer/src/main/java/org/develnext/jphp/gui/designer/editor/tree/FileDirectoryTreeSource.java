@@ -10,11 +10,17 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class FileDirectoryTreeSource extends AbstractDirectoryTreeSource {
+    public interface ValueCreator {
+        DirectoryTreeValue create(String path, File file);
+    }
+
+
     private final File directory;
     private Map<String, DirectoryTreeListener> watchers = new HashMap<>();
 
     private boolean showHidden = false;
     private List<FileFilter> fileFilters = new ArrayList<>();
+    private List<ValueCreator> valueCreators = new ArrayList<>();
 
     public FileDirectoryTreeSource(File directory) {
         this.directory = directory;
@@ -59,6 +65,10 @@ public class FileDirectoryTreeSource extends AbstractDirectoryTreeSource {
 
     public void addFileFilter(FileFilter filter) {
         fileFilters.add(filter);
+    }
+
+    public void addValueCreator(ValueCreator creator) {
+        valueCreators.add(creator);
     }
 
     private boolean isShowingInTree(File file) {
@@ -141,6 +151,14 @@ public class FileDirectoryTreeSource extends AbstractDirectoryTreeSource {
 
         if (file.getPath().endsWith(File.separator)) {
             file = new File(file.getPath().substring(0, file.getPath().length() - 1));
+        }
+
+        for (ValueCreator valueCreator : valueCreators) {
+            DirectoryTreeValue value = valueCreator.create(path, file);
+
+            if (value != null) {
+                return value;
+            }
         }
 
         String text = file.getName();

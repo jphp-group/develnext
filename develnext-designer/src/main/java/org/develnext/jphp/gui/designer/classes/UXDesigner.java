@@ -37,6 +37,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.develnext.jphp.ext.javafx.classes.UXImage;
+import org.develnext.jphp.ext.javafx.classes.layout.UXPanel;
 import org.develnext.jphp.ext.javafx.classes.shape.UXPolygon;
 import org.develnext.jphp.ext.javafx.support.control.*;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;

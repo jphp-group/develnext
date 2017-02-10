@@ -15,11 +15,17 @@ class PhpCodeFormat extends AbstractFormat
     /**
      * @param $file
      *
+     * @param array $options
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         $editor = new CodeEditor($file, 'php');
+
+        if (!$options['withoutCommands']) {
+            $editor->registerDefaultCommands();
+        }
+
         return $editor;
     }
 

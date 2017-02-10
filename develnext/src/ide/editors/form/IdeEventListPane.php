@@ -33,6 +33,7 @@ use php\gui\UXListView;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
 use php\gui\UXNode;
+use php\gui\UXScreen;
 use php\lang\IllegalStateException;
 use php\lib\Items;
 use php\lib\Str;
@@ -294,6 +295,8 @@ class IdeEventListPane
                 $this->openInConstructor($eventCode);
                 break;
         }
+
+        return $editorType;
     }
 
     protected function openInConstructor($eventCode)
@@ -348,11 +351,15 @@ class IdeEventListPane
                     if ($actionConstructor->getLiveCode() != $this->codeEditor->getValue()) {
                         $this->codeEditor->setValue($actionConstructor->getLiveCode());
                         $this->codeEditor->save();
+
+                        $this->manager->load();
+                        $this->update($this->targetId);
                     }
 
                     //$this->codeEditor->load(false);
                     $this->jumpToLine($eventCode);
                 }
+
             }
         }
     }
@@ -678,6 +685,7 @@ class IdeEventListPane
                     AccurateTimer::executeAfter(100, function () use ($selected, $bind) {
                         if ($this->codeEditor) {
                             $this->codeEditor->loadContentToArea(false);
+                            $this->codeEditor->doChange(true);
                         }
 
                         $this->manager->load();
@@ -705,6 +713,7 @@ class IdeEventListPane
             uiLater(function () use ($code) {
                 if ($this->codeEditor) {
                     $this->codeEditor->loadContentToArea(false);
+                    $this->codeEditor->doChange(true);
                 }
 
                 $this->manager->load();
@@ -732,6 +741,7 @@ class IdeEventListPane
             uiLater(function () use ($code, $type) {
                 if ($this->codeEditor) {
                     $this->codeEditor->loadContentToArea(false);
+                    $this->codeEditor->doChange(true);
                 }
 
                 $this->manager->load();
@@ -748,7 +758,10 @@ class IdeEventListPane
         if ($event) {
             /** @var UXButton $target */
             $target = $event->sender;
-            $menu->showByNode($target, $target->boundsInParent['width'] / 2, $target->boundsInParent['height']);
+
+            $offsetX = $target->boundsInParent['width'] / 4;
+
+            $menu->showByNode($target, $offsetX, $target->boundsInParent['height']);
         } else {
             $menu->show($this->ui->form, Mouse::x(), Mouse::y());
         }

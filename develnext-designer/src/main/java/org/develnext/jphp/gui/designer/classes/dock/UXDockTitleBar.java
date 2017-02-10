@@ -1,4 +1,4 @@
-package org.develnext.jphp.gui.designer.classes.dock;
+/*package org.develnext.jphp.gui.designer.classes.dock;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -37,4 +37,4 @@ public class UXDockTitleBar extends UXHBox<DockTitleBar> {
     public void __construct(UXDockNode node) {
         __wrappedObject = new DockTitleBar(node.getWrappedObject());
     }
-}
+}*/

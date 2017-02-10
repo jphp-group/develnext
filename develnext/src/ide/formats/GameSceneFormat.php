@@ -72,7 +72,7 @@ class GameSceneFormat extends GuiFormFormat
      *
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         return new GameSceneEditor($file, new GuiFormDumper($this->formElementTags));
     }

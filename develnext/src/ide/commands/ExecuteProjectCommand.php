@@ -222,6 +222,7 @@ class ExecuteProjectCommand extends AbstractCommand
                 Ide::get()->getMainForm()->hideBottom();
             }, __CLASS__);
 
+            ProjectSystem::saveOnlyRequired();
             ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'java -cp ... php.runtime.launcher.Launcher', function ($success) use ($dialog, $project, $ide) {
                 if (!$success) {
                     $dialog->stopWithError();

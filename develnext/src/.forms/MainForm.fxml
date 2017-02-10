@@ -43,8 +43,13 @@
                         <SplitPane dividerPositions="0.2530487804878049" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <items>
                               <AnchorPane id="directoryTree" minHeight="0.0" minWidth="0.0" prefWidth="150.0" SplitPane.resizableWithParent="false" />
-                                      <SplitPane id="contentSplitPane" dividerPositions="0.3324538258575198" prefHeight="557.0" prefWidth="900.0">
+                                      <SplitPane id="contentSplitPane" dividerPositions="0.6724538258575198" prefHeight="557.0" prefWidth="900.0">
                                           <items>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                                  <children>
+                                                      <TabPane id="fileTabPane" prefHeight="555.0" prefWidth="660.0" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                  </children>
+                                              </AnchorPane>
                                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
                                                   <children>
                                                       <AnchorPane id="dockLeftSide" minHeight="0.0" minWidth="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -60,11 +65,6 @@
                                                               </ScrollPane>
                                                           </children>
                                                       </AnchorPane>
-                                                  </children>
-                                              </AnchorPane>
-                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                                  <children>
-                                                      <TabPane id="fileTabPane" prefHeight="555.0" prefWidth="660.0" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                                   </children>
                                               </AnchorPane>
                                           </items>

@@ -16,6 +16,12 @@ use php\lib\reflect;
 use script\TimerScript;
 use timer\AccurateTimer;
 
+/**
+ * Class Animation
+ * @package action
+ *
+ * @packages framework
+ */
 class Animation
 {
     /**

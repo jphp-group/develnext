@@ -299,7 +299,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function initCodeEditor($phpFile)
     {
-        $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile);
+        $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile, ['withoutCommands' => true]);
+
         $this->codeEditor->register(AbstractCommand::make('Скрыть', 'icons/close16.png', function () {
             $this->codeEditor->save();
 
@@ -799,6 +800,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         parent::open();
 
+        if (!Ide::project()) {
+            return;
+        }
+
         $this->reloadClones();
 
         Logger::trace("0");
@@ -1040,7 +1045,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->actionEditor->renameMethod($bind['className'], $bind['methodName'], $bind['newMethodName']);
         }
 
-        $this->codeEditor->loadContentToArea();
+        $this->codeEditor->loadContentToArea(false);
+        $this->codeEditor->doChange(true);
         $node->id = $newId;
 
         $this->reindex();
@@ -1071,7 +1077,13 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
      */
     public function getObjectList()
     {
-        return GuiFrameworkProjectBehaviour::get()->getObjectList($this->file);
+        $gui = GuiFrameworkProjectBehaviour::get();
+
+        if ($gui) {
+            return $gui->getObjectList($this->file);
+        } else {
+            return [];
+        }
     }
 
     public function deleteNode($node)
@@ -1108,7 +1120,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
 
             if ($this->eventManager->removeBinds($nodeId)) {
-                $this->codeEditor->loadContentToArea();
+                $this->codeEditor->loadContentToArea(false);
+                $this->codeEditor->doChange(true);
             }
 
             foreach ($this->behaviourManager->getBehaviours($nodeId) as $one) {
@@ -1170,7 +1183,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $designer = $this->makeDesigner();
 
         $tabs = new UXTabPane();
-        $tabs->side = 'LEFT';
+        $tabs->side = 'BOTTOM';
         $tabs->tabClosingPolicy = 'UNAVAILABLE';
 
         $tabs->observer('focused')->addListener(function ($_, $new) {
@@ -1179,9 +1192,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
         });
 
-        $tabs->on('keyDown', function (UXKeyEvent $e) {
+        /*$tabs->on('keyDown', function (UXKeyEvent $e) {
             $e->consume();
-        });
+        });*/
 
         $codeTab = new UXTab();
         $codeTab->text = 'Исходный код';
@@ -1657,7 +1670,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if ($this->prototypeTypePane) {
             $typePanes = new UXTabPane();
             $typePanes->tabClosingPolicy = 'UNAVAILABLE';
-            $typePanes->side = 'RIGHT';
+            $typePanes->side = 'LEFT';
 
             $elementTab = new UXTab();
             $elementTab->text = 'Объекты';
@@ -1684,9 +1697,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $wrap = new UXVBox([$actions, $this->viewerAndEvents]);
             UXVBox::setVgrow($this->viewerAndEvents, 'ALWAYS');
 
-            $split = new UXSplitPane([$wrap, $scrollPane]);
+            $split = new UXSplitPane([$scrollPane, $wrap]);
         } else {
-            $split = new UXSplitPane([$this->viewerAndEvents, $scrollPane]);
+            $split = new UXSplitPane([$scrollPane, $this->viewerAndEvents]);
         }
 
         $this->makeContextMenu();
@@ -1866,7 +1879,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->eventManager->addUseImports($imports);
 
         waitAsync(100, function () {
-            $this->codeEditor->loadContentToArea();
+            $this->codeEditor->loadContentToArea(false);
         });
     }
 
@@ -1875,7 +1888,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->eventManager->insertCodeToMethod($class, $method, $code);
 
         waitAsync(100, function () {
-            $this->codeEditor->loadContentToArea();
+            $this->codeEditor->loadContentToArea(false);
+            $this->codeEditor->doChange(true);
         });
     }
 

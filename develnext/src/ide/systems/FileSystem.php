@@ -270,10 +270,7 @@ class FileSystem
             }
 
             $mainForm->clearLeftPane();
-
-            if ($editor->getLeftPaneUi()) {
-                $mainForm->setLeftPane($editor->getLeftPaneUi());
-            }
+            $mainForm->setLeftPane($editor->getLeftPaneUi());
 
             $editor->open($param);
 
@@ -359,7 +356,7 @@ class FileSystem
                 if (static::$previousEditor === $e->sender->userData) {
                     uiLater(function () {
                         if (Ide::project()) {
-                            FileSystem::open('~project');
+                            //FileSystem::open(Ide::project()->getMainProjectFile());
                         }
                     });
                 }
@@ -412,6 +409,11 @@ class FileSystem
         static::$openedEditors[$hash] = $editor;
 
         return $editor;
+    }
+
+    static function closeAllTabs()
+    {
+        Ide::get()->getMainForm()->{'fileTabPane'}->tabs->clear();
     }
 
     static function close($path, $removeTab = true, $save = true)

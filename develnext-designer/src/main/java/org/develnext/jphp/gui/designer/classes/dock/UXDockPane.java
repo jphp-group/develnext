@@ -1,4 +1,4 @@
-package org.develnext.jphp.gui.designer.classes.dock;
+/*package org.develnext.jphp.gui.designer.classes.dock;
 
 import org.develnext.jphp.ext.javafx.classes.UXNode;
 import org.develnext.jphp.ext.javafx.classes.layout.UXStackPane;
@@ -32,3 +32,4 @@ public class UXDockPane extends UXStackPane<DockPane> {
         __wrappedObject = new DockPane();
     }
 }
+*/

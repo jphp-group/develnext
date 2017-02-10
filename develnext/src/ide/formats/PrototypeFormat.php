@@ -38,7 +38,7 @@ class PrototypeFormat extends AbstractFormat
      *
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         return new PrototypeEditor($file);
     }

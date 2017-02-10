@@ -280,15 +280,23 @@ class CodeEditor extends AbstractEditor
 
     public $__eventUpdates = 0;
 
-    protected function doChange()
+    /**
+     * Trigger change content.
+     * @param bool $now
+     */
+    public function doChange($now = false)
     {
-        $i = ++$this->__eventUpdates;
+        if ($now) {
+            $this->trigger('update', []);
+        } else {
+            $i = ++$this->__eventUpdates;
 
-        waitAsync(1000, function () use ($i) {
-            if ($i == $this->__eventUpdates) {
-                $this->trigger('update', []);
-            }
-        });
+            waitAsync(1000, function () use ($i) {
+                if ($i == $this->__eventUpdates) {
+                    $this->trigger('update', []);
+                }
+            });
+        }
     }
 
     public function executeCommand($command)
@@ -527,13 +535,8 @@ class CodeEditor extends AbstractEditor
 
     public function makeLeftPaneUi()
     {
-        $tmp = new UXLabel('В разработке ...');
-        $tmp->style = '-fx-font-style: italic;';
-        $tmp->padding = 10;
-
-        return $tmp;
+        return null;
     }
-
 
     public function registerDefaultCommands()
     {

@@ -9,6 +9,8 @@ use script\MediaPlayerScript;
 /**
  * Class Media
  * @package action
+ *
+ * @packages framework
  */
 class Media
 {

@@ -4,6 +4,7 @@ import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import org.develnext.jphp.gui.designer.editor.tree.AbstractDirectoryTreeSource;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Namespace;
+import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
@@ -16,5 +17,15 @@ abstract public class UXAbstractDirectoryTreeSource extends BaseWrapper<Abstract
 
     public UXAbstractDirectoryTreeSource(Environment env, ClassEntity clazz) {
         super(env, clazz);
+    }
+
+    @Signature
+    public void shutdown() {
+        getWrappedObject().shutdown();
+    }
+
+    @Signature
+    public String rename(String path, String newValue) {
+        return getWrappedObject().rename(path, newValue);
     }
 }

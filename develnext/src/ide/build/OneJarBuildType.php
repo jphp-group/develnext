@@ -170,6 +170,7 @@ class OneJarBuildType extends AbstractBuildType
             }
         };
 
+        ProjectSystem::saveOnlyRequired();
         ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'gradle jar', function ($success) use ($ide, $project, $dialog) {
             if ($success) {
                 $process = new Process([$ide->getGradleProgram(), 'clean', 'splitConfig', 'jar'], $project->getRootDir(), $ide->makeEnvironment());

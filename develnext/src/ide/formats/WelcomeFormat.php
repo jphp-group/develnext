@@ -13,9 +13,10 @@ class WelcomeFormat extends AbstractFormat
     /**
      * @param $file
      *
+     * @param array $options
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         return new WelcomeEditor($file);
     }

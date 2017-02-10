@@ -201,7 +201,11 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
 
     @Signature
     public void jumpToLine(int line, int pos) {
-        getWrappedObject().moveTo(getWrappedObject().position(line, pos).toOffset());
+        try {
+            getWrappedObject().moveTo(getWrappedObject().position(line, pos).toOffset());
+        } catch (IndexOutOfBoundsException e) {
+            getWrappedObject().moveTo(getText().length());
+        }
         getWrappedObject().requestFollowCaret();
     }
 

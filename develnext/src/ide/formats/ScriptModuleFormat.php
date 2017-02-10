@@ -71,7 +71,7 @@ class ScriptModuleFormat extends AbstractFormFormat
      *
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         if ($file instanceof ProjectFile) {
             $name = fs::name($file);

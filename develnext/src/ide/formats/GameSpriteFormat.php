@@ -38,7 +38,7 @@ class GameSpriteFormat extends AbstractFormat
      * @param $file
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         return new GameSpriteEditor($file);
     }

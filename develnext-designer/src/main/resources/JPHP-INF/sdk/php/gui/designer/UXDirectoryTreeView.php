@@ -11,8 +11,13 @@ use php\gui\UXTreeView;
 class UXDirectoryTreeView extends UXTreeView
 {
     /**
+     * @var UXAbstractDirectoryTreeSource
+     */
+    public $treeSource;
+
+    /**
      * UXDirectoryTreeView constructor.
-     * @param string $directory
+     * @param string $directory (optional)
      */
     public function __construct($directory)
     {

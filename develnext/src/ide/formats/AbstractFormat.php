@@ -69,9 +69,10 @@ abstract class AbstractFormat
 
     /**
      * @param $file
+     * @param array $options
      * @return AbstractEditor
      */
-    abstract public function createEditor($file);
+    abstract public function createEditor($file, array $options = []);
 
     /**
      * @return null TODO

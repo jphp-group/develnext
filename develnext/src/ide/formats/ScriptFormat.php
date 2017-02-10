@@ -41,7 +41,7 @@ class ScriptFormat extends AbstractFormat
      *
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
 
     }

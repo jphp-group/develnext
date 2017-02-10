@@ -136,7 +136,17 @@ class PHPInspector extends AbstractInspector
         try {
             try {
                 $tokenizer = new Tokenizer(new Context($stream, $moduleName));
-                $analyzer = new SyntaxAnalyzer(new Environment(), $tokenizer);
+                $env = new Environment();
+
+                foreach ($this->packages as $package => $info) {
+                    $pkg = new \php\lang\Package;
+                    $pkg->addClasses((array)$info['classes']);
+                    $pkg->addFunctions((array)$info['functions']);
+                    $pkg->addConstants((array)$info['constants']);
+                    $env->setPackage($package, $pkg);
+                }
+
+                $analyzer = new SyntaxAnalyzer($env, $tokenizer);
 
                 foreach ($analyzer->getClasses() as $class) {
                     if ($unload) {

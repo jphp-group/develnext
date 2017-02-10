@@ -5,6 +5,7 @@ use ide\editors\AbstractEditor;
 use ide\editors\ProjectEditor;
 use ide\editors\WelcomeEditor;
 use ide\project\control\AbstractProjectControlPane;
+use php\lib\fs;
 use php\lib\reflect;
 
 /**
@@ -34,9 +35,10 @@ class ProjectFormat extends AbstractFormat
     /**
      * @param $file
      *
+     * @param array $options
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         return new ProjectEditor($file, $this->controlPanes);
     }
@@ -53,7 +55,7 @@ class ProjectFormat extends AbstractFormat
      */
     public function isValid($file)
     {
-        return $file == '~project';
+        return fs::ext($file) == 'dnproject';
     }
 
     /**

@@ -233,7 +233,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('save', [$this, 'doSave']);
         $this->project->on('close', [$this, 'doClose']);
-        $this->project->on('updateTree', [$this, 'doUpdateTree']);
         $this->project->on('preCompile', [$this, 'doPreCompile']);
         $this->project->on('compile', [$this, 'doCompile']);
         $this->project->on('export', [$this, 'doExport']);
@@ -504,11 +503,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->mainForm = $this->applicationConfig->get('app.mainForm', '');
         $this->appUuid = $this->applicationConfig->get('app.uuid', str::uuid());
-    }
-
-    public function doUpdateTree(ProjectTree $tree, $path)
-    {
-        // ... todo.
     }
 
     public function doRecover()

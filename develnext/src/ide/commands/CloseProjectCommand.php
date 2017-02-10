@@ -19,7 +19,7 @@ class CloseProjectCommand extends AbstractProjectCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        ProjectSystem::close();
+        ProjectSystem::close(false);
         FileSystem::open('~welcome');
     }
 

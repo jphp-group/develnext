@@ -6,6 +6,8 @@ use php\gui\framework\ObjectGroup;
 /**
  * Class Geometry
  * @package action
+ *
+ * @packages framework
  */
 class Geometry
 {

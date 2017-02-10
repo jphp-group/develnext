@@ -244,7 +244,7 @@ class ProjectSystem
             Ide::get()->getMainForm()->showPreloader('Открытие проекта ...');
 
             static::clear();
-            static::close();
+            static::close(false);
 
             $file = File::of($fileName);
 
@@ -274,7 +274,7 @@ class ProjectSystem
                 $project->load();
                 $project->recover();
 
-                FileSystem::open('~project');
+                FileSystem::open($project->getMainProjectFile());
 
                 $project->open();
 
@@ -294,6 +294,16 @@ class ProjectSystem
             Ide::get()->getMainForm()->hidePreloader();
             ProjectSystem::closeWithWelcome(false);
             Notifications::error('Поврежденный проект', 'Проект "' . fs::nameNoExt($fileName) . '" невозможно открыть, он поврежден или создан в новой версии DevelNext.');
+        }
+    }
+
+    /**
+     * ...
+     */
+    static function saveOnlyRequired()
+    {
+        if ($editor = FileSystem::getSelectedEditor()) {
+            $editor->save();
         }
     }
 
@@ -319,35 +329,35 @@ class ProjectSystem
 
     /**
      * Закрывает проект с открытми файлами проекта.
-     * @param bool $save
+     * @param bool $saveAll
      */
-    static function close($save = true)
+    static function close($saveAll = true)
     {
         $project = Ide::get()->getOpenedProject();
 
-        FileSystem::saveAll();
+        FileSystem::getSelectedEditor()->save();
 
         if ($project) {
             Ide::get()->trigger('closeProject', [$project]);
         }
 
         if ($project) {
-            $project->close($save);
+            $project->close($saveAll);
         }
 
         foreach (FileSystem::getOpened() as $hash => $info) {
             //if ($project && $project->isContainsFile($info['file'])) {
-            FileSystem::close($info['file'], $save);
+            FileSystem::close($info['file'], $saveAll);
             //}
         }
+
+        FileSystem::closeAllTabs();
 
         Cache::clear();
 
         /** @var MainForm $mainForm */
         $mainForm = Ide::get()->getMainForm();
-        $pane = $mainForm->getPropertiesPane();
-
-        $pane->children->clear();
+        $mainForm->clearLeftPane();
 
         static::clear();
 

@@ -10,6 +10,8 @@ use php\lang\Module;
 /**
  * Class Score
  * @package action
+ *
+ * @packages framework
  */
 class Score
 {

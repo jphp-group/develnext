@@ -206,6 +206,7 @@ class AntOneJarBuildType extends AbstractBuildType
         };
         $dialog->setOnExitProcess($onExitProcess);
 
+        ProjectSystem::saveOnlyRequired();
         ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'ant onejar', function ($success) use ($project, $dialog) {
             if ($success) {
                 $this->makeAntBuildFile($project, $this->getConfig());

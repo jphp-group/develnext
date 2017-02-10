@@ -10,15 +10,19 @@ use ide\project\templates\DefaultGuiProjectTemplate;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
+use ide\utils\FileUtils;
 use php\desktop\HotKeyManager;
 use php\desktop\Robot;
 use php\gui\designer\UXDesigner;
+use php\gui\designer\UXDirectoryTreeValue;
 use php\gui\designer\UXDirectoryTreeView;
+use php\gui\designer\UXFileDirectoryTreeSource;
 use php\gui\dock\UXDockNode;
 use php\gui\dock\UXDockPane;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyboardManager;
 use php\gui\event\UXKeyEvent;
+use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\Preloader;
 use php\gui\layout\UXAnchorPane;
@@ -39,7 +43,9 @@ use php\gui\UXTab;
 use php\gui\UXTabPane;
 use php\gui\UXTextArea;
 use php\gui\UXTreeView;
+use php\io\File;
 use php\lang\System;
+use php\lib\fs;
 use php\lib\str;
 use script\TimerScript;
 
@@ -65,6 +71,9 @@ class MainForm extends AbstractIdeForm
      */
     public $mainMenu;
 
+
+    private $contentSplitPaneRight;
+
     /**
      * MainForm constructor.
      */
@@ -82,6 +91,8 @@ class MainForm extends AbstractIdeForm
         if (!$this->mainMenu) {
             throw new IdeException("Cannot find main menu on main form");
         }
+
+        $this->contentSplitPaneRight = $this->contentSplitPane->items[1];
     }
 
     /**
@@ -125,17 +136,20 @@ class MainForm extends AbstractIdeForm
         $tabPane->id = 'fileTabPane';
         $tabPane->tabClosingPolicy = 'ALL_TABS';
 
-        $tabPane->on('keyDown', function (UXEvent $e) {
-            $e->consume();
-        });
+        // todo fix bug
+        /*$tabPane->on('keyDown', $keyDown = function (UXKeyEvent $e) {
+            if ($e->controlDown && $e->codeName == 'Tab') {
+                $e->consume();
+                FileSystem::openNext();
+            }
+        });*/
 
         if ($pane) {
             UXAnchorPane::setAnchor($pane, 0);
             $parent->add($pane);
 
-            $pane->on('keyDown', function (UXEvent $e) {
-                $e->consume();
-            });
+            // fix bug
+            // $pane->on('keyDown', $keyDown);
         } else {
             $parent->add($tabPane);
         }
@@ -161,21 +175,22 @@ class MainForm extends AbstractIdeForm
             System::halt(1);
         }); */
 
-        $v = function () {
-            $this->directoryTree->children->clear();
-            $tree = new UXDirectoryTreeView(Ide::project()->getRootDir());
-            $tree->position = [0, 0];
-            $this->directoryTree->add($tree);
+        $tree = new UXDirectoryTreeView();
+        $tree->position = [0, 0];
+        $this->directoryTree->add($tree);
+
+        UXAnchorPane::setAnchor($tree, 0);
+
+        Ide::get()->bind('openProject', function () use ($tree) {
+            Ide::project()->getTree()->setView($tree);
+            $tree->treeSource = Ide::project()->getTree()->createSource();
             $tree->root->expanded = true;
+        });
 
-            UXAnchorPane::setAnchor($tree, 0);
-        };
-
-        if (Ide::project()) {
-            $v();
-        }
-
-        Ide::get()->bind('openProject', $v);
+        Ide::get()->bind('closeProject', function () use ($tree) {
+            $tree->treeSource->shutdown();
+            $tree->treeSource = null;
+        });
     }
 
     /**
@@ -208,23 +223,42 @@ class MainForm extends AbstractIdeForm
         $menu->text = $text;
     }
 
+    private $contentSplitPaneDividerPositions;
+
     /**
      * @param IdeTabPane|UXNode $pane
      */
     public function setLeftPane($pane)
     {
-        $this->clearLeftPane();
+        if ($pane) {
+            if ($this->contentSplitPane->items->last() !== $this->contentSplitPaneRight) {
+                $this->contentSplitPane->items->insert(1, $this->contentSplitPaneRight);
+
+                $this->contentSplitPane->dividerPositions = $this->contentSplitPaneDividerPositions;
+            }
+
+            $this->clearLeftPane();
+        } else {
+            if ($this->contentSplitPane->items->last() === $this->contentSplitPaneRight) {
+                $this->contentSplitPaneDividerPositions = $this->contentSplitPane->dividerPositions;
+                $this->contentSplitPane->items->removeByIndex(1);
+            }
+        }
 
         if ($pane instanceof IdeTabPane) {
             $this->properties->children->add($pane->makeUi());
         } else {
-            $this->properties->children->add($pane);
+            if ($pane) {
+                $this->properties->children->add($pane);
+            }
         }
     }
 
     public function clearLeftPane()
     {
-        $this->properties->children->clear();
+        if ($this->properties) {
+            $this->properties->children->clear();
+        }
     }
 
     public function show()
@@ -235,6 +269,8 @@ class MainForm extends AbstractIdeForm
         $screen = UXScreen::getPrimary();
 
         $this->contentSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . '.dividerPositions', $this->contentSplitPane->dividerPositions);
+        $this->contentSplitPaneDividerPositions = $this->contentSplitPane->dividerPositions;
+
         $this->width  = Ide::get()->getUserConfigValue(get_class($this) . '.width', $screen->bounds['width'] * 0.75);
         $this->height = Ide::get()->getUserConfigValue(get_class($this) . '.height', $screen->bounds['height'] * 0.75);
 
@@ -363,15 +399,6 @@ class MainForm extends AbstractIdeForm
     public function getHeadRightPane()
     {
         return $this->headRightPane;
-    }
-
-    /**
-     * @deprecated
-     * @return UXVBox
-     */
-    public function getPropertiesPane()
-    {
-        return $this->properties;
     }
 
     /**

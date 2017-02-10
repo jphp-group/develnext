@@ -7,7 +7,7 @@ use php\time\Time;
 /**
  * Class Logger
  * @package php\framework
- * @packages std
+ * @packages framework
  */
 class Logger
 {

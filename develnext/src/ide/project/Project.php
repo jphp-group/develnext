@@ -172,7 +172,7 @@ class Project
         /** @var MainForm $mainForm */
         $mainForm = Ide::get()->getMainForm();
 
-        $this->tree = new ProjectTree($this, new UXTreeView());
+        $this->tree = new ProjectTree($this);
         $this->indexer = new ProjectIndexer($this);
         $this->refactorManager = new ProjectRefactorManager($this);
 
@@ -196,6 +196,11 @@ class Project
         }
 
         return new Project($file->getParent(), $name);
+    }
+
+    public function getMainProjectFile()
+    {
+        return $this->config->getConfigPath();
     }
 
     public function doTick()
@@ -702,7 +707,7 @@ class Project
      */
     public function create()
     {
-        FileSystem::open('~project');
+        FileSystem::open($this->getMainProjectFile());
         $this->trigger(__FUNCTION__);
     }
 
@@ -712,8 +717,6 @@ class Project
     public function update()
     {
         $this->trigger(__FUNCTION__);
-
-        $this->tree->update();
     }
 
     /**
@@ -723,11 +726,7 @@ class Project
     {
         Logger::info("Opening project ...");
 
-        $this->tree->clear();
-
         $this->trigger(__FUNCTION__);
-
-        $this->tree->update();
 
         //if (!$this->indexer->isValid()) { todo implement it
         $this->reindex();
@@ -849,8 +848,6 @@ class Project
             $behaviour->inject();
         }
 
-        $this->tree->clear();
-
         $this->trigger(__FUNCTION__);
     }
 
@@ -876,7 +873,9 @@ class Project
 
         $this->trigger(__FUNCTION__);
 
-        FileSystem::saveAll();
+        if ($editor = FileSystem::getSelectedEditor()) {
+            $editor->save();
+        }
 
         foreach ($this->ideConfigs as $name => $config) {
             if ($config->isAutoSave()) {
@@ -922,8 +921,6 @@ class Project
      */
     public function compile($environment, callable $log = null)
     {
-        $this->save();
-
         Logger::info("Compile project: env = $environment");
 
         $this->trigger(__FUNCTION__, $environment, $log);
@@ -1076,7 +1073,6 @@ class Project
         }
 
         $this->ideConfigs = [];
-        $this->tree->clear(true);
 
         foreach ($this->inspectors as $inspector) {
             $inspector->free();

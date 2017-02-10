@@ -252,6 +252,7 @@ class WindowsApplicationBuildType extends AbstractBuildType
         };
         $dialog->setOnExitProcess($onExitProcess);
 
+        ProjectSystem::saveOnlyRequired();
         ProjectSystem::compileAll(Project::ENV_PROD, $dialog, 'ant jar launch4j', function ($success) use ($project, $dialog, $config) {
             if ($success) {
                 AntOneJarBuildType::makeAntBuildFile($project, $config);

@@ -1238,12 +1238,12 @@ class Ide extends Application
         }
 
 
-        $manager = new UXKeyboardManager($this->getMainForm());
+        /*$manager = new UXKeyboardManager($this->getMainForm());
         $manager->onDown('Ctrl+Tab', function (UXKeyEvent $e) {
             uiLater(function () {
                 FileSystem::openNext();
             });
-        });
+        });*/
 
         $this->afterShow(function () {
             $projectFile = $this->getUserConfigValue('lastProject');
@@ -1253,14 +1253,6 @@ class Ide extends Application
             if (!$this->disableOpenLastProject && $projectFile && File::of($projectFile)->exists()) {
                 ProjectSystem::open($projectFile, false);
             }
-
-            /*if (SystemTray::isSupported()) {
-                $icon = new TrayIcon(ico('browse16')->image);
-                $icon->tooltip = 'HI!';
-                $icon->imageAutoSize = true;
-
-                SystemTray::add($icon);
-            }*/
         });
     }
 
@@ -1334,8 +1326,15 @@ class Ide extends Application
 
     public function shutdown()
     {
-        $shutdownTh = (new Thread(function () {
-            sleep(40);
+        $done = false;
+
+        $shutdownTh = (new Thread(function () use (&$done) {
+            sleep(30);
+
+            while (!$done) {
+                sleep(1);
+            }
+
             Logger::warn("System halt 0\n");
             System::halt(0);
         }));
@@ -1362,27 +1361,29 @@ class Ide extends Application
 
         $this->mainForm->hide();
 
-        if ($project) {
-            ProjectSystem::close();
-        }
-
-        //WatcherSystem::shutdown();
-
-        $stream = null;
-
         foreach ($this->configurations as $name => $config) {
             if ($config->isAutoSave()) {
                 $config->save();
             }
         }
 
+        if ($project) {
+            FileSystem::getSelectedEditor()->save();
+            ProjectSystem::close(false);
+        }
+
+        //WatcherSystem::shutdown();
+
         Logger::info("Finish IDE shutdown");
+
         try {
             Logger::shutdown();
             parent::shutdown();
         } catch (\Exception $e) {
             //System::halt(0);
         }
+
+        $done = true;
     }
 
     /**

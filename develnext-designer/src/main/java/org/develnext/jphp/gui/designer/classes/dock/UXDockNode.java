@@ -1,4 +1,4 @@
-package org.develnext.jphp.gui.designer.classes.dock;
+/*package org.develnext.jphp.gui.designer.classes.dock;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -76,3 +76,4 @@ public class UXDockNode extends UXVBox<DockNode> {
         __wrappedObject = new DockNode(content, title, graphics);
     }
 }
+*/

@@ -8,6 +8,8 @@ use php\gui\animation\UXAnimationTimer;
  * --RU--
  * Утилитный класс для обработки столкновений.
  * @package action
+ *
+ * @packages framework
  */
 class Collision
 {

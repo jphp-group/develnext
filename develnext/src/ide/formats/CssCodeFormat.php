@@ -12,9 +12,10 @@ class CssCodeFormat extends AbstractFormat
     /**
      * @param $file
      *
+     * @param array $options
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         $editor = new CodeEditor($file, 'css');
         $editor->registerDefaultCommands();
