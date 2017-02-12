@@ -42,6 +42,11 @@ class MessageBoxForm extends AbstractIdeForm
     protected $indexResult = -1;
 
     /**
+     * @var mixed
+     */
+    protected $iconImage;
+
+    /**
      * @param string $text
      * @param array $buttons
      * @param null $owner
@@ -53,6 +58,12 @@ class MessageBoxForm extends AbstractIdeForm
         $this->text = $text;
         $this->buttons = $buttons;
         $this->owner = $owner instanceof UXNode ? $owner->form : ($owner instanceof UXWindow ? $owner : $this->owner);
+        $this->iconImage = 'icons/question32.png';
+    }
+
+    public function makeWarning()
+    {
+        $this->iconImage = 'icons/warning32.png';
     }
 
     protected function init()
@@ -73,6 +84,12 @@ class MessageBoxForm extends AbstractIdeForm
             $this->centerOnScreen();
         });
         return $this->_showDialog();
+    }
+
+    public function showWarningDialog($x = null, $y = null)
+    {
+        $this->makeWarning();
+        return $this->showDialog($x, $y);
     }
 
     public function showDialog($x = null, $y = null)
@@ -98,7 +115,8 @@ class MessageBoxForm extends AbstractIdeForm
     public function doOpen()
     {
         $this->indexResult = -1;
-        $this->icon->image = Ide::get()->getImage('icons/question32.png')->image;
+        $image = Ide::get()->getImage($this->iconImage);
+        $this->icon->image = $image ? $image->image : null;
 
         $this->iconified = false;
         $this->messageLabel->text = $this->text;

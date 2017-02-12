@@ -1,13 +1,17 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.collections.ObservableList;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
+import php.runtime.memory.ArrayMemory;
+import php.runtime.memory.ReferenceMemory;
 import php.runtime.reflection.ClassEntity;
 
 import java.util.List;
@@ -81,6 +85,30 @@ public class UXTreeView extends UXControl<TreeView> {
         }
     }
 
+    private void _getExpandedItems(Environment env, TreeItem item, ArrayMemory result) {
+        if (item.isExpanded()) {
+            result.add(new UXTreeItem(env, item));
+        }
+
+        ObservableList<TreeItem> children = item.getChildren();
+
+        for (TreeItem one : children) {
+            _getExpandedItems(env, one, result);
+        }
+    }
+
+    @Getter
+    public Memory getExpandedItems(Environment env) {
+        TreeItem root = getWrappedObject().getRoot();
+
+        ArrayMemory result = new ArrayMemory();
+        if (root != null) {
+            _getExpandedItems(env, root, result);
+        }
+
+        return result;
+    }
+
     @Getter
     public TreeItem getFocusedItem() {
         return (TreeItem) getWrappedObject().getFocusModel().getFocusedItem();
@@ -104,5 +132,41 @@ public class UXTreeView extends UXControl<TreeView> {
     @Signature
     public void scrollTo(TreeItem item) {
         getWrappedObject().scrollTo(getWrappedObject().getRow(item));
+    }
+
+    private void expandTreeView(TreeItem<?> item){
+        if(item != null && !item.isLeaf()){
+            item.setExpanded(true);
+            for(TreeItem<?> child:item.getChildren()){
+                expandTreeView(child);
+            }
+        }
+    }
+
+    private void collapseTreeView(TreeItem<?> item){
+        if(item != null && !item.isLeaf()){
+            item.setExpanded(false);
+            for(TreeItem<?> child:item.getChildren()){
+                collapseTreeView(child);
+            }
+        }
+    }
+
+    @Signature
+    public void collapseAll() {
+        TreeItem root = getWrappedObject().getRoot();
+
+        if (root != null) {
+            collapseTreeView(root);
+        }
+    }
+
+    @Signature
+    public void expandAll() {
+        TreeItem root = getWrappedObject().getRoot();
+
+        if (root != null) {
+            expandTreeView(root);
+        }
     }
 }

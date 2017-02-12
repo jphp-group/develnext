@@ -5,6 +5,7 @@ use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\AbstractFormElementTag;
+use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
 use php\lang\Environment;
@@ -12,6 +13,7 @@ use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\lang\Thread;
 use php\lang\ThreadPool;
+use php\lib\fs;
 use php\lib\Str;
 use php\lib\String;
 
@@ -27,6 +29,11 @@ abstract class AbstractFormFormat extends AbstractFormat
     protected $formElements = [];
 
     /**
+     * @var AbstractFormElement[]
+     */
+    protected $formElementsByClass = [];
+
+    /**
      * @var AbstractFormElementTag[]
      */
     protected $formElementTags = [];
@@ -38,11 +45,17 @@ abstract class AbstractFormFormat extends AbstractFormat
 
     public function isValid($file)
     {
-        if (Str::endsWith($file, '.fxml')) {
-            return true;
+        $ext = fs::ext($file);
+
+        if ($ext != 'php') {
+            return false;
         }
 
-        return false;
+        if (!fs::isFile(fs::pathNoExt($file) . '.fxml')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -87,6 +100,15 @@ abstract class AbstractFormFormat extends AbstractFormat
     }
 
     /**
+     * @param string $class
+     * @return AbstractFormElement
+     */
+    public function getElementByClass($class)
+    {
+        return $this->formElementsByClass[$class];
+    }
+
+    /**
      * @param $any
      * @return mixed
      * @throws IllegalArgumentException
@@ -95,6 +117,10 @@ abstract class AbstractFormFormat extends AbstractFormat
     {
         if ($any instanceof AbstractFormElement) {
             $this->formElements[get_class($any)] = $any;
+
+            if ($elementClass = $any->getElementClass()) {
+                $this->formElementsByClass[$elementClass] = $any;
+            }
             //FormEditor::initializeElement($any);
         } else if ($any instanceof AbstractMenuCommand) {
             $this->contextCommands[$any->getUniqueId()] = $any;
@@ -115,6 +141,10 @@ abstract class AbstractFormFormat extends AbstractFormat
             $element = $this->formElements[get_class($any)];
 
             if ($element) {
+                if ($elementClass = $element->getElementClass()) {
+                    unset($this->formElementsByClass[$elementClass]);
+                }
+
                 $element->unregister();
             }
 

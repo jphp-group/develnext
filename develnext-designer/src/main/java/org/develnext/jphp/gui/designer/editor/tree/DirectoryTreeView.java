@@ -7,12 +7,40 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.util.Callback;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DirectoryTreeView extends TreeView<DirectoryTreeValue> {
+    public static final AbstractDirectoryTreeSource EMPTY_TREE_SOURCE = new AbstractDirectoryTreeSource() {
+        @Override
+        public boolean isEmpty(String path) {
+            return true;
+        }
+
+        @Override
+        DirectoryTreeValue createValue(String path) {
+            return new DirectoryTreeValue(path, "", "", null, null, false);
+        }
+
+        @Override
+        List<DirectoryTreeValue> list(String path) {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public DirectoryTreeListener listener(String path) {
+            return null;
+        }
+
+        @Override
+        public void shutdown() {
+
+        }
+
+        @Override
+        public String rename(String path, String newName) {
+            return null;
+        }
+    };
     private SimpleObjectProperty<AbstractDirectoryTreeSource> treeSource = new SimpleObjectProperty<>();
     private Set<String> selectedPathPool = new HashSet<>();
 
@@ -58,7 +86,11 @@ public class DirectoryTreeView extends TreeView<DirectoryTreeValue> {
     }
 
     public void setTreeSource(AbstractDirectoryTreeSource treeSource) {
-        this.treeSource.set(treeSource);
+        if (treeSource == null) {
+            this.treeSource.set(EMPTY_TREE_SOURCE);
+        } else {
+            this.treeSource.set(treeSource);
+        }
     }
 
     public void refresh(String path) {

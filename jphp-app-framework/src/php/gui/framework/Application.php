@@ -83,9 +83,6 @@ class Application
     public function __construct($configPath = null)
     {
        // System::setProperty("prism.lcdtext", "false");
-        $packageLoader = new FrameworkPackageLoader();
-        $packageLoader->register();
-
         if (Stream::exists('res://.debug/preloader.php')) {
             include 'res://.debug/preloader.php';
         }
@@ -110,8 +107,6 @@ class Application
         } catch (IOException $e) {
             throw new Exception("Unable to find the '$configPath' config");
         }
-
-        $this->loadModules();
     }
 
     /**
@@ -154,6 +149,14 @@ class Application
     public function getVersion()
     {
         return $this->config->get('app.version');
+    }
+
+    /**
+     * @return int
+     */
+    public function getVersionHash()
+    {
+        return (int) $this->config->get('app.hash');
     }
 
     /**
@@ -444,27 +447,15 @@ class Application
         $this->splashFormClass = $class;
     }
 
-    public function loadModules()
+    public function loadModules(array $classes)
     {
-        try {
-            $json = Json::fromFile('res://.system/modules.json');
-
-            if ($json && ($modules = $json['modules'])) {
-                foreach ($modules as $type) {
-                    /** @var AbstractModule $module */
-                    $module = new $type(true);
-
-                    if ($module->id == 'AppModule') {
-                        $this->appModule = new $type();
-                    } else {
-                        if ($module->singleton) {
-                            $this->modules[$module->id] = new $type();
-                        }
-                    }
-                }
+        foreach ($classes as $class) {
+            /** @var AbstractModule $module */
+            if ($class == "{$this->getNamespace()}\\modules\\AppModule") {
+                $this->appModule = new $class();
+            } else {
+                $this->modules[$class] = new $class();
             }
-        } catch (IOException $e) {
-            Logger::error("Unable to load modules, {$e->getMessage()}");
         }
     }
 
@@ -490,6 +481,7 @@ class Application
     /**
      * @param $id
      * @return AbstractModule
+     * @return-dynamic $package\modules\$0
      * @throws Exception
      */
     public function module($id)
@@ -497,6 +489,19 @@ class Application
         $module = $this->modules[$id];
 
         if (!$module) {
+            $module = $this->modules["{$this->namespace}\\modules\\$id"];
+        }
+
+        if (!$module) {
+            if (class_exists($id)) {
+                return new $id();
+            }
+
+            $cls = "{$this->namespace}\\modules\\$id";
+            if (class_exists($cls)) {
+                return new $cls();
+            }
+
             throw new Exception("Unable to find '$id' module");
         }
 

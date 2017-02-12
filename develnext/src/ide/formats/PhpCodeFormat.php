@@ -29,6 +29,11 @@ class PhpCodeFormat extends AbstractFormat
         return $editor;
     }
 
+    public function getIcon()
+    {
+        return 'icons/phpFile16.png';
+    }
+
     /**
      * @param $file
      *

@@ -249,7 +249,7 @@ class ProjectSystem
             $file = File::of($fileName);
 
             try {
-                $project = new Project($file->getParent(), FileUtils::stripExtension($file->getName()));
+                $project = new Project($file->getParent(), fs::nameNoExt($file));
 
                 if ($project->isOpenedInOtherIde()) {
                     if ($showDialogAlreadyOpened) {
@@ -268,6 +268,42 @@ class ProjectSystem
                     Ide::get()->getMainForm()->hidePreloader();
                     return;
                 }
+
+                if ($project->getConfig()->getIdeVersionHash() > Ide::get()->getVersionHash()) {
+                    $msg = new MessageBoxForm("Проект '{$project->getName()}' создан в более новой версии DevelNext, вы точно хотите его открыть?", [
+                        'Нет', 'Да, открыть проект'
+                    ]);
+
+                    $msg->makeWarning();
+                    $msg->showWarningDialog();
+
+                    if ($msg->getResultIndex() == 0) {
+                        FileSystem::open('~welcome');
+                        Ide::get()->getMainForm()->hidePreloader();
+                        return;
+                    }
+                }
+
+                if ($project->getConfig()->getTemplate()) {
+                    if ($project->getConfig()->getTemplate()->isProjectWillMigrate($project)) {
+                        $msg = new MessageBoxForm("Проект '{$project->getName()}' будет сконвертирован в новый формат, который не поддерживается предыдущими версиями, продолжить?", [
+                            'Открыть проект', 'Отмена'
+                        ]);
+                        $msg->showWarningDialog();
+
+                        if ($msg->getResultIndex() == 1) {
+                            FileSystem::open('~welcome');
+                            Ide::get()->getMainForm()->hidePreloader();
+
+                            uiLater(function () {
+                                $dialog = new OpenProjectForm();
+                                $dialog->showDialog();
+                            });
+                            return;
+                        }
+                    }
+                }
+
 
                 Ide::get()->setOpenedProject($project);
 
@@ -335,7 +371,7 @@ class ProjectSystem
     {
         $project = Ide::get()->getOpenedProject();
 
-        FileSystem::getSelectedEditor()->save();
+        ProjectSystem::saveOnlyRequired();
 
         if ($project) {
             Ide::get()->trigger('closeProject', [$project]);

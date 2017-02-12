@@ -1,4 +1,3 @@
 ide\formats\WelcomeFormat
-ide\formats\ScriptFormat
 ide\formats\PhpCodeFormat
 ide\formats\CssCodeFormat

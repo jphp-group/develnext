@@ -89,6 +89,8 @@ abstract class AbstractCommand
 
         $button->graphic = Ide::get()->getImage($this->getIcon());
         $button->maxHeight = 9999;
+        $button->padding = 4;
+        $button->paddingLeft = $button->paddingRight = 8;
 
         $button->on('action', $this->makeAction());
 

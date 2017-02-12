@@ -26,16 +26,16 @@ trait IdeFormatOwner
             return;
         }
 
+        foreach ($format->getRequireFormats() as $el) {
+            $this->registerFormat($el);
+        }
+
         $this->formats[$class] = $format;
 
         $createCommand = $format->createBlankCommand();
 
         if ($createCommand) {
             Ide::get()->registerCommand($createCommand, 'create');
-        }
-
-        foreach ($format->getRequireFormats() as $el) {
-            $this->registerFormat($el);
         }
     }
 

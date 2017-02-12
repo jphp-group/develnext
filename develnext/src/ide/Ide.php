@@ -52,6 +52,7 @@ use php\io\File;
 use php\io\IOException;
 use php\io\ResourceStream;
 use php\io\Stream;
+use php\lang\IllegalArgumentException;
 use php\lang\System;
 use php\lang\Thread;
 use php\lang\ThreadPool;
@@ -612,6 +613,33 @@ class Ide extends Application
     public function getFile($path)
     {
         return IdeSystem::getFile($path);
+    }
+
+    /**
+     * @param AbstractFormat|string $format
+     * @param string $directory
+     * @return \string[]
+     * @throws IllegalArgumentException
+     */
+    public function getFilesOfFormat($format, $directory)
+    {
+        if (is_string($format)) {
+            $format = $this->getRegisteredFormat($format);
+        }
+
+        if (!$format) {
+            throw new IllegalArgumentException("Format is invalid");
+        }
+
+        $files = [];
+
+        fs::scan($directory, function ($filename) use ($format, &$files) {
+            if ($format->isValid($filename)) {
+                $files[] = $filename;
+            }
+        });
+
+        return $files;
     }
 
     /**

@@ -85,22 +85,6 @@ class ScriptComponentContainer
     }
 
     /**
-     * @param string $configPath
-     */
-    public function setConfigPath($configPath)
-    {
-        $this->_configPath = $configPath;
-    }
-
-    /**
-     * @return string
-     */
-    public function getConfigPath()
-    {
-        return $this->_configPath;
-    }
-
-    /**
      * @return int
      */
     public function getX()

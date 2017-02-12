@@ -25,4 +25,13 @@ abstract class AbstractProjectTemplate
      * @return mixed
      */
     abstract public function recoveryProject(Project $project);
+
+    /**
+     * @param Project $project
+     * @return bool
+     */
+    public function isProjectWillMigrate(Project $project)
+    {
+        return false;
+    }
 }

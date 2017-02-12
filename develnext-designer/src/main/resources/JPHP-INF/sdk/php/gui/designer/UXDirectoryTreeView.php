@@ -16,6 +16,11 @@ class UXDirectoryTreeView extends UXTreeView
     public $treeSource;
 
     /**
+     * @var string[]
+     */
+    public $expandedPaths;
+
+    /**
      * UXDirectoryTreeView constructor.
      * @param string $directory (optional)
      */

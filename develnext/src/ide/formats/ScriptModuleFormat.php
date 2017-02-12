@@ -29,6 +29,7 @@ use php\io\File;
 use php\lib\fs;
 use php\lib\Str;
 use php\util\Regex;
+use php\util\Scanner;
 
 /**
  * Class ScriptModuleFormat
@@ -69,13 +70,14 @@ class ScriptModuleFormat extends AbstractFormFormat
     /**
      * @param $file
      *
+     * @param array $options
      * @return AbstractEditor
      */
     public function createEditor($file, array $options = [])
     {
         if ($file instanceof ProjectFile) {
             $name = fs::name($file);
-            $sources = $file->getProject()->getSrcFile("app/modules/$name.php");
+            $sources = $file->getProject()->getSrcFile("{$file->getProject()->getPackageName()}/modules/$name.php");
 
             if ($sources->exists()) {
                 $file->addLink($sources);
@@ -100,7 +102,7 @@ class ScriptModuleFormat extends AbstractFormFormat
             return "Загрузчик";
         }
 
-        return parent::getTitle($path);
+        return fs::nameNoExt($path);
     }
 
     /**
@@ -110,16 +112,15 @@ class ScriptModuleFormat extends AbstractFormFormat
      */
     public function isValid($file)
     {
-        $project = Ide::get()->getOpenedProject();
-
-        if ($project) {
-            $path = $project->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY);
-            return Str::startsWith(File::of($file)->getPath(), $path->getPath())
-                && fs::isDir($file)
-                && File::of($file)->getPath() != $path->getPath();
+        if (fs::ext($file) != 'php') {
+            return false;
         }
 
-        return false;
+        if (!fs::isFile(fs::pathNoExt($file) . '.module')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -146,14 +147,13 @@ class ScriptModuleFormat extends AbstractFormFormat
     {
         parent::delete($path, $silent);
 
-        if ($project = Ide::project()) {
-            $project->getSrcFile("app/modules/" . fs::name($path) . '.json')->delete();
-            $project->getSrcFile("app/modules/" . fs::name($path) . '.php')->delete();
-            $project->getSrcFile("app/modules/" . fs::name($path) . '.php.source')->delete();
-            $project->getSrcFile("app/modules/" . fs::name($path) . '.php.sourcemap')->delete();
-            $project->getSrcFile("app/modules/" . fs::name($path) . '.behaviour')->delete();
-            $project->getSrcFile("app/modules/" . fs::name($path) . '.php.axml')->delete();
-        }
+        $path = fs::pathNoExt($path);
+
+        fs::delete("$path.module");
+        fs::delete("$path.php.source");
+        fs::delete("$path.php.sourcemap");
+        fs::delete("$path.php.axml");
+        fs::delete("$path.behaviour");
     }
 
     public function duplicate($path, $toPath)
@@ -161,16 +161,17 @@ class ScriptModuleFormat extends AbstractFormFormat
         parent::duplicate($path, $toPath);
 
         if ($project = Ide::project()) {
-            foreach (['json', 'php', 'php.source', 'behaviour', 'php.axml'] as $ext) {
+            $path = fs::pathNoExt($path);
+            $toPath = fs::pathNoExt($toPath);
+
+            foreach (['module', 'php', 'php.source', 'behaviour', 'php.axml'] as $ext) {
+                $toFile = "$toPath.$ext";
+                FileUtils::copyFile("$path.$ext", "$toPath.$ext");
+
                 $name = fs::name($path);
                 $toName = fs::name($toPath);
 
-                $file = $project->getSrcFile("app/modules/" . fs::name($path) . '.' . $ext);
-
-                if (fs::isFile($file)) {
-                    $toFile = $project->getSrcFile("app/modules/" . fs::name($toPath) . '.' . $ext);
-                    FileUtils::copyFile($file, $toFile);
-
+                if (fs::isFile($toFile)) {
                     if ($ext == 'php' || $ext == 'php.source') {
                         FileUtils::replaceInFile($toFile, "class $name extends", "class $toName extends");
                     }

@@ -203,6 +203,14 @@ class Project
         return $this->config->getConfigPath();
     }
 
+    /**
+     * @return ProjectConfig
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
     public function doTick()
     {
         $file = $this->getIdeFile("ide.lock");
@@ -885,6 +893,7 @@ class Project
 
         $files = Flow::of(FileSystem::getOpened())->map(function ($e) { return $this->getAbsoluteFile($e['file']); })->toArray();
 
+        $this->config->setTreeState($this->tree);
         $this->config->setOpenedFiles($files, FileSystem::getSelected());
         $this->config->setProjectFiles($this->filesData);
         $this->config->setBehaviours($this->behaviours);

@@ -2,52 +2,35 @@
 namespace ide\project\behaviours;
 
 use develnext\bundle\game2d\Game2DBundle;
-use develnext\bundle\jsoup\JsoupBundle;
-use develnext\bundle\orientdb\OrientDbBundle;
-use Files;
 use ide\action\ActionManager;
-use ide\build\OneJarBuildType;
-use ide\build\SetupWindowsApplicationBuildType;
-use ide\build\WindowsApplicationBuildType;
 use ide\bundle\std\UIDesktopBundle;
 use ide\bundle\std\JPHPDesktopDebugBundle;
-use ide\bundle\std\JPHPGuiDesktopBundle;
-use ide\commands\BuildProjectCommand;
 use ide\commands\CreateFormProjectCommand;
 use ide\commands\CreateGameSpriteProjectCommand;
 use ide\commands\CreateScriptModuleProjectCommand;
-use ide\commands\ExecuteProjectCommand;
 use ide\editors\AbstractEditor;
-use ide\editors\CodeEditor;
 use ide\editors\common\FormListEditor;
 use ide\editors\common\ObjectListEditorItem;
-use ide\editors\FactoryEditor;
 use ide\editors\FormEditor;
 use ide\editors\GameSpriteEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\editors\menu\ContextMenu;
-use ide\editors\ProjectEditor;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\form\AbstractFormElement;
-use ide\formats\form\elements\GameBackgroundFormElement;
-use ide\formats\form\elements\GameObjectFormElement;
-use ide\formats\form\elements\GamePaneFormElement;
-use ide\formats\form\elements\SpriteViewFormElement;
 use ide\formats\form\FormEditorSettings;
-use ide\formats\form\FormProjectTreeNavigation;
 use ide\formats\GameSpriteFormat;
 use ide\formats\GuiFormFormat;
-use ide\formats\module\ModuleProjectTreeNavigation;
+use ide\formats\PhpCodeFormat;
 use ide\formats\ProjectFormat;
 use ide\formats\ScriptModuleFormat;
 use ide\formats\sprite\IdeSpriteManager;
-use ide\formats\sprite\SpriteProjectTreeNavigation;
 use ide\formats\templates\GuiApplicationConfFileTemplate;
 use ide\formats\templates\GuiBootstrapFileTemplate;
 use ide\formats\templates\GuiFormFileTemplate;
 use ide\formats\templates\GuiLauncherConfFileTemplate;
 use ide\formats\templates\PhpClassFileTemplate;
 use ide\Ide;
+use ide\IdeException;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
@@ -60,9 +43,7 @@ use ide\project\ProjectExporter;
 use ide\project\ProjectFile;
 use ide\project\ProjectIndexer;
 use ide\project\ProjectTree;
-use ide\scripts\ScriptComponentManager;
 use ide\systems\FileSystem;
-use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use php\gui\event\UXEvent;
@@ -71,15 +52,12 @@ use php\gui\layout\UXVBox;
 use php\gui\UXLabel;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
-use php\gui\UXNode;
 use php\gui\UXTextField;
 use php\io\File;
 use php\io\IOException;
-use php\io\Stream;
 use php\lib\fs;
-use php\lib\Str;
+use php\lib\str;
 use php\util\Configuration;
-use php\util\Regex;
 
 class GuiFrameworkProjectBehaviour_ProjectTreeMenuCommand extends AbstractMenuCommand
 {
@@ -169,19 +147,10 @@ class GuiFrameworkProjectBehaviour_ProjectTreeMenuCommand extends AbstractMenuCo
  */
 class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 {
-    const FORMS_DIRECTORY = 'src/.forms';
-    const FACTORY_DIRECTORY = 'src/.factories';
-    const PROTOTYPES_DIRECTORY  = 'src/app/prototypes';
-    const SCRIPTS_DIRECTORY = 'src/.scripts';
     const GAME_DIRECTORY = 'src/.game';
 
     /** @var string */
     protected $mainForm = '';
-
-    /**
-     * @var ScriptComponentManager
-     */
-    protected $scriptComponentManager;
 
     /**
      * @var ActionManager
@@ -241,9 +210,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('makeSettings', [$this, 'doMakeSettings']);
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
 
-        //WatcherSystem::addListener([$this, 'doWatchFile']);
-
         $this->project->registerFormat($projectFormat = new ProjectFormat());
+        $this->project->registerFormat(new PhpCodeFormat());
         $this->project->registerFormat(new GuiFormFormat());
         $this->project->registerFormat(new ScriptModuleFormat());
         $this->project->registerFormat(new GameSpriteFormat());
@@ -268,16 +236,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $addMenu->addCommand(new CreateGameSpriteProjectCommand());
         $addMenu->add(new GuiFrameworkProjectBehaviour_ProjectTreeMenuCommand($this));
 
-        //Ide::get()->registerCommand(new CreateFormProjectCommand());
-        //Ide::get()->registerCommand(new CreateScriptModuleProjectCommand());
-        //Ide::get()->registerCommand(new CreateFactoryProjectCommand());
-
-        //Ide::get()->registerCommand(new CreateGameObjectPrototypeProjectCommand());
-        //Ide::get()->registerCommand(new CreateGameSpriteProjectCommand());
-
         Ide::get()->registerSettings(new FormEditorSettings());
 
-        $this->scriptComponentManager = new ScriptComponentManager();
         $this->actionManager = ActionManager::get();
         $this->spriteManager = new IdeSpriteManager($this->project);
     }
@@ -337,16 +297,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function doClose()
     {
         $this->actionManager->free();
-        $this->scriptComponentManager->free();
         $this->spriteManager->free();
     }
 
     public function doCreate()
     {
         $this->setAppUuid(str::uuid());
-
-
-        //FileSystem::open('~project');
     }
 
     public function doUpdate()
@@ -418,52 +374,85 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doCompile($environment, callable $log = null)
     {
-        $this->updateScriptManager();
-
-        $modules = $this->scriptComponentManager->getModules();
-        $values = [];
-
-        foreach ($modules as $module) {
-            $values[] = $this->project->getPackageName() . '\\modules\\'
-                . Str::replace(FileUtils::relativePath($this->project->getFile(self::SCRIPTS_DIRECTORY), $module), '/', '\\');
-        }
-
-        Json::toFile($this->project->getFile('src/.system/modules.json'), [
-            'modules' => $values
-        ]);
     }
 
-    public function getScriptModules()
+    /**
+     * @return ProjectFile|File
+     */
+    public function getModuleDirectory()
     {
-        $this->updateScriptManager();
-
-        $modules = $this->scriptComponentManager->getModules();
-
-        foreach ($modules as &$module) {
-            $module = Str::replace(FileUtils::relativePath($this->project->getFile(self::SCRIPTS_DIRECTORY), $module), '/', '\\');
-        }
-
-        return $modules;
+        return $this->project->getFile("src/{$this->project->getPackageName()}/modules");
     }
 
-    public function doWatchFile(ProjectFile $file, $event)
+    /**
+     * @param $fullClass
+     * @return string
+     */
+    public function getModuleShortClass($fullClass)
     {
-        /*if ($file) {
-            $path = $file->getRelativePath();
+        $prefix = "{$this->project->getPackageName()}\\modules\\";
 
-            switch ($event['kind']) {
-                case 'ENTRY_CREATE':
-                case 'ENTRY_DELETE':
-                    if (Str::startsWith($path, self::FORMS_DIRECTORY)) {
-                        $this->updateFormsInTree();
-                    } else if (Str::startsWith($path, self::SCRIPTS_DIRECTORY)) {
-                        $this->updateScriptsInTree();
-                        $this->updateScriptManager();
-                    }
+        if (str::startsWith($fullClass, $prefix)) {
+            return str::sub($fullClass, str::length($prefix));
+        }
 
-                    break;
+        return $fullClass;
+    }
+
+    /**
+     * @param $fullClass
+     * @return bool
+     */
+    public function isModuleSingleton($fullClass)
+    {
+        if ($fullClass == $this->getAppModuleClass()) {
+            return true;
+        }
+
+        $fullClass = fs::normalize($fullClass);
+
+        $metaFile = $this->project->getSrcFile("$fullClass.module");
+
+        if ($metaFile->isFile()) {
+            if ($meta = Json::fromFile($metaFile)) {
+                return (bool) $meta['props']['singleton'];
             }
-        } */
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAppModuleClass()
+    {
+        return "{$this->project->getPackageName()}\\modules\\AppModule";
+    }
+
+    /**
+     * @return array
+     */
+    public function getModuleClasses()
+    {
+        $files = $this->getModuleFiles();
+
+        $classes = [];
+
+        foreach ($files as $file) {
+            $item = FileUtils::relativePath($this->project->getFile('src'), $file);
+            $classes[] = str::replace(fs::pathNoExt($item), '/', '\\');
+        }
+
+        return $classes;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getModuleFiles()
+    {
+        return Ide::get()->getFilesOfFormat(ScriptModuleFormat::class, $this->getModuleDirectory());
     }
 
     public function doSave()
@@ -473,13 +462,25 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doOpen()
     {
-        /*$tree = $this->project->getTree();
+        $tree = $this->project->getTree();
+        $tree->addIgnoreExtensions([
+            'behaviour', 'axml', 'module', 'fxml'
+        ]);
+        $tree->addIgnorePaths([
+            'application.pid', 'build.gradle', 'settings.gradle', 'build.xml',
+            'src/.forms', 'src/.scripts', 'src/.system', 'src/.debug', 'src/JPHP-INF', "src/.theme"
+        ]);
 
-        $tree->register(new FormProjectTreeNavigation(self::FORMS_DIRECTORY));
-        $tree->register(new ModuleProjectTreeNavigation(self::SCRIPTS_DIRECTORY));
-        $tree->register(new SpriteProjectTreeNavigation(self::GAME_DIRECTORY . '/sprites'));
+        $tree->addIgnoreFilter(function ($file) {
+            if (fs::ext($file) == 'conf') {
+                if (fs::isFile(fs::pathNoExt($file) . '.fxml')) {
+                    return true;
+                }
+            }
 
-        $tree->getRoot()->root->children->add( $tree->createItemForFile($this->project->getFile('src/.theme/style.css'))->getOrigin() );  */
+            return false;
+        });
+
 
         /** @var GradleProjectBehaviour $gradleBehavior */
         $gradleBehavior = $this->project->getBehaviour(GradleProjectBehaviour::class);
@@ -492,7 +493,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $buildConfig->setDefine('jar.archiveName', '"dn-compiled-module.jar"');
 
-        $this->updateScriptManager();
         $this->updateSpriteManager();
 
         try {
@@ -582,16 +582,19 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             });
         }
 
+        $moduleClasses = [];
+
+        foreach ($this->getModuleClasses() as $class) {
+            if ($this->isModuleSingleton($class)) {
+                $moduleClasses[] = $class;
+            }
+        }
+
+        $code .= "\n\$app->loadModules(" . var_export($moduleClasses, true) . ');';
+
         $template->setInnerCode($code);
 
         $this->project->defineFile('src/JPHP-INF/.bootstrap', $template, true);
-
-    }
-
-    public function updateScriptManager()
-    {
-        $this->scriptComponentManager->removeAll();
-        $this->scriptComponentManager->updateByPath($this->project->getFile(self::SCRIPTS_DIRECTORY));
     }
 
     public function updateSpriteManager()
@@ -599,83 +602,19 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->spriteManager->reloadAll();
     }
 
-    public function recoveryModule($filename)
-    {
-        $file = $this->project->getAbsoluteFile($filename);
-
-        $sources = $file->findLinkByExtension('php');
-
-        $rel = FileUtils::relativePath($this->project->getFile(self::SCRIPTS_DIRECTORY), $filename);
-        $rel = Str::replace($rel, '\\', '/');
-
-        if (!$sources) {
-            $sources = $this->project->getFile("src/app/modules/$rel.php");
-            $file->addLink($sources);
-        }
-
-        if (!$sources->exists()) {
-            $this->createModule($rel);
-        }
-    }
-
-    public function recoveryForm($filename)
-    {
-        $name = Str::sub($filename, 0, Str::length($filename) - 5);
-
-        $form = $this->project->getAbsoluteFile($filename);
-        $conf = $this->project->getAbsoluteFile($name . ".conf");
-
-        $sources = $form->findLinkByExtension('php');
-
-        $rel = FileUtils::relativePath($this->project->getFile(self::FORMS_DIRECTORY), $filename);
-        $rel = Str::sub($rel, 0, Str::length($rel) - 5);
-        $rel = Str::replace($rel, '\\', '/');
-
-        if (!$sources) {
-            $sources = $this->project->getFile("src/app/forms/$rel.php");
-            $form->addLink($sources);
-        }
-
-        if (!$sources->exists()) {
-            Logger::warn("Source file of the '$rel' form not found - $sources, will be create ...");
-            $this->createForm($rel);
-        }
-
-        if (!$form->findLinkByExtension('conf')) {
-            $form->addLink($conf);
-        }
-    }
-
-    public function makeForm($name)
-    {
-        $form = $this->project->getFile("src/.forms/$name.fxml");
-        $conf = $this->project->getFile("src/.forms/$name.conf");
-
-        $sources = $this->project->getFile("src/app/forms/$name.php");
-
-        if ($sources->exists() && !$form->findLinkByExtension('php')) {
-            $form->addLink($sources);
-        }
-
-        if (!$form->findLinkByExtension('conf')) {
-            $form->addLink($conf);
-        }
-
-        return $form;
-    }
-
     public function hasModule($name)
     {
-        return $this->project->getFile("src/.scripts/$name")->isDirectory();
+        return $this->project->getFile("src/{$this->project->getPackageName()}/modules/$name.php")->isFile();
     }
 
     /**
      * @param $name
+     * @param bool $cache
      * @return ScriptModuleEditor|null
      */
-    public function getModuleEditor($name)
+    public function getModuleEditor($name, $cache = false)
     {
-        return FileSystem::fetchEditor($this->project->getFile(self::SCRIPTS_DIRECTORY . '/' . $name));
+        return FileSystem::fetchEditor($this->project->getFile("src/{$this->project->getPackageName()}/modules/$name.php"), $cache);
     }
 
     public function createModule($name)
@@ -687,10 +626,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         Logger::info("Creating module '$name' ...");
 
-        $this->project->makeDirectory("src/.scripts/$name");
-
-        $file = $this->project->getFile("src/.scripts/$name");
-
         $template = new PhpClassFileTemplate($name, 'AbstractModule');
         $template->setNamespace("{$this->project->getPackageName()}\\modules");
 
@@ -698,16 +633,15 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             'std, gui, framework'
         ]);
 
-        $sources = $file->findLinkByExtension('php');
+        $file = $this->project->createFile("src/{$this->project->getPackageName()}/modules/$name.php", $template);
 
-        if (!$sources) {
-            $sources = $this->project->createFile("src/{$this->project->getPackageName()}/modules/$name.php", $template);
-            $file->addLink($sources);
-        } else {
-            if (!$sources->exists()) {
-                $sources->applyTemplate($template);
-                $sources->updateTemplate(true);
-            }
+        Json::toFile(
+            $this->project->getFile("src/{$this->project->getPackageName()}/modules/$name.module"), ['props' => [], 'components' => []]
+        );
+
+        if (!$file->exists()) {
+            $file->applyTemplate($template);
+            $file->updateTemplate(true);
         }
 
         Logger::info("Finish creating module '$name'");
@@ -721,8 +655,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     public function getModuleEditors()
     {
         $editors = [];
-        foreach ($this->getScriptModules() as $file) {
-            $editor = FileSystem::fetchEditor($this->project->getFile(self::SCRIPTS_DIRECTORY . '/' . $file), true);
+
+        foreach ($this->getModuleFiles() as $file) {
+            $editor = FileSystem::fetchEditor($file, true);
             $editors[FileUtils::hashName($file)] = $editor;
         }
 
@@ -750,44 +685,34 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         return $editors;
     }
 
+    public function getFormDirectory()
+    {
+        return $this->project->getFile("src/{$this->project->getPackageName()}/forms");
+    }
+
+    public function getFormFiles()
+    {
+        return Ide::get()->getFilesOfFormat(GuiFormFormat::class, $this->getFormDirectory());
+    }
+
     /**
      * @return FormEditor[]
      */
     public function getFormEditors()
     {
-        $formDir = $this->project->getFile(self::FORMS_DIRECTORY);
-
         $editors = [];
 
-        FileUtils::scan($formDir, function ($filename) use (&$editors) {
-            if (fs::ext($filename) == "fxml") {
-                $editor = FileSystem::fetchEditor($filename, true);
+        foreach ($this->getFormFiles() as $filename) {
+            $editor = FileSystem::fetchEditor($filename, true);
 
-                if ($editor) {
-                    $editors[FileUtils::hashName($filename)] = $editor;
+            if ($editor) {
+                if (!($editor instanceof FormEditor)) {
+                    throw new IdeException("Invalid format for -> $filename");
                 }
-            }
-        });
-
-        return $editors;
-    }
-
-    /**
-     * @return FactoryEditor[]
-     */
-    public function getFactoryEditors()
-    {
-        $formDir = $this->project->getFile(self::FACTORY_DIRECTORY);
-
-        $editors = [];
-
-        FileUtils::scan($formDir, function ($filename) use (&$editors) {
-            if (FileUtils::getExtension($filename) == "factory") {
-                $editor = FileSystem::fetchEditor($filename);
 
                 $editors[FileUtils::hashName($filename)] = $editor;
             }
-        });
+        }
 
         return $editors;
     }
@@ -826,7 +751,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function hasForm($name)
     {
-        return $this->project->getFile("src/.forms/$name.fxml")->isFile();
+        return $this->project->getFile("src/{$this->project->getPackageName()}/forms/$name.php")->isFile();
     }
 
     /**
@@ -835,7 +760,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
      */
     public function getFormEditor($name)
     {
-        return $this->hasForm($name) ? FileSystem::fetchEditor($this->project->getFile("src/.forms/$name.fxml"), true) : null;
+        return $this->hasForm($name) ?
+            FileSystem::fetchEditor($this->project->getFile("src/{$this->project->getPackageName()}/forms/$name.php"), true)
+            : null;
     }
 
     public function createForm($name)
@@ -847,7 +774,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         Logger::info("Creating form '$name' ...");
 
-        $form = $this->project->createFile("src/.forms/$name.fxml", new GuiFormFileTemplate());
+        $this->project->createFile("src/{$this->project->getPackageName()}/forms/$name.fxml", new GuiFormFileTemplate());
 
         $template = new PhpClassFileTemplate($name, 'AbstractForm');
         $template->setNamespace("{$this->project->getPackageName()}\\forms");
@@ -855,30 +782,13 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             'std, gui, framework'
         ]);
 
-        $sources = $form->findLinkByExtension('php');
-
-        if (!$sources) {
-            $sources = $this->project->createFile("src/{$this->project->getPackageName()}/forms/$name.php", $template);
-            $form->addLink($sources);
-        } else {
-            if (!$sources->exists()) {
-                $sources->applyTemplate($template);
-                $sources->updateTemplate(true);
-            }
-        }
-
-        $conf = $form->findLinkByExtension('conf');
-
-        if (!$conf) {
-            $conf = $this->project->getFile("src/.forms/$name.conf");
-            $form->addLink($conf);
-        }
-
-        $conf->setHiddenInTree(true);
+        $sources = $this->project->createFile("src/{$this->project->getPackageName()}/forms/$name.php", $template);
+        $sources->applyTemplate($template);
+        $sources->updateTemplate(true);
 
         Logger::info("Finish creating form '$name'");
 
-        return $form;
+        return $sources;
     }
 
     /**
@@ -985,20 +895,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->makeDirectory('src/');
         $this->project->makeDirectory('src/.data');
         $this->project->makeDirectory('src/.data/img');
-        $this->project->makeDirectory('src/.forms');
         $this->project->makeDirectory('src/.system');
-        $this->project->makeDirectory('src/.scripts');
-        $this->project->makeDirectory('src/.scripts/AppModule');
         $this->project->makeDirectory('src/JPHP-INF');
 
-        $this->project->makeDirectory('src/app');
+        $this->project->makeDirectory("src/{$this->project->getPackageName()}");
+        $this->project->makeDirectory("src/{$this->project->getPackageName()}/forms");
+        $this->project->makeDirectory("src/{$this->project->getPackageName()}/modules");
 
-        $this->project->makeDirectory('src/app/forms');
-
-        $formsPath = $this->project->getFile('src/app/forms');
-        $formsPath->setHiddenInTree(true);
-
-        try {
+        /*try {
             $modules = Json::fromFile($this->project->getFile("src/.system/modules.json"));
 
             foreach ((array)$modules["modules"] as $module) {
@@ -1007,26 +911,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             }
         } catch (IOException $e) {
             ;
-        }
-
-        $this->project->getFile(self::FORMS_DIRECTORY)->scan(function ($name, File $file) {
-            if ($file->isFile() && Str::endsWith($name, '.fxml')) {
-                $this->recoveryForm($file);
-            }
-        });
-
-        $this->project->getFile('src/.scripts')->scan(function ($name, File $file) {
-            if ($file->isDirectory()) {
-                $this->recoveryModule($file);
-            }
-        });
-    }
-
-    /**
-     * @return ScriptComponentManager
-     */
-    public function getScriptComponentManager()
-    {
-        return $this->scriptComponentManager;
+        }*/
     }
 }

@@ -5,6 +5,7 @@ use php\gui\layout\UXAnchorPane;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\io\Stream;
+use php\lib\reflect;
 use php\lib\str;
 
 /**
@@ -58,7 +59,7 @@ abstract class AbstractFormArea extends UXAnchorPane
     protected function loadDesign()
     {
         $loader = new UXLoader();
-        $ui = $loader->load(Stream::of(AbstractForm::DEFAULT_PATH . 'blocks/_' . $this->getResourceName() . '.fxml'));
+        $ui = $loader->load(Stream::of($this->getResourcePath() . '.fxml'));
 
         UXAnchorPane::setAnchor($ui, 0);
         UXAnchorPane::setAnchor($this, 0);
@@ -68,23 +69,9 @@ abstract class AbstractFormArea extends UXAnchorPane
         return $ui;
     }
 
-    protected function getResourceName()
+    protected function getResourcePath()
     {
-        $class = get_class($this);
-
-        if (app()->getNamespace()) {
-            $class = str::replace($class, app()->getNamespace(), '');
-
-            if (str::startsWith($class, '\\')) {
-                $class = str::sub($class, 1);
-            }
-
-            if (Str::startsWith($class, 'forms\\area\\')) {
-                $class = Str::sub($class, 11);
-            }
-        }
-
-        return str::replace($class, '\\', '/');
+        return 'res://' . str::replace(reflect::typeOf($this), '\\', '/');
     }
 
     /**

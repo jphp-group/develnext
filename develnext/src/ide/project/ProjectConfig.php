@@ -1,5 +1,6 @@
 <?php
 namespace ide\project;
+
 use Exception;
 use ide\Ide;
 use ide\Logger;
@@ -68,7 +69,7 @@ class ProjectConfig
         $this->configPath = $configPath = "$rootDir/$projectName.dnproject";
 
         $this->reload();
-        $this->update();
+        $this->update(true);
     }
 
     /**
@@ -91,6 +92,8 @@ class ProjectConfig
 
     public function save()
     {
+        $this->update();
+
         $parentFile = File::of($this->configPath)->getParentFile();
 
         if ($parentFile) {
@@ -231,6 +234,14 @@ class ProjectConfig
     }
 
     /**
+     * @return int
+     */
+    public function getIdeVersionHash()
+    {
+        return (int)$this->getProperty('ideVersionHash');
+    }
+
+    /**
      * @return string
      */
     public function getIdeName()
@@ -268,11 +279,61 @@ class ProjectConfig
             $domFiles->removeChild($domFile);
         }
 
-        foreach ($files as $file) {
+        /*foreach ($files as $file) {
             $domFile = $this->document->createElement('file');
             $file->serialize($domFile, $this->document);
 
             $domFiles->appendChild($domFile);
+        }*/
+    }
+
+    public function loadTreeState(ProjectTree $tree)
+    {
+        if ($this->document->find('/project/tree')) {
+            $paths = [];
+
+            /** @var DomElement $domOne */
+            foreach ($this->document->findAll('/project/tree/expanded/path') as $domOne) {
+                $path = $domOne->getAttribute('src');
+                $paths[$path] = $path;
+            }
+
+            $tree->setExpandedPaths($paths);
+        }
+    }
+
+    /**
+     * @param ProjectTree|array $treeOrPaths
+     */
+    public function setTreeState($treeOrPaths)
+    {
+        $domTree = $this->document->find('/project/tree');
+
+        if (!$domTree) {
+            $domTree = $this->document->createElement('tree');
+            $this->document->find('/project')->appendChild($domTree);
+        }
+
+        $domExpanded = $domTree->find('expanded');
+
+        if (!$domExpanded) {
+            $domExpanded = $this->document->createElement('expanded');
+            $domTree->appendChild($domExpanded);
+        }
+
+        foreach ($domExpanded->findAll('path') as $domOne) {
+            $domExpanded->removeChild($domOne);
+        }
+
+        $paths = $treeOrPaths;
+
+        if ($treeOrPaths instanceof ProjectTree) {
+            $paths = $treeOrPaths->getExpandedPaths();
+        }
+
+        foreach ((array)$paths as $path) {
+            $domPath = $this->document->createElement('path', ['@src' => $path]);
+            $domExpanded->appendChild($domPath);
         }
     }
 
@@ -337,10 +398,10 @@ class ProjectConfig
         $files = [];
 
         /** @var DomElement $domFile */
-        foreach ($this->document->findAll('/project/files/file') as $domFile) {
+        /*foreach ($this->document->findAll('/project/files/file') as $domFile) {
             $projectFile = ProjectFile::unserialize($project, $domFile);
             $files[$projectFile->getNameHash()] = $projectFile;
-        }
+        }    */
 
         return $files;
     }
@@ -409,11 +470,9 @@ class ProjectConfig
         return $behaviours;
     }
 
-    protected function update()
+    protected function update($onlyNew = false)
     {
         $project = $this->document->find('/project');
-
-        $isNew = false;
 
         if (!$project) {
             $project = $this->document->createElement('project');
@@ -423,17 +482,13 @@ class ProjectConfig
             $project->setAttribute('authorOS', System::getProperty('os.name'));
 
             $project->setAttribute('createdAt', Time::millis());
-
-            $isNew = true;
         }
 
-        $project->setAttribute('ideVersion', Ide::get()->getVersion());
-        $project->setAttribute('ideVersionHash', Ide::get()->getConfig()->get('app.hash'));
-        $project->setAttribute('ideName', Ide::get()->getName());
-        $project->setAttribute('updatedAt', Time::millis());
-
-        if ($isNew) {
-            $this->save();
+        if (!$onlyNew) {
+            $project->setAttribute('ideVersion', Ide::get()->getVersion());
+            $project->setAttribute('ideVersionHash', Ide::get()->getConfig()->get('app.hash'));
+            $project->setAttribute('ideName', Ide::get()->getName());
+            $project->setAttribute('updatedAt', Time::millis());
         }
     }
 
@@ -458,6 +513,5 @@ class ProjectConfig
         $domProject->setAttribute('name', $project->getName());
         $domProject->setAttribute('template', get_class($project->getTemplate()));
         $domProject->setAttribute('packageName', $project->getPackageName());
-
     }
 }

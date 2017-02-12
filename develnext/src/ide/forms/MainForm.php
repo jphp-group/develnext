@@ -72,7 +72,7 @@ class MainForm extends AbstractIdeForm
     public $mainMenu;
 
 
-    private $contentSplitPaneRight;
+    private $contentSplitPaneSm;
 
     /**
      * MainForm constructor.
@@ -92,7 +92,7 @@ class MainForm extends AbstractIdeForm
             throw new IdeException("Cannot find main menu on main form");
         }
 
-        $this->contentSplitPaneRight = $this->contentSplitPane->items[1];
+        $this->contentSplitPaneSm = $this->contentSplitPane->items[0];
     }
 
     /**
@@ -182,12 +182,16 @@ class MainForm extends AbstractIdeForm
         UXAnchorPane::setAnchor($tree, 0);
 
         Ide::get()->bind('openProject', function () use ($tree) {
-            Ide::project()->getTree()->setView($tree);
-            $tree->treeSource = Ide::project()->getTree()->createSource();
+            $project = Ide::project();
+            $project->getTree()->setView($tree);
+
+            $tree->treeSource = $project->getTree()->createSource();
+
             $tree->root->expanded = true;
+            $project->getConfig()->loadTreeState($project->getTree());
         });
 
-        Ide::get()->bind('closeProject', function () use ($tree) {
+        Ide::get()->bind('afterCloseProject', function () use ($tree) {
             $tree->treeSource->shutdown();
             $tree->treeSource = null;
         });
@@ -231,17 +235,17 @@ class MainForm extends AbstractIdeForm
     public function setLeftPane($pane)
     {
         if ($pane) {
-            if ($this->contentSplitPane->items->last() !== $this->contentSplitPaneRight) {
-                $this->contentSplitPane->items->insert(1, $this->contentSplitPaneRight);
+            if ($this->contentSplitPane->items[0] !== $this->contentSplitPaneSm) {
+                $this->contentSplitPane->items->insert(0, $this->contentSplitPaneSm);
 
                 $this->contentSplitPane->dividerPositions = $this->contentSplitPaneDividerPositions;
             }
 
             $this->clearLeftPane();
         } else {
-            if ($this->contentSplitPane->items->last() === $this->contentSplitPaneRight) {
+            if ($this->contentSplitPane->items[0] === $this->contentSplitPaneSm) {
                 $this->contentSplitPaneDividerPositions = $this->contentSplitPane->dividerPositions;
-                $this->contentSplitPane->items->removeByIndex(1);
+                $this->contentSplitPane->items->removeByIndex(0);
             }
         }
 

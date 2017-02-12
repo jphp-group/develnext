@@ -1,14 +1,18 @@
 <?php
 namespace php\gui\framework;
 use Error;
+use php\format\JsonProcessor;
 use php\framework\Logger;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;
 use php\gui\framework\behaviour\custom\ModuleBehaviourManager;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
+use php\io\IOException;
+use php\io\Stream;
 use php\lang\IllegalStateException;
 use php\lib\Items;
+use php\lib\reflect;
 use php\lib\Str;
 use php\util\Scanner;
 use ReflectionClass;
@@ -29,37 +33,22 @@ abstract class AbstractModule extends AbstractScript
     /**
      * @var ModuleBehaviourManager
      */
-    protected $behaviourManager;
+    private $__behaviourManager;
 
     /**
-     * @var bool
+     * @var AbstractScript[]
      */
-    public $applyToApplication = false;
+    private $__scripts = [];
+
+    /**
+     * @var AbstractModule
+     */
+    private $__modules = [];
 
     /**
      * @var bool
      */
     public $singleton = false;
-
-    /**
-     * @var string
-     */
-    public $author = '';
-
-    /**
-     * @var string
-     */
-    public $version = '1.0';
-
-    /**
-     * @var string
-     */
-    public $description = '';
-
-    /**
-     * @var ScriptManager
-     */
-    protected $scriptManager;
 
     /**
      * AbstractModule constructor.
@@ -68,39 +57,75 @@ abstract class AbstractModule extends AbstractScript
      */
     public function __construct($mock = false)
     {
+        $this->id = (new ReflectionClass($this))->getShortName();
         $this->_enabledGetters = $this->_enabledSetters = false;
 
-        $this->scriptManager = new ScriptManager();
-
-        $path = $name = Str::replace(get_class($this), '\\', '/');
-
-        $reflection = new ReflectionClass($this);
-        $this->id = $reflection->getShortName();
-
-        $json = $this->scriptManager->addFromIndex(
-            "res://$path.json",
-            'res://.scripts/' . $this->id . '/', !$mock
-        );
-
-        if ($json && is_array($json['properties'])) {
-            foreach ((array)$json['properties'] as $key => $value) {
-                $this->{$key} = $value;
-            }
-        }
+        $this->loadModule();
 
         if (!$mock) {
             $this->loadBinds($this);
 
-            $this->behaviourManager = new ModuleBehaviourManager($this);
-            BehaviourLoader::load("res://$name.behaviour", $this->behaviourManager);
+            $this->__behaviourManager = new ModuleBehaviourManager($this);
+            BehaviourLoader::load("{$this->getResourcePath()}.behaviour", $this->__behaviourManager);
 
             Logger::debug("Module '$this->id' is created.");
         }
     }
 
+    private function loadModule()
+    {
+        $this->__scripts = [];
+
+        $json = new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS);
+
+        $stream = Stream::of($this->getResourcePath() . '.module');
+        try {
+            $module = $json->parse($stream);
+
+            if ($module) {
+                if (is_array($module['props'])) {
+                    foreach ((array)$module['props'] as $key => $value) {
+                        $this->{$key} = $value;
+                    }
+                }
+
+                if (is_array($module['components'])) {
+                    foreach ((array) $module['components'] as $id => $meta) {
+                        $meta = (array) $meta;
+
+                        $type = $meta['type'];
+
+                        if ($type) {
+                            /** @var AbstractScript $script */
+                            $script = new $type();
+                            $script->id = $id;
+                            $this->loadScript($script, $meta);
+
+                            $this->__scripts[$id] = $script;
+                        }
+                    }
+                }
+            }
+        } finally {
+            $stream->close();
+        }
+    }
+
+    protected function loadScript(AbstractScript $script, array $meta)
+    {
+        foreach ((array) $meta['props'] as $key => $value) {
+            $script->{$key} = $value;
+        }
+    }
+
+    protected function getResourcePath()
+    {
+        return 'res://' . str::replace(reflect::typeOf($this), '\\', '/');
+    }
+
     public function behaviour($target, $class)
     {
-        return $this->behaviourManager->getBehaviour($target, $class);
+        return $this->__behaviourManager->getBehaviour($target, $class);
     }
 
     /**
@@ -110,37 +135,8 @@ abstract class AbstractModule extends AbstractScript
      */
     public function loadBinds($handler)
     {
-        $class = new ReflectionClass($handler);
-        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
-
-        $events = [];
-
         $eventBinder = new EventBinder($this, $handler);
         $eventBinder->load();
-
-        /*foreach ($methods as $method) {
-            $comment = $method->getDocComment();
-
-            $scanner = new Scanner($comment);
-
-            while ($scanner->hasNextLine()) {
-                $line = Str::trim($scanner->nextLine());
-
-                if (Str::startsWith($line, '@event ')) {
-                    $event = Str::trim(Str::sub($line, 7));
-
-                    if (isset($events[$event])) {
-                        throw new IllegalStateException(
-                            "Unable to bind '$event' for {$method->getName()}(), this event already bound for {$events[$event]}()"
-                        );
-                    }
-
-                    $methodName = $events[$event] = $method->getName();
-
-                    $this->bind($event, [$handler, $methodName]);
-                }
-            }
-        }*/
     }
 
     public function bind($event, callable $handler, $group = 'general')
@@ -151,7 +147,7 @@ abstract class AbstractModule extends AbstractScript
 
         if ($parts) {
             $id = Str::join($parts, '.');
-            $script = $this->scriptManager->{$id};
+            $script = $this->__scripts[$id];
         } else {
             $script = $this;
         }
@@ -169,7 +165,7 @@ abstract class AbstractModule extends AbstractScript
      */
     protected function applyImpl($target)
     {
-        foreach ($this->scriptManager->getScripts() as $script) {
+        foreach ($this->__scripts as $script) {
             $script->_owner = $this;
 
             if (!$script->disabled) {
@@ -190,19 +186,20 @@ abstract class AbstractModule extends AbstractScript
         return $this->_context instanceof AbstractForm ? $this->_context->getName() : null;
     }
 
+    /**
+     * @deprecated
+     * @param $name
+     * @return AbstractScript
+     */
     public function getScript($name)
     {
-        if (isset($this->scriptManager->{$name})) {
-            return $this->scriptManager->{$name};
-        }
-
-        return null;
+        return $this->__scripts[$name];
     }
 
     public function __get($name)
     {
-        if (isset($this->scriptManager->{$name})) {
-            return $this->scriptManager->{$name};
+        if (isset($this->__scripts[$name])) {
+            return $this->__scripts[$name];
         }
 
         return parent::__get($name);
@@ -210,7 +207,7 @@ abstract class AbstractModule extends AbstractScript
 
     public function __isset($name)
     {
-        return isset($this->scriptManager->{$name}) || parent::__isset($name);
+        return isset($this->__scripts[$name]) || parent::__isset($name);
     }
 
     public function __call($name, array $args)
@@ -236,7 +233,7 @@ abstract class AbstractModule extends AbstractScript
     {
         parent::free();
 
-        foreach ($this->scriptManager->getScripts() as $script) {
+        foreach ($this->__scripts as $script) {
             $script->free();
         }
 

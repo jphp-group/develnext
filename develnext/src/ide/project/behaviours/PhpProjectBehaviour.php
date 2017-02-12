@@ -39,7 +39,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     const OPT_COMPILE_BYTE_CODE = 'compileByteCode';
     const OPT_IMPORT_TYPE_CODE = 'importType';
 
-    const SOURCES_DIRECTORY = 'src/app';
     const GENERATED_DIRECTORY = 'src_generated';
 
     private static $importTypes = [
@@ -118,6 +117,11 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         return $this->getIdeConfigValue(self::OPT_IMPORT_TYPE_CODE, 'simple');
     }
 
+    public function setImportType($value)
+    {
+        $this->setIdeConfigValue(self::OPT_IMPORT_TYPE_CODE, $value);
+    }
+
     protected function refreshInspector()
     {
         if ($this->inspector) {
@@ -144,6 +148,16 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
     public function doOpen()
     {
+        $tree = $this->project->getTree();
+        $tree->addIgnoreExtensions([
+            'source', 'sourcemap'
+        ]);
+
+        $tree->addIgnorePaths([
+            self::GENERATED_DIRECTORY
+        ]);
+
+
         $this->project->eachSrcFile(function (ProjectFile $file) {
             if (str::endsWith($file, '.php.source')) {
                 FileUtils::copyFile($file, fs::pathNoExt($file));
@@ -169,7 +183,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     {
         if ($this->uiSettings) {
             $this->setIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, $this->uiByteCodeCheckbox->selected);
-            $this->setIdeConfigValue(self::OPT_IMPORT_TYPE_CODE, arr::keys(static::$importTypes)[$this->uiImportTypesSelect->selectedIndex]);
+            $this->setImportType(arr::keys(static::$importTypes)[$this->uiImportTypesSelect->selectedIndex]);
         }
 
         $this->refreshInspector();
@@ -197,7 +211,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
         FileUtils::put($this->project->getIdeCacheFile('bytecode/.cacheignore'), str::join($cacheIgnore, "\n"));
 
-        fs::scan($this->project->getFile(self::SOURCES_DIRECTORY), function ($filename) {
+        fs::scan($this->project->getSrcFile($this->project->getPackageName()), function ($filename) {
             if (fs::ext($filename) == 'phb') {
                 fs::delete($filename);
             }

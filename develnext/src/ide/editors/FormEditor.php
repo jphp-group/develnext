@@ -123,6 +123,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     /**
      * @var string
      */
+    protected $fxmlFile;
+
+    /**
+     * @var string
+     */
     protected $configFile;
 
     /**
@@ -249,40 +254,25 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->config = new Configuration();
         $this->formDumper = $dumper;
 
-        $phpFile = $file;
-        $confFile = $file;
+        $fxmlFile = fs::pathNoExt($file) . ".fxml";
+        $confFile = fs::pathNoExt($file) . ".conf";
 
-        if (Str::endsWith($phpFile, '.fxml')) {
-            $this->factory = new IdeFormFactory(fs::nameNoExt($file), $this->file);
-
-            $phpFile = Str::sub($phpFile, 0, Str::length($phpFile) - 5);
-            $confFile = $phpFile;
+        if (fs::isFile($fxmlFile)) {
+            $this->factory = new IdeFormFactory(fs::nameNoExt($file), $fxmlFile);
         }
 
-        $phpFile .= '.php';
-        $confFile .= '.conf';
+        $this->eventManager = new SourceEventManager($file);
 
-        if ($file instanceof ProjectFile) {
-            if ($link = $file->findLinkByExtension('php')) {
-                $phpFile = $link;
-            }
-
-            if ($link = $file->findLinkByExtension('conf')) {
-                $confFile = $link;
-            }
-        }
-
-        $this->eventManager = new SourceEventManager($phpFile);
-
-        $this->codeFile = $phpFile;
+        $this->codeFile = $file;
         $this->configFile = $confFile;
+        $this->fxmlFile = $fxmlFile;
 
         $this->initCodeEditor($this->codeFile);
 
-        $this->actionEditor = new ActionEditor($phpFile . '.axml');
+        $this->actionEditor = new ActionEditor($file . '.axml');
         $this->actionEditor->setFormEditor($this);
 
-        $this->behaviourManager = new IdeBehaviourManager(fs::pathNoExt($phpFile) . '.behaviour', function ($targetId, $has = false) {
+        $this->behaviourManager = new IdeBehaviourManager(fs::pathNoExt($file) . '.behaviour', function ($targetId, $has = false) {
             $node = $targetId ? $this->layout->lookup("#$targetId") : $this;
 
             if (!$node) {
@@ -363,10 +353,18 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     public function getTooltip()
     {
         $tooltip = new UXTooltip();
-        $tooltip->text = (new File($this->file))->getPath();
+        $tooltip->text = fs::normalize($this->getFile());
         UiUtils::setWatchingFocusable($tooltip);
 
         return $tooltip;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFxmlFile()
+    {
+        return $this->fxmlFile;
     }
 
     /**
@@ -1395,9 +1393,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         foreach ($modules as $module) {
             $module = Str::trim($module);
-            $this->modules[$module] = FileSystem::fetchEditor(
-                Ide::get()->getOpenedProject()->getFile(GuiFrameworkProjectBehaviour::SCRIPTS_DIRECTORY . "/$module"), true
-            );
+
+            if ($gui = GuiFrameworkProjectBehaviour::get()) {
+                $this->modules[$module] = $gui->getModuleEditor($module, true);
+            }
         }
 
         return $this->modules;
@@ -1697,9 +1696,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $wrap = new UXVBox([$actions, $this->viewerAndEvents]);
             UXVBox::setVgrow($this->viewerAndEvents, 'ALWAYS');
 
-            $split = new UXSplitPane([$scrollPane, $wrap]);
+            $split = new UXSplitPane([$wrap, $scrollPane]);
         } else {
-            $split = new UXSplitPane([$scrollPane, $this->viewerAndEvents]);
+            $split = new UXSplitPane([$this->viewerAndEvents, $scrollPane]);
         }
 
         $this->makeContextMenu();

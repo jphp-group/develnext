@@ -230,6 +230,11 @@ class FileSystem
         return null;
     }
 
+    /**
+     * @param $path
+     * @param bool $cache
+     * @return AbstractEditor|null
+     */
     static function fetchEditor($path, $cache = false)
     {
         $hash = FileUtils::hashName($path);

@@ -5,12 +5,14 @@ use ide\commands\CreateScriptModuleProjectCommand;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\utils\FileUtils;
 use php\gui\framework\AbstractForm;
 use php\gui\UXButton;
 use php\gui\UXCheckbox;
 use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\gui\UXTextArea;
+use php\lib\fs;
 use php\lib\Items;
 use php\util\Flow;
 
@@ -55,17 +57,19 @@ class ModuleListEditorForm extends AbstractIdeForm
         if ($project) {
             /** @var GuiFrameworkProjectBehaviour $gui */
             $gui = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
-            $modules = $gui->getScriptModules();
+            $classes = $gui->getModuleClasses();
 
-            foreach ($modules as $item) {
-                if ($item == 'AppModule') {
+            foreach ($classes as $class) {
+                if ($class == $gui->getAppModuleClass()) {
                     continue;
                 }
 
-                $checkbox = new UXCheckbox($item);
-                $checkbox->selected = $values[$item];
+                $class = $gui->getModuleShortClass($class);
 
-                $this->checkboxes[$item] = $checkbox;
+                $checkbox = new UXCheckbox($class);
+                $checkbox->selected = $values[$class];
+
+                $this->checkboxes[$class] = $checkbox;
                 $this->list->items->add($checkbox);
             }
         }

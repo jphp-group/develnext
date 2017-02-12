@@ -1,6 +1,7 @@
 package org.develnext.jphp.gui.designer.editor.tree;
 
 import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.util.StringConverter;
 
@@ -30,8 +31,10 @@ public class DirectoryTreeCell extends TextFieldTreeCell<DirectoryTreeValue> {
         if (empty) {
             setText(null);
             setGraphic(null);
+            setTooltip(null);
         } else {
             setText(item.getText());
+            setTooltip(new Tooltip(item.getText()));
 
             Node icon = item.getIcon();
 

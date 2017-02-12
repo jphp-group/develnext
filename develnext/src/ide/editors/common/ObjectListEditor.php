@@ -337,7 +337,7 @@ class ObjectListEditor
                     $this->addItem(new ObjectListEditorItem('[Модули]', null, ''));
 
                     foreach ($moduleEditors as $module => $moduleEditor) {
-                        $nodes = $moduleEditor->getManager()->getComponents();
+                        $nodes = $moduleEditor->getComponents();
 
                         if ($nodes) {
                             $this->addItem(new ObjectListEditorItem(

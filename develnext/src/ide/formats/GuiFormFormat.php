@@ -38,8 +38,6 @@ class GuiFormFormat extends AbstractFormFormat
 
     function __construct()
     {
-        $this->requireFormat(new PhpCodeFormat());
-
         // Context Menu.
         $this->register(new SelectAllMenuCommand());
         $this->register(new CutMenuCommand());
@@ -115,14 +113,12 @@ class GuiFormFormat extends AbstractFormFormat
 
         $parent = File::of($path)->getParent();
 
-        $path = $parent . '/../app/forms/';
-
         fs::delete("$parent/$name.conf");
 
-        fs::delete("$path/$name.php");
-        fs::delete("$path/$name.php.source");
-        fs::delete("$path/$name.php.axml");
-        fs::delete("$path/$name.behaviour");
+        fs::delete("$parent/$name.php");
+        fs::delete("$parent/$name.php.source");
+        fs::delete("$parent/$name.php.axml");
+        fs::delete("$parent/$name.behaviour");
     }
 
     public function duplicate($path, $toPath)
@@ -135,8 +131,8 @@ class GuiFormFormat extends AbstractFormFormat
         $parent = File::of($path)->getParent();
         $toParent = File::of($toPath)->getParent();
 
-        $path = $parent . '/../app/forms/';
-        $toPath = $toParent . '/../app/forms/';
+        $path = $parent;// . '/../app/forms/';
+        $toPath = $toParent;// . '/../app/forms/';
 
         if (fs::isFile("$parent/$name.conf")) {
             FileUtils::copyFile("$parent/$name.conf", "$toParent/$toName.conf");
@@ -161,15 +157,6 @@ class GuiFormFormat extends AbstractFormFormat
      */
     public function createEditor($file, array $options = [])
     {
-        if ($file instanceof ProjectFile) {
-            $name = fs::nameNoExt($file);
-            $sources = $file->getProject()->getSrcFile("app/forms/$name.php");
-
-            if ($sources->exists()) {
-                $file->addLink($sources);
-            }
-        }
-
         $editor = new FormEditor($file, $this->dumper);
         return $editor;
     }
@@ -182,6 +169,7 @@ class GuiFormFormat extends AbstractFormFormat
             if ($editor instanceof FormEditor) {
                 $oldId = $editor->getNodeId($target);
                 $result = $editor->changeNodeId($target, $newId);
+                $editor->save();
 
                 if ($result == '') {
                     $gui = GuiFrameworkProjectBehaviour::get();
@@ -222,7 +210,6 @@ class GuiFormFormat extends AbstractFormFormat
     {
         return true;
     }
-
 
     public function showCreateDialog($name = '')
     {

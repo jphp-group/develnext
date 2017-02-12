@@ -55,6 +55,12 @@ class UXTreeView extends UXControl
     public $focusedItem = null;
 
     /**
+     * @readonly
+     * @var UXTreeItem[]
+     */
+    public $expandedItems = [];
+
+    /**
      * @param int $index
      * @return UXTreeItem
      */
@@ -97,6 +103,14 @@ class UXTreeView extends UXControl
      * @param UXTreeItem $item
      */
     public function scrollTo(UXTreeItem $item)
+    {
+    }
+
+    public function expandAll()
+    {
+    }
+
+    public function collapseAll()
     {
     }
 }

@@ -31,6 +31,7 @@ use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\lang\Thread;
 use php\lib\Items;
+use php\lib\reflect;
 use php\lib\Str;
 use php\util\Configuration;
 use php\util\Scanner;
@@ -392,6 +393,10 @@ abstract class AbstractForm extends UXForm
         $module = $this->_modules[$id];
 
         if (!$module) {
+            $module = $this->_modules["{$this->_app->getNamespace()}\\modules\\$id"];
+        }
+
+        if (!$module) {
             throw new Exception("Unable to find '$id' module");
         }
 
@@ -404,26 +409,7 @@ abstract class AbstractForm extends UXForm
      */
     protected function getResourcePath()
     {
-        return static::DEFAULT_PATH . $this->getResourceName();
-    }
-
-    private function getResourceName()
-    {
-        $class = get_class($this);
-
-        if ($this->_app->getNamespace()) {
-            $class = Str::replace($class, $this->_app->getNamespace(), '');
-
-            if (Str::startsWith($class, '\\')) {
-                $class = Str::sub($class, 1);
-            }
-
-            if (Str::startsWith($class, 'forms\\')) {
-                $class = Str::sub($class, 6);
-            }
-        }
-
-        return Str::replace($class, '\\', '/');
+        return 'res://' . str::replace(reflect::typeOf($this), '\\', '/');
     }
 
     protected function applyConfig()
@@ -509,19 +495,7 @@ abstract class AbstractForm extends UXForm
         $modules = $this->_config->getArray('modules', []);
 
         foreach ($modules as $type) {
-            /** @var AbstractModule $module */
-            if (!Str::contains($type, '\\') && $this->_app->getNamespace()) {
-                $type = $this->_app->getNamespace() . "\\modules\\$type";
-            }
-
-            // create mock.
-            $module = new $type(true);
-
-            if ($module->singleton) {
-                $this->_modules[$module->id] = app()->module($module->id);
-            } else {
-                $this->_modules[$module->id] = new $type();
-            }
+            $this->_modules[$type] = app()->module($type);
         }
 
         foreach ($this->_modules as $module) {

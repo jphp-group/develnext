@@ -82,7 +82,7 @@ class GuiFormDumper extends AbstractFormDumper
         $xml = $this->xml;
 
         try {
-            $document = $xml->parse(FileUtils::get($editor->getFile()));
+            $document = $xml->parse(FileUtils::get($editor->getFxmlFile()));
 
             /** @var DomElement $element */
             foreach ($document->findAll('//*[@id]') as $element) {
@@ -105,7 +105,7 @@ class GuiFormDumper extends AbstractFormDumper
             Logger::error("Unable fetchFormFile(), {$e->getMessage()}");
             return null;
         } catch (ProcessorException $e) {
-            Logger::error("Unable parse xml file {$editor->getFile()}, {$e->getMessage()}");
+            Logger::error("Unable parse xml file {$editor->getFxmlFile()}, {$e->getMessage()}");
             return null;
         }
     }
@@ -168,11 +168,11 @@ class GuiFormDumper extends AbstractFormDumper
         $stream = null;
 
         try {
-            fs::ensureParent($editor->getFile());
-            $stream = Stream::of($editor->getFile(), 'w');
+            fs::ensureParent($editor->getFxmlFile());
+            $stream = Stream::of($editor->getFxmlFile(), 'w');
             $this->processor->formatTo($document, $stream);
         } catch (IOException $e) {
-            Logger::warn("Unable to save file: {$e->getFile()}");
+            Logger::warn("Unable to save file: {$editor->getFxmlFile()}");
         } finally {
             if ($stream) $stream->close();
         }
