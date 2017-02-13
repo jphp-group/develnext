@@ -57,7 +57,6 @@ use script\TimerScript;
  * @property UXTreeView $projectTree
  * @property UXHBox $headPane
  * @property UXHBox $headRightPane
- * @property UXSplitPane $contentSplitPane
  * @property UXVBox $contentVBox
  * @property UXAnchorPane $bottomSpoiler
  * @property UXTabPane $bottomSpoilerTabPane
@@ -70,9 +69,6 @@ class MainForm extends AbstractIdeForm
      * @var UXMenuBar
      */
     public $mainMenu;
-
-
-    private $contentSplitPaneSm;
 
     /**
      * MainForm constructor.
@@ -91,8 +87,6 @@ class MainForm extends AbstractIdeForm
         if (!$this->mainMenu) {
             throw new IdeException("Cannot find main menu on main form");
         }
-
-        $this->contentSplitPaneSm = $this->contentSplitPane->items[0];
     }
 
     /**
@@ -135,6 +129,7 @@ class MainForm extends AbstractIdeForm
         $tabPane = $pane ? $pane->children[0] : new UXTabPane();
         $tabPane->id = 'fileTabPane';
         $tabPane->tabClosingPolicy = 'ALL_TABS';
+        $tabPane->classes->add('dn-file-tab-pane');
 
         // todo fix bug
         /*$tabPane->on('keyDown', $keyDown = function (UXKeyEvent $e) {
@@ -232,7 +227,7 @@ class MainForm extends AbstractIdeForm
     /**
      * @param IdeTabPane|UXNode $pane
      */
-    public function setLeftPane($pane)
+    /*public function setLeftPane($pane)
     {
         if ($pane) {
             if ($this->contentSplitPane->items[0] !== $this->contentSplitPaneSm) {
@@ -256,14 +251,14 @@ class MainForm extends AbstractIdeForm
                 $this->properties->children->add($pane);
             }
         }
-    }
+    } */
 
-    public function clearLeftPane()
+    /*public function clearLeftPane()
     {
         if ($this->properties) {
             $this->properties->children->clear();
         }
-    }
+    }*/
 
     public function show()
     {
@@ -272,8 +267,9 @@ class MainForm extends AbstractIdeForm
 
         $screen = UXScreen::getPrimary();
 
-        $this->contentSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . '.dividerPositions', $this->contentSplitPane->dividerPositions);
+        /*$this->contentSplitPane->dividerPositions = Ide::get()->getUserConfigArrayValue(get_class($this) . '.dividerPositions', $this->contentSplitPane->dividerPositions);
         $this->contentSplitPaneDividerPositions = $this->contentSplitPane->dividerPositions;
+        */
 
         $this->width  = Ide::get()->getUserConfigValue(get_class($this) . '.width', $screen->bounds['width'] * 0.75);
         $this->height = Ide::get()->getUserConfigValue(get_class($this) . '.height', $screen->bounds['height'] * 0.75);
@@ -299,9 +295,9 @@ class MainForm extends AbstractIdeForm
             Ide::get()->setUserConfigValue(get_class($this) . '.maximized', $new);
         });
 
-        $this->contentSplitPane->items[0]->observer('width')->addListener(function ($old, $new) {
+        /*$this->contentSplitPane->items[0]->observer('width')->addListener(function ($old, $new) {
             Ide::get()->setUserConfigValue(get_class($this) . '.dividerPositions', $new);
-        });
+        });*/
 
         foreach (['width', 'height', 'x', 'y'] as $prop) {
             $this->observer($prop)->addListener(function ($old, $new) use ($prop) {
@@ -313,7 +309,7 @@ class MainForm extends AbstractIdeForm
                     Ide::get()->setUserConfigValue(get_class($this) . '.' . $prop, $new);
                 }
 
-                Ide::get()->setUserConfigValue(get_class($this) . '.dividerPositions', $this->contentSplitPane->dividerPositions);
+                //Ide::get()->setUserConfigValue(get_class($this) . '.dividerPositions', $this->contentSplitPane->dividerPositions);
             });
         }
 

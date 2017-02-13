@@ -10,8 +10,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -194,6 +196,7 @@ public class UXDesignProperties extends BaseObject {
     public static class PropertyTableView extends TableView<PropertyValue> {
         protected final TableColumn nameColumn;
         protected final TableColumn valueColumn;
+
 
         public PropertyTableView() {
             super();

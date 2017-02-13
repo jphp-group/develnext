@@ -3,6 +3,7 @@ namespace ide\project\behaviours;
 
 use develnext\lexer\inspector\PHPInspector;
 use Error;
+use ide\formats\PhpCodeFormat;
 use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
@@ -110,6 +111,8 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
         $this->project->on('makeSettings', [$this, 'doMakeSettings']);
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
+
+        $this->project->registerFormat(new PhpCodeFormat());
     }
 
     public function getImportType()

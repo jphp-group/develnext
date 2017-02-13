@@ -2,6 +2,7 @@
 namespace ide\systems;
 
 use ide\editors\AbstractEditor;
+use ide\editors\form\IdeTabPane;
 use ide\editors\menu\ContextMenu;
 use ide\forms\MainForm;
 use ide\Ide;
@@ -10,10 +11,13 @@ use ide\utils\FileUtils;
 use ide\utils\Json;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
+use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXScrollPane;
 use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXContextMenu;
 use php\gui\UXDialog;
+use php\gui\UXSplitPane;
 use php\gui\UXTab;
 use php\gui\UXMenu;
 use php\gui\UXTabPane;
@@ -63,6 +67,11 @@ class FileSystem
      * @var bool
      */
     static protected $freeze = false;
+
+    /**
+     * @var array
+     */
+    static protected $editorContentDividePosition;
 
     /**
      * ..
@@ -274,8 +283,8 @@ class FileSystem
                 static::$previousEditor->hide();
             }
 
-            $mainForm->clearLeftPane();
-            $mainForm->setLeftPane($editor->getLeftPaneUi());
+            /*$mainForm->clearLeftPane();
+            $mainForm->setLeftPane($editor->getLeftPaneUi());*/
 
             $editor->open($param);
 
@@ -332,15 +341,57 @@ class FileSystem
 
         if (!$tab) {
             $tab = new UXTab();
-            /*$tab->detachable = false;
-            $tab->disableDragFirst = true;
-            $tab->disableDragLast = true;*/
 
             $tab->text = $editor->getTitle();
             $tab->tooltip = $editor->getTooltip();
-            $tab->style = '-fx-cursor: hand; ' . $editor->getTabStyle();
+            $tab->style = $editor->getTabStyle();
             $tab->graphic = Ide::get()->getImage($editor->getIcon());
-            $tab->content = $editor->makeUi();
+
+            $content = $editor->makeUi();
+
+            if ($leftPaneUi = $editor->makeLeftPaneUi()) {
+                $editor->setLeftPaneUi($leftPaneUi);
+
+                if ($leftPaneUi instanceof IdeTabPane) {
+                    $leftPaneUi = $leftPaneUi->makeUi();
+                }
+
+                $wrapScroll = new UXScrollPane($leftPaneUi);
+                $wrapScroll->fitToHeight = true;
+                $wrapScroll->fitToWidth = true;
+                UXAnchorPane::setAnchor($wrapScroll, 0);
+
+                $wrap = new UXAnchorPane();
+                $wrap->width = 250;
+                $wrap->add($wrapScroll);
+                UXSplitPane::setResizeWithParent($wrap, false);
+
+                $content = new UXSplitPane([$wrap, $content]);
+
+                $init = false;
+
+                if (static::$editorContentDividePosition) {
+                    $init = true;
+                    $content->dividerPositions = static::$editorContentDividePosition;
+                }
+
+
+                $wrap->observer('width')->addListener(function () use (&$dividePositions, $content) {
+                    static::$editorContentDividePosition = $content->dividerPositions;
+                });
+
+                $content->observer('width')->addListener(function ($_, $width) use (&$init, $content, $wrap) {
+                    if (!$init) {
+                        $init = true;
+                        $content->dividerPositions = [$wrap->width/$width];
+                    }
+                });
+            } else {
+                $editor->setLeftPaneUi(null);
+            }
+
+            $tab->content = $content;
+
             $tab->userData = $editor;
 
             $tab->closable = $editor->isCloseable();
@@ -348,23 +399,14 @@ class FileSystem
             /** @var MainForm $mainForm */
             $mainForm = Ide::get()->getMainForm();
 
-            $leftPaneUi = $editor->makeLeftPaneUi();
-            $editor->setLeftPaneUi($leftPaneUi);
-
-            $mainForm->clearLeftPane();
-
-            if ($leftPaneUi) {
-                $mainForm->setLeftPane($leftPaneUi);
-            }
-
             $tab->on('closeRequest', function (UXEvent $e) use ($path, $editor) {
-                if (static::$previousEditor === $e->sender->userData) {
+                /*if (static::$previousEditor === $e->sender->userData) {
                     uiLater(function () {
                         if (Ide::project()) {
-                            //FileSystem::open(Ide::project()->getMainProjectFile());
+                            FileSystem::open(Ide::project()->getMainProjectFile());
                         }
                     });
-                }
+                }*/
 
                 static::close($path, false);
             });
@@ -385,6 +427,10 @@ class FileSystem
                     $tab = $fileTabPane->selectedTab;
 
                     if ($tab) {
+                        if (static::$editorContentDividePosition && $tab->content instanceof UXSplitPane) {
+                            $tab->content->dividerPositions = static::$editorContentDividePosition;
+                        }
+
                         Logger::info("Opening selected tab '$tab->text'");
 
                         static::_openEditor($tab->userData, $param);
@@ -403,6 +449,10 @@ class FileSystem
 
             static::addTab($tab);
             $tab->draggable = $editor->isDraggable();
+        } else {
+            if (static::$editorContentDividePosition && $tab->content instanceof UXSplitPane) {
+                $tab->content->dividerPositions = static::$editorContentDividePosition;
+            }
         }
 
         if ($switchToTab) {
@@ -482,7 +532,7 @@ class FileSystem
             $tab = new UXTab();
             $tab->draggable = false;
             $tab->closable = false;
-            $tab->style = '-fx-cursor: hand;';
+            $tab->style = '-fx-cursor: hand; -fx-padding: 1px 0px;';
             $tab->graphic = Ide::get()->getImage('icons/plus16.png');
 
             $button = new UXButton();
@@ -490,7 +540,7 @@ class FileSystem
 
             $button->graphic = Ide::get()->getImage('icons/plus16.png');
             $button->classes->add('dn-add-tab-button');
-            $tab->style = '-fx-cursor: hand; -fx-padding: 1px 0px;';
+            $button->style = '-fx-background-radius: 0; -fx-border-radius: 0; -fx-border-width: 0';
 
             /*$showMenu = function (UXMouseEvent $event) use ($button) {
                 call_user_func(self::$addTabClick);

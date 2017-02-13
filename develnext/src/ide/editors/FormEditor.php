@@ -1177,6 +1177,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             throw new \Exception("Cannot open unloaded form");
         }
 
+        if ($this->designer) {
+            throw new IllegalStateException();
+        }
+
         $this->codeEditorUi = $codeEditor = $this->makeCodeEditor();
         $designer = $this->makeDesigner();
 
@@ -1189,10 +1193,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 $this->designer->requestFocus();
             }
         });
-
-        /*$tabs->on('keyDown', function (UXKeyEvent $e) {
-            $e->consume();
-        });*/
 
         $codeTab = new UXTab();
         $codeTab->text = 'Исходный код';
@@ -1221,9 +1221,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                     if ($tabs->selectedTab === $this->codeTab) {
                         if ($this->viewerAndEvents->items[1] != null) {
                             $this->hideCodeEditorInDesigner();
-                            /*TimerScript::executeAfter(2000, function () {
-                                $this->switchToSource();
-                            });  */
                         }
                     }
 
@@ -1239,12 +1236,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $this->tabs = $tabs;
-
-        /*if (Ide::get()->getUserConfigValue(__CLASS__ . '.sourceEditorEx', false)) {
-            UXApplication::runLater(function () {
-                $this->switchToSmallSource();
-            });
-        }*/
 
         return $this->tabs;
     }
@@ -1281,9 +1272,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     public function switchToSmallSource()
     {
-        /*$this->switchToSource();
-        return;*/
-
         static $dividerPositions;
 
         Logger::info("Start switch to small source editor...");
@@ -1295,12 +1283,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 return (double)Str::trim($el);
             })->toArray();
         }
-
-        /*UXApplication::runLater(function () {
-            $this->switchToDesigner();
-            $this->codeEditor->requestFocus();
-        });*/
-
 
         $class = __CLASS__;
 
@@ -1539,10 +1521,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $area->classes->remove('FormEditor');
         }
 
-        //$area->backgroundColor = 'green';
-
         $viewer = new UXScrollPane($area);
-        //$viewer->backgroundColor = 'white';
 
         $viewer->on('mouseUp', function ($e) {
             $this->selectForm();
@@ -1577,9 +1556,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             $this->layout->style = '-fx-border-width: 0px; -fx-border-style: none; -fx-border-color: silver;';
             $this->layout->backgroundColor = '#F7F7F7';
-            //$this->layout->position = [10, 10];
-            //$this->layout->size = $area->size;
-            //UXAnchorPane::setAnchor($this->layout, 0);
 
             uiLater(function () use ($area, $viewer) {
                 $area->minWidth = $viewer->viewportBounds['width'];

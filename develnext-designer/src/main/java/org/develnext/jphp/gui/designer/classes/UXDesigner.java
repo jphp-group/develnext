@@ -849,7 +849,7 @@ public class UXDesigner extends BaseObject {
         }
 
         if (node.getParent() == null) {
-            throw new IllegalArgumentException("Node.parent must not be null");
+            return;
         }
 
         Selection selection = selections.get(node);

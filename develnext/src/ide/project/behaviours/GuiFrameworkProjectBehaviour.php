@@ -211,7 +211,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
 
         $this->project->registerFormat($projectFormat = new ProjectFormat());
-        $this->project->registerFormat(new PhpCodeFormat());
         $this->project->registerFormat(new GuiFormFormat());
         $this->project->registerFormat(new ScriptModuleFormat());
         $this->project->registerFormat(new GameSpriteFormat());

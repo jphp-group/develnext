@@ -31,13 +31,25 @@ class ProjectTree
      */
     protected $tree;
 
+    /**
+     * @var array
+     */
     protected $ignoreExts = [];
+
+    /**
+     * @var array
+     */
     protected $ignorePaths = ['.dn' => 1];
 
     /**
      * @var callable[]
      */
     protected $ignoreFilters = [];
+
+    /**
+     * @var callable[]
+     */
+    protected $openHandlers = [];
 
     /**
      * ProjectTree constructor.
@@ -60,10 +72,15 @@ class ProjectTree
                     $file = $this->project->getFile($treeView->focusedItem->value->path);
 
                     if ($file->isFile()) {
+                        foreach ($this->openHandlers as $handler) {
+                            if ($handler($file)) {
+                                return;
+                            }
+                        }
+
                         $editor = FileSystem::open($file);
 
                         if (!$editor) {
-
                             switch (fs::ext($file)) {
                                 case 'png':
                                 case 'jpg':
@@ -106,7 +123,15 @@ class ProjectTree
                                     if (Ide::get()->isWindows() && MessageBoxForm::confirm("Запустить исполняемый файл " . fs::name($file) . '?')) {
                                         $process = new Process(['cmd', '/c', $file], fs::parent($file), (array)$_ENV);
                                         $process->start();
+                                        return;
                                     }
+
+                                    if (!Ide::get()->isWindows()) {
+                                        $desktop = new UXDesktop();
+                                        $desktop->edit($file);
+                                        return;
+                                    }
+
                                     break;
 
                                 default:
@@ -148,6 +173,11 @@ class ProjectTree
     public function addIgnoreFilter(callable $callback)
     {
         $this->ignoreFilters[] = $callback;
+    }
+
+    public function addOpenHandler(callable $callback)
+    {
+        $this->openHandlers[] = $callback;
     }
 
     /**

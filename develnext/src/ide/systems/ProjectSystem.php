@@ -18,6 +18,7 @@ use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;
 use php\io\File;
 use php\io\IOException;
+use php\lang\System;
 use php\lang\Thread;
 use php\lib\fs;
 use php\lib\Items;
@@ -391,10 +392,6 @@ class ProjectSystem
 
         Cache::clear();
 
-        /** @var MainForm $mainForm */
-        $mainForm = Ide::get()->getMainForm();
-        $mainForm->clearLeftPane();
-
         static::clear();
 
 
@@ -407,5 +404,6 @@ class ProjectSystem
         }
 
         FileSystem::clearCache();
+        System::gc();
     }
 }

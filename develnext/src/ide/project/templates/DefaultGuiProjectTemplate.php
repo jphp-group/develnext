@@ -151,16 +151,30 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
             }
         }
 
-        if (!$project->getFile('src/app/modules/AppModule.module')->isFile()) {
-            Json::toFile($project->getFile('src/app/modules/AppModule.module'), ['props' => [], 'components' => []]);
+
+        foreach ($project->getFile('src/app/modules')->findFiles() as $file) {
+            if (fs::ext($file) == 'php') {
+                $metaFile = fs::pathNoExt($file) . '.module';
+
+                if (!fs::isFile($metaFile)) {
+                    $jsonFile = fs::pathNoExt($file) . '.json';
+
+                    $meta = ['props' => [], 'components' => []];
+
+                    if (fs::isFile($jsonFile)) {
+                        if ($oldMeta = Json::fromFile($jsonFile)) {
+                            $meta['props'] = (array)$meta['properties'];
+                        }
+
+                        fs::delete($jsonFile);
+                    }
+
+                    Json::toFile($metaFile, $meta);
+                }
+            }
         }
 
         FileUtils::deleteDirectory($project->getFile('src/.scripts'));
-        foreach ($project->getFile('src/app/modules')->findFiles() as $file) {
-            if (fs::isFile($file) && fs::ext($file) == 'json') {
-                fs::delete($file);
-            }
-        }
 
         fs::delete($project->getFile('src/.system/modules.json'));
         FileUtils::deleteDirectory($project->getFile('src/.gradle'));

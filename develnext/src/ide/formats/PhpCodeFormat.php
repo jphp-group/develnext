@@ -26,6 +26,10 @@ class PhpCodeFormat extends AbstractFormat
             $editor->registerDefaultCommands();
         }
 
+        if ($options['readOnly']) {
+            $editor->setReadOnly(true);
+        }
+
         return $editor;
     }
 
