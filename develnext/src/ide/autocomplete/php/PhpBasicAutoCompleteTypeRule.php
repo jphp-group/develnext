@@ -4,6 +4,7 @@ namespace ide\autocomplete\php;
 use develnext\lexer\Context;
 use develnext\lexer\inspector\entry\FunctionEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
+use develnext\lexer\inspector\PHPInspector;
 use develnext\lexer\SyntaxAnalyzer;
 use develnext\lexer\token\CallExprToken;
 use develnext\lexer\token\ClassStmtToken;
@@ -486,11 +487,18 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
         //var_dump($this->complete->identifyType('; app()->', $this->complete->getGlobalRegion()));
 
-        $result = $this->complete->getInspector()->loadSource($stream);
+        $inspector = $this->complete->getInspector();
+
+        $result = $inspector->loadSource($stream);
 
         if ($result) {
             foreach ($result['classes'] as $type) {
                 /** @var TypeEntry $type */
+
+                if (Ide::project()) {
+                    $type->packages[Ide::project()->getPackageName()] = Ide::project()->getPackageName();
+                }
+
                 $this->complete->setValueOfRegion($type, 'class');
 
                 foreach ($type->methods as $one) {

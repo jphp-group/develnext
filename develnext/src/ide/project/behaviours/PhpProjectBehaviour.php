@@ -13,15 +13,20 @@ use ide\project\ProjectFile;
 use ide\project\ProjectModule;
 use ide\utils\FileUtils;
 use ide\zip\JarArchive;
+use php\compress\ZipFile;
+use php\framework\FrameworkPackageLoader;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXCheckbox;
 use php\gui\UXComboBox;
 use php\gui\UXLabel;
 use php\io\File;
+use php\io\FileStream;
 use php\io\IOException;
 use php\lang\Environment;
 use php\lang\Module;
+use php\lang\Package;
+use php\lang\Thread;
 use php\lang\ThreadPool;
 use php\lib\arr;
 use php\lib\fs;
@@ -66,6 +71,11 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
      * @var PHPInspector
      */
     protected $inspector;
+
+    /**
+     * @var Package
+     */
+    protected $projectPackage;
 
     /**
      * @var ThreadPool
@@ -125,16 +135,46 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $this->setIdeConfigValue(self::OPT_IMPORT_TYPE_CODE, $value);
     }
 
+    protected function getProjectPackage()
+    {
+        $package = ['classes' => [], 'functions' => [], 'constants' => []];
+
+        foreach ([$this->project->getSrcFile(''), $this->project->getSrcFile('', true)] as $directory) {
+            fs::scan($directory, function ($filename) use ($directory, &$package) {
+                if (fs::ext($filename) == 'php') {
+                    $classname = FileUtils::relativePath($directory, $filename);
+
+                    if ($classname[0] == '.') {
+                        return;
+                    }
+
+                    $classname = fs::pathNoExt($classname);
+                    $classname = str::replace($classname, '/', '\\');
+                    $package['classes'][] = $classname;
+                }
+            });
+        }
+
+        return $package;
+    }
+
     protected function refreshInspector()
     {
         if ($this->inspector) {
-            $this->project->loadDirectoryForInspector($this->project->getFile("src/"));
-
-            $this->inspector->setExtensions(['source']);
-            $this->project->loadDirectoryForInspector($this->project->getFile("src/"));
-
             $this->inspector->setExtensions(['php']);
-            $this->project->loadDirectoryForInspector($this->project->getFile(self::GENERATED_DIRECTORY));
+
+            (new Thread(function () {
+                $package = $this->getProjectPackage();
+
+                $this->inspector->putPackage($this->project->getPackageName(), $package);
+
+                $options = [
+                    'defaultPackages' => [$this->project->getPackageName()]
+                ];
+
+                $this->project->loadDirectoryForInspector($this->project->getFile("src/"), $options);
+                $this->project->loadDirectoryForInspector($this->project->getFile(self::GENERATED_DIRECTORY), $options);
+            }))->start();
         }
     }
 
@@ -214,11 +254,35 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
         FileUtils::put($this->project->getIdeCacheFile('bytecode/.cacheignore'), str::join($cacheIgnore, "\n"));
 
-        fs::scan($this->project->getSrcFile($this->project->getPackageName()), function ($filename) {
+        fs::scan($this->project->getSrcFile(''), function ($filename) {
             if (fs::ext($filename) == 'phb') {
                 fs::delete($filename);
             }
         });
+
+        if ($this->inspector) {
+            $packageName = $this->project->getPackageName();
+
+            $file = $this->project->getSrcFile(".packages/$packageName.pkg", true);
+            fs::ensureParent($file);
+            fs::delete($file);
+
+            $fs = new FileStream($file, 'w+');
+
+            $package = $this->getProjectPackage();
+
+            try {
+                $fs->write("[classes]\n");
+
+                foreach ((array)$package['classes'] as $type) {
+                    if ($type) {
+                        $fs->write($type . "\n");
+                    }
+                }
+            } finally {
+                $fs->close();
+            }
+        }
     }
 
     public function isByteCodeEnabled() {
@@ -262,15 +326,28 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 }
             }
 
+            // Add packages -------------------------------
             foreach ($dirs as $dir) {
-                fs::scan("$dir/.inc/package", function ($filename) {
+                fs::scan("$dir/.packages", function ($filename) use ($scope) {
                     $ext = fs::ext($filename);
 
-                    if ($ext == 'php') {
-                        include $filename;
+                    if ($ext == 'pkg') {
+                        $package = FrameworkPackageLoader::makeFrom($filename);
+                        $scope->setPackage(fs::nameNoExt($filename), $package);
                     }
-                });
+                }, 1);
             }
+
+            foreach ($zipLibraries as $library) {
+                $zip = new ZipFile($library);
+                foreach ($zip->getEntryNames() as $name) {
+                    if (str::startsWith($name, '.packages/') && fs::ext($name) == 'pkg') {
+                        $package = FrameworkPackageLoader::makeFrom($zip->getEntryStream($name));
+                        $scope->setPackage(fs::nameNoExt($name), $package);
+                    }
+                }
+            }
+            // ----------------------------------------------
 
             $scope->execute(function () use ($zipLibraries, $generatedDirectory, $dirs, &$includedFiles) {
                 ob_implicit_flush(true);

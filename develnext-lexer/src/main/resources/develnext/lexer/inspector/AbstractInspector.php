@@ -4,6 +4,7 @@ namespace develnext\lexer\inspector;
 use develnext\lexer\inspector\entry\ConstantEntry;
 use develnext\lexer\inspector\entry\FunctionEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
+use ide\utils\FileUtils;
 use php\lib\fs;
 
 /**
@@ -49,10 +50,16 @@ abstract class AbstractInspector
     protected $constants = [];
 
     /**
+     * @var array
+     */
+    protected $cacheTags = [];
+
+    /**
      * @param string $path
+     * @param array $options
      * @return mixed
      */
-    abstract public function loadSource($path);
+    abstract public function loadSource($path, array $options = []);
 
     /**
      * @param string $path
@@ -62,19 +69,38 @@ abstract class AbstractInspector
 
     /**
      * @param string $path
+     * @param array $options
      * @param bool $recursive
      */
-    public function loadDirectory($path, $recursive = true)
+    public function loadDirectory($path, array $options = [], $recursive = true)
     {
-        fs::scan($path, function ($filename) use ($recursive) {
+        fs::scan($path, function ($filename) use ($recursive, $options) {
             if (fs::isDir($filename)) {
                 if ($recursive) {
-                    $this->loadDirectory($filename);
+                    $this->loadDirectory($filename, $options);
                 }
             } else {
-                $this->loadSource($filename);
+                $this->loadSourceWithCache($filename, $options);
             }
         }, 1);
+    }
+
+    public function loadSourceWithCache($filename, array $options = [])
+    {
+        $time = fs::time($filename);
+        $size = fs::size($filename);
+
+        if ($cache = $this->cacheTags[FileUtils::hashName($filename)]) {
+            if ($cache['time'] === $time && $cache['size'] === $size && $cache['options'] == $options) {
+                return true;
+            }
+        }
+
+        $this->cacheTags[FileUtils::hashName($filename)] = [
+            'time' => $time, 'size' => $size, 'options' => $options
+        ];
+
+        return (bool) $this->loadSource($filename, $options);
     }
 
     public function unloadDirectory($path, $recursive = true)
@@ -85,6 +111,7 @@ abstract class AbstractInspector
                     $this->unloadDirectory($filename);
                 }
             } else {
+                unset($this->cacheTags[FileUtils::hashName($filename)]);
                 $this->unloadSource($filename);
             }
         }, 1);
@@ -121,6 +148,10 @@ abstract class AbstractInspector
                 $return->extends[$name] = $extend;
             }
 
+            foreach ($dynamicType->packages as $key => $value) {
+                $return->packages[$key] = $value;
+            }
+
             $return->data = $return->data + $dynamicType->data;
 
             return $return;
@@ -148,6 +179,11 @@ abstract class AbstractInspector
     public function putConstant(ConstantEntry $entry)
     {
         $this->constants[$entry->name] = $entry;
+    }
+
+    public function putPackage($name, array $meta)
+    {
+        $this->packages[$name] = $meta;
     }
 
     public function removeType($fullName)
@@ -279,5 +315,7 @@ abstract class AbstractInspector
         $this->functions = [];
         $this->typesByShort = [];
         $this->packages = [];
+
+        $this->cacheTags = [];
     }
 }

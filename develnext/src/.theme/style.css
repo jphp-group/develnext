@@ -249,7 +249,7 @@
     -fx-color: -fx-hover-base;
 }
 .dn-file-tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {
-    -fx-text-fill: -fx-default-button;
+    -fx-text-fill: #16467b;
 }
 
 .dn-file-tab-pane > .tab-header-area > .headers-region > .tab:selected {

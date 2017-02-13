@@ -28,6 +28,7 @@ use php\lang\ThreadPool;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\Items;
+use php\lib\reflect;
 use php\lib\Str;
 use php\time\Time;
 use php\util\Configuration;
@@ -1204,11 +1205,12 @@ class Project
 
         if (!$inspectors) {
             Logger::warn("Unable to loadSourceForInspector(), inspectors are empty.");
+            return;
         }
 
         $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
             foreach ($inspectors as $one) {
-                if (!$one->loadSource($path)) {
+                if (!$one->loadSourceWithCache($path)) {
                     Logger::warn("Unable to load source for inspector, $path");
                 }
             }
@@ -1230,7 +1232,7 @@ class Project
         });
     }
 
-    public function loadDirectoryForInspector($path)
+    public function loadDirectoryForInspector($path, array $options = [], callable $done = null)
     {
         $inspectors = $this->inspectors;
 
@@ -1240,9 +1242,13 @@ class Project
             Logger::warn("Unable to loadDirectoryForInspector(), inspectors are empty.");
         }
 
-        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
+        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors, $options, $done) {
             foreach ($inspectors as $one) {
-                $one->loadDirectory($path);
+                $one->loadDirectory($path, $options);
+            }
+
+            if ($done) {
+                $done();
             }
         });
     }

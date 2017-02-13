@@ -17,12 +17,12 @@ use php\util\Scanner;
  */
 class FrameworkPackageLoader extends PackageLoader
 {
-    public static function makeFromFile($file)
+    public static function makeFrom($fileOrStream)
     {
         $pkg = new Package();
         $type = 0;
 
-        $sc = new Scanner(fs::get($file));
+        $sc = new Scanner($fileOrStream instanceof Stream ? $fileOrStream : fs::get($fileOrStream));
 
         $classes = [];
         $functions = [];
@@ -94,7 +94,7 @@ class FrameworkPackageLoader extends PackageLoader
         if (ResourceStream::exists($file)) {
             Logger::debug("load '$name' package.");
 
-            return self::makeFromFile($file);
+            return self::makeFrom($file);
         } else {
             Logger::warn("package '$name' is not found.");
         }

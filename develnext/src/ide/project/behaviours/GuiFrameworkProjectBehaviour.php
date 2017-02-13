@@ -645,6 +645,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         Logger::info("Finish creating module '$name'");
 
+        $this->project->save();
+
         return $file;
     }
 
@@ -786,6 +788,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $sources->updateTemplate(true);
 
         Logger::info("Finish creating form '$name'");
+
+        $this->project->save();
 
         return $sources;
     }

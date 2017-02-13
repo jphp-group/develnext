@@ -26,6 +26,7 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\Environment;
 use php\lang\JavaException;
+use php\lang\Package;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
@@ -44,20 +45,22 @@ class PHPInspector extends AbstractInspector
     protected $simpleTypes = ['null', 'string', 'int', 'bool', 'float', 'double', 'boolean', 'integer', 'void', 'false', 'true', 'array', 'callable', 'mixed', 'object', 'number'];
     protected $extensions = ['php'];
 
-    public function loadSource($path)
+    protected $defaultPackages = [];
+
+    public function loadSource($path, array $options = [])
     {
         if ($path instanceof Stream) {
-            return $this->loadPhpSource($path, $path->getPath());
+            return $this->loadPhpSource($path, $path->getPath(), $options);
         }
 
         switch (fs::ext($path)) {
             case 'zip':
             case 'jar':
-                $this->loadZipSource($path);
+                $this->loadZipSource($path, $options);
                 return true;
             default:
                 if (arr::has($this->extensions, fs::ext($path))) {
-                    return $this->loadPhpSource($path, $path);
+                    return $this->loadPhpSource($path, $path, $options);
                 } else {
                     return false;
                 }
@@ -67,17 +70,17 @@ class PHPInspector extends AbstractInspector
     public function unloadSource($path)
     {
         if ($path instanceof Stream) {
-            return $this->loadPhpSource($path, $path, true);
+            return $this->loadPhpSource($path, $path, [], true);
         }
 
         switch (fs::ext($path)) {
             case 'zip':
             case 'jar':
-                $this->loadZipSource($path, true);
+                $this->loadZipSource($path, [], true);
                 return true;
             default:
                 if (arr::has($this->extensions, fs::ext($path))) {
-                    $this->loadPhpSource($path, $path, true);
+                    $this->loadPhpSource($path, $path, [], true);
                     return true;
                 } else {
                     return false;
@@ -93,7 +96,15 @@ class PHPInspector extends AbstractInspector
         $this->extensions = $extensions;
     }
 
-    protected function loadZipSource($path, $unload = false)
+    /**
+     * @param array $defaultPackages
+     */
+    public function setDefaultPackages($defaultPackages)
+    {
+        $this->defaultPackages = $defaultPackages;
+    }
+
+    protected function loadZipSource($path, array $options = [], $unload = false)
     {
         $archive = new ArchiveInputStream('zip', $path);
         $entries = [];
@@ -116,7 +127,7 @@ class PHPInspector extends AbstractInspector
                 $entry = arr::shift($entries);
 
                 if (arr::has($this->extensions, fs::ext($entry->getName()))) {
-                    if (!$this->loadPhpSource($archive, $entry->getName(), $unload)) {
+                    if (!$this->loadPhpSource($archive, $entry->getName(), $options, $unload)) {
                     }
                 }
             }
@@ -127,7 +138,7 @@ class PHPInspector extends AbstractInspector
         }
     }
 
-    protected function loadPhpSource($path, $moduleName = null, $unload = false)
+    protected function loadPhpSource($path, $moduleName = null, array $options = [], $unload = false)
     {
         $stream = $path instanceof Stream ? $path : Stream::of($path);
 
@@ -139,20 +150,27 @@ class PHPInspector extends AbstractInspector
                 $env = new Environment();
 
                 foreach ($this->packages as $package => $info) {
-                    $pkg = new \php\lang\Package;
+                    $pkg = new Package;
                     $pkg->addClasses((array)$info['classes']);
                     $pkg->addFunctions((array)$info['functions']);
                     $pkg->addConstants((array)$info['constants']);
+
                     $env->setPackage($package, $pkg);
                 }
 
                 $analyzer = new SyntaxAnalyzer($env, $tokenizer);
 
                 foreach ($analyzer->getClasses() as $class) {
+
                     if ($unload) {
                         $this->removeType($class->getFulledName());
                     } else {
                         $this->putType($t = $this->makeType($class));
+
+                        foreach ((array)$options['defaultPackages'] as $pkg) {
+                            $t->packages[$pkg] = $pkg;
+                        }
+
                         $result['classes'][] = $t;
                     }
                 }
@@ -202,7 +220,7 @@ class PHPInspector extends AbstractInspector
             $data['getters'] = false;
         }
 
-        $data['packages'] = [];
+        $data['packages'] = $this->defaultPackages;
 
         if (str::contains($comment, '@packages')) {
             $regex = new Regex('\\@packages[ ]+([a-z0-9\_]+)', 'is', $comment);
@@ -457,14 +475,6 @@ class PHPInspector extends AbstractInspector
 
         if ($entry->data['packages']) {
             foreach ($entry->data['packages'] as $p) {
-                $entry->packages[$p] = $p;
-            }
-        }
-
-        if ($pkg = $entry->constants['__PACKAGE__']) {
-            foreach (str::split($pkg->value, ',') as $p) {
-                $p = str::trim($p);
-
                 $entry->packages[$p] = $p;
             }
         }

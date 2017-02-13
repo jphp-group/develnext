@@ -30,6 +30,7 @@ use php\gui\designer\UXSyntaxTextArea;
 use php\gui\event\UXKeyEvent;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
+use php\gui\layout\UXVBox;
 use php\gui\text\UXFont;
 use php\gui\UXApplication;
 use php\gui\UXCheckbox;
@@ -138,6 +139,11 @@ class CodeEditor extends AbstractEditor
      * @var bool
      */
     protected $contentLoaded = false;
+
+    /**
+     * @var UXHBox
+     */
+    protected $statusBar;
 
     /**
      * @return UXAbstractCodeArea|UXSyntaxTextArea
@@ -487,7 +493,7 @@ class CodeEditor extends AbstractEditor
      */
     public function makeUi()
     {
-        $this->ui = $ui = new UXAnchorPane();
+        $this->ui = $ui = new UXVBox();
 
         $commandPane = UiUtils::makeCommandPane($this->commands);
         $commandPane->padding = 5;
@@ -498,15 +504,15 @@ class CodeEditor extends AbstractEditor
             $ui->add($commandPane);
         }
 
+        $this->statusBar = $statusBar = new UXHBox();
+        $statusBar->add(new UXLabel($this->file));
+        $statusBar->padding = 4;
+
         $this->textAreaScrollPane = $scrollPane = new UXCodeAreaScrollPane($this->textArea);
-
         $ui->add($scrollPane);
+        //$ui->add($statusBar);
 
-        UXAnchorPane::setAnchor($commandPane, 0);
-        UXAnchorPane::setAnchor($scrollPane, 0);
-
-        $commandPane->bottomAnchor = null;
-        $scrollPane->topAnchor = 35;
+        UXVBox::setVgrow($scrollPane, 'ALWAYS');
 
         $resize = function () {
             $this->refreshUi();
