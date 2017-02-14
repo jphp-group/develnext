@@ -10,7 +10,6 @@ namespace php\gui;
 class UXDragboard
 {
 
-
     /** @var UXImage */
     public $dragView = null;
 
@@ -27,6 +26,11 @@ class UXDragboard
      * @var string
      */
     public $string;
+
+    /**
+     * @var UXImage
+     */
+    public $image;
 
     public function __construct(UXDragboard $origin)
     {

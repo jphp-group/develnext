@@ -41,10 +41,13 @@ use ide\project\ProjectFile;
 use ide\project\ProjectIndexer;
 use ide\systems\FileSystem;
 use ide\ui\Notifications;
+use ide\utils\Json;
 use ide\utils\UiUtils;
+use php\format\ProcessorException;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
+use php\gui\event\UXDragEvent;
 use php\gui\event\UXEvent;
 use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
@@ -1528,6 +1531,48 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         });
 
         $designPane = new UXDesignPane();
+
+        $area->on('dragOver', function (UXDragEvent $e) {
+            try {
+                if ($e->dragboard->string) {
+                    $data = Json::decode($e->dragboard->string);
+
+                    if ($data['create'] && ($element = $this->format->getFormElement($data['type']))) {
+                        $e->acceptTransferModes(['MOVE']);
+                        $e->consume();
+                    }
+                }
+            } catch (ProcessorException $e) {
+                ;
+            }
+        });
+
+        $area->on('dragDone', function (UXEvent $e) {$e->consume();} );
+        $area->on('dragDrop', function (UXDragEvent $e) {
+            try {
+                if ($e->dragboard->string) {
+                    $data = Json::decode($e->dragboard->string);
+
+                    if ($data['create'] && ($element = $this->format->getFormElement($data['type']))) {
+                        $node = $this->createElement($element, $e->screenX, $e->screenY);
+
+                        if ($node) {
+                            $this->elementTypePane->clearSelected();
+                            $this->designer->requestFocus();
+
+                            uiLater(function () use ($node) {
+                                $this->designer->unselectAll();
+                                $this->designer->selectNode($node);
+                            });
+
+                            $e->consume();
+                        }
+                    }
+                }
+            } catch (ProcessorException $e) {
+                ;
+            }
+        });
 
         if (!$fullArea) {
             $viewer->content = new UXGroup([$area]);

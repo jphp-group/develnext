@@ -5,8 +5,10 @@ use ide\editors\common\ObjectListEditorItem;
 use ide\editors\menu\ContextMenu;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
+use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
 use ide\scripts\AbstractScriptComponent;
+use ide\utils\Json;
 use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXVBox;
@@ -27,6 +29,7 @@ use php\gui\UXToggleGroup;
 use php\gui\UXTooltip;
 use php\lib\arr;
 use php\lib\Number;
+use php\lib\reflect;
 use php\lib\str;
 
 /**
@@ -411,7 +414,7 @@ class FormElementTypePane
         $fbox->padding = 2;
 
         /** @var AbstractFormElement|ObjectListEditorItem $element */
-        foreach ($elements as $element) {
+        foreach ($elements as $id => $element) {
             $button = $this->selectable ? new UXToggleButton($element->getName()) : new UXButton($element->getName());
             $smallButton = $this->selectable ? new UXToggleButton() : new UXButton();
 
@@ -425,8 +428,8 @@ class FormElementTypePane
             $button->maxWidth = 10000;
             $button->alignment = 'BASELINE_LEFT';
             $button->userData = $element;
-
             $button->graphic = Ide::get()->getImage($element->getIcon());
+
 
             if ($button->graphic) {
                 $button->graphic->size = [16, 16];
@@ -463,6 +466,23 @@ class FormElementTypePane
 
             $vbox->add($button);
             $fbox->add($smallButton);
+
+
+            $dragDetect = function (UXMouseEvent $e) use ($element) {
+                $dragboard = $e->sender->startDrag(['MOVE']);
+
+                $dragboard->dragView = $e->sender->snapshot();
+
+                //$dragboard->dragViewOffsetX = $dragboard->dragView->width / 2;
+               // $dragboard->dragViewOffsetY = $dragboard->dragView->height / 2;
+
+                $dragboard->string = Json::encode(['type' => reflect::typeOf($element), 'create' => true]);
+
+                $e->consume();
+            };
+
+            $smallButton->on('dragDetect', $dragDetect);
+            $button->on('dragDetect', $dragDetect);
 
             if ($buttonCreateCallback) {
                 $buttonCreateCallback($button);

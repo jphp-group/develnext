@@ -42,10 +42,23 @@ public class UXDragboard extends BaseWrapper<Dragboard> {
         return getWrappedObject().hasString() ? getWrappedObject().getString() : null;
     }
 
+    @Getter
+    public Image getImage() {
+        return getWrappedObject().hasImage() ? getWrappedObject().getImage() : null;
+    }
+
     @Setter
     public void setString(String text) {
         ClipboardContent content = new ClipboardContent();
         content.putString(text);
+
+        getWrappedObject().setContent(content);
+    }
+
+    @Setter
+    public void setImage(Image image) {
+        ClipboardContent content = new ClipboardContent();
+        content.putImage(image);
 
         getWrappedObject().setContent(content);
     }

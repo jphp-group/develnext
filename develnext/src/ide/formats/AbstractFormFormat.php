@@ -83,14 +83,17 @@ abstract class AbstractFormFormat extends AbstractFormat
     }
 
     /**
-     * @param $any
+     * @param string|object $any class or object
      *
      * @return AbstractFormElement|null
      */
     public function getFormElement($any)
     {
-        foreach ($this->formElements as $element) {
+        if ($element = $this->formElements[$any]) {
+            return $element;
+        }
 
+        foreach ($this->formElements as $element) {
             if ($element->isOrigin($any)) {
                 return $element;
             }

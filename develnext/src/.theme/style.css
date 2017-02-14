@@ -112,7 +112,7 @@
 
 .dn-simple-toggle-button:hover { -fx-background-color: #cce6fe; -fx-border-color: #5a71a7; }
 .dn-simple-toggle-button:selected { -fx-background-color: silver; -fx-border-color: gray; }
-.dn-simple-toggle-button, .dn-simple-button { -fx-background-color: white; -fx-border-color: silver; -fx-border-width: 1px; -fx-cursor: hand; }
+.dn-simple-toggle-button, .dn-simple-button { -fx-background-color: white; -fx-border-color: silver; -fx-border-width: 1px; }
 
 .dn-simple-button { -fx-border-radius: 3px; }
 

@@ -130,6 +130,10 @@ class ScriptModuleFormat extends AbstractFormFormat
      */
     public function getFormElement($any)
     {
+        if ($element = $this->formElements[$any]) {
+            return $element;
+        }
+
         foreach ($this->formElements as $element) {
             if ($any && $any->userData instanceof ScriptComponentContainer) {
                 $any = $any->userData->getType();
