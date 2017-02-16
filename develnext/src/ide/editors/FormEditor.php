@@ -1198,7 +1198,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         });
 
         $codeTab = new UXTab();
-        $codeTab->text = 'Исходный код';
+        $codeTab->text = 'Исходный код [' . fs::name($this->codeFile) . ']';
         $codeTab->content = $this->codeEditorUi;
         $codeTab->style = '-fx-cursor: hand;';
         $codeTab->graphic = Ide::get()->getImage($this->codeEditor->getIcon());

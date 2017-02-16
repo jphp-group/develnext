@@ -4,12 +4,14 @@ namespace ide\formats\form;
 use ide\formats\form\event\AbstractEventKind;
 use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
+use ide\project\behaviours\PhpProjectBehaviour;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
 use php\io\File;
 use php\io\IOException;
 use php\io\MemoryStream;
 use php\io\Stream;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
@@ -398,7 +400,30 @@ class SourceEventManager
 
         if ($imports) {
             $parser = new PhpParser($source);
-            $parser->addUseImports($imports);
+
+            if ($php = PhpProjectBehaviour::get()) {
+                if ($php->getImportType() == 'package') {
+                    $packages = [];
+
+                    foreach ($imports as $import) {
+                        if ($type = $php->getInspector()->findType($import)) {
+                            if ($type->packages) {
+                                $package = arr::first($type->packages);
+                            } else {
+                                $package = $import;
+                            }
+
+                            $packages[$package] = $package;
+                        }
+                    }
+
+                    $parser->addUseImports($packages);
+                } else {
+                    $parser->addUseImports($imports);
+                }
+            } else {
+                $parser->addUseImports($imports);
+            }
 
             $source = $parser->getContent();
         }

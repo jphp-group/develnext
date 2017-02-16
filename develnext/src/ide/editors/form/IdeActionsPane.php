@@ -69,7 +69,7 @@ class IdeActionsPane extends UXHBox
         $ui = $this;
 
         $ui->spacing = 4;
-        $ui->padding = 8;
+        $ui->padding = 5;
         $ui->paddingBottom = 4;
         $ui->height = 25;
         $ui->fillHeight = true;

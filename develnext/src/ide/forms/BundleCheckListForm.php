@@ -303,11 +303,11 @@ class BundleCheckListForm extends AbstractIdeForm
     public function doInstall()
     {
         if ($this->displayResource) {
-            if (MessageBoxForm::confirm('Вы уверены, что хотите добавить этот пакет к проекту?', $this)) {
+            //if (MessageBoxForm::confirm('Вы уверены, что хотите добавить этот пакет к проекту?', $this)) {
                 $this->behaviour->addBundle(Project::ENV_ALL, $this->displayResource->getBundle());
                 //$this->toast('Пакет расширения подключен к проекту');
                 $this->update();
-            }
+            //}
         }
     }
 
@@ -330,11 +330,11 @@ class BundleCheckListForm extends AbstractIdeForm
     public function doUninstall()
     {
         if ($this->displayResource) {
-            if (MessageBoxForm::confirmDelete('пакет расширения ' . $this->displayResource->getName())) {
+           // if (MessageBoxForm::confirmDelete('пакет расширения ' . $this->displayResource->getName())) {
                 $this->behaviour->removeBundle($this->displayResource->getBundle());
-                $this->toast('Пакет расширения отключен от проекта');
+                //$this->toast('Пакет расширения отключен от проекта');
                 $this->update();
-            }
+            //}
         }
     }
 

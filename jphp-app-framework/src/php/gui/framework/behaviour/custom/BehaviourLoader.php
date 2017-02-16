@@ -118,7 +118,7 @@ class BehaviourLoader
                 if ($content) {
                     $document = $xml->parse($content);
                 } else {
-                    $document = new DomDocument();
+                    $document = $xml->createDocument();
                 }
 
                 static::$documents[$file] = $document;

@@ -537,7 +537,7 @@ class Ide extends Application
 
     /**
      * @param string $name
-     * @return Configuration
+     * @return IdeConfiguration
      */
     public function getUserConfig($name)
     {
@@ -1366,10 +1366,13 @@ class Ide extends Application
             Logger::warn("System halt 0\n");
             System::halt(0);
         }));
+
         $shutdownTh->setName("DevelNext Shutdown");
         $shutdownTh->start();
 
         Logger::info("Start IDE shutdown ...");
+
+        $this->trigger(__FUNCTION__);
 
         (new Thread(function () {
             Logger::info("Shutdown asyncThreadPool");

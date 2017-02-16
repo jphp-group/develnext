@@ -10,6 +10,7 @@ use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\event\UXWindowEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\paint\UXColor;
 use php\gui\text\UXFont;
@@ -36,6 +37,7 @@ use php\util\SharedQueue;
  * @property UXCheckbox $closeAfterDoneCheckbox
  * @property UXButton $closeButton
  * @property UXRichTextArea $consoleArea
+ * @property UXHBox $bottomPane
  *
  * Class BuildProgressForm
  * @package ide\forms
@@ -97,13 +99,21 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
     public function reduceHeader()
     {
-        $this->content->padding = 10;
-        $this->content->spacing = 10;
+        $this->content->padding = 5;
+        $this->content->spacing = 5;
         $this->header->spacing = 5;
         $this->workTitle->font = $this->workTitle->font->withSize(12)->withBold();
         $this->workDescription->free();
         $this->icon->preserveRatio = true;
         $this->icon->size = [16, 16];
+    }
+
+    public function reduceFooter()
+    {
+        $this->bottomPane->height = $this->closeButton->height = 30;
+        $this->bottomPane->padding = 5;
+        $this->bottomPane->spacing = 10;
+        $this->bottomPane->paddingLeft = 0;
     }
 
     public function removeHeader()

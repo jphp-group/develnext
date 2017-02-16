@@ -150,7 +150,7 @@ class ProjectTree
 
     public function getExpandedPaths()
     {
-        return $this->tree->expandedPaths;
+        return $this->tree ? $this->tree->expandedPaths : [];
     }
 
     /**

@@ -33,7 +33,7 @@
             </HBox>
             <ListView id="consoleList" styleClass="dn-console-list" VBox.vgrow="ALWAYS" />
             <ProgressBar id="progress" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="23.0" />
-            <HBox alignment="CENTER_LEFT" minHeight="-Infinity" prefHeight="35.0" spacing="15.0">
+            <HBox alignment="CENTER_LEFT" id="bottomPane" minHeight="-Infinity" prefHeight="35.0" spacing="15.0">
                <children>
                   <Button id="closeButton" mnemonicParsing="false" prefHeight="35.0" text="Закрыть">
                      <cursor>

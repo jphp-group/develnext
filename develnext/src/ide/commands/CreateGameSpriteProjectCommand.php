@@ -4,6 +4,7 @@ namespace ide\commands;
 use Dialog;
 use Files;
 use ide\editors\AbstractEditor;
+use ide\formats\GameSpriteFormat;
 use ide\formats\ScriptModuleFormat;
 use ide\forms\BuildProgressForm;
 use ide\forms\InputMessageBoxForm;
@@ -43,7 +44,7 @@ class CreateGameSpriteProjectCommand extends AbstractCommand
         $project = $ide->getOpenedProject();
 
         if ($project) {
-            $name = $ide->getRegisteredFormat(ScriptModuleFormat::class)->showCreateDialog();
+            $name = $ide->getRegisteredFormat(GameSpriteFormat::class)->showCreateDialog();
 
             if ($name !== null) {
                 $name = str::trim($name);

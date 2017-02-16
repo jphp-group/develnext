@@ -207,6 +207,7 @@ class ExecuteProjectCommand extends AbstractCommand
             $this->processDialog = $dialog = new BuildProgressForm();
             //$dialog->removeHeader();
             $dialog->reduceHeader();
+            $dialog->reduceFooter();
             $dialog->removeProgressbar();
 
             Ide::get()->getMainForm()->showBottom($dialog->layout);

@@ -211,11 +211,6 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
         $project->on('create', function () use ($gui, $bundle, $php, $project) {
             $php->setImportType('package');
 
-            $project->getConfig()->setTreeState([
-                "/src/{$project->getPackageName()}/forms",
-                "/src/{$project->getPackageName()}/modules"
-            ]);
-
             $bundle->addBundle(Project::ENV_ALL, UIDesktopBundle::class, false);
             //$bundle->addBundle(Project::ENV_ALL, ControlFXBundle::class);
             $bundle->addBundle(Project::ENV_ALL, Game2DBundle::class);
@@ -223,6 +218,11 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
             $appModule  = $gui->createModule('AppModule');
             $mainModule = $gui->createModule('MainModule');
             $mainForm   = $gui->createForm('MainForm');
+
+            $project->getConfig()->setTreeState([
+                "/src/{$project->getPackageName()}/forms",
+                "/src/{$project->getPackageName()}/modules"
+            ]);
 
             $gui->setMainForm('MainForm');
 
