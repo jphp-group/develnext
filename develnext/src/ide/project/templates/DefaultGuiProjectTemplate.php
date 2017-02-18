@@ -128,11 +128,13 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
                 foreach ($file->findFiles() as $scriptFile) {
                     $meta = Json::fromFile($scriptFile);
 
-                    $meta['props'] = (array) $meta['properties'];
+                    if ($meta['type']) {
+                        $meta['props'] = (array)$meta['properties'];
 
-                    unset($meta['id'], $meta['ideType'], $meta['properties']);
+                        unset($meta['id'], $meta['ideType'], $meta['properties']);
 
-                    $moduleMeta['components'][fs::nameNoExt($scriptFile)] = $meta;
+                        $moduleMeta['components'][fs::nameNoExt($scriptFile)] = $meta;
+                    }
                 }
 
                 Json::toFile(fs::pathNoExt($phpFile) . '.module', $moduleMeta);

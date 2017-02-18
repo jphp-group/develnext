@@ -18,8 +18,9 @@ use php\lib\str;
 
 class IdeActionsPane extends UXHBox
 {
-    protected $zoomSelect;
     use EventHandlerBehaviour;
+
+    protected $zoomSelect;
 
     /**
      * @var UXDesigner

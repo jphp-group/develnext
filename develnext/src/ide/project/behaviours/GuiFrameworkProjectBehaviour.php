@@ -540,7 +540,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             foreach ($usagePrototypes as $factoryId => $ids) {
                 $formEditor = $this->getFormEditor($factoryId);
 
-                if (!$formEditor->getConfig()->get('form.withPrototypes')) {
+                if (!$formEditor) {
+                    Logger::warn("Cannot find form editor for factory '$factoryId'.");
+                    continue;
+                }
+
+                if ($formEditor && !$formEditor->getConfig()->get('form.withPrototypes')) {
                     $formEditor->getConfig()->set('form.withPrototypes', true);
                     $formEditor->saveConfig();
                 }
@@ -697,7 +702,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
-     * @return FormEditor[]
+     * @return \ide\editors\FormEditor[]
+     * @throws IdeException
      */
     public function getFormEditors()
     {
@@ -904,16 +910,5 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->makeDirectory("src/{$this->project->getPackageName()}");
         $this->project->makeDirectory("src/{$this->project->getPackageName()}/forms");
         $this->project->makeDirectory("src/{$this->project->getPackageName()}/modules");
-
-        /*try {
-            $modules = Json::fromFile($this->project->getFile("src/.system/modules.json"));
-
-            foreach ((array)$modules["modules"] as $module) {
-                $name = str::replace($module, "{$this->project->getPackageName()}\\modules\\", "");
-                $this->project->makeDirectory("src/.scripts/$name");
-            }
-        } catch (IOException $e) {
-            ;
-        }*/
     }
 }
