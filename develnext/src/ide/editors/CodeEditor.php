@@ -398,6 +398,13 @@ class CodeEditor extends AbstractEditor
         $this->textArea->text = $value;
     }
 
+    public function loadContentToAreaIfModified()
+    {
+        if (!$this->contentLoaded || $this->fileTime != fs::time($this->file)) {
+            $this->loadContentToArea(false);
+        }
+    }
+
     public function open($param = null)
     {
         parent::open($param);
@@ -411,9 +418,7 @@ class CodeEditor extends AbstractEditor
                 $this->requestFocus();
             }
 
-            if (!$this->contentLoaded || $this->fileTime != fs::time($this->file)) {
-                $this->loadContentToArea(false);
-            }
+            $this->loadContentToAreaIfModified();
         }
 
         if (!$this->embedded && !$this->isTabbed()) {

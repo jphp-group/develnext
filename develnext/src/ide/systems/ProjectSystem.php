@@ -379,7 +379,7 @@ class ProjectSystem
         }
 
         if ($project) {
-            $project->close($saveAll);
+            $project->close(true);
         }
 
         foreach (FileSystem::getOpened() as $hash => $info) {

@@ -484,8 +484,9 @@ class FileSystem
             });
         };
 
+        $tab->data('change-handler', $changeHandler);
+
         uiLater(function () use ($tab, $changeHandler) {
-            $tab->data('change-handler', $changeHandler);
             $tab->on('change', $changeHandler);
         });
 

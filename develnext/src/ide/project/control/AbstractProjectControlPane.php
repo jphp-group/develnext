@@ -37,6 +37,11 @@ abstract class AbstractProjectControlPane implements MenuViewable
         // nop.
     }
 
+    public function leave()
+    {
+        $this->save();
+    }
+
     public function close()
     {
         // nop.

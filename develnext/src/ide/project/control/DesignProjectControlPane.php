@@ -3,6 +3,7 @@ namespace ide\project\control;
 use ide\editors\CodeEditor;
 use ide\editors\CodeEditorX;
 use ide\Ide;
+use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\utils\FileUtils;
 use ide\utils\StrUtils;
 use php\gui\designer\UXCssCodeArea;
@@ -19,14 +20,9 @@ use php\util\Regex;
 class DesignProjectControlPane extends AbstractProjectControlPane
 {
     /**
-     * @var CodeEditor|CodeEditorX
+     * @var CodeEditor
      */
     protected $editor;
-
-    /**
-     * @var
-     */
-    protected $ideStylesheet;
 
     /**
      * @var bool
@@ -53,26 +49,20 @@ class DesignProjectControlPane extends AbstractProjectControlPane
     {
         if ($this->editor) {
             $this->editor->save();
-            $this->reloadStylesheet();
         }
     }
 
     public function open()
     {
-        $this->reloadStylesheet();
-
         if ($this->editor) {
             $this->editor->refreshUi();
+            $this->editor->loadContentToArea(false);
         }
     }
 
     public function load()
     {
-        $this->ideStylesheet = Ide::project()->getIdeCacheFile('.theme/style-ide.css');
-
         if ($this->editor) {
-            /*$file = $this->editor->data('file');
-            $this->editor->text = FileUtils::get($file);  */
             $this->editor->load();
 
             $this->loaded = true;
@@ -84,13 +74,12 @@ class DesignProjectControlPane extends AbstractProjectControlPane
      */
     protected function makeUi()
     {
-        $editor = new CodeEditor($file, 'fxcss');
-        $editor->registerDefaultCommands();
+        $path = Ide::project()->getSrcFile('.theme/style.fx.css');
+        $this->editor = Ide::get()->getFormat($path)->createEditor($path);
+        $this->editor->setTabbed(false);
+        $this->editor->loadContentToArea();
 
-        $editor->loadContentToArea();
-        $this->editor = $editor;
-
-        return $editor->makeUi();
+        return $this->editor->makeUi();
     }
 
     /**
@@ -99,6 +88,8 @@ class DesignProjectControlPane extends AbstractProjectControlPane
     public function refresh()
     {
         if ($this->ui) {
+            $this->editor->loadContentToAreaIfModified();
+
             $this->ui->requestFocus();
 
             uiLater(function () {

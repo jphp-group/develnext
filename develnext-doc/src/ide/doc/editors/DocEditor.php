@@ -154,6 +154,11 @@ class DocEditor extends AbstractEditor
         $this->docService = new DocService();
     }
 
+    public function isAutoClose()
+    {
+        return false;
+    }
+
     /**
      * @return DocService
      */

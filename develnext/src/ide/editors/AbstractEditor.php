@@ -111,6 +111,11 @@ abstract class AbstractEditor
         return $this->readOnly;
     }
 
+    public function isAutoClose()
+    {
+        return true;
+    }
+
     /**
      * @param bool $readOnly
      */

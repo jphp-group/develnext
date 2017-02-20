@@ -91,20 +91,35 @@ class ProjectEditor extends AbstractEditor
         return false;
     }
 
+    public function refresh()
+    {
+        parent::refresh();
+    }
+
     public function open()
     {
         parent::open();
 
         $this->menu->refresh();
 
-        if (!$this->getOpenedPane()) {
-            $this->navigate(arr::firstKey($this->controlPanes));
-        }
-
         foreach ($this->controlPanes as $pane) {
             $pane->open();
         }
+
+        if (!$this->getOpenedPane()) {
+            $this->navigate(arr::firstKey($this->controlPanes));
+        }
     }
+
+    public function leave()
+    {
+        parent::leave();
+
+        if ($pane = $this->menu->selectedItem) {
+            $pane->leave();
+        }
+    }
+
 
     public function load()
     {
@@ -115,23 +130,27 @@ class ProjectEditor extends AbstractEditor
 
     public function save()
     {
-        foreach ($this->controlPanes as $pane) {
+        if ($pane = $this->getOpenedPane()) {
             $pane->save();
         }
+
+        /*foreach ($this->controlPanes as $pane) {
+            $pane->save();
+        }*/
     }
 
     public function close($save = true)
     {
         parent::close($save);
 
-        foreach ($this->controlPanes as $pane) {
+        if ($pane = $this->getOpenedPane()) {
             $pane->close();
         }
     }
 
     public function hide()
     {
-        foreach ($this->controlPanes as $pane) {
+        if ($pane = $this->getOpenedPane()) {
             $pane->save();
         }
     }
@@ -147,6 +166,10 @@ class ProjectEditor extends AbstractEditor
     public function navigate($paneClass, $setMenu = true)
     {
         if ($pane = $this->controlPanes[$paneClass]) {
+            if ($oldPane = $this->menu->selectedItem) {
+                $oldPane->leave();
+            }
+
             $ui = $pane->getUi();
             $pane->refresh();
 
@@ -171,7 +194,7 @@ class ProjectEditor extends AbstractEditor
     public function makeUi()
     {
         $pane = new UXAnchorPane();
-        $pane->padding = 15;
+        $pane->padding = 10;
 
         return $this->contentPane = $pane;
     }

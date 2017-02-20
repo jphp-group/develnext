@@ -20,6 +20,11 @@ class WelcomeEditor extends AbstractEditor
         return 'Welcome';
     }
 
+    public function isAutoClose()
+    {
+        return false;
+    }
+
     public function load()
     {
         // nop.

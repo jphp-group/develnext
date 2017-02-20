@@ -1271,7 +1271,7 @@ public class UXDesigner extends BaseObject {
                                 }
 
                                 selection.drag(x, y, false);
-                                relocateNode(selection.node, x, y);
+                                relocateNode(selection.node, x - getCenterX(node), y - getCenterY(node));
                             } else {
                                 int index = selection.parent.getChildren().indexOf(selection.dragView);
                                 selection.parent.getChildren().add(index, selection.node);

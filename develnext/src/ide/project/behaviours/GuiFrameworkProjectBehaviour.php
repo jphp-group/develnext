@@ -237,7 +237,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $projectFormat->addControlPanes([
             new CommonProjectControlPane(),
-            //new DesignProjectControlPane(),
+            new DesignProjectControlPane(),
 
             new FormsProjectControlPane(),
             new ModulesProjectControlPane(),
@@ -596,6 +596,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
+
         if (!$styleFile->exists() || fs::time($styleFile) != $this->ideStylesheetFileTime) {
             $this->reloadStylesheet();
         }
@@ -613,28 +614,35 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
 
         if ($form = Ide::get()->getMainForm()) {
-            $source = FileUtils::get($styleFile);
+            if (fs::exists($styleFile)) {
+                $source = FileUtils::get($styleFile);
 
-            $regex = Regex::of('((\.|\#)?[\.\w\d\,\*\+\-\_\:\# \r\n]{1,}(\{))')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
+                $regex = Regex::of('((\.|\#)?[\.\w\d\,\*\+\-\_\:\# \r\n]{1,}(\{))')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
 
-            $source = $regex->replaceWithCallback(function (Regex $regex) {
-                $selector = str::trim($regex->group(1));
+                $source = $regex->replaceWithCallback(function (Regex $regex) {
+                    $selector = str::trim($regex->group(1));
 
-                $newSelector = [];
+                    $newSelector = [];
 
-                foreach (str::split($selector, ',') as $one) {
-                    $newSelector[] = ".FormEditor $one";
-                }
+                    foreach (str::split($selector, ',') as $one) {
+                        $newSelector[] = ".FormEditor $one";
+                    }
 
-                return str::join($newSelector, ', ');
-            });
+                    return str::join($newSelector, ', ');
+                });
 
-            FileUtils::put($this->ideStylesheetFile, $source);
+                FileUtils::put($this->ideStylesheetFile, $source);
+            } else {
+                fs::delete($this->ideStylesheetFile);
+            }
 
             $path = "file:///" . str::replace($this->ideStylesheetFile, "\\", "/");
 
             $form->removeStylesheet($path);
-            $form->addStylesheet($path);
+
+            if (fs::exists($styleFile)) {
+                $form->addStylesheet($path);
+            }
         }
 
         $this->ideStylesheetFileTime = fs::time($styleFile);

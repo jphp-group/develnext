@@ -183,6 +183,8 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
         if (fs::isFile($styleFile = $project->getFile('src/.theme/style.css'))) {
             $styleFile->renameTo($project->getFile('src/.theme/style.fx.css'));
+        } else {
+            FileUtils::put($styleFile, "/* JavaFX CSS Style with -fx- prefix */\n\n");
         }
 
         fs::delete($project->getFile('src/.theme/style-ide.css'));
