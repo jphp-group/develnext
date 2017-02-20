@@ -101,7 +101,7 @@ class MyAccountCommand extends AbstractCommand
         $btn->text = $this->getName();
         $btn->font = $btn->font->withBold(); //UXFont::of($btn->font->family, $btn->font->size, 'BOLD');
         $btn->classes->addAll(['flat-button']);
-        $btn->paddingLeft = $btn->paddingRight = 20;
+        $btn->paddingLeft = $btn->paddingRight = 15;
 
         $this->accountButton = $btn;
 

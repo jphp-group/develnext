@@ -23,13 +23,30 @@ use php\lib\str;
  */
 abstract class AbstractEditor
 {
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $file;
+
+    /**
+     * @var int
+     */
+    protected $fileTime;
 
     /**
      * @var bool
      */
     protected $incorrectFormat = false;
+
+    /***
+     * @var bool
+     */
+    protected $readOnly = false;
+
+    /**
+     * @var bool
+     */
+    protected $tabbed = true;
 
     /**
      * @var AbstractFormat
@@ -84,6 +101,38 @@ abstract class AbstractEditor
                 Ide::project()->getIdeConfig($name)->save();
             }
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReadOnly()
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * @param bool $readOnly
+     */
+    public function setReadOnly($readOnly)
+    {
+        $this->readOnly = $readOnly;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTabbed()
+    {
+        return $this->tabbed;
+    }
+
+    /**
+     * @param bool $tabbed
+     */
+    public function setTabbed($tabbed)
+    {
+        $this->tabbed = $tabbed;
     }
 
     /**
@@ -169,14 +218,22 @@ abstract class AbstractEditor
     abstract public function save();
 
     /**
-     * @param bool|true $save
+     * @param bool $save
      */
     public function close($save = true)
     {
         if ($save) {
-            $this->save();
+            if (!$this->readOnly) {
+                $this->save();
+            }
+
             $this->reindex();
         }
+    }
+
+    public function leave()
+    {
+        // nop
     }
 
     public function open($param = null)
@@ -246,7 +303,7 @@ abstract class AbstractEditor
 
     public function delete($silent = false)
     {
-        FileSystem::close($this->file);
+        FileSystem::close($this->file, true, false);
 
         $this->getFormat()->delete($this->file, $silent);
     }

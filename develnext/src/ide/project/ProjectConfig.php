@@ -12,6 +12,7 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\System;
 use php\lib\arr;
+use php\lib\fs;
 use php\lib\Str;
 use php\time\Time;
 use php\util\Scanner;
@@ -337,7 +338,7 @@ class ProjectConfig
         }
     }
 
-    public function setOpenedFiles(array $files, $selectedFile)
+    public function setOpenedFiles(array $files, $selectedFile, array $windowFiles = [])
     {
         $domOpenedFiles = $this->document->find('/project/openedFiles');
 
@@ -350,12 +351,18 @@ class ProjectConfig
             $domOpenedFiles->removeChild($domOpenedFile);
         }
 
+        $windowFiles = arr::combine($windowFiles, $windowFiles);
+
         foreach ($files as $file) {
             $domFile = $this->document->createElement('file');
             $domFile->setAttribute('src', $file instanceof ProjectFile ? $file->getRelativePath() : $file);
 
             if (FileUtils::hashName($selectedFile) == FileUtils::hashName($file)) {
                 $domFile->setAttribute('selected', '1');
+            }
+
+            if ($windowFiles[FileUtils::hashName($file)]) {
+                $domFile->setAttribute('window', '1');
             }
 
             $domOpenedFiles->appendChild($domFile);
@@ -415,7 +422,26 @@ class ProjectConfig
 
         /** @var DomElement $file */
         foreach ($this->document->findAll('/project/openedFiles/file') as $file) {
-            $files[] = $file->getAttribute('src');
+            if (!$file->getAttribute('window')) {
+                $files[] = $file->getAttribute('src');
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * @return array
+     */
+    public function getWindowOpenedFiles()
+    {
+        $files = [];
+
+        /** @var DomElement $file */
+        foreach ($this->document->findAll('/project/openedFiles/file') as $file) {
+            if ($file->getAttribute('window')) {
+                $files[] = $file->getAttribute('src');
+            }
         }
 
         return $files;

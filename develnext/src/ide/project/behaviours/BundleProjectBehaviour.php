@@ -3,6 +3,7 @@ namespace ide\project\behaviours;
 
 use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
+use ide\editors\AbstractEditor;
 use ide\editors\ProjectEditor;
 use ide\forms\BundleCheckListForm;
 use ide\Ide;
@@ -16,6 +17,7 @@ use ide\systems\FileSystem;
 use ide\systems\IdeSystem;
 use ide\utils\FileUtils;
 use ide\utils\PhpParser;
+use php\gui\designer\UXDirectoryTreeValue;
 use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXScrollPane;
@@ -111,6 +113,8 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('makeSettings', [$this, 'doMakeSettings']);
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
         $this->project->on('create', [$this, 'doCreate']);
+
+        $this->project->on('createEditor', [$this, 'doCreateEditor']);
     }
 
     public function doCreate()
@@ -118,6 +122,17 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         uiLater(function () {
             $this->showBundleCheckListDialog();
         });
+    }
+
+    public function doCreateEditor(AbstractEditor $editor)
+    {
+        $file = $editor->getFile();
+
+        $path = $this->project->getAbsoluteFile($file)->getRelativePath();
+
+        if (str::startsWith($path, self::VENDOR_DIRECTORY . '/')) {
+            $editor->setReadOnly(true);
+        }
     }
 
     public function doClose()
@@ -134,7 +149,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         }
 
         //$this->bundleConfigs = [];
-       // $this->bundles = [];
+        // $this->bundles = [];
         $this->fileStat = [];
     }
 
@@ -169,6 +184,29 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     public function doLoad()
     {
+        $this->project->getTree()->addValueCreator(function ($path, File $file) {
+            if ($file->isDirectory() && str::startsWith($path, '/' . self::VENDOR_DIRECTORY . '/')) {
+                $names = str::split($path, '/', 100);
+
+                if (sizeof($names) === 3) {
+                    $class = $names[2];
+                    $class = str::replace($class, '.', '\\');
+
+                    $resource = $this->getResourceOfBundle($class);
+
+                    if ($resource) {
+                        $icon = Ide::get()->getImage($resource->getIcon(), [16, 16]);
+
+                        if (!$icon) {
+                            $icon = ico('blocks16');
+                        }
+
+                        return new UXDirectoryTreeValue($path, $file->getName(), $resource->getName(), $icon, $icon, true);
+                    }
+                }
+            }
+        });
+
         $files = $this->project->getIdeFile("bundles/")->findFiles();
 
         foreach ($files as $file) {
@@ -531,11 +569,17 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         return $result;
     }
 
-    public function getResourceOfBundle(AbstractBundle $bundle)
+    /**
+     * @param AbstractBundle|string $bundleOrClass
+     * @return IdeLibraryBundleResource|null
+     */
+    public function getResourceOfBundle($bundleOrClass)
     {
+        $class = $bundleOrClass instanceof AbstractBundle ? reflect::typeOf($bundleOrClass) : (string)$bundleOrClass;
+
         /** @var IdeLibraryBundleResource $resource */
         foreach (Ide::get()->getLibrary()->getResources('bundles') as $resource) {
-            if (reflect::typeOf($resource->getBundle()) == reflect::typeOf($bundle)) {
+            if (reflect::typeOf($resource->getBundle()) == $class) {
                 return $resource;
             }
         }

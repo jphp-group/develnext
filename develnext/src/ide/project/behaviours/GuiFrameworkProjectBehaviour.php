@@ -18,6 +18,7 @@ use ide\editors\menu\ContextMenu;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\FormEditorSettings;
+use ide\formats\FxCssCodeFormat;
 use ide\formats\GameSpriteFormat;
 use ide\formats\GuiFormFormat;
 use ide\formats\PhpCodeFormat;
@@ -49,6 +50,7 @@ use ide\utils\Json;
 use php\gui\event\UXEvent;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
+use php\gui\UXApplication;
 use php\gui\UXLabel;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
@@ -58,6 +60,8 @@ use php\io\IOException;
 use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
+use php\util\Regex;
+use timer\AccurateTimer;
 
 class GuiFrameworkProjectBehaviour_ProjectTreeMenuCommand extends AbstractMenuCommand
 {
@@ -183,6 +187,21 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     protected $appUuid;
 
     /**
+     * @var File
+     */
+    protected $ideStylesheetFile;
+
+    /**
+     * @var int
+     */
+    protected $ideStylesheetFileTime;
+
+    /**
+     * @var AccurateTimer
+     */
+    protected $ideStylesheetTimer;
+
+    /**
      * @return int
      */
     public function getPriority()
@@ -214,10 +233,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->project->registerFormat(new GuiFormFormat());
         $this->project->registerFormat(new ScriptModuleFormat());
         $this->project->registerFormat(new GameSpriteFormat());
+        $this->project->registerFormat(new FxCssCodeFormat());
 
         $projectFormat->addControlPanes([
             new CommonProjectControlPane(),
-            new DesignProjectControlPane(),
+            //new DesignProjectControlPane(),
 
             new FormsProjectControlPane(),
             new ModulesProjectControlPane(),
@@ -239,6 +259,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->actionManager = ActionManager::get();
         $this->spriteManager = new IdeSpriteManager($this->project);
+
+        $this->ideStylesheetFile = $this->project->getIdeCacheFile('.theme/style-ide.css');
     }
 
     public function makeApplicationConf()
@@ -295,8 +317,16 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doClose()
     {
+        $this->ideStylesheetTimer->stop();
+
         $this->actionManager->free();
         $this->spriteManager->free();
+
+        // Clear all styles for MainForm.
+        if ($form = Ide::get()->getMainForm()) {
+            $path = "file:///" . str::replace($this->ideStylesheetFile, "\\", "/");
+            $form->removeStylesheet($path);
+        }
     }
 
     public function doCreate()
@@ -467,7 +497,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         ]);
         $tree->addIgnorePaths([
             'application.pid', 'build.gradle', 'settings.gradle', 'build.xml',
-            'src/.forms', 'src/.scripts', 'src/.system', 'src/.debug', 'src/JPHP-INF', "src/.theme"
+            'src/.forms', 'src/.scripts', 'src/.system', 'src/.debug', 'src/JPHP-INF'
         ]);
 
         $tree->addIgnoreFilter(function ($file) {
@@ -502,6 +532,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->mainForm = $this->applicationConfig->get('app.mainForm', '');
         $this->appUuid = $this->applicationConfig->get('app.uuid', str::uuid());
+
+        $this->reloadStylesheetIfModified();
+
+        $this->ideStylesheetTimer = new AccurateTimer(100, [$this, 'reloadStylesheetIfModified']);
+        $this->ideStylesheetTimer->start();
     }
 
     public function doRecover()
@@ -553,6 +588,58 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
+    public function reloadStylesheetIfModified()
+    {
+        if (!$this->ideStylesheetFileTime) {
+            $this->reloadStylesheet();
+            return;
+        }
+
+        $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
+        if (!$styleFile->exists() || fs::time($styleFile) != $this->ideStylesheetFileTime) {
+            $this->reloadStylesheet();
+        }
+    }
+
+    public function reloadStylesheet()
+    {
+        if (!UXApplication::isUiThread()) {
+            uiLater(function () {
+                $this->reloadStylesheet();
+            });
+            return;
+        }
+
+        $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
+
+        if ($form = Ide::get()->getMainForm()) {
+            $source = FileUtils::get($styleFile);
+
+            $regex = Regex::of('((\.|\#)?[\.\w\d\,\*\+\-\_\:\# \r\n]{1,}(\{))')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
+
+            $source = $regex->replaceWithCallback(function (Regex $regex) {
+                $selector = str::trim($regex->group(1));
+
+                $newSelector = [];
+
+                foreach (str::split($selector, ',') as $one) {
+                    $newSelector[] = ".FormEditor $one";
+                }
+
+                return str::join($newSelector, ', ');
+            });
+
+            FileUtils::put($this->ideStylesheetFile, $source);
+
+            $path = "file:///" . str::replace($this->ideStylesheetFile, "\\", "/");
+
+            $form->removeStylesheet($path);
+            $form->addStylesheet($path);
+        }
+
+        $this->ideStylesheetFileTime = fs::time($styleFile);
+    }
+
     public function saveBootstrapScript($incExtension = ['php', 'phb'])
     {
         $template = new GuiBootstrapFileTemplate();
@@ -595,6 +682,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $code .= "\n\$app->loadModules(" . var_export($moduleClasses, true) . ');';
+        $code .= "\n\$app->addStyle('/.theme/style.fx.css');";
 
         $template->setInnerCode($code);
 

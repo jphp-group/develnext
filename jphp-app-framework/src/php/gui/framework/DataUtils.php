@@ -12,7 +12,6 @@ use php\gui\UXTabPane;
 use php\gui\UXTitledPane;
 use php\lang\IllegalArgumentException;
 use php\lib\Str;
-use php\lib\String;
 
 /**
  * Class DataUtils

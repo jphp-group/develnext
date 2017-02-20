@@ -12,4 +12,8 @@ abstract public class AbstractDirectoryTreeSource {
     abstract public void shutdown();
 
     abstract public String rename(String path, String newName);
+
+    public Object getDragContent(String path) {
+        return null;
+    }
 }

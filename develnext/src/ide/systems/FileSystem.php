@@ -17,6 +17,7 @@ use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXContextMenu;
 use php\gui\UXDialog;
+use php\gui\UXForm;
 use php\gui\UXSplitPane;
 use php\gui\UXTab;
 use php\gui\UXMenu;
@@ -25,6 +26,7 @@ use php\io\File;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\Items;
+use timer\AccurateTimer;
 
 class FileSystem
 {
@@ -57,6 +59,11 @@ class FileSystem
      * @var array
      */
     static protected $openedFiles = [];
+
+    /**
+     * @var UXForm[]
+     */
+    static protected $openedWindows = [];
 
     /**
      * @var AbstractEditor
@@ -124,6 +131,15 @@ class FileSystem
                     }
                 }
 
+                foreach (self::$openedWindows as $window) {
+                    if ($window->userData === $editor) {
+                        self::$freeze = true;
+                        $window->toFront();
+                        self::$freeze = false;
+                        break;
+                    }
+                }
+
                 static::_openEditor($editor, $param);
             } else {
                 $editor->open($param);
@@ -184,6 +200,17 @@ class FileSystem
         $hash = FileUtils::hashName($path);
 
         return isset(static::$openedFiles[$hash]);
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    static function isTabbed($path)
+    {
+        $hash = FileUtils::hashName($path);
+
+        return !isset(static::$openedWindows[$hash]) && static::isOpened($path);
     }
 
     /**
@@ -300,14 +327,196 @@ class FileSystem
         }
     }
 
+    static private function makeUiForEditor(AbstractEditor $editor)
+    {
+        $content = $editor->makeUi();
+
+        if ($leftPaneUi = $editor->makeLeftPaneUi()) {
+            $editor->setLeftPaneUi($leftPaneUi);
+
+            if ($leftPaneUi instanceof IdeTabPane) {
+                $leftPaneUi = $leftPaneUi->makeUi();
+            }
+
+            $wrapScroll = new UXScrollPane($leftPaneUi);
+            $wrapScroll->fitToHeight = true;
+            $wrapScroll->fitToWidth = true;
+            UXAnchorPane::setAnchor($wrapScroll, 0);
+
+            $wrap = new UXAnchorPane();
+            $wrap->width = 250;
+            $wrap->add($wrapScroll);
+            UXSplitPane::setResizeWithParent($wrap, false);
+
+            $content = new UXSplitPane([$wrap, $content]);
+
+            $init = false;
+
+            if (static::$editorContentDividePosition) {
+                $init = true;
+                $content->dividerPositions = static::$editorContentDividePosition;
+            }
+
+
+            $v = function () use (&$dividePositions, $content) {
+                static::$editorContentDividePosition = $content->dividerPositions;
+            };
+            $wrap->observer('width')->addListener($v);
+            Ide::get()->getMainForm()->observer('width')->addListener($v);
+
+            (new AccurateTimer(100, $v))->start();
+
+            $content->observer('width')->addListener(function ($_, $width) use (&$init, $content, $wrap) {
+                if (!$init) {
+                    $init = true;
+                    $content->dividerPositions = [$wrap->width/$width];
+                }
+            });
+        } else {
+            $editor->setLeftPaneUi(null);
+        }
+
+        return $content;
+    }
+
+    static private function makeWindowForEditor(AbstractEditor $editor)
+    {
+        $editor->setTabbed(false);
+
+        $win = new UXForm();
+        $win->owner = Ide::get()->getMainForm();
+        $win->title = $editor->getTitle() . " [" . $editor->getFile() . "]";
+
+        if ($editor->getIcon()) {
+            $win->icons->add(Ide::get()->getImage($editor->getIcon())->image);
+        } else {
+            $win->icons->addAll(Ide::get()->getMainForm()->icons);
+        }
+
+        $win->layout = static::makeUiForEditor($editor);
+        $win->layout->size = [800, 600];
+
+        $changeHandler = function (UXEvent $e = null, $param = null) use ($editor) {
+            Logger::debug("Opening window editor '{$editor->getTitle()}'");
+            self::_openEditor($editor, $param);
+        };
+
+        $win->observer('focused')->addListener(function ($_, $new) use ($editor, $changeHandler) {
+            if (!$new) {
+                if (self::isOpened($editor->getFile())) {
+                    Logger::debug("Leave window '{$editor->getTitle()}'");
+                    $editor->leave();
+                }
+            } else {
+                $changeHandler();
+            }
+        });
+
+        $win->on('close', function () use ($editor) {
+            if (!static::$freeze) {
+                static::close($editor->getFile(), false);
+            }
+        });
+
+        //$win->on('showing', $changeHandler);
+        $win->data('change-handler', $changeHandler);
+
+        return $win;
+    }
+
+    static private function makeTabForEditor(AbstractEditor $editor)
+    {
+        $tab = new UXTab();
+
+        $editor->setTabbed(true);
+
+        $tab->text = $editor->getTitle();
+        $tab->tooltip = $editor->getTooltip();
+        $tab->style = $editor->getTabStyle();
+        $tab->graphic = Ide::get()->getImage($editor->getIcon());
+        $tab->content = static::makeUiForEditor($editor);
+        $tab->userData = $editor;
+
+        $tab->closable = $editor->isCloseable();
+
+        /** @var MainForm $mainForm */
+        $mainForm = Ide::get()->getMainForm();
+
+        $tab->on('closeRequest', function (UXEvent $e) use ($editor) {
+            static::close($editor->getFile(), false);
+        });
+
+        $changeHandler = function (UXEvent $e = null, $param = null) use ($mainForm, $editor) {
+            /** @var UXTabPane $fileTabPane */
+            $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
+
+            if ($e && $e->sender === $fileTabPane->selectedTab) {
+                return;
+            }
+
+            if (static::$freeze) {
+                return;
+            }
+
+            if ($e && $e->sender instanceof UXTab && $e->sender->userData instanceof AbstractEditor) {
+                $editor = $e->sender->userData;
+
+                uiLater(function () use ($editor) {
+                    if (self::isOpened($editor->getFile())) {
+                        Logger::debug("Leave tab '{$editor->getTitle()}'");
+                        $editor->leave();
+                    }
+                });
+            }
+
+            uiLater(function () use ($mainForm, $editor, $fileTabPane, $param) {
+                $tab = $fileTabPane->selectedTab;
+
+                if ($tab) {
+                    if (static::$editorContentDividePosition && $tab->content instanceof UXSplitPane) {
+                        $tab->content->dividerPositions = static::$editorContentDividePosition;
+                    }
+
+                    Logger::debug("Opening selected tab '$tab->text'");
+
+                    static::_openEditor($tab->userData, $param);
+                }
+            });
+        };
+
+        uiLater(function () use ($tab, $changeHandler) {
+            $tab->data('change-handler', $changeHandler);
+            $tab->on('change', $changeHandler);
+        });
+
+        static::addTab($tab);
+        $tab->draggable = $editor->isDraggable();
+
+        return $tab;
+    }
+
+    static function switchToWindow($path)
+    {
+        if ($win = static::$openedWindows[FileUtils::hashName($path)]) {
+            $win->toFront();
+            return;
+        }
+
+        if ($editor = static::getOpenedEditor($path)) {
+            static::close($path);
+
+            static::open($path, true, null, true);
+        }
+    }
+
     /**
      * @param $path
-     * @param bool $switchToTab
+     * @param bool $switchToEditor
      * @param null $param
+     * @param bool $inWindow
      * @return AbstractEditor|null
-     * @throws \php\lang\IllegalStateException
      */
-    static function open($path, $switchToTab = true, $param = null)
+    static function open($path, $switchToEditor = true, $param = null, $inWindow = false)
     {
         if ($path instanceof AbstractEditor) {
             $path = $path->getFile();
@@ -321,6 +530,7 @@ class FileSystem
 
         $editor = static::$openedEditors[$hash];
         $tab    = static::$openedTabs[$hash];
+        $win    = static::$openedWindows[$hash];
         $info   = (array) static::$openedFiles[$hash];
 
         if (!$editor) {
@@ -339,129 +549,48 @@ class FileSystem
             return null;
         }
 
-        if (!$tab) {
-            $tab = new UXTab();
+        if ($inWindow) {
+            if (!$win) {
+                $win = static::makeWindowForEditor($editor);
+                $changeHandler = $win->data('change-handler');
 
-            $tab->text = $editor->getTitle();
-            $tab->tooltip = $editor->getTooltip();
-            $tab->style = $editor->getTabStyle();
-            $tab->graphic = Ide::get()->getImage($editor->getIcon());
-
-            $content = $editor->makeUi();
-
-            if ($leftPaneUi = $editor->makeLeftPaneUi()) {
-                $editor->setLeftPaneUi($leftPaneUi);
-
-                if ($leftPaneUi instanceof IdeTabPane) {
-                    $leftPaneUi = $leftPaneUi->makeUi();
+                if ($switchToEditor && is_callable($changeHandler)) {
+                    $changeHandler(null, $param);
                 }
-
-                $wrapScroll = new UXScrollPane($leftPaneUi);
-                $wrapScroll->fitToHeight = true;
-                $wrapScroll->fitToWidth = true;
-                UXAnchorPane::setAnchor($wrapScroll, 0);
-
-                $wrap = new UXAnchorPane();
-                $wrap->width = 250;
-                $wrap->add($wrapScroll);
-                UXSplitPane::setResizeWithParent($wrap, false);
-
-                $content = new UXSplitPane([$wrap, $content]);
-
-                $init = false;
-
-                if (static::$editorContentDividePosition) {
-                    $init = true;
-                    $content->dividerPositions = static::$editorContentDividePosition;
-                }
-
-
-                $wrap->observer('width')->addListener(function () use (&$dividePositions, $content) {
-                    static::$editorContentDividePosition = $content->dividerPositions;
-                });
-
-                $content->observer('width')->addListener(function ($_, $width) use (&$init, $content, $wrap) {
-                    if (!$init) {
-                        $init = true;
-                        $content->dividerPositions = [$wrap->width/$width];
-                    }
-                });
-            } else {
-                $editor->setLeftPaneUi(null);
             }
 
-            $tab->content = $content;
-
-            $tab->userData = $editor;
-
-            $tab->closable = $editor->isCloseable();
-
-            /** @var MainForm $mainForm */
-            $mainForm = Ide::get()->getMainForm();
-
-            $tab->on('closeRequest', function (UXEvent $e) use ($path, $editor) {
-                /*if (static::$previousEditor === $e->sender->userData) {
-                    uiLater(function () {
-                        if (Ide::project()) {
-                            FileSystem::open(Ide::project()->getMainProjectFile());
-                        }
-                    });
-                }*/
-
-                static::close($path, false);
-            });
-
-            $changeHandler = function (UXEvent $e = null, $param = null) use ($mainForm, $path) {
-                /** @var UXTabPane $fileTabPane */
-                $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
-
-                if ($e && $e->sender === $fileTabPane->selectedTab) {
-                    return;
-                }
-
-                if (static::$freeze) {
-                    return;
-                }
-
-                uiLater(function () use ($mainForm, $path, $fileTabPane, $param) {
-                    $tab = $fileTabPane->selectedTab;
-
-                    if ($tab) {
-                        if (static::$editorContentDividePosition && $tab->content instanceof UXSplitPane) {
-                            $tab->content->dividerPositions = static::$editorContentDividePosition;
-                        }
-
-                        Logger::info("Opening selected tab '$tab->text'");
-
-                        static::_openEditor($tab->userData, $param);
-                    }
-                });
-            };
-
-            uiLater(function () use ($tab, $changeHandler) {
-                $tab->data('change-handler', $changeHandler);
-                $tab->on('change', $changeHandler);
-            });
-
-            if ($switchToTab) {
-                $changeHandler(null, $param);
+            if ($switchToEditor) {
+                $win->show();
+                $win->toFront();
             }
-
-            static::addTab($tab);
-            $tab->draggable = $editor->isDraggable();
         } else {
-            if (static::$editorContentDividePosition && $tab->content instanceof UXSplitPane) {
-                $tab->content->dividerPositions = static::$editorContentDividePosition;
+            if (!$tab) {
+                $tab = static::makeTabForEditor($editor);
+                $changeHandler = $tab->data('change-handler');
+
+                if ($switchToEditor && is_callable($changeHandler)) {
+                    $changeHandler(null, $param);
+                }
+            } else {
+                if (static::$editorContentDividePosition && $tab->content instanceof UXSplitPane) {
+                    $tab->content->dividerPositions = static::$editorContentDividePosition;
+                }
+            }
+
+            if ($switchToEditor) {
+                Ide::get()->getMainForm()->{'fileTabPane'}->selectTab($tab);
             }
         }
 
-        if ($switchToTab) {
-            Ide::get()->getMainForm()->{'fileTabPane'}->selectTab($tab);
-        }
 
         static::$openedFiles[$hash] = $info;
-        static::$openedTabs[$hash] = $tab;
         static::$openedEditors[$hash] = $editor;
+
+        if ($inWindow) {
+            static::$openedWindows[$hash] = $win;
+        } else {
+            static::$openedTabs[$hash] = $tab;
+        }
 
         return $editor;
     }
@@ -471,22 +600,39 @@ class FileSystem
         Ide::get()->getMainForm()->{'fileTabPane'}->tabs->clear();
     }
 
-    static function close($path, $removeTab = true, $save = true)
+    static function close($path, $removeUiEditor = true, $save = true)
     {
+        Logger::debug("Close file '$path', removeUiEditor = $removeUiEditor, save = $save");
+
         $hash = FileUtils::hashName($path);
 
         /** @var AbstractEditor $editor */
         $editor = static::$openedEditors[$hash];
         $tab    = static::$openedTabs[$hash];
+        $win    = static::$openedWindows[$hash];
 
-        unset(static::$openedTabs[$hash], static::$openedEditors[$hash], static::$openedFiles[$hash], static::$cachedEditors[$hash]);
+        unset(
+            static::$openedTabs[$hash],
+            static::$openedEditors[$hash],
+            static::$openedFiles[$hash],
+            static::$cachedEditors[$hash],
+            static::$openedWindows[$hash]
+        );
 
         if ($editor) {
             $editor->close($editor->isCorrectFormat() && $save);
         }
 
-        if ($removeTab && $tab) {
-            Ide::get()->getMainForm()->{'fileTabPane'}->tabs->remove($tab);
+        if ($removeUiEditor) {
+            if ($tab) {
+                Ide::get()->getMainForm()->{'fileTabPane'}->tabs->remove($tab);
+            }
+
+            if ($win) {
+                self::$freeze = true;
+                $win->hide();
+                self::$freeze = false;
+            }
         }
     }
 
@@ -542,20 +688,6 @@ class FileSystem
             $button->classes->add('dn-add-tab-button');
             $button->style = '-fx-background-radius: 0; -fx-border-radius: 0; -fx-border-width: 0';
 
-            /*$showMenu = function (UXMouseEvent $event) use ($button) {
-                call_user_func(self::$addTabClick);
-
-                $contextMenu = new UXContextMenu();
-
-                // @var UXMenu $menu
-                $menu = Ide::get()->getMainForm()->findSubMenu('menuCreate');
-
-                foreach ($menu->items as $item) {
-                    $contextMenu->items->add($item);
-                }
-
-                $contextMenu->showByNode($button, 24, 24);
-            };*/
             $button->on('click', function ($e) {
                 call_user_func(self::$addTabClick, $e);
             });

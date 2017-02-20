@@ -44,10 +44,7 @@ import php.runtime.reflection.ClassEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXNode")
@@ -182,6 +179,17 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
         }
     }
 
+
+    @Signature
+    public Memory __debugInfo(Environment env, Memory... args) {
+        ArrayMemory info = new ArrayMemory();
+        info.refOfIndex("*id").assign(getWrappedObject().getId());
+        info.refOfIndex("*nativeType").assign(getWrappedObject().getClass().getName());
+        info.refOfIndex("*classes").assign(ArrayMemory.ofStringCollection(getWrappedObject().getStyleClass()));
+
+        return info.toConstant();
+    }
+
     @Getter
     public Memory getEffects(Environment env) {
         Memory effects = data("--effects");
@@ -292,9 +300,9 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     public void setClassesString(String value) {
         String[] strings = value.split(" ");
 
-        Set<String> set = new TreeSet<>();
+        Set<String> set = new LinkedHashSet<>();
         for (String string : strings) {
-            set.add(string);
+            set.add(string.trim());
         }
 
         getWrappedObject().getStyleClass().clear();

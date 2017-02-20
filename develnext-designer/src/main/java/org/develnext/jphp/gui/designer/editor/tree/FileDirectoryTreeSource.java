@@ -1,6 +1,11 @@
 package org.develnext.jphp.gui.designer.editor.tree;
 
 import javafx.scene.Node;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.monitor.FileAlterationListener;
+import org.apache.commons.io.monitor.FileAlterationMonitor;
+import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -16,7 +21,7 @@ public class FileDirectoryTreeSource extends AbstractDirectoryTreeSource {
 
 
     private final File directory;
-    private Map<String, DirectoryTreeListener> watchers = new HashMap<>();
+    private final Map<String, DirectoryTreeListener> watchers = new HashMap<>();
 
     private boolean showHidden = false;
     private List<FileFilter> fileFilters = new ArrayList<>();
@@ -85,6 +90,11 @@ public class FileDirectoryTreeSource extends AbstractDirectoryTreeSource {
         return true;
     }
 
+    @Override
+    public Object getDragContent(String path) {
+        return Collections.singletonList(new File(directory, "/" + path));
+    }
+
     public boolean isEmpty(String path) {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(Paths.get(directory.getPath(), path))) {
             for (Path el : dirStream) {
@@ -132,16 +142,14 @@ public class FileDirectoryTreeSource extends AbstractDirectoryTreeSource {
         }
 
         try {
-            WatchService watchService = FileSystems.getDefault().newWatchService();
-            Path p = Paths.get(new File(directory, "/" + path).getPath());
-            p.register(
-                    watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE
-            );
+            File file = new File(directory, "/" + path);
 
-            Listener listener = new Listener(path, watchService);
-            watchers.put(path, listener);
-            return listener;
-        } catch (IOException e) {
+            if (!file.exists()) {
+                return null;
+            }
+
+            return new Listener(path);
+        } catch (Exception e) {
             return null;
         }
     }
@@ -171,42 +179,103 @@ public class FileDirectoryTreeSource extends AbstractDirectoryTreeSource {
     }
 
     private class Listener extends DirectoryTreeListener {
-        private boolean shutdown = false;
+        private final String path;
+        private final Timer timer;
 
-        public Listener(String path, WatchService watcher) {
+        private Set<String> lastFiles;
+
+        private boolean shutdown;
+
+        public Listener(String path) {
             super(path);
+            this.path = path;
 
-            new Thread(() -> {
-                while (true) {
-                    WatchKey poll = null;
-                    try {
-                        poll = watcher.poll(1, TimeUnit.SECONDS);
+            this.timer = new Timer("Listener-" + path);
+            this.timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    check();
+                }
+            }, 0, 1000);
 
-                        if (shutdown) {
-                            watcher.close();
-                            break;
+            synchronized (watchers) {
+                watchers.put(path, this);
+            }
+        }
+
+        private void check() {
+            File file = new File(directory, "/" + path);
+
+            if (!file.exists()) {
+                shutdown();
+                return;
+            }
+
+            String[] files = file.list();
+
+            if (files == null) {
+                shutdown();
+                return;
+            }
+
+            if (lastFiles == null) {
+                lastFiles = new HashSet<>();
+                Collections.addAll(lastFiles, files);
+            } else {
+                if (lastFiles.size() != files.length) {
+                    saveAndTrigger(files);
+                } else {
+                    // check new files
+                    for (String f : files) {
+                        if (!lastFiles.contains(f)) {
+                            if (!shutdown) {
+                                saveAndTrigger(files);
+                            }
+                            return;
                         }
+                    }
 
-                        if (poll != null) {
-                            poll.pollEvents();
-                            trigger();
+                    Set<String> newLastFiles = new HashSet<>();
+                    Collections.addAll(newLastFiles, files);
 
-                            poll.reset();
+                    // check deleted files
+                    for (String f : lastFiles) {
+                        if (!newLastFiles.contains(f)) {
+                            lastFiles = newLastFiles;
+
+                            if (!shutdown) {
+                                trigger();
+                            }
+
+                            return;
                         }
-                    } catch (InterruptedException | IOException e) {
-                        //watchers.remove(getPath());
-                        break;
                     }
                 }
-            }).start();
+            }
+        }
+
+        private void saveAndTrigger(String[] files) {
+            Set<String> newLastFiles = new HashSet<>();
+            Collections.addAll(newLastFiles, files);
+
+            lastFiles = newLastFiles;
+            trigger();
         }
 
         @Override
         public void shutdown() {
             super.shutdown();
 
-            watchers.remove(getPath());
+            synchronized (watchers) {
+                watchers.remove(path);
+            }
+
             shutdown = true;
+            try {
+                timer.cancel();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

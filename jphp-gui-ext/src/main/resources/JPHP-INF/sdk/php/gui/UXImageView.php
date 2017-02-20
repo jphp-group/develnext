@@ -35,4 +35,12 @@ class UXImageView extends UXNode
      * @var double
      */
     public $fitHeight;
+
+    /**
+     * UXImageView constructor.
+     * @param UXImage|null $image
+     */
+    public function __construct(UXImage $image = null)
+    {
+    }
 }

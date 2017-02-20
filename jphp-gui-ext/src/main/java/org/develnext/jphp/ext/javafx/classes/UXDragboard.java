@@ -11,6 +11,9 @@ import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 @Reflection.Name(JavaFXExtension.NS + "UXDragboard")
@@ -43,8 +46,18 @@ public class UXDragboard extends BaseWrapper<Dragboard> {
     }
 
     @Getter
+    public String getUrl() {
+        return getWrappedObject().hasUrl() ? getWrappedObject().getUrl() : null;
+    }
+
+    @Getter
     public Image getImage() {
         return getWrappedObject().hasImage() ? getWrappedObject().getImage() : null;
+    }
+
+    @Getter
+    public List<File> getFiles() {
+        return getWrappedObject().hasFiles() ? getWrappedObject().getFiles() : Collections.emptyList();
     }
 
     @Setter
@@ -59,6 +72,22 @@ public class UXDragboard extends BaseWrapper<Dragboard> {
     public void setImage(Image image) {
         ClipboardContent content = new ClipboardContent();
         content.putImage(image);
+
+        getWrappedObject().setContent(content);
+    }
+
+    @Setter
+    public void setFiles(List<File> files) {
+        ClipboardContent content = new ClipboardContent();
+        content.putFiles(files);
+
+        getWrappedObject().setContent(content);
+    }
+
+    @Setter
+    public void setUrl(String url) {
+        ClipboardContent content = new ClipboardContent();
+        content.putUrl(url);
 
         getWrappedObject().setContent(content);
     }

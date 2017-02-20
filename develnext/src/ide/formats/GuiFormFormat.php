@@ -111,12 +111,14 @@ class GuiFormFormat extends AbstractFormFormat
             }
         }
 
-        $parent = File::of($path)->getParent();
+        $parent = fs::parent($path);
 
         fs::delete("$parent/$name.conf");
 
         fs::delete("$parent/$name.php");
+        fs::delete("$parent/$name.fxml");
         fs::delete("$parent/$name.php.source");
+        fs::delete("$parent/$name.php.sourcemap");
         fs::delete("$parent/$name.php.axml");
         fs::delete("$parent/$name.behaviour");
     }

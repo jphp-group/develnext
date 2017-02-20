@@ -16,6 +16,7 @@ public class Data extends MetaNode implements Map<String, String>, Styleable {
         this.idKey = "id";
 
         map = new HashMap<>();
+        setManaged(false);
     }
 
     /* Map <String, String> */

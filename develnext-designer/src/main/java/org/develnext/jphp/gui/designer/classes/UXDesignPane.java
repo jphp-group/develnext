@@ -257,8 +257,8 @@ public class UXDesignPane extends UXAnchorPane {
     }
 
     protected void updateStyle() {
-        getWrappedObject().setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: " + borderWidth + "px; -fx-border-radius: 4px;");
-        topBorders.setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: " + borderWidth + "px; -fx-border-radius: 4px;");
+        getWrappedObject().setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: " + borderWidth + "px; -fx-border-radius: 0px;");
+        topBorders.setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: " + borderWidth + "px; -fx-border-radius: 0px;");
         topBorders.setMouseTransparent(true);
         topBorders.setBackground(Background.EMPTY);
         topBorders.setOpacity(0.5);

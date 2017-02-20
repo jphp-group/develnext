@@ -76,7 +76,6 @@ public class DirectoryTreeView extends TreeView<DirectoryTreeValue> {
         setTreeSource(treeSource);
     }
 
-
     public AbstractDirectoryTreeSource getTreeSource() {
         return treeSource.get();
     }
@@ -202,6 +201,7 @@ public class DirectoryTreeView extends TreeView<DirectoryTreeValue> {
             for (TreeItem<DirectoryTreeValue> selectedItem : selectedItems) {
                 getSelectionModel().select(selectedItem);
             }
+
 
             if (saveState) {
                 selectedPaths.clear();

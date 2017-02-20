@@ -31,15 +31,15 @@ ide\formats\form\elements\PanelFormElement
 ide\formats\form\elements\TitledPaneFormElement
 ide\formats\form\elements\ScrollPaneFormElement
 ide\formats\form\elements\TabPaneFormElement
+ide\formats\form\elements\HBoxFormElement
+ide\formats\form\elements\VBoxFormElement
+ide\formats\form\elements\FlowPaneFormElement
 
 ide\formats\form\elements\RectangleFormElement
 ide\formats\form\elements\CircleFormElement
 ide\formats\form\elements\EllipseFormElement
 ide\formats\form\elements\RhombusFormElement
 ide\formats\form\elements\HexahedronFormElement
-
-
-
 
 ide\formats\form\tags\NodeFormElementTag
 ide\formats\form\tags\DataFormElementTag

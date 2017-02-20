@@ -1,20 +1,15 @@
 <?php
 namespace php\gui\framework;
-use Error;
+
 use php\format\JsonProcessor;
 use php\framework\Logger;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
-use php\gui\framework\behaviour\custom\BehaviourManager;
 use php\gui\framework\behaviour\custom\ModuleBehaviourManager;
-use php\gui\UXApplication;
-use php\gui\UXDialog;
-use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalStateException;
 use php\lib\Items;
 use php\lib\reflect;
 use php\lib\Str;
-use php\util\Scanner;
 use ReflectionClass;
 use ReflectionMethod;
 

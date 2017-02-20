@@ -1,21 +1,11 @@
 <?php
 namespace php\gui\framework;
 
-use BaseException;
 use Exception;
-use facade\Json;
-use php\format\JsonProcessor;
-use php\framework\FrameworkPackageLoader;
 use php\framework\Logger;
-use php\gui\framework\behaviour\custom\AbstractBehaviour;
-use php\gui\layout\UXAnchorPane;
-use php\gui\UXAlert;
 use php\gui\UXApplication;
-use php\gui\UXDialog;
 use php\gui\UXForm;
 use php\gui\UXNode;
-use php\gui\UXTextArea;
-use php\gui\UXWindow;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
@@ -24,9 +14,6 @@ use php\lang\System;
 use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
-use script\storage\AbstractStorage;
-use script\storage\IniStorage;
-use timer\AccurateTimer;
 
 /**
  * Class Application
@@ -67,6 +54,9 @@ class Application
 
     /** @var AbstractModule[] */
     protected $modules = [];
+
+    /** @var string[] */
+    protected $styles = [];
 
     /**
      * @var null|AbstractModule
@@ -239,7 +229,7 @@ class Application
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @param UXForm $origin
      * @return AbstractForm
      * @return-dynamic $package\forms\$0
@@ -251,6 +241,17 @@ class Application
         }
 
         return $this->getNewForm($name, $origin);
+    }
+
+    /**
+     * @param string $name
+     * @param UXForm $origin
+     * @return AbstractForm
+     * @return-dynamic $package\forms\$0
+     */
+    public function form($name, UXForm $origin = null)
+    {
+        return $this->getForm($name, $origin);
     }
 
     /**
@@ -266,6 +267,17 @@ class Application
         }
 
         return $this->getNewForm($name, $origin);
+    }
+
+    /**
+     * @param string $name
+     * @param UXForm|null $origin
+     * @return AbstractForm
+     * @return-dynamic $package\forms\$0
+     */
+    public function originForm($name, UXForm $origin = null)
+    {
+        return $this->getOriginForm($name, $origin);
     }
 
     /**
@@ -445,6 +457,21 @@ class Application
     public function setSplashFormClass($class)
     {
         $this->splashFormClass = $class;
+    }
+
+    public function addStyle($resource)
+    {
+        $this->styles[$resource] = $resource;
+    }
+
+    public function getStyles()
+    {
+        return $this->styles;
+    }
+
+    public function removeStyle($resource)
+    {
+        unset($this->styles[$resource]);
     }
 
     public function loadModules(array $classes)

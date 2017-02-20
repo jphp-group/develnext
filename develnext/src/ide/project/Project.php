@@ -893,9 +893,16 @@ class Project
         }
 
         $files = Flow::of(FileSystem::getOpened())->map(function ($e) { return $this->getAbsoluteFile($e['file']); })->toArray();
+        $windowFiles = [];
+
+        foreach ($files as $file) {
+            if (!FileSystem::isTabbed($file)) {
+                $windowFiles[] = $file;
+            }
+        }
 
         $this->config->setTreeState($this->tree);
-        $this->config->setOpenedFiles($files, FileSystem::getSelected());
+        $this->config->setOpenedFiles($files, FileSystem::getSelected(), $windowFiles);
         $this->config->setProjectFiles($this->filesData);
         $this->config->setBehaviours($this->behaviours);
 

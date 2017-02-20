@@ -211,6 +211,8 @@ class ActionConstructorForm extends AbstractIdeForm
         });
 
         $this->liveCodeEditor = $liveCodeEditor = new CodeEditor(null, 'php');
+        $liveCodeEditor->setEmbedded(true);
+
         $this->liveCodeEditor->getTextArea()->on('keyUp', function (UXKeyEvent $e) {
             if ($e->codeName == 'Enter' && $e->controlDown) {
                 $this->actionSave();

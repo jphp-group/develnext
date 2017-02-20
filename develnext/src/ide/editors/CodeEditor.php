@@ -15,6 +15,8 @@ use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use ide\project\behaviours\PhpProjectBehaviour;
+use ide\scripts\AbstractScriptComponent;
+use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\utils\UiUtils;
@@ -75,7 +77,7 @@ class CodeEditor extends AbstractEditor
     protected $mode;
 
     /**
-     * @var UXNode
+     * @var UXVBox
      */
     protected $ui;
 
@@ -144,6 +146,11 @@ class CodeEditor extends AbstractEditor
      * @var UXHBox
      */
     protected $statusBar;
+
+    /**
+     * @var bool
+     */
+    protected $embedded = false;
 
     /**
      * @return UXAbstractCodeArea|UXSyntaxTextArea
@@ -236,6 +243,28 @@ class CodeEditor extends AbstractEditor
         //$this->autoComplete = null;
     }
 
+    public function leave()
+    {
+        if (!$this->embedded) {
+            $this->save();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmbedded()
+    {
+        return $this->embedded;
+    }
+
+    /**
+     * @param bool $embedded
+     */
+    public function setEmbedded($embedded)
+    {
+        $this->embedded = $embedded;
+    }
 
     public function getFindDialog()
     {
@@ -261,7 +290,19 @@ class CodeEditor extends AbstractEditor
 
     public function setReadOnly($value)
     {
-        $this->textArea->editable = !$value;
+        parent::setReadOnly($value);
+
+        if ($this->textArea) {
+            $this->textArea->editable = !$value;
+        }
+
+        if ($this->statusBar) {
+            if ($value) {
+                $this->statusBar->free();
+            } else {
+                $this->ui->add($this->statusBar);
+            }
+        }
     }
 
     public function installAutoCompletion(UXSyntaxAutoCompletion $completion)
@@ -366,18 +407,26 @@ class CodeEditor extends AbstractEditor
         if (!$this->file) {
             $this->loadContentToArea();
         } else {
-            $hash = str::hash($this->getValue(), 'SHA-256');
-            $fHash = fs::hash($this->file, 'SHA-256');
+            if (!$this->embedded) {
+                $this->requestFocus();
+            }
 
-            if ($hash != $fHash) {
-                $this->loadContentToArea();
+            if (!$this->contentLoaded || $this->fileTime != fs::time($this->file)) {
+                $this->loadContentToArea(false);
             }
         }
-    }
 
-    public function refresh()
-    {
-        parent::refresh();
+        if (!$this->embedded && !$this->isTabbed()) {
+            $this->on('update', function () {
+                $this->save();
+            }, __CLASS__);
+
+            $this->textArea->on('keyDown', function (UXKeyEvent $e) {
+                if ($e->controlDown && $e->codeName == 'S') {
+                    $this->save();
+                }
+            }, __CLASS__);
+        }
     }
 
     public function loadContentToArea($resetHistory = true)
@@ -419,6 +468,8 @@ class CodeEditor extends AbstractEditor
         }
 
         Logger::info("Finish load file $file");
+
+        $this->fileTime = fs::time($this->file);
     }
 
     public function load($resetHistory = true)
@@ -426,52 +477,24 @@ class CodeEditor extends AbstractEditor
         if (!$this->file) {
             return;
         }
-
-        //$caret = $this->textArea->caretPosition;
-
-        /*if ($this->isSourceFile()) {
-            $sourceFile = "$this->file.source";
-
-            if (fs::exists($sourceFile)) {
-                $file = $sourceFile;
-            } else {
-                $file = $this->file;
-            }
-        } else {
-            $file = $this->file;
-        }*/
-
-        //Logger::info("Start load file $file");
-
-        /*try {
-            $content = FileUtils::get($file);
-        } catch (IOException $e) {
-            $content = '';
-            Logger::warn("Unable to load $file: {$e->getMessage()}");
-        }
-
-        $this->setValue($content);
-
-        if ($resetHistory) {
-            $this->textArea->forgetHistory();
-        }
-
-        $this->textArea->caretPosition = $caret;
-
-        Logger::info("Finish load file $file");*/
     }
 
     public function save()
     {
+        if ($this->readOnly) {
+            return;
+        }
+
+        Logger::info("Start save file $this->file ...");
+
         if (!$this->contentLoaded) {
+            Logger::warn("File '$this->file' cannot be saved, is not loaded to area.");
             return;
         }
 
         if (!$this->file) {
             return;
         }
-
-        Logger::info("Start save file $this->file ...");
 
         $value = $this->getValue();
 
@@ -486,6 +509,7 @@ class CodeEditor extends AbstractEditor
         }
 
         Logger::info("Finish save file $this->file.");
+        $this->fileTime = fs::time($this->file);
     }
 
     /**
@@ -493,6 +517,10 @@ class CodeEditor extends AbstractEditor
      */
     public function makeUi()
     {
+        if (!$this->embedded) {
+            $this->registerDefaultCommands();
+        }
+
         $this->ui = $ui = new UXVBox();
 
         $commandPane = UiUtils::makeCommandPane($this->commands);
@@ -505,12 +533,20 @@ class CodeEditor extends AbstractEditor
         }
 
         $this->statusBar = $statusBar = new UXHBox();
-        $statusBar->add(new UXLabel($this->file));
-        $statusBar->padding = 4;
+        $label = new UXLabel("* Только для чтения");
+        $label->font = $label->font->withBold();
+        $label->textColor = 'red';
+        $statusBar->backgroundColor = 'white';
+
+        $statusBar->add($label);
+        $statusBar->padding = 5;
 
         $this->textAreaScrollPane = $scrollPane = new UXCodeAreaScrollPane($this->textArea);
         $ui->add($scrollPane);
-        //$ui->add($statusBar);
+
+        if ($this->isReadOnly()) {
+            $ui->add($statusBar);
+        }
 
         UXVBox::setVgrow($scrollPane, 'ALWAYS');
 
@@ -546,6 +582,34 @@ class CodeEditor extends AbstractEditor
 
     public function registerDefaultCommands()
     {
+        if (!$this->embedded) {
+            if (!$this->embedded) {
+                if ($this->isTabbed()) {
+                    $this->register(AbstractCommand::make('В отдельном окне', 'icons/tabRight16.png', function () {
+                        $this->save();
+
+                        FileSystem::close($this->file);
+                        FileSystem::open($this->file, true, null, true);
+                    }));
+                } else {
+                    $this->register(AbstractCommand::make('В виде таба', 'icons/tab16.png', function () {
+                        $this->save();
+
+                        FileSystem::close($this->file);
+                        FileSystem::open($this->file);
+                    }));
+                }
+            }
+
+            if (!$this->isTabbed()) {
+                $this->register(AbstractCommand::make('Сохранить (Ctrl + S)', 'icons/save16.png', function () {
+                    $this->save();
+                }));
+            }
+
+            $this->register(AbstractCommand::makeSeparator());
+        }
+
         $this->register(AbstractCommand::make('Отменить (Ctrl + Z)', 'icons/undo16.png', function () {
             $this->executeCommand('undo');
         }));
@@ -579,7 +643,6 @@ class CodeEditor extends AbstractEditor
             $this->executeCommand('replace');
             $this->save();
         }));
-
 
         $this->register(AbstractCommand::makeSeparator());
 

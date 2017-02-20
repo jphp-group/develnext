@@ -1,5 +1,6 @@
 <?php
 namespace php\gui;
+use php\io\File;
 
 /**
  * Class UXDragboard
@@ -31,6 +32,16 @@ class UXDragboard
      * @var UXImage
      */
     public $image;
+
+    /**
+     * @var File[]
+     */
+    public $files;
+
+    /**
+     * @var string
+     */
+    public $url;
 
     public function __construct(UXDragboard $origin)
     {

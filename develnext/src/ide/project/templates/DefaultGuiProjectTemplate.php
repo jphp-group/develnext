@@ -181,6 +181,12 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
         fs::delete($project->getFile('src/.system/modules.json'));
         FileUtils::deleteDirectory($project->getFile('src/.gradle'));
 
+        if (fs::isFile($styleFile = $project->getFile('src/.theme/style.css'))) {
+            $styleFile->renameTo($project->getFile('src/.theme/style.fx.css'));
+        }
+
+        fs::delete($project->getFile('src/.theme/style-ide.css'));
+
         $project->getConfig()->setTreeState(['/src/app/forms', '/src/app/modules']);
         $project->getConfig()->setOpenedFiles($openedFiles, $selectedFile);
         $project->getConfig()->save();
@@ -216,6 +222,12 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
             $bundle->addBundle(Project::ENV_ALL, UIDesktopBundle::class, false);
             //$bundle->addBundle(Project::ENV_ALL, ControlFXBundle::class);
             $bundle->addBundle(Project::ENV_ALL, Game2DBundle::class);
+
+            $styleFile = $project->getFile('src/.theme/style.fx.css');
+
+            if (!$styleFile->exists()) {
+                FileUtils::put($styleFile, "/* JavaFX CSS Style with -fx- prefix */\n\n");
+            }
 
             $appModule  = $gui->createModule('AppModule');
             $mainModule = $gui->createModule('MainModule');

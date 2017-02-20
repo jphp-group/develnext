@@ -4,6 +4,7 @@ namespace ide\editors\form;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
+use php\gui\event\UXScrollEvent;
 use php\gui\layout\UXHBox;
 use php\gui\UXButton;
 use php\gui\UXComboBox;

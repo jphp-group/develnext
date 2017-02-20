@@ -3,14 +3,12 @@ namespace ide\formats;
 
 use ide\editors\AbstractEditor;
 use ide\editors\CodeEditor;
+use ide\utils\FileUtils;
 use php\gui\designer\UXSyntaxAutoCompletion;
+use php\lib\fs;
 use php\lib\Str;
 
-/**
- * Class PhpCodeFormat
- * @package ide\formats
- */
-class PhpCodeFormat extends AbstractFormat
+class FxCssCodeFormat extends AbstractFormat
 {
     /**
      * @param $file
@@ -20,20 +18,10 @@ class PhpCodeFormat extends AbstractFormat
      */
     public function createEditor($file, array $options = [])
     {
-        $editor = new CodeEditor($file, 'php');
-        $editor->setEmbedded((bool) $options['embedded']);
-
-        if ($options['readOnly']) {
-            $editor->setReadOnly(true);
-        }
-
+        $editor = new CodeEditor($file, 'fxcss');
         return $editor;
     }
 
-    public function getIcon()
-    {
-        return 'icons/phpFile16.png';
-    }
 
     /**
      * @param $file
@@ -42,7 +30,12 @@ class PhpCodeFormat extends AbstractFormat
      */
     public function isValid($file)
     {
-        return Str::endsWith($file, '.php');
+        return str::endsWith($file, '.fx.css');
+    }
+
+    public function getIcon()
+    {
+        return 'icons/cssFile16.png';
     }
 
     /**

@@ -13,13 +13,14 @@ use php\gui\designer\UXDesignProperties;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
+use php\gui\layout\UXVBox;
 use php\gui\UXButton;
 use php\gui\UXNode;
 use php\gui\UXTableCell;
 use php\gui\UXTextField;
 use php\gui\UXTitledPane;
 
-class HBoxFormElement extends AbstractFormElement
+class VBoxFormElement extends AbstractFormElement
 {
     public function getGroup()
     {
@@ -28,22 +29,22 @@ class HBoxFormElement extends AbstractFormElement
 
     public function getElementClass()
     {
-        return UXHBox::class;
+        return UXVBox::class;
     }
 
     public function getName()
     {
-        return 'Горизонтальный слой';
+        return 'Вертикальный слой';
     }
 
     public function getIcon()
     {
-        return 'icons/hbox16.png';
+        return 'icons/vbox16.png';
     }
 
     public function getIdPattern()
     {
-        return "hbox%s";
+        return "vbox%s";
     }
 
     public function isLayout()
@@ -68,7 +69,7 @@ class HBoxFormElement extends AbstractFormElement
      */
     public function createElement()
     {
-        $button = new UXHBox();
+        $button = new UXVBox();
         $button->spacing = 5;
 
         return $button;
@@ -76,11 +77,11 @@ class HBoxFormElement extends AbstractFormElement
 
     public function getDefaultSize()
     {
-        return [200, 50];
+        return [150, 250];
     }
 
     public function isOrigin($any)
     {
-        return $any instanceof UXHBox;
+        return $any instanceof UXVBox;
     }
 }

@@ -33,7 +33,7 @@ public class UXImageView extends UXNode<ImageView> {
     }
 
     @Signature
-    public void __construct(Image image) {
+    public void __construct(@Nullable Image image) {
         __wrappedObject = new ImageView(image);
     }
 

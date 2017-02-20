@@ -2,17 +2,20 @@
 namespace ide\project;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
+use ide\Logger;
 use ide\systems\FileSystem;
 use ide\systems\IdeSystem;
 use ide\utils\FileUtils;
 use php\gui\designer\UXDirectoryTreeValue;
 use php\gui\designer\UXDirectoryTreeView;
 use php\gui\designer\UXFileDirectoryTreeSource;
+use php\gui\event\UXDragEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXDesktop;
 use php\io\File;
 use php\lang\Process;
 use php\lib\fs;
+use php\lib\str;
 
 
 /**
@@ -52,6 +55,11 @@ class ProjectTree
     protected $openHandlers = [];
 
     /**
+     * @var callable[]
+     */
+    protected $valueCreators = [];
+
+    /**
      * ProjectTree constructor.
      * @param Project $project
      */
@@ -66,10 +74,59 @@ class ProjectTree
     public function setView(UXDirectoryTreeView $treeView)
     {
         $this->tree = $treeView;
+
+        $treeView->on('dragOver', function (UXDragEvent $e) {
+            if ($e->dragboard->files) {
+                $e->acceptTransferModes(['MOVE', 'COPY']);
+                $e->consume();
+            }
+        });
+
+        $treeView->on('dragDrop', function (UXDragEvent $e) use ($treeView) {
+            if ($e->dragboard->files && $treeView->focusedItem) {
+
+                $item = $treeView->focusedItem;
+
+                if ($item->value) {
+                    $destFile = $this->project->getFile($item->value->path);
+
+                    if ($destFile->isFile()) {
+                        $destFile = $destFile->getParentFile();
+                    }
+
+                    foreach ($e->dragboard->files as $file) {
+                        $copyFile = $destFile->getPath() . "/" . fs::name($file);
+
+                        if (FileUtils::equalNames($file, $copyFile)) {
+                            continue;
+                        }
+
+                        if ($file->isFile()) {
+                            FileUtils::copyFile($file, $copyFile);
+                        } else {
+                            fs::makeDir($copyFile);
+                            FileUtils::copyDirectory($file, $copyFile);
+                        }
+
+                        // in root dir of project
+                        if (str::startsWith(FileUtils::hashName($file), FileUtils::hashName($this->project->getRootDir()))) {
+                            if ($file->isDirectory()) {
+                                FileUtils::deleteDirectory($file);
+                            } else {
+                                fs::delete($file);
+                            }
+                        }
+                    }
+
+                    $e->consume();
+                }
+            }
+        });
+
         $treeView->on('click', function (UXMouseEvent $e) use ($treeView) {
             if ($e->clickCount > 1) {
-                if ($treeView->focusedItem && $treeView->focusedItem->value instanceof UXDirectoryTreeValue) {
-                    $file = $this->project->getFile($treeView->focusedItem->value->path);
+                if ($treeView->selectedItems && $treeView->selectedItems[0]->value instanceof UXDirectoryTreeValue) {
+                    $file = $this->project->getFile($treeView->selectedItems[0]->value->path);
 
                     if ($file->isFile()) {
                         foreach ($this->openHandlers as $handler) {
@@ -175,6 +232,11 @@ class ProjectTree
         $this->ignoreFilters[] = $callback;
     }
 
+    public function addValueCreator(callable $callback)
+    {
+        $this->valueCreators[] = $callback;
+    }
+
     public function addOpenHandler(callable $callback)
     {
         $this->openHandlers[] = $callback;
@@ -214,6 +276,11 @@ class ProjectTree
         });
 
         $ide = Ide::get();
+
+        foreach ($this->valueCreators as $creator) {
+            $source->addValueCreator($creator);
+        }
+
         $source->addValueCreator(function ($path, File $file) use ($ide) {
             $format = $ide->getFormat($file);
 

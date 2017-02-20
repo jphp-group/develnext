@@ -288,6 +288,22 @@ class Ide extends Application
                     $extension->onIdeStart();
                 }
 
+                $timer = new AccurateTimer(1000, function () {
+                    Ide::async(function () {
+                        $file = FileSystem::getSelected();
+
+                        foreach (FileSystem::getOpened() as $info) {
+                            if (!fs::exists($info['file']) /*&& !FileUtils::equalNames($file, $info['file'])*/) {
+                                uiLater(function () use ($info) {
+                                    $editor = FileSystem::getOpenedEditor($info['file']);
+                                    $editor->delete();
+                                });
+                            }
+                        }
+                    });
+                });
+                $timer->start();
+
                 $this->trigger('start', []);
             }
         );
@@ -299,7 +315,13 @@ class Ide extends Application
      */
     public static function async(callable $callback, callable $after = null)
     {
-        self::get()->asyncThreadPool->execute(function () use ($callback, $after) {
+        $ide = self::get();
+
+        if ($ide->asyncThreadPool->isShutdown() || $ide->asyncThreadPool->isTerminated()) {
+            return;
+        }
+
+        $ide->asyncThreadPool->execute(function () use ($callback, $after) {
             $result = $callback();
 
             if ($after) {
@@ -905,8 +927,8 @@ class Ide extends Application
                     if ($ui instanceof UXButton) {
                         $ui->maxHeight = 9999;
                     } else if ($ui instanceof UXSeparator) {
-                        $ui->paddingLeft = 4;
-                        $ui->paddingRight = 2;
+                        $ui->paddingLeft = 3;
+                        $ui->paddingRight = 1;
                     }
 
                     $mainForm->getHeadPane()->children->insert($mainForm->getHeadPane()->children->count - 1, $ui);
@@ -931,8 +953,8 @@ class Ide extends Application
                     if ($ui instanceof UXButton) {
                         $ui->maxHeight = 999;
                     } else if ($ui instanceof UXSeparator) {
-                        $ui->paddingLeft = 4;
-                        $ui->paddingRight = 2;
+                        $ui->paddingLeft = 3;
+                        $ui->paddingRight = 1;
                     }
 
                     $mainForm->getHeadRightPane()->add($ui);
@@ -1136,6 +1158,14 @@ class Ide extends Application
 
             if ($editor) {
                 $editor->setFormat($format);
+            }
+
+            if ($project = Ide::project()) {
+                if (!str::startsWith(FileUtils::hashName($path), FileUtils::hashName($project->getRootDir()))) {
+                    $editor->setReadOnly(true);
+                }
+
+                $project->trigger('createEditor', $editor);
             }
 
             return $editor;

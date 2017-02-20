@@ -71,6 +71,22 @@ class Logger
         return $ansi_str;
     }
 
+    /**
+     * @return int
+     */
+    public static function getLevel()
+    {
+        return self::$level;
+    }
+
+    /**
+     * @param int $level
+     */
+    public static function setLevel($level)
+    {
+        self::$level = $level;
+    }
+
     static protected function getLogName($level)
     {
         switch ($level) {

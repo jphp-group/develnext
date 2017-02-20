@@ -418,18 +418,20 @@ class ObjectListEditor
         if ($this->enableAppModule && !$this->disableModules) {
             $gui = GuiFrameworkProjectBehaviour::get();
 
-            if ($gui) {
+            if ($gui && $gui->hasModule('AppModule')) {
                 $appModule = $gui->getModuleEditor('AppModule');
 
-                if ($editor && ($appModule && $editor && FileUtils::equalNames($appModule->getFile(), $editor->getFile()))) {
-                    // ...
-                } else {
-                    if ($appModule) {
-                        $this->addItem(new ObjectListEditorItem(
-                            $appModule->getTitle(), Ide::get()->getImage($appModule->getIcon(), [16, 16]), 'appModule()'
-                        ));
+                if ($appModule instanceof ScriptModuleEditor) {
+                    if ($editor && ($appModule && $editor && FileUtils::equalNames($appModule->getFile(), $editor->getFile()))) {
+                        // ...
+                    } else {
+                        if ($appModule) {
+                            $this->addItem(new ObjectListEditorItem(
+                                $appModule->getTitle(), Ide::get()->getImage($appModule->getIcon(), [16, 16]), 'appModule()'
+                            ));
 
-                        $this->appendFormEditor($appModule, 1, 'appModule()');
+                            $this->appendFormEditor($appModule, 1, 'appModule()');
+                        }
                     }
                 }
             }

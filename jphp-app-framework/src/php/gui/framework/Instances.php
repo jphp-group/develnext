@@ -1,9 +1,9 @@
 <?php
 namespace php\gui\framework;
+
 use ArrayAccess;
 use Countable;
 use Iterator;
-use php\lang\IllegalStateException;
 use php\util\Flow;
 
 /**

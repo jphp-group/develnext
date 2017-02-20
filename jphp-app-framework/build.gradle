@@ -23,7 +23,9 @@ task prepareDist << {
 
     File lstFile = new File(project.projectDir.path + "/src/.packages/framework.pkg");
 
-    lstFile.withWriter{ out ->
+    lstFile.getParentFile().mkdirs();
+
+    lstFile.withWriter { out ->
         out.println("[classes]")
 
         classes.each {

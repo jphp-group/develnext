@@ -12,10 +12,8 @@ use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXCustomNode;
 use php\gui\UXData;
-use php\gui\UXDialog;
 use php\gui\UXForm;
 use php\gui\UXImage;
-use php\gui\UXLabel;
 use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\gui\UXNodeWrapper;
@@ -24,12 +22,10 @@ use php\gui\UXPopupWindow;
 use php\gui\UXScreen;
 use php\gui\UXTooltip;
 use php\gui\UXWindow;
-use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
-use php\lang\Thread;
 use php\lib\Items;
 use php\lib\reflect;
 use php\lib\Str;
@@ -121,8 +117,8 @@ abstract class AbstractForm extends UXForm
 
         $this->addStylesheet('/php/gui/framework/style.css');
 
-        if (Stream::exists('res://.theme/style.css')) {
-            $this->addStylesheet('/.theme/style.css');
+        foreach ($this->_app->getStyles() as $one) {
+            $this->addStylesheet($one);
         }
 
         $this->behaviourManager = $behaviourManager = new FormBehaviourManager($this);

@@ -22,9 +22,11 @@ use ide\editors\menu\ContextMenu;
 use ide\editors\value\BooleanPropertyEditor;
 use ide\editors\value\DoubleArrayPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
+use ide\formats\AbstractFormat;
 use ide\formats\AbstractFormFormat;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElement;
+use ide\formats\form\elements\ImageViewFormElement;
 use ide\formats\form\SourceEventManager;
 use ide\formats\FormFormat;
 use ide\formats\GuiFormFormat;
@@ -63,6 +65,8 @@ use php\gui\UXApplication;
 use php\gui\UXCustomNode;
 use php\gui\UXData;
 use php\gui\UXGroup;
+use php\gui\UXImage;
+use php\gui\UXImageArea;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXSplitPane;
@@ -292,7 +296,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function initCodeEditor($phpFile)
     {
-        $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile, ['withoutCommands' => true]);
+        $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile, [
+            'withoutCommands' => true, 'embedded' => true
+        ]);
 
         $this->codeEditor->register(AbstractCommand::make('Скрыть', 'icons/close16.png', function () {
             $this->codeEditor->save();
@@ -912,6 +918,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 }
             }
         }
+
+        $node->on('dragOver', $this->makeDesignerDragOverHandler($node), __CLASS__);
+        $node->on('dragDrop', $this->makeDesignerDragDropHandler($node), __CLASS__);
+        $node->on('dragDone', function (UXEvent $e) {$e->consume();}, __CLASS__);
     }
 
     public function refresh()
@@ -1514,6 +1524,132 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return $prototypeTypePane;
     }
 
+    protected function makeDesignerDragOverHandler(UXNode $parent = null)
+    {
+        $parentElement = $parent == null ? null : $this->format->getFormElement($parent);
+
+        return function (UXDragEvent $e) use ($parent, $parentElement) {
+            try {
+                if ($e->dragboard->string) {
+                    $data = Json::decode($e->dragboard->string);
+
+                    if ($data['create'] && ($element = $this->format->getFormElement($data['type']))) {
+                        $e->acceptTransferModes(['MOVE']);
+                        $e->consume();
+                        return;
+                    }
+                }
+
+                if (Ide::project()) {
+                    if ($parentElement && !$parentElement->isLayout()) {
+                        if ($parentElement->canDragDropIn($e)) {
+                            $e->acceptTransferModes(['MOVE', 'COPY', 'LINK']);
+                            $e->consume();
+                            return;
+                        }
+                    }
+
+                    /** @var AbstractFormFormat $format */
+                    $format = $this->getFormat();
+
+                    foreach ($format->getFormElements() as $element) {
+                        if ($element->canDragDrop($e, $parent)) {
+                            $e->acceptTransferModes(['MOVE', 'COPY', 'LINK']);
+                            $e->consume();
+                        }
+                    }
+
+                    return;
+                }
+
+            } catch (ProcessorException $e) {
+                ;
+            }
+        };
+    }
+
+    protected $dragAlready = false;
+
+    protected function callDragDone(UXNode $node)
+    {
+        $this->elementTypePane->clearSelected();
+        $this->designer->requestFocus();
+
+        uiLater(function () use ($node) {
+            $this->designer->unselectAll();
+            $this->designer->selectNode($node);
+        });
+
+        $this->dragAlready = true;
+
+        waitAsync(500, function () {
+            $this->dragAlready = false;
+        });
+    }
+
+    protected function makeDesignerDragDropHandler(UXNode $parent = null)
+    {
+        $parentElement = $parent == null ? null : ($this->format->getFormElement($parent) ?: null);
+
+        return function (UXDragEvent $e) use ($parent, $parentElement) {
+            if ($this->dragAlready) {
+                return;
+            }
+
+            try {
+                if ($e->dragboard->string) {
+                    $data = Json::decode($e->dragboard->string);
+
+                    if ($data['create'] && ($element = $this->format->getFormElement($data['type']))) {
+                        $parent = $parentElement && $parentElement->isLayout() ? $parent : null;
+
+                        $node = $this->createElement($element, $e->screenX, $e->screenY, $parent);
+
+                        if ($node) {
+                            $this->callDragDone($node);
+                            $e->consume();
+                            return;
+                        }
+                    }
+                }
+            } catch (ProcessorException $e) {
+                ;
+            }
+
+            if (Ide::project()) {
+                /** @var AbstractFormFormat $format */
+                $format = $this->getFormat();
+
+                if ($parentElement && !$parentElement->isLayout()) {
+                    if ($parentElement->canDragDropIn($e, $parent)) {
+                        $parentElement->dragDropIn($e, $parent);
+
+                        $this->callDragDone($parent);
+                        return;
+                    }
+                }
+
+                foreach ($format->getFormElements() as $element) {
+                    if ($element->canDragDrop($e, $parent)) {
+                        $parent = ($parentElement && $parentElement->isLayout()) ? $parent : null;
+
+                        $node = $this->createElement($element, $e->screenX, $e->screenY, $parent);
+
+                        if ($node) {
+                            $element->dragDrop($e, $node, $parent);
+
+                            $this->callDragDone($node);
+                            $e->consume();
+                            return;
+                        }
+                    }
+                }
+
+                return;
+            }
+        };
+    }
+
     protected function makeDesigner($fullArea = false)
     {
         $area = new UXAnchorPane();
@@ -1532,47 +1668,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $designPane = new UXDesignPane();
 
-        $area->on('dragOver', function (UXDragEvent $e) {
-            try {
-                if ($e->dragboard->string) {
-                    $data = Json::decode($e->dragboard->string);
-
-                    if ($data['create'] && ($element = $this->format->getFormElement($data['type']))) {
-                        $e->acceptTransferModes(['MOVE']);
-                        $e->consume();
-                    }
-                }
-            } catch (ProcessorException $e) {
-                ;
-            }
-        });
-
-        $area->on('dragDone', function (UXEvent $e) {$e->consume();} );
-        $area->on('dragDrop', function (UXDragEvent $e) {
-            try {
-                if ($e->dragboard->string) {
-                    $data = Json::decode($e->dragboard->string);
-
-                    if ($data['create'] && ($element = $this->format->getFormElement($data['type']))) {
-                        $node = $this->createElement($element, $e->screenX, $e->screenY);
-
-                        if ($node) {
-                            $this->elementTypePane->clearSelected();
-                            $this->designer->requestFocus();
-
-                            uiLater(function () use ($node) {
-                                $this->designer->unselectAll();
-                                $this->designer->selectNode($node);
-                            });
-
-                            $e->consume();
-                        }
-                    }
-                }
-            } catch (ProcessorException $e) {
-                ;
-            }
-        });
+        $viewer->on('dragOver', $this->makeDesignerDragOverHandler());
+        $viewer->on('dragDone', function (UXEvent $e) {$e->consume();} );
+        $viewer->on('dragDrop', $this->makeDesignerDragDropHandler());
 
         if (!$fullArea) {
             $viewer->content = new UXGroup([$area]);

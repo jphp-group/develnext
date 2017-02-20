@@ -43,8 +43,8 @@ class UiUtils
             if ($command == '-' || $command instanceof SeparatorCommand) {
                 $ui = new UXSeparator();
                 $ui->orientation = 'VERTICAL';
-                $ui->width = 5;
-                $ui->paddingLeft = 3;
+                $ui->width = 4;
+                $ui->paddingLeft = 2;
                 $ui->maxSize = [20, 20];
             } else {
                 if (!$command->getName() && !$command->getIcon()) {

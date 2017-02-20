@@ -12,14 +12,16 @@ use ide\formats\form\AbstractFormElement;
 use php\gui\designer\UXDesignProperties;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXHBox;
+use php\gui\layout\UXVBox;
 use php\gui\UXButton;
 use php\gui\UXNode;
 use php\gui\UXTableCell;
 use php\gui\UXTextField;
 use php\gui\UXTitledPane;
 
-class HBoxFormElement extends AbstractFormElement
+class FlowPaneFormElement extends AbstractFormElement
 {
     public function getGroup()
     {
@@ -28,22 +30,22 @@ class HBoxFormElement extends AbstractFormElement
 
     public function getElementClass()
     {
-        return UXHBox::class;
+        return UXFlowPane::class;
     }
 
     public function getName()
     {
-        return 'Горизонтальный слой';
+        return 'Потоковый слой';
     }
 
     public function getIcon()
     {
-        return 'icons/hbox16.png';
+        return 'icons/flowPane16.png';
     }
 
     public function getIdPattern()
     {
-        return "hbox%s";
+        return "flowPane%s";
     }
 
     public function isLayout()
@@ -68,19 +70,20 @@ class HBoxFormElement extends AbstractFormElement
      */
     public function createElement()
     {
-        $button = new UXHBox();
-        $button->spacing = 5;
+        $button = new UXFlowPane();
+        $button->hgap = 5;
+        $button->vgap = 5;
 
         return $button;
     }
 
     public function getDefaultSize()
     {
-        return [200, 50];
+        return [250, 250];
     }
 
     public function isOrigin($any)
     {
-        return $any instanceof UXHBox;
+        return $any instanceof UXFlowPane;
     }
 }

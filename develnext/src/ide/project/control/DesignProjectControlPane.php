@@ -52,9 +52,6 @@ class DesignProjectControlPane extends AbstractProjectControlPane
     public function save()
     {
         if ($this->editor) {
-            /*$file = $this->editor->data('file');
-            FileUtils::put($file, $this->editor->text);                       */
-
             $this->editor->save();
             $this->reloadStylesheet();
         }
@@ -82,76 +79,16 @@ class DesignProjectControlPane extends AbstractProjectControlPane
         }
     }
 
-    public function reloadStylesheet()
-    {
-        if (!UXApplication::isUiThread()) {
-            uiLater(function () {
-               $this->reloadStylesheet();
-            });
-            return;
-        }
-
-        if (Ide::project() && ($form = Ide::get()->getMainForm())) {
-            $source = FileUtils::get(Ide::project()->getSrcFile('.theme/style.css'));
-
-            $regex = Regex::of('((\.|\#)?[\.\w\d\,\*\+\-\_\:\# \r\n]{1,}(\{))')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
-
-            $source = $regex->replaceWithCallback(function (Regex $regex) {
-                $selector = str::trim($regex->group(1));
-
-                $newSelector = [];
-
-                foreach (str::split($selector, ',') as $one) {
-                    $newSelector[] = ".FormEditor $one";
-                }
-
-                return str::join($newSelector, ', ');
-            });
-
-            FileUtils::put($this->ideStylesheet, $source);
-
-            $path = "file:///" . str::replace($this->ideStylesheet, "\\", "/");
-
-            $form->removeStylesheet($path);
-            $form->addStylesheet($path);
-        }
-    }
-
-    public function close()
-    {
-        parent::close();
-
-        // Clear all styles for MainForm.
-        if ($form = Ide::get()->getMainForm()) {
-            $path = "file:///" . str::replace($this->ideStylesheet, "\\", "/");
-            $form->removeStylesheet($path);
-        }
-    }
-
     /**
      * @return UXNode
      */
     protected function makeUi()
     {
-        $file = Ide::project()->getSrcFile('.theme/style.css');
-
-        if (!$file->exists()) {
-            FileUtils::put($file, "/* JavaFX CSS Style with -fx- prefix */\n");
-        }
-
-       /* $editor = new UXCssSyntaxTextArea();
-        $editor->data('file', $file);
-        $this->editor = $editor;
-
-        return $editor;    */
-
         $editor = new CodeEditor($file, 'fxcss');
         $editor->registerDefaultCommands();
 
         $editor->loadContentToArea();
         $this->editor = $editor;
-
-        $this->reloadStylesheet();
 
         return $editor->makeUi();
     }

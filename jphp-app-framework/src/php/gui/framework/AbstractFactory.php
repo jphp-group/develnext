@@ -1,9 +1,7 @@
 <?php
 namespace php\gui\framework;
 
-use behaviour\SetTextBehaviour;
 use php\format\ProcessorException;
-use php\framework\Logger;
 use php\game\UXSpriteView;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;

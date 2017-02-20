@@ -4,6 +4,7 @@ use ide\editors\FormEditor;
 use ide\formats\FormFormat;
 use ide\Ide;
 use ide\IdeClassLoader;
+use ide\Logger;
 use ide\systems\IdeSystem;
 use php\gui\UXDialog;
 
@@ -16,7 +17,12 @@ $loader->register(true);
 
 IdeSystem::setLoader($loader);
 
+if (!IdeSystem::isDevelopment()) {
+    Logger::setLevel(Logger::LEVEL_INFO);
+}
+
 $app = new Ide();
+$app->addStyle('/.theme/style.css');
 $app->launch();
 
 function dump($arg)

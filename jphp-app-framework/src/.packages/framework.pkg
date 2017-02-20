@@ -81,7 +81,7 @@ php\gui\framework\functions
 php\gui\framework\GUI
 php\gui\framework\Instances
 php\gui\framework\Preloader
-php\gui\framework\ScriptManager
+php\gui\framework\ScriptEvent
 php\gui\framework\StandaloneFactory
 php\gui\framework\View
 php\gui\UXButtonWrapper

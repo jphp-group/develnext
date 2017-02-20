@@ -107,6 +107,10 @@ abstract public class AbstractCodeArea extends CodeArea {
                 .subscribe(this::applyHighlighting);
 
         Nodes.addInputMap(this, InputMap.consume(keyReleased(), e -> {
+            if (!isEditable()) {
+                return;
+            }
+
             if (onAfterChange != null) {
                 onAfterChange.handle(new ActionEvent(this, this));
             }
@@ -225,10 +229,12 @@ abstract public class AbstractCodeArea extends CodeArea {
 
         InputMap<KeyEvent> inputMap = InputMap.sequence(
                 InputMap.consume(eventPattern, keyEvent -> {
-                    if (!keyEvent.isShortcutDown() || hotkey.isAllowShortcutDown()) {
-                        if (hotkey.apply(this, keyEvent)) {
-                            if (hotkey.isAffectsUndoManager()) {
-                                this.getUndoManager().mark();
+                    if (isEditable()) {
+                        if (!keyEvent.isShortcutDown() || hotkey.isAllowShortcutDown()) {
+                            if (hotkey.apply(this, keyEvent)) {
+                                if (hotkey.isAffectsUndoManager()) {
+                                    this.getUndoManager().mark();
+                                }
                             }
                         }
                     }

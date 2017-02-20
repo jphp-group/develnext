@@ -7,6 +7,7 @@ use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
 use ide\Logger;
 use php\gui\designer\UXDesignProperties;
+use php\gui\event\UXDragEvent;
 use php\gui\UXImage;
 use php\gui\UXNode;
 use php\io\IOException;
@@ -238,5 +239,23 @@ abstract class AbstractFormElement
     public function unregister()
     {
         // nop.
+    }
+
+    public function canDragDrop(UXDragEvent $e, UXNode $parent = null)
+    {
+        return false;
+    }
+
+    public function canDragDropIn(UXDragEvent $e)
+    {
+        return false;
+    }
+
+    public function dragDrop(UXDragEvent $e, UXNode $node, UXNode $parent = null)
+    {
+    }
+
+    public function dragDropIn(UXDragEvent $e, UXNode $node)
+    {
     }
 }
