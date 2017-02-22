@@ -294,6 +294,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         });
     }
 
+    public function canOpenInWindow()
+    {
+        return true;
+    }
+
     protected function initCodeEditor($phpFile)
     {
         $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile, [

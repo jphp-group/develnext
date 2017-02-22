@@ -55,8 +55,8 @@ class DesignProjectControlPane extends AbstractProjectControlPane
     public function open()
     {
         if ($this->editor) {
+            $this->editor->open();
             $this->editor->refreshUi();
-            $this->editor->loadContentToArea(false);
         }
     }
 
@@ -88,8 +88,6 @@ class DesignProjectControlPane extends AbstractProjectControlPane
     public function refresh()
     {
         if ($this->ui) {
-            $this->editor->loadContentToAreaIfModified();
-
             $this->ui->requestFocus();
 
             uiLater(function () {

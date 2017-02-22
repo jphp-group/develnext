@@ -7,6 +7,7 @@ use ide\formats\PhpCodeFormat;
 use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\behaviours\php\TreeCreatePhpFileMenuCommand;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
 use ide\project\ProjectFile;
@@ -123,6 +124,8 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $this->project->on('updateSettings', [$this, 'doUpdateSettings']);
 
         $this->project->registerFormat(new PhpCodeFormat());
+
+        $this->registerTreeMenu();
     }
 
     public function getImportType()
@@ -156,6 +159,12 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         }
 
         return $package;
+    }
+
+    protected function registerTreeMenu()
+    {
+        $menu = $this->project->getTree()->getContextMenu();
+        $menu->add(new TreeCreatePhpFileMenuCommand($this->project->getTree()), 'new');
     }
 
     protected function refreshInspector()

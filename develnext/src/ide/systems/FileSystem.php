@@ -302,22 +302,14 @@ class FileSystem
 
     static public function _openEditor($editor, $param = null)
     {
-        /** @var MainForm $mainForm */
-        $mainForm = Ide::get()->getMainForm();
-
         if ($editor instanceof AbstractEditor && $editor !== static::$previousEditor) {
-            if (static::$previousEditor) {
+            if (static::$previousEditor && static::$previousEditor->isTabbed()) {
                 static::$previousEditor->hide();
+
+                static::$previousEditor = $editor;
             }
 
-            /*$mainForm->clearLeftPane();
-            $mainForm->setLeftPane($editor->getLeftPaneUi());*/
-
             $editor->open($param);
-
-            static::$previousEditor = $editor;
-        } else {
-            $previousEditor = null;
         }
 
         $project = Ide::project();
@@ -384,6 +376,12 @@ class FileSystem
         $editor->setTabbed(false);
 
         $win = new UXForm();
+
+        $win->addStylesheet('/php/gui/framework/style.css');
+        foreach (app()->getStyles() as $one) {
+            $win->addStylesheet($one);
+        }
+
         $win->owner = Ide::get()->getMainForm();
         $win->title = $editor->getTitle() . " [" . $editor->getFile() . "]";
 
@@ -552,7 +550,7 @@ class FileSystem
 
         if ($inWindow) {
             if (!$win) {
-                $win = static::makeWindowForEditor($editor);
+                $win = FileSystem::makeWindowForEditor($editor);
                 $changeHandler = $win->data('change-handler');
 
                 if ($switchToEditor && is_callable($changeHandler)) {

@@ -1,5 +1,12 @@
 <?php
 namespace ide\project;
+use ide\commands\tree\TreeCreateDirectoryCommand;
+use ide\commands\tree\TreeCreateFileCommand;
+use ide\commands\tree\TreeDeleteFileCommand;
+use ide\commands\tree\TreeEditFileCommand;
+use ide\commands\tree\TreeEditInWindowFileCommand;
+use ide\commands\tree\TreeShowInExplorerCommand;
+use ide\editors\menu\ContextMenu;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
@@ -60,12 +67,72 @@ class ProjectTree
     protected $valueCreators = [];
 
     /**
+     * @var ContextMenu
+     */
+    protected $contextMenu;
+
+    /**
      * ProjectTree constructor.
      * @param Project $project
      */
     public function __construct(Project $project)
     {
         $this->project = $project;
+        $this->contextMenu = new ContextMenu();
+
+        $this->contextMenu->addGroup('new', 'Создать');
+        $this->contextMenu->add(new TreeCreateDirectoryCommand($this));
+        $this->contextMenu->addSeparator();
+        $this->contextMenu->add(new TreeEditFileCommand($this));
+        $this->contextMenu->add(new TreeEditInWindowFileCommand($this));
+        $this->contextMenu->add(new TreeDeleteFileCommand($this));
+        $this->contextMenu->addSeparator();
+        $this->contextMenu->add(new TreeShowInExplorerCommand($this));
+
+        $this->contextMenu->add(new TreeCreateFileCommand($this), 'new');
+        $this->contextMenu->addSeparator('new');
+
+    }
+
+    /**
+     * @return ContextMenu
+     */
+    public function getContextMenu()
+    {
+        return $this->contextMenu;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSelectedPath()
+    {
+        if ($this->tree) {
+            return $this->tree->selectedItems ? $this->tree->selectedItems[0]->value->path : null;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return ProjectFile|null|File
+     */
+    public function getSelectedFullPath()
+    {
+        $path = $this->getSelectedPath();
+
+        if ($path) {
+            return $this->project->getFile($path);
+        }
+
+        return null;
+    }
+
+    public function expandSelected()
+    {
+        if ($this->tree && $this->tree->selectedItems) {
+             $this->tree->selectedItems[0]->expanded = true;
+        }
     }
 
     /**
@@ -74,6 +141,8 @@ class ProjectTree
     public function setView(UXDirectoryTreeView $treeView)
     {
         $this->tree = $treeView;
+
+        $this->contextMenu->linkTo($treeView);
 
         $treeView->on('dragOver', function (UXDragEvent $e) {
             if ($e->dragboard->files) {
@@ -125,8 +194,10 @@ class ProjectTree
 
         $treeView->on('click', function (UXMouseEvent $e) use ($treeView) {
             if ($e->clickCount > 1) {
-                if ($treeView->selectedItems && $treeView->selectedItems[0]->value instanceof UXDirectoryTreeValue) {
-                    $file = $this->project->getFile($treeView->selectedItems[0]->value->path);
+                $selectedPath = $this->getSelectedPath();
+
+                if ($selectedPath) {
+                    $file = $this->project->getFile($selectedPath);
 
                     if ($file->isFile()) {
                         foreach ($this->openHandlers as $handler) {

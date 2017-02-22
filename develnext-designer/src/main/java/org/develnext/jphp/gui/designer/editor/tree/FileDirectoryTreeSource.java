@@ -1,18 +1,12 @@
 package org.develnext.jphp.gui.designer.editor.tree;
 
 import javafx.scene.Node;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.monitor.FileAlterationListener;
-import org.apache.commons.io.monitor.FileAlterationMonitor;
-import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class FileDirectoryTreeSource extends AbstractDirectoryTreeSource {
     public interface ValueCreator {

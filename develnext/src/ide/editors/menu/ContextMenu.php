@@ -210,10 +210,10 @@ class ContextMenu
         }
 
         if ($menuItem instanceof UXMenuItem) {
-            $menuItem->on('action', function ($e) use ($command, $menuItem) {
+            $menuItem->on('action', function ($e) use ($command, $menuItem, $group) {
                 $filter = $this->filter;
 
-                if ($this->isCursorInPopup()) {
+                if ($this->isCursorInPopup() || $group) {
                     if (!$filter || $filter($command) || (!$menuItem->visible && !$menuItem->disable)) {
                         $command->onExecute($e, $this->editor);
                     }
@@ -262,7 +262,7 @@ class ContextMenu
 
         foreach ($this->groups as $menu) {
             foreach ($menu->items as $item) {
-                if ($item->userData instanceof AbstractMenuCommand) {
+                if ($item && $item->userData instanceof AbstractMenuCommand) {
                     $item->userData->onBeforeShow($item, $this->editor);
                 }
             }
@@ -308,7 +308,7 @@ class ContextMenu
 
             foreach ($this->groups as $menu) {
                 foreach ($menu->items as $item) {
-                    if ($e->matches($item->userData->getAccelerator())) {
+                    if ($item->userData && $e->matches($item->userData->getAccelerator())) {
                         $item->userData->onExecute($e, $this->editor);
                         break;
                     }

@@ -3,11 +3,14 @@ package org.develnext.jphp.ext.javafx.classes;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -132,19 +135,19 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Getter
-    public Pane getLayout(Environment env) {
+    public Parent getLayout(Environment env) {
         Memory data = data("~~virtual-layout");
 
         if (data.isNotNull()) {
-            return (Pane) Memory.unwrap(env, data);
+            return (Parent) Memory.unwrap(env, data);
         }
 
 
-        return getWrappedObject().getScene() == null ? null : (Pane) getWrappedObject().getScene().getRoot();
+        return getWrappedObject().getScene() == null ? null : getWrappedObject().getScene().getRoot();
     }
 
     @Setter
-    public void setLayout(Environment env, Pane pane) {
+    public void setLayout(Environment env, Parent pane) {
         if (getWrappedObject().getScene() == null) {
             throw new IllegalStateException("Unable to set layout");
         }
@@ -156,15 +159,21 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
 
     @Signature
     public void makeVirtualLayout(Environment env) {
-        Pane layout = getLayout(env);
+        Parent layout = getLayout(env);
         data(env, "~~virtual-layout", Memory.wrap(env, layout));
         getWrappedObject().getScene().setRoot(new AnchorPane());
     }
 
     @Getter
     public ObservableList<Node> getChildren(Environment env) {
-        Pane root = getLayout(env);
-        return root == null ? null : root.getChildren();
+        Parent root = getLayout(env);
+        if (root instanceof Pane) {
+            return ((Pane) root).getChildren();
+        } else if (root instanceof SplitPane) {
+            return ((SplitPane) root).getItems();
+        } else {
+            return FXCollections.emptyObservableList();
+        }
     }
 
     @Signature

@@ -116,6 +116,11 @@ abstract class AbstractEditor
         return true;
     }
 
+    public function canOpenInWindow()
+    {
+        return true;
+    }
+
     /**
      * @param bool $readOnly
      */

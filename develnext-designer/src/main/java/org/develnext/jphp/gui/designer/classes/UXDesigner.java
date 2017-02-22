@@ -483,6 +483,17 @@ public class UXDesigner extends BaseObject {
         selectionRectangle.setScene(new Scene(selectionRectangleLayout));
         selectionRectangle.setOpacity(0.5);
 
+        if (area.getScene() != null) {
+            selectionRectangle.initOwner(area.getScene().getWindow());
+        }
+
+        area.sceneProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                selectionRectangle.hide();
+                selectionRectangle.initOwner(newValue.getWindow());
+            }
+        });
+
         selectionRectangleLayout.setStyle("-fx-background-color: black;");
 
         area.setOnKeyPressed(new EventHandler<KeyEvent>() {
