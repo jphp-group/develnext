@@ -241,9 +241,12 @@ class OpenProjectForm extends AbstractIdeForm
 
     public function update()
     {
+        $emptyText = $this->projectListHelper->getEmptyListText();
+
+        $this->projectListHelper->setEmptyListText('Поиск проектов, подождите ...');
         $this->projectListHelper->clear();
 
-        $th = new Thread(function () {
+        $th = new Thread(function () use ($emptyText) {
             $projectDirectory = File::of(Ide::get()->getUserConfigValue('projectDirectory'));
 
             $projects = [];
@@ -292,7 +295,13 @@ class OpenProjectForm extends AbstractIdeForm
                 });
             }
 
-            uiLater(function () use ($projectDirectory) {
+            $this->projectListHelper->setEmptyListText($emptyText);
+
+            uiLater(function () use ($projectDirectory, $projects) {
+                if (!$projects) {
+                    $this->projectListHelper->clear();
+                }
+
                 $this->pathField->text = $projectDirectory;
             });
         });
