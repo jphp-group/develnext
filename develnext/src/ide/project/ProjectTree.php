@@ -330,6 +330,7 @@ class ProjectTree
     public function createSource()
     {
         $source = new UXFileDirectoryTreeSource($this->project->getRootDir());
+        $source->showHidden = true;
 
         $source->addFileFilter(function (File $file) use ($source) {
             $ext = fs::ext($file);

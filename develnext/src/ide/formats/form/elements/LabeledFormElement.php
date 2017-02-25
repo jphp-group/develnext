@@ -40,20 +40,20 @@ abstract class LabeledFormElement extends AbstractFormElement
         parent::registerNode($node);
 
         /** @var UXLabeled $node */
-        $data = DataUtils::get($node);
+            $data = DataUtils::get($node);
 
-        $image = $data->get('graphic');
+            $image = $data->get('graphic');
 
-        if ($image) {
-            $file = Ide::get()->getOpenedProject()->getFile("src/$image");
+            if ($image) {
+                $file = Ide::get()->getOpenedProject()->getFile("src/$image");
 
-            if ($file->exists()) {
-                $graphic = new UXImageView();
-                $graphic->image = new UXImage($file);
+                if ($file->exists()) {
+                    $graphic = new UXImageView();
+                    $graphic->image = new UXImage($file);
 
-                $node->graphic = $graphic;
+                    $node->graphic = $graphic;
+                }
             }
-        }
     }
 
     private function getFileFromDragDrop(UXDragboard $db)

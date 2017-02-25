@@ -176,7 +176,7 @@ class ProjectSystem
             }
 
             AccurateTimer::executeAfter(1000, function () use ($projectDir, $files, $file, $afterOpen) {
-                ProjectSystem::open($projectDir . "/" . Items::first($files)->getName());
+                ProjectSystem::open($projectDir . "/" . Items::first($files)->getName(), true, false);
 
                 Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива", 3000);
 
@@ -236,8 +236,9 @@ class ProjectSystem
     /**
      * @param string $fileName
      * @param bool $showDialogAlreadyOpened
+     * @param bool $showMigrationDialog
      */
-    static function open($fileName, $showDialogAlreadyOpened = true)
+    static function open($fileName, $showDialogAlreadyOpened = true, $showMigrationDialog = true)
     {
         Logger::info("Start opening project: $fileName");
 
@@ -285,26 +286,27 @@ class ProjectSystem
                     }
                 }
 
-                if ($project->getConfig()->getTemplate()) {
-                    if ($project->getConfig()->getTemplate()->isProjectWillMigrate($project)) {
-                        $msg = new MessageBoxForm("Проект '{$project->getName()}' будет сконвертирован в новый формат, который не поддерживается предыдущими версиями, продолжить?", [
-                            'Открыть проект', 'Отмена'
-                        ]);
-                        $msg->showWarningDialog();
+                if ($showMigrationDialog) {
+                    if ($project->getConfig()->getTemplate()) {
+                        if ($project->getConfig()->getTemplate()->isProjectWillMigrate($project)) {
+                            $msg = new MessageBoxForm("Проект '{$project->getName()}' будет сконвертирован в новый формат, который не поддерживается предыдущими версиями, продолжить?", [
+                                'Открыть проект', 'Отмена'
+                            ]);
+                            $msg->showWarningDialog();
 
-                        if ($msg->getResultIndex() == 1) {
-                            FileSystem::open('~welcome');
-                            Ide::get()->getMainForm()->hidePreloader();
+                            if ($msg->getResultIndex() == 1) {
+                                FileSystem::open('~welcome');
+                                Ide::get()->getMainForm()->hidePreloader();
 
-                            uiLater(function () {
-                                $dialog = new OpenProjectForm();
-                                $dialog->showDialog();
-                            });
-                            return;
+                                uiLater(function () {
+                                    $dialog = new OpenProjectForm();
+                                    $dialog->showDialog();
+                                });
+                                return;
+                            }
                         }
                     }
                 }
-
 
                 Ide::get()->setOpenedProject($project);
 

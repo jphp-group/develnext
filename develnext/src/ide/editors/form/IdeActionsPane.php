@@ -177,7 +177,7 @@ class IdeActionsPane extends UXHBox
         }
 
         $this->zoomSelect->value = "100%";
-        $this->zoomSelect->width = 75;
+        $this->zoomSelect->width = 85;
 
         $this->zoomSelect->on('action', function () use ($zoomSelect, $zoomList) {
             $zoom = round($zoomList[$zoomSelect->selectedIndex] / 100, 2);

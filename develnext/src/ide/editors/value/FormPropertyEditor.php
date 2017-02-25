@@ -3,6 +3,7 @@ namespace ide\editors\value;
 
 use ide\editors\common\FormListEditor;
 use ide\utils\UiUtils;
+use php\gui\layout\UXHBox;
 use php\gui\UXNode;
 use php\gui\UXTooltip;
 use php\xml\DomElement;
@@ -32,6 +33,9 @@ class FormPropertyEditor extends ElementPropertyEditor
         $this->listEditor->build();
 
         $ui = $this->listEditor->getUi();
+        $ui->maxWidth = 9999;
+        UXHBox::setHgrow($ui, 'ALWAYS');
+
         $ui->padding = 3;
 
         $this->listEditor->onChange(function ($value) {

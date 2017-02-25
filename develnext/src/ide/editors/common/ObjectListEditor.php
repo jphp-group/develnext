@@ -250,7 +250,7 @@ class ObjectListEditor
     }
 
     /**
-     * @return UXNode
+     * @return UXComboBox
      */
     public function getUi()
     {

@@ -4,6 +4,7 @@ namespace ide\editors\argument;
 use ide\editors\common\ObjectListEditorButtonRender;
 use ide\editors\common\ObjectListEditorItem;
 use ide\Ide;
+use php\gui\layout\UXHBox;
 use php\gui\UXComboBox;
 use php\gui\UXListCell;
 use php\gui\UXNode;
@@ -61,6 +62,7 @@ class EnumArgumentEditor extends AbstractArgumentEditor
     public function makeUi($label = null)
     {
         $this->list = new UXComboBox();
+        UXHBox::setHgrow($this->list, 'ALWAYS');
 
         $this->list->visibleRowCount = 30;
 
