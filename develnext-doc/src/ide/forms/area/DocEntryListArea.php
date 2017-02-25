@@ -43,6 +43,11 @@ class DocEntryListArea extends AbstractFormArea
     protected $accessEntry = false;
 
     /**
+     * @var ContextMenu
+     */
+    protected $contextMenu;
+
+    /**
      * @var array
      */
     protected $selectEntry;

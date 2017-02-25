@@ -80,7 +80,9 @@ abstract class AbstractModule extends AbstractScript
             if ($module) {
                 if (is_array($module['props'])) {
                     foreach ((array)$module['props'] as $key => $value) {
-                        $this->{$key} = $value;
+                        if (property_exists($this, $key)) {
+                            $this->{$key} = $value;
+                        }
                     }
                 }
 

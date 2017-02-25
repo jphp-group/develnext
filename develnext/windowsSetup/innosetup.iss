@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DevelNext"
-#define MyAppVersion "2016 rc-2"
+#define MyAppVersion "16.5 (snapshot)"
 #define MyAppPublisher "develnext.org"
 #define MyAppURL "http://develnext.org"
 #define MyAppExeName "DevelNext.exe"
@@ -23,7 +23,7 @@ DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName=DevelNext IDE
 OutputDir=../build/distributions/
 OutputBaseFilename=DevelNextSetup
-Compression=lzma
+Compression=lzma2/normal
 SolidCompression=no
 WizardImageFile=wizardImage.bmp
 ChangesAssociations=yes
