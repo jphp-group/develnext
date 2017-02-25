@@ -240,7 +240,7 @@ class Application
             return $form;
         }
 
-        return $this->getNewForm($name, $origin);
+        return $this->getNewForm($name, $origin, true, true, true);
     }
 
     /**
@@ -266,7 +266,7 @@ class Application
             return $form;
         }
 
-        return $this->getNewForm($name, $origin);
+        return $this->getNewForm($name, $origin, true, true, true);
     }
 
     /**
