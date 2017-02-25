@@ -353,8 +353,9 @@ class IdeEventListPane
                         $this->codeEditor->save();
 
                         $this->manager->load();
-                        $this->update($this->targetId);
                     }
+
+                    $this->update($this->targetId);
 
                     //$this->codeEditor->load(false);
                     $this->jumpToLine($eventCode);
@@ -533,9 +534,15 @@ class IdeEventListPane
                 $selected = Items::first($list->selectedItems);
 
                 if ($selected) {
-                    $this->openEventSource($selected['eventCode']);
+                    $editor = null;
 
-                    $this->trigger('edit', [$selected['eventCode'], $this->getDefaultEventEditor()]);
+                    if ($selected['info']['actionCount']) {
+                        $editor = 'constructor';
+                    }
+
+                    $this->openEventSource($selected['eventCode'], $editor);
+
+                    $this->trigger('edit', [$selected['eventCode'], $editor ?: $this->getDefaultEventEditor()]);
                 }
             }
         });
@@ -548,6 +555,10 @@ class IdeEventListPane
                 /** @var array $eventType */
                 $eventType = $item['type'];
                 $methodName = $item['info']['methodName'];
+
+                $actionCount = $item['info']['actionCount'];
+                $codeEmpty = $item['info']['codeEmpty'];
+
                 $param = $item['paramName'];
 
                 $cell->text = null;
@@ -574,10 +585,19 @@ class IdeEventListPane
 
                 $name = new UXLabel($eventType['name']);
                 $name->font = $name->font->withBold();
+                if ($codeEmpty && !$actionCount) {
+                    $name->textColor = 'gray';
+                }
 
                 $nameLabel = new UXHBox([$name]);
                 $nameLabel->spacing = 4;
 
+                if ($actionCount) {
+                    $node = new UXLabel("+$actionCount");
+                    $node->textColor = 'blue';
+                    $node->font = $node->font->withSize(11);
+                    $nameLabel->add($node);
+                }
 
                 $methodNameLabel = new UXLabel($methodName);
                 $methodNameLabel->textColor = UXColor::of('gray');
@@ -658,6 +678,9 @@ class IdeEventListPane
             list($code, $param) = Str::split($code, '-');
 
             if ($eventType = $this->eventTypes[$code]) {
+                $info['actionCount'] = sizeof($this->actionEditor->findMethod($info['className'], $info['methodName']));
+                $info['codeEmpty'] = !str::trim($this->manager->getCodeOfMethod($info['className'], $info['methodName']));
+
                 $this->uiList->items->add([
                     'type' => $eventType,
                     'info' => $info,

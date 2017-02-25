@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.antlr.v4.runtime.*;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.CodeAreaGutterNote;
+import org.develnext.jphp.gui.designer.editor.syntax.hotkey.*;
 import org.develnext.lexer.css.CSSLexer;
 import org.develnext.lexer.css.CSSParser;
 import org.develnext.lexer.regex.RegexToken;
@@ -20,6 +21,14 @@ public class CssCodeArea extends AbstractCodeArea {
 
     public CssCodeArea() {
         super();
+
+        registerHotkey(new AddTabsHotkey());
+        registerHotkey(new RemoveTabsHotkey());
+        registerHotkey(new DuplicateSelectionHotkey());
+        registerHotkey(new AutoSpaceEnterHotkey());
+        registerHotkey(new AutoBracketsHotkey());
+        registerHotkey(new BackspaceHotkey());
+
         setStylesheet(AbstractCodeArea.class.getResource("CssCodeArea.css").toExternalForm());
     }
 

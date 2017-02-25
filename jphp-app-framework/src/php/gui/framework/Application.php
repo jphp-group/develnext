@@ -289,7 +289,7 @@ class Application
      * @return AbstractForm
      * @return-dynamic $package\forms\$0
      */
-    public function getNewForm($name, UXForm $origin = null, $loadEvents = true, $loadBehaviours = true, $cache = true)
+    public function getNewForm($name, UXForm $origin = null, $loadEvents = true, $loadBehaviours = true, $cache = false)
     {
         $class = $name;
 
@@ -582,7 +582,7 @@ class Application
                     include 'res://.debug/bootstrap.php';
                 }
 
-                Logger::info("Application start is done.");
+                Logger::debug("Application start is done.");
             };
 
             if ($splashFormClass) {

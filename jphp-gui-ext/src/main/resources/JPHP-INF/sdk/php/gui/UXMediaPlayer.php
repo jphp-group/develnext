@@ -9,8 +9,6 @@ namespace php\gui;
  */
 class UXMediaPlayer
 {
-
-
     /**
      * @var double form -1.0 to 1.0
      */
@@ -64,6 +62,11 @@ class UXMediaPlayer
      * @var int
      */
     public $currentCount;
+
+    /**
+     * @var UXMedia
+     */
+    public $media;
 
     /**
      * @param UXMedia $media

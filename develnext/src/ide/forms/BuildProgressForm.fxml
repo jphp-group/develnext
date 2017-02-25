@@ -48,6 +48,9 @@
                      </styleClass>
                   </Button>
                   <CheckBox id="closeAfterDoneCheckbox" mnemonicParsing="false" selected="true" text="Закрыть после выполнения" />
+                  <Separator orientation="VERTICAL">
+                  </Separator>
+                  <Hyperlink id="message" textFill="red" />
                </children>
             </HBox>
          </children>

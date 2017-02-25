@@ -90,7 +90,7 @@
                         </AnchorPane>
                     </items>
                 </SplitPane>
-                <HBox id="statusPane" prefHeight="24" maxHeight="24" alignment="CENTER_LEFT">
+                <HBox id="statusPane" prefHeight="24" maxHeight="24" alignment="CENTER_LEFT" managed="false" visible="false">
                 </HBox>
             </children>
         </VBox>

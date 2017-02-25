@@ -106,6 +106,74 @@ class AutoCompletePane
         $this->init();
     }
 
+    public function pasteUsesFromCode($text)
+    {
+        if ($text) {
+            $reg = Regex::of('([a-z0-9_]+)\\:\\:|new[ ]+([a-z0-9_]+)|([\w\d\_]+)[ ]+\$', 'ig')->with($text);
+
+            /** @var TypeEntry[] $types */
+            $types = [];
+
+            while ($reg->find()) {
+                $class = $reg->group(1) ?: ($reg->group(2) ?: $reg->group(3));
+                $type = $this->complete->getInspector()->findTypeByShortName($class);
+
+                if ($type) {
+                    if (!Regex::of('use[ ]+' . Regex::quote($type->fulledName))->with($this->area->text)->find()) {
+                        $regex = new Regex('use[ ]+([a-z0-9\\_\\,]+)', 'i', $this->area->text);
+
+                        $usePackages = [];
+
+                        if ($regex->find()) {
+                            foreach (str::split($regex->group(1), ',') as $p) {
+                                $p = str::trim($p);
+                                $usePackages[$p] = $p;
+                            }
+                        }
+
+                        $exists = false;
+
+                        if ($usePackages) {
+                            foreach ($type->packages as $package) {
+                                if ($usePackages[$package]) {
+                                    $exists = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!$exists) {
+                            $types[$class] = $type;
+                        }
+                    }
+                }
+            }
+
+            if ($types) {
+                $done = MessageBoxForm::confirm(
+                    'В тексте есть неподключенные классы (' . str::join(arr::keys($types), ', ') . '), хотите их подключить?',
+                    $this->area
+                );
+
+                if ($done) {
+                    foreach ($types as $type) {
+                        $insert = $type->fulledName;
+
+                        if ($php = PhpProjectBehaviour::get()) {
+                            if ($php->getImportType() == 'package') {
+                                if ($type->packages) {
+                                    $insert = arr::first($type->packages);
+                                }
+                            }
+                        }
+
+                        PhpAnyAutoCompleteType::appendUseClass($this->area, $insert);
+                    }
+                }
+            }
+        }
+    }
+
     protected function init()
     {
         $this->area->observer('focused')->addListener(function ($old, $new) {
@@ -116,71 +184,7 @@ class AutoCompletePane
 
         $this->area->on('paste', function () {
             $text = UXClipboard::getText();
-
-            if ($text) {
-                $reg = Regex::of('([a-z0-9_]+)\\:\\:|new[ ]+([a-z0-9_]+)|([\w\d\_]+)[ ]+\$', 'ig')->with($text);
-
-                /** @var TypeEntry[] $types */
-                $types = [];
-
-                while ($reg->find()) {
-                    $class = $reg->group(1) ?: ($reg->group(2) ?: $reg->group(3));
-                    $type = $this->complete->getInspector()->findTypeByShortName($class);
-
-                    if ($type) {
-                        if (!Regex::of('use[ ]+' . Regex::quote($type->fulledName))->with($this->area->text)->find()) {
-                            $regex = new Regex('use[ ]+([a-z0-9\\_\\,]+)', 'i', $this->area->text);
-
-                            $usePackages = [];
-
-                            if ($regex->find()) {
-                                foreach (str::split($regex->group(1), ',') as $p) {
-                                    $p = str::trim($p);
-                                    $usePackages[$p] = $p;
-                                }
-                            }
-
-                            $exists = false;
-
-                            if ($usePackages) {
-                                foreach ($type->packages as $package) {
-                                    if ($usePackages[$package]) {
-                                        $exists = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (!$exists) {
-                                $types[$class] = $type;
-                            }
-                        }
-                    }
-                }
-
-                if ($types) {
-                    $done = MessageBoxForm::confirm(
-                        'В тексте есть неподключенные классы (' . str::join(arr::keys($types), ', ') . '), хотите их подключить?',
-                        $this->area
-                    );
-
-                    if ($done) {
-                        foreach ($types as $type) {
-                            $insert = $type->fulledName;
-
-                            if ($php = PhpProjectBehaviour::get()) {
-                                if ($php->getImportType() == 'package') {
-                                    if ($type->packages) {
-                                        $insert = arr::first($type->packages);
-                                    }
-                                }
-                            }
-
-                            PhpAnyAutoCompleteType::appendUseClass($this->area, $insert);
-                        }
-                    }
-                }
-            }
+            $this->pasteUsesFromCode($text);
         });
 
         $this->area->on('mouseDown', function () {

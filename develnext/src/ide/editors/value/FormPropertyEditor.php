@@ -36,6 +36,7 @@ class FormPropertyEditor extends ElementPropertyEditor
 
         $this->listEditor->onChange(function ($value) {
             $this->applyValue($value, false);
+            $this->refreshDesign();
         });
 
         return $ui;

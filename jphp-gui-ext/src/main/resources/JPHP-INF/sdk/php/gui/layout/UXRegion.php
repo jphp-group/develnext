@@ -48,6 +48,12 @@ class UXRegion extends UXParent
     public $maxHeight = -1;
 
     /**
+     * Предпочитаемые размеры.
+     * @var array
+     */
+    public $prefSize = [0.0, 0.0];
+
+    /**
      * Внутренние отступы.
      * @var array|double
      */

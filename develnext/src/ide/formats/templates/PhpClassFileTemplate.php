@@ -83,7 +83,11 @@ class PhpClassFileTemplate extends AbstractFileTemplate
         $header = '';
 
         if ($this->namespace) {
-            $header .= "namespace $this->namespace;\n\n";
+            $header .= "namespace $this->namespace;";
+        }
+
+        if ($this->imports) {
+            $header .= "\n\n";
         }
 
         foreach ($this->imports as $import) {
@@ -93,7 +97,7 @@ class PhpClassFileTemplate extends AbstractFileTemplate
         return [
             'CLASS'     => $this->class,
             'HEADER'    => $header,
-            'EXTENDS'   => $this->extends,
+            'EXTENDS'   => $this->extends ? "extends $this->extends" : "",
         ];
     }
 }

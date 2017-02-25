@@ -54,10 +54,12 @@ use php\gui\UXApplication;
 use php\gui\UXLabel;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
+use php\gui\UXParent;
 use php\gui\UXTextField;
 use php\io\File;
 use php\io\IOException;
 use php\lib\fs;
+use php\lib\reflect;
 use php\lib\str;
 use php\util\Configuration;
 use php\util\Regex;
@@ -218,6 +220,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->project->on('recover', [$this, 'doRecover']);
         $this->project->on('create', [$this, 'doCreate']);
+        $this->project->on('createEditor', [$this, 'doCreateEditor']);
         $this->project->on('open', [$this, 'doOpen']);
         $this->project->on('save', [$this, 'doSave']);
         $this->project->on('close', [$this, 'doClose']);
@@ -250,9 +253,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $addMenu->show($e->sender);
         });
 
-        $addMenu->addCommand(new CreateFormProjectCommand());
-        $addMenu->addCommand(new CreateScriptModuleProjectCommand());
-        $addMenu->addCommand(new CreateGameSpriteProjectCommand());
+        $addMenu->add(new CreateFormProjectCommand());
+        $addMenu->add(new CreateScriptModuleProjectCommand());
+        $addMenu->add(new CreateGameSpriteProjectCommand());
         $addMenu->add(new GuiFrameworkProjectBehaviour_ProjectTreeMenuCommand($this));
 
         Ide::get()->registerSettings(new FormEditorSettings());
@@ -261,11 +264,24 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->spriteManager = new IdeSpriteManager($this->project);
 
         $this->ideStylesheetFile = $this->project->getIdeCacheFile('.theme/style-ide.css');
+
+        $this->registerTreeMenu();
     }
 
     public function makeApplicationConf()
     {
         $this->project->createFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
+    }
+
+    protected function registerTreeMenu()
+    {
+        $tree = $this->project->getTree();
+        $menu = $tree->getContextMenu();
+
+        $menu->addSeparator('new');
+        $menu->add(new CreateFormProjectCommand($tree), 'new');
+        $menu->add(new CreateScriptModuleProjectCommand($tree), 'new');
+        $menu->add(new CreateGameSpriteProjectCommand($tree), 'new');
     }
 
     /**
@@ -334,6 +350,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->setAppUuid(str::uuid());
     }
 
+    public function doCreateEditor(AbstractEditor $editor)
+    {
+        $this->applyStylesheetToEditor($editor);
+    }
+
     public function doUpdate()
     {
         if ($this->spriteManager) {
@@ -363,7 +384,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $uiUuid->alignment = 'CENTER_LEFT';
 
         $this->uiUuidInput = $uiUuidInput;
-        $uiUuidInput->observer('text')->addListener(function ($old, $new) { $this->setAppUuid($new, false); });
+        $uiUuidInput->observer('text')->addListener(function ($old, $new) {
+            $this->setAppUuid($new, false);
+        });
 
         $wrap = new UXVBox([$title, $uiUuid]);
         $wrap->spacing = 5;
@@ -444,7 +467,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         if ($metaFile->isFile()) {
             if ($meta = Json::fromFile($metaFile)) {
-                return (bool) $meta['props']['singleton'];
+                return (bool)$meta['props']['singleton'];
             }
         }
 
@@ -602,6 +625,49 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
+    private function saveStylesheet()
+    {
+        $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
+
+        if (fs::exists($styleFile)) {
+            //$source = FileUtils::get($styleFile);
+
+            /*$regex = Regex::of('((\.|\#)?[\.\w\d\,\*\+\-\_\:\# \r\n]{1,}(\{))')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
+
+            $source = $regex->replaceWithCallback(function (Regex $regex) {
+                $selector = str::trim($regex->group(1));
+
+                $newSelector = [];
+
+                foreach (str::split($selector, ',') as $one) {
+                    if (str::trim($one) == '.root') {
+                        $newSelector[] = ".FormEditor";
+                    } else {
+                        $newSelector[] = "$one";
+                    }
+                }
+
+                return str::join($newSelector, ', ');
+            });*/
+
+            //FileUtils::put($this->ideStylesheetFile, $source);
+        } else {
+            fs::delete($this->ideStylesheetFile);
+        }
+    }
+
+    private function applyStylesheetToEditor(AbstractEditor $editor)
+    {
+        $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
+        $path = "file:///" . str::replace($styleFile, "\\", "/");
+
+        $editor->removeStylesheet($path);
+
+        if (fs::isFile($styleFile)) {
+            $editor->addStylesheet($path);
+        }
+    }
+
     public function reloadStylesheet()
     {
         if (!UXApplication::isUiThread()) {
@@ -611,41 +677,13 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             return;
         }
 
-        $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
+        $this->saveStylesheet();
 
-        if ($form = Ide::get()->getMainForm()) {
-            if (fs::exists($styleFile)) {
-                $source = FileUtils::get($styleFile);
-
-                $regex = Regex::of('((\.|\#)?[\.\w\d\,\*\+\-\_\:\# \r\n]{1,}(\{))')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
-
-                $source = $regex->replaceWithCallback(function (Regex $regex) {
-                    $selector = str::trim($regex->group(1));
-
-                    $newSelector = [];
-
-                    foreach (str::split($selector, ',') as $one) {
-                        $newSelector[] = ".FormEditor $one";
-                    }
-
-                    return str::join($newSelector, ', ');
-                });
-
-                FileUtils::put($this->ideStylesheetFile, $source);
-            } else {
-                fs::delete($this->ideStylesheetFile);
-            }
-
-            $path = "file:///" . str::replace($this->ideStylesheetFile, "\\", "/");
-
-            $form->removeStylesheet($path);
-
-            if (fs::exists($styleFile)) {
-                $form->addStylesheet($path);
-            }
+        foreach (FileSystem::getOpenedEditors() as $editor) {
+            $this->applyStylesheetToEditor($editor);
         }
 
-        $this->ideStylesheetFileTime = fs::time($styleFile);
+        $this->ideStylesheetFileTime = fs::time($this->project->getSrcFile('.theme/style.fx.css'));
     }
 
     public function saveBootstrapScript($incExtension = ['php', 'phb'])
@@ -654,7 +692,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $code = "";
 
-        Logger::info("Save bootstrap script ...");
+        Logger::debug("Save bootstrap script ...");
 
         $dirs = [];
 
@@ -868,7 +906,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             : null;
     }
 
-    public function createForm($name)
+    public function createForm($name, $namespace = null)
     {
         if ($this->hasForm($name)) {
             $editor = $this->getFormEditor($name);
@@ -877,15 +915,20 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         Logger::info("Creating form '$name' ...");
 
-        $this->project->createFile("src/{$this->project->getPackageName()}/forms/$name.fxml", new GuiFormFileTemplate());
+        $namespace = $namespace ?: "{$this->project->getPackageName()}\\forms";
+
+        $file = $this->project->getSrcFile(str::replace($namespace, '\\', '/') . "/$name");
+
+        $this->project->createFile($this->project->getAbsoluteFile("$file.fxml"), new GuiFormFileTemplate());
 
         $template = new PhpClassFileTemplate($name, 'AbstractForm');
-        $template->setNamespace("{$this->project->getPackageName()}\\forms");
+
+        $template->setNamespace($namespace);
         $template->setImports([
             "std, gui, framework, {$this->project->getPackageName()}"
         ]);
 
-        $sources = $this->project->createFile("src/{$this->project->getPackageName()}/forms/$name.php", $template);
+        $sources = $this->project->createFile($this->project->getAbsoluteFile("$file.php"), $template);
         $sources->applyTemplate($template);
         $sources->updateTemplate(true);
 
@@ -922,7 +965,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             foreach ($editor->getBehaviourManager()->getBehaviours($id) as $one) {
                 $result['behaviours'][] = [
                     'value' => $one,
-                    'spec'  => $editor->getBehaviourManager()->getBehaviourSpec($one),
+                    'spec' => $editor->getBehaviourManager()->getBehaviourSpec($one),
                 ];
             }
 
@@ -970,7 +1013,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $index = $project->getIndexer()->get($this->project->getAbsoluteFile($fileName), '_objects');
 
-        foreach ((array) $index as $it) {
+        foreach ((array)$index as $it) {
             /** @var AbstractFormElement $element */
             $element = class_exists($it['type']) ? new $it['type']() : null;
 
@@ -980,11 +1023,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
             $item->hint = $element ? $element->getName() : '';
             $item->element = $element;
-            $item->version = (int) $it['version'];
+            $item->version = (int)$it['version'];
             $item->rawType = $it['type'];
 
             if ($element) {
-                if ($graphic = $element->getCustomPreviewImage((array) $it['data'])) {
+                if ($graphic = $element->getCustomPreviewImage((array)$it['data'])) {
                     $item->graphic = $graphic;
                 } else {
                     $item->graphic = $element->getIcon();

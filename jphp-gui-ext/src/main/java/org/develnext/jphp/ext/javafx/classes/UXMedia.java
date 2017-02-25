@@ -20,7 +20,6 @@ public class UXMedia extends BaseWrapper<Media> {
     interface WrappedInterface {
         @Property Duration duration();
         @Property int width();
-
         @Property int height();
 
         @Property String source();

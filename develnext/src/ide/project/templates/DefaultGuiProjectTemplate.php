@@ -18,6 +18,7 @@ use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use php\lib\fs;
+use php\lib\str;
 
 /**
  * Class DefaultGuiProjectTemplate
@@ -182,9 +183,10 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
         FileUtils::deleteDirectory($project->getFile('src/.gradle'));
 
         if (fs::isFile($styleFile = $project->getFile('src/.theme/style.css'))) {
-            $styleFile->renameTo($project->getFile('src/.theme/style.fx.css'));
+            FileUtils::copyFile($styleFile, $project->getFile('src/.theme/style.fx.css'));
+            fs::delete($styleFile);
         } else {
-            FileUtils::put($styleFile, "/* JavaFX CSS Style with -fx- prefix */\n\n");
+            FileUtils::put($project->getFile('src/.theme/style.fx.css'), "/* JavaFX CSS Style with -fx- prefix */\n\n");
         }
 
         fs::delete($project->getFile('src/.theme/style-ide.css'));
@@ -223,9 +225,23 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
             $bundle->addBundle(Project::ENV_ALL, UIDesktopBundle::class, false);
             //$bundle->addBundle(Project::ENV_ALL, ControlFXBundle::class);
-            $bundle->addBundle(Project::ENV_ALL, Game2DBundle::class);
+            //$bundle->addBundle(Project::ENV_ALL, Game2DBundle::class);
 
+            //$project->makeDirectory('src/.theme/img');
             $styleFile = $project->getFile('src/.theme/style.fx.css');
+
+            $rules = [
+                '# Ignore rules for GIT (github.com, bitbucket.com, etc.)', '',
+                '/.dn/cache', '/.dn/ide.lock', '/.dn/tmp', '/.dn/index.json',
+                '',
+                '/vendor', '/src_generated', '/src/JPHP-INF', '/src/.debug', '/build', '/build.xml', '/build.gradle', '/settings.gradle',
+                '',
+                '*.log', '*.pid', '*.tmp', '*.sourcemap',
+            ];
+
+            FileUtils::putAsync(
+                $project->getFile('.gitignore'), str::join($rules, "\n")
+            );
 
             if (!$styleFile->exists()) {
                 FileUtils::put($styleFile, "/* JavaFX CSS Style with -fx- prefix */\n\n");
@@ -237,14 +253,17 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
             $project->getConfig()->setTreeState([
                 "/src/{$project->getPackageName()}/forms",
-                "/src/{$project->getPackageName()}/modules"
+                "/src/{$project->getPackageName()}/modules",
+                "/src/.theme",
             ]);
 
             $gui->setMainForm('MainForm');
 
             FileSystem::open($mainModule);
+
             /** @var FormEditor $editor */
             $editor = FileSystem::open($mainForm);
+            $editor->getConfig()->set('title', 'MainForm');
             $editor->addModule('MainModule');
             $editor->saveConfig();
         });

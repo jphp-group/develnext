@@ -29,6 +29,7 @@ import org.develnext.jphp.ext.javafx.classes.effect.UXEffectPipeline;
 import org.develnext.jphp.ext.javafx.classes.support.Eventable;
 import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.UserData;
+import org.develnext.jphp.ext.javafx.support.control.FragmentPane;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -756,6 +757,23 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
         Memory data = data("--property-" + name);
 
         return data;
+    }
+
+    @Signature
+    public Memory __set(Environment env, String name, Memory value) throws Throwable {
+        Memory data = data("--property-" + name + "-setter");
+
+        if (data.isNotNull()) {
+            Invoker invoker = Invoker.create(env, data);
+
+            if (invoker != null) {
+                invoker.call(value);
+                return Memory.NULL;
+            }
+        }
+
+        data(env, "--property-" + name, value);
+        return Memory.NULL;
     }
 
     @Signature

@@ -84,6 +84,7 @@ php\gui\framework\Preloader
 php\gui\framework\ScriptEvent
 php\gui\framework\StandaloneFactory
 php\gui\framework\View
+php\gui\layout\UXFragmentPaneWrapper
 php\gui\UXButtonWrapper
 php\gui\UXCheckboxWrapper
 php\gui\UXDatePickerWrapper

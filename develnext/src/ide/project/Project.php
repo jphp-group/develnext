@@ -328,7 +328,7 @@ class Project
     {
         $directory = "$this->rootDir/$path";
 
-        Logger::info("Make directory in project: $directory");
+        Logger::debug("Make directory in project: $directory");
 
         return File::of($directory)->mkdirs();
     }
@@ -341,13 +341,15 @@ class Project
      */
     public function createFile($file, AbstractFileTemplate $template)
     {
-        $file = $this->getFile($file);
+        $file = $file instanceof ProjectFile ? $file : $this->getFile($file);
 
         $file->applyTemplate($template);
         $file->updateTemplate(true);
 
-        foreach ($this->inspectors as $inspector) {
-            $inspector->loadSource($file);
+        if (fs::isFile($file)) {
+            foreach ($this->inspectors as $inspector) {
+                $inspector->loadSource($file);
+            }
         }
 
         return $file;
@@ -454,7 +456,7 @@ class Project
     public function addModule(ProjectModule $module, $owner = 'user')
     {
         if (!$this->modules[$module->getUniqueId()][$owner]) {
-            Logger::info("Add module: " . $module->getUniqueId() . ", owner = $owner");
+            Logger::debug("Add module: " . $module->getUniqueId() . ", owner = $owner");
             $handlers = $this->moduleTypeHandlers[$module->getType()];
 
             if ($handlers) {
@@ -793,6 +795,13 @@ class Project
         $exporter = new ProjectExporter($this);
         $exporter->addDirectory($this->getIdeDir());
         $exporter->addFile($this->getProjectFile());
+
+        $gitIgnoreFile = $this->getFile('.gitignore');
+
+        if ($gitIgnoreFile->exists()) {
+            $exporter->addFile($gitIgnoreFile);
+        }
+
         $exporter->removeFile($this->indexer->getIndexFile());
         $exporter->removeFile($this->getIdeLibraryConfig());
         $exporter->removeFile($this->getIdeFile("ide.lock"));
@@ -1208,7 +1217,7 @@ class Project
     {
         $inspectors = $this->inspectors;
 
-        Logger::info("Load source for inspector: $path");
+        Logger::debug("Load source for inspector: $path");
 
         if (!$inspectors) {
             Logger::warn("Unable to loadSourceForInspector(), inspectors are empty.");
@@ -1243,7 +1252,7 @@ class Project
     {
         $inspectors = $this->inspectors;
 
-        Logger::info("Load directory for inspector: $path");
+        Logger::debug("Load directory for inspector: $path");
 
         if (!$inspectors) {
             Logger::warn("Unable to loadDirectoryForInspector(), inspectors are empty.");

@@ -7,6 +7,7 @@ use ide\formats\PhpCodeFormat;
 use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\behaviours\php\TreeCreatePhpClassMenuCommand;
 use ide\project\behaviours\php\TreeCreatePhpFileMenuCommand;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
@@ -165,6 +166,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     {
         $menu = $this->project->getTree()->getContextMenu();
         $menu->add(new TreeCreatePhpFileMenuCommand($this->project->getTree()), 'new');
+        $menu->add(new TreeCreatePhpClassMenuCommand($this->project->getTree()), 'new');
     }
 
     protected function refreshInspector()

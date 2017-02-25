@@ -80,12 +80,14 @@ class CopyMenuCommand extends AbstractMenuCommand
 
             $rootElement = $document->createElement('copies');
             $dataElement = $document->createElement('data');
+            $bindsElement = $document->createElement('binds');
             $rootElement->appendChild($dataElement);
+            $rootElement->appendChild($bindsElement);
 
             $targetIds = [];
 
 
-            $editor->eachNode(function (UXNode $node) use (&$targetIds, $editor, $document, $dataElement) {
+            $editor->eachNode(function (UXNode $node) use (&$targetIds, $editor, $document, $dataElement, $bindsElement) {
                 $id = $editor->getNodeId($node);
 
                 if ($id) {
@@ -97,6 +99,34 @@ class CopyMenuCommand extends AbstractMenuCommand
                         $oneElement->setAttribute('id', $id);
 
                         $dataElement->appendChild($oneElement);
+                    }
+
+                    $eventManager = $editor->getEventManager();
+
+                    if ($binds = $eventManager->findBinds($id)) {
+                        foreach ($binds as $event => $bind) {
+                            $bindElement = $document->createElement('bind');
+                            $bindElement->setAttribute('id', $id);
+                            $bindElement->setAttribute('event', $event);
+                            $bindElement->setAttribute('methodName', $bind['methodName']);
+
+                            if ($actions = $editor->getActionEditor()->findMethod($bind['className'], $bind['methodName'])) {
+                                $actionsElement = $document->createElement('actions');
+
+                                foreach ($actions as $action) {
+                                    $actionElement = $editor->getActionEditor()->makeActionDom($action, $document);
+                                    $actionsElement->appendChild($actionElement);
+                                }
+
+                                $bindElement->appendChild($actionsElement);
+                            }
+
+                            $codeElement = $document->createElement('code');
+                            $codeElement->setTextContent($eventManager->getCodeOfMethod($bind['className'], $bind['methodName']));
+                            $bindElement->appendChild($codeElement);
+
+                            $bindsElement->appendChild($bindElement);
+                        }
                     }
 
                     $targetIds[] = $id;

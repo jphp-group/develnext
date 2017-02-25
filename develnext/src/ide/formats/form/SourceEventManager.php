@@ -340,14 +340,17 @@ class SourceEventManager
      * @param $id
      * @param $event
      * @param AbstractEventKind $kind
+     * @param string $methodName
      */
-    public function addBind($id, $event, AbstractEventKind $kind)
+    public function addBind($id, $event, AbstractEventKind $kind, $methodName = null)
     {
         $source = "";
 
-        Logger::info("Start adding event bind: id = $id, event = $event, kind = " . get_class($kind));
+        Logger::debug("Start adding event bind: id = $id, event = $event, kind = " . get_class($kind));
 
-        $methodName = "do" . Str::upperFirst($id) . Str::upperFirst(Str::replace(Str::replace($event, '-', ''), '+', ''));
+        if (!$methodName) {
+            $methodName = "do" . Str::upperFirst($id) . Str::upperFirst(Str::replace(Str::replace($event, '-', ''), '+', ''));
+        }
 
         $line = $this->classBeginLine;
 
@@ -430,7 +433,7 @@ class SourceEventManager
 
         $this->save($source);
 
-        Logger::info("Finish adding bind: id = $id, event = $event.");
+        Logger::debug("Finish adding bind: id = $id, event = $event.");
     }
 
     /**

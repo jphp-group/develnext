@@ -197,7 +197,12 @@ class ActionEditor extends AbstractEditor
         return $this->pane;
     }
 
-    protected function fetchMethodDom($class, $method)
+    /**
+     * @param $class
+     * @param $method
+     * @return DomElement
+     */
+    public function fetchMethodDom($class, $method)
     {
         $domMethod = $this->document->find("/root/class[@name='$class']/method[@name='$method']");
 
@@ -256,11 +261,18 @@ class ActionEditor extends AbstractEditor
         $this->save();
     }
 
+    public function makeActionDom(Action $action, DomDocument $document)
+    {
+        $element = $document->createElement($action->getType()->getTagName());
+
+        $action->getType()->serialize($action, $element, $document);
+
+        return $element;
+    }
+
     public function addAction(Action $action, $class, $method)
     {
-        $element = $this->document->createElement($action->getType()->getTagName());
-
-        $action->getType()->serialize($action, $element, $this->document);
+        $element = $this->makeActionDom($action, $this->document);
 
         $methodDom = $this->fetchMethodDom($class, $method);
         $methodDom->appendChild($element);

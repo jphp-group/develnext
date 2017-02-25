@@ -45,8 +45,8 @@ abstract public class AbstractCodeArea extends CodeArea {
     private boolean showGutter;
     private String stylesheet;
 
-    private final Set<AbstractHotkey> hotkeys = new HashSet<>();
-    private final Map<AbstractHotkey, InputMap<KeyEvent>> hotkeyHandlers = new LinkedHashMap<>();
+    protected final Set<AbstractHotkey> hotkeys = new HashSet<>();
+    protected final Map<AbstractHotkey, InputMap<KeyEvent>> hotkeyHandlers = new LinkedHashMap<>();
 
     private CodeAreaGutter gutter = CodeAreaGutter.get(this);
     private CodeAreaPopup popup = new CodeAreaPopup();
@@ -126,13 +126,6 @@ abstract public class AbstractCodeArea extends CodeArea {
         focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) hidePopup();
         });
-
-        registerHotkey(new AddTabsHotkey());
-        registerHotkey(new RemoveTabsHotkey());
-        registerHotkey(new DuplicateSelectionHotkey());
-        registerHotkey(new AutoSpaceEnterHotkey());
-        registerHotkey(new AutoBracketsHotkey());
-        registerHotkey(new BackspaceHotkey());
 
         setStylesheet(null);
     }

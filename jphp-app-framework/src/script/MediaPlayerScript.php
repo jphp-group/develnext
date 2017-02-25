@@ -307,6 +307,14 @@ class MediaPlayerScript extends AbstractScript implements TextableBehaviour, Val
     }
 
     /**
+     * @return UXMedia
+     */
+    public function getMedia()
+    {
+        return $this->_player ? $this->_player->media : null;
+    }
+
+    /**
      * @param $file
      */
     public function open($file)

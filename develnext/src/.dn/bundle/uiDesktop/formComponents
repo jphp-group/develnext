@@ -16,9 +16,10 @@ ide\formats\form\elements\ListViewFormElement
 ide\formats\form\elements\TreeViewFormElement
 ide\formats\form\elements\ImageViewFormElement
 ide\formats\form\elements\MediaViewFormElement
-
 ide\formats\form\elements\ProgressBarFormElement
 ide\formats\form\elements\SliderFormElement
+ide\formats\form\elements\FragmentFormElement
+
 ide\formats\form\elements\ColorPickerFormElement
 ide\formats\form\elements\ProgressIndicatorFormElement
 ide\formats\form\elements\SeparatorFormElement
@@ -41,9 +42,11 @@ ide\formats\form\elements\EllipseFormElement
 ide\formats\form\elements\RhombusFormElement
 ide\formats\form\elements\HexahedronFormElement
 
+
 ide\formats\form\tags\NodeFormElementTag
 ide\formats\form\tags\DataFormElementTag
 ide\formats\form\tags\LabeledFormElementTag
+ide\formats\form\tags\PaneFormElementTag
 ide\formats\form\tags\AnchorPaneFormElementTag
 ide\formats\form\tags\ButtonFormElementTag
 ide\formats\form\tags\FlatButtonFormElementTag
@@ -69,9 +72,13 @@ ide\formats\form\tags\ImageViewFormElementTag
 ide\formats\form\tags\DatePickerFormElementTag
 ide\formats\form\tags\WebViewFormElementTag
 
+ide\formats\form\tags\FragmentFormElementTag
 ide\formats\form\tags\TitledPaneFormElementTag
 ide\formats\form\tags\TabPaneFormElementTag
 ide\formats\form\tags\PanelFormElementTag
+ide\formats\form\tags\HBoxFormElementTag
+ide\formats\form\tags\VBoxFormElementTag
+ide\formats\form\tags\FlowPaneFormElementTag
 ide\formats\form\tags\ShapeFormElementTag
 ide\formats\form\tags\RectangleFormElementTag
 ide\formats\form\tags\EllipseFormElementTag

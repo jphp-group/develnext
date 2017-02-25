@@ -58,6 +58,11 @@ abstract class AbstractEditor
      */
     protected $leftPaneUi = null;
 
+    /**
+     * @var string[]
+     */
+    protected $stylesheets = [];
+
 
     public $cacheData = [];
 
@@ -195,6 +200,24 @@ abstract class AbstractEditor
     }
 
     /**
+     * @param mixed $message
+     */
+    public function sendMessage($message)
+    {
+
+    }
+
+    public function addStylesheet($stylesheet)
+    {
+        $this->stylesheets[$stylesheet] = $stylesheet;
+    }
+
+    public function removeStylesheet($stylesheet)
+    {
+        unset($this->stylesheets[$stylesheet]);
+    }
+
+    /**
      * @param AbstractFormat $format
      */
     public function setFormat($format)
@@ -243,7 +266,7 @@ abstract class AbstractEditor
 
     public function leave()
     {
-        // nop
+        $this->save();
     }
 
     public function open($param = null)
@@ -264,7 +287,7 @@ abstract class AbstractEditor
 
     public function getIcon()
     {
-        return $this->format->getIcon();
+        return $this->format ? $this->format->getIcon() : null;
     }
 
     public function getTooltip()

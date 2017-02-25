@@ -30,7 +30,7 @@ class SplashForm extends AbstractIdeForm
 {
     protected function init()
     {
-        Logger::info("Init form ...");
+        Logger::debug("Init form ...");
 
         $this->centerOnScreen();
 

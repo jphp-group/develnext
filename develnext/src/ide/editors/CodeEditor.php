@@ -29,6 +29,7 @@ use php\gui\designer\UXJavaScriptCodeArea;
 use php\gui\designer\UXPhpCodeArea;
 use php\gui\designer\UXSyntaxAutoCompletion;
 use php\gui\designer\UXSyntaxTextArea;
+use php\gui\designer\UXTextCodeArea;
 use php\gui\event\UXKeyEvent;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
@@ -46,6 +47,7 @@ use php\gui\UXListView;
 use php\gui\UXMenuItem;
 use php\gui\UXNode;
 use php\gui\UXPopupWindow;
+use php\gui\UXTooltip;
 use php\gui\UXWebEngine;
 use php\gui\UXWebView;
 use php\io\File;
@@ -176,10 +178,10 @@ class CodeEditor extends AbstractEditor
         $this->sourceFile = $sourceFile;
     }
 
-    public function getIcon()
+    /*public function getIcon()
     {
         return $this->mode ? 'icons/' . $this->mode . 'File16.png' : null;
-    }
+    }*/
 
     public function __construct($file, $mode = 'php', $options = array())
     {
@@ -204,6 +206,10 @@ class CodeEditor extends AbstractEditor
 
                 case 'js':
                     $this->textArea = new UXJavaScriptCodeArea();
+                    break;
+
+                default:
+                    $this->textArea = new UXTextCodeArea();
                     break;
             }
         } else {
@@ -234,6 +240,14 @@ class CodeEditor extends AbstractEditor
         }
 
         $this->resetSettings();
+    }
+
+    /**
+     * @return AutoCompletePane
+     */
+    public function getAutoComplete()
+    {
+        return $this->autoComplete;
     }
 
     public function close($save = true)
@@ -825,6 +839,36 @@ class CodeEditor extends AbstractEditor
     {
         return $this->mode;
     }
+
+    /**
+     * @return array|null
+     */
+    public function getCaretBounds()
+    {
+        return $this->textArea ? $this->textArea->caretBounds : null;
+    }
+
+    public function sendMessage($message)
+    {
+        $this->jumpToLineSpaceOffset($message['error']['line'] - 1);
+
+        if ($message['error']['message']) {
+            $tooltip = new UXTooltip();
+            $tooltip->text = $message['error']['message'];
+            $tooltip->graphic = ico('error16');
+
+            $bounds = $this->getCaretBounds();
+
+            $tooltip->show($this->ui->window, $bounds['x'], $bounds['y'] + 25);
+
+            $handler = function () use ($tooltip) {
+                $tooltip->hide();
+            };
+            waitAsync(5000, $handler);
+            $tooltip->on('click', $handler);
+        }
+    }
+
 
     /**
      * Reset default settings.

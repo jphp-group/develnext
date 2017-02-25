@@ -7,6 +7,8 @@ use ide\editors\form\IdeTabPane;
 use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\formats\form\AbstractFormElement;
+use ide\formats\form\event\AbstractEventKind;
+use ide\Logger;
 use ide\ui\Notifications;
 use php\format\ProcessorException;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
@@ -19,7 +21,10 @@ use php\gui\UXMenuItem;
 use php\gui\UXNode;
 use php\io\MemoryStream;
 use php\io\Stream;
+use php\lib\arr;
 use php\lib\Items;
+use php\lib\reflect;
+use php\lib\str;
 use php\xml\DomElement;
 use php\xml\DomNode;
 use php\xml\DomNodeList;
@@ -56,6 +61,7 @@ class PasteMenuCommand extends AbstractMenuCommand
             $selectedType = $selectedNode ? $editor->getFormat()->getFormElement($selectedNode) : null;
 
             $editor->getDesigner()->unselectAll();
+            $allCode = '';
 
             try {
                 $document = $processor->parse($text);
@@ -69,13 +75,17 @@ class PasteMenuCommand extends AbstractMenuCommand
                 /** @var DomElement $behaviours */
                 $behaviours = $document->find('/copies/behaviours');
 
-                $addLayout = function (UXNode $uiNode, $factoryId) use ($editor, &$addLayout, $document, $behaviours) {
+                $addLayout = function (UXNode $uiNode, $factoryId) use ($editor, &$addLayout, $document, $behaviours, &$allCode) {
                     /** @var AbstractFormElement $type */
                     $type = $editor->getFormat()->getFormElement($uiNode);
 
                     if ($type) {
-                        $oldId = $editor->getNodeId($uiNode);
-                        $id = $editor->generateNodeId($type);
+                        if ($oldId = $uiNode->data('old-id')) {
+                            $id = $uiNode->id;
+                        } else {
+                            $oldId = $editor->getNodeId($uiNode);
+                            $id = $editor->generateNodeId($type, $oldId);
+                        }
 
                         if (!$factoryId) {
                             $uiNode->id = $id;
@@ -83,6 +93,67 @@ class PasteMenuCommand extends AbstractMenuCommand
 
                         /** @var DomElement $oneDataElement */
                         $oneDataElement = $document->find("/copies/data/one[@id='$oldId']");
+                        $oneBindElements = $document->findAll("/copies/binds/bind[@id='$oldId']");
+
+                        if ($oneBindElements->count()) {
+                            Logger::debug("Paste events (count = {$oneBindElements->count()}).");
+
+                            /** @var DomElement $oneBindElement */
+                            foreach ($oneBindElements as $oneBindElement) {
+                                $event = $oneBindElement->getAttribute('event');
+                                $methodName = $oneBindElement->getAttribute('methodName');
+
+                                $code = $oneBindElement->find('./code');
+                                $actions = $oneBindElement->findAll('./actions/*');
+
+                                if ($code) {
+                                    $code = $code->getTextContent();
+                                }
+
+                                if (!$editor->getEventManager()->findBind($id, $event)) {
+                                    $eventType = $type->findEventType($event);
+
+                                    /** @var AbstractEventKind $eventKind */
+                                    $eventKind = $eventType['kind'];
+
+                                    if ($eventKind instanceof AbstractEventKind) {
+                                        $editor->getEventManager()->addBind($id, $event, $eventKind);
+                                        $editor->getEventManager()->load();
+
+                                        $bind = $editor->getEventManager()->findBind($id, $event);
+
+                                        if ($bind) {
+                                            if ($code) {
+                                                $editor->getEventManager()->replaceCodeOfMethod($bind['className'], $bind['methodName'], $code);
+
+                                                $allCode .= "$code\n\n";
+                                            }
+
+                                            if ($actions->count()) {
+                                                /** @var DomElement $one */
+                                                foreach ($actions as $one) {
+                                                    $action = $editor->getActionEditor()->getManager()->buildAction($one);
+
+                                                    if ($action) {
+                                                        $editor->getActionEditor()->addAction($action, $bind['className'], $bind['methodName']);
+                                                        Logger::debug("Add action " . reflect::typeOf($action->getType()));
+                                                    } else {
+                                                        Logger::warn("Unable to create action from '{$one->getTagName()}'");
+                                                    }
+                                                }
+                                            } else {
+                                                Logger::debug("Paste empty action list.");
+                                            }
+                                        }
+
+                                    } else {
+                                        Logger::warn("Unable to paste event '$id.$event', event kind not found.");
+                                    }
+                                } else {
+                                    Logger::warn("Unable to paste event '$id.$event', already exists!");
+                                }
+                            }
+                        }
 
                         // Paste virtual properties
                         if ($oneDataElement) {
@@ -102,7 +173,7 @@ class PasteMenuCommand extends AbstractMenuCommand
                             }
                         }
 
-                        $type->refreshNode($uiNode);
+                        $type->refreshNode($uiNode, $editor->getDesigner());
 
                         if ($behaviours && !$factoryId) {
                             BehaviourLoader::loadOne($oldId, $behaviours, $editor->getBehaviourManager(), $id);
@@ -136,8 +207,6 @@ class PasteMenuCommand extends AbstractMenuCommand
                     if ($uiNode == null) {
                         $loader = new UXLoader();
                         $uiNode = $loader->load($this->makeXmlForLoader($element, $imports));
-
-                        $targetId = $editor->getNodeId($uiNode);
                     }
 
                     $type = $editor->getFormat()->getFormElement($uiNode);
@@ -152,6 +221,16 @@ class PasteMenuCommand extends AbstractMenuCommand
                     $uiNode->x += $offsetX;
                     $uiNode->y += $offsetY;
 
+                    $busyIds = [];
+
+                    $editor->eachNode(function (UXNode $node, $nodeId, AbstractFormElement $type) use ($editor, &$busyIds) {
+                        if ($nodeId) {
+                            $node->data('old-id', $nodeId);
+                            $node->id = $editor->generateNodeId($type, $nodeId, $busyIds);
+                            $busyIds[$node->id] = $node->id;
+                        }
+                    }, [$uiNode]);
+
                     if ($selectedType && $selectedType->isLayout()) {
                         $selectedType->addToLayout($selectedNode, $uiNode, $selectedNode->screenX + $offsetX, $selectedNode->screenY + $offsetY);
                     } else {
@@ -160,6 +239,9 @@ class PasteMenuCommand extends AbstractMenuCommand
 
                     $editor->registerNode($uiNode);
                     $addLayout($uiNode, $factoryId);
+
+                    $editor->getCodeEditor()->loadContentToAreaIfModified();
+                    $editor->getAutoComplete()->pasteUsesFromCode($allCode);
 
                     waitAsync(100, function () use ($editor, $uiNode) {
                         $editor->getDesigner()->selectNode($uiNode);

@@ -97,7 +97,7 @@ class ProjectSystem
 
     static public function checkDirectory($path)
     {
-        Logger::info("Check directory: $path");
+        Logger::debug("Check directory: $path");
 
         if (File::of($path)->find()) {
             $path = File::of($path);
@@ -311,7 +311,9 @@ class ProjectSystem
                 $project->load();
                 $project->recover();
 
-                FileSystem::open($project->getMainProjectFile());
+                if (!FileSystem::getOpened()) {
+                    FileSystem::open($project->getMainProjectFile());
+                }
 
                 $project->open();
 

@@ -1,6 +1,7 @@
 package org.develnext.jphp.gui.designer.classes;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.stage.PopupWindow;
 import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
@@ -154,6 +155,11 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
     @Setter
     public void setEstimatedScrollX(double value) {
         getWrappedObject().setEstimatedScrollX(value);
+    }
+
+    @Getter
+    public Bounds getCaretBounds() {
+        return getWrappedObject().getCaretBounds().orElse(null);
     }
 
     @Signature

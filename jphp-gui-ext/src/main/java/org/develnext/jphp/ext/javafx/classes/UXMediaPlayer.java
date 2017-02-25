@@ -56,6 +56,11 @@ public class UXMediaPlayer extends BaseWrapper<MediaPlayer> {
     }
 
     @Getter
+    public Media getMedia() {
+        return getWrappedObject().getMedia();
+    }
+
+    @Getter
     public long getCurrentTimeAsPercent() {
         Duration duration = getWrappedObject().getMedia().getDuration();
         Duration currentTime = getWrappedObject().getCurrentTime();

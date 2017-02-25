@@ -45,7 +45,7 @@ class SplashTipSystem
 
         foreach (self::$sources as $source) {
             try {
-                Logger::info("Load tip database from '$source'");
+                Logger::debug("Load tip database from '$source'");
 
                 self::$databases[] = new TipDatabase($source);
             } catch (IOException $e) {

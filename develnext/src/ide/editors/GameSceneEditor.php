@@ -119,7 +119,7 @@ class GameSceneEditor extends FormEditor
             $element = $this->format->getFormElement($node);
 
             if ($element) {
-                $element->refreshNode($node);
+                $element->refreshNode($node,$this->designer);
             }
 
             return $node;

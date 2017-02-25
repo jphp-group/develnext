@@ -3,11 +3,14 @@ namespace ide\project\behaviours\php;
 
 use ide\editors\AbstractEditor;
 use ide\editors\menu\AbstractMenuCommand;
+use ide\forms\InputMessageBoxForm;
+use ide\forms\MessageBoxForm;
 use ide\project\ProjectTree;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use php\gui\UXDialog;
 use php\lib\fs;
+use php\util\Regex;
 
 class TreeCreatePhpFileMenuCommand extends AbstractMenuCommand
 {
@@ -32,7 +35,11 @@ class TreeCreatePhpFileMenuCommand extends AbstractMenuCommand
     {
         $file = $this->tree->getSelectedFullPath();
 
-        $name = UXDialog::input('Введите название для php файла:');
+        $dialog = new InputMessageBoxForm('Создание php файла', 'Введите название для php файла', '* Только валидное имя для файла');
+        $dialog->setPattern(new Regex('^[\\w\\d\\_\\-\\.\\+\\=\\ \\@\\/\\,\\\\]{1,}$', 'i'), 'Данное название некорректное');
+
+        $dialog->showDialog();
+        $name = $dialog->getResult();
 
         if ($name) {
             $f = $file->isDirectory() ? "$file/$name" : "{$file->getParent()}/$name";
@@ -42,6 +49,12 @@ class TreeCreatePhpFileMenuCommand extends AbstractMenuCommand
             }
 
             $f = fs::normalize($f);
+
+            if (fs::exists($f)) {
+                UXDialog::showAndWait('Файл или папка с таким названием уже существует.', 'ERROR');
+                $this->onExecute($e, $editor);
+                return;
+            }
 
             FileUtils::put($f, "<?php \n\n");
 
@@ -58,6 +71,6 @@ class TreeCreatePhpFileMenuCommand extends AbstractMenuCommand
     {
         parent::onBeforeShow($item, $editor);
 
-        $item->disable = !$this->tree->getSelectedFullPath();
+        $item->disable = !$this->tree->hasSelectedPath();
     }
 }

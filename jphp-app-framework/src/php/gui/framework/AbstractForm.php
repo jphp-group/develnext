@@ -8,6 +8,7 @@ use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;
 use php\gui\framework\behaviour\custom\FormBehaviourManager;
 use php\gui\framework\event\AbstractEventAdapter;
+use php\gui\layout\UXFragmentPane;
 use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXCustomNode;
@@ -87,6 +88,11 @@ abstract class AbstractForm extends UXForm
     protected $widget;
 
     /**
+     * @var UXFragmentPane
+     */
+    protected $__fragmentPane;
+
+    /**
      * @var string
      */
     private $resourcePath;
@@ -148,6 +154,36 @@ abstract class AbstractForm extends UXForm
         $this->makeVirtualLayout();
 
         $this->widget->layout = $layout;
+    }
+
+    /**
+     * @param UXFragmentPane $fragmentPane
+     * @throws IllegalStateException
+     */
+    public function showInFragment(UXFragmentPane $fragmentPane)
+    {
+        if ($this->isFragment()) {
+            throw new IllegalStateException("Form already is fragment!");
+        }
+
+        $this->__fragmentPane = $fragmentPane;
+
+        $fragmentPane->data('--property-content', $this);
+
+        /** @var UXFragmentPane $node */
+        $layout = $this->layout;
+
+        $fragmentPane->applyFragment($this);
+
+        $this->data('~~virtual-layout', $layout);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFragment()
+    {
+        return (bool) $this->__fragmentPane;
     }
 
     /**
@@ -582,14 +618,15 @@ abstract class AbstractForm extends UXForm
                         if ($node instanceof UXCustomNode) {
                             $clones[] = $node;
                         } else {
-                            if ($node) {
-                                $node->data('-factory-name', $this->getName());
-                                $node->data('-factory', $this);
+                            $node->data('-factory-name', $this->getName());
+                            $node->data('-factory', $this);
 
-                                $data = $data ?: new UXData();
-                                UXNodeWrapper::get($node)->applyData($data);
-                            }
+                            $data = $data ?: new UXData();
+                            $wrapper = UXNodeWrapper::get($node);
+                            $wrapper->applyData($data);
                         }
+                    } else {
+                        //Logger::warn("Unnecessary data component '{$data->id}', node not found.");
                     }
                 });
 
@@ -797,6 +834,10 @@ abstract class AbstractForm extends UXForm
             }
         }
 
+        /*if ($this->__fragmentPane) {
+            return $this->__fragmentPane->layout->lookup("#$name");
+        }*/
+
         return parent::__get($name);
     }
 
@@ -811,6 +852,10 @@ abstract class AbstractForm extends UXForm
                 return true;
             }
         }
+
+        /*if ($this->__fragmentPane) {
+            return (bool) $this->__fragmentPane->layout->lookup("#$name");
+        }*/
 
         return parent::__isset($name);
     }

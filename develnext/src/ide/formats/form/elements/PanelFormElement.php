@@ -65,7 +65,11 @@ class PanelFormElement extends AbstractFormElement
 
     public function getLayoutChildren($layout)
     {
-        return $layout->children;
+        $children = flow($layout->children)
+            ->find(function (UXNode $it) { return !$it->classes->has('x-system-element'); })
+            ->toArray();
+
+        return $children;
     }
 
     /**

@@ -47,6 +47,7 @@ public class UXPane<T extends Pane> extends UXRegion<T> {
 
     @Signature
     public boolean remove(Node node) {
+        getWrappedObject().getPrefWidth();
         return getChildren().remove(node);
     }
 }

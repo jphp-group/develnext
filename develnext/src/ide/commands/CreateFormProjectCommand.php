@@ -3,6 +3,7 @@ namespace ide\commands;
 
 use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
+use ide\editors\menu\AbstractMenuCommand;
 use ide\formats\GuiFormFormat;
 use ide\forms\BuildProgressForm;
 use ide\forms\InputMessageBoxForm;
@@ -11,6 +12,7 @@ use ide\Ide;
 use ide\misc\AbstractCommand;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\project\ProjectTree;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use php\gui\UXDialog;
@@ -20,8 +22,23 @@ use php\lib\Str;
 use php\time\Time;
 use php\util\Regex;
 
-class CreateFormProjectCommand extends AbstractCommand
+class CreateFormProjectCommand extends AbstractMenuCommand
 {
+    /**
+     * @var ProjectTree
+     */
+    protected $tree;
+
+    /**
+     * CreateFormProjectCommand constructor.
+     * @param ProjectTree $tree
+     */
+    public function __construct(ProjectTree $tree = null)
+    {
+        $this->tree = $tree;
+    }
+
+
     public function getName()
     {
         return 'Новая форма';

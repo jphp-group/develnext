@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
+import org.develnext.jphp.gui.designer.editor.syntax.hotkey.*;
 import org.develnext.lexer.js.ECMAScriptLexer;
 import org.develnext.lexer.js.ECMAScriptParser;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
@@ -15,6 +16,14 @@ public class JavaScriptCodeArea extends AbstractCodeArea {
 
     public JavaScriptCodeArea() {
         super();
+
+        registerHotkey(new AddTabsHotkey());
+        registerHotkey(new RemoveTabsHotkey());
+        registerHotkey(new DuplicateSelectionHotkey());
+        registerHotkey(new AutoSpaceEnterHotkey());
+        registerHotkey(new AutoBracketsHotkey());
+        registerHotkey(new BackspaceHotkey());
+
         setStylesheet(AbstractCodeArea.class.getResource("JavaScriptCodeArea.css").toExternalForm());
     }
 

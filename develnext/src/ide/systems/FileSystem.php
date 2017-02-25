@@ -89,6 +89,16 @@ class FileSystem
     }
 
     /**
+     * @return UXForm[]
+     */
+    public static function getOpenedWindows()
+    {
+        return self::$openedWindows;
+    }
+
+
+
+    /**
      * @param $path
      * @param null $param
      */
@@ -171,6 +181,14 @@ class FileSystem
     }
 
     /**
+     * @return AbstractEditor[]
+     */
+    static function getOpenedEditors()
+    {
+        return static::$openedEditors;
+    }
+
+    /**
      * @param $file
      * @return AbstractEditor
      */
@@ -182,7 +200,7 @@ class FileSystem
     /**
      * @return UXTab[]
      */
-    private static function getOpenedTabs()
+    public static function getOpenedTabs()
     {
         /** @var UXTabPane $fileTabPane */
         $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};

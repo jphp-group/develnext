@@ -91,7 +91,6 @@ class ProjectTree
 
         $this->contextMenu->add(new TreeCreateFileCommand($this), 'new');
         $this->contextMenu->addSeparator('new');
-
     }
 
     /**
@@ -115,13 +114,21 @@ class ProjectTree
     }
 
     /**
+     * @return bool
+     */
+    public function hasSelectedPath()
+    {
+        return $this->tree && $this->tree->selectedItems;
+    }
+
+    /**
      * @return ProjectFile|null|File
      */
     public function getSelectedFullPath()
     {
         $path = $this->getSelectedPath();
 
-        if ($path) {
+        if ($this->hasSelectedPath()) {
             return $this->project->getFile($path);
         }
 
@@ -164,6 +171,10 @@ class ProjectTree
                     }
 
                     foreach ($e->dragboard->files as $file) {
+                        if (FileUtils::startsName($destFile->getPath(), $file)) {
+                            continue;
+                        }
+
                         $copyFile = $destFile->getPath() . "/" . fs::name($file);
 
                         if (FileUtils::equalNames($file, $copyFile)) {

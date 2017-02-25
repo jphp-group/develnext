@@ -27,7 +27,7 @@ class DataUtils
     public static function scanAll(UXParent $layout, callable $callback)
     {
         foreach ($layout->childrenUnmodifiable as $node) {
-            if ($node instanceof UXNode) {
+            if ($node instanceof UXNode && !($node instanceof UXData)) {
                 $data = $node->id ? self::get($node, $layout, false) : null;
                 $callback($data, $node);
             }

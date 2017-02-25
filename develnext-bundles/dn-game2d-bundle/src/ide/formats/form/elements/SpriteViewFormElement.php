@@ -12,6 +12,7 @@ use php\game\UXGameEntity;
 use php\game\UXGamePane;
 use php\game\UXSprite;
 use php\game\UXSpriteView;
+use php\gui\designer\UXDesigner;
 use php\gui\framework\DataUtils;
 use php\gui\UXApplication;
 use php\gui\UXImage;
@@ -89,9 +90,9 @@ class SpriteViewFormElement extends AbstractFormElement
         return null;
     }
 
-    public function refreshNode(UXNode $node)
+    public function refreshNode(UXNode $node, UXDesigner $designer)
     {
-        parent::refreshNode($node);
+        parent::refreshNode($node, $designer);
 
         $project = Ide::project();
 
@@ -118,8 +119,8 @@ class SpriteViewFormElement extends AbstractFormElement
                 $spritePreviewImage = $manager->getSpritePreview($data->get('sprite'));
 
                 if (!$spritePreviewImage) {
-                    waitAsync(200, function () use ($node) {
-                        $this->refreshNode($node);
+                    waitAsync(200, function () use ($node, $designer) {
+                        $this->refreshNode($node, $designer);
                     });
                     return;
                 }

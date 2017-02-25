@@ -834,6 +834,22 @@ public class UXDesigner extends BaseObject {
     }
 
     @Signature
+    public boolean isNodeParentSelected(Node node) {
+        Node parent = node;
+
+        do {
+            parent = parent.getParent();
+
+            if (selections.containsKey(parent)) {
+                return true;
+            }
+
+        } while (parent != null && parent != area);
+
+        return false;
+    }
+
+    @Signature
     public Set<Node> getNodes() {
         return nodes.keySet();
     }
@@ -1124,7 +1140,7 @@ public class UXDesigner extends BaseObject {
                 }
 
                 for (final Selection selection : selections.values()) {
-                    if (getNodeLock(selection.getNode())) {
+                    if (getNodeLock(selection.getNode()) || isNodeParentSelected(selection.getNode())) {
                         continue;
                     }
 
@@ -1171,7 +1187,7 @@ public class UXDesigner extends BaseObject {
                 }
 
                 for (Selection sel : selections.values()) {
-                    if (getNodeLock(sel.getNode())) {
+                    if (getNodeLock(sel.getNode()) || isNodeParentSelected(sel.getNode())) {
                         continue;
                     }
 
@@ -1265,11 +1281,18 @@ public class UXDesigner extends BaseObject {
         EventHandler<MouseEvent> onMouseReleased = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
                 if (dragged) {
+                    List<Selection> skipSelections = new ArrayList<>();
+
                     for (Selection selection : selections.values()) {
                         selection.node.setMouseTransparent(false);
                         selection.node.setCursor(Cursor.DEFAULT);
 
-                        if (!getNodeLock(selection.node)) {
+                        if (isNodeParentSelected(selection.node)) {
+                            skipSelections.add(selection);
+                            continue;
+                        }
+
+                        if (!getNodeLock(selection.node) && !isNodeParentSelected(selection.node)) {
                             if (selection.parent instanceof AnchorPane) {
                                 Object userData = selection.dragView.getUserData();
 
@@ -1291,6 +1314,10 @@ public class UXDesigner extends BaseObject {
 
                         selection.update();
                         selection.parent.getChildren().remove(selection.dragView);
+                    }
+
+                    for (Selection skipSelection : skipSelections) {
+                        skipSelection.update();
                     }
 
                     if (onChanged != null) {

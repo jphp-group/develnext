@@ -10,12 +10,12 @@ class JavaScriptCodeFormat extends AbstractFormat
 {
     /**
      * @param $file
+     * @param array $options
      * @return AbstractEditor
      */
-    public function createEditor($file)
+    public function createEditor($file, array $options = [])
     {
         $editor = new CodeEditor($file, 'js');
-        $editor->registerDefaultCommands();
 
         return $editor;
     }

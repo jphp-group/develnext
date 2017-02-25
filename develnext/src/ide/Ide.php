@@ -1149,14 +1149,16 @@ class Ide extends Application
     /**
      * @param $path
      *
+     * @param array $options
+     * @param string $format
      * @return AbstractEditor
      */
-    public function createEditor($path)
+    public function createEditor($path, array $options = [], $format = null)
     {
-        $format = $this->getFormat($path);
+        $format = $format ? $this->getRegisteredFormat($format) : $this->getFormat($path);
 
         if ($format) {
-            $editor = $format->createEditor($path);
+            $editor = $format->createEditor($path, $options);
 
             if ($editor) {
                 $editor->setFormat($format);

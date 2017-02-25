@@ -4,6 +4,7 @@ namespace ide\forms;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\project\ProjectConsoleOutput;
+use ide\systems\FileSystem;
 use php\gui\designer\UXCodeAreaScrollPane;
 use php\gui\designer\UXRichTextArea;
 use php\gui\event\UXEvent;
@@ -19,6 +20,7 @@ use php\gui\UXButton;
 use php\gui\UXCheckbox;
 use php\gui\UXDialog;
 use php\gui\UXImageView;
+use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\io\IOException;
@@ -38,6 +40,7 @@ use php\util\SharedQueue;
  * @property UXButton $closeButton
  * @property UXRichTextArea $consoleArea
  * @property UXHBox $bottomPane
+ * @property UXLabel $message
  *
  * Class BuildProgressForm
  * @package ide\forms
@@ -95,23 +98,58 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
         //$this->consoleList->hide();
         $this->consoleList->parent->children->replace($this->consoleList, $scrollPane);
+
+        $this->message->on('click', function () {
+            $text = $this->message->text;
+
+            $patterns = [
+                "Uncaught\\ ([a-z\\_0-9]+)\\: (.+)\\ in\\ (.+)\\ on\\ line\\ ([0-9]+)\\,\\ position\\ ([0-9]+)",
+                "'(.+)'\\ with\\ message\\ '(.+?)'\\ in\\ (.+\\.php)\\ on\\ line\\ ([0-9]+)\\,\\ position\\ ([0-9]+)"
+            ];
+
+            foreach ($patterns as $pattern) {
+                $regex = new Regex($pattern, 'i', $text);
+                $one = $regex->one();
+
+                if ($one) {
+                    list(, $type, $message, $file, $line, $position) = $one;
+
+                    if (str::startsWith($file, 'res://')) {
+                        $file = Ide::project()->getSrcFile(str::sub($file, 6));
+                    }
+
+                    $editor = FileSystem::open($file);
+
+                    if ($editor) {
+                        $editor->sendMessage(['error' => ['line' => $line, 'position' => $position, 'message' => $message]]);
+                    }
+
+                    return;
+                }
+            }
+        });
     }
 
     public function reduceHeader()
     {
         $this->content->padding = 5;
-        $this->content->spacing = 5;
+        $this->content->paddingBottom = 0;
+        $this->content->spacing = 0;
         $this->header->spacing = 5;
+
         $this->workTitle->font = $this->workTitle->font->withSize(12)->withBold();
         $this->workDescription->free();
         $this->icon->preserveRatio = true;
         $this->icon->size = [16, 16];
+
+        $this->header->free();
     }
 
     public function reduceFooter()
     {
-        $this->bottomPane->height = $this->closeButton->height = 30;
-        $this->bottomPane->padding = 5;
+        $this->bottomPane->height = $this->closeButton->height = 25;
+        $this->closeButton->padding = [0, 8];
+        $this->bottomPane->padding = 0;
         $this->bottomPane->spacing = 10;
         $this->bottomPane->paddingLeft = 0;
     }
@@ -269,14 +307,26 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
         if (str::startsWith($text, "[ERROR] ") || str::startsWith($text, "Fatal error: ")) {
             $color = '#D8000C';
+
+            $this->message->text = $text;
+            $this->message->style = "-fx-text-fill: $color;";
+            $this->message->graphic = ico('error16');
         }
 
         if (str::startsWith($text, "[WARN] ") || str::startsWith($text, "[WARNING] ")) {
             $color = '#9F6000';
+
+            $this->message->text = $text;
+            $this->message->style = "-fx-text-fill: $color;";
+            $this->message->graphic = ico('warning16');
         }
 
         if (str::startsWith($text, "[INFO] ")) {
             $color = '#00529B';
+
+            $this->message->text = $text;
+            $this->message->style = "-fx-text-fill: $color;";
+            $this->message->graphic = ico('information16');
         }
 
         if (str::startsWith($text, "[DEBUG] ") || $text[0] == ':' || str::trimLeft($text)[0] == '#') {

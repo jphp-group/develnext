@@ -16,6 +16,7 @@ import org.develnext.jphp.core.tokenizer.token.expr.value.*;
 import org.develnext.jphp.core.tokenizer.token.stmt.StmtToken;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.CodeAreaGutterNote;
+import org.develnext.jphp.gui.designer.editor.syntax.hotkey.*;
 import org.develnext.lexer.php.PHPLexer;
 import org.develnext.lexer.php.PHPParser;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
@@ -88,6 +89,14 @@ public class PhpCodeArea extends AbstractCodeArea {
 
     public PhpCodeArea() {
         super();
+
+        registerHotkey(new AddTabsHotkey());
+        registerHotkey(new RemoveTabsHotkey());
+        registerHotkey(new DuplicateSelectionHotkey());
+        registerHotkey(new AutoSpaceEnterHotkey());
+        registerHotkey(new AutoBracketsHotkey());
+        registerHotkey(new BackspaceHotkey());
+
         setStylesheet(AbstractCodeArea.class.getResource("PhpCodeArea.css").toExternalForm());
     }
 

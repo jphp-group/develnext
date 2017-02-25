@@ -307,6 +307,11 @@ class FileUtils
         return self::hashName($oneName) == self::hashName($twoName);
     }
 
+    public static function startsName($fullName, $suffixName)
+    {
+        return str::startsWith(self::hashName($fullName), self::hashName($suffixName));
+    }
+
     public static function replaceInFile($fileName, $what, $to)
     {
         $content = FileUtils::get($fileName);

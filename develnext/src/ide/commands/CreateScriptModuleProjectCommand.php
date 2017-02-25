@@ -4,6 +4,7 @@ namespace ide\commands;
 use Dialog;
 use Files;
 use ide\editors\AbstractEditor;
+use ide\editors\menu\AbstractMenuCommand;
 use ide\formats\ScriptModuleFormat;
 use ide\forms\BuildProgressForm;
 use ide\forms\InputMessageBoxForm;
@@ -21,7 +22,7 @@ use php\lib\Str;
 use php\time\Time;
 use php\util\Regex;
 
-class CreateScriptModuleProjectCommand extends AbstractCommand
+class CreateScriptModuleProjectCommand extends AbstractMenuCommand
 {
     public function getName()
     {

@@ -1,11 +1,13 @@
 <?php
 namespace ide\formats\form;
 
+use develnext\lexer\inspector\entry\TypeEntry;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
 use ide\Logger;
+use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXDragEvent;
 use php\gui\UXImage;
@@ -190,6 +192,27 @@ abstract class AbstractFormElement
         return $this->config ? $this->config->getEventTypes() : [];
     }
 
+    public function findEventType($codeOrBind)
+    {
+        $types = $this->getEventTypes();
+
+        if ($type = $types[$codeOrBind]) {
+            return $type;
+        }
+
+        if ($type = $types[str::split($codeOrBind, '-')[0]]) {
+            return $type;
+        }
+
+        $tmp = str::split($codeOrBind, '.', 2);
+
+        if ($type = $types[str::split($tmp[1], '-')[0]]) {
+            return $type;
+        }
+
+        return null;
+    }
+
     public function getGroup()
     {
         return 'Главное';
@@ -210,7 +233,7 @@ abstract class AbstractFormElement
         return $size;
     }
 
-    public function refreshNode(UXNode $node)
+    public function refreshNode(UXNode $node, UXDesigner $designer)
     {
         // nop.
     }
@@ -256,6 +279,10 @@ abstract class AbstractFormElement
     }
 
     public function dragDropIn(UXDragEvent $e, UXNode $node)
+    {
+    }
+
+    public function refreshInspector(UXNode $node, TypeEntry $type)
     {
     }
 }

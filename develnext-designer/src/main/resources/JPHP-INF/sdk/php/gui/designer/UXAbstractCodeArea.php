@@ -39,6 +39,12 @@ class UXAbstractCodeArea extends UXControl
     public $caretOffset;
 
     /**
+     * Screen caret bounds [x,y,width,height]
+     * @var array|null
+     */
+    public $caretBounds;
+
+    /**
      * @readonly
      * @var int
      */

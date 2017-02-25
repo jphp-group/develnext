@@ -128,6 +128,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, org.develnext.jphp.ext.javafx.support.control.Panel.class, UXPanel.class);
         registerWrapperClass(scope, StackPane.class, UXStackPane.class);
         registerWrapperClass(scope, VBox.class, UXVBox.class);
+        registerWrapperClass(scope, FragmentPane.class, UXFragmentPane.class);
         registerWrapperClass(scope, HBox.class, UXHBox.class);
         registerWrapperClass(scope, FlowPane.class, UXFlowPane.class);
 

@@ -19,6 +19,7 @@ use php\gui\UXNode;
 use php\gui\UXTableCell;
 use php\gui\UXTextField;
 use php\gui\UXTitledPane;
+use php\lib\reflect;
 
 class VBoxFormElement extends AbstractFormElement
 {
@@ -82,6 +83,6 @@ class VBoxFormElement extends AbstractFormElement
 
     public function isOrigin($any)
     {
-        return $any instanceof UXVBox;
+        return reflect::typeOf($any) == UXVBox::class;
     }
 }

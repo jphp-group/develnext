@@ -254,6 +254,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
      */
     protected $loaded = false;
 
+    /**
+     * @var UXScrollPane
+     */
+    protected $layoutViewer;
+
     public function __construct($file, AbstractFormDumper $dumper)
     {
         parent::__construct($file);
@@ -301,9 +306,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function initCodeEditor($phpFile)
     {
-        $this->codeEditor = Ide::get()->getRegisteredFormat(PhpCodeFormat::class)->createEditor($phpFile, [
+        $this->codeEditor = Ide::get()->createEditor($phpFile, [
             'withoutCommands' => true, 'embedded' => true
-        ]);
+        ], PhpCodeFormat::class);
 
         $this->codeEditor->register(AbstractCommand::make('Скрыть', 'icons/close16.png', function () {
             $this->codeEditor->save();
@@ -490,6 +495,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                         $t->data['icon'] = $spec->getIcon();
                         $t->data['type'][] = reflect::typeOf($one);
                     }
+                }
+
+                $node = $this->layout->lookup("#$el->value");
+                if ($node && $el->element) {
+                    $el->element->refreshInspector($node, $behaviourType);
                 }
 
                 $prop->data['type'][] = $behaviourType;
@@ -808,9 +818,17 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
-    public function open()
+    public function sendMessage($message)
     {
-        parent::open();
+        if ($message['error']) {
+            $this->switchToSource();
+            $this->codeEditor->sendMessage($message);
+        }
+    }
+
+    public function open($param = null)
+    {
+        parent::open($param);
 
         if (!Ide::project()) {
             return;
@@ -888,7 +906,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $element = $this->format->getFormElement($node);
 
         if ($element) {
-            $element->refreshNode($node);
+            $element->refreshNode($node, $this->designer);
         }
 
         $targetId = $this->getNodeId($node);
@@ -1047,23 +1065,27 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
         }
 
-        $data = DataUtils::get($node, $this->layout, false);
+        $data = DataUtils::get($node, null, false);
 
-        if ($data) {
+        if ($data instanceof UXData) {
             $data->id = "data-$newId";
+            $data->set('id', $data->id);
+        } else {
+            return 'invalid';
         }
 
-        $this->behaviourManager->changeTargetId($node->id, $newId);
+        $oldId = $node->id;
+        $node->id = $newId;
 
-        $binds = $this->eventManager->renameBind($node->id, $newId, $eventsWithIdParam);
+        $this->behaviourManager->changeTargetId($oldId, $newId);
 
+        $binds = $this->eventManager->renameBind($oldId, $newId, $eventsWithIdParam);
         foreach ($binds as $bind) {
             $this->actionEditor->renameMethod($bind['className'], $bind['methodName'], $bind['newMethodName']);
         }
 
         $this->codeEditor->loadContentToArea(false);
         $this->codeEditor->doChange(true);
-        $node->id = $newId;
 
         $this->reindex();
 
@@ -1189,6 +1211,24 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         return $ui;
     }
 
+    public function addStylesheet($stylesheet)
+    {
+        parent::addStylesheet($stylesheet);
+
+        if ($this->layoutViewer) {
+            $this->layoutViewer->stylesheets->add($stylesheet);
+        }
+    }
+
+    public function removeStylesheet($stylesheet)
+    {
+        parent::removeStylesheet($stylesheet);
+
+        if ($this->layoutViewer) {
+            $this->layoutViewer->stylesheets->remove($stylesheet);
+        }
+    }
+
     public function makeUi()
     {
         if (!$this->layout) {
@@ -1263,6 +1303,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->tabs->selectTab($this->codeTab);
     }
 
+    /**
+     * @deprecated
+     */
     public function switchToFullSource()
     {
         Logger::info("Start switch to full source editor...");
@@ -1448,7 +1491,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     }
 
     /**
-     * @param callable $callback (UXNode $node, AbstractFormElement $element, int $level)
+     * @param callable $callback (UXNode $node, $nodeId, AbstractFormElement $element, int $level)
      * @param array $children
      */
     public function eachNode(callable $callback, array $children = null)
@@ -1665,7 +1708,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $area->classes->remove('FormEditor');
         }
 
-        $viewer = new UXScrollPane($area);
+        $viewer = $this->layoutViewer = new UXScrollPane($area);
+
+        foreach ($this->stylesheets as $stylesheet) {
+            $viewer->stylesheets->add($stylesheet);
+        }
 
         $viewer->on('mouseUp', function ($e) {
             $this->selectForm();
@@ -1840,20 +1887,26 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->designer->contextMenu = $this->contextMenu->getRoot();
     }
 
-    public function generateNodeId(AbstractFormElement $element)
+    public function generateNodeId(AbstractFormElement $element, $tryId = null, array $busyIds = [])
     {
         $n = 3;
 
+        if ($tryId) {
+            if (!$this->layout->lookup("#$tryId") && !$busyIds[$tryId]) {
+                return $tryId;
+            }
+        }
+
         $id = Str::format($element->getIdPattern(), "");
 
-        if ($this->layout->lookup("#$id")) {
+        if ($this->layout->lookup("#$id") || $busyIds[$id]) {
             $id = Str::format($element->getIdPattern(), "Alt");
 
-            if ($this->layout->lookup("#$id")) {
+            if ($this->layout->lookup("#$id") || $busyIds[$id]) {
                 do {
                     $id = Str::format($element->getIdPattern(), $n);
                     $n++;
-                } while ($this->layout->lookup("#$id"));
+                } while ($this->layout->lookup("#$id") || $busyIds[$id]);
             }
         }
 
@@ -2308,6 +2361,38 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     public function setDefaultEventEditor($editor)
     {
         Ide::get()->setUserConfigValue(CodeEditor::class . '.editorOnDoubleClick', $editor);
+    }
+
+    /**
+     * @return SourceEventManager
+     */
+    public function getEventManager()
+    {
+        return $this->eventManager;
+    }
+
+    /**
+     * @return CodeEditor
+     */
+    public function getCodeEditor()
+    {
+        return $this->codeEditor;
+    }
+
+    /**
+     * @return \ide\autocomplete\ui\AutoCompletePane
+     */
+    public function getAutoComplete()
+    {
+        return $this->codeEditor->getAutoComplete();
+    }
+
+    /**
+     * @return ActionEditor
+     */
+    public function getActionEditor()
+    {
+        return $this->actionEditor;
     }
 
     public function getDefaultEventEditor($request = true)

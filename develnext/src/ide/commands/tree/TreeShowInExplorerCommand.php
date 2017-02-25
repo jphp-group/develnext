@@ -48,6 +48,6 @@ class TreeShowInExplorerCommand extends AbstractMenuCommand
     {
         parent::onBeforeShow($item, $editor);
 
-        $item->disable = !$this->tree->getSelectedFullPath();
+        $item->disable = !$this->tree->hasSelectedPath();
     }
 }

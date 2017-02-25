@@ -1,0 +1,5 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property name="Подключаемая форма" code="content" editor="form" tooltip="" virtual="1" />
+    </properties>
+</element>
