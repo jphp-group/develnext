@@ -51,6 +51,11 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     protected static $editors = [];
 
     /**
+     * @var bool
+     */
+    protected $reindexOnUpdate;
+
+    /**
      * ElementPropertyEditor constructor.
      *
      * @param callable $getter
@@ -85,7 +90,10 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             $editor = FileSystem::getSelectedEditor();
 
             if ($editor instanceof FormEditor) {
-                $editor->reindex();
+                if ($this->reindexOnUpdate) {
+                    $editor->reindex();
+                }
+
                 //$editor->getDesigner()->update();
 
                 $target = $this->designProperties->target;

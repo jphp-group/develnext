@@ -1243,7 +1243,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $designer = $this->makeDesigner();
 
         $tabs = new UXTabPane();
-        $tabs->side = 'BOTTOM';
+        $tabs->side = 'TOP';
         $tabs->tabClosingPolicy = 'UNAVAILABLE';
 
         $tabs->observer('focused')->addListener(function ($_, $new) {
@@ -1255,7 +1255,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $codeTab = new UXTab();
         $codeTab->text = 'Исходный код [' . fs::name($this->codeFile) . ']';
         $codeTab->content = $this->codeEditorUi;
-        $codeTab->style = '-fx-cursor: hand;';
         $codeTab->graphic = Ide::get()->getImage($this->codeEditor->getIcon());
         $codeTab->tooltip = UXTooltip::of($this->codeFile);
 
@@ -1264,7 +1263,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $designerTab->content = $designer;
 
-        $designerTab->style = '-fx-cursor: hand;';
         $designerTab->graphic = Ide::get()->getImage($this->getIcon());
 
         $this->designerTab = $designerTab;

@@ -434,6 +434,11 @@ class MediaPlayerScript extends AbstractScript implements TextableBehaviour, Val
         $this->_view = $view;
 
         if ($this->isApplied()) {
+            if (!$view) {
+                $this->_view = null;
+                return;
+            }
+
             if (is_string($this->_view)) {
                 $this->_eachHelper($this->_view, function (NodeHelper $node) {
                     $this->_view = $node->getRoot();
@@ -446,7 +451,7 @@ class MediaPlayerScript extends AbstractScript implements TextableBehaviour, Val
 
             $view = is_string($view) ? $view : reflect::typeOf($view);
 
-            Logger::error("Media player cannot use '$view' as view of media content.");
+            Logger::warn("Media player (id = '$this->id') cannot use '$view' as view of media content.");
 
             $this->_view = null;
         }

@@ -199,14 +199,14 @@ class DocEntryListArea extends AbstractFormArea
         $this->accessCategory = $accessCategory;
         $this->accessEntry = $accessEntry;
 
-        if ($accessCategory || $accessEntry) {
+        /*if ($accessCategory || $accessEntry) {
             if (!$this->moderPane->parent) {
                 $this->content->add($this->moderPane);
             }
         } else {
             $this->{'moderPane'} = $this->moderPane;
             $this->moderPane->free();
-        }
+        } */
     }
 
     /**

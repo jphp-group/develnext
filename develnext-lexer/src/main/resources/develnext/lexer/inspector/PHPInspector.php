@@ -155,7 +155,10 @@ class PHPInspector extends AbstractInspector
                     $pkg->addFunctions((array)$info['functions']);
                     $pkg->addConstants((array)$info['constants']);
 
-                    $env->setPackage($package, $pkg);
+                    //var_dump($package);
+                    if ($info['classes'] || $info['functions'] || $info['constants']) {
+                        $env->setPackage($package, $pkg);
+                    }
                 }
 
                 $analyzer = new SyntaxAnalyzer($env, $tokenizer);

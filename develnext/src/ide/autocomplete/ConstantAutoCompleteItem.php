@@ -7,5 +7,8 @@ namespace ide\autocomplete;
  */
 class ConstantAutoCompleteItem extends AutoCompleteItem
 {
-    
+    public function getIcon()
+    {
+        return $this->icon ?: 'icons/sun16.png';
+    }
 }

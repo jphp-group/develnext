@@ -120,7 +120,7 @@ class AutoCompletePane
 
                 if ($type) {
                     if (!Regex::of('use[ ]+' . Regex::quote($type->fulledName))->with($this->area->text)->find()) {
-                        $regex = new Regex('use[ ]+([a-z0-9\\_\\,]+)', 'i', $this->area->text);
+                        $regex = new Regex('use[ ]+([0-9\\,\\ \\_a-z\\\\]+)', 'i', $this->area->text);
 
                         $usePackages = [];
 
@@ -754,7 +754,7 @@ class AutoCompletePane
             $hintLabel->textColor = UXColor::of('gray');
 
             if ($icon) {
-                if ($item->getDescription()) {
+                if (str::trim($item->getDescription())) {
                     $dots = new UXLabel(": ");
                     $dots->textColor = $hintLabel->textColor;
                     $hintLabel->text = $item->getDescription();

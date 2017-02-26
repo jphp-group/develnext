@@ -359,29 +359,7 @@ class FileSystem
             UXSplitPane::setResizeWithParent($wrap, false);
 
             $content = new UXSplitPane([$wrap, $content]);
-
-            $init = false;
-
-            if (static::$editorContentDividePosition) {
-                $init = true;
-                $content->dividerPositions = static::$editorContentDividePosition;
-            }
-
-
-            $v = function () use (&$dividePositions, $content) {
-                static::$editorContentDividePosition = $content->dividerPositions;
-            };
-            $wrap->observer('width')->addListener($v);
-            Ide::get()->getMainForm()->observer('width')->addListener($v);
-
-            (new AccurateTimer(100, $v))->start();
-
-            $content->observer('width')->addListener(function ($_, $width) use (&$init, $content, $wrap) {
-                if (!$init) {
-                    $init = true;
-                    $content->dividerPositions = [$wrap->width/$width];
-                }
-            });
+            $content->dividerPositions = [0.2];
         } else {
             $editor->setLeftPaneUi(null);
         }

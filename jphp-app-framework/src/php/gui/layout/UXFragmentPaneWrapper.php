@@ -19,9 +19,11 @@ class UXFragmentPaneWrapper extends UXNodeWrapper
         /** @var UXFragmentPane $node */
         $node = $this->node;
 
-        $form = $data->get('content');
+        $value = $data->get('content');
 
         $node->data('--property-content-setter', function ($value) use ($node) {
+            Logger::warn("Use AbstractForm::showInFragment() method instead of set 'content' property for fragment with id = '{$node->id}'!");
+
             $form = $value;
 
             if (!$form) {
@@ -34,14 +36,22 @@ class UXFragmentPaneWrapper extends UXNodeWrapper
             } else if ($form instanceof AbstractForm) {
 
             } else {
-                Logger::error("Cannot load form '$value' for fragment with id = '{$this->node->id}', must be instance of " . AbstractForm::class);
+                Logger::error("Cannot load form '$value' for fragment with id = '{$node->id}', must be instance of " . AbstractForm::class);
+            }
+
+            if (!$form) {
+                return;
             }
 
             $form->showInFragment($node);
         });
 
-        if ($form) {
-            $node->content = $form;
+        $form = app()->getNewForm($value);
+
+        if ($form instanceof AbstractForm) {
+            $form->showInFragment($node);
+        } else {
+            Logger::error("Cannot load form '$value' for fragment with id = '{$node->id}', must be instance of " . AbstractForm::class);
         }
     }
 }

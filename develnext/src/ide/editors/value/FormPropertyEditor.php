@@ -15,6 +15,12 @@ class FormPropertyEditor extends ElementPropertyEditor
      */
     protected $listEditor;
 
+    public function __construct(callable $getter = null, callable $setter = null)
+    {
+        parent::__construct($getter, $setter);
+
+        $this->reindexOnUpdate = true;
+    }
 
     /**
      * @return string
