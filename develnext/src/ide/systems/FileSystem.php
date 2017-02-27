@@ -359,7 +359,7 @@ class FileSystem
             UXSplitPane::setResizeWithParent($wrap, false);
 
             $content = new UXSplitPane([$wrap, $content]);
-            $content->dividerPositions = [0.2];
+            $content->dividerPositions = [0.15];
         } else {
             $editor->setLeftPaneUi(null);
         }

@@ -125,6 +125,7 @@ class PasteMenuCommand extends AbstractMenuCommand
                                         if ($bind) {
                                             if ($code) {
                                                 $editor->getEventManager()->replaceCodeOfMethod($bind['className'], $bind['methodName'], $code);
+                                                $editor->getEventManager()->load();
 
                                                 $allCode .= "$code\n\n";
                                             }

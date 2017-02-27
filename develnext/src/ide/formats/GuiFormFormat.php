@@ -140,7 +140,7 @@ class GuiFormFormat extends AbstractFormFormat
             FileUtils::copyFile("$parent/$name.conf", "$toParent/$toName.conf");
         }
 
-        foreach (['php', 'php.source', 'php.axml', 'behaviour'] as $ext) {
+        foreach (['php', 'php.source', 'php.axml', 'behaviour', 'fxml'] as $ext) {
             if (fs::isFile("$path/$name.$ext")) {
                 FileUtils::copyFile("$path/$name.$ext", "$toPath/$toName.$ext");
 
