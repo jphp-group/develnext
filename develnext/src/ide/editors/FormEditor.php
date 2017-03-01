@@ -1852,8 +1852,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $prototypeTab->content->fitToWidth = true;
 
             $typePanes->tabs->add($prototypeTab);
-            $typePanes->maxWidth = $scrollPane->content->maxWidth;
-
             $scrollPane = $typePanes;
         }
 
@@ -1869,6 +1867,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         } else {
             $split = new UXSplitPane([$this->viewerAndEvents, $scrollPane]);
         }
+
+        $split->observer('width')->addOnceListener(function ($_, $width) use ($scrollPane, $split) {
+            $split->dividerPositions = [1.0 - (240 / $width)];
+        });
 
         $this->makeContextMenu();
 

@@ -81,6 +81,11 @@ class ProjectEditor extends AbstractEditor
         return '-fx-padding: 1px 7px; -fx-font-weight: bold;';
     }
 
+    public function isPrependTab()
+    {
+        return true;
+    }
+
     public function isCloseable()
     {
         return false;

@@ -259,6 +259,7 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
             $gui->setMainForm('MainForm');
 
+            FileSystem::open($project->getMainProjectFile());
             FileSystem::open($mainModule);
 
             /** @var FormEditor $editor */

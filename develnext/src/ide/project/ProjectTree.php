@@ -217,6 +217,10 @@ class ProjectTree
                             }
                         }
 
+                        if (FileSystem::isOpenedAndSelected($file)) {
+                            return;
+                        }
+
                         $editor = FileSystem::open($file);
 
                         if (!$editor) {

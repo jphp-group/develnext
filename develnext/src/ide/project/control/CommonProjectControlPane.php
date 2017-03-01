@@ -1,5 +1,7 @@
 <?php
 namespace ide\project\control;
+use ide\forms\InputMessageBoxForm;
+use ide\systems\FileSystem;
 use php\gui\layout\UXScrollPane;
 use php\gui\UXNode;
 use php\gui\UXLoader;
@@ -17,6 +19,7 @@ use php\gui\UXSeparator;
 use php\gui\UXDialog;
 use ide\utils\FileUtils;
 use php\gui\UXDesktop;
+use php\util\Regex;
 
 /**
  * Class CommonProjectControlPane
@@ -145,20 +148,29 @@ class CommonProjectControlPane extends AbstractProjectControlPane
     public function doChangeProjectName()
     {
         if (Ide::project()) {
-            $input = UXDialog::input('Введите новое название для проекта', Ide::project()->getName());
+            retry:
+            $dialog = new InputMessageBoxForm('Переименование проекта', 'Введите новое название для проекта', '* Только валидное имя для файла');
 
-            if ($input) {
-                if (!FileUtils::validate($input)) {
+            $dialog->setPattern(new Regex('[^\\?\\<\\>\\*\\:\\|\\"]{1,}', 'i'), 'Данное название некорректное');
+
+            $dialog->showDialog();
+            $name = $dialog->getResult();
+
+            if ($name) {
+                if (!FileUtils::validate($name)) {
                     return;
                 }
 
-                $success = Ide::project()->setName($input);
+                $success = Ide::project()->setName($name);
 
                 if (!$success) {
-                    UXDialog::showAndWait("Невозможно дать проекту введенное имя '$input', попробуйте другое.");
+                    UXDialog::showAndWait("Невозможно дать проекту введенное имя '$name', попробуйте другое.", 'ERROR');
+                    goto retry;
                 } else {
-                    $this->projectNameLabel->text = $input;
+                    $this->projectNameLabel->text = $name;
                     Ide::get()->setOpenedProject(Ide::project());
+
+                    FileSystem::open(Ide::project()->getMainProjectFile());
                 }
             }
         }

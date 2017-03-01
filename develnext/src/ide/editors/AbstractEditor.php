@@ -143,6 +143,14 @@ abstract class AbstractEditor
     }
 
     /**
+     * @return bool
+     */
+    public function isPrependTab()
+    {
+        return false;
+    }
+
+    /**
      * @param bool $tabbed
      */
     public function setTabbed($tabbed)

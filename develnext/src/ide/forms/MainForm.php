@@ -411,7 +411,7 @@ class MainForm extends AbstractIdeForm
 
             $this->bottom->add($content);
 
-            $percent = (($content->height + 4) * 100 / $height) / 100;
+            $percent = (($content->height + 3) * 100 / $height) / 100;
 
             $this->contentSplit->dividerPositions = [1 - $percent, $percent];
         } else {

@@ -110,7 +110,7 @@ class CallScriptActionType extends AbstractSimpleActionType
     function convertToCode(Action $action, ActionScript $actionScript)
     {
         if ($action->async) {
-            if ($this->wait) {
+            if ($action->wait) {
                 return "{$action->get('script')}->callAsync(";
             } else {
                 return "{$action->get('script')}->callAsync()";

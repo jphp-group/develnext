@@ -256,6 +256,8 @@ class Project
 
         $this->name = $newName;
 
+        $this->config = new ProjectConfig($this->getRootDir(), $newName);
+
         return true;
     }
 
@@ -718,7 +720,7 @@ class Project
      */
     public function create()
     {
-        FileSystem::open($this->getMainProjectFile());
+        //FileSystem::open($this->getMainProjectFile());
         $this->trigger(__FUNCTION__);
     }
 

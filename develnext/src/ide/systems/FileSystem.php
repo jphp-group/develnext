@@ -224,6 +224,15 @@ class FileSystem
      * @param string $path
      * @return bool
      */
+    static function isOpenedAndSelected($path)
+    {
+        return self::isOpened($path) && FileUtils::equalNames(self::getSelected(), $path);
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
     static function isTabbed($path)
     {
         $hash = FileUtils::hashName($path);
@@ -337,7 +346,9 @@ class FileSystem
         }
     }
 
-    static private function makeUiForEditor(AbstractEditor $editor)
+    static private $editorSplitDividerWidth = 250;
+
+    static private function makeUiForEditor(AbstractEditor $editor, $type = 'tab')
     {
         $content = $editor->makeUi();
 
@@ -354,12 +365,25 @@ class FileSystem
             UXAnchorPane::setAnchor($wrapScroll, 0);
 
             $wrap = new UXAnchorPane();
-            $wrap->width = 250;
+            $wrap->width = self::$editorSplitDividerWidth;
             $wrap->add($wrapScroll);
             UXSplitPane::setResizeWithParent($wrap, false);
 
             $content = new UXSplitPane([$wrap, $content]);
-            $content->dividerPositions = [0.15];
+
+            if ($type == 'tab') {
+                $wrap->observer('width')->addListener(function ($_, $value) {
+                    if ($value > 50) {
+                        self::$editorSplitDividerWidth = $value;
+                    }
+                });
+
+                $content->observer('width')->addOnceListener(function ($_, $width) use ($wrap, $content) {
+                    $content->dividerPositions = [$wrap->width / $width];
+                });
+            } else {
+                $content->dividerPositions = [0.2];
+            }
         } else {
             $editor->setLeftPaneUi(null);
         }
@@ -387,8 +411,8 @@ class FileSystem
             $win->icons->addAll(Ide::get()->getMainForm()->icons);
         }
 
-        $win->layout = static::makeUiForEditor($editor);
-        $win->layout->size = [800, 600];
+        $win->layout = static::makeUiForEditor($editor, 'window');
+        $win->layout->size = [Ide::get()->getMainForm()->width * 0.6, Ide::get()->getMainForm()->height * 0.7];
 
         $changeHandler = function (UXEvent $e = null, $param = null) use ($editor) {
             Logger::debug("Opening window editor '{$editor->getTitle()}'");
@@ -428,7 +452,7 @@ class FileSystem
         $tab->tooltip = $editor->getTooltip();
         $tab->style = $editor->getTabStyle();
         $tab->graphic = Ide::get()->getImage($editor->getIcon());
-        $tab->content = static::makeUiForEditor($editor);
+        $tab->content = static::makeUiForEditor($editor, 'tab');
         $tab->userData = $editor;
 
         $tab->closable = $editor->isCloseable();
@@ -467,11 +491,11 @@ class FileSystem
                 $tab = $fileTabPane->selectedTab;
 
                 if ($tab) {
-                    if (static::$editorContentDividePosition && $tab->content instanceof UXSplitPane) {
-                        $tab->content->dividerPositions = static::$editorContentDividePosition;
-                    }
-
                     Logger::debug("Opening selected tab '$tab->text'");
+
+                    if (static::$editorSplitDividerWidth && $tab->content instanceof UXSplitPane) {
+                        $tab->content->dividerPositions = [(self::$editorSplitDividerWidth + 3) / $tab->content->layoutBounds['width']];
+                    }
 
                     static::_openEditor($tab->userData, $param);
                 }
@@ -484,7 +508,7 @@ class FileSystem
             $tab->on('change', $changeHandler);
         });
 
-        static::addTab($tab);
+        static::addTab($tab, $editor->isPrependTab());
         $tab->draggable = $editor->isDraggable();
 
         return $tab;
@@ -567,8 +591,8 @@ class FileSystem
                     $changeHandler(null, $param);
                 }
             } else {
-                if (static::$editorContentDividePosition && $tab->content instanceof UXSplitPane) {
-                    $tab->content->dividerPositions = static::$editorContentDividePosition;
+                if (static::$editorSplitDividerWidth && $tab->content instanceof UXSplitPane) {
+                    $tab->content->dividerPositions = [static::$editorSplitDividerWidth / $tab->content->width];
                 }
             }
 
@@ -644,14 +668,18 @@ class FileSystem
         }
     }
 
-    private static function addTab(UXTab $tab)
+    private static function addTab(UXTab $tab, $prepend = false)
     {
         /** @var UXTabPane $fileTabPane */
         $fileTabPane = Ide::get()->getMainForm()->{'fileTabPane'};
 
-        static::hideAddTab();
-        $fileTabPane->tabs->add($tab);
-        static::showAddTab();
+        if ($prepend) {
+            $fileTabPane->tabs->insert(0, $tab);
+        } else {
+            static::hideAddTab();
+            $fileTabPane->tabs->add($tab);
+            static::showAddTab();
+        }
     }
 
     private static function hideAddTab()
