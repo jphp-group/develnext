@@ -9,6 +9,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -42,9 +43,6 @@ public class UXLabeled<T extends Labeled> extends UXControl<Labeled> {
         @Property
         boolean wrapText();
 
-        @Property @Nullable
-        Font font();
-
         @Property
         boolean mnemonicParsing();
     }
@@ -76,6 +74,16 @@ public class UXLabeled<T extends Labeled> extends UXControl<Labeled> {
     @Setter
     public void setTextColor(Color color) {
         getWrappedObject().setTextFill(color);
+    }
+
+    @Getter
+    public UXFont getFont(Environment env) {
+        return new UXFont(env, getWrappedObject().getFont(), font -> getWrappedObject().setFont(font));
+    }
+
+    @Setter
+    public void setFont(Font font) {
+        getWrappedObject().setFont(font);
     }
 
     @Getter

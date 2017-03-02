@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.ImageViewEx;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -22,7 +23,6 @@ public class UXImageArea extends UXCanvas<ImageViewEx> {
         @Property double mosaicGap();
         @Property boolean preserveRatio();
         @Property String text();
-        @Property Font font();
 
         @Property @Nullable Image image();
         @Property @Nullable Image hoverImage();
@@ -45,6 +45,16 @@ public class UXImageArea extends UXCanvas<ImageViewEx> {
     public void __construct(@Nullable Image image) {
         __wrappedObject = new ImageViewEx();
         getWrappedObject().setImage(image);
+    }
+
+    @Getter
+    public UXFont getFont(Environment env) {
+        return new UXFont(env, getWrappedObject().getFont(), font -> getWrappedObject().setFont(font));
+    }
+
+    @Setter
+    public void setFont(Font font) {
+        getWrappedObject().setFont(font);
     }
 
     @Setter

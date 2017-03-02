@@ -6,6 +6,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.classes.text.UXFont;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Property;
@@ -16,7 +18,6 @@ import php.runtime.reflection.ClassEntity;
 @Name(JavaFXExtension.NS + "UXTooltip")
 public class UXTooltip<T extends Tooltip> extends UXPopupWindow<Tooltip> {
     interface WrappedInterface {
-        @Property Font font();
         @Property Node graphic();
         @Property double graphicTextGap();
         @Property String text();
@@ -39,6 +40,16 @@ public class UXTooltip<T extends Tooltip> extends UXPopupWindow<Tooltip> {
     @SuppressWarnings("unchecked")
     public T getWrappedObject() {
         return (T) super.getWrappedObject();
+    }
+
+    @Reflection.Getter
+    public UXFont getFont(Environment env) {
+        return new UXFont(env, getWrappedObject().getFont(), font -> getWrappedObject().setFont(font));
+    }
+
+    @Reflection.Setter
+    public void setFont(Font font) {
+        getWrappedObject().setFont(font);
     }
 
     @Signature

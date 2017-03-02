@@ -1,10 +1,12 @@
 package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.scene.control.Button;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.classes.layout.UXFlowPane;
+import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.control.PaginationEx;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Property;
@@ -22,7 +24,6 @@ public class UXPagination extends UXFlowPane<PaginationEx> {
         @Property int selectedPage();
         @Property String hintText();
         @Property boolean showTotal();
-        @Property Font font();
         @Property Color textColor();
         @Property boolean showPrevNext();
 
@@ -39,8 +40,24 @@ public class UXPagination extends UXFlowPane<PaginationEx> {
     }
 
     @Override
+    public PaginationEx getWrappedObject() {
+        return (PaginationEx) super.getWrappedObject();
+    }
+
+    @Override
     @Signature
     public void __construct() {
         __wrappedObject = new PaginationEx();
+    }
+
+
+    @Reflection.Getter
+    public UXFont getFont(Environment env) {
+        return new UXFont(env, getWrappedObject().getFont(), font -> getWrappedObject().setFont(font));
+    }
+
+    @Reflection.Setter
+    public void setFont(Font font) {
+        getWrappedObject().setFont(font);
     }
 }

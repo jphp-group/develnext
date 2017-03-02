@@ -31,6 +31,16 @@ class UXFont
     public $style;
 
     /**
+     * @var bool
+     */
+    public $bold = false;
+
+    /**
+     * @var bool
+     */
+    public $italic = false;
+
+    /**
      * @readonly
      * @var float
      */
@@ -86,6 +96,13 @@ class UXFont
      * @return UXFont
      */
     public function withItalic()
+    {
+    }
+
+    /**
+     * @return UXFont
+     */
+    public function withoutItalic()
     {
     }
 

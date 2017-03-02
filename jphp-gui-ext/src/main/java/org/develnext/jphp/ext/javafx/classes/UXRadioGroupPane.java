@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import org.develnext.jphp.ext.javafx.classes.layout.UXVBox;
+import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.control.RadioGroupPane;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Name;
@@ -26,7 +27,6 @@ public class UXRadioGroupPane extends UXVBox<RadioGroupPane> {
         @Property int selectedIndex();
         @Property Orientation orientation();
 
-        @Property Font font();
         @Property Color textColor();
 
         void update();
@@ -41,6 +41,11 @@ public class UXRadioGroupPane extends UXVBox<RadioGroupPane> {
     }
 
     @Override
+    public RadioGroupPane getWrappedObject() {
+        return (RadioGroupPane) super.getWrappedObject();
+    }
+
+    @Override
     @Signature
     public void __construct() {
         __wrappedObject = new RadioGroupPane<>();
@@ -50,5 +55,16 @@ public class UXRadioGroupPane extends UXVBox<RadioGroupPane> {
     @Signature
     public void __construct(List<Node> children) {
         __construct();
+    }
+
+
+    @Reflection.Getter
+    public UXFont getFont(Environment env) {
+        return new UXFont(env, getWrappedObject().getFont(), font -> getWrappedObject().setFont(font));
+    }
+
+    @Reflection.Setter
+    public void setFont(Font font) {
+        getWrappedObject().setFont(font);
     }
 }

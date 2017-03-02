@@ -8,7 +8,9 @@ import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Property;
+import php.runtime.annotation.Reflection.Setter;
 import php.runtime.annotation.Reflection.Signature;
+import php.runtime.common.Messages;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
@@ -18,10 +20,13 @@ import java.util.List;
 
 @Reflection.Name(JavaFXExtension.NS + "text\\UXFont")
 public class UXFont extends BaseWrapper<Font> {
+    private OwnerObject ownerObject;
+
+    public interface OwnerObject {
+        void assignFont(Font font);
+    }
+
     interface WrappedInterface {
-        @Property String name();
-        @Property String family();
-        @Property String size();
         @Property String style();
     }
 
@@ -29,8 +34,21 @@ public class UXFont extends BaseWrapper<Font> {
         super(env, wrappedObject);
     }
 
+    public UXFont(Environment env, Font wrappedObject, OwnerObject ownerObject) {
+        super(env, wrappedObject);
+        this.ownerObject = ownerObject;
+    }
+
     public UXFont(Environment env, ClassEntity clazz) {
         super(env, clazz);
+    }
+
+    private OwnerObject requestOwnerObject(Environment env, String property) {
+        if (ownerObject == null) {
+            env.exception(Messages.ERR_READONLY_PROPERTY.fetch(getReflection().getName(), property));
+        }
+
+        return ownerObject;
     }
 
     @Signature
@@ -41,6 +59,56 @@ public class UXFont extends BaseWrapper<Font> {
     @Signature
     public void __construct(double size, String name) {
         __wrappedObject = new Font(name, size);
+    }
+
+    @Setter
+    public void setSize(Environment env, double size) {
+        requestOwnerObject(env, "size").assignFont(__wrappedObject = withSize(size));
+    }
+
+    @Getter
+    public double getSize() {
+        return getWrappedObject().getSize();
+    }
+
+    @Setter
+    public void setName(Environment env, String name) {
+        requestOwnerObject(env, "name").assignFont(__wrappedObject = withName(name));
+    }
+
+    @Getter
+    public String getName() {
+        return getWrappedObject().getName();
+    }
+
+    @Setter
+    public void setFamily(Environment env, String name) {
+        requestOwnerObject(env, "family").assignFont(__wrappedObject = withName(name));
+    }
+
+    @Getter
+    public String getFamily() {
+        return getWrappedObject().getFamily();
+    }
+
+    @Setter
+    public void setBold(Environment env, boolean bold) {
+        requestOwnerObject(env, "bold").assignFont(__wrappedObject = bold ? withBold() : withThin());
+    }
+
+    @Getter
+    public boolean getBold() {
+        return getWrappedObject().getStyle().toUpperCase().contains("BOLD");
+    }
+
+    @Setter
+    public void setItalic(Environment env, boolean italic) {
+        requestOwnerObject(env, "italic").assignFont(__wrappedObject = italic ? withItalic() : withoutItalic());
+    }
+
+    @Getter
+    public boolean getItalic() {
+        return getWrappedObject().getStyle().toUpperCase().contains("ITALIC");
     }
 
     @Signature
@@ -69,6 +137,11 @@ public class UXFont extends BaseWrapper<Font> {
     }
 
     @Signature
+    public Font withoutItalic() {
+        return withNameAndSize(getWrappedObject().getName(), getWrappedObject().getSize(), null, false);
+    }
+
+    @Signature
     public Font withRegular() {
         return withNameAndSize(getWrappedObject().getName(), getWrappedObject().getSize(), null, false);
     }
@@ -89,7 +162,7 @@ public class UXFont extends BaseWrapper<Font> {
     }
 
     @Signature
-    public Font withSize(int size) {
+    public Font withSize(double size) {
         return withNameAndSize(getWrappedObject().getName(), size);
     }
 

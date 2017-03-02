@@ -12,6 +12,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
@@ -24,7 +25,6 @@ public class UXGraphicsContext extends BaseWrapper<GraphicsContext> {
     interface WrappedInterface {
         @Property Canvas canvas();
 
-        @Property Font font();
         @Property double globalAlpha();
         @Property BlendMode globalBlendMode();
         @Property FillRule fillRule();
@@ -102,5 +102,15 @@ public class UXGraphicsContext extends BaseWrapper<GraphicsContext> {
     @Getter
     public Color getFillColor() {
         return getWrappedObject().getFill() instanceof Color ? (Color) getWrappedObject().getFill() : null;
+    }
+
+    @Getter
+    public UXFont getFont(Environment env) {
+        return new UXFont(env, getWrappedObject().getFont(), font -> getWrappedObject().setFont(font));
+    }
+
+    @Setter
+    public void setFont(Font font) {
+        getWrappedObject().setFont(font);
     }
 }
