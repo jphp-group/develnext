@@ -11,7 +11,8 @@ class UXButton extends UXButtonBase
 
 
     /**
-     * @param string $text (optional)
+     * @param string $text
+     * @param UXNode $graphic
      */
-    public function __construct($text) {}
+    public function __construct($text = '', UXNode $graphic = null) {}
 }

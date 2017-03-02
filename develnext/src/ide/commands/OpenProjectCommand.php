@@ -67,6 +67,7 @@ class OpenProjectCommand extends AbstractCommand
 
         if (!$dialog) {
             $dialog = new OpenProjectForm();
+            $dialog->owner = Ide::get()->getMainForm();
         }
 
         $dialog->showAndWait();

@@ -188,8 +188,9 @@ class IdeTabPane
 
     public function addEventListPane(IdeEventListPane $pane)
     {
-        $this->tab('eventList', 'События', $pane->makeUi(), false);
+        $tab = $this->tab('eventList', 'События', $pane->makeUi(), false);
 
+        $pane->setHintNode($tab);
         $this->eventListPane = $pane;
 
         $handler = function () {

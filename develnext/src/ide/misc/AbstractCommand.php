@@ -3,6 +3,7 @@ namespace ide\misc;
 
 use ide\editors\AbstractEditor;
 use ide\Ide;
+use php\gui\event\UXMouseEvent;
 use php\gui\UXButton;
 use php\gui\UXMenuItem;
 use php\gui\UXSeparator;
@@ -92,7 +93,8 @@ abstract class AbstractCommand
         $button->padding = 3;
         $button->paddingLeft = $button->paddingRight = 7;
 
-        $button->on('action', $this->makeAction());
+        $action = $this->makeAction();
+        $button->on('action', $action);
 
         return $button;
     }

@@ -4,6 +4,7 @@ namespace php\gui\framework;
 use action\Animation;
 use Exception;
 use php\framework\Logger;
+use php\gui\event\UXWindowEvent;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
 use php\gui\framework\behaviour\custom\BehaviourManager;
 use php\gui\framework\behaviour\custom\FormBehaviourManager;
@@ -173,9 +174,13 @@ abstract class AbstractForm extends UXForm
         /** @var UXFragmentPane $node */
         $layout = $this->layout;
 
+        $this->trigger('showing', UXWindowEvent::makeMock($this, 'showing'));
+
         $fragmentPane->applyFragment($this);
 
         $this->data('~~virtual-layout', $layout);
+
+        $this->trigger('show', UXWindowEvent::makeMock($this, 'show'));
     }
 
     /**

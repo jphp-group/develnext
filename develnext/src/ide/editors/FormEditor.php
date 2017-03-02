@@ -1832,7 +1832,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $scrollPane = new UXScrollPane($this->elementTypePane->getContent());
         $scrollPane->fitToWidth = true;
-        $scrollPane->maxWidth = $scrollPane->content->maxWidth;
+        $scrollPane->maxWidth = 240;
         $this->elementTypePaneContainer = $scrollPane;
 
         if ($this->prototypeTypePane) {
@@ -1870,6 +1870,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $split->observer('width')->addOnceListener(function ($_, $width) use ($scrollPane, $split) {
             $split->dividerPositions = [1.0 - (240 / $width)];
+            $scrollPane->maxWidth = -1;
         });
 
         $this->makeContextMenu();

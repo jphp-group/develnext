@@ -28,12 +28,14 @@ use php\gui\UXContextMenu;
 use php\gui\UXDialog;
 use php\gui\UXHyperlink;
 use php\gui\UXLabel;
+use php\gui\UXLabeled;
 use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
 use php\gui\UXNode;
 use php\gui\UXScreen;
+use php\gui\UXTab;
 use php\lang\IllegalStateException;
 use php\lib\Items;
 use php\lib\Str;
@@ -93,6 +95,17 @@ class IdeEventListPane
      */
     protected $context;
 
+
+    /**
+     * @var UXNode
+     */
+    protected $hintNode;
+
+    /**
+     * @var string
+     */
+    protected $hintNodeText;
+
     /**
      * IdeEventListPane constructor.
      * @param SourceEventManager $manager
@@ -116,6 +129,23 @@ class IdeEventListPane
     public function setContext($context)
     {
         $this->context = $context;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHintNode()
+    {
+        return $this->hintNode;
+    }
+
+    /**
+     * @param mixed $hintNode
+     */
+    public function setHintNode($hintNode)
+    {
+        $this->hintNode = $hintNode;
+        $this->hintNodeText = $hintNode->text;
     }
 
     /**
@@ -595,7 +625,7 @@ class IdeEventListPane
                 if ($actionCount) {
                     $node = new UXLabel("+$actionCount");
                     $node->textColor = 'blue';
-                    $node->font = $node->font->withSize(11);
+                    $node->font = $node->font->withSize(10)->withBold();
                     $nameLabel->add($node);
                 }
 
@@ -674,10 +704,14 @@ class IdeEventListPane
 
         $this->uiList->items->clear();
 
+        $count = 0;
+
         foreach ($binds as $code => $info) {
             list($code, $param) = Str::split($code, '-');
 
             if ($eventType = $this->eventTypes[$code]) {
+                $count++;
+
                 $info['actionCount'] = sizeof($this->actionEditor->findMethod($info['className'], $info['methodName']));
                 $info['codeEmpty'] = !str::trim($this->manager->getCodeOfMethod($info['className'], $info['methodName']));
 
@@ -688,6 +722,24 @@ class IdeEventListPane
                     'paramName' => $eventType['kind']->findParamName($param, $this->contextEditor),
                     'eventCode' => $param ? "$eventType[code]-$param" : $eventType['code'],
                 ]);
+            }
+        }
+
+        if ($this->hintNode) {
+            if ($this->hintNode instanceof UXTab || $this->hintNode instanceof UXLabeled) {
+                if ($count) {
+                    $this->hintNode->text = "";
+                    $countLabel = new UXLabel("+{$count}");
+                    $countLabel->textColor = 'blue';
+                    $countLabel->font = $countLabel->font->withSize(10)->withBold();
+
+                    $this->hintNode->graphic = new UXHBox([new UXLabel($this->hintNodeText), $countLabel]);
+                    $this->hintNode->graphic->spacing = 2;
+                } else {
+                    $this->hintNode->graphic = new UXLabel($this->hintNodeText);
+                    $this->hintNode->graphic->textColor = 'gray';
+                    $this->hintNode->text = "";
+                }
             }
         }
 

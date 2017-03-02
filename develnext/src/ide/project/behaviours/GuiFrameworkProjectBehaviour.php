@@ -58,6 +58,7 @@ use php\gui\UXParent;
 use php\gui\UXTextField;
 use php\io\File;
 use php\io\IOException;
+use php\io\ResourceStream;
 use php\lib\fs;
 use php\lib\reflect;
 use php\lib\str;
@@ -352,7 +353,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doCreateEditor(AbstractEditor $editor)
     {
-        $this->applyStylesheetToEditor($editor);
+        if (reflect::typeOf($editor) === FormEditor::class) {
+            $this->applyStylesheetToEditor($editor);
+        }
     }
 
     public function doUpdate()
@@ -661,8 +664,12 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
         $path = "file:///" . str::replace($styleFile, "\\", "/");
 
+        $resource = new ResourceStream('/ide/formats/form/FormEditor.css');
+
+        $editor->removeStylesheet($resource->toExternalForm());
         $editor->removeStylesheet($path);
 
+        $editor->addStylesheet($resource->toExternalForm());
         if (fs::isFile($styleFile)) {
             $editor->addStylesheet($path);
         }

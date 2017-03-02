@@ -13,4 +13,13 @@ class UXWindowEvent extends UXEvent {
      * @var UXWindow
      */
     public $target;
+
+    /**
+     * @param UXWindow $sender
+     * @param string $eventName
+     * @return UXWindowEvent
+     */
+    public static function makeMock(UXWindow $sender, $eventName = 'any')
+    {
+    }
 }

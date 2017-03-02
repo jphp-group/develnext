@@ -3,7 +3,9 @@ package org.develnext.jphp.ext.javafx.classes;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Name;
+import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
@@ -36,7 +38,7 @@ public class UXLabel<T extends Label> extends UXLabeled<Label> {
     }
 
     @Signature
-    public void __construct(String text, Node graphic) {
+    public void __construct(String text, @Nullable Node graphic) {
         __wrappedObject = new Label(text, graphic);
         getWrappedObject().setMnemonicParsing(false);
     }

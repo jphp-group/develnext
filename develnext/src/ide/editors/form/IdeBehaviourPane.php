@@ -19,7 +19,9 @@ use php\gui\layout\UXVBox;
 use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\gui\UXLabel;
+use php\gui\UXLabeled;
 use php\gui\UXNode;
+use php\gui\UXTab;
 use php\gui\UXTitledPane;
 use php\util\Flow;
 
@@ -156,7 +158,23 @@ class IdeBehaviourPane
         }
 
         if ($this->hintNode) {
-            $this->hintNode->text = "{$this->hintNodeText} [{$box->children->count}]";
+            if ($this->hintNode instanceof UXTab || $this->hintNode instanceof UXLabeled) {
+                if ($box->children->count) {
+                    $this->hintNode->text = "";
+                    $countLabel = new UXLabel("+{$box->children->count}");
+                    $countLabel->textColor = 'blue';
+                    $countLabel->font = $countLabel->font->withSize(10)->withBold();
+
+                    $this->hintNode->graphic = new UXHBox([new UXLabel($this->hintNodeText), $countLabel]);
+                    $this->hintNode->graphic->spacing = 2;
+                } else {
+                    $this->hintNode->graphic = new UXLabel($this->hintNodeText);
+                    $this->hintNode->graphic->textColor = 'gray';
+                    $this->hintNode->text = "";
+                }
+            } else {
+                $this->hintNode->text = "{$this->hintNodeText} [{$box->children->count}]";
+            }
         }
 
         if ($box->children->count == 0) {

@@ -29,6 +29,11 @@ class UXWebView extends UXParent
     public $maxWidth, $maxHeight = -1;
 
     /**
+     * @var double
+     */
+    public $zoom = 1.0;
+
+    /**
      * @readonly
      * @var UXWebEngine
      */

@@ -114,7 +114,7 @@ class IfVarActionType extends AbstractSimpleActionType
 
         $not = $action->not ? '!' : '';
 
-        switch ($this->method) {
+        switch ($action->method) {
             case 'regex':
                 return "if ({$not}Regex::match($string, $object))";
 

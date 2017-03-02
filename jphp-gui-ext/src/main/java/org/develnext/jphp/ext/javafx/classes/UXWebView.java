@@ -20,6 +20,8 @@ public class UXWebView extends UXParent {
         @Property double minHeight();
         @Property double minWidth();
 
+        @Property double zoom();
+
         @Property WebEngine engine();
     }
 
