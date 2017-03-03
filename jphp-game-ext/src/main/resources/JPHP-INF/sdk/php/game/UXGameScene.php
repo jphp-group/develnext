@@ -5,6 +5,7 @@ use php\gui\layout\UXAnchorPane;
 /**
  * Class UXGameScene
  * @package php\game
+ * @packages game, javafx
  */
 class UXGameScene
 {

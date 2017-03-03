@@ -9,6 +9,7 @@ use php\gui\event\UXEvent;
  *
  * Class UXCollisionEvent
  * @package php\game\event
+ * @packages game, javafx
  */
 class UXCollisionEvent extends UXEvent
 {

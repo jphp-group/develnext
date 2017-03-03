@@ -119,12 +119,12 @@ class AutoCompletePane
                 $type = $this->complete->getInspector()->findTypeByShortName($class);
 
                 if ($type) {
-                    if (!Regex::of('use[ ]+' . Regex::quote($type->fulledName))->with($this->area->text)->find()) {
-                        $regex = new Regex('use[ ]+([0-9\\,\\ \\_a-z\\\\]+)', 'i', $this->area->text);
+                    if (!Regex::of('use[ ]+' . Regex::quote($type->fulledName), 'im')->with($this->area->text)->find()) {
+                        $regex = new Regex('use[ ]+([0-9\\,\\ \\_a-z\\\\]+)', 'im', $this->area->text);
 
                         $usePackages = [];
 
-                        if ($regex->find()) {
+                        while ($regex->find()) {
                             foreach (str::split($regex->group(1), ',') as $p) {
                                 $p = str::trim($p);
                                 $usePackages[$p] = $p;

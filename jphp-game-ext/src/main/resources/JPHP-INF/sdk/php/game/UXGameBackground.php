@@ -7,6 +7,7 @@ use php\gui\UXImage;
 /**
  * Class UXGameBackground
  * @package php\game
+ * @packages game, javafx
  */
 class UXGameBackground extends UXCanvas
 {

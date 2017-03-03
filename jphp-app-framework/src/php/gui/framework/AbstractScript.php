@@ -46,11 +46,6 @@ abstract class AbstractScript
     protected $_owner;
 
     /**
-     * @var mixed
-     */
-    protected $form;
-
-    /**
      * @var string
      */
     public $id = null;
@@ -63,7 +58,7 @@ abstract class AbstractScript
     /**
      * @var callable[]
      */
-    protected $handlers = [];
+    private $handlers = [];
 
     /**
      * @param $name
@@ -150,7 +145,7 @@ abstract class AbstractScript
             $e = $args[0];
         } else {
             $e = new ScriptEvent($this, $this->_context);
-            $e->sender->form = $this->_context instanceof UXForm ? $this->_context : null;
+            //$e->sender->form = $this->_context instanceof UXForm ? $this->_context : null;
 
             foreach ((array)$args as $name => $code) {
                 $e->{$name} = $code;

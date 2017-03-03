@@ -8,6 +8,7 @@ use php\lang\IllegalArgumentException;
 /**
  * Class UXSprite
  * @package php\game
+ * @packages game, javafx
  */
 class UXSprite
 {

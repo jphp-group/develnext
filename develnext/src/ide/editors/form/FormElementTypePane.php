@@ -476,7 +476,11 @@ class FormElementTypePane
                 //$dragboard->dragViewOffsetX = $dragboard->dragView->width / 2;
                // $dragboard->dragViewOffsetY = $dragboard->dragView->height / 2;
 
-                $dragboard->string = Json::encode(['type' => reflect::typeOf($element), 'create' => true]);
+                if ($element instanceof ObjectListEditorItem) {
+                    $dragboard->string = Json::encode(['prototype' => $element->value, 'create' => true]);
+                } else {
+                    $dragboard->string = Json::encode(['type' => reflect::typeOf($element), 'create' => true]);
+                }
 
                 $e->consume();
             };

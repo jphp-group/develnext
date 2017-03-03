@@ -108,14 +108,14 @@ abstract class AbstractModule extends AbstractScript
         }
     }
 
-    protected function loadScript(AbstractScript $script, array $meta)
+    private function loadScript(AbstractScript $script, array $meta)
     {
         foreach ((array) $meta['props'] as $key => $value) {
             $script->{$key} = $value;
         }
     }
 
-    protected function getResourcePath()
+    private function getResourcePath()
     {
         return 'res://' . str::replace(reflect::typeOf($this), '\\', '/');
     }
@@ -130,7 +130,7 @@ abstract class AbstractModule extends AbstractScript
      *
      * @throws IllegalStateException
      */
-    public function loadBinds($handler)
+    private function loadBinds($handler)
     {
         $eventBinder = new EventBinder($this, $handler);
         $eventBinder->load();

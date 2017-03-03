@@ -7,6 +7,7 @@ use php\gui\UXParent;
 /**
  * Class UXGameObject
  * @package php\game
+ * @packages game, javafx
  */
 class UXGameEntity
 {

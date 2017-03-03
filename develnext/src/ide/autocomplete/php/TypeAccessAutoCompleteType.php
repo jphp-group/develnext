@@ -130,8 +130,12 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                 }
 
                 if ($prop->modifier == 'PRIVATE' && $parentContext) {
-                    continue;
+                    if ($parentContext) {
+                        continue;
+                    }
                 }
+
+                $description = "$description [$prop->modifier]";
 
                 $icon = 'icons/greenSquares16.png';
             }
@@ -296,7 +300,7 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
             $contextClass = '';
 
             if ($class = $region->getLastValue('self')) {
-                $contextClass = ($class['namespace'] ? $class['namespace'] . "\\" : '') . $class['name'];
+                $contextClass = $class;
             }
 
             $this->typeData = $this->inspector->collectTypeData($type->fulledName);

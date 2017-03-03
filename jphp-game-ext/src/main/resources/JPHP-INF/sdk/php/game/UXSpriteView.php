@@ -6,6 +6,7 @@ use php\gui\UXCanvas;
 /**
  * Class UXSpriteView
  * @package php\game
+ * @packages game, javafx
  */
 class UXSpriteView extends UXCanvas
 {

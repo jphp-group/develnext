@@ -10,6 +10,7 @@ use php\game\UXSpriteView;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\event\CollisionEventAdapter;
+use php\gui\UXControl;
 use php\gui\UXNode;
 use php\lang\IllegalStateException;
 use php\lib\str;
@@ -99,7 +100,13 @@ class GameEntityBehaviour extends AbstractBehaviour
             $target->data(Jumping::DATA_SOLID_PROPERTY, true);
         }
 
-        $this->__loadFixture();
+        $fixtureLoaded = true;
+
+        if ($this->findTargetSize()) {
+            $this->__loadFixture();
+        } else {
+            $fixtureLoaded = false;
+        }
 
         $collisionHandlers = $target->data(CollisionEventAdapter::class);
 
@@ -111,7 +118,11 @@ class GameEntityBehaviour extends AbstractBehaviour
             $target->data(CollisionEventAdapter::class, null);
         }
 
-        $action = function () use ($target, $type) {
+        $action = function () use ($target, $type, $fixtureLoaded) {
+            if (!$fixtureLoaded) {
+                $this->__loadFixture();
+            }
+
             $sceneBehaviour = $this->findScene();
 
             if ($sceneBehaviour) {
@@ -121,9 +132,23 @@ class GameEntityBehaviour extends AbstractBehaviour
             }
         };
 
-        TimerScript::executeWhile(function () use ($target, $type, &$try) {
-            return $this->findScene();
+        TimerScript::executeWhile(function () use ($target, $type, &$try, $fixtureLoaded) {
+            return ($fixtureLoaded || $this->findTargetSize()) && $this->findScene();
         }, $action);
+    }
+
+    protected function findTargetSize()
+    {
+        /** @var UXNode $target */
+        $target = $this->_target;
+
+        list($width, $height) = $target instanceof UXControl ? $target->prefSize : $target->size;
+
+        if ($width <= 0 || $height <= 0) {
+            return null;
+        }
+
+        return [$width, $height];
     }
 
     protected function findScene()
@@ -205,16 +230,19 @@ class GameEntityBehaviour extends AbstractBehaviour
 
     public function __loadFixture()
     {
+        /** @var UXNode $target */
         $target = $this->_target;
+
+        list($width, $height) = $this->findTargetSize();
 
         switch ($this->fixtureType) {
             case 'ELLIPSE':
-                $this->entity->setEllipseFixture($target->width, $target->height);
+                $this->entity->setEllipseFixture($width, $height);
                 break;
 
             case 'INHERITED':
             case 'RECTANGLE':
-                $this->entity->setRectangleFixture($target->width, $target->height);
+                $this->entity->setRectangleFixture($width, $height);
                 break;
 
             /*case 'INHERITED':*/

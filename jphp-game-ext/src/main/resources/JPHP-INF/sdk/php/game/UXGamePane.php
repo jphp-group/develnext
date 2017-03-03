@@ -10,6 +10,7 @@ use php\gui\UXNode;
 /**
  * Class UXGamePane
  * @package php\game
+ * @packages game, javafx
  */
 class UXGamePane extends UXPanel
 {
