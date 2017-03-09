@@ -6,7 +6,11 @@ use develnext\lexer\inspector\entry\ExtendTypeEntry;
 use develnext\lexer\inspector\entry\MethodEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
 use develnext\lexer\inspector\entry\TypePropertyEntry;
+use develnext\lexer\token\ArgumentStmtToken;
+use develnext\lexer\token\FunctionStmtToken;
+use develnext\lexer\token\MethodStmtToken;
 use ide\action\ActionEditor;
+use ide\autocomplete\AutoCompleteRegion;
 use ide\behaviour\AbstractBehaviourSpec;
 use ide\behaviour\IdeBehaviourManager;
 use ide\editors\common\ObjectListEditorItem;
@@ -927,7 +931,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $node->on('dragOver', $this->makeDesignerDragOverHandler($node), __CLASS__);
         $node->on('dragDrop', $this->makeDesignerDragDropHandler($node), __CLASS__);
-        $node->on('dragDone', function (UXEvent $e) {$e->consume();}, __CLASS__);
+        $node->on('dragDone', function (UXEvent $e) {
+            $e->consume();
+        }, __CLASS__);
 
         $node->on('click', function (UXMouseEvent $e) {
             if ($e->clickCount >= 2) {
@@ -1230,6 +1236,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $this->codeEditorUi = $codeEditor = $this->makeCodeEditor();
+
         $designer = $this->makeDesigner();
 
         $tabs = new UXTabPane();
@@ -1475,6 +1482,61 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function makeCodeEditor()
     {
+        $complete = $this->codeEditor->getAutoComplete()->getComplete();
+
+        $complete->on('addFunctionArgument', function ($type, ArgumentStmtToken $arg, $index, FunctionStmtToken $func, AutoCompleteRegion $region) use ($complete) {
+            if ($index == 0 && $func instanceof MethodStmtToken) {
+                $comment = $func->getComment();
+
+                if ($comment) {
+                    $regxp = new Regex('\\@event[ ]+([a-z0-9\\_\\-\\.\\+]+)', 'im', $comment);
+
+                    if ($regxp->find()) {
+                        list($id, $event) = str::split($regxp->group(1), '.', 2);
+
+                        $ownerName = $func->getOwnerName();
+
+                        foreach (Ide::project()->getInspectors() as $inspector) {
+                            if ($owner = $inspector->findType($ownerName)) {
+                                if (!$event) {
+                                    $helper = new TypeEntry();
+                                    $helper->name = "helper:$ownerName";
+                                    $helper->properties['sender'] = $p = new TypePropertyEntry();
+
+                                    $p->name = 'sender';
+                                    $p->data['type'][] = $ownerName;
+
+                                    return [
+                                        'name' => $arg->getName(),
+                                        'type' => $type,
+                                        'typeHelper' => $helper
+                                    ];
+                                }
+
+                                if ($prop = $owner->properties[$id]) {
+                                    if ($prop->data['type'] && $prop->modifier == 'PUBLIC' && !$prop->static) {
+                                        $helper = new TypeEntry();
+                                        $helper->name = "helper:$ownerName";
+                                        $helper->properties['sender'] = $p = clone $prop;
+
+                                        $p->name = 'sender';
+
+                                        return [
+                                            'name' => $arg->getName(),
+                                            'type' => $type,
+                                            'typeHelper' => $helper
+                                        ];
+                                    }
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+        });
         return $this->codeEditor->makeUi();
     }
 
@@ -1709,7 +1771,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $designPane = new UXDesignPane();
 
         $viewer->on('dragOver', $this->makeDesignerDragOverHandler());
-        $viewer->on('dragDone', function (UXEvent $e) {$e->consume();} );
+        $viewer->on('dragDone', function (UXEvent $e) {
+            $e->consume();
+        });
         $viewer->on('dragDrop', $this->makeDesignerDragDropHandler());
 
         if (!$fullArea) {

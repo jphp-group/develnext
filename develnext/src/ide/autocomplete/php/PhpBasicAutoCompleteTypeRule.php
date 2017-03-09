@@ -76,7 +76,12 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
                         foreach ($variables as $one) {
                             if ($one['name'] == $token->getName()) {
-                                return $one['type'];
+                                //var_dump($one);
+                                if ($one['typeHelper']) {
+                                    return [$one['typeHelper'], $one['type']];
+                                } else {
+                                    return $one['type'];
+                                }
                             }
                         }
                     }
@@ -232,7 +237,8 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                     break;
 
                 default:
-                    var_dump($token->getTypeName());
+
+                    //var_dump($token->getTypeName());
             }
         }
 
@@ -338,6 +344,8 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
         $this->complete->addRegion($region);
 
+        $this->complete->trigger('addFunction', [$token]);
+
         $region->setValue($token, 'token');
         $region->setValue($owner, 'tokenOwner');
         $region->setValue($owner ? $owner->getFulledName() : null, 'self');
@@ -357,14 +365,20 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
             }
         }
 
-        foreach ($token->getArguments() as $arg) {
+        foreach ($token->getArguments() as $index => $arg) {
             $type = $arg->getHintType() ? str::lower($arg->getHintType()) : ($arg->getHintTypeClass() ? $arg->getHintTypeClass()->getName() : 'mixed');
             $vars[$arg->getName()] = $type;
 
-            $this->complete->setValueOfRegion([
-                'name' => $arg->getName(),
-                'type' => $type,
-            ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
+
+            if ($result = $this->complete->trigger('addFunctionArgument', [$type, $arg, $index, $token, $region])) {
+                $this->complete->setValueOfRegion($result, 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
+            } else {
+                $this->complete->setValueOfRegion([
+                    'name' => $arg->getName(),
+                    'type' => $type,
+                    'argument' => true,
+                ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
+            }
         }
 
 
@@ -511,7 +525,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
 
                         while ($scanner->hasNextLine()) {
                             if ($i >= $one->startLine && $i <= $one->endLine) {
-                                $code []= $scanner->nextLine();
+                                $code [] = $scanner->nextLine();
                             } else {
                                 $scanner->nextLine();
                             }

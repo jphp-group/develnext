@@ -4,6 +4,7 @@ namespace develnext\lexer\inspector;
 use develnext\lexer\inspector\entry\ConstantEntry;
 use develnext\lexer\inspector\entry\FunctionEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
+use ide\misc\EventHandlerBehaviour;
 use ide\utils\FileUtils;
 use php\lib\fs;
 

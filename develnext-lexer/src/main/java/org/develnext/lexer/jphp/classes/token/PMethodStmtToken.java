@@ -39,4 +39,14 @@ public class PMethodStmtToken extends PFunctionStmtToken<MethodStmtToken> {
         __wrappedObject = new MethodStmtToken(TokenMeta.empty());
     }
 
+    @Signature
+    public String getOwnerName() {
+        return getWrappedObject().getClazz().getFulledName();
+    }
+
+    @Signature
+    public PClassStmtToken getOwner(Environment env) {
+        return new PClassStmtToken(env, getWrappedObject().getClazz());
+    }
+
 }

@@ -3,6 +3,7 @@ namespace ide\autocomplete;
 use develnext\lexer\inspector\AbstractInspector;
 use develnext\lexer\inspector\entry\TypeEntry;
 use ide\Logger;
+use ide\misc\EventHandlerBehaviour;
 use php\io\MemoryStream;
 use php\lib\Items;
 use php\lib\Str;
@@ -14,6 +15,8 @@ use phpx\parser\SourceTokenizer;
  */
 class AutoComplete
 {
+    use EventHandlerBehaviour;
+
     /**
      * @var AutoComplete
      */

@@ -46,7 +46,7 @@ class CameraSnapBehaviourSpec extends AbstractBehaviourSpec
      */
     public function getDescription()
     {
-        return 'Объект будет следовать за камерой';
+        return 'Привязать объект к позиции камеры.';
     }
 
     /**

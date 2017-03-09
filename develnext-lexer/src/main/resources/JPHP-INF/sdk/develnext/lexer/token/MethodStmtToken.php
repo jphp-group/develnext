@@ -38,4 +38,18 @@ class MethodStmtToken extends FunctionStmtToken
     public function isInterfacable()
     {
     }
+
+    /**
+     * @return string
+     */
+    public function getOwnerName()
+    {
+    }
+
+    /**
+     * @return ClassStmtToken
+     */
+    public function getOwner()
+    {
+    }
 }

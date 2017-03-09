@@ -106,6 +106,14 @@ class AutoCompletePane
         $this->init();
     }
 
+    /**
+     * @return AutoComplete
+     */
+    public function getComplete()
+    {
+        return $this->complete;
+    }
+
     public function pasteUsesFromCode($text)
     {
         if ($text) {
