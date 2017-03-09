@@ -19,6 +19,21 @@ public class UXSpriteView extends UXCanvas<SpriteView> {
         @Property String animationName();
         @Property int animationSpeed();
 
+        @Property int frame();
+        @Property int frameCount();
+
+        @Property boolean flipX();
+        @Property boolean flipY();
+
+        void play(String animation);
+        void play(String animation, int speed);
+        void playOnce(String animation);
+        void playOnce(String animation, int speed);
+
+        void pause();
+        boolean isPaused();
+        void resume();
+
         void update(long now);
     }
 

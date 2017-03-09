@@ -245,16 +245,23 @@ class BundleCheckListForm extends AbstractIdeForm
                                 }
                             }
 
-                            Ide::get()->getLibrary()->update();
+                            Ide::get()->getLibrary()->updateCategory('bundles');
 
                             uiLater(function () use ($resource) {
                                 $this->hidePreloader();
                                 $this->doShowing();
 
+                                /** @var IdeLibraryBundleResource $resource */
                                 $resource = Ide::get()->getLibrary()->findResource('bundles', $resource->getPath());
+
+                                if ($env = $this->behaviour->hasBundleInAnyEnvironment($resource->getBundle())) {
+                                    $this->behaviour->removeBundle($resource->getBundle());
+                                    $this->behaviour->addBundle($env, $resource->getBundle());
+                                }
+
                                 $this->display($resource);
 
-                                UXDialog::showAndWait('Для завершения установки пакета перезапустите DevelNext!');
+                                UXDialog::showAndWait('Для завершения установки пакета перезапустите DevelNext!', 'INFORMATION', $this);
 
                                 //$this->toast('Пакет успешно добавлен в IDE');
                             });

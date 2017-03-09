@@ -15,7 +15,7 @@ class MouseEventKind extends AbstractEventKind
     public function getArguments()
     {
         return [
-            [UXMouseEvent::class, 'event', 'null']
+            [UXMouseEvent::class, 'e', 'null']
         ];
     }
 }

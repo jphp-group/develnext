@@ -31,6 +31,9 @@ public class UXSprite extends BaseWrapper<Sprite> {
         void freeze();
         void unfreeze();
         boolean isFreeze();
+
+        void play(String animation);
+        void play(String animation, int speed);
     }
 
     public UXSprite(Environment env, Sprite wrappedObject) {

@@ -8,22 +8,22 @@ namespace php\gui;
  */
 class UXDialog
 {
-
-
     /**
      * @param $text
      * @param string $type
+     * @param UXWindow $owner
      * @return null|string
      */
-    public static function show($text, $type = 'INFORMATION')
+    public static function show($text, $type = 'INFORMATION', UXWindow $owner = null)
     {
     }
 
     /**
      * @param $text
      * @param string $type
+     * @param UXWindow $owner
      */
-    public static function showAndWait($text, $type = 'INFORMATION')
+    public static function showAndWait($text, $type = 'INFORMATION', UXWindow $owner = null)
     {
     }
 
@@ -39,18 +39,20 @@ class UXDialog
 
     /**
      * @param $text
+     * @param UXWindow $owner
      * @return bool
      */
-    public static function confirm($text)
+    public static function confirm($text, UXWindow $owner = null)
     {
     }
 
     /**
      * @param $text
-     * @param $default
-     * @return string|null
+     * @param string $default
+     * @param UXWindow $owner
+     * @return null|string
      */
-    public static function input($text, $default = '')
+    public static function input($text, $default = '', UXWindow $owner = null)
     {
     }
 }

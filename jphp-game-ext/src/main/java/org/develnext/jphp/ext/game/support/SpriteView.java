@@ -15,6 +15,9 @@ import javafx.scene.paint.Color;
 public class SpriteView extends Canvas {
     protected ObjectProperty<Sprite> sprite = new SimpleObjectProperty<>(null);
 
+    private boolean flipX;
+    private boolean flipY;
+
     private boolean animationEnabled = false;
     private AnimationTimer timer = new AnimationTimer() {
         @Override
@@ -81,7 +84,10 @@ public class SpriteView extends Canvas {
         } else {
             setWidth(this.sprite.get().getFrameWidth());
             setHeight(this.sprite.get().getFrameHeight());
-            sprite.drawNext(this);
+            setFlipX(flipX);
+            setFlipY(flipY);
+
+            setFrame(0);
         }
     }
 
@@ -109,6 +115,129 @@ public class SpriteView extends Canvas {
         return sprite.get().getSpeed();
     }
 
+    public boolean isFlipX() {
+        return flipX;
+    }
+
+    public boolean isFlipY() {
+        return flipY;
+    }
+
+    public void setFlipX(boolean flipX) {
+        this.flipX = flipX;
+
+        Sprite sprite = getSprite();
+        if (sprite != null) {
+            sprite.setFlipX(flipX);
+
+            if (sprite.isFreeze()) {
+                setFrame(getFrame());
+            }
+        }
+    }
+
+    public void setFlipY(boolean flipY) {
+        this.flipY = flipY;
+
+        Sprite sprite = getSprite();
+        if (sprite != null) {
+            sprite.setFlipY(flipY);
+
+            if (sprite.isFreeze()) {
+                setFrame(getFrame());
+            }
+        }
+    }
+
+    public void playOnce(String animation) {
+        Sprite sprite = getSprite();
+
+        if (sprite != null) {
+            setAnimationEnabled(true);
+            sprite.setCycledAnimation(false);
+            sprite.play(animation);
+        }
+    }
+
+    public void playOnce(String animation, int speed) {
+        Sprite sprite = getSprite();
+        if (sprite != null) {
+            setAnimationEnabled(true);
+            sprite.setCycledAnimation(false);
+            sprite.play(animation, speed);
+        }
+    }
+
+    public void play(String animation) {
+        Sprite sprite = getSprite();
+        if (sprite != null) {
+            setAnimationEnabled(true);
+            sprite.setCycledAnimation(true);
+            sprite.play(animation);
+        }
+    }
+
+    public void play(String animation, int speed) {
+        Sprite sprite = getSprite();
+        if (sprite != null) {
+            setAnimationEnabled(true);
+            sprite.setCycledAnimation(true);
+            sprite.play(animation, speed);
+        }
+    }
+
+    public boolean isPaused() {
+        if (getSprite() != null) {
+            return getSprite().isFreeze();
+        }
+
+        return false;
+    }
+
+    public void pause() {
+        if (getSprite() != null) {
+            getSprite().freeze();
+        }
+    }
+
+    public void resume() {
+        if (getSprite() != null) {
+            getSprite().unfreeze();
+        }
+    }
+
+    public void setFrame(int index) {
+        Sprite sprite = getSprite();
+
+        if (sprite != null) {
+            setAnimationEnabled(false);
+
+            sprite.unfreeze();
+            sprite.draw(this, index);
+            sprite.freeze();
+        }
+    }
+
+    public int getFrameCount() {
+        Sprite sprite = getSprite();
+
+        if (sprite != null) {
+            return sprite.getMaxIndex() + 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public int getFrame() {
+        Sprite sprite = getSprite();
+
+        if (sprite != null) {
+            return sprite.getCurrentIndex();
+        } else {
+            return -1;
+        }
+    }
+
     public void setAnimationEnabled(boolean value) {
         if (animationEnabled != value) {
             animationEnabled = value;
@@ -126,6 +255,11 @@ public class SpriteView extends Canvas {
     }
 
     protected void onUpdate(long now) {
+        if (!animationEnabled) {
+            timer.stop();
+            return;
+        }
+
         if (!isVisible()) {
             return;
         }

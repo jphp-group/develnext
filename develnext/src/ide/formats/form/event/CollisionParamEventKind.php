@@ -41,7 +41,7 @@ class CollisionParamEventKind extends AbstractEventKind
     public function getArguments()
     {
         return [
-            [UXCollisionEvent::class, 'event', 'null']
+            [UXCollisionEvent::class, 'e', 'null']
         ];
     }
 }

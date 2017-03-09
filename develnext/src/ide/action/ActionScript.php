@@ -174,6 +174,7 @@ class ActionScript
 
             if ($isYield) {
                 $locals = Items::keys($this->getLocalVariables());
+                $locals[] = 'e';
                 $locals[] = 'event';
                 $uses = $locals ? '$' . Str::join($locals, ', $') : '';
 

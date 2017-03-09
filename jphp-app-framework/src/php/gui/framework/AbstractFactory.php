@@ -127,6 +127,10 @@ class AbstractFactory
             case 'SpriteView':
                 $node = new UXSpriteView();
                 $node->size = [$attrs['width'], $attrs['height']];
+
+                if ($attrs['flipX'] == 'true') $node->flipX = true;
+                if ($attrs['flipY'] == 'true') $node->flipY = true;
+
                 break;
             case 'ImageViewEx':
                 $node = new UXImageArea();

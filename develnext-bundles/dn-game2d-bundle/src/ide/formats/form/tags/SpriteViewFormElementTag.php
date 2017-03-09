@@ -25,6 +25,14 @@ class SpriteViewFormElementTag extends AbstractFormElementTag
         /** @var UXSpriteView $node */
         $element->setAttribute('animationEnabled', $node->animated ? 'true' : 'false');
 
+        if ($node->flipX) {
+            $element->setAttribute('flipX', 'true');
+        }
+
+        if ($node->flipY) {
+            $element->setAttribute('flipY', 'true');
+        }
+
         $element->removeAttribute('prefWidth');
         $element->removeAttribute('prefHeight');
 

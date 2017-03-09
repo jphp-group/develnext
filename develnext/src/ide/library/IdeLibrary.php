@@ -84,20 +84,18 @@ class IdeLibrary
         }
     }
 
-    public function update()
+    public function updateCategory($code)
     {
-        Logger::info("Update ide library resources ...");
-
         $directories = $this->directories;
         $directories[] = $this->defaultDirectory;
 
-        $this->resources = [];
+        if ($type = $this->categories[$code]) {
+            $this->resources[$code] = [];
 
-        foreach ($this->categories as $code => $type) {
             foreach ($directories as $directory) {
                 Logger::info("Scan library resource directory - $directory/$code, type = $type[type]");
 
-                FileUtils::scan("$directory/$code", function ($filename) use ($code, $type) {
+                fs::scan("$directory/$code", function ($filename) use ($code, $type) {
                     if (Str::endsWith($filename, '.resource')) {
                         $path = fs::pathNoExt($filename);
 
@@ -116,6 +114,15 @@ class IdeLibrary
                     }
                 });
             }
+        }
+    }
+
+    public function update()
+    {
+        Logger::info("Update ide library resources ...");
+
+        foreach ($this->categories as $code => $type) {
+            $this->updateCategory($code);
         }
     }
 
@@ -142,7 +149,7 @@ class IdeLibrary
      */
     public function getResources($category)
     {
-        return (array) $this->resources[$category];
+        return (array)$this->resources[$category];
     }
 
     /**
@@ -166,7 +173,11 @@ class IdeLibrary
             return null;
         } else {
             fs::delete("$path.resource");
-            fs::delete("$path");
+            if (fs::isFile($path)) {
+                fs::delete("$path");
+            } else {
+                FileUtils::deleteDirectory("$path");
+            }
         }
 
         return new $info['type']($path);

@@ -505,6 +505,14 @@ class FormElementTypePane
         $pane->expanded = true;
         $pane->padding = [1, 3];
 
+        $pane->observer('expanded')->addListener(function () use ($pane) {
+            if (!$pane->isFree()) {
+                uiLater(function () {
+                    $this->trigger('change');
+                });
+            }
+        });
+
         return $pane;
     }
 

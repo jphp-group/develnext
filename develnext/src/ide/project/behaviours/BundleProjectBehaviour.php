@@ -169,8 +169,14 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 $type = get_class($bundle);
                 $type = str::replace($type, '\\', '.');
 
+                $bundleResource = $this->getResourceOfBundle($bundle);
+
                 $config = $this->project->getIdeConfig("bundles/$type.conf");
                 $config->set('env', $env);
+
+                if ($bundleResource) {
+                    $config->set('version', $bundleResource->getVersion());
+                }
 
                 $bundle->onSave($this->project, $config);
                 $config->save();
@@ -387,31 +393,25 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
         fs::makeDir($generatedDirectory);
 
-        //FileUtils::deleteDirectory($this->project->getFile(self::VENDOR_DIRECTORY));
-
         fs::scan($this->project->getSrcFile(''), function ($filename) {
             if (str::endsWith($filename, '.php.sourcemap')) {
                 fs::delete($filename);
             }
-
-            /*if (str::endsWith($filename, '.php.source')) {
-                //$this->tryFileChange("$filename.php.source", function () use ($filename) {
-                FileUtils::copyFile($filename, fs::pathNoExt($filename)); // rewrite from origin.
-                //});
-            }*/
         });
 
-        $allBundles = $this->fetchAllBundles($env);
+        return function ($env, callable $log = null) {
+            $allBundles = $this->fetchAllBundles($env);
 
-        foreach ($allBundles as $bundle) {
-            if ($log) {
-                $log(':apply-bundle "' . reflect::typeOf($bundle) . '"');
+            foreach ($allBundles as $bundle) {
+                if ($log) {
+                    $log(':apply-bundle "' . reflect::typeOf($bundle) . '"');
+                }
+
+                $bundle->onPreCompile($this->project, $env, $log);
             }
 
-            $bundle->onPreCompile($this->project, $env, $log);
-        }
-
-        $this->doPreCompileUseImports($env, $log);
+            $this->doPreCompileUseImports($env, $log);
+        };
     }
 
     /**
@@ -514,15 +514,15 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     /**
      * @param string $class
-     * @return bool
+     * @return string|null
      */
     public function hasBundleInAnyEnvironment($class)
     {
         foreach ($this->bundles as $env => $group) {
-            if ($this->hasBundle($env, $class)) return true;
+            if ($this->hasBundle($env, $class)) return $env;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -615,7 +615,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     /**
      * @param string $env
-     * @param string $class
+     * @param string|AbstractBundle $class
      * @param bool $canRemove
      */
     public function addBundle($env, $class, $canRemove = true)
@@ -644,7 +644,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
-     * @param $class
+     * @param AbstractBundle|string $class
      * @param bool $force true to remove that cannot be removed.
      */
     public function removeBundle($class, $force = false)

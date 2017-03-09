@@ -425,6 +425,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                 $log(':apply actions "' . $name . '"');
             }
         }, $withSourceMap);
+
+        if (!PhpProjectBehaviour::get()) {
+            $this->saveBootstrapScript();
+        }
     }
 
     public function doCompile($environment, callable $log = null)
@@ -512,7 +516,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doSave()
     {
-        $this->saveBootstrapScript();
+        //$this->saveBootstrapScript();
     }
 
     public function doOpen()
@@ -590,7 +594,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->_recoverDirectories();
 
-        $this->saveBootstrapScript();
         $this->project->defineFile('src/JPHP-INF/launcher.conf', new GuiLauncherConfFileTemplate());
         $this->project->defineFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
 
@@ -693,15 +696,13 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->ideStylesheetFileTime = fs::time($this->project->getSrcFile('.theme/style.fx.css'));
     }
 
-    public function saveBootstrapScript($incExtension = ['php', 'phb'])
+    public function saveBootstrapScript(array $dirs = [], $encoded = false)
     {
         $template = new GuiBootstrapFileTemplate();
 
         $code = "";
 
         Logger::debug("Save bootstrap script ...");
-
-        $dirs = [];
 
         if ($this->project->getSrcGeneratedDirectory()) {
             $dirs[] = $this->project->getSrcFile('.inc', true);
@@ -711,17 +712,28 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             $dirs[] = $this->project->getSrcFile('.inc', false);
         }
 
+        $incFiles = [];
+
         foreach ($dirs as $dir) {
-            fs::scan($dir, function ($filename) use (&$code, $dir, $incExtension) {
+            fs::scan($dir, function ($filename) use (&$code, $dir, $encoded, &$incFiles) {
                 $ext = fs::ext($filename);
 
-                if (in_array($ext, $incExtension)) {
-                    $name = fs::name(fs::parent($dir));
+                if (in_array($ext, ['php', 'phb'])) {
                     $file = $this->project->getAbsoluteFile($filename);
 
-                    $code .= "include 'res://" . $file->getRelativePath($name) . "'; \n";
+                    if ($encoded && $ext == 'php') {
+                        $file = fs::pathNoExt($file) . '.phb';
+                    }
 
-                    Logger::debug("Add '{$file->getRelativePath('src')}' to bootstrap script.");
+                    $incFile = FileUtils::relativePath($dir, $file);
+
+                    if (!$incFiles[$incFile]) {
+                        $incFiles[$incFile] = true;
+
+                        $code .= "include 'res://" . $incFile . "'; \n";
+
+                        Logger::debug("Add '{$incFile}' to bootstrap script.");
+                    }
                 }
             });
         }

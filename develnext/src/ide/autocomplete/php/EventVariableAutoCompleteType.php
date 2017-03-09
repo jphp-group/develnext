@@ -47,7 +47,7 @@ class EventVariableAutoCompleteType extends AutoCompleteType
         $values = $region->getValues('variable');
         if ($values) {
             foreach ($values as $value) {
-                if ($value['name'] == 'event' && Str::endsWith($value['type'], 'Event')) {
+                if (($value['name'] == 'event' || $value['name'] == 'e') && Str::endsWith($value['type'], 'Event')) {
                     $result[] = new PropertyAutoCompleteItem('sender', 'Текущий объект');
                     $result[] = new PropertyAutoCompleteItem('target', 'Целевой объект');
 

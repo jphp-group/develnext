@@ -70,6 +70,14 @@ class UXSprite
     }
 
     /**
+     * @param string $animation
+     * @param int $speed (optional)
+     */
+    public function play($animation, $speed = -1)
+    {
+    }
+
+    /**
      * @param UXCanvas $canvas
      * @param $index
      */

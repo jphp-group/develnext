@@ -294,6 +294,20 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                 $fs->close();
             }
         }
+
+        if ($gui = GuiFrameworkProjectBehaviour::get()) {
+            $useByteCode = Project::ENV_PROD == $env;
+
+            $dirs = [];
+
+            if ($bundle = BundleProjectBehaviour::get()) {
+                foreach ($bundle->fetchAllBundles($env) as $one) {
+                    $dirs[] = $one->getProjectVendorDirectory() . '/.inc';
+                }
+            }
+
+            $gui->saveBootstrapScript($dirs, $useByteCode && $this->isByteCodeEnabled());
+        }
     }
 
     public function isByteCodeEnabled() {
@@ -526,10 +540,6 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                         }
                     }
                 }
-            }
-
-            if ($gui = GuiFrameworkProjectBehaviour::get()) {
-                $gui->saveBootstrapScript(['phb']);
             }
         }
     }

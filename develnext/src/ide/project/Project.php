@@ -657,10 +657,23 @@ class Project
      */
     public function trigger($event, ...$args)
     {
+        $onLast = [];
+
         foreach ((array) $this->handlers[$event] as $handler) {
-            if ($handler(...$args)) {
+            $result = $handler(...$args);
+
+            if (is_callable($result)) {
+                $onLast[] = $result;
+                continue;
+            }
+
+            if ($result) {
                 break;
             }
+        }
+
+        foreach ($onLast as $handler) {
+            $handler(...$args);
         }
     }
 

@@ -68,6 +68,8 @@ public class Sprite {
     private boolean cycledAnimation = true;
 
     private boolean freeze = false;
+    private boolean flipX = false;
+    private boolean flipY = false;
 
     private Sprite prototype;
 
@@ -91,6 +93,8 @@ public class Sprite {
         image = sprite.image;
         frameWidth = sprite.frameWidth;
         frameHeight = sprite.frameHeight;
+        flipX = sprite.flipX;
+        flipY = sprite.flipY;
 
         speed = sprite.speed;
         cycledAnimation = sprite.cycledAnimation;
@@ -105,7 +109,7 @@ public class Sprite {
     }
 
     public int getMaxIndex() {
-        return maxIndex;
+        return prototype != null ? prototype.maxIndex : maxIndex;
     }
 
     public void freeze() {
@@ -169,6 +173,14 @@ public class Sprite {
         }
 
         return new double[] { frameWidth, frameHeight };
+    }
+
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
     }
 
     public Image getImage() {
@@ -280,6 +292,33 @@ public class Sprite {
         this.speed = speed;
     }
 
+    public void play(String animation) {
+        unfreeze();
+        setCurrentAnimation(animation);
+    }
+
+    public void play(String animation, int speed) {
+        unfreeze();
+        setCurrentAnimation(animation);
+        setSpeed(speed);
+    }
+
+    public boolean isFlipX() {
+        return flipX;
+    }
+
+    public void setFlipX(boolean flipX) {
+        this.flipX = flipX;
+    }
+
+    public boolean isFlipY() {
+        return flipY;
+    }
+
+    public void setFlipY(boolean flipY) {
+        this.flipY = flipY;
+    }
+
     public void drawNext(Canvas canvas) {
         currentIndex++;
 
@@ -309,8 +348,14 @@ public class Sprite {
                 drawIndex = currentAnimation.indexes[newIndex];
             }
 
-            if (cycledAnimation) {
+            if (drawIndex >= 0) {
+                boolean last = drawIndex < currentIndex;
+
                 draw(canvas, drawIndex);
+
+                if (!cycledAnimation && last) {
+                    freeze();
+                }
             }
         } else {
             if (speed <= 0) {
@@ -322,7 +367,9 @@ public class Sprite {
             }
 
             if (cycledAnimation || (currentIndex == -1 || currentIndex < drawIndex)) {
-                draw(canvas, drawIndex);
+                if (drawIndex >= 0) {
+                    draw(canvas, drawIndex);
+                }
             }
         }
     }
@@ -362,7 +409,13 @@ public class Sprite {
         double x = col * frameWidth;
         double y = row * frameHeight;
 
-        gc.drawImage(image, x, y, frameWidth, frameHeight, 0, 0, frameWidth, frameHeight);
+        gc.drawImage(
+                image, x, y, frameWidth, frameHeight,
+                flipX ? frameWidth : 0,
+                flipY ? frameHeight : 0,
+                frameWidth * (flipX ? -1 : 1),
+                frameHeight * (flipY ? -1 : 1)
+        );
     }
 
     public Image getFrameImage(int index) {

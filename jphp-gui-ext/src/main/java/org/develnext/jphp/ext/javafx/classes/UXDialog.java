@@ -5,8 +5,11 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
+import javafx.stage.Window;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Name;
+import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.lang.BaseObject;
@@ -27,17 +30,31 @@ public class UXDialog extends BaseObject {
 
     @Signature
     public static void show(final String text, final Alert.AlertType type) {
+        show(text, type, null);
+    }
+
+    @Signature
+    public static void show(final String text, final Alert.AlertType type, @Nullable Window owner) {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                showAndWait(text, type);
+                showAndWait(text, type, owner);
             }
         });
     }
 
     @Signature
     public static String showAndWait(String text, Alert.AlertType type) {
+        return showAndWait(text, type, null);
+    }
+
+    @Signature
+    public static String showAndWait(String text, Alert.AlertType type, @Nullable Window owner) {
         Alert alert = new Alert(type);
+
+        if (owner != null) {
+            alert.initOwner(owner);
+        }
 
         alert.setResizable(false);
         alert.setContentText(text);
@@ -73,7 +90,16 @@ public class UXDialog extends BaseObject {
 
     @Signature
     public static boolean confirm(String question) {
+        return confirm(question, null);
+    }
+
+    @Signature
+    public static boolean confirm(String question, @Nullable Window owner) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+        if (owner != null) {
+            alert.initOwner(owner);
+        }
 
         alert.setResizable(false);
         alert.setContentText(question);
@@ -91,7 +117,16 @@ public class UXDialog extends BaseObject {
 
     @Signature
     public static String input(String text, String defaultValue) {
+        return input(text, defaultValue, null);
+    }
+
+    @Signature
+    public static String input(String text, String defaultValue, Window owner) {
         TextInputDialog dialog = new TextInputDialog(defaultValue);
+
+        if (owner != null) {
+            dialog.initOwner(owner);
+        }
 
         dialog.setContentText(text);
 

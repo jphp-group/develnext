@@ -450,29 +450,6 @@ class ActionConstructorForm extends AbstractIdeForm
     public function getLiveCode()
     {
         $value = $this->liveCodeEditor->getValue();
-
-        /*if (Str::startsWith($value, "<?\n")) {
-            $value = str::sub($value, 3);
-        }
-
-        if (Str::startsWith($value, "<?")) {
-            $value = str::sub($value, 2);
-        }
-
-        $regex = Regex::of("\\/\\/ \\+Actions\\:[ ]+?[0-9]+?[ ]+?//")->with($value);
-
-        if ($regex->matches()) {
-            if ($this->list->items->count) {
-                $value = $regex->replace("// +Actions: {$this->list->items->count} //");
-            } else {
-                $value = $regex->replace("");
-            }
-        } else {
-            if ($this->list->items->count) {
-                $value = "// +Actions: {$this->list->items->count} //\n" . $value;
-            }
-        }*/
-
         return $value;
     }
 
