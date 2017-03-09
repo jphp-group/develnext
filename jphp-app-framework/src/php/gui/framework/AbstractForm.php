@@ -366,14 +366,14 @@ abstract class AbstractForm extends UXForm
 
         if ($form) {
             if ($saveSize) {
-                UXApplication::runLater(function () use ($form) {
+                uiLater(function () use ($form) {
                     $form->size = $this->size;
                     $form->centerOnScreen();
                 });
             }
 
             if ($savePosition) {
-                UXApplication::runLater(function () use ($form) {
+                uiLater(function () use ($form) {
                     $form->x = $this->x;
                     $form->y = $this->y;
                 });
@@ -614,8 +614,9 @@ abstract class AbstractForm extends UXForm
 
             if ($this->layout) {
                 $clones = [];
+                $datas = [];
 
-                DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node = null) use (&$clones) {
+                DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node = null) use (&$clones, &$datas) {
                     if ($node) {
                         // skip clones.
                         if ($node->data('-factory-id')) return;
@@ -625,6 +626,10 @@ abstract class AbstractForm extends UXForm
                         } else {
                             $node->data('-factory-name', $this->getName());
                             $node->data('-factory', $this);
+
+                            if ($data) {
+                                $datas[] = $data;
+                            }
 
                             $data = $data ?: new UXData();
                             $wrapper = UXNodeWrapper::get($node);
@@ -642,6 +647,8 @@ abstract class AbstractForm extends UXForm
                         $clone->parent->children->replace($clone, $newNode);
                     }
                 }
+
+                foreach ($datas as $data) $data->free();
             }
         });
     }

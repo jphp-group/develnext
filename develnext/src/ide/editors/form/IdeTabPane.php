@@ -152,6 +152,31 @@ class IdeTabPane
         return $tab;
     }
 
+    /**
+     * @param string $tabCode
+     */
+    private function select($tabCode)
+    {
+        if ($tab = $this->tabs[$tabCode]) {
+            $this->tabPane->selectedTab = $tab;
+        }
+    }
+
+    public function selectEventList()
+    {
+        $this->select('eventList');
+    }
+
+    public function selectBehaviours()
+    {
+        $this->select('behaviours');
+    }
+
+    public function selectProperties()
+    {
+        $this->select('properties');
+    }
+
     public function addObjectTreeList(IdeObjectTreeList $list)
     {
         $this->objectTreeList = $list;

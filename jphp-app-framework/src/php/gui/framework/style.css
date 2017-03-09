@@ -121,3 +121,42 @@
 .button, .combo-box-base, .list-view, .text-area, .text-field, .tab-header-area, .tab-pane, .tab-header-background {
     -fx-background-radius: 2px;
 }
+
+.list-view {
+    -fx-background-radius: 0px;
+}
+
+.scroll-pane {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane:focused {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.split-pane:focused,
+.list-view:focused,
+.tree-view:focused,
+.table-view:focused,
+.tree-table-view:focused,
+.html-editor:contains-focus {
+    -fx-background-color: -fx-box-border, -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 0, 1;
+    -fx-background-radius: 0, 0, 0;
+}
+
+.text-area > .scroll-pane {
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 1;
+}
+
+.text-area:focused > .scroll-pane {
+    -fx-background-insets: -1.4, -0.3, 1;
+    -fx-background-radius: 2, 0, 0;
+    -fx-background-color: -fx-faint-focus-color, -fx-focus-color, -fx-background;
+}

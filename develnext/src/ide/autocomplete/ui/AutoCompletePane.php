@@ -218,13 +218,23 @@ class AutoCompletePane
                     }
                     break;
 
+                case 'Left':
+                case 'Right':
+                    $this->hide();
+                    break;
+
                 case 'Esc':
-                    $this->ui->hide();
+                    $this->hide();
                     $e->consume();
                     break;
 
                 default:
                     $this->complete->update($this->area->text, $this->area->caretPosition, $this->area->caretLine, $this->area->caretOffset);
+
+                    if ($e->controlDown && $e->codeName == 'Space') {
+                        $e->consume();
+                    }
+
                     break;
             }
 

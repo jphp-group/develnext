@@ -259,6 +259,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
      */
     protected $layoutViewer;
 
+    /**
+     * @var IdeTabPane
+     */
+    protected $leftTabPane;
+
     public function __construct($file, AbstractFormDumper $dumper)
     {
         parent::__construct($file);
@@ -316,26 +321,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             Ide::get()->setUserConfigValue(get_class($this) . ".multipleEditor", false);
             $this->switchToDesigner(true);
         }));
-
-        /* $this->codeEditor->register(AbstractCommand::make('На весь экран', 'icons/fullScreenEnable16.png', function () {
-             $fullScreen = Ide::get()->getUserConfigValue(get_class($this) . ".codeEditorFullScreen", true);
-
-             Ide::get()->setUserConfigValue(get_class($this) . ".codeEditorFullScreen", !$fullScreen);
-
-             if ($this->tabs->selectedTab === $this->codeTab) {
-                 $this->switchToDesigner();
-
-                 uiLater(function () {
-                     $this->switchToSmallSource();
-                 });
-             } else {
-                 $this->switchToDesigner(true);
-
-                 uiLater(function () {
-                     $this->switchToSource();
-                 });
-             }
-         }));*/
 
         $this->codeEditor->register(AbstractCommand::make('Совместное редактирование', 'icons/layoutHorizontal16.png', function () {
             Ide::get()->setUserConfigValue(get_class($this) . ".multipleEditor", true);
@@ -836,8 +821,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->reloadClones();
 
-        Logger::trace("0");
-
         $ideConfig = $this->getIdeConfig();
 
         if ($this->actionsPane) {
@@ -882,11 +865,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $this->updateMultipleEditor();
 
-        UXApplication::runLater(function () {
+        uiLater(function () {
             $this->updateProperties($this->designer->pickedNode ?: $this);
             //$this->updateEventTypes($this->designer->pickedNode ?: $this);
 
-            UXApplication::runLater(function () {
+            uiLater(function () {
                 $this->designer->requestFocus();
             });
         });
@@ -945,6 +928,13 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $node->on('dragOver', $this->makeDesignerDragOverHandler($node), __CLASS__);
         $node->on('dragDrop', $this->makeDesignerDragDropHandler($node), __CLASS__);
         $node->on('dragDone', function (UXEvent $e) {$e->consume();}, __CLASS__);
+
+        $node->on('click', function (UXMouseEvent $e) {
+            if ($e->clickCount >= 2) {
+                //$this->leftTabPane->selectEventList();
+                $this->eventListPane->doAddEvent();
+            }
+        }, __CLASS__);
     }
 
     public function refresh()
@@ -2148,7 +2138,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     public function makeLeftPaneUi()
     {
-        $ui = new IdeTabPane();
+        $ui = $this->leftTabPane = new IdeTabPane();
 
         $objectTreeList = new IdeObjectTreeList();
         $objectTreeList->setTraverseFunc([$this, 'eachNode']);
@@ -2174,13 +2164,17 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $this->eventListPane->setCodeEditor($this->codeEditor);
         $this->eventListPane->setActionEditor($this->actionEditor);
         $this->eventListPane->setContextEditor($this);
-        $this->eventListPane->on('edit', function ($eventCode, $editor) {
+
+        $editHandler = function ($eventCode, $editor) {
             if ($editor == 'php') {
                 if (!$this->isFullSourceShown()) {
                     $this->switchToSmallSource();
                 }
             }
-        });
+        };
+
+        $this->eventListPane->on('edit', $editHandler, __CLASS__);
+        $this->eventListPane->on('add', $editHandler, __CLASS__);
 
         $ui->addEventListPane($this->eventListPane);
 
