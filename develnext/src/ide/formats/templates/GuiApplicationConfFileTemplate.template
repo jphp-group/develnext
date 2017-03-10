@@ -8,3 +8,5 @@ app.version = 1
 app.namespace = #PROJECT_PACKAGE#
 app.mainForm = #MAIN_FORM#
 app.showMainForm = 1
+
+app.fx.splash.autoHide = #FX_SPLASH_AUTO_HIDE#

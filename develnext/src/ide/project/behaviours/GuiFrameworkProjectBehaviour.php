@@ -30,6 +30,7 @@ use ide\formats\templates\GuiBootstrapFileTemplate;
 use ide\formats\templates\GuiFormFileTemplate;
 use ide\formats\templates\GuiLauncherConfFileTemplate;
 use ide\formats\templates\PhpClassFileTemplate;
+use ide\forms\ImagePropertyEditorForm;
 use ide\Ide;
 use ide\IdeException;
 use ide\Logger;
@@ -51,6 +52,8 @@ use php\gui\event\UXEvent;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXApplication;
+use php\gui\UXButton;
+use php\gui\UXCheckbox;
 use php\gui\UXLabel;
 use php\gui\UXMenu;
 use php\gui\UXMenuItem;
@@ -205,6 +208,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     protected $ideStylesheetTimer;
 
     /**
+     * @var array
+     */
+    protected $splashData = [];
+
+    /**
      * @return int
      */
     public function getPriority()
@@ -245,7 +253,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
             new FormsProjectControlPane(),
             new ModulesProjectControlPane(),
-            new SpritesProjectControlPane(),
         ]);
 
         $addMenu = new ContextMenu();
@@ -283,6 +290,14 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $menu->add(new CreateFormProjectCommand($tree), 'new');
         $menu->add(new CreateScriptModuleProjectCommand($tree), 'new');
         $menu->add(new CreateGameSpriteProjectCommand($tree), 'new');
+    }
+
+    /**
+     * @return array
+     */
+    public function getSplashData()
+    {
+        return $this->splashData;
     }
 
     /**
@@ -365,36 +380,74 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
     }
 
+    /**
+     * @var UXLabel
+     */
+    protected $uiSplashLabel;
+
+    /**
+     * @var UXCheckbox
+     */
+    protected $uiSplashOnTop;
+
+    /**
+     * @var UXCheckbox
+     */
+    protected $uiSplashAutoHide;
+
     public function doUpdateSettings(CommonProjectControlPane $editor = null)
     {
-        if ($this->uiUuidInput) {
-            $this->uiUuidInput->text = $this->getAppUuid();
+        if ($this->uiSplashLabel) {
+            $this->uiSplashLabel->text = $this->splashData['src'] ?: '(Нет изображения)';
+        }
+
+        if ($this->uiSplashOnTop) {
+            $this->uiSplashOnTop->selected = (bool) $this->splashData['alwaysOnTop'];
         }
     }
 
     public function doMakeSettings(CommonProjectControlPane $editor)
     {
-        $title = new UXLabel('Десктопное приложение:');
+        $title = new UXLabel('Заставка (Splash):');
         $title->font = $title->font->withBold();
 
-        $uiUuidInput = new UXTextField();
-        $uiUuidInput->width = 250;
-        $uiUuidInput->editable = false;
-        $uiUuidInput->tooltipText = 'В коде можно получить через app()->getUuid(), используется для индетификации приложения в системе.';
+        $label = new UXLabel('(Нет изображения)');
+        $label->textColor = 'gray';
+        $button = new UXButton('Выбрать');
+        $button->classes->add('icon-open');
 
-        $uiUuid = new UXHBox([new UXLabel('ID приложения'), $uiUuidInput]);
-        $uiUuid->spacing = 10;
-        $uiUuid->alignment = 'CENTER_LEFT';
+        $this->uiSplashLabel = $label;
 
-        $this->uiUuidInput = $uiUuidInput;
-        $uiUuidInput->observer('text')->addListener(function ($old, $new) {
-            $this->setAppUuid($new, false);
+        $button->on('action', function () use ($label) {
+            $dialog = new ImagePropertyEditorForm();
+
+            if ($dialog->showDialog()) {
+                $this->splashData['src'] = $dialog->getResult() ? "/{$dialog->getResult()}" : null;
+                $label->text = $this->splashData['src'] ?: '(Нет изображения)';
+
+                $this->saveLauncherConfig();
+            }
         });
 
-        $wrap = new UXVBox([$title, $uiUuid]);
-        $wrap->spacing = 5;
+        $UXHBox = new UXHBox([$button, $label], 10);
+        $UXHBox->alignment = 'CENTER_LEFT';
 
-        //$editor->addSettingsPane($wrap);
+        $this->uiSplashOnTop = $fxSplashOnTop = new UXCheckbox('Заставка всегда поверх окон');
+        $this->uiSplashAutoHide = $fxSplashAutoHide = new UXCheckbox('Автоматически скрывать заставку после старта');
+
+        $fxSplashOnTop->on('mouseUp', function () {
+            $this->splashData['alwaysOnTop'] = $this->uiSplashOnTop->selected;
+            $this->saveLauncherConfig();
+        });
+
+        $fxSplashAutoHide->on('mouseUp', function () {
+            $this->splashData['autoHide'] = $this->uiSplashAutoHide->selected;
+            $this->saveLauncherConfig();
+        });
+
+        $wrap = new UXVBox([$title, $UXHBox, $fxSplashOnTop, $fxSplashAutoHide], 5);
+
+        $editor->addSettingsPane($wrap);
     }
 
     public function doReindex(ProjectIndexer $indexer)
@@ -425,6 +478,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                 $log(':apply actions "' . $name . '"');
             }
         }, $withSourceMap);
+
+        $this->saveLauncherConfig();
 
         if (!PhpProjectBehaviour::get()) {
             $this->saveBootstrapScript();
@@ -547,7 +602,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $buildConfig = $gradleBehavior->getConfig();
 
         $buildConfig->addPlugin('application');
-        $buildConfig->setDefine('mainClassName', '"php.runtime.launcher.Launcher"');
+        $buildConfig->setDefine('mainClassName', '"org.develnext.jphp.ext.javafx.FXLauncher"');
         $buildConfig->addSourceSet('main.resources.srcDirs', 'src');
 
         $buildConfig->setDefine('jar.archiveName', '"dn-compiled-module.jar"');
@@ -563,6 +618,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $this->mainForm = $this->applicationConfig->get('app.mainForm', '');
         $this->appUuid = $this->applicationConfig->get('app.uuid', str::uuid());
 
+        $this->loadLauncherConfig();
         $this->reloadStylesheetIfModified();
 
         $this->ideStylesheetTimer = new AccurateTimer(100, [$this, 'reloadStylesheetIfModified']);
@@ -594,7 +650,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->_recoverDirectories();
 
-        $this->project->defineFile('src/JPHP-INF/launcher.conf', new GuiLauncherConfFileTemplate());
         $this->project->defineFile('src/.system/application.conf', new GuiApplicationConfFileTemplate($this->project));
 
         // Set config for prototype forms.
@@ -635,29 +690,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     {
         $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
 
-        if (fs::exists($styleFile)) {
-            //$source = FileUtils::get($styleFile);
-
-            /*$regex = Regex::of('((\.|\#)?[\.\w\d\,\*\+\-\_\:\# \r\n]{1,}(\{))')->with($source)->withFlags(Regex::MULTILINE | Regex::DOTALL);
-
-            $source = $regex->replaceWithCallback(function (Regex $regex) {
-                $selector = str::trim($regex->group(1));
-
-                $newSelector = [];
-
-                foreach (str::split($selector, ',') as $one) {
-                    if (str::trim($one) == '.root') {
-                        $newSelector[] = ".FormEditor";
-                    } else {
-                        $newSelector[] = "$one";
-                    }
-                }
-
-                return str::join($newSelector, ', ');
-            });*/
-
-            //FileUtils::put($this->ideStylesheetFile, $source);
-        } else {
+        if (!fs::exists($styleFile)) {
             fs::delete($this->ideStylesheetFile);
         }
     }
@@ -694,6 +727,38 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $this->ideStylesheetFileTime = fs::time($this->project->getSrcFile('.theme/style.fx.css'));
+    }
+
+    public function saveLauncherConfig()
+    {
+        $template = new GuiLauncherConfFileTemplate();
+        $template->setFxSplashAlwaysOnTop($this->splashData['alwaysOnTop']);
+
+        if ($this->splashData['src']) {
+            $template->setFxSplash($this->splashData['src']);
+        }
+
+        $this->project->defineFile($this->project->getSrcDirectory() . '/JPHP-INF/launcher.conf', $template, true);
+        $this->makeApplicationConf();
+    }
+
+    public function loadLauncherConfig()
+    {
+        $config = new Configuration();
+
+        $file = $this->project->getSrcFile('JPHP-INF/launcher.conf');
+
+        if ($file->isFile()) {
+            try {
+                $config->load($file);
+
+                $this->splashData['src'] = $config->get('fx.splash');
+                $this->splashData['alwaysOnTop'] = $config->getBoolean('fx.splash.alwaysOnTop');
+                $this->splashData['autoHide'] = $this->applicationConfig->getBoolean('app.fx.splash.autoHide', true);
+            } catch (IOException $e) {
+                Logger::warn("Unable to load {$file}, {$e->getMessage()}");
+            }
+        }
     }
 
     public function saveBootstrapScript(array $dirs = [], $encoded = false)

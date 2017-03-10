@@ -98,6 +98,18 @@ class UXImageArea extends UXCanvas
     public $clickImage = null;
 
     /**
+     * Отразить изображение по оси X.
+     * @var bool
+     */
+    public $flipX = false;
+
+    /**
+     * Отразить изображение по оси Y.
+     * @var bool
+     */
+    public $flipY = false;
+
+    /**
      * @param UXImage|null $image
      */
     public function __construct(UXImage $image = null)

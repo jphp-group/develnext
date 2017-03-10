@@ -5,5 +5,8 @@
 
         <property code="velocityX" name="Скорость (Гориз.)" editor="float" tooltip="Скорость перемещения фона по X" virtual="1" />
         <property code="velocityY" name="Скорость (Верт.)" editor="float" tooltip="Скорость перемещения фона по Y" virtual="1" />
+
+        <property code="flipX" name="Отразить по X" editor="boolean" tooltip="Отразить изображение по оси X" />
+        <property code="flipY" name="Отразить по Y" editor="boolean" tooltip="Отразить изображение по оси Y" />
     </properties>
 </element>

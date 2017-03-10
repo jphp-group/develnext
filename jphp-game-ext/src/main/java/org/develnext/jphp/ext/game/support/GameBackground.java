@@ -14,6 +14,9 @@ public class GameBackground extends Canvas implements Styleable {
     protected Vec2d viewPos = new Vec2d(0, 0);
     protected Vec2d velocity = new Vec2d(0, 0);
 
+    private boolean flipX;
+    private boolean flipY;
+
     protected AnimationTimer animationTimer = new AnimationTimer() {
         @Override
         public void handle(long now) {
@@ -45,6 +48,24 @@ public class GameBackground extends Canvas implements Styleable {
             }
         }
     };
+
+    public boolean isFlipX() {
+        return flipX;
+    }
+
+    public void setFlipX(boolean flipX) {
+        this.flipX = flipX;
+        update();
+    }
+
+    public boolean isFlipY() {
+        return flipY;
+    }
+
+    public void setFlipY(boolean flipY) {
+        this.flipY = flipY;
+        update();
+    }
 
     public Vec2d getVelocity() {
         return velocity;
@@ -149,7 +170,13 @@ public class GameBackground extends Canvas implements Styleable {
 
             for (int i = -1; i < verCount + 1; i++) {
                 for (int j = -1; j < horCount + 1; j++) {
-                    g2.drawImage(image, viewPos.x + (j * w), viewPos.y + (i * h), w, h);
+                    g2.drawImage(
+                            image, viewPos.x + (j * w), viewPos.y + (i * h), w, h,
+                            flipX ? w : 0,
+                            flipY ? h : 0,
+                            w * (flipX ? -1 : 1),
+                            h * (flipY ? -1 : 1)
+                    );
                 }
             }
         }

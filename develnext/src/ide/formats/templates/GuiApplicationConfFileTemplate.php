@@ -45,6 +45,7 @@ class GuiApplicationConfFileTemplate extends AbstractFileTemplate
             'PROJECT_PACKAGE' => $this->project->getPackageName(),
             'MAIN_FORM' => $this->behaviour->getMainForm(),
             'APP_UUID' => $this->behaviour->getAppUuid(),
+            'FX_SPLASH_AUTO_HIDE' => $this->behaviour->getSplashData()['autoHide'] ? 1 : 0
         ];
     }
 }

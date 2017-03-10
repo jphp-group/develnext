@@ -31,6 +31,7 @@ use php\gui\UXLabelEx;
 use php\gui\UXNode;
 use php\gui\UXTextField;
 use php\io\File;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\Items;
 use php\lib\Str;
@@ -312,13 +313,13 @@ class ImagePropertyEditorForm extends AbstractIdeForm
 
             $file = $project->getFile("src/$path");
 
-            if (Files::isFile($file)) {
+            if (fs::isFile($file)) {
                 $this->setResult($path);
-            } elseif (Files::isFile($path)) {
+            } elseif (fs::isFile($path)) {
                 $files = $project->findDuplicatedFiles($path);
 
                 if ($files) {
-                    $file = Items::first($files);
+                    $file = arr::first($files);
                 } else {
                     $file = $project->copyFile($path, 'src/.data/img/');
                 }

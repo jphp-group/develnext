@@ -14,9 +14,11 @@ use ide\formats\form\tags\GameBackgroundFormElementTag;
 use ide\formats\form\tags\GamePaneFormElementTag;
 use ide\formats\form\tags\SpriteViewFormElementTag;
 use ide\formats\GuiFormFormat;
+use ide\formats\ProjectFormat;
 use ide\Ide;
 use ide\library\IdeLibraryBundleResource;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\project\control\SpritesProjectControlPane;
 use ide\project\Project;
 use php\desktop\Runtime;
 use php\game\event\UXCollisionEvent;
@@ -42,6 +44,10 @@ class Game2DBundle extends AbstractJarBundle
     {
         parent::onAdd($project, $owner);
 
+        /** @var ProjectFormat $projectFormat */
+        $projectFormat = Ide::get()->getRegisteredFormat(ProjectFormat::class);
+        $projectFormat->addControlPane(new SpritesProjectControlPane());
+
         $format = Ide::get()->getRegisteredFormat(GuiFormFormat::class);
 
         if ($format) {
@@ -60,6 +66,10 @@ class Game2DBundle extends AbstractJarBundle
     public function onRemove(Project $project, AbstractBundle $owner = null)
     {
         parent::onRemove($project, $owner);
+
+        /** @var ProjectFormat $projectFormat */
+        $projectFormat = Ide::get()->getRegisteredFormat(ProjectFormat::class);
+        $projectFormat->removeControlPane(SpritesProjectControlPane::class);
 
         $format = Ide::get()->getRegisteredFormat(GuiFormFormat::class);
 

@@ -139,7 +139,7 @@ class AbstractFactory
                 $node->textColor = $attrs['textFill'];
                 $node->backgroundColor = $attrs['background'];
 
-                foreach (['autoSize', 'proportional', 'stretch', 'centered', 'mosaic', 'mosaicGap'] as $prop) {
+                foreach (['autoSize', 'proportional', 'stretch', 'centered', 'mosaic', 'mosaicGap', 'flipX', 'flipY'] as $prop) {
                     $node->{$prop} = $attrs[$prop] == 'true';
                 }
                 break;

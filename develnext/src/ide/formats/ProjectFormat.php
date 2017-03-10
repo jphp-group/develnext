@@ -27,9 +27,25 @@ class ProjectFormat extends AbstractFormat
         $this->controlPanes[reflect::typeOf($pane)] = $pane;
     }
 
+    /**
+     * @param string $class
+     */
+    public function removeControlPane($class)
+    {
+        unset($this->controlPanes[$class]);
+    }
+
     public function addControlPanes(array $panes)
     {
         foreach ($panes as $pane) $this->addControlPane($pane);
+    }
+
+    /**
+     * @return \ide\project\control\AbstractProjectControlPane[]
+     */
+    public function getControlPanes()
+    {
+        return $this->controlPanes;
     }
 
     /**
@@ -40,7 +56,9 @@ class ProjectFormat extends AbstractFormat
      */
     public function createEditor($file, array $options = [])
     {
-        return new ProjectEditor($file, $this->controlPanes);
+        $editor = new ProjectEditor($file);
+        $editor->setFormat($this);
+        return $editor;
     }
 
     public function getIcon()

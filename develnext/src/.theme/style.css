@@ -113,7 +113,7 @@
 .dn-list-menu-description { -fx-text-fill: gray; }
 .dn-list-menu-count { -fx-background-color: gray; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2px 5px; -fx-background-radius: 3px; }
 
-.flow-list-view { -fx-background-color: white; }
+.flow-list-view { -fx-background-color: white;  -fx-border-width: 1; -fx-border-color: silver; }
 .flow-list-view .list-cell { -fx-cursor: hand; -fx-border-width: 1px; -fx-border-color: transparent; }
 .flow-list-view .list-cell.selected { -fx-background-color: #dcdcdc; }
 .flow-list-view .list-cell.hovered { -fx-border-color: gray; }

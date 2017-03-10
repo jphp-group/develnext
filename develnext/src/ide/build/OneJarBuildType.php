@@ -74,7 +74,7 @@ class OneJarBuildType extends AbstractBuildType
 
                 from 'src/META-INF/services/php.runtime.ext.support.Extension'
 
-                manifest { attributes 'Main-Class': 'php.runtime.launcher.Launcher' }
+                manifest { attributes 'Main-Class': 'org.develnext.jphp.ext.javafx.FXLauncher' }
             ";
         }
 

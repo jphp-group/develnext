@@ -439,6 +439,14 @@ class ActionConstructorForm extends AbstractIdeForm
         return $this->contextEditor;
     }
 
+    /**
+     * @return CodeEditor
+     */
+    public function getLiveCodeEditor()
+    {
+        return $this->liveCodeEditor;
+    }
+
     public function setLiveCode($value, $beginLine = 0, $beginPosition = 0)
     {
         $this->liveCodeEditor->setValue($value);

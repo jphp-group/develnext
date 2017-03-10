@@ -2,7 +2,7 @@
     <properties>
         <property code="sprite" name="Спрайт" editor="sprite" virtual="1" />
         <property code="animated" name="Анимирован" editor="boolean" tooltip="Проигрывать анимацию спрайта да или нет" virtual="1" />
-        <property code="flipX" name="Отразить по X" editor="boolean" />
-        <property code="flipY" name="Отразить по Y" editor="boolean" />
+        <property code="flipX" name="Отразить по X" editor="boolean" tooltip="Отразить изображение по оси X" />
+        <property code="flipY" name="Отразить по Y" editor="boolean" tooltip="Отразить изображение по оси Y" />
     </properties>
 </element>

@@ -15,7 +15,7 @@
   <manifest></manifest>
   <icon>#ICO_FILE#</icon>
   <classPath>
-    <mainClass>php.runtime.launcher.Launcher</mainClass>
+    <mainClass>org.develnext.jphp.ext.javafx.FXLauncher</mainClass>
     <cp>lib/*</cp>
   </classPath>
   <jre>

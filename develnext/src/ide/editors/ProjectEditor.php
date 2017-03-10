@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors;
 
+use ide\formats\ProjectFormat;
 use ide\Ide;
 use ide\Logger;
 use ide\project\control\AbstractProjectControlPane;
@@ -26,6 +27,13 @@ use php\lib\arr;
 use php\lib\reflect;
 use php\lib\str;
 
+/**
+ * Class ProjectEditor
+ * @package ide\editors
+ *
+ * @property ProjectFormat $format
+ *
+ */
 class ProjectEditor extends AbstractEditor
 {
     /**
@@ -51,15 +59,10 @@ class ProjectEditor extends AbstractEditor
     /**
      * ProjectEditor constructor.
      * @param string $file
-     * @param AbstractProjectControlPane[] $controlPanes
      */
-    public function __construct($file, array $controlPanes = [])
+    public function __construct($file)
     {
         parent::__construct($file);
-
-        foreach ($controlPanes as $pane) {
-            $this->addControlPane($pane);
-        }
     }
 
     public function addControlPane(AbstractProjectControlPane $pane)
@@ -104,6 +107,21 @@ class ProjectEditor extends AbstractEditor
     public function open()
     {
         parent::open();
+
+        /** @var ProjectFormat $format */
+        $format = $this->getFormat();
+
+        $this->controlPanes = [];
+
+        foreach ($format->getControlPanes() as $pane) {
+            $this->addControlPane($pane);
+        }
+
+        $opened = $this->getOpenedPane();
+        $this->menu->items->setAll($this->controlPanes);
+
+        $this->navigate(reflect::typeOf($opened));
+
 
         $this->menu->refresh();
 
@@ -198,6 +216,12 @@ class ProjectEditor extends AbstractEditor
      */
     public function makeUi()
     {
+        $this->controlPanes = [];
+
+        foreach ($this->format->getControlPanes() as $pane) {
+            $this->addControlPane($pane);
+        }
+
         $pane = new UXAnchorPane();
         $pane->padding = 10;
 
@@ -217,10 +241,6 @@ class ProjectEditor extends AbstractEditor
         });
 
         $this->menu = $ui;
-
-        /*$ui = Ide::project()->getTree()->getRoot();
-        $ui->focusTraversable = false;
-        UXAnchorPane::setAnchor($ui, 0);*/
 
         return $ui;
     }

@@ -34,7 +34,7 @@
             #ONE_JAR_CONTENT#
 
             <manifest>
-                <attribute name="Main-Class" value="php.runtime.launcher.Launcher" />
+                <attribute name="Main-Class" value="org.develnext.jphp.ext.javafx.FXLauncher" />
             </manifest>
         </jar>
 
@@ -58,7 +58,7 @@
             <config headerType="gui" outfile="${dist}/#NAME#.exe"
                     dontWrapJar="#L4J_DONT_WRAP_JAR#" jarPath="#L4J_JAR_FILE#" chdir="."
                     downloadUrl="http://java.com/download" icon="#L4J_ICON_FILE#">
-                <classPath mainClass="php.runtime.launcher.Launcher">
+                <classPath mainClass="org.develnext.jphp.ext.javafx.FXLauncher">
                     <cp>lib/*</cp>
                 </classPath>
                 <jre minVersion="1.8.0" path="#L4J_JRE_PATH#" runtimeBits="64/32">

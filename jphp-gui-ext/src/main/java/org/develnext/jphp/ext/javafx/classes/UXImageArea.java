@@ -24,6 +24,9 @@ public class UXImageArea extends UXCanvas<ImageViewEx> {
         @Property boolean preserveRatio();
         @Property String text();
 
+        @Property boolean flipX();
+        @Property boolean flipY();
+
         @Property @Nullable Image image();
         @Property @Nullable Image hoverImage();
         @Property @Nullable Image clickImage();

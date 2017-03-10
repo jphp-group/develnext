@@ -79,4 +79,12 @@ class UXApplication
     public static function runLater(callable $callback)
     {
     }
+
+    /**
+     * Splash form if it set in launcher.conf via option fx.splash=/path/to/image.png
+     * @return UXForm|null
+     */
+    public static function getSplash()
+    {
+    }
 }

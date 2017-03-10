@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import org.develnext.jphp.ext.javafx.FXLauncher;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.Abstract;
@@ -151,6 +152,23 @@ public class UXApplication extends BaseWrapper<Application> {
                 }
             }
         });
+    }
+
+    @Signature
+    public static UXForm getSplash(Environment env) {
+        FXLauncher fxLauncher = FXLauncher.current();
+
+        if (fxLauncher != null) {
+            Stage splashStage = fxLauncher.getSplashStage();
+
+            if (splashStage == null) {
+                return null;
+            }
+
+            return new UXForm(env, splashStage);
+        } else {
+            return null;
+        }
     }
 
     @Signature

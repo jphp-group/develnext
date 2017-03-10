@@ -747,6 +747,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
             if ($editor = FileSystem::getSelectedEditor()) {
                 $editor->open();
+                $editor->refresh();
             }
         }
     }

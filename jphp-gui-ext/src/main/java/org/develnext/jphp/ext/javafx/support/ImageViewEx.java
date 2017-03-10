@@ -4,9 +4,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.Styleable;
 import javafx.event.EventHandler;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -26,6 +28,9 @@ public class ImageViewEx extends Canvas implements Styleable {
     protected boolean smartStretch;
     protected boolean centered;
     protected boolean proportional;
+
+    protected boolean flipX;
+    protected boolean flipY;
 
     protected boolean mosaic;
     protected double mosaicGap = 0;
@@ -109,6 +114,24 @@ public class ImageViewEx extends Canvas implements Styleable {
         this.image = image;
         this.originImage = image;
 
+        update();
+    }
+
+    public boolean isFlipX() {
+        return flipX;
+    }
+
+    public void setFlipX(boolean flipX) {
+        this.flipX = flipX;
+        update();
+    }
+
+    public boolean isFlipY() {
+        return flipY;
+    }
+
+    public void setFlipY(boolean flipY) {
+        this.flipY = flipY;
         update();
     }
 
@@ -294,7 +317,38 @@ public class ImageViewEx extends Canvas implements Styleable {
                     y = Math.round(getHeight() / 2 - h / 2);
                 }
 
-                g2.drawImage(image, x, y, w, h);
+                if (isStretch() && (flipX || flipY)) {
+                    Canvas canvas = new Canvas();
+                    canvas.setWidth(w);
+                    canvas.setHeight(h);
+
+                    GraphicsContext g2_tmp = canvas.getGraphicsContext2D();
+                    g2_tmp.drawImage(image, x, y, w, h);
+
+                    SnapshotParameters snapshotParameters = new SnapshotParameters();
+                    snapshotParameters.setFill(Color.TRANSPARENT);
+                    WritableImage snapshot = canvas.snapshot(snapshotParameters, null);
+
+                    g2.drawImage(
+                            snapshot, x, y, w, h,
+                            flipX ? w : 0,
+                            flipY ? h : 0,
+                            w * (flipX ? -1 : 1),
+                            h * (flipY ? -1 : 1)
+                    );
+                } else {
+                    if (flipX || flipY) {
+                        g2.drawImage(
+                                image, x, y, w, h,
+                                flipX ? w : 0,
+                                flipY ? h : 0,
+                                w * (flipX ? -1 : 1),
+                                h * (flipY ? -1 : 1)
+                        );
+                    } else {
+                        g2.drawImage(image, x, y, w, h);
+                    }
+                }
             }
         }
 

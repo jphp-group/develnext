@@ -107,52 +107,9 @@ subprojects {
     }
 }
 
-configure([
-        project(':jphp-gui-ext'),
-        project(':jphp-game-ext'),
-        project(':jphp-app-framework')
-]) {
-    apply plugin: 'maven'
-    apply plugin: 'java'
-    apply plugin: 'com.jfrog.bintray'
-
-
-    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
-
-    javadoc.failOnError = false
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    jar.dependsOn += [sourcesJar, javadocJar]
-
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
-    }
-
-    bintray {
-        user = rootProject.hasProperty('bintray.user') ? rootProject.getProperty("bintray.user") : "";
-        key = rootProject.hasProperty('bintray.apikey') ? rootProject.getProperty("bintray.apikey") : "";
-
-        configurations = ['archives']
-
-        pkg {
-            repo = "maven"
-            name = "jphp-compiler"
-            websiteUrl = 'http://github.com/jphp-compiler'
-            vcsUrl = 'http://github.com/jphp-compiler'
-            licenses = ["Apache-2.0"]
-            publish = true
-        }
-    }
-}
-
 project(':jphp-gui-ext') {
     dependencies {
-        compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
+        compile "org.develnext.jphp:jphp-core:$jphpVersion"
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
     }
 }

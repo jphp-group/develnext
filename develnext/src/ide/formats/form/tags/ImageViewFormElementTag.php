@@ -32,6 +32,14 @@ class ImageViewFormElementTag extends AbstractFormElementTag
         $element->setAttribute('mosaic', $node->mosaic ? 'true' : 'false');
         $element->setAttribute('mosaicGap', $node->mosaicGap);
 
+        if ($node->flipX) {
+            $element->setAttribute('flipX', 'true');
+        }
+
+        if ($node->flipY) {
+            $element->setAttribute('flipY', 'true');
+        }
+
         $element->removeAttribute('prefWidth');
         $element->removeAttribute('prefHeight');
 

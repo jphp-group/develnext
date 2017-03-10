@@ -454,6 +454,20 @@ class Application
         $this->mainFormClass = $class;
     }
 
+    /**
+     * Скрыть заставку.
+     */
+    public function hideSplash()
+    {
+        if ($splash = UXApplication::getSplash()) {
+            $splash->hide();
+        }
+
+        if ($this->splash) {
+            $this->splash->hide();
+        }
+    }
+
     public function setSplashFormClass($class)
     {
         $this->splashFormClass = $class;
@@ -583,6 +597,12 @@ class Application
                 }
 
                 Logger::debug("Application start is done.");
+
+                if ($oldSplash = UXApplication::getSplash()) {
+                    if ($this->getConfig()->getBoolean('app.fx.splash.autoHide')) {
+                        $oldSplash->hide();
+                    }
+                }
             };
 
             if ($splashFormClass) {
@@ -594,8 +614,13 @@ class Application
                     /** @var AbstractForm $form */
                     $form = $this->splash;
                     $form->alwaysOnTop = true;
+
                     $form->show();
                     $form->toFront();
+
+                    if ($oldSplash = UXApplication::getSplash()) {
+                        $oldSplash->hide();
+                    }
 
                     uiLater(function () use ($form, $startMain) {
                         waitAsync(1000, $startMain);

@@ -33,7 +33,7 @@ clean {
 }
 
 manifest {
-    attributes 'Main-Class': 'php.runtime.launcher.Launcher'
+    attributes 'Main-Class': 'org.develnext.jphp.ext.javafx.FXLauncher'
 }
 
 def buildISS = { issFile ->

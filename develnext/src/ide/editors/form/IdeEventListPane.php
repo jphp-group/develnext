@@ -1,7 +1,10 @@
 <?php
 namespace ide\editors\form;
 
+use develnext\lexer\token\ArgumentStmtToken;
+use develnext\lexer\token\MethodStmtToken;
 use ide\action\ActionEditor;
+use ide\autocomplete\AutoCompleteRegion;
 use ide\editors\AbstractEditor;
 use ide\editors\CodeEditor;
 use ide\editors\menu\AbstractMenuCommand;
@@ -352,6 +355,17 @@ class IdeEventListPane
 
                 $actionConstructor = new ActionConstructorForm();
                 $actionConstructor->setContext($this->context);
+
+                $actionConstructor->getLiveCodeEditor()->getAutoComplete()->getComplete()->on(
+                    'addFunctionArgument',
+                    function ($type, ArgumentStmtToken $argument, $index, MethodStmtToken $method, AutoCompleteRegion $region) {
+                        return $this->codeEditor
+                            ->getAutoComplete()
+                            ->getComplete()
+                            ->trigger('addFunctionArgument', [$type, $argument, $index, $method, $region]);
+                    }
+                );
+
                 $actionConstructor->setLiveCode($this->codeEditor->getValue(), $bind['beginLine'], $bind['beginPosition']);
                     //$this->manager->getCodeOfMethod($selectedClass, $selectedMethod));
 
