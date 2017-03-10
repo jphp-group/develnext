@@ -80,9 +80,9 @@ abstract class AbstractSimpleActionType extends AbstractActionType
                 return "\$GLOBALS['$value']";
             case 'object':
                 if ($value == '~sender') {
-                    $result = '$event->sender';
+                    $result = '$event ? $event->sender : $e->sender';
                 } else if ($value == '~target') {
-                    $result = '$event->target';
+                    $result = '$event ? $event->target : $e->target';
                 } else if ($value == '~instance') {
                     $result = '$instance';
                 } else if ($value == '~senderForm') {
