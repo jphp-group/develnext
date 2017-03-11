@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DevelNext Patch"
-#define MyAppVersion "16"
+#define MyAppVersion "16.5.0"
 #define MyAppPublisher "develnext.org"
 #define MyAppURL "http://develnext.org"
 #define MyAppExeName "DevelNext.exe"
