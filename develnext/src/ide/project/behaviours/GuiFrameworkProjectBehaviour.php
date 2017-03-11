@@ -49,6 +49,8 @@ use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use php\gui\event\UXEvent;
+use php\gui\framework\AbstractForm;
+use php\gui\framework\AbstractModule;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXApplication;
@@ -855,9 +857,18 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $template = new PhpClassFileTemplate($name, 'AbstractModule');
         $template->setNamespace("{$this->project->getPackageName()}\\modules");
 
-        $template->setImports([
-            "std, gui, framework, {$this->project->getPackageName()}"
-        ]);
+
+        $php = PhpProjectBehaviour::get();
+
+        if ($php && $php->getImportType() == 'package') {
+            $template->setImports([
+                "std, gui, framework, {$this->project->getPackageName()}"
+            ]);
+        } else {
+            $template->setImports([
+                AbstractModule::class
+            ]);
+        }
 
         $file = $this->project->createFile("src/{$this->project->getPackageName()}/modules/$name.php", $template);
 
@@ -1012,9 +1023,18 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $template = new PhpClassFileTemplate($name, 'AbstractForm');
 
         $template->setNamespace($namespace);
-        $template->setImports([
-            "std, gui, framework, {$this->project->getPackageName()}"
-        ]);
+
+        $php = PhpProjectBehaviour::get();
+
+        if ($php && $php->getImportType() == 'package') {
+            $template->setImports([
+                "std, gui, framework, {$this->project->getPackageName()}"
+            ]);
+        } else {
+            $template->setImports([
+                AbstractForm::class
+            ]);
+        }
 
         $sources = $this->project->createFile($this->project->getAbsoluteFile("$file.php"), $template);
         $sources->applyTemplate($template);

@@ -1937,6 +1937,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     protected function makeContextMenu()
     {
         $this->contextMenu = new ContextMenu($this, $this->format->getContextCommands());
+        $this->contextMenu->addSeparator();
+        $this->contextMenu->addCommand(AbstractCommand::makeWithText('События объекта', null, function () {
+            $this->eventListPane->showEventMenu(true, $this->designer->pickedNode);
+        }));
+
         $this->contextMenu->setFilter(function () {
             return $this->layout->focused || $this->contextMenu->getRoot()->visible || $this->layout->findFocusedNode();
         });

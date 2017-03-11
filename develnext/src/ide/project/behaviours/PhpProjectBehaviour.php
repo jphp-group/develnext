@@ -570,6 +570,12 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $importTitle = new UXLabel('Метод импортирования классов:');
         $importTypeSelect = new UXComboBox(self::$importTypes);
 
+        $importTypeSelect->on('action', function () {
+            uiLater(function () {
+                $this->setImportType(arr::keys(static::$importTypes)[$this->uiImportTypesSelect->selectedIndex]);
+            });
+        });
+
         $this->uiImportTypesSelect = $importTypeSelect;
 
         $importTypeSelect->padding = 5;
