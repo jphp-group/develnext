@@ -134,6 +134,10 @@ class ActionScript
             $code .= "$prefix// $comment\n";
         }
 
+        if ($actions) {
+            $code .= '$e = $event ?: $e; // legacy code from 16 rc-2' . "\n\n";
+        }
+
         /** @var Action $action */
         foreach ($actions as $i => $action)  {
             $type = $action->getType();
