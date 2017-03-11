@@ -78,7 +78,7 @@ public class Launcher {
 
         String[] args = concatArrays(jvmArgs, new String[]{
                 "-Ddevelnext.launcher=root",
-                "-Ddevelnext.path=" + rootDir.getAbsolutePath(), "-cp", rootDir.getAbsolutePath() + "/lib/*", "php.runtime.launcher.Launcher"
+                "-Ddevelnext.path=" + rootDir.getAbsolutePath(), "-cp", rootDir.getAbsolutePath() + "/lib/*", "org.develnext.jphp.ext.javafx.FXLauncher"
         });
 
         System.out.print(join(args, " "));
