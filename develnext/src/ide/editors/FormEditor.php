@@ -938,7 +938,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $node->on('click', function (UXMouseEvent $e) use ($node) {
             if ($e->clickCount >= 2) {
                 //$this->leftTabPane->selectEventList();
-                $this->eventListPane->showEventMenu(true, $node);
+                $this->eventListPane->showEventMenu(true);
+                $e->consume();
             }
         }, __CLASS__);
     }
