@@ -65,6 +65,16 @@ public class UXMenuItem extends BaseWrapper<MenuItem> {
         __wrappedObject = new MenuItem(text, graphic == null ? null : graphic.getWrappedObject());
     }
 
+    @Getter
+    public boolean getEnabled() {
+        return !getWrappedObject().isDisable();
+    }
+
+    @Setter
+    public void setEnabled(boolean value) {
+        getWrappedObject().setDisable(!value);
+    }
+
     @Signature
     @SuppressWarnings("unchecked")
     public void on(String event, Invoker invoker, String group) {

@@ -419,7 +419,7 @@ class IdeEventListPane
         $this->contextMenu->add(new IdeEventListPaneDeleteCommand($this));
     }
 
-    protected function makeContextMenuForEdit(callable $onAction)
+    protected function makeContextMenuForEdit(callable $onAction, $withEdit = false)
     {
         $menu = new UXContextMenu();
         $prevKind = null;
@@ -433,13 +433,19 @@ class IdeEventListPane
             $variants = $kind->getParamVariants($this->contextEditor);
 
             if (!$variants) {
-                $menuItem->on('action', function () use ($type, $onAction) {
-                    $onAction($type, $type['code']);
-                });
-
-                if ($this->manager->findBind($this->targetId, $type['code'])) {
-                    $menuItem->disable = true;
+                if ($bind = $this->manager->findBind($this->targetId, $type['code'])) {
+                    if ($withEdit) {
+                        $menuItem->style = '-fx-font-weight: bold;';
+                        $menuItem->enabled = true;
+                    } else {
+                        $menuItem->style = '';
+                        $menuItem->enabled = false;
+                    }
                 }
+
+                $menuItem->on('action', function () use ($type, $onAction, $bind) {
+                    $onAction($type, $type['code'], $bind);
+                });
             } else {
                 $menuItem = new UXMenu($menuItem->text, $menuItem->graphic);
             }
@@ -455,7 +461,7 @@ class IdeEventListPane
             }
 
             if ($variants) {
-                $appendVariants = function ($variants, UXMenu $menuItem) use ($type, &$appendVariants, $onAction) {
+                $appendVariants = function ($variants, UXMenu $menuItem) use ($type, &$appendVariants, $onAction, $withEdit) {
                     foreach ($variants as $name => $param) {
                         if ($param === '-') {
                             $menuItem->items->add(UXMenuItem::createSeparator());
@@ -482,13 +488,22 @@ class IdeEventListPane
                             $item->disable = true;
                         }
 
-                        $item->on('action', function () use ($type, $code, $onAction) {
-                            $onAction($type, $code);
-                        });
+                        if ($bind = $this->manager->findBind($this->targetId, $code)) {
+                            if ($withEdit) {
+                                $item->style = '-fx-font-weight: bold;';
+                                $item->enabled = true;
+                            } else {
+                                $item->style = '';
+                                $item->enabled = false;
+                            }
 
-                        if ($this->manager->findBind($this->targetId, $code)) {
-                            $item->disable = true;
+                            $item->userData = $bind;
                         }
+
+
+                        $item->on('action', function () use ($type, $code, $onAction, $bind) {
+                            $onAction($type, $code, $bind);
+                        });
 
                         $menuItem->items->add($item);
                     }
@@ -820,40 +835,50 @@ class IdeEventListPane
         }
     }
 
-    public function doAddEvent(UXEvent $event = null)
+    /**
+     * @param bool $editable
+     * @param UXNode|null $target
+     */
+    public function showEventMenu($editable = false, UXNode $target = null)
     {
-        $menu = $this->makeContextMenuForEdit(function (array $type, $code) {
-            $this->manager->addBind($this->targetId, $code, $type['kind']);
+        $menu = $this->makeContextMenuForEdit(function (array $type, $code, $bind) {
+            if ($bind) {
+                $editor = $this->openEventSource($code);
 
-            $this->trigger('add', [$code, $type]);
+                $this->trigger('edit', [$code, $editor ?: $this->getDefaultEventEditor()]);
+            } else {
+                $this->manager->addBind($this->targetId, $code, $type['kind']);
 
-            uiLater(function () use ($code, $type) {
-                if ($this->codeEditor) {
-                    $this->codeEditor->loadContentToArea(false);
-                    $this->codeEditor->doChange(true);
-                }
+                uiLater(function () use ($code, $type) {
+                    if ($this->codeEditor) {
+                        $this->codeEditor->loadContentToArea(false);
+                        $this->codeEditor->doChange(true);
+                    }
 
-                $this->manager->load();
+                    $this->manager->load();
 
-                $this->update($this->targetId);
+                    $this->update($this->targetId);
 
-                $this->setSelectedCode($code);
-                $this->openEventSource($code);
+                    $this->setSelectedCode($code);
+                    $editor = $this->openEventSource($code);
 
-                $this->trigger('add', [$code, $type]);
-            });
-        });
+                    $this->trigger('add', [$code, $editor]);
+                });
+            }
+        }, $editable);
 
-        if ($event) {
-            /** @var UXButton $target */
-            $target = $event->sender;
-
+        if ($target) {
             $offsetX = $target->boundsInParent['width'] / 4;
 
             $menu->showByNode($target, $offsetX, $target->boundsInParent['height']);
         } else {
             $menu->show($this->ui->form, Mouse::x(), Mouse::y());
         }
+    }
+
+    public function doAddEvent(UXEvent $event = null)
+    {
+        $this->showEventMenu(false, $event ? $event->sender : null);
     }
 }
 

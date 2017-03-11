@@ -359,7 +359,7 @@ class IdeTabPane
         $ui = new UXTabPane();
         UXAnchorPane::setAnchor($ui, 0);
 
-        $ui->tabs->addAll($this->tabs);
+        $ui->tabs->setAll($this->tabs);
 
         $box = new UXVBox();
         $box->spacing = 2;

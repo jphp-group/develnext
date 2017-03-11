@@ -9,8 +9,6 @@ use php\gui\event\UXEvent;
  */
 class UXMenuItem
 {
-
-
     /**
      * @var string
      */
@@ -52,9 +50,15 @@ class UXMenuItem
     public $visible;
 
     /**
+     * @depricated
      * @var bool
      */
     public $disable;
+
+    /**
+     * @var bool
+     */
+    public $enabled;
 
     /**
      * @var mixed

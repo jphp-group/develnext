@@ -78,6 +78,7 @@ class InputMessageBoxForm extends AbstractIdeForm
     }
 
     /**
+     * @event close
      * @event cancelButton.action
      */
     public function doCancel()

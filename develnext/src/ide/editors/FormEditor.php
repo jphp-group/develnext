@@ -935,10 +935,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $e->consume();
         }, __CLASS__);
 
-        $node->on('click', function (UXMouseEvent $e) {
+        $node->on('click', function (UXMouseEvent $e) use ($node) {
             if ($e->clickCount >= 2) {
                 //$this->leftTabPane->selectEventList();
-                $this->eventListPane->doAddEvent();
+                $this->eventListPane->showEventMenu(true, $node);
             }
         }, __CLASS__);
     }
@@ -1631,7 +1631,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 if ($e->dragboard->string) {
                     $data = Json::decode($e->dragboard->string);
 
-                    if ($data['create'] && ($element = $this->format->getFormElement($data['type']))) {
+                    if ($data['create'] && ($data['prototype'] || $this->format->getFormElement($data['type']))) {
                         $e->acceptTransferModes(['MOVE']);
                         $e->consume();
                         return;
@@ -1698,8 +1698,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 if ($e->dragboard->string) {
                     $data = Json::decode($e->dragboard->string);
 
-                    if ($data['create'] && ($element = $this->format->getFormElement($data['type']))) {
+                    if ($data['create']) {
                         $parent = $parentElement && $parentElement->isLayout() ? $parent : null;
+
+                        $element = $data['prototype'] ?: $this->format->getFormElement($data['type']);
 
                         $node = $this->createElement($element, $e->screenX, $e->screenY, $parent);
 
@@ -1982,9 +1984,14 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         $isClone = false;
 
-        if ($element instanceof ObjectListEditorItem) {
+        if ($element instanceof ObjectListEditorItem || is_string($element)) {
             $isClone = true;
-            $node = $this->createClone($element->value);
+            $node = $this->createClone(is_string($element) ? $element : $element->value);
+
+            if (!$node) {
+                Logger::error("Unable to createElement($element)");
+                return null;
+            }
 
             $size = $node->size;
         } else {
@@ -2368,7 +2375,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         } else {
             $this->leftPaneUi->update($this->getNodeId($node), $element ? $element->getTarget($node) : $node);
         }
-
 
         if (!$element && !$factoryId) {
             $this->leftPaneUi->hideBehaviourPane();

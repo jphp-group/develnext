@@ -17,7 +17,7 @@ class WelcomeEditor extends AbstractEditor
 
     public function getTitle()
     {
-        return 'Welcome';
+        return 'Добро пожаловать';
     }
 
     public function isAutoClose()

@@ -593,7 +593,9 @@ class FileSystem
             } else {
                 if (!self::isOpenedAndSelected($path)) {
                     if (static::$editorSplitDividerWidth && $tab->content instanceof UXSplitPane) {
-                        $tab->content->dividerPositions = [static::$editorSplitDividerWidth / $tab->content->width];
+                        uiLater(function () use ($tab) {
+                            $tab->content->dividerPositions = [static::$editorSplitDividerWidth / $tab->content->width];
+                        });
                     }
                 }
             }

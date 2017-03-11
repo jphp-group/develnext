@@ -2,20 +2,21 @@ package org.develnext.jphp.ext.game.support;
 
 import javafx.animation.AnimationTimer;
 import javafx.css.Styleable;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 
 public class GameBackground extends Canvas implements Styleable {
     private final GraphicsContext g2;
     protected Image image;
+    protected Image drawImage;
     protected boolean autoSize;
 
     protected Vec2d viewPos = new Vec2d(0, 0);
     protected Vec2d velocity = new Vec2d(0, 0);
-
-    private boolean flipX;
-    private boolean flipY;
 
     protected AnimationTimer animationTimer = new AnimationTimer() {
         @Override
@@ -48,24 +49,6 @@ public class GameBackground extends Canvas implements Styleable {
             }
         }
     };
-
-    public boolean isFlipX() {
-        return flipX;
-    }
-
-    public void setFlipX(boolean flipX) {
-        this.flipX = flipX;
-        update();
-    }
-
-    public boolean isFlipY() {
-        return flipY;
-    }
-
-    public void setFlipY(boolean flipY) {
-        this.flipY = flipY;
-        update();
-    }
 
     public Vec2d getVelocity() {
         return velocity;
@@ -154,6 +137,7 @@ public class GameBackground extends Canvas implements Styleable {
         return !autoSize;
     }
 
+
     protected void update() {
         if (autoSize) {
             setWidth(image == null ? 0 : image.getWidth());
@@ -170,13 +154,7 @@ public class GameBackground extends Canvas implements Styleable {
 
             for (int i = -1; i < verCount + 1; i++) {
                 for (int j = -1; j < horCount + 1; j++) {
-                    g2.drawImage(
-                            image, viewPos.x + (j * w), viewPos.y + (i * h), w, h,
-                            flipX ? w : 0,
-                            flipY ? h : 0,
-                            w * (flipX ? -1 : 1),
-                            h * (flipY ? -1 : 1)
-                    );
+                    g2.drawImage(image, viewPos.x + (j * w), viewPos.y + (i * h), w, h);
                 }
             }
         }

@@ -404,6 +404,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         if ($this->uiSplashOnTop) {
             $this->uiSplashOnTop->selected = (bool) $this->splashData['alwaysOnTop'];
         }
+
+        if ($this->uiSplashAutoHide) {
+            $this->uiSplashAutoHide->selected = (bool) $this->splashData['autoHide'];
+        }
     }
 
     public function doMakeSettings(CommonProjectControlPane $editor)

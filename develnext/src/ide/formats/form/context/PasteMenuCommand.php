@@ -174,11 +174,11 @@ class PasteMenuCommand extends AbstractMenuCommand
                             }
                         }
 
-                        $type->refreshNode($uiNode, $editor->getDesigner());
-
                         if ($behaviours && !$factoryId) {
                             BehaviourLoader::loadOne($oldId, $behaviours, $editor->getBehaviourManager(), $id);
                         }
+
+                        $editor->refreshNode($uiNode);
                     }
                 };
 

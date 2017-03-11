@@ -1,6 +1,7 @@
 <?php
 namespace ide\commands;
 
+use develnext\bundle\game2d\Game2DBundle;
 use Dialog;
 use Files;
 use ide\editors\AbstractEditor;
@@ -11,6 +12,7 @@ use ide\forms\BuildProgressForm;
 use ide\forms\InputMessageBoxForm;
 use ide\Ide;
 use ide\misc\AbstractCommand;
+use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\FileSystem;
@@ -69,5 +71,14 @@ class CreateGameSpriteProjectCommand extends AbstractMenuCommand
                 return $name;
             }
         }
+    }
+
+    public function onBeforeShow($item, AbstractEditor $editor = null)
+    {
+        parent::onBeforeShow($item, $editor);
+
+        $bundle = BundleProjectBehaviour::get();
+
+        $item->enabled = $bundle && $bundle->hasBundleInAnyEnvironment(Game2DBundle::class);
     }
 }

@@ -30,13 +30,5 @@ class GameBackgroundFormElementTag extends AbstractFormElementTag
 
         $element->setAttribute('width', $node->width);
         $element->setAttribute('height', $node->height);
-
-        if ($node->flipX) {
-            $element->setAttribute('flipX', 'true');
-        }
-
-        if ($node->flipY) {
-            $element->setAttribute('flipY', 'true');
-        }
     }
 }
