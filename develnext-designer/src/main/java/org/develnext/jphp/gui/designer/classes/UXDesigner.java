@@ -489,8 +489,15 @@ public class UXDesigner extends BaseObject {
 
         area.sceneProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                selectionRectangle.hide();
-                selectionRectangle.initOwner(newValue.getWindow());
+                if (selectionRectangle.getOwner() == null) {
+                    selectionRectangle.hide();
+
+                    try {
+                        selectionRectangle.initOwner(newValue.getWindow());
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
