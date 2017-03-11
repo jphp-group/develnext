@@ -30,12 +30,12 @@ import org.develnext.jphp.ext.javafx.support.control.tabpane.skin.DnDTabPaneSkin
  * Factory to create a tab pane who support DnD
  */
 public final class DndTabPaneFactory {
-	private static MarkerFeedback CURRENT_FEEDBACK;
+    private static MarkerFeedback CURRENT_FEEDBACK;
 //	private static Map<TabSerializationStrategy<?>, Boolean> SERIALIZERS = new WeakHashMap<>();
 
-	private DndTabPaneFactory() {
+    private DndTabPaneFactory() {
 
-	}
+    }
 
 //	public static final class TabSerializationStrategy<O> {
 //		private final Function<Tab, String> serializationFunction;
@@ -62,63 +62,59 @@ public final class DndTabPaneFactory {
 //		return t;
 //	}
 
-	/**
-	 * Create a tab pane and set the drag strategy
-	 * 
-	 * @param setup
-	 *            the setup instance for the pane
-	 * @return the tab pane
-	 */
-	public static DndTabPane createDndTabPane(final Consumer<DragSetup> setup) {
-		return new DndTabPane() {
-			@Override
-			protected javafx.scene.control.Skin<?> createDefaultSkin() {
-				DnDTabPaneSkin skin = new DnDTabPaneSkin(this);
-				setup.accept(skin);
-				return skin;
-			}
-		};
-	}
+    /**
+     * Create a tab pane and set the drag strategy
+     *
+     * @param setup the setup instance for the pane
+     * @return the tab pane
+     */
+    public static DndTabPane createDndTabPane(final Consumer<DragSetup> setup) {
+        return new DndTabPane() {
+            @Override
+            protected javafx.scene.control.Skin<?> createDefaultSkin() {
+                DnDTabPaneSkin skin = new DnDTabPaneSkin(this);
+                setup.accept(skin);
+                return skin;
+            }
+        };
+    }
 
-	/**
-	 * Create a tab pane with a default setup for drag feedback
-	 * 
-	 * @param feedbackType
-	 *            the feedback type
-	 * @param setup
-	 *            consumer to set up the tab pane
-	 * @return a pane containing the TabPane
-	 */
-	public static Pane createDefaultDnDPane(final FeedbackType feedbackType, Consumer<TabPane> setup) {
-		final StackPane pane = new StackPane();
-		DndTabPane tabPane = new DndTabPane() {
-			@Override
-			protected javafx.scene.control.Skin<?> createDefaultSkin() {
-				DnDTabPaneSkin skin = new DnDTabPaneSkin(this);
-				setup(feedbackType, pane, skin);
+    /**
+     * Create a tab pane with a default setup for drag feedback
+     *
+     * @param feedbackType the feedback type
+     * @param setup        consumer to set up the tab pane
+     * @return a pane containing the TabPane
+     */
+    public static Pane createDefaultDnDPane(final FeedbackType feedbackType, Consumer<TabPane> setup) {
+        final StackPane pane = new StackPane();
+        DndTabPane tabPane = new DndTabPane() {
+            @Override
+            protected javafx.scene.control.Skin<?> createDefaultSkin() {
+                DnDTabPaneSkin skin = new DnDTabPaneSkin(this);
+                setup(feedbackType, pane, skin);
 
-				return skin;
-			}
-		};
-		
-		if (setup != null) {
-			setup.accept(tabPane);
-		}
-		
-		pane.getChildren().add(tabPane);
-		return pane;
-	}
+                return skin;
+            }
+        };
 
-	/**
-	 * Extract the tab content
-	 * 
-	 * @param e
-	 *            the event
-	 * @return the content
-	 */
-	public static boolean hasDnDContent(DragEvent e) {
-		return e.getDragboard().hasContent(DnDTabPaneSkin.TAB_MOVE);
-	}
+        if (setup != null) {
+            setup.accept(tabPane);
+        }
+
+        pane.getChildren().add(tabPane);
+        return pane;
+    }
+
+    /**
+     * Extract the tab content
+     *
+     * @param e the event
+     * @return the content
+     */
+    public static boolean hasDnDContent(DragEvent e) {
+        return e.getDragboard().hasContent(DnDTabPaneSkin.TAB_MOVE);
+    }
 
 //	/**
 //	 * Extract the tab content
@@ -148,393 +144,378 @@ public final class DndTabPaneFactory {
 //
 //		return (O) null;
 //	}
-	
-	/**
-	 * Extract the content
-	 * 
-	 * @param e
-	 *            the event
-	 * @return the return value
-	 */
-	public static String getDnDContent(DragEvent e) {
-		return (String) e.getDragboard().getContent(DnDTabPaneSkin.TAB_MOVE);
-	}
 
-	/**
-	 * Setup insert marker
-	 * 
-	 * @param type
-	 *            the feedback type.
-	 * @param layoutNode
-	 *            the layout node used to position
-	 * @param setup
-	 *            the setup
-	 */
-	public static void setup(final FeedbackType type, final Pane layoutNode, DragSetup setup) {
-		setup.setStartFunction(new Function<Tab, Boolean>() {
-			@Override
-			public Boolean apply(Tab t) {
-				DndTabPane tabPane = (DndTabPane) t.getTabPane();
+    /**
+     * Extract the content
+     *
+     * @param e the event
+     * @return the return value
+     */
+    public static String getDnDContent(DragEvent e) {
+        return (String) e.getDragboard().getContent(DnDTabPaneSkin.TAB_MOVE);
+    }
 
-				return Boolean.valueOf(!t.isDisabled() && ((DndTabPane) t.getTabPane()).isDraggingEnabled() && tabPane.isDraggableTab(t));
-			}
-		});
-		setup.setFeedbackConsumer(new Consumer<FeedbackData>() {
-			@Override
-			public void accept(FeedbackData d) {
-				DndTabPane tabPane = (DndTabPane) d.draggedTab.getTabPane();
+    /**
+     * Setup insert marker
+     *
+     * @param type       the feedback type.
+     * @param layoutNode the layout node used to position
+     * @param setup      the setup
+     */
+    public static void setup(final FeedbackType type, final Pane layoutNode, DragSetup setup) {
+        setup.setStartFunction(new Function<Tab, Boolean>() {
+            @Override
+            public Boolean apply(Tab t) {
+                DndTabPane tabPane = (DndTabPane) t.getTabPane();
 
-				if (!tabPane.isDraggableTab(d.draggedTab)) {
-					cleanup();
-					return;
-				}
+                return Boolean.valueOf(!t.isDisabled() && ((DndTabPane) t.getTabPane()).isDraggingEnabled() && tabPane.isDraggableTab(t));
+            }
+        });
+        setup.setFeedbackConsumer(new Consumer<FeedbackData>() {
+            @Override
+            public void accept(FeedbackData d) {
+                DndTabPane tabPane = (DndTabPane) d.draggedTab.getTabPane();
 
-				handleFeedback(type, layoutNode, d);
-			}
-		});
-		setup.setDropConsumer(new Consumer<DroppedData>() {
-			@Override
-			public void accept(DroppedData data) {
-				DndTabPane tabPane = (DndTabPane) data.draggedTab.getTabPane();
+                if (!tabPane.isDraggableTab(d.draggedTab)) {
+                    cleanup();
+                    return;
+                }
 
-				if (!tabPane.isDraggableTab(data.targetTab)) {
-					return;
-				}
+                handleFeedback(type, layoutNode, d);
+            }
+        });
+        setup.setDropConsumer(new Consumer<DroppedData>() {
+            @Override
+            public void accept(DroppedData data) {
+                DndTabPane tabPane = (DndTabPane) data.draggedTab.getTabPane();
 
-				DndTabPaneFactory.handleDropped(data);
-			}
-		});
-		setup.setDragFinishedConsumer(new Consumer<Tab>() {
-			@Override
-			public void accept(Tab tab) {
-				DndTabPaneFactory.handleFinished(tab);
-			}
-		});
-	}
-	
-	private static void fireTabDraggedEvent(DndTabPane tabPane, Tab draggedTab, int fromIndex, int toIndex) {
-		tabPane.fireTabDragged(draggedTab, fromIndex, toIndex);
-	}
-	
-	private static void handleDropped(DroppedData data) {
-		TabPane targetPane = data.targetTab.getTabPane();
-		int oldIndex = data.draggedTab.getTabPane().getTabs().indexOf(data.draggedTab);
-		data.draggedTab.getTabPane().getTabs().remove(data.draggedTab);
-		int idx = targetPane.getTabs().indexOf(data.targetTab);
-		if (data.dropType == DropType.AFTER) {
-			if (idx + 1 <= targetPane.getTabs().size()) {
-				targetPane.getTabs().add(idx + 1, data.draggedTab);
-			} else {
-				targetPane.getTabs().add(data.draggedTab);
-			}
-		} else {
-			targetPane.getTabs().add(idx, data.draggedTab);
-		}
-		
-		fireTabDraggedEvent((DndTabPane) targetPane, data.draggedTab, oldIndex, targetPane.getTabs().indexOf(data.draggedTab));
-				
-		data.draggedTab.getTabPane().getSelectionModel().select(data.draggedTab);
-	}
+                if (!tabPane.isDraggableTab(data.targetTab)) {
+                    return;
+                }
 
-	private static void handleFeedback(FeedbackType type, Pane layoutNode, FeedbackData data) {
-		if (data.dropType == DropType.NONE) {
-			cleanup();
-			return;
-		}
+                DndTabPaneFactory.handleDropped(data);
+            }
+        });
+        setup.setDragFinishedConsumer(new Consumer<Tab>() {
+            @Override
+            public void accept(Tab tab) {
+                DndTabPaneFactory.handleFinished(tab);
+            }
+        });
+    }
 
-		MarkerFeedback f = CURRENT_FEEDBACK;
-		if (f == null || !f.data.equals(data)) {
-			cleanup();
-			if (type == FeedbackType.MARKER) {
-				CURRENT_FEEDBACK = handleMarker(layoutNode, data);
-			} else {
-				CURRENT_FEEDBACK = handleOutline(layoutNode, data);
-			}
-		}
-	}
+    private static void fireTabDraggedEvent(DndTabPane tabPane, Tab draggedTab, int fromIndex, int toIndex) {
+        tabPane.fireTabDragged(draggedTab, fromIndex, toIndex);
+    }
 
-	private static void handleFinished(Tab tab) {
-		cleanup();
-	}
+    private static void handleDropped(DroppedData data) {
+        TabPane targetPane = data.targetTab.getTabPane();
+        int oldIndex = data.draggedTab.getTabPane().getTabs().indexOf(data.draggedTab);
+        data.draggedTab.getTabPane().getTabs().remove(data.draggedTab);
+        int idx = targetPane.getTabs().indexOf(data.targetTab);
 
-	static void cleanup() {
-		if (CURRENT_FEEDBACK != null) {
-			CURRENT_FEEDBACK.hide();
-			CURRENT_FEEDBACK = null;
-		}
-	}
+        if (data.dropType == DropType.AFTER) {
+            if (idx + 1 <= targetPane.getTabs().size()) {
+                targetPane.getTabs().add(idx + 1, data.draggedTab);
+            } else {
+                targetPane.getTabs().add(data.draggedTab);
+            }
+        } else {
+            targetPane.getTabs().add(idx, data.draggedTab);
+        }
 
-	private static MarkerFeedback handleMarker(Pane layoutNode, FeedbackData data) {
-		PositionMarker marker = null;
-		for (Node n : layoutNode.getChildren()) {
-			if (n instanceof PositionMarker) {
-				marker = (PositionMarker) n;
-			}
-		}
+        fireTabDraggedEvent((DndTabPane) targetPane, data.draggedTab, oldIndex, targetPane.getTabs().indexOf(data.draggedTab));
 
-		if (marker == null) {
-			marker = new PositionMarker();
-			marker.setManaged(false);
-			layoutNode.getChildren().add(marker);
-		} else {
-			marker.setVisible(true);
-		}
+        data.draggedTab.getTabPane().getSelectionModel().select(data.draggedTab);
+    }
 
-		double w = marker.getBoundsInLocal().getWidth();
-		double h = marker.getBoundsInLocal().getHeight();
+    private static void handleFeedback(FeedbackType type, Pane layoutNode, FeedbackData data) {
+        if (data.dropType == DropType.NONE) {
+            cleanup();
+            return;
+        }
 
-		double ratio = data.bounds.getHeight() / h;
-		ratio += 0.1;
-		marker.setScaleX(ratio);
-		marker.setScaleY(ratio);
+        MarkerFeedback f = CURRENT_FEEDBACK;
+        if (f == null || !f.data.equals(data)) {
+            cleanup();
+            if (type == FeedbackType.MARKER) {
+                CURRENT_FEEDBACK = handleMarker(layoutNode, data);
+            } else {
+                CURRENT_FEEDBACK = handleOutline(layoutNode, data);
+            }
+        }
+    }
 
-		double wDiff = w / 2;
-		double hDiff = (h - h * ratio) / 2;
+    private static void handleFinished(Tab tab) {
+        cleanup();
+    }
 
-		if (data.dropType == DropType.AFTER) {
-			marker.relocate(data.bounds.getMinX() + data.bounds.getWidth() - wDiff, data.bounds.getMinY() - hDiff);
-		} else {
-			marker.relocate(data.bounds.getMinX() - wDiff, data.bounds.getMinY() - hDiff);
-		}
+    static void cleanup() {
+        if (CURRENT_FEEDBACK != null) {
+            CURRENT_FEEDBACK.hide();
+            CURRENT_FEEDBACK = null;
+        }
+    }
 
-		final PositionMarker fmarker = marker;
+    private static MarkerFeedback handleMarker(Pane layoutNode, FeedbackData data) {
+        PositionMarker marker = null;
+        for (Node n : layoutNode.getChildren()) {
+            if (n instanceof PositionMarker) {
+                marker = (PositionMarker) n;
+            }
+        }
 
-		return new MarkerFeedback(data) {
+        if (marker == null) {
+            marker = new PositionMarker();
+            marker.setManaged(false);
+            layoutNode.getChildren().add(marker);
+        } else {
+            marker.setVisible(true);
+        }
 
-			@Override
-			public void hide() {
-				fmarker.setVisible(false);
-			}
-		};
-	}
+        double w = marker.getBoundsInLocal().getWidth();
+        double h = marker.getBoundsInLocal().getHeight();
 
-	private static MarkerFeedback handleOutline(Pane layoutNode, FeedbackData data) {
-		TabOutlineMarker marker = null;
+        double ratio = data.bounds.getHeight() / h;
+        ratio += 0.1;
+        marker.setScaleX(ratio);
+        marker.setScaleY(ratio);
 
-		for (Node n : layoutNode.getChildren()) {
-			if (n instanceof TabOutlineMarker) {
-				marker = (TabOutlineMarker) n;
-			}
-		}
+        double wDiff = w / 2;
+        double hDiff = (h - h * ratio) / 2;
 
-		if (marker == null) {
-			marker = new TabOutlineMarker(layoutNode.getBoundsInLocal(), new BoundingBox(data.bounds.getMinX(), data.bounds.getMinY(), data.bounds.getWidth(), data.bounds.getHeight()), data.dropType == DropType.BEFORE);
-			marker.setManaged(false);
-			marker.setMouseTransparent(true);
-			layoutNode.getChildren().add(marker);
-		} else {
-			marker.updateBounds(layoutNode.getBoundsInLocal(), new BoundingBox(data.bounds.getMinX(), data.bounds.getMinY(), data.bounds.getWidth(), data.bounds.getHeight()), data.dropType == DropType.BEFORE);
-			marker.setVisible(true);
-		}
+        if (data.dropType == DropType.AFTER) {
+            marker.relocate(data.bounds.getMinX() + data.bounds.getWidth() - wDiff, data.bounds.getMinY() - hDiff);
+        } else {
+            marker.relocate(data.bounds.getMinX() - wDiff, data.bounds.getMinY() - hDiff);
+        }
 
-		final TabOutlineMarker fmarker = marker;
+        final PositionMarker fmarker = marker;
 
-		return new MarkerFeedback(data) {
+        return new MarkerFeedback(data) {
 
-			@Override
-			public void hide() {
-				fmarker.setVisible(false);
-			}
-		};
-	}
+            @Override
+            public void hide() {
+                fmarker.setVisible(false);
+            }
+        };
+    }
 
-	private abstract static class MarkerFeedback {
-		public final FeedbackData data;
+    private static MarkerFeedback handleOutline(Pane layoutNode, FeedbackData data) {
+        TabOutlineMarker marker = null;
 
-		public MarkerFeedback(FeedbackData data) {
-			this.data = data;
-		}
+        for (Node n : layoutNode.getChildren()) {
+            if (n instanceof TabOutlineMarker) {
+                marker = (TabOutlineMarker) n;
+            }
+        }
 
-		public abstract void hide();
-	}
+        if (marker == null) {
+            marker = new TabOutlineMarker(layoutNode.getBoundsInLocal(), new BoundingBox(data.bounds.getMinX(), data.bounds.getMinY(), data.bounds.getWidth(), data.bounds.getHeight()), data.dropType == DropType.BEFORE);
+            marker.setManaged(false);
+            marker.setMouseTransparent(true);
+            layoutNode.getChildren().add(marker);
+        } else {
+            marker.updateBounds(layoutNode.getBoundsInLocal(), new BoundingBox(data.bounds.getMinX(), data.bounds.getMinY(), data.bounds.getWidth(), data.bounds.getHeight()), data.dropType == DropType.BEFORE);
+            marker.setVisible(true);
+        }
 
-	/**
-	 * The drop type
-	 */
-	public enum DropType {
-		/**
-		 * No dropping
-		 */
-		NONE,
-		/**
-		 * Dropped before a reference tab
-		 */
-		BEFORE,
-		/**
-		 * Dropped after a reference tab
-		 */
-		AFTER
-	}
+        final TabOutlineMarker fmarker = marker;
 
-	/**
-	 * The feedback type to use
-	 */
-	public enum FeedbackType {
-		/**
-		 * Show a marker
-		 */
-		MARKER,
-		/**
-		 * Show an outline
-		 */
-		OUTLINE
-	}
+        return new MarkerFeedback(data) {
 
-	/**
-	 * Data to create a feedback
-	 */
-	public static class FeedbackData {
-		/**
-		 * The tab dragged
-		 */
-		public final Tab draggedTab;
-		/**
-		 * The reference tab
-		 */
-		public final Tab targetTab;
-		/**
-		 * The bounds of the reference tab
-		 */
-		public final Bounds bounds;
-		/**
-		 * The drop type
-		 */
-		public final DropType dropType;
+            @Override
+            public void hide() {
+                fmarker.setVisible(false);
+            }
+        };
+    }
 
-		/**
-		 * Create a feedback data
-		 * 
-		 * @param draggedTab
-		 *            the dragged tab
-		 * @param targetTab
-		 *            the reference tab
-		 * @param bounds
-		 *            the bounds of the reference tab
-		 * @param dropType
-		 *            the drop type
-		 */
-		public FeedbackData(Tab draggedTab, Tab targetTab, Bounds bounds, DropType dropType) {
-			this.draggedTab = draggedTab;
-			this.targetTab = targetTab;
-			this.bounds = bounds;
-			this.dropType = dropType;
-		}
+    private abstract static class MarkerFeedback {
+        public final FeedbackData data;
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((this.bounds == null) ? 0 : this.bounds.hashCode());
-			result = prime * result + this.draggedTab.hashCode();
-			result = prime * result + this.dropType.hashCode();
-			result = prime * result + ((this.targetTab == null) ? 0 : this.targetTab.hashCode());
-			return result;
-		}
+        public MarkerFeedback(FeedbackData data) {
+            this.data = data;
+        }
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			FeedbackData other = (FeedbackData) obj;
-			if (this.bounds == null) {
-				if (other.bounds != null)
-					return false;
-			} else if (!this.bounds.equals(other.bounds))
-				return false;
-			if (!this.draggedTab.equals(other.draggedTab))
-				return false;
-			if (this.dropType != other.dropType)
-				return false;
-			if (this.targetTab == null) {
-				if (other.targetTab != null)
-					return false;
-			} else if (!this.targetTab.equals(other.targetTab))
-				return false;
-			return true;
-		}
+        public abstract void hide();
+    }
 
-	}
+    /**
+     * The drop type
+     */
+    public enum DropType {
+        /**
+         * No dropping
+         */
+        NONE,
+        /**
+         * Dropped before a reference tab
+         */
+        BEFORE,
+        /**
+         * Dropped after a reference tab
+         */
+        AFTER
+    }
 
-	/**
-	 * The drop data
-	 */
-	public static class DroppedData {
-		/**
-		 * The dragged tab
-		 */
-		public final Tab draggedTab;
-		/**
-		 * The reference tab
-		 */
-		public final Tab targetTab;
-		/**
-		 * The drop type
-		 */
-		public final DropType dropType;
+    /**
+     * The feedback type to use
+     */
+    public enum FeedbackType {
+        /**
+         * Show a marker
+         */
+        MARKER,
+        /**
+         * Show an outline
+         */
+        OUTLINE
+    }
 
-		/**
-		 * Create drop data
-		 * 
-		 * @param draggedTab
-		 *            the dragged tab
-		 * @param targetTab
-		 *            the target tab
-		 * @param dropType
-		 *            the drop type
-		 */
-		public DroppedData(Tab draggedTab, Tab targetTab, DropType dropType) {
-			this.draggedTab = draggedTab;
-			this.targetTab = targetTab;
-			this.dropType = dropType;
-		}
-	}
+    /**
+     * Data to create a feedback
+     */
+    public static class FeedbackData {
+        /**
+         * The tab dragged
+         */
+        public final Tab draggedTab;
+        /**
+         * The reference tab
+         */
+        public final Tab targetTab;
+        /**
+         * The bounds of the reference tab
+         */
+        public final Bounds bounds;
+        /**
+         * The drop type
+         */
+        public final DropType dropType;
 
-	/**
-	 * Setup of the drag and drop
-	 */
-	public interface DragSetup {
-		/**
-		 * Function to handle the starting of the the drag
-		 * 
-		 * @param startFunction
-		 *            the function
-		 */
-		public void setStartFunction(Function<Tab, Boolean> startFunction);
+        /**
+         * Create a feedback data
+         *
+         * @param draggedTab the dragged tab
+         * @param targetTab  the reference tab
+         * @param bounds     the bounds of the reference tab
+         * @param dropType   the drop type
+         */
+        public FeedbackData(Tab draggedTab, Tab targetTab, Bounds bounds, DropType dropType) {
+            this.draggedTab = draggedTab;
+            this.targetTab = targetTab;
+            this.bounds = bounds;
+            this.dropType = dropType;
+        }
 
-		/**
-		 * Consumer called to handle the finishing of the drag process
-		 * 
-		 * @param dragFinishedConsumer
-		 *            the consumer
-		 */
-		public void setDragFinishedConsumer(Consumer<Tab> dragFinishedConsumer);
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((this.bounds == null) ? 0 : this.bounds.hashCode());
+            result = prime * result + this.draggedTab.hashCode();
+            result = prime * result + this.dropType.hashCode();
+            result = prime * result + ((this.targetTab == null) ? 0 : this.targetTab.hashCode());
+            return result;
+        }
 
-		/**
-		 * Consumer called to present drag feedback
-		 * 
-		 * @param feedbackConsumer
-		 *            the consumer to call
-		 */
-		public void setFeedbackConsumer(Consumer<FeedbackData> feedbackConsumer);
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            FeedbackData other = (FeedbackData) obj;
+            if (this.bounds == null) {
+                if (other.bounds != null)
+                    return false;
+            } else if (!this.bounds.equals(other.bounds))
+                return false;
+            if (!this.draggedTab.equals(other.draggedTab))
+                return false;
+            if (this.dropType != other.dropType)
+                return false;
+            if (this.targetTab == null) {
+                if (other.targetTab != null)
+                    return false;
+            } else if (!this.targetTab.equals(other.targetTab))
+                return false;
+            return true;
+        }
 
-		/**
-		 * Consumer called when the drop has to be handled
-		 * 
-		 * @param dropConsumer
-		 *            the consumer
-		 */
-		public void setDropConsumer(Consumer<DroppedData> dropConsumer);
+    }
 
-		/**
-		 * Function to translate the tab content into clipboard content
-		 * 
-		 * @param clipboardDataFunction
-		 *            the function
-		 */
-		public void setClipboardDataFunction(Function<Tab, String> clipboardDataFunction);
-	}
+    /**
+     * The drop data
+     */
+    public static class DroppedData {
+        /**
+         * The dragged tab
+         */
+        public final Tab draggedTab;
+        /**
+         * The reference tab
+         */
+        public final Tab targetTab;
+        /**
+         * The drop type
+         */
+        public final DropType dropType;
+
+        /**
+         * Create drop data
+         *
+         * @param draggedTab the dragged tab
+         * @param targetTab  the target tab
+         * @param dropType   the drop type
+         */
+        public DroppedData(Tab draggedTab, Tab targetTab, DropType dropType) {
+            this.draggedTab = draggedTab;
+            this.targetTab = targetTab;
+            this.dropType = dropType;
+        }
+    }
+
+    /**
+     * Setup of the drag and drop
+     */
+    public interface DragSetup {
+        /**
+         * Function to handle the starting of the the drag
+         *
+         * @param startFunction the function
+         */
+        public void setStartFunction(Function<Tab, Boolean> startFunction);
+
+        /**
+         * Consumer called to handle the finishing of the drag process
+         *
+         * @param dragFinishedConsumer the consumer
+         */
+        public void setDragFinishedConsumer(Consumer<Tab> dragFinishedConsumer);
+
+        /**
+         * Consumer called to present drag feedback
+         *
+         * @param feedbackConsumer the consumer to call
+         */
+        public void setFeedbackConsumer(Consumer<FeedbackData> feedbackConsumer);
+
+        /**
+         * Consumer called when the drop has to be handled
+         *
+         * @param dropConsumer the consumer
+         */
+        public void setDropConsumer(Consumer<DroppedData> dropConsumer);
+
+        /**
+         * Function to translate the tab content into clipboard content
+         *
+         * @param clipboardDataFunction the function
+         */
+        public void setClipboardDataFunction(Function<Tab, String> clipboardDataFunction);
+    }
 }
