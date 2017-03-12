@@ -351,7 +351,9 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
     public function doClose()
     {
-        $this->ideStylesheetTimer->stop();
+        if ($this->ideStylesheetTimer) {
+            $this->ideStylesheetTimer->stop();
+        }
 
         $this->actionManager->free();
         $this->spriteManager->free();
@@ -440,6 +442,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $this->uiSplashOnTop = $fxSplashOnTop = new UXCheckbox('Заставка всегда поверх окон');
         $this->uiSplashAutoHide = $fxSplashAutoHide = new UXCheckbox('Автоматически скрывать заставку после старта');
+        $fxSplashAutoHide->tooltipText = 'Чтобы скрыть заставку через код используйте app()->hideSplash()';
 
         $fxSplashOnTop->on('mouseUp', function () {
             $this->splashData['alwaysOnTop'] = $this->uiSplashOnTop->selected;

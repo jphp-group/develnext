@@ -21,9 +21,9 @@ class MaskTextFieldFormElementTag extends AbstractFormElementTag
     public function writeAttributes($node, DomElement $element)
     {
         /** @var UXMaskTextField $node */
-        $element->setAttribute('mask', $node->mask);
-        $element->setAttribute('plainText', $node->plainText);
-        $element->setAttribute('placeholder', $node->placeholder);
+        $element->setAttribute('mask', self::escapeText($node->mask));
+        $element->setAttribute('plainText', self::escapeText($node->plainText));
+        $element->setAttribute('placeholder', self::escapeText($node->placeholder));
 
         $element->removeAttribute('text');
     }

@@ -34,7 +34,7 @@ class PanelFormElementTag extends AbstractFormElementTag
         $element->setAttribute('layoutY', $node->y);
 
         if ($node->title) {
-            $element->setAttribute('title', $node->title);
+            $element->setAttribute('title', self::escapeText($node->title));
         }
 
         $element->setAttribute('titlePosition', $node->titlePosition);
