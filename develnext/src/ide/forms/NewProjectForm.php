@@ -201,6 +201,11 @@ class NewProjectForm extends AbstractIdeForm
             return;
         }
 
+        if (!fs::valid($name)) {
+            UXDialog::show("Введите корректное название для проекта, подходящее для файловой системы! \n\n$name", 'ERROR');
+            return;
+        }
+
         $package = str::trim($this->packageField->text);
 
         $regex = new Regex('^[a-z\\_]{2,15}$');
@@ -227,8 +232,11 @@ class NewProjectForm extends AbstractIdeForm
 
             uiLater(function () use ($template, $filename, $package) {
                 app()->getMainForm()->showPreloader('Создание проекта ...');
-                ProjectSystem::create($template, $filename, $package);
-                app()->getMainForm()->hidePreloader();
+                try {
+                    ProjectSystem::create($template, $filename, $package);
+                } finally {
+                    app()->getMainForm()->hidePreloader();
+                }
             });
         }
     }

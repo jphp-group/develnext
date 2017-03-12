@@ -12,5 +12,5 @@ sourceSets {
 }
 
 dependencies {
-    compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1209.jre7'
+    compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1212.jre7'
 }

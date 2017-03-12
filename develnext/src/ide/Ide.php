@@ -1391,7 +1391,7 @@ class Ide extends Application
         $done = false;
 
         $shutdownTh = (new Thread(function () use (&$done) {
-            sleep(30);
+            sleep(40);
 
             while (!$done) {
                 sleep(1);
