@@ -225,7 +225,7 @@ class ProjectSystem
             Ide::get()->trigger('openProject', [$project]);
 
             static::save();
-        } catch (IOException $e) {
+        } catch (\Exception $e) {
             Logger::exception("Unable to create project", $e);
             ProjectSystem::close(false);
             Ide::get()->getMainForm()->hidePreloader();
