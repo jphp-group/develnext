@@ -43,7 +43,7 @@ Source: "../build/install/develnext/*"; DestDir: "{app}"; Flags: ignoreversion r
 
 [InstallDelete]
 Type: files; Name: "{app}/lib/*"
-Type: files; Name: "{app}/library/*"
+Type: filesandordirs; Name: "{app}/library/*"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

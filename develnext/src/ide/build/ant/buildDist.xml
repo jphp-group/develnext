@@ -39,7 +39,7 @@
         </jar>
 
         <delete dir="${dist}/gen" failonerror="false" />
-        <!--<delete dir="${dist}/lib" failonerror="false" />-->
+        <delete dir="${dist}/lib" failonerror="false" />
     </target>
 
     <target name="clean" description="clean up">

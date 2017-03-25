@@ -11,6 +11,7 @@ use php\gui\event\UXKeyEvent;
 use php\gui\layout\UXHBox;
 use php\gui\text\UXFont;
 use php\gui\UXButton;
+use php\gui\UXHyperlink;
 use php\gui\UXSeparator;
 use php\gui\UXTextField;
 
@@ -96,7 +97,12 @@ class DocCommand extends AbstractCommand
 
         $searchButton->on('action', $searchHandle);
 
-        $ui = new UXHBox([$searchButton, $input, $button]);
+        $hyperlink = new UXHyperlink('Онлайн справка');
+        $hyperlink->style = '-fx-font-size: 14';
+        $hyperlink->on('action', function () { browse('https://github.com/jphp-compiler/develnext/wiki'); });
+
+        $ui = new UXHBox([$hyperlink, new UXSeparator('VERTICAL'), $searchButton, $input, $button]);
+        $ui->alignment = 'CENTER_LEFT';
         $ui->spacing = 5;
         $ui->fillHeight = true;
 

@@ -39,7 +39,7 @@ Source: "../build/install/develnext/*"; DestDir: "{app}"; Flags: ignoreversion r
 
 [InstallDelete]
 Type: files; Name: "{app}/lib/*"
-Type: files; Name: "{app}/library/*"
+Type: filesandordirs; Name: "{app}/library/*"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
