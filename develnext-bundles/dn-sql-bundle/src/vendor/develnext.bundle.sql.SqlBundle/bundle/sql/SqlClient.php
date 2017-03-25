@@ -113,7 +113,7 @@ abstract class SqlClient extends AbstractScript
     }
 
     /**
-     * @param array $sql
+     * @param string $sql
      * @param array $arguments
      * @return SqlStatement
      * @throws SqlException

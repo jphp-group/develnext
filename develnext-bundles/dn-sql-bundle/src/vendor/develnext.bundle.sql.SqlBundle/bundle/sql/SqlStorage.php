@@ -1,6 +1,7 @@
 <?php
 namespace bundle\sql;
 
+use php\gui\framework\ScriptEvent;
 use script\storage\AbstractStorage;
 
 abstract class SqlStorage extends AbstractStorage
