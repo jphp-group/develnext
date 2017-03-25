@@ -135,11 +135,8 @@ project(':jphp-desktop-hotkey-ext') {
 
 project(':jphp-systemtray-ext') {
     dependencies {
-        compile (project(':jphp-gui-ext')) {
-            transitive = false
-        }
-
         compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
+        provided project(':jphp-gui-ext')
     }
 }
 

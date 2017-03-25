@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DevelNext"
-#define MyAppVersion "16.5.0"
+#define MyAppVersion "16.5.1"
 #define MyAppPublisher "develnext.org"
 #define MyAppURL "http://develnext.org"
 #define MyAppExeName "DevelNext.exe"
@@ -43,6 +43,7 @@ Source: "../build/install/develnext/*"; DestDir: "{app}"; Flags: ignoreversion r
 
 [InstallDelete]
 Type: files; Name: "{app}/lib/*"
+Type: files; Name: "{app}/library/*"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

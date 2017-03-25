@@ -9,7 +9,6 @@ import java.util.List;
 
 public class DesktopApi {
     public static boolean browse(URI uri) {
-
         if (openSystemSpecific(uri.toString())) return true;
 
         if (browseDESKTOP(uri)) return true;

@@ -51,5 +51,13 @@ class ScrollPaneFormElementTag extends AbstractFormElementTag
 
         $element->setAttribute("hbarPolicy", $node->hbarPolicy);
         $element->setAttribute("vbarPolicy", $node->vbarPolicy);
+
+        if ($node->fitToWidth) {
+            $element->setAttribute('fitToWidth', $node->fitToWidth ? 'true' : 'false');
+        }
+
+        if ($node->fitToHeight) {
+            $element->setAttribute('fitToHeight', $node->fitToHeight ? 'true' : 'false');
+        }
     }
 }

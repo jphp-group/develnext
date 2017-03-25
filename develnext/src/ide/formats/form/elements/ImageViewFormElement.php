@@ -115,22 +115,26 @@ class ImageViewFormElement extends AbstractFormElement
             $node = $new;
         }
 
-        $data = DataUtils::get($node);
-        $image = $data->get('image');
+        if ($node->parent) { // fix bug.
+            $data = DataUtils::get($node);
+            $image = $data->get('image');
 
-        UXApplication::runLater(function () use ($image, $node) {
-            if ($image) {
-                $project = Ide::get()->getOpenedProject();
+            UXApplication::runLater(function () use ($image, $node) {
+                if ($image) {
+                    $project = Ide::get()->getOpenedProject();
 
-                if ($project) {
-                    $file = $project->getFile("src/$image");
+                    if ($project) {
+                        $file = $project->getFile("src/$image");
 
-                    if ($file->exists()) {
-                        $node->image = Cache::getImage($file);
+                        if ($file->exists()) {
+                            $node->image = Cache::getImage($file);
+                        }
                     }
                 }
-            }
+            });
+        }
 
+        uiLater(function () use ($node) {
             if (!$node->image) {
                 $node->image = Ide::get()->getImage('dummyImage.png')->image;
             }

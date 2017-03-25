@@ -56,6 +56,7 @@ use php\io\ResourceStream;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
+use php\lang\JavaException;
 use php\lib\Char;
 use php\lib\fs;
 use php\lib\Items;
@@ -363,8 +364,23 @@ class CodeEditor extends AbstractEditor
     public function executeCommand($command)
     {
         switch ($command) {
-            case 'undo': $this->textArea->undo(); break;
-            case 'redo': $this->textArea->redo(); break;
+            case 'undo':
+                try {
+                    $this->textArea->undo();
+                } catch (\Exception $e) {
+                    Logger::warn("Undo fail: " . $e->getMessage());
+                    // fix bug.
+                }
+                break;
+
+            case 'redo':
+                try {
+                    $this->textArea->redo();
+                } catch (\Exception $e) {
+                    Logger::warn("Redo fail: " . $e->getMessage());
+                    // fix bug.
+                }
+                break;
             case 'copy': $this->textArea->copy(); break;
             case 'cut': $this->textArea->cut(); break;
             case 'paste': $this->textArea->paste(); break;
@@ -415,7 +431,8 @@ class CodeEditor extends AbstractEditor
     public function loadContentToAreaIfModified()
     {
         if (!$this->contentLoaded || $this->fileTime != fs::time($this->file)) {
-            $this->loadContentToArea(false);
+            $resetHistory = !$this->contentLoaded;
+            $this->loadContentToArea($resetHistory);
         }
     }
 

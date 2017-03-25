@@ -41,8 +41,12 @@ public class UXDesktop extends BaseWrapper<Desktop> {
     @Signature
     public boolean browse(URI uri) throws IOException {
         if (getWrappedObject().isSupported(Desktop.Action.BROWSE)) {
-            getWrappedObject().browse(uri);
-            return true;
+            try {
+                getWrappedObject().browse(uri);
+                return true;
+            } catch (IOException e) {
+                return DesktopApi.browse(uri);
+            }
         } else {
             return DesktopApi.browse(uri);
         }
@@ -51,7 +55,12 @@ public class UXDesktop extends BaseWrapper<Desktop> {
     @Signature
     public boolean edit(File file) throws IOException {
         if (getWrappedObject().isSupported(Desktop.Action.EDIT)) {
-            getWrappedObject().edit(file);
+            try {
+                getWrappedObject().edit(file);
+            } catch (IOException e) {
+                return false;
+            }
+
             return true;
         } else {
             return DesktopApi.edit(file);
