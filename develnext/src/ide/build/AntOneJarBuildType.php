@@ -74,8 +74,6 @@ class AntOneJarBuildType extends AbstractBuildType
             $classPaths = $bundleBehaviour->getSourceDirectories();
         }
 
-        print_r($classPaths);
-
         foreach ($classPaths as $src) {
             $excludes = ".debug/** **/*.source **/*.sourcemap **/*.axml";
 
@@ -136,9 +134,17 @@ class AntOneJarBuildType extends AbstractBuildType
         $extList = '';
         $oneJarContent = [];
 
+        $addedModuleNames = [];
+
         foreach ($project->getModules() as $module) {
             if ($module->getType() == 'jarfile') {
                 $name = fs::name($module->getId());
+
+                if ($addedModuleNames[$name]) {
+                    continue;
+                }
+
+                $addedModuleNames[$name] = 1;
 
                 if ($php = PhpProjectBehaviour::get()) {
                     $excl = $php->isByteCodeEnabled() ? '**/*.php' : '';

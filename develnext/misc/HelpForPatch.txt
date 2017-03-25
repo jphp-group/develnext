@@ -5,7 +5,7 @@ How to install a patch for DevelNext?
 - If you cannot use a patch setup follow the next instructions:
 
 1. Shutdown all instances of DevelNext!
-2. Remove the `lib` directory in the develnext directory.
+2. Remove the `lib` and `library` directories in the develnext directory.
 3. Unpack all files from a patch setup and replace all files.
 4. Start DevelNext!
 
@@ -17,7 +17,7 @@ How to install a patch for DevelNext?
 - Если вы не можете использовать инсталятор, следуйте инструкциями:
 
 1. Закройте все экземпляры программы DevelNext!
-2. Удалить папку `lib` из директории DN.
+2. Удалить папку `lib` и `library` из директории DN.
 3. Распакуйте все файла из архива с патчем, заменив все!
 4. Запускайте DevelNext!
 

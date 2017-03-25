@@ -39,7 +39,8 @@ abstract class LabeledFormElement extends AbstractFormElement
     {
         parent::registerNode($node);
 
-        /** @var UXLabeled $node */
+        if ($node->parent) {
+            /** @var UXLabeled $node */
             $data = DataUtils::get($node);
 
             $image = $data->get('graphic');
@@ -54,6 +55,7 @@ abstract class LabeledFormElement extends AbstractFormElement
                     $node->graphic = $graphic;
                 }
             }
+        }
     }
 
     private function getFileFromDragDrop(UXDragboard $db)

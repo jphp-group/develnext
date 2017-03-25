@@ -804,7 +804,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
                     if (!$incFiles[$incFile]) {
                         $incFiles[$incFile] = true;
 
-                        $code .= "include 'res://" . $incFile . "'; \n";
+                        $code .= "include 'res://.inc/" . $incFile . "'; \n";
 
                         Logger::debug("Add '{$incFile}' to bootstrap script.");
                     }

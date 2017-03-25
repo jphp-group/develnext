@@ -27,6 +27,7 @@ use php\lang\Process;
 use php\lang\Thread;
 use php\lang\ThreadPool;
 use php\lib\arr;
+use php\lib\fs;
 use php\lib\number;
 use php\lib\Str;
 use php\time\Time;
@@ -88,7 +89,7 @@ class ExecuteProjectCommand extends AbstractCommand
     {
         $this->stopButton = $this->makeGlyphButton();
         $this->stopButton->graphic = Ide::get()->getImage('icons/square16.png');
-        $this->stopButton->tooltipText = 'Завершить выполнение программы';
+        $this->stopButton->tooltipText = 'Завершить выполнение программы (F9)';
         $this->stopButton->on('action', [$this, 'onStopExecute']);
         $this->stopButton->enabled = false;
 
@@ -117,7 +118,7 @@ class ExecuteProjectCommand extends AbstractCommand
 
         $proc = function () use ($appPidFile, $ide, $mainForm, $callback) {
             try {
-                $pid = Stream::getContents($appPidFile);
+                $pid = fs::get($appPidFile);
 
                 if ($pid) {
                     if ($ide->isWindows()) {
@@ -188,6 +189,11 @@ class ExecuteProjectCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
+        if ($this->isRunning()) {
+            $this->onStopExecute(null);
+            return;
+        }
+
         $ide = Ide::get();
         $project = $ide->getOpenedProject();
 

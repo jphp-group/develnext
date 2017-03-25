@@ -64,20 +64,22 @@ class DatePickerFormElement extends AbstractFormElement
 
     public function registerNode(UXNode $node)
     {
-        /** @var UXDatePicker $node */
-        $data = DataUtils::get($node);
-        $format = $data->get('format');
-        $value = $data->get('value');
+        if ($node->parent) { // fix bug.
+            /** @var UXDatePicker $node */
+            $data = DataUtils::get($node);
+            $format = $data->get('format');
+            $value = $data->get('value');
 
-        UXApplication::runLater(function () use ($format, $value, $node) {
-            if ($format) {
-                $node->format = $format;
-            }
+            UXApplication::runLater(function () use ($format, $value, $node) {
+                if ($format) {
+                    $node->format = $format;
+                }
 
-            if ($value) {
-                $node->value = $value;
-            }
-        });
+                if ($value) {
+                    $node->value = $value;
+                }
+            });
+        }
     }
 
 
