@@ -17,6 +17,6 @@
             </variants>
         </property>
         <property code="fitToWidth" name="Ширина контента" editor="boolean" tooltip="Ширина контента будет соответствовать ширине контейнера" />
-        <property code="fitToHeight" name="Ширина контента" editor="boolean" tooltip="Высота контента будет соответствовать высоте контейнера" />
+        <property code="fitToHeight" name="Высота контента" editor="boolean" tooltip="Высота контента будет соответствовать высоте контейнера" />
     </properties>
 </element>
