@@ -16,7 +16,7 @@ class OpenProjectCommand extends AbstractCommand
 {
     public function getName()
     {
-        return 'Открыть проект';
+        return _('menu.project.open');
     }
 
     public function getIcon()

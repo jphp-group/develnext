@@ -56,7 +56,7 @@ class MyAccountCommand extends AbstractCommand
         }, __CLASS__);
 
         Ide::accountManager()->on('update', function ($data) {
-            $this->accountButton->text = $data ? $data['name'] : 'Войти в аккаунт';
+            $this->accountButton->text = $data ? $data['name'] : _('account.log.in');
 
             Ide::service()->media()->loadImage($data['avatar'], $this->accountImage, 'noAvatar.jpg');
         }, __CLASS__);
@@ -67,7 +67,7 @@ class MyAccountCommand extends AbstractCommand
 
     public function getName()
     {
-        return 'Мой Аккаунт';
+        return _('account.my');
     }
 
     public function onExecute($e = null, AbstractEditor $editor = null)

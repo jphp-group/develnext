@@ -18,7 +18,7 @@ class IdeLogShowCommand extends AbstractCommand
 {
     public function getName()
     {
-        return 'Диагностика среды';
+        return _('menu.help.diagnostic');
     }
 
     public function getCategory()

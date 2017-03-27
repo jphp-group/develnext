@@ -16,7 +16,7 @@ class ExitCommand extends AbstractCommand
 {
     public function getName()
     {
-        return 'Выход';
+        return _('menu.exit');
     }
 
     public function onExecute($e = null, AbstractEditor $editor = null)

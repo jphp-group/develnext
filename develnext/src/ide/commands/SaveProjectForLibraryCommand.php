@@ -16,7 +16,7 @@ class SaveProjectForLibraryCommand extends AbstractProjectCommand
 {
     public function getName()
     {
-        return 'Сохранить проект в библиотеке';
+        return _('menu.project.save.in.library');
     }
 
     public function getIcon()
@@ -63,7 +63,7 @@ class SaveProjectForLibraryCommand extends AbstractProjectCommand
                 $resource = Ide::get()->getLibrary()->makeResource('projects', $result['name'] . ".zip");
 
                 if (!$resource) {
-                    $msg = new MessageBoxForm('Проект с таким названием уже есть в вашей библиотеке, хотите его перезаписать?', ['yes' => 'Да, перезаписать', 'no' => 'Нет']);
+                    $msg = new MessageBoxForm(_('confirm.project.library.name.conflict'), ['yes' => _('btn.yes.rewrite'), 'no' => _('btn.no')]);
 
                     if ($msg->showDialog()) {
                         if ($msg->getResultIndex() == 1) {
@@ -79,7 +79,7 @@ class SaveProjectForLibraryCommand extends AbstractProjectCommand
                         $openDialog = new OpenProjectForm('library');
                         $openDialog->show();
                         $openDialog->selectLibraryResource($resource);
-                        $openDialog->toast('Проект был успешно сохранен в библиотеке');
+                        $openDialog->toast(_('toast.project.save.in.library.done'));
                     });
 
                     $project->getIdeLibraryConfig()->set('resource', $resource->getPath());
@@ -92,11 +92,11 @@ class SaveProjectForLibraryCommand extends AbstractProjectCommand
 
                     Ide::get()->getLibrary()->update();
                 } else {
-                    Ide::toast('Ошибка, невозможно сохранить проект в библиотеке!');
+                    Ide::toast(_('toast.project.save.in.library.fail'));
                 }
             }
         } else {
-            UXDialog::show('Создайте новый проект, чтобы сохранить его в библиотеке');
+            UXDialog::show(_('alert.project.save.in.library.fail'));
         }
     }
 }

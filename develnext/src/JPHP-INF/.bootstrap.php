@@ -25,6 +25,16 @@ $app = new Ide();
 $app->addStyle('/.theme/style.css');
 $app->launch();
 
+function _($code, ...$args) {
+    static $l10n;
+
+    if (!$l10n) {
+        $l10n = Ide::get()->getL10n();
+    }
+
+    return $l10n->get($code, ...$args);
+}
+
 function dump($arg)
 {
     ob_start();

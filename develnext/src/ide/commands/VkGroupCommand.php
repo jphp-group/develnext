@@ -9,7 +9,7 @@ class VkGroupCommand extends AbstractCommand
 {
     public function getName()
     {
-        return 'VK группа';
+        return _('menu.help.vk');
     }
 
     public function isAlways()

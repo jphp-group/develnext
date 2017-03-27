@@ -9,7 +9,7 @@ class YoutubeChannelCommand extends AbstractCommand
 {
     public function getName()
     {
-        return 'YouTube канал';
+        return _('menu.help.youtube');
     }
 
     public function isAlways()

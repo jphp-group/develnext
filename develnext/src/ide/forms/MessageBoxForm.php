@@ -70,6 +70,7 @@ class MessageBoxForm extends AbstractIdeForm
     {
         parent::init();
 
+        $this->title = _('msg.title');
         $this->owner = Ide::get()->getMainForm();
     }
 

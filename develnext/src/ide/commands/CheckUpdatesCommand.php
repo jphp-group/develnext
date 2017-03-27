@@ -14,7 +14,7 @@ class CheckUpdatesCommand extends AbstractCommand
 {
     public function getName()
     {
-        return 'Поиск обновлений DevelNext';
+        return _('menu.help.check.updates');
     }
 
     public function getIcon()
@@ -39,7 +39,7 @@ class CheckUpdatesCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        Ide::get()->getMainForm()->showPreloader('Поиск обновлений ...');
+        Ide::get()->getMainForm()->showPreloader(_('toast.search.updates'));
 
         Ide::service()->ide()->getLastUpdateAsync('NIGHT', function (ServiceResponse $response) {
             Ide::get()->getMainForm()->hidePreloader();
@@ -55,10 +55,10 @@ class CheckUpdatesCommand extends AbstractCommand
                         $dialog->tryShow($response->data(), true);
                     });
                 } else {
-                    UXDialog::show('Вы используете последнюю из доступных версий программы.');
+                    UXDialog::show(_('alert.last.version.installed'));
                 }
             } else {
-                Notifications::warning('Сервер недоступен', 'Сервис обновлений недоступен, попробуйте проверить обновления позже.');
+                Notifications::warning(_('account.server.unavailable'), _('account.update.service.unavailable.message'));
             }
         });
     }
