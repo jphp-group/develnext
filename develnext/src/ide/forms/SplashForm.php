@@ -86,7 +86,7 @@ class SplashForm extends AbstractIdeForm
      */
     public function doTipClick(UXEvent $e)
     {
-        $this->tip->text = SplashTipSystem::get();
+        $this->tip->text = SplashTipSystem::get(Ide::get()->getLanguage()->getCode());
         $e->consume();
     }
 
@@ -95,10 +95,14 @@ class SplashForm extends AbstractIdeForm
      */
     public function doShow()
     {
-        $this->tip->text = SplashTipSystem::get();
+        $this->tip->text = SplashTipSystem::get(Ide::get()->getLanguage()->getCode());
 
         if (Ide::get()->isDevelopment() && Ide::get()->isWindows()) {
-            $this->opacity = 0.05;
+            if ($this->opacity > 0.9) {
+                $this->opacity = 0.05;
+            } else {
+                $this->opacity = 1;
+            }
         }
 
         uiLater(function () {

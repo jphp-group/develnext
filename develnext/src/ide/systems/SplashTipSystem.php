@@ -1,12 +1,14 @@
 <?php
 namespace ide\systems;
 
+use ide\Ide;
 use ide\Logger;
 use ide\misc\TipDatabase;
 use ide\utils\FileUtils;
 use php\io\IOException;
 use php\io\Stream;
 use php\lib\arr;
+use php\lib\fs;
 use php\lib\str;
 use php\util\Scanner;
 
@@ -73,6 +75,12 @@ class SplashTipSystem
         }
 
         self::addSource('res://.dn/splash/tips');
+
+        $langTips = Ide::get()->getLanguage()->getDirectory() . '/tips';
+
+        if (fs::isFile($langTips)) {
+            SplashTipSystem::addSource($langTips);
+        }
     }
 
     static protected function save()
@@ -96,7 +104,7 @@ class SplashTipSystem
         self::save();
     }
 
-    static function get()
+    static function get($lang)
     {
         self::init();
 
@@ -105,12 +113,20 @@ class SplashTipSystem
             return arr::first(self::$databases)->getFirst();
         }
 
-        $key = array_rand(self::$databases);
+        $databases = [];
 
-        $object = self::$databases[$key];
+        foreach (self::$databases as $database) {
+            if ($database->hasLanguage($lang)) {
+                $databases[] = $database;
+            }
+        }
+
+        $key = array_rand($databases);
+
+        $object = $databases[$key];
 
         if ($object) {
-            return $object->getRandom();
+            return $object->getRandom($lang);
         } else {
             return null;
         }

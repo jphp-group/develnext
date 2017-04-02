@@ -34,15 +34,22 @@ class TipDatabase
         try {
             $scanner = new Scanner($stream, 'UTF-8');
 
+            $lang = 'en';
+
             while ($scanner->hasNextLine()) {
                 $line = str::trim($scanner->nextLine());
 
                 if ($line) {
+                    if ($line[0] == '[' && substr($line, -1) == ']') {
+                        $lang = substr($line, 1, -1);
+                        continue;
+                    }
+
                     if ($line[0] == '~') {
                         $line = base64_decode(str::sub($line, 1));
                     }
 
-                    $this->list[] = $line;
+                    $this->list[$lang][] = $line;
                 }
             }
         } finally {
@@ -51,17 +58,27 @@ class TipDatabase
     }
 
     /**
+     * @param $lang
      * @return mixed
      */
-    public function getRandom()
+    public function getRandom($lang)
     {
-        $key = rand(0, sizeof($this->list) - 1);
+        $key = rand(0, sizeof($this->list[$lang]) - 1);
 
-        return $this->list[$key];
+        return $this->list[$lang][$key];
     }
 
-    public function getFirst()
+    /**
+     * @param $lang
+     * @return bool
+     */
+    public function hasLanguage($lang)
     {
-        return arr::first($this->list);
+        return !!$this->list[$lang];
+    }
+
+    public function getFirst($lang)
+    {
+        return arr::first($this->list[$lang]);
     }
 }

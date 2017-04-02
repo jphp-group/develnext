@@ -50,7 +50,9 @@ class IdeSandboxShowCommand extends AbstractCommand
         $ui->spacing = 5;
         $ui->padding = 5;
 
-        $editor = new CodeEditor(IdeSystem::getFile("sandbox.php"), 'php');
+        $file = IdeSystem::getFile("sandbox.php");
+        $editor = new CodeEditor($file, 'php');
+        $editor->setEmbedded(true);
         $editor->setSourceFile(false);
         $editor->registerDefaultCommands();
         $editor->loadContentToArea();
@@ -64,7 +66,9 @@ class IdeSandboxShowCommand extends AbstractCommand
         });
 
         $pane = UiUtils::makeCommandPane([
-            $this->command = SimpleSingleCommand::makeWithText('Запустить', 'icons/run16.png', function () use ($editor) {
+            $this->command = SimpleSingleCommand::makeWithText('Запустить', 'icons/run16.png', function () use ($editor, $file) {
+                //include $file;
+
                 eval("?>" . $editor->getValue());
             }),
             SimpleSingleCommand::makeWithText('Скрыть', 'icons/square16.png', function () use ($editor) {
@@ -74,7 +78,7 @@ class IdeSandboxShowCommand extends AbstractCommand
             })
         ]);
         $pane->spacing = 5;
-        $pane->minHeight = 30;
+        $pane->minHeight = 25;
 
         $textArea = $editor->makeUi();
         UXVBox::setVgrow($textArea, 'ALWAYS');

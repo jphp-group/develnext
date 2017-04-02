@@ -21,6 +21,8 @@ class IdeLanguage
 
     private $restartMessage;
 
+    private $altLang;
+
     function __construct($code, $directory)
     {
         $this->code = $code;
@@ -32,8 +34,25 @@ class IdeLanguage
         $config = new Configuration("$directory/description.ini");
         $this->title = $config->get('name');
         $this->titleEn = $config->get('name.en');
+        $this->altLang = $config->get('alt.lang');
 
         $this->restartMessage = $config->get('restart.message');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDirectory()
+    {
+        return $this->directory;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAltLang()
+    {
+        return $this->altLang;
     }
 
     /**
@@ -93,11 +112,17 @@ class IdeLanguage
     }
 
     /**
+     * @param L10n $altLanguage
      * @return mixed
      */
-    public function getL10n()
+    public function getL10n(L10n $altLanguage = null)
     {
-        return $this->l10n;
+        if ($altLanguage) {
+            $this->l10n->setAlternatives([$altLanguage]);
+            return $this->l10n;
+        } else {
+            return $this->l10n;
+        }
     }
 
     public function load() {

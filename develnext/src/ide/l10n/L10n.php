@@ -26,6 +26,19 @@ class L10n
     protected $messages = [];
 
     /**
+     * @var L10n[]
+     */
+    private $alternatives = [];
+
+    /**
+     * @param L10n[] $alternatives
+     */
+    public function setAlternatives($alternatives)
+    {
+        $this->alternatives = $alternatives;
+    }
+
+    /**
      * @return mixed
      */
     public function getLanguage()
@@ -73,6 +86,12 @@ class L10n
 
         if ($message) {
             return str::format($message, ...$args);
+        }
+
+        foreach ($this->alternatives as $alt) {
+            if ($message = $alt->messages[$code]) {
+                return str::format($message, ...$args);
+            }
         }
 
         return $code;

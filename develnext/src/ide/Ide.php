@@ -383,7 +383,8 @@ class Ide extends Application
     public function getL10n()
     {
         if (!$this->l10n && $this->language) {
-            $this->l10n = $this->language->getL10n();
+            $language = $this->languages[$this->language->getAltLang()];
+            $this->l10n = $this->language->getL10n($language ? $language->getL10n() : $language);
         }
 
         return $this->l10n;
@@ -631,6 +632,10 @@ class Ide extends Application
 
         if ($this->language) {
             $this->language->load();
+        }
+
+        if ($altLanguage = $this->languages[$this->language->getAltLang()]) {
+            $altLanguage->load();
         }
 
         $this->setUserConfigValue('ide.language', $ideLanguage);
