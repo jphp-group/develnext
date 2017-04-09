@@ -37,14 +37,14 @@ public class UXSpinner extends UXControl<Spinner> {
             @Override
             public void decrement(int steps) {
                 if (decrement != null) {
-                    decrement.callAny(this, steps);
+                    decrement.callAny(UXSpinner.this, steps);
                 }
             }
 
             @Override
             public void increment(int steps) {
                 if (increment != null) {
-                    increment.callAny(this, steps);
+                    increment.callAny(UXSpinner.this, steps);
                 }
             }
         });
