@@ -112,7 +112,7 @@ class Logger
     static protected function log($level, $message, ...$args)
     {
         if ($level <= static::$level) {
-            if (Ide::isCreated()) {
+            if (class_exists(Ide::class, false) && Ide::isCreated()) { // bug fixes.
                 $file = Ide::get()->getLogFile();
             }
 
@@ -133,7 +133,7 @@ class Logger
 
             $line = static::getLogName($level) . " [" . $class . "] ($time) " . $message . "\r\n";
 
-            if (IdeSystem::isDevelopment()) {
+            if (class_exists(IdeSystem::class, false) && IdeSystem::isDevelopment()) {
                 $out = Stream::of('php://stdout');
 
                 $_line = $line;
@@ -145,7 +145,7 @@ class Logger
                 $out->write($_line);
             }
 
-            if (Ide::isCreated()) {
+            if (class_exists(Ide::class, false) && Ide::isCreated()) { // bug fixes.
                 $sync = Shared::value(__CLASS__ . '#logfile');
 
                 if (self::$threadPool) {
