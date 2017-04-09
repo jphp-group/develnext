@@ -226,6 +226,7 @@ task distIdeLinux(dependsOn: ['distIde']) {
 task distIde(dependsOn: ['prepareDist']) {
     doLast {
         makeExe("$project.rootDir/develnext/launcher/winLauncher.xml")
+        makeExe("$project.rootDir/develnext/launcher/winLauncher-debug.xml")
 
         copy {
             from "$project.rootDir/develnext-tools"
@@ -239,6 +240,11 @@ task distIde(dependsOn: ['prepareDist']) {
 
         copy {
             from "$project.rootDir/develnext/launcher/DevelNext.exe"
+            into "$project.buildDir/install/$project.name"
+        }
+
+        copy {
+            from "$project.rootDir/develnext/launcher/DevelNext-debug.exe"
             into "$project.buildDir/install/$project.name"
         }
 
