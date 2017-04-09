@@ -13,8 +13,12 @@ import javafx.stage.StageStyle;
 import org.develnext.jphp.ext.javafx.classes.UXImage;
 import org.develnext.jphp.ext.javafx.support.ImageViewEx;
 import php.runtime.Memory;
+import php.runtime.lang.spl.exception.RuntimeException;
 import php.runtime.launcher.Launcher;
 
+import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.InputStream;
 
 public class FXLauncher extends Launcher {
@@ -78,6 +82,34 @@ public class FXLauncher extends Launcher {
                 splashStage.show();
                 splashStage.centerOnScreen();
             });
+        }
+    }
+
+    @Override
+    public void run(boolean mustBootstrap, boolean disableExtensions) throws Throwable {
+        try {
+            super.run(mustBootstrap, disableExtensions);
+        } catch (Throwable e) {
+            e.printStackTrace();
+
+            SwingUtilities.invokeLater(() -> {
+                ExceptionDialog ld = new ExceptionDialog("Unexpected System Error!", e.getMessage(), e);
+                ld.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+                ld.setAlwaysOnTop(true);
+                ld.expand();
+                ld.setLocationRelativeTo(null);
+                ld.setVisible(true);
+            });
+
+            if (splashStage != null) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        splashStage.hide();
+                    }
+                });
+            }
         }
     }
 
