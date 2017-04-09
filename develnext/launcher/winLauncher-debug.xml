@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>true</dontWrapJar>
+  <headerType>console</headerType>
+  <outfile>DevelNext-debug.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>http://develnext.org</supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>DevelNext.ico</icon>
+  <classPath>
+    <mainClass>org.develnext.jphp.ext.javafx.FXLauncher</mainClass>
+    <cp>lib/*</cp>
+  </classPath>
+  <jre>
+    <path>tools/jre</path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion></minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>jreOnly</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+    <initialHeapSize>256</initialHeapSize>
+    <maxHeapSize>1024</maxHeapSize>
+
+    <opt>-Dfile.encoding=UTF-8</opt>
+    <opt>-Ddevelnext.launcher=root</opt>
+    <opt>-Ddevelnext.mode=dev</opt>
+    <opt>-Dprism.verbose=true</opt>
+  </jre>
+  <versionInfo>
+    <fileVersion>0.0.0.0</fileVersion>
+    <txtFileVersion>-</txtFileVersion>
+    <fileDescription>DevelNext IDE</fileDescription>
+    <copyright>201x, OpenSource</copyright>
+    <productVersion>0.0.0.0</productVersion>
+    <txtProductVersion>-</txtProductVersion>
+    <productName>DevelNext</productName>
+    <companyName>DevelNext Software</companyName>
+    <internalName>DevelNext</internalName>
+    <originalFilename>DevelNext-debug.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>

@@ -26,7 +26,9 @@ class IdeSystem
         $mode = 'prod';
         $env = System::getEnv();
 
-        if (isset($env['DEVELNEXT_MODE'])) {
+        if ($value = System::getProperty('develnext.mode')) {
+            $mode = $value;
+        } else if (isset($env['DEVELNEXT_MODE'])) {
             $mode = $env['DEVELNEXT_MODE'];
         }
 
