@@ -8,6 +8,7 @@ ide\commands\CloseProjectCommand
 ide\commands\ExitCommand
 
 ide\commands\IdeLogShowCommand
+ide\commands\IdeSandboxShowCommand
 
 ide\commands\OfficialSiteCommand
 ide\commands\YoutubeChannelCommand

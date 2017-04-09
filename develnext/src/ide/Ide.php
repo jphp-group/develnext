@@ -11,6 +11,7 @@ use ide\formats\AbstractFormat;
 use ide\formats\IdeFormatOwner;
 use ide\forms\MainForm;
 use ide\forms\SplashForm;
+use ide\l10n\L10n;
 use ide\library\IdeLibrary;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
@@ -158,6 +159,21 @@ class Ide extends Application
     protected $settings = [];
 
     /**
+     * @var L10n
+     */
+    protected $l10n;
+
+    /**
+     * @var IdeLanguage[]
+     */
+    protected $languages = [];
+
+    /**
+     * @var IdeLanguage
+     */
+    protected $language;
+
+    /**
      * @var ThreadPool
      */
     private $asyncThreadPool;
@@ -205,27 +221,31 @@ class Ide extends Application
 
                     if (!$showError) {
                         $showError = true;
-                        $notify = Notifications::error('Непредвиденная ошибка', 'Возникла неожиданная ошибка, пожалуйста нажмите сюда, чтобы узнать подробности.');
+                        $notify = Notifications::error(_('error.unknown.title'), _('error.unknown.message'));
 
                         $notify->on('click', function () use ($e) {
                             $dialog = new UXAlert('ERROR');
-                            $dialog->title = 'Ошибка';
-                            $dialog->headerText = 'Произошла ошибка в DevelNext, сообщите об этом авторам';
+                            $dialog->title = _('error.title');
+                            $dialog->headerText = _('error.unknown.help.text');
                             $dialog->contentText = $e->getMessage();
-                            $dialog->setButtonTypes(['Выход из DevelNext', 'Продолжить']);
+                            $dialog->setButtonTypes([_('btn.exit.dn'), _('btn.resume')]);
                             $pane = new UXAnchorPane();
                             $pane->maxWidth = 100000;
 
                             $class = get_class($e);
 
-                            $content = new UXTextArea("{$class}\n{$e->getMessage()}\n\nОшибка в файле '{$e->getFile()}'\n\t-> на строке {$e->getLine()}\n\n" . $e->getTraceAsString());
+                            $content = new UXTextArea("{$class}\n{$e->getMessage()}\n\n"
+                                . _("error.in.file", $e->getFile())
+                                . "\n\t-> " . _("error.at.line", $e->getLine()) . "\n\n" . $e->getTraceAsString());
+
+
                             $content->padding = 10;
                             UXAnchorPane::setAnchor($content, 0);
                             $pane->add($content);
                             $dialog->expandableContent = $pane;
                             $dialog->expanded = true;
                             switch ($dialog->showAndWait()) {
-                                case 'Выход из DevelNext':
+                                case _('btn.exit.dn'):
                                     Ide::get()->shutdown();
                                     break;
                             }
@@ -243,6 +263,8 @@ class Ide extends Application
                     restore_exception_handler();
                 }
 
+                $this->readLanguages();
+
                 if ($this->handleArgs($GLOBALS['argv'])) {
                     Logger::info("Protocol handler is shutdown ide ...");
 
@@ -251,14 +273,6 @@ class Ide extends Application
                     });
                     return;
                 }
-
-                /*$this->splash = $splash = new SplashForm();
-                $splash->show();
-                $splash->requestFocus();*/
-
-                TimerScript::executeAfter(1000, function () {
-
-                });
             },
             function () {
 
@@ -361,6 +375,35 @@ class Ide extends Application
     public function getToolManager()
     {
         return $this->toolManager;
+    }
+
+    /**
+     * @return L10n
+     */
+    public function getL10n()
+    {
+        if (!$this->l10n && $this->language) {
+            $language = $this->languages[$this->language->getAltLang()];
+            $this->l10n = $this->language->getL10n($language ? $language->getL10n() : $language);
+        }
+
+        return $this->l10n;
+    }
+
+    /**
+     * @return IdeLanguage
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @return IdeLanguage[]
+     */
+    public function getLanguages()
+    {
+        return $this->languages;
     }
 
     /**
@@ -557,6 +600,45 @@ class Ide extends Application
         }
 
         $this->getMainForm()->title = $title;
+    }
+
+    protected function readLanguages()
+    {
+        $this->languages = [];
+
+        $directory = IdeSystem::getOwnFile('languages');
+
+        if (self::isDevelopment() && !fs::isDir($directory)) {
+            $directory = IdeSystem::getOwnFile('misc/languages');
+        }
+
+        fs::scan($directory, function ($path) {
+            if (fs::isDir($path)) {
+                $code = fs::name($path);
+
+                Logger::info("Add ide language '$code', path = $path");
+
+                $this->languages[$code] = new IdeLanguage($code, $path);
+            }
+        }, 1);
+
+        $ideLanguage = $this->getUserConfigValue('ide.language', System::getProperty('user.language'));
+
+        if (!$this->languages[$ideLanguage]) {
+            $ideLanguage = 'en';
+        }
+
+        $this->language = $this->languages[$ideLanguage];
+
+        if ($this->language) {
+            $this->language->load();
+        }
+
+        if ($altLanguage = $this->languages[$this->language->getAltLang()]) {
+            $altLanguage->load();
+        }
+
+        $this->setUserConfigValue('ide.language', $ideLanguage);
     }
 
     /**

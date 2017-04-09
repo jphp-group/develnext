@@ -16,7 +16,7 @@ class SaveProjectCommand extends AbstractProjectCommand
 {
     public function getName()
     {
-        return 'Сохранить';
+        return _('menu.project.save');
     }
 
     public function getIcon()
@@ -50,7 +50,7 @@ class SaveProjectCommand extends AbstractProjectCommand
             $marker->tooltipText = "Нажмите на это поле, \nчтобы добавить выделенный компонент!";
             $marker->show();*/
 
-            Ide::get()->getMainForm()->toast('Проект успешно сохранен');
+            Ide::get()->getMainForm()->toast(_('toast.project.save.done'));
         }
     }
 }

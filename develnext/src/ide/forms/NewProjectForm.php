@@ -58,6 +58,8 @@ class NewProjectForm extends AbstractIdeForm
 
     public function init()
     {
+        parent::init();
+
         $this->contextMenu = new ContextMenu();
 
         $this->contextMenu->addCommand(AbstractCommand::make('Удалить', 'icons/delete16.png', function () {
@@ -181,7 +183,7 @@ class NewProjectForm extends AbstractIdeForm
         $template = Items::first($this->templateList->selectedItems);
 
         if (!$template || !is_object($template)) {
-            UXDialog::show('Выберите шаблон для проекта');
+            UXDialog::show(_('project.new.alert.select.template'));
             return;
         }
 
@@ -189,7 +191,7 @@ class NewProjectForm extends AbstractIdeForm
 
         if (!$path->isDirectory()) {
             if (!$path->mkdirs()) {
-                UXDialog::show('Невозможно создать папку проектов', 'ERROR');
+                UXDialog::show(_('project.new.error.create.project.directory'), 'ERROR');
                 return;
             }
         }
@@ -197,12 +199,12 @@ class NewProjectForm extends AbstractIdeForm
         $name = str::trim($this->nameField->text);
 
         if (!$name) {
-            UXDialog::show('Введите название для нового проекта', 'ERROR');
+            UXDialog::show(_('project.new.error.name.required'), 'ERROR');
             return;
         }
 
         if (!fs::valid($name)) {
-            UXDialog::show("Введите корректное название для проекта, подходящее для файловой системы! \n\n$name", 'ERROR');
+            UXDialog::show(_('project.new.error.name.invalid') . " \n\n$name", 'ERROR');
             return;
         }
 
@@ -211,7 +213,7 @@ class NewProjectForm extends AbstractIdeForm
         $regex = new Regex('^[a-z\\_]{2,15}$');
 
         if (!$regex->test($package)) {
-            UXDialog::show("Введите корректный код для проекта\n* От 2 до 15 символов, только маленькие английские буквы и '_'.", 'ERROR');
+            UXDialog::show(_('project.new.error.package.invalid') . "\n* " . _('project.new.error.package.invalid.description'), 'ERROR');
             return;
         }
 

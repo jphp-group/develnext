@@ -4,7 +4,16 @@ namespace ide\forms;
 use ide\Ide;
 use ide\Logger;
 use php\gui\framework\AbstractForm;
+use php\gui\framework\DataUtils;
 use php\gui\UXForm;
+use php\gui\UXLabeled;
+use php\gui\UXMenu;
+use php\gui\UXMenuBar;
+use php\gui\UXMenuItem;
+use php\gui\UXNode;
+use php\gui\UXTextInputControl;
+use php\lib\str;
+use php\util\Regex;
 
 /**
  * Class AbstractIdeForm
@@ -38,4 +47,15 @@ class AbstractIdeForm extends AbstractForm
             Ide::get()->trigger('hideForm', [$this]);
         }, __CLASS__);
     }
+
+    protected function init()
+    {
+        parent::init();
+
+        $l10n = Ide::get()->getL10n();
+
+        $this->title = $l10n->translate($this->title);
+        $l10n->translateNode($this->layout);
+    }
+
 }

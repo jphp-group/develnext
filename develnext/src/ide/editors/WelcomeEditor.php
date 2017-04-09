@@ -17,7 +17,7 @@ class WelcomeEditor extends AbstractEditor
 
     public function getTitle()
     {
-        return 'Добро пожаловать';
+        return _('welcome.title');
     }
 
     public function isAutoClose()
@@ -43,6 +43,8 @@ class WelcomeEditor extends AbstractEditor
         $loader = new UXLoader();
 
         $layout = $loader->load('res://.forms/blocks/_Welcome.fxml');
+
+        Ide::get()->getL10n()->translateNode($layout);
 
         $layout->lookup('#createProjectButton')->on('click', function () {
             Ide::get()->executeCommand(NewProjectCommand::class);

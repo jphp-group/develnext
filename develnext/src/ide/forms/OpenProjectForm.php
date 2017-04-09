@@ -106,20 +106,20 @@ class OpenProjectForm extends AbstractIdeForm
             $titleDescription->style = '-fx-text-fill: gray;';
 
             if (!$titleDescription->text) {
-                $titleDescription->text = 'Проект без описания ...';
+                $titleDescription->text = _('project.open.empty.description');
             }
 
             $actions = new UXHBox();
             $actions->spacing = 7;
 
-            $openLink = new UXHyperlink('Открыть');
+            $openLink = new UXHyperlink(_('project.open.action'));
             $openLink->on('click', function () use ($resource, $cell) {
                 $cell->listView->selectedIndex = $cell->listView->items->indexOf($resource);
                 $this->doCreate(UXEvent::makeMock($cell->listView));
             });
             $actions->add($openLink);
 
-            $deleteLink = new UXHyperlink('Удалить');
+            $deleteLink = new UXHyperlink(_('project.open.action.delete'));
             $deleteLink->on('click', function () use ($resource, $cell) {
                 $cell->listView->selectedIndex = $cell->listView->items->indexOf($resource);
                 $this->doDelete(UXEvent::makeMock($cell->listView));
@@ -144,7 +144,7 @@ class OpenProjectForm extends AbstractIdeForm
         $this->sharedList->setCellFactory(function (UXListCell $cell, $item) {
             if ($item instanceof ServiceResponse) {
                 if ($item->isNotSuccess()) {
-                    $cell->text = 'Ошибка, список проектов недоступен.';
+                    $cell->text = _('project.open.error.unavailable');
                     $cell->textColor = 'gray';
                 }
             } else {
@@ -154,7 +154,7 @@ class OpenProjectForm extends AbstractIdeForm
         });
 
         $this->projectListHelper = new FlowListViewDecorator($this->projectList->content);
-        $this->projectListHelper->setEmptyListText('Список проектов пуст.');
+        $this->projectListHelper->setEmptyListText(_('project.open.empty.list'));
         $this->projectListHelper->setMultipleSelection(true);
         $this->projectListHelper->on('remove', [$this, 'doRemove']);
         $this->projectListHelper->on('beforeRemove', function ($nodes) {
@@ -176,7 +176,7 @@ class OpenProjectForm extends AbstractIdeForm
 
         $this->icon->image = Ide::get()->getImage('icons/open32.png')->image;
         $this->modality = 'APPLICATION_MODAL';
-        $this->title = 'Открыть проект';
+        $this->title = _('project.open.title');
 
         Ide::accountManager()->bind('login', [$this, 'updateShared']);
         Ide::accountManager()->bind('logout', [$this, 'updateShared']);
@@ -184,20 +184,20 @@ class OpenProjectForm extends AbstractIdeForm
 
     protected function sharedCellFactory(array $item)
     {
-        $name = $item['name'] ?: 'Неизвестный проект';
+        $name = $item['name'] ?: _('project.open.unknown.project');
 
         $titleName = new UXLabel($name);
         $titleName->style = '-fx-font-weight: bold;';
 
-        $titleDescription = new UXLabel("Обновлено: " . (new Time($item['updatedAt']))->toString('dd.MM.yyyy HH:mm'));
+        $titleDescription = new UXLabel(_('project.open.updated.at') . ": " . (new Time($item['updatedAt']))->toString('dd.MM.yyyy HH:mm'));
         $titleDescription->style = '-fx-text-fill: gray;';
 
         $actions = new UXHBox();
         $actions->spacing = 7;
 
-        $openLink = new UXHyperlink('Открыть');
+        $openLink = new UXHyperlink(_('project.open.action'));
         $openLink->on('click', function () use ($item) {
-            $this->showPreloader('Подождите ...');
+            $this->showPreloader(_('project.open.wait'));
             $form = new SharedProjectDetailForm($item['uid']);
 
             if ($form->showDialog()) {
@@ -208,7 +208,7 @@ class OpenProjectForm extends AbstractIdeForm
         });
         $actions->add($openLink);
 
-        $deleteLink = new UXHyperlink('Удалить');
+        $deleteLink = new UXHyperlink(_('project.open.action.delete'));
         $deleteLink->on('click', function () use ($item, $name) {
             if (MessageBoxForm::confirmDelete($name, $this)) {
                 $response = Ide::service()->projectArchive()->delete($item['id']);
@@ -224,9 +224,9 @@ class OpenProjectForm extends AbstractIdeForm
         });
         $actions->add($deleteLink);
 
-        $actions->add(new UXLabel("Просмотров: {$item['viewCount']}"));
-        $actions->add(new UXLabel("Скачиваний: {$item['downloadCount']}"));
-        $actions->add(new UXLabel("Клонирований: {$item['cloneCount']}"));
+        $actions->add(new UXLabel(_("project.open.view.count") . ": {$item['viewCount']}"));
+        $actions->add(new UXLabel(_("project.open.download.count") . ": {$item['downloadCount']}"));
+        $actions->add(new UXLabel(_("project.open.clone.count") . ": {$item['cloneCount']}"));
 
         $title = new UXVBox([$titleName, $titleDescription, $actions]);
         $title->spacing = 0;
@@ -243,7 +243,7 @@ class OpenProjectForm extends AbstractIdeForm
     {
         $emptyText = $this->projectListHelper->getEmptyListText();
 
-        $this->projectListHelper->setEmptyListText('Поиск проектов, подождите ...');
+        $this->projectListHelper->setEmptyListText(_('project.open.searching'));
         $this->projectListHelper->clear();
 
         $th = new Thread(function () use ($emptyText) {
@@ -424,7 +424,7 @@ class OpenProjectForm extends AbstractIdeForm
                 }
 
                 if (!FileUtils::deleteDirectory($directory)) {
-                    Notifications::error('Ошибка удаления', 'Папка проекта была не удалена полностью, возможно она занята другими программами.');
+                    Notifications::error(_('project.open.error.delete.title'), _('project.open.error.delete.description'));
                     $this->update();
                 }
             }
@@ -441,7 +441,7 @@ class OpenProjectForm extends AbstractIdeForm
             $file = $node ? $node->data('file') : null;
 
             if ($file && $file->exists()) {
-                $this->showPreloader('Подождите ...');
+                $this->showPreloader(_('project.open.wait'));
 
                 waitAsync(100, function () use ($file) {
                     try {
@@ -452,7 +452,7 @@ class OpenProjectForm extends AbstractIdeForm
                     }
                 });
             } else {
-                UXDialog::show('Ошибка открытия проекта', 'ERROR');
+                UXDialog::show(_('project.open.error'), 'ERROR');
             }
         }
     }
@@ -490,14 +490,14 @@ class OpenProjectForm extends AbstractIdeForm
 
             if (!$path->isDirectory()) {
                 if (!$path->mkdirs()) {
-                    UXDialog::show('Невозможно создать папку проектов', 'ERROR');
+                    UXDialog::show(_('project.open.fail.create.directory'), 'ERROR');
                     return;
                 }
             }
 
             $name = FileUtils::stripExtension(File::of($selected->getPath())->getName());
 
-            $this->showPreloader('Подождите ...');
+            $this->showPreloader(_('project.open.wait'));
 
             waitAsync(100, function () use ($path, $name, $selected) {
                 try {

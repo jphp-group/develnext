@@ -19,7 +19,7 @@ class ExportProjectCommand extends AbstractProjectCommand
 {
     public function getName()
     {
-        return 'Сохранить как архив';
+        return _('menu.project.save.as.archive');
     }
 
     public function getIcon()
@@ -63,10 +63,10 @@ class ExportProjectCommand extends AbstractProjectCommand
 
                 $project->export($file);
 
-                Ide::toast('Проект успешно сохранен в zip архив');
+                Ide::toast(_('toast.project.save.zip.done'));
             }
         } else {
-            UXDialog::show('Для экспортирования необходимо открыть или создать проект');
+            UXDialog::show(_('alert.project.export.fail'));
         }
     }
 }

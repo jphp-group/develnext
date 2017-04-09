@@ -9,7 +9,7 @@ class AboutCommand extends AbstractCommand
 {
     public function getName()
     {
-        return 'О проекте';
+        return _('menu.help.about');
     }
 
     public function isAlways()

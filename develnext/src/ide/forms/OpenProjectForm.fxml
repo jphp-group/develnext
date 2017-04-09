@@ -12,7 +12,7 @@
    <children>
       <Separator layoutX="21.0" layoutY="46.0" prefHeight="32.0" prefWidth="573.0" AnchorPane.leftAnchor="21.0" AnchorPane.rightAnchor="20.0" />
       <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="21.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
-      <Label layoutX="61.0" layoutY="14.0" prefHeight="32.0" prefWidth="533.0" text="Открыть проект" AnchorPane.leftAnchor="61.0" AnchorPane.rightAnchor="20.0">
+      <Label layoutX="61.0" layoutY="14.0" prefHeight="32.0" prefWidth="533.0" text="{project.open.title}" AnchorPane.leftAnchor="61.0" AnchorPane.rightAnchor="20.0">
          <font>
             <Font name="Tahoma" size="17.0" />
          </font>
@@ -22,11 +22,11 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Label layoutX="22.0" layoutY="443.0" prefHeight="24.0" prefWidth="559.0" text="Папка избранных проектов:" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="33.0" />
+      <Label layoutX="22.0" layoutY="443.0" prefHeight="24.0" prefWidth="559.0" text="{project.open.favorite.directory}:" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="33.0" />
       <TextField id="pathField" disable="true" editable="false" layoutX="54.0" layoutY="467.0" prefHeight="25.0" prefWidth="533.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="27.0" />
       <TabPane id="tabPane" layoutX="31.0" layoutY="116.0" prefHeight="344.0" prefWidth="617.0" styleClass="dn-style" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="81.0" AnchorPane.leftAnchor="31.0" AnchorPane.rightAnchor="33.0" AnchorPane.topAnchor="116.0">
         <tabs>
-          <Tab text="Избранное">
+          <Tab text="{project.open.favorites}">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -39,7 +39,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-          <Tab text="Демо и примеры">
+          <Tab text="{project.open.demos}">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -48,7 +48,7 @@
                   </AnchorPane>
             </content>
           </Tab>
-            <Tab styleClass="icon-library" text="Библиотека">
+            <Tab styleClass="icon-library" text="{project.open.library}">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -57,12 +57,12 @@
                   </AnchorPane>
                </content>
             </Tab>
-            <Tab text="Публичное">
+            <Tab text="{project.open.public}">
               <content>
                 <AnchorPane id="sharedPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <ListView id="sharedList" fixedCellSize="64.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
-                        <Label layoutX="3.0" layoutY="289.0" prefHeight="24.0" prefWidth="610.0" text="* Ваши опубликованные проекты на сайте develnext.org" textFill="#a4a4a4" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" />
+                        <Label layoutX="3.0" layoutY="289.0" prefHeight="24.0" prefWidth="610.0" text="* {project.open.public.desc}" textFill="#a4a4a4" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" />
                      </children></AnchorPane>
               </content>
             </Tab>
@@ -70,12 +70,12 @@
       </TabPane>
       <HBox alignment="CENTER_LEFT" layoutX="32.0" layoutY="76.0" prefHeight="28.0" prefWidth="617.0" spacing="10.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="32.0">
          <children>
-            <Button id="openButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Открыть другой ...">
+            <Button id="openButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="{project.open.file}">
                <padding>
                   <Insets left="15.0" right="15.0" />
                </padding>
             </Button>
-            <Label prefHeight="24.0" text="Выбрать файл или zip-архив с проектом и открыть" textFill="#6f6f6f" />
+            <Label prefHeight="24.0" text="{project.open.file.desc}" textFill="#6f6f6f" />
          </children>
       </HBox>
    </children>

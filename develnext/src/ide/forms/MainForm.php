@@ -38,6 +38,7 @@ use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXMenu;
 use php\gui\UXMenuBar;
+use php\gui\UXMenuItem;
 use php\gui\UXNode;
 use php\gui\UXScreen;
 use php\gui\UXSplitPane;
@@ -227,10 +228,49 @@ class MainForm extends AbstractIdeForm
         $menu->text = $text;
     }
 
+    /**
+     * @event showing
+     */
+    public function doShowing()
+    {
+        Ide::get()->getL10n()->translateNode($this->mainMenu);
+    }
+
     public function show()
     {
         parent::show();
         Logger::info("Show main form ...");
+
+        $ideLanguage = Ide::get()->getLanguage();
+
+        $menu = $this->findSubMenu('menuL10n');
+        $menu->items->clear();
+
+        if ($ideLanguage) {
+            $menu->graphic = Ide::get()->getImage(new UXImage($ideLanguage->getIcon()));
+            $menu->text = 'Language';
+        }
+
+        foreach (Ide::get()->getLanguages() as $language) {
+            $item = new UXMenuItem($language->getTitle(), Ide::get()->getImage(new UXImage($language->getIcon())));
+
+            if ($language->getTitle() != $language->getTitleEn()) {
+                $item->text .= ' (' . $language->getTitleEn() . ')';
+            }
+
+            //$item->enabled = !$ideLanguage || $language->getCode() != $ideLanguage->getCode();
+
+            $item->on('action', function () use ($language, $item, $menu) {
+                $msg = new MessageBoxForm($language->getRestartMessage(), ['OK']);
+                $msg->makeWarning();
+                $msg->showDialog();
+
+                $menu->graphic = Ide::get()->getImage(new UXImage($language->getIcon()));
+                Ide::get()->setUserConfigValue('ide.language', $language->getCode());
+            });
+
+            $menu->items->add($item);
+        }
 
         $screen = UXScreen::getPrimary();
 
@@ -287,15 +327,6 @@ class MainForm extends AbstractIdeForm
                 $this->splitTree->dividerPositions = $this->ideConfig()->getArray('splitTree.dividerPositions', [0.3]);
             }
         });
-
-       /* $overlay = new UXAnchorPane();
-        $overlay->opacity = 0.01;
-        UXAnchorPane::setAnchor($overlay, 0);
-        $this->layout->add($overlay);*/
-
-
-        //$this->projectTabs->tabs[0]->graphic = ico('settings16');
-        //$this->projectTabs->tabs[1]->graphic = ico('tree16');
     }
 
     /**
@@ -313,12 +344,12 @@ class MainForm extends AbstractIdeForm
         $project = Ide::get()->getOpenedProject();
 
         if ($project) {
-            $dialog = new MessageBoxForm("Хотите открыть текущий проект ({$project->getName()}) при следующем запуске среды?", [
-                'yes' => 'Да, открыть проект',
-                'no'  => 'Нет',
-                'abort' => 'Отмена, не закрывать среду'
+            $dialog = new MessageBoxForm(_('exit.project.message', $project->getName()), [
+                'yes' => _('exit.project.yes'),
+                'no'  => _('exit.project.no'),
+                'abort' => _('exit.project.abort')
             ]);
-            $dialog->title = 'Закрытие проекта';
+            $dialog->title = _('exit.project.title');
 
             if ($dialog->showDialog()) {
                 $result = $dialog->getResult();
@@ -346,7 +377,7 @@ class MainForm extends AbstractIdeForm
         } else {
             Ide::get()->setUserConfigValue('lastProject', null);
 
-            $dialog = new MessageBoxForm('Вы уверены, что хотите выйти из среды?', ['Да, выйти', 'Нет']);
+            $dialog = new MessageBoxForm(_('exit.message'), [_('exit.yes'), _('exit.no')]);
             if ($dialog->showDialog() && $dialog->getResultIndex() == 0) {
                 $this->hide();
 

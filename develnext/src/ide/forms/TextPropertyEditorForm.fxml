@@ -10,16 +10,16 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="247.0" prefWidth="428.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TextArea id="textArea" layoutX="14.0" layoutY="14.0" prefHeight="239.0" prefWidth="442.0" promptText="Введите текст" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <Button id="applyButton" defaultButton="true" layoutX="366.0" layoutY="262.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="110.0" style="-fx-font-weight: bold;" text="Применить" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <TextArea id="textArea" layoutX="14.0" layoutY="14.0" prefHeight="239.0" prefWidth="442.0" promptText="{prompt.enter.text}" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <Button id="applyButton" defaultButton="true" layoutX="366.0" layoutY="262.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="110.0" style="-fx-font-weight: bold;" text="{btn.apply}" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button id="cancelButton" layoutX="280.0" layoutY="262.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="80.0" text="Отмена" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="115.0">
+      <Button id="cancelButton" layoutX="280.0" layoutY="262.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="80.0" text="{btn.cancel}" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="115.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button id="copyButton" layoutX="20.0" layoutY="207.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="127.0" styleClass="icon-copy" text="Скопировать" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+      <Button id="copyButton" layoutX="20.0" layoutY="207.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="127.0" styleClass="icon-copy" text="{btn.copy}" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>

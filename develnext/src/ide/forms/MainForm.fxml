@@ -22,15 +22,16 @@
                             <children>
                                 <MenuBar focusTraversable="false" prefHeight="25.0" prefWidth="900.0">
                                     <menus>
-                                        <Menu id="menuProject" mnemonicParsing="false" text="Проект"/>
+                                        <Menu id="menuProject" mnemonicParsing="false" text="{menu.project}"/>
                                         <!-- <Menu id="menuSettings" mnemonicParsing="false" text="Настройки"/> -->
                                         <!-- <Menu id="menuLibrary" mnemonicParsing="false" text="Библиотека"/> -->
-                                        <Menu id="menuAccount" text="Аккаунт" visible="false"/>
-                                        <Menu id="menuRun" text="Запуск"/>
-                                        <Menu id="menuHelp" text="Помощь"/>
+                                        <Menu id="menuAccount" text="{menu.account}" visible="false"/>
+                                        <Menu id="menuRun" text="{menu.run}"/>
+                                        <Menu id="menuHelp" text="{menu.help}"/>
+                                        <Menu id="menuL10n" text="Language" />
                                         <Menu id="menuCreate" disable="true" mnemonicParsing="false"
                                               style="-fx-text-fill: transparent; -fx-pref-width: 0; -fx-font-size: 0;"
-                                              text="Создать"/>
+                                              text="..."/>
                                     </menus>
                                     <opaqueInsets>
                                         <Insets/>
