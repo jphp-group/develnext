@@ -35,8 +35,8 @@ class TreeShowInExplorerCommand extends AbstractMenuCommand
                 $desktop->open($file);
             } else {
                 if (Ide::get()->isWindows()) {
-                    $process = new Process(['explorer.exe', '/select,'.$file]);
-                    $process->start();
+                    $file = fs::abs($file);
+                    $output = `explorer /select,$file`;
                 } else {
                     $desktop->open($file->getParent());
                 }
