@@ -37,6 +37,14 @@ class TrayIcon
         $this->image = $image;
     }
 
+    /**
+     * @param string $caption
+     * @param string $text
+     * @param string $messageType
+     */
+	public function displayMessage($caption, $text, $messageType)
+    {
+    }
 
     /**
      * @param string $event
