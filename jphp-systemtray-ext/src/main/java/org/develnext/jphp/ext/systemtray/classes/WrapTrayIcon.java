@@ -59,6 +59,11 @@ public class WrapTrayIcon extends BaseWrapper<TrayIcon> {
     public void setTooltip(String tooltip) {
         getWrappedObject().setToolTip(tooltip);
     }
+    
+    @Signature
+	public void displayMessage(String caption, String text, String messageType) {
+		getWrappedObject().displayMessage(caption, text, TrayIcon.MessageType.valueOf(messageType));
+	}
 
     @Signature
     @SuppressWarnings("unchecked")
