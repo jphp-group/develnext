@@ -163,6 +163,7 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
     }
 
     /**
+     * @deprecated use waitAsync
      * @param int $delay millis
      * @param callable $callback
      * @return TimerScript

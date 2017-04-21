@@ -602,11 +602,11 @@ class CodeEditor extends AbstractEditor
 
         $ui->requestLayout();
 
-        TimerScript::executeAfter(500, function () use ($ui) {
+        waitAsync(500, function () use ($ui) {
             $ui->requestLayout();
         });
 
-        TimerScript::executeAfter(1000, function () use ($ui) {
+        waitAsync(1000, function () use ($ui) {
             $ui->requestLayout();
         });
     }
