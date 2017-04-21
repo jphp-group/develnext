@@ -43,7 +43,7 @@ class AutoDestroyBehaviour extends AnimationBehaviour
         $this->timer(50, function (ScriptEvent $e) use ($target) {
             $e->sender->stop();
 
-            TimerScript::executeAfter($this->delay, function () use ($target, $e) {
+            waitAsync($this->delay, function () use ($target, $e) {
                 if ($target->isFree()) {
                     return;
                 }

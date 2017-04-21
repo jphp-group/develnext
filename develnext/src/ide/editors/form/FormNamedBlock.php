@@ -84,8 +84,8 @@ class FormNamedBlock extends UXAnchorPane
                     $this->updateLabelX();
                 };
                 uiLater($v);
-                TimerScript::executeAfter(100, $v); // fix bug!
-                TimerScript::executeAfter(1000, $v); // fix bug!
+                waitAsync(100, $v); // fix bug!
+                waitAsync(1000, $v); // fix bug!
             } else {
                 uiLater(function () use ($label) {
                     $label->free();

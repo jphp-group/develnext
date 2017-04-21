@@ -42,7 +42,7 @@ abstract class AnimationBehaviour extends AbstractBehaviour
     public function apply($target)
     {
         if ($this->delay > 0 && $this->when == 'ALWAYS') {
-            TimerScript::executeAfter($this->delay, function () use ($target) {
+            waitAsync($this->delay, function () use ($target) {
                 $this->__apply($target);
             });
         } else {
