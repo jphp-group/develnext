@@ -159,6 +159,11 @@ class Project
     protected $inspectors = [];
 
     /**
+     * @var ThreadPool
+     */
+    protected $inspectorLoaderThreadPoll;
+
+    /**
      * Project constructor.
      *
      * @param string $rootDir
@@ -178,7 +183,7 @@ class Project
         $this->refactorManager = new ProjectRefactorManager($this);
 
         $this->tickTimer = new TimerScript(1000 * 9, true, [$this, 'doTick']);
-        $this->inspectorLoaderThreadPoll = ThreadPool::createFixed(2);
+        //gi$this->inspectorLoaderThreadPoll = ThreadPool::createFixed(2);
     }
 
     /**
@@ -1242,13 +1247,15 @@ class Project
             return;
         }
 
-        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
-            foreach ($inspectors as $one) {
-                if (!$one->loadSourceWithCache($path)) {
-                    Logger::warn("Unable to load source for inspector, $path");
+        if (!$this->inspectorLoaderThreadPoll->isShutdown()) {
+            $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
+                foreach ($inspectors as $one) {
+                    if (!$one->loadSourceWithCache($path)) {
+                        Logger::warn("Unable to load source for inspector, $path");
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public function unloadSourceForInspector($path)
@@ -1259,11 +1266,13 @@ class Project
             Logger::warn("Unable to unloadSourceForInspector(), inspectors are empty.");
         }
 
-        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
-            foreach ($inspectors as $one) {
-                $one->unloadSource($path);
-            }
-        });
+        if (!$this->inspectorLoaderThreadPoll->isShutdown()) {
+            $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
+                foreach ($inspectors as $one) {
+                    $one->unloadSource($path);
+                }
+            });
+        }
     }
 
     public function loadDirectoryForInspector($path, array $options = [], callable $done = null)
@@ -1276,15 +1285,17 @@ class Project
             Logger::warn("Unable to loadDirectoryForInspector(), inspectors are empty.");
         }
 
-        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors, $options, $done) {
-            foreach ($inspectors as $one) {
-                $one->loadDirectory($path, $options);
-            }
+        if (!$this->inspectorLoaderThreadPoll->isShutdown()) {
+            $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors, $options, $done) {
+                foreach ($inspectors as $one) {
+                    $one->loadDirectory($path, $options);
+                }
 
-            if ($done) {
-                $done();
-            }
-        });
+                if ($done) {
+                    $done();
+                }
+            });
+        }
     }
 
     public function unloadDirectoryForInspector($path)
@@ -1295,11 +1306,13 @@ class Project
             Logger::warn("Unable to unloadDirectoryForInspector(), inspectors are empty.");
         }
 
-        $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
-            foreach ($inspectors as $one) {
-                $one->unloadDirectory($path);
-            }
-        });
+        if (!$this->inspectorLoaderThreadPoll->isShutdown()) {
+            $this->inspectorLoaderThreadPoll->execute(function () use ($path, $inspectors) {
+                foreach ($inspectors as $one) {
+                    $one->unloadDirectory($path);
+                }
+            });
+        }
     }
 
     /**
