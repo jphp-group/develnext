@@ -10,6 +10,7 @@ use php\lang\IllegalStateException;
 use php\lang\InterruptedException;
 use php\lang\Thread;
 use php\lib\str;
+use php\time\Timer;
 use php\xml\DomDocument;
 use timer\AccurateTimer;
 
@@ -24,12 +25,12 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
     /**
      * @var int
      */
-    public $interval = 1000;
+    private $interval = 1000;
 
     /**
      * @var bool
      */
-    public $repeatable = false;
+    private $repeatable = false;
 
     /**
      * @var bool
@@ -42,7 +43,7 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
     protected $stopped = false;
 
     /**
-     * @var Thread
+     * @var Timer
      */
     protected $th;
 
@@ -61,8 +62,7 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
             $this->on('action', $action);
         }
     }
-
-
+    
     /**
      * @param $target
      * @return mixed
@@ -82,34 +82,39 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
 
         $this->stopped = false;
 
-        $this->th = (new Thread(function() {
-            try {
-                Thread::sleep($this->interval < 1 ? 1 : $this->interval);
-
-                if (!$this->stopped && !$this->disabled) {
-                    UXApplication::runLater([$this, 'doInterval']);
-                }
-            } catch (InterruptedException $e) {
-                ;
-            } catch (IllegalStateException $e) {
-                if ($e->getMessage() != "java.lang.IllegalStateException: Platform.exit has been called") {
-                    throw $e;
-                }
+        $callback = function (Timer $self) {
+            if (!$this->stopped && !$this->disabled) {
+                uiLater([$this, 'doInterval']);
             }
-        }));
-        $this->th->setName("TimerScript[interval=$this->interval] #" . str::random());
 
-        $this->th->start();
+            if ($this->stopped) {
+                $self->cancel();
+            }
+        };
+
+        if ($this->repeatable) {
+            $this->th = Timer::every($this->interval, $callback);
+        } else {
+            $this->th = Timer::after($this->interval, $callback);
+        }
     }
 
     public function stop()
     {
         $this->stopped = true;
 
-        if ($this->th && $this->th->isAlive()) {
-            $this->th->interrupt();
+        if ($this->th) {
+            $this->th->cancel();
         }
     }
+
+    public function free()
+    {
+        parent::free();
+        
+        $this->stop();
+    }
+
 
     public function isStopped()
     {
@@ -118,7 +123,7 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
 
     public function isRunning()
     {
-        return !$this->stopped && ($this->th && $this->th->isAlive());
+        return !$this->stopped && $this->th;
     }
 
     protected function doInterval()
@@ -132,9 +137,47 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
         if ($this->stopped || $this->disabled) {
             return;
         }
+    }
 
-        if ($this->repeatable) {
-            $this->start(true);
+    /**
+     * @return int
+     */
+    public function getInterval()
+    {
+        return $this->interval;
+    }
+
+    /**
+     * @param int $interval
+     */
+    public function setInterval($interval)
+    {
+        if ($interval != $this->interval) {
+            $this->interval = $interval;
+
+            $this->stop();
+            $this->start();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRepeatable()
+    {
+        return $this->repeatable;
+    }
+
+    /**
+     * @param bool $repeatable
+     */
+    public function setRepeatable($repeatable)
+    {
+        if ($repeatable != $this->repeatable) {
+            $this->repeatable = $repeatable;
+
+            $this->stop();
+            $this->start();
         }
     }
 
@@ -163,21 +206,21 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
     }
 
     /**
-     * @deprecated use waitAsync
-     * @param int $delay millis
+     * @deprecated use waitAsync or Timer::after()
+     * @param string $period
      * @param callable $callback
      * @return TimerScript
      */
-    static function executeAfter($delay, callable $callback)
+    static function executeAfter($period, callable $callback)
     {
-        if ($delay <= 0) {
+        if ($period <= 0) {
             $callback();
             return null;
         }
 
         $timer = new TimerScript();
         $timer->repeatable = false;
-        $timer->interval = $delay;
+        $timer->interval = $period;
         $timer->on('action', $callback);
         $timer->start();
 
@@ -191,14 +234,13 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
             return null;
         }
 
-        $timer = new AccurateTimer($checkInterval, function () use ($callback, $condition) {
+        $timer = Timer::every($checkInterval, function (Timer $self) use ($callback, $condition) {
             if ($condition()) {
-                $callback();
-                return true;
+                $self->cancel();
+                uiLater($callback);
             }
         });
 
-        $timer->start();
         return $timer;
     }
 
