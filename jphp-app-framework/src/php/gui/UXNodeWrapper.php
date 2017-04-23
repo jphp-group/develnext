@@ -7,6 +7,8 @@ use php\gui\event\UXEvent;
 use php\gui\event\UXKeyboardManager;
 use php\gui\event\UXKeyEvent;
 use php\gui\framework\AbstractForm;
+use php\gui\framework\AbstractScript;
+use php\gui\framework\ScriptEvent;
 use php\gui\framework\View;
 use php\lib\arr;
 use php\lib\str;
@@ -15,7 +17,7 @@ use script\TimerScript;
 class UXNodeWrapper
 {
     /**
-     * @var UXNode
+     * @var AbstractScript|UXNode
      */
     protected $node;
 
@@ -127,7 +129,13 @@ class UXNodeWrapper
         switch ($event) {
             case 'construct':
                 uiLater(function () use ($handler) {
-                    $handler(UXEvent::makeMock($this->node));
+                    if ($this->node instanceof UXNode) {
+                        $handler(UXEvent::makeMock($this->node));
+                    } else if ($this->node instanceof AbstractScript) {
+                        $handler(new ScriptEvent($this->node));
+                    } else {
+                        $handler();
+                    }
                 });
                 return;
 
