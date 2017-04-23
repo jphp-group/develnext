@@ -208,6 +208,22 @@ class SystemTrayScript extends AbstractScript
     }
 
     /**
+     * Displays a popup message near the tray icon.  The message will
+     * disappear after a time or if the user clicks on it.  Clicking
+     * on the message may trigger an ActionEvent.
+     * 
+     * @param string $title
+     * @param string $text
+     * @param string $type NONE, INFO, ERROR, WARNING
+     */
+    public function displayMessage($title, $text, $type = 'NONE')
+    {
+        if ($this->_trayIcon) {
+            $this->_trayIcon->displayMessage($title, $text, $type);
+        }
+    }
+
+    /**
      * Show tray icon.
      */
     public function show()
