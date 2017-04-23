@@ -115,7 +115,7 @@ class HttpClient extends AbstractScript
      */
     public function __construct()
     {
-        $this->_boundary = "===" . str::replace(str::uuid(), "-", "") . Time::millis() . "===";
+        $this->_boundary = Str::random(90);
         $this->_lock = new SharedValue();
     }
 
@@ -355,7 +355,7 @@ class HttpClient extends AbstractScript
 
                     case 'MULTIPART':
                         $connect->setRequestProperty('Cache-Control', 'no-cache');
-                        $connect->setRequestProperty('Content-Type', 'multipart/form-data;boundary=' . $this->_boundary);
+                        $connect->setRequestProperty('Content-Type', 'multipart/form-data; boundary=' . $this->_boundary);
 
                         if (!is_array($this->data)) {
                             $this->data = self::textToArray($this->data);
@@ -390,8 +390,15 @@ class HttpClient extends AbstractScript
     protected function connect(URLConnection $connection, $body)
     {
         if ($body) {
-            $connection->setRequestProperty('Content-Length', str::length($body));
-            $connection->getOutputStream()->write($body);
+            if ($body instanceof Stream) {
+                $readFully = $body->readFully();
+                $connection->setRequestProperty('Content-Length', str::length($readFully));
+                $connection->getOutputStream()->write($readFully);
+                $readFully = null;
+            } else {
+                $connection->setRequestProperty('Content-Length', str::length($body));
+                $connection->getOutputStream()->write($body);
+            }
         }
 
         $response = new HttpResponse();
@@ -502,7 +509,7 @@ class HttpClient extends AbstractScript
     {
         $streams = [];
 
-        $str = '';
+        $out = new MemoryStream();
 
         foreach ($data as $name => $value) {
             if ($value instanceof File) {
@@ -510,52 +517,53 @@ class HttpClient extends AbstractScript
             } else if ($value instanceof Stream) {
                 $streams[$name] = $value;
             } else {
-                $str .= "--";
-                $str .= $this->_boundary;
-                $str .= self::CRLF;
+                $out->write("--");
+                $out->write($this->_boundary);
+                $out->write(self::CRLF);
 
                 $name = urlencode($name);
-                $str .= "Content-Disposition: form-data; name=\"$name\"";
-                $str .= self::CRLF;
+                $out->write("Content-Disposition: form-data; name=\"$name\"");
+                $out->write(self::CRLF);
 
-                $str .= "Content-Type: text/plain; charset={$this->encoding}";
-                $str .= self::CRLF;
-                $str .= self::CRLF;
+                $out->write("Content-Type: text/plain; charset={$this->encoding}");
+                $out->write(self::CRLF);
+                $out->write(self::CRLF);
 
-                $str .= "$value";
-                $str .= self::CRLF;
+                $out->write("$value");
+                $out->write(self::CRLF);
             }
         }
 
         foreach ($streams as $name => $stream) {
             /** @var Stream $stream */
-            $str .= "--";
-            $str .= $this->_boundary;
-            $str .= self::CRLF;
+            $out->write("--");
+            $out->write($this->_boundary);
+            $out->write(self::CRLF);
 
             $name = urlencode($name);
-            $str .= "Content-Disposition: form-data; name=\"$name\"; filename=\"";
-            $str .= urlencode(fs::name($stream->getPath())) . "\"";
-            $str .= self::CRLF;
+            $out->write("Content-Disposition: form-data; name=\"$name\"; filename=\"");
+            $out->write(urlencode(fs::name($stream->getPath())) . "\"");
+            $out->write(self::CRLF);
 
-            $str .= "Content-Type: ";
-            $str .= URLConnection::guessContentTypeFromName($stream->getPath());
-            $str .= self::CRLF;
+            $out->write("Content-Type: ");
+            $out->write(URLConnection::guessContentTypeFromName($stream->getPath()));
+            $out->write(self::CRLF);
 
-            $str .= "Content-Transfer-Encoding: binary";
-            $str .= self::CRLF;
-            $str .= self::CRLF;
+            $out->write("Content-Transfer-Encoding: binary");
+            $out->write(self::CRLF);
+            $out->write(self::CRLF);
 
-            $str .= $stream->readFully();
-            $str .= self::CRLF;
+            $out->write($stream->readFully());
+            $out->write(self::CRLF);
 
             $stream->close();
         }
 
-        $str .= "--$this->_boundary--";
-        $str .= self::CRLF;
+        $out->write("--$this->_boundary--");
+        $out->write(self::CRLF);
+        $out->seek(0);
 
-        return $str;
+        return $out;
     }
 
     protected static function textToArray($text, $trimValues = false)
