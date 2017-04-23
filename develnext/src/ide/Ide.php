@@ -63,6 +63,7 @@ use php\lib\Items;
 use php\lib\reflect;
 use php\lib\Str;
 use php\time\Time;
+use php\time\Timer;
 use php\util\Configuration;
 use php\util\Scanner;
 use script\TimerScript;
@@ -268,7 +269,7 @@ class Ide extends Application
                 if ($this->handleArgs($GLOBALS['argv'])) {
                     Logger::info("Protocol handler is shutdown ide ...");
 
-                    TimerScript::executeAfter(7000, function () {
+                    Timer::after('7s', function () {
                         $this->shutdown();
                     });
                     return;
