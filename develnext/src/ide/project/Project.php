@@ -183,7 +183,7 @@ class Project
         $this->refactorManager = new ProjectRefactorManager($this);
 
         $this->tickTimer = new TimerScript(1000 * 9, true, [$this, 'doTick']);
-        //gi$this->inspectorLoaderThreadPoll = ThreadPool::createFixed(2);
+        $this->inspectorLoaderThreadPoll = ThreadPool::createSingle();
     }
 
     /**
@@ -853,7 +853,7 @@ class Project
         Logger::info("Project loading ...");
 
         $this->inspectors = [];
-        $this->inspectorLoaderThreadPoll = ThreadPool::createSingle();
+        //$this->inspectorLoaderThreadPoll = ThreadPool::createSingle();
 
         $dir = $this->getIdeDir();
 
