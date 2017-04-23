@@ -128,6 +128,8 @@ public class FXLauncher extends Launcher {
     }
 
     public static void main(String[] args) throws Throwable {
+        System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
+        
         FXLauncher launcher = new FXLauncher(args);
         launcher.run();
     }
