@@ -116,7 +116,7 @@ class SplashTipSystem
         $databases = [];
 
         foreach (self::$databases as $database) {
-            if ($database->hasLanguage($lang)) {
+            if ($database && $database->hasLanguage($lang)) {
                 $databases[] = $database;
             }
         }
