@@ -91,7 +91,7 @@ class IdeSandboxShowCommand extends AbstractCommand
 
     public function isAlways()
     {
-        return true;
+        return false;
     }
 
     public function getAccelerator()
