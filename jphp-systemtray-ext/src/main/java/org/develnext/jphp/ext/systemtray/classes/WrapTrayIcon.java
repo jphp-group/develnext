@@ -61,6 +61,16 @@ public class WrapTrayIcon extends BaseWrapper<TrayIcon> {
     }
 
     @Signature
+    public void displayMessage(String title, String text) {
+        displayMessage(title, text, TrayIcon.MessageType.NONE);
+    }
+
+    @Signature
+    public void displayMessage(String title, String text, TrayIcon.MessageType type) {
+        getWrappedObject().displayMessage(title, text, type);
+    }
+
+    @Signature
     @SuppressWarnings("unchecked")
     public void on(String event, Invoker invoker, String group, Environment env) {
         Object target = getWrappedObject();
