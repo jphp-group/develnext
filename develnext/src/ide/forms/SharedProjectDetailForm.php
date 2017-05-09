@@ -91,12 +91,14 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
 
     public function update(array $data)
     {
+        $data['canWrite'] = $data['owner'] == Ide::accountManager()->getAccountData()['id'];
+        
         $this->data = $data;
 
         $this->nameLabel->text = $data['name'] ?: 'Неизвестный проект';
         //$this->descriptionLabel->text = $data['description'] ?: 'У данного проекта нет описания.';
-        $this->urlLink->text = $data['shareUrl'] ? Ide::service()->getEndpoint() . $data['shareUrl'] : 'Неизвестная ссылка';
-        $this->accountLink->text = $data['account']['name'] ?: 'Неизвестно';
+        $this->urlLink->text = $data['sharedUrl'] ? $data['sharedUrl'] : 'Неизвестная ссылка';
+        $this->accountLink->text = $data['ownerData']['login'] ?: 'Неизвестно';
         $this->dateLabel->text = $data['updatedAt'] ? (new Time($data['updatedAt']))->toString('dd.MM.yyyy') : 'Неизвестно';
 
         if ($this->deleteButton) {
@@ -121,7 +123,7 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
 
         $this->showPreloader('Подождите ...');
 
-        Ide::service()->projectArchive()->deleteAsync($this->data['id'], false, function (ServiceResponse $response) {
+        Ide::service()->projectArchive()->deleteAsync($this->data['uid'], function (ServiceResponse $response) {
             $this->hidePreloader();
 
             if ($response->isSuccess()) {
@@ -172,13 +174,13 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
             $this->hidePreloader();
 
             if ($response->isSuccess()) {
-                $this->update($response->data());
+                $this->update($response->result());
 
                 Ide::project()->getIdeServiceConfig()->set('projectArchive.uid', $response->data()['uid']);
 
                 Ide::service()->projectArchive()->updateAsync($this->data['id'], $project->getName(), '', function (ServiceResponse $response) {
                     if ($response->isSuccess()) {
-                        $this->update($response->data());
+                        $this->update($response->result());
                     }
                 });
 
@@ -261,7 +263,7 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
             $this->hidePreloader();
 
             if ($response->isSuccess()) {
-                $this->update($response->data());
+                $this->update($response->result());
             } else {
                 switch ($response->message()) {
                     case 'NotFound':
@@ -299,7 +301,7 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
      */
     public function doOpen()
     {
-        if ($this->data['shareUrl']) {
+        if ($this->data['sharedUrl']) {
             $this->showPreloader('Загрузка файла проекта ...');
 
             $thread = (new Thread(function () {
@@ -307,7 +309,7 @@ class SharedProjectDetailForm extends AbstractOnlineIdeForm
                 $path = Ide::get()->getUserConfigValue('projectDirectory') . "/$name.zip";
 
                 try {
-                    if (Ide::service()->projectArchive()->downloadToFile($this->data['shareUrl'], $path)) {
+                    if (Ide::service()->projectArchive()->download($this->data['uid'], $this->data['downloadKey'], $path)) {
                         UXApplication::runLater(function () use ($path) {
                             $this->setResult(true);
 

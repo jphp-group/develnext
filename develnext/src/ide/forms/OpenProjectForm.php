@@ -8,6 +8,7 @@ use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\library\IdeLibraryProjectResource;
 use ide\library\IdeLibraryResource;
+use ide\Logger;
 use ide\project\Project;
 use ide\project\ProjectConfig;
 use ide\systems\DialogSystem;
@@ -226,7 +227,6 @@ class OpenProjectForm extends AbstractIdeForm
 
         $actions->add(new UXLabel(_("project.open.view.count") . ": {$item['viewCount']}"));
         $actions->add(new UXLabel(_("project.open.download.count") . ": {$item['downloadCount']}"));
-        $actions->add(new UXLabel(_("project.open.clone.count") . ": {$item['cloneCount']}"));
 
         $title = new UXVBox([$titleName, $titleDescription, $actions]);
         $title->spacing = 0;
@@ -349,13 +349,13 @@ class OpenProjectForm extends AbstractIdeForm
                 $preloader = new Preloader($this->sharedPane);
                 $preloader->show();
 
-                Ide::service()->projectArchive()->getListAsync(0, 100, function (ServiceResponse $response) use ($preloader) {
+                Ide::service()->projectArchive()->getListAsync(function (ServiceResponse $response) use ($preloader) {
                     $preloader->hide();
 
                     uiLater(function () use ($response) {
                         if ($response->isSuccess()) {
                             // for performance.
-                            foreach ($response->data() as $one) {
+                            foreach ($response->result() as $one) {
                                 uiLater(function () use ($one) {
                                     $this->sharedList->items->add($one);
                                 });

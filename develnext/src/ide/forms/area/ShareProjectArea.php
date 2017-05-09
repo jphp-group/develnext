@@ -1,4 +1,5 @@
 <?php
+
 namespace ide\forms\area;
 
 use ide\account\api\ServiceResponse;
@@ -15,6 +16,7 @@ use php\gui\UXClipboard;
 use php\gui\UXHyperlink;
 use php\gui\UXLabel;
 use php\gui\UXNode;
+use php\lib\str;
 
 /**
  * Class SyncProjectArea
@@ -59,11 +61,13 @@ class ShareProjectArea extends AbstractFormArea
         $this->_syncPane->free();
 
         if ($data) {
-            if ($this->data['canWrite'] || !isset($this->data['canWrite'])) {
+            $canWrite = Ide::accountManager()->getAccountData()['id'] == $this->data['owner'];
+
+            if ($canWrite) {
                 $this->content->add($this->_syncPane);
 
                 $this->updatedAtLabel->text = TimeUtils::getUpdateAt($data['updatedAt']);
-                $this->setUrl(Ide::service()->getEndpoint() . $data['shareUrl']);
+                $this->setUrl($data['sharedUrl']);
             } else {
                 $this->content->add($this->_nonSyncPane);
             }
@@ -206,32 +210,17 @@ class ShareProjectArea extends AbstractFormArea
 
         $project->export($file);
 
-        $this->showPreloader('Загружаем проект на develnext.org ...');
+        $this->showPreloader('Загружаем проект на hub.develnext.org ...');
 
-        Ide::service()->projectArchive()->uploadNewAsync($file, function (ServiceResponse $response) use ($project) {
-            if ($response->isSuccess()) {
-                $data = $response->data();
-
-                Ide::service()->projectArchive()->updateAsync($data['id'], $project->getName(), '', function (ServiceResponse $response) use ($data) {
-                    $this->hidePreloader();
-
-                    if ($response->isSuccess()) {
-                        Notifications::show('Проект загружен', 'Ваш проект был успешно загружен и опубликован на develnext.org', 'SUCCESS');
-
-                        Ide::project()->getIdeServiceConfig()->set("projectArchive.uid", $data['uid']);
-
-                        uiLater(function () use ($response) {
-                            $this->setData($response->data());
-                        });
-                    } else {
-                        Logger::error("Unable to update project {$response->toLog()}");
-                        Notifications::error('Проект не загружен', 'Что-то пошло не так, попробуйте позже, возможно сервис недоступен.');
-                    }
-                });
+        $failedCallback = function (ServiceResponse $response) {
+            if ($response->isConflict()) {
+                Notifications::error('Проект не загружен', 'У вас уже есть проект с таким именем, измените название проекта.');
             } else {
-                switch ($response->message()) {
+                list($message, $arg) = str::split($response->result(), ':');
+
+                switch ($message) {
                     case 'FileSizeLimit':
-                        $mb = round($response->data() / 1024 / 1024, 2);
+                        $mb = round($arg / 1024 / 1024, 2);
                         Notifications::warning('Проект не загружен', "Проект слишком большой для загрузки, максимум разрешено $mb mb!");
                         break;
                     case 'LimitSpacePerDay':
@@ -244,9 +233,30 @@ class ShareProjectArea extends AbstractFormArea
                         Logger::error("Unable to upload project {$response->toLog()}");
                         Notifications::error('Проект не загружен', 'Что-то пошло не так, попробуйте позже, возможно сервис недоступен.');
                 }
-
-                $this->hidePreloader();
             }
+            
+            $this->hidePreloader();
+        };
+
+        $response = Ide::service()->projectArchive()->createAsync($project->getName(), '', null);
+        $response->on('fail', $failedCallback);
+        $response->on('success', function (ServiceResponse $response) use ($file, $failedCallback) {
+            $projectId = $response->result('id');
+            $projectUid = $response->result('uid');
+
+            $response = Ide::service()->projectArchive()->uploadArchiveAsync($projectId, $file, null);
+            $response->on('fail', $failedCallback);
+
+            $response->on('success', function (ServiceResponse $response) use ($projectUid, $failedCallback) {
+                Notifications::show('Проект загружен', 'Ваш проект был успешно загружен и опубликован на hub.develnext.org', 'SUCCESS');
+
+                Ide::project()->getIdeServiceConfig()->set("projectArchive.uid", $projectUid);
+
+                uiLater(function () use ($response) {
+                    $this->hidePreloader();
+                    $this->setData($response->result());
+                });
+            });
         });
     }
 }
