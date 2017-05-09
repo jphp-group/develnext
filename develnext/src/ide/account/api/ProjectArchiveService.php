@@ -14,7 +14,7 @@ use php\io\FileStream;
  * @method ServiceResponseFuture uploadArchiveAsync($projectId, $file, callable $callback = null)
  * @method uploadNewAsync($file, callable $callback = null)
  * @method uploadOldAsync($id, $file, callable $callback = null)
- * @method updateAsync($id, $name, $description, callable $callback = null)
+ * @method ServiceResponseFuture updateAsync($id, $name, $description, callable $callback = null)
  * @method ServiceResponseFuture getAsync($uid, callable $callback = null)
  * @method deleteAsync($id, callable $callback = null)
  * @method getListAsync(callable $callback = null)
@@ -135,10 +135,9 @@ class ProjectArchiveService extends AbstractService
      */
     public function update($idProject, $name, $description)
     {
-        return $this->execute('project-archive/update', [
-            'id' => $idProject,
+        return $this->execute("project/projects/$idProject", [
             'name' => $name,
             'description' => $description
-        ]);
+        ], 'PUT');
     }
 }

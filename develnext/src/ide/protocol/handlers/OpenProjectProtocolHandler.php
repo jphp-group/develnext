@@ -47,7 +47,7 @@ class OpenProjectProtocolHandler extends AbstractProtocolHandler
                         if ($response->isSuccess()) {
                             uiLater(function () use ($response) {
                                 Notifications::show('Обнаружен проект', 'Мы обнаружили ссылку на общедоступный проект, вы можете его открыть.', 'INFORMATION');
-                                $dialog = new SharedProjectDetailForm($response->data()['uid']);
+                                $dialog = new SharedProjectDetailForm($response->result('uid'));
                                 $dialog->showAndWait();
                             });
                         } else {

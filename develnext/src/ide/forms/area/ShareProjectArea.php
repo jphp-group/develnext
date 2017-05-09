@@ -111,48 +111,61 @@ class ShareProjectArea extends AbstractFormArea
         $project = Ide::project();
         $project->save();
 
-        $this->showPreloader('Загружаем проект на develnext.org ...');
+        $this->showPreloader('Загружаем проект на hub.develnext.org ...');
 
         $file = Ide::get()->createTempFile('.zip');
 
         $project->export($file);
 
-        Ide::service()->projectArchive()->uploadOldAsync($this->data['id'], $file, function (ServiceResponse $response) use ($project, $silent) {
-            if ($response->isSuccess()) {
-                $this->setData($response->data());
+        $res = Ide::service()->projectArchive()->updateAsync($this->data['id'], $project->getName(), '', null);
+        $res->on('success', function (ServiceResponse $res) use ($file, $project, $silent) {
+            $this->setData($res->data());
+            Ide::project()->getIdeServiceConfig()->set('projectArchive.uid', $res->result('uid'));
 
-                Ide::project()->getIdeServiceConfig()->set('projectArchive.uid', $response->data()['uid']);
+            Ide::service()->projectArchive()->uploadArchiveAsync($res->result('id'), $file, function (ServiceResponse $response) use ($project, $silent) {
+                if ($response->isSuccess()) {
+                    $this->setData($response->result());
 
-                Ide::service()->projectArchive()->updateAsync($this->data['id'], $project->getName(), '', function (ServiceResponse $response) {
-                    if ($response->isSuccess()) {
-                        $this->setData($response->data());
+                    if (!$silent) {
+                        $this->hidePreloader();
+                        $this->refresh();
+
+                        uiLater(function () {
+                            Notifications::show('Изменения загружены', 'Измненения в проекте были успешно загружены на hub.develnext.org');
+                        });
                     }
-                });
+                } else {
+                    $this->hidePreloader();
+                    if (!$silent) {
+                        list($message, $arg) = str::split($response->result(), ':');
 
-                if (!$silent) {
-                    $this->refresh();
-
-                    uiLater(function () {
-                        Notifications::show('Проект перезалит', 'Проект был успешно перезалит в общую базу проектов');
-                    });
+                        if ($message === 'FileSizeLimit') {
+                            $mb = round($arg / 1024 / 1024, 2);
+                            Notifications::warning('Проект не загружен', "Проект слишком большой для загрузки, максимум разрешено $mb mb!");
+                        } else {
+                            if ($response->isAccessDenied()) {
+                                Notifications::warning('Доступ запрещен', 'У вас нет доступа на запись к этому проекту, попробуйте его загрузить по новой.');
+                            } else if ($response->isNotFound()) {
+                                Notifications::warning('Проект не найден', 'По неясной причине проект не был найден, попробуйте его загрузить по новой.');
+                            } else {
+                                Notifications::error('Проект не загружен', 'Произошла непредвиденная ошибка, возможно сервис временно недоступен, попробуйте позже.');
+                            }
+                        }
+                    }
                 }
-            } else {
-                if (!$silent) {
-                    switch ($response->message()) {
-                        case 'AccessDenied':
-                            Notifications::warning('Доступ запрещен', 'У вас нет доступа на запись к этому проекту, попробуйте его загрузить по новой.');
-                            break;
-                        case 'NotFound':
-                            Notifications::warning('Проект не найден', 'По неясной причине проект не был найден, попробуйте его загрузить по новой.');
-                            break;
-                        default:
-                            Notifications::error('Проект не перезалит', 'Произошла непредвиденная ошибка, возможно сервис временно недоступен, попробуйте позже.');
-                            break;
-                    }
+            });
+        });
+
+        $res->on('fail', function (ServiceResponse $res) use ($silent) {
+            $this->hidePreloader();
+
+            if (!$silent) {
+                if ($res->isConflict()) {
+                    Notifications::error('Проект не загружен', 'У вас уже есть проект с таким именем, измените название проекта.');
+                } else {
+                    Notifications::error('Проект не загружен', 'Произошла непредвиденная ошибка, возможно сервис временно недоступен, попробуйте позже.');
                 }
             }
-
-            $this->hidePreloader();
         });
     }
 
