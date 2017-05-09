@@ -294,12 +294,6 @@ abstract class AbstractService
                     });
                 }
 
-                if ($connection->responseCode != 200) {
-                    if ($connection->responseCode >= 500) {
-                        throw new ServiceNotAvailableException($connection->responseCode, $data);
-                    }
-                }
-
                 try {
                     $response = new ServiceResponse($connection->responseCode, Json::decode($data));
                 } catch (ProcessorException $e) {
@@ -370,21 +364,23 @@ abstract class AbstractService
 
                 if (!$this->pool->isShutdown()) {
                     $this->pool->execute(function () use ($name, $args, $last, $result) {
-                        $json = $this->{$name}(...$args);
-                        $result->apply($json);
+                        $response = $this->{$name}(...$args);
+                        $result->apply($response);
 
                         if ($last) {
-                            uiLater(function () use ($last, $json, $result) {
-                                $result();
-                                $last($json);
+                            uiLater(function () use ($last, $response, $result) {
+                                $last($response);
                             });
                         }
+
+                        uiLater(function () use ($response, $result) {
+                            $result($response);
+                        });
                     });
                 }
 
                 uiLater(function () use ($result) {
                     $result->__used = true;
-                    $result();
                 });
 
                 return $result;

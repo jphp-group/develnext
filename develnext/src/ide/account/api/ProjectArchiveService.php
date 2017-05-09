@@ -10,13 +10,14 @@ use php\io\FileStream;
  * Class ProjectArchiveService
  * @package ide\account\api
  *
+ * @method ServiceResponseFuture createAsync($name, $description, callable $callback = null)
+ * @method ServiceResponseFuture uploadArchiveAsync($projectId, $file, callable $callback = null)
  * @method uploadNewAsync($file, callable $callback = null)
  * @method uploadOldAsync($id, $file, callable $callback = null)
  * @method updateAsync($id, $name, $description, callable $callback = null)
- * @method getAsync($uid, callable $callback = null)
- * @method deleteAsync($id, $absolutely, callable $callback = null)
- * @method getDownloadUrlAsync($url, callable $callback = null)
- * @method getListAsync($offset, $limit, callable $callback = null)
+ * @method ServiceResponseFuture getAsync($uid, callable $callback = null)
+ * @method deleteAsync($id, callable $callback = null)
+ * @method getListAsync(callable $callback = null)
  */
 class ProjectArchiveService extends AbstractService
 {
@@ -29,81 +30,63 @@ class ProjectArchiveService extends AbstractService
      */
     public function get($uid)
     {
-        return $this->execute('project-archive/get', [
-            'uid' => $uid
-        ]);
+        return $this->executeGet("project/projects/$uid");
     }
 
     /**
-     * @param $url
-     * @param $file
-     * @return bool
+     * @param string $name
+     * @param string $description
+     * @return ServiceResponse
      */
-    public function downloadToFile($url, $file)
+    public function create($name, $description)
     {
-        $url = $this->getDownloadUrl(Ide::service()->getEndpoint() . $url);
-
-        if ($url) {
-            $conn = $this->getUrlConnection(Ide::service()->getEndpoint() . $url);
-
-            $input = $conn->getInputStream();
-            $output = new FileStream($file, 'w+');
-
-            try {
-                while (($buff = $input->read(2048)) !== false) {
-                    $output->write($buff);
-                }
-
-                return true;
-            } catch (IOException $e) {
-                Logger::exception("Unable to download file", $e);
-                return false;
-            } finally {
-                $input->close();
-
-                if ($output) {
-                    $output->close();
-                }
-            }
-        } else {
-            return false;
-        }
+        return $this->execute("project/projects/create", ['name' => $name, 'description' => $description]);
     }
 
     /**
-     * @param $url
-     * @return string
+     * @param string $projectId
+     * @param string $file
+     * @return ServiceResponse
      */
-    public function getDownloadUrl($url)
+    public function uploadArchive($projectId, $file)
     {
+        return $this->upload("project/projects/$projectId/upload", ['file' => $file]);
+    }
+
+    public function download($uid, $downloadKey, $file)
+    {
+        $input = $this->getStream("project/projects/$uid/$downloadKey/download");
+
+        $output = new FileStream($file, 'w+');
+
         try {
-            $conn = $this->getUrlConnection($url);
-
-            if (!$conn) {
-                return null;
+            while (($buff = $input->read(8096)) !== false) {
+                $output->write($buff);
             }
 
-            $conn->getInputStream()->readFully();
-            return $conn->getHeaderField('X-Download-File');
+            return true;
         } catch (IOException $e) {
-            return null;
+            Logger::exception("Unable to download file", $e);
+            return false;
+        } finally {
+            $input->close();
+
+            if ($output) {
+                $output->close();
+            }
         }
     }
 
     /**
-     * @param $id
-     * @param bool|false $absolutely
+     * @param $uid
      * @return ServiceResponse
      * @throws ServiceException
      * @throws ServiceInvalidResponseException
      * @throws ServiceNotAvailableException
      */
-    public function delete($id, $absolutely = false)
+    public function delete($uid)
     {
-        return $this->execute('project-archive/delete', [
-            'id' => $id,
-            'absolutely' => $absolutely
-        ]);
+        return $this->execute("project/projects/$uid", [], 'DELETE');
     }
 
     /**
@@ -134,13 +117,11 @@ class ProjectArchiveService extends AbstractService
     }
 
     /**
-     * @param int $offset
-     * @param int $limit
      * @return ServiceResponse
      */
-    public function getList($offset, $limit = 101)
+    public function getList()
     {
-        return $this->execute('project-archive/list', ['offset' => $offset, 'limit' => $limit]);
+        return $this->executeGet('project/projects/list/owner/' . Ide::accountManager()->getAccountData()['id']);
     }
 
     /**

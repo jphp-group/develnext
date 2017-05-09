@@ -87,11 +87,11 @@ class ShareProjectBehaviour extends AbstractProjectBehaviour
                 if ($uid) {
                     $this->projectService->getAsync($uid, function (ServiceResponse $response) {
                         if ($response->isSuccess()) {
-                            $this->data = $response->data();
-                            $this->uiSyncPane->setData($data = $response->data());
+                            $this->data = $response->result();
+                            $this->uiSyncPane->setData($data = $response->result());
                         } else {
                             $this->uiSyncPane->setData(null);
-                            $this->data = $response->data();
+                            $this->data = $response->result();
                         }
                     });
                 } else {
@@ -113,8 +113,10 @@ class ShareProjectBehaviour extends AbstractProjectBehaviour
 
         $url = new URL(Ide::service()->getEndpoint());
 
-        $link = new UXHyperlink($url->getHost());
-        $link->on('action', function () use ($url) { browse(Ide::service()->getEndpoint()); });
+        $link = new UXHyperlink('hub.develnext.org');
+        $link->on('action', function () use ($url) {
+            browse('https://hub.develnext.org');
+        });
 
         $titleFlow = new UXHBox([$title, $link, $colon]);
 

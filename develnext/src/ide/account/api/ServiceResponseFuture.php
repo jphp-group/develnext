@@ -19,22 +19,23 @@ class ServiceResponseFuture extends ServiceResponse
     public function apply(ServiceResponse $response)
     {
         $this->json = $response->json;
+        $this->code = (int) $response->code;
     }
 
-    public function __invoke()
+    public function __invoke(ServiceResponse $response)
     {
         if ($this->__used) {
             $this->__used = false;
             $this->triggered = true;
 
-            $this->trigger('action');
+            $this->trigger('action', [$response]);
 
             if ($this->isSuccess()) {
-                $this->trigger('success');
+                $this->trigger('success', [$response]);
             }
 
             if ($this->isNotSuccess()) {
-                $this->trigger('fail');
+                $this->trigger('fail', [$response]);
             }
         }
     }

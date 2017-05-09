@@ -63,6 +63,11 @@ class ServiceResponse
         return $this->code === 422;
     }
 
+    public function isConflict()
+    {
+        return $this->code === 409;
+    }
+
     public function isSuccess()
     {
         return $this->code === 200;
