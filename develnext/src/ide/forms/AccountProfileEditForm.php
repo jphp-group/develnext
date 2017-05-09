@@ -1,7 +1,7 @@
 <?php
 namespace ide\forms;
 
-use Async;
+use facade\Async;
 use ide\account\api\ServiceResponse;
 use ide\Ide;
 use ide\ui\Notifications;
@@ -11,7 +11,7 @@ use php\gui\UXFileChooser;
 use php\gui\UXImage;
 use php\gui\UXImageArea;
 use php\io\Stream;
-use php\util\SharedValue;
+use php\lib\str;
 
 /**
  * Class AccountProfileEditForm
@@ -70,11 +70,11 @@ class AccountProfileEditForm extends AbstractForm
 
         Ide::service()->account()->getAsync(function (ServiceResponse $response) {
             if ($response->isSuccess()) {
-                $data = $response->data();
+                $data = $response->result();
 
-                Ide::service()->media()->loadImage($data['avatar'], $this->avatarArea, 'noAvatar.jpg');
+                Ide::service()->file()->loadImage($data['avatarId'], $this->avatarArea, 'noAvatar.jpg');
 
-                $this->nameField->text = $data['name'];
+                $this->nameField->text = $data['login'];
                 $this->emailLabel->text = $data['email'];
 
                 $this->hidePreloader();
@@ -103,12 +103,28 @@ class AccountProfileEditForm extends AbstractForm
         Async::parallel([
             function ($callback) {
                 $my = $callback;
-                $oldName = Ide::accountManager()->getAccountData()['name'];
+                $oldName = Ide::accountManager()->getAccountData()['login'];
 
-                Ide::service()->profile()->updateNameAsync($this->nameField->text, function (ServiceResponse $response) use ($callback, $oldName) {
+                Ide::service()->account()->changeLoginAsync($this->nameField->text, function (ServiceResponse $response) use ($callback, $oldName) {
                     if ($response->isNotSuccess()) {
                         if ($response->isFail()) {
-                            Notifications::error('Ошибка сохранения', $response->message());
+                            list($message, $param) = str::split($response->result(), ':');
+
+                            switch ($message) {
+                                case 'LoginNotUnique':
+                                    Notifications::error('Ошибка сохранения', "Данное имя занято другим пользователем.");
+                                    break;
+                                case "LoginMinLength":
+                                    Notifications::error('Ошибка сохранения', 'Введенное имя слишком короткое, минимум символов - ' . $param);
+                                    break;
+                                case "LoginMaxLength":
+                                    Notifications::error('Ошибка сохранения', 'Введенное имя слишком длинное, максимум символов - ' . $param);
+                                    break;
+                                default:
+                                    Notifications::error('Ошибка сохранения', $message);
+                                    break;
+                            }
+
                         } else {
                             Notifications::show('Ошибка сохранения', 'Невозможно сохранить ваш псевдоним, возможно он введен некорректно!', 'ERROR');
                         }
@@ -124,9 +140,9 @@ class AccountProfileEditForm extends AbstractForm
             function ($callback) {
                 if ($this->avatarChanged) {
                     if ($this->avatarFile) {
-                        Ide::service()->media()->uploadAsync($this->avatarFile, function (ServiceResponse $response) use ($callback) {
+                        Ide::service()->file()->uploadAsync($this->avatarFile, function (ServiceResponse $response) use ($callback) {
                             if ($response->isSuccess()) {
-                                Ide::service()->profile()->updateAvatarAsync($response->data()['uid'], function (ServiceResponse $response) use ($callback) {
+                                Ide::service()->account()->changeAvatarAsync($response->result('id'), function (ServiceResponse $response) use ($callback) {
                                     if ($response->isNotSuccess()) {
                                         if ($response->isFail()) {
                                             Notifications::error('Ошибка сохранения', $response->message());
@@ -156,7 +172,7 @@ class AccountProfileEditForm extends AbstractForm
                             }
                         });
                     } else {
-                        Ide::service()->profile()->updateAvatarAsync(null, function (ServiceResponse $response) use ($callback) {
+                        Ide::service()->account()->deleteAvatarAsync(function (ServiceResponse $response) use ($callback) {
                             if ($response->isNotSuccess()) {
                                 Notifications::show('Ошибка сохранения', 'Невозможно удалить ваш аватар, попробуйте в другой раз.', 'ERROR');
                             }

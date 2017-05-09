@@ -4,7 +4,7 @@ namespace ide\account;
 use ide\account\api\AbstractService;
 use ide\account\api\AccountService;
 use ide\account\api\IconService;
-use ide\account\api\MediaService;
+use ide\account\api\FileService;
 use ide\account\api\NoticeService;
 use ide\account\api\ProfileService;
 use ide\account\api\ProjectArchiveService;
@@ -32,12 +32,7 @@ class ServiceManager
     /**
      * @var string
      */
-    protected $endpoint = 'http://develnext.org/';
-
-    /**
-     * @var string
-     */
-    protected $session;
+    protected $endpoint = 'https://api.develnext.org/';
 
     /**
      * @var array
@@ -78,9 +73,9 @@ class ServiceManager
     protected $noticeService;
 
     /**
-     * @var MediaService
+     * @var FileService
      */
-    protected $mediaService;
+    protected $fileService;
 
     /**
      * @var IconService
@@ -98,7 +93,7 @@ class ServiceManager
         $this->projectService = new ProjectService();
         $this->projectArchiveService = new ProjectArchiveService();
         $this->noticeService = new NoticeService();
-        $this->mediaService = new MediaService();
+        $this->fileService = new FileService();
         $this->iconService = new IconService();
 
         $this->accountService->on('exception', function () { $this->updateStatus(); });
@@ -111,30 +106,12 @@ class ServiceManager
 
         $timer = new TimerScript(20 * 1000, true, [$this, 'updateStatus']);
         $timer->start();
-
-        $this->on('notice', [$this, 'updateNotices']);
     }
 
     protected function changeStatus($status)
     {
         if ($status['endpoint']) {
             $this->endpoint = $status['endpoint'];
-        }
-
-        if ($status['session']) {
-            if ($status['session'] != $this->status) {
-                Logger::info("Set http sessionId = " . $status['session']);
-                $this->session = $status['session'];
-            }
-        }
-
-        if ($status['account']) {
-            $noticeUpdatedAt = $status['account']['noticeUpdatedAt'];
-
-            if ($noticeUpdatedAt != $this->noticeService->getLastUpdatedAt()) {
-                $this->noticeService->setLastUpdatedAt($noticeUpdatedAt);
-                $this->trigger('notice');
-            }
         }
 
         if ($status['private'] != $this->status['private']) {
@@ -174,33 +151,6 @@ class ServiceManager
         return $this->endpoint;
     }
 
-    /**
-     * @return string
-     */
-    public function getSession()
-    {
-        return $this->session;
-    }
-
-    public function updateNotices()
-    {
-        if ($this->ideService) {
-            $this->ideService->noticesAsync(function (ServiceResponse $response) {
-                if ($response->isSuccess()) {
-                    $list = $response->data();
-
-                    foreach ($list as $notice) {
-                        try {
-                            Notifications::show($notice['title'], $notice['message'], $notice['type']);
-                        } catch (IllegalArgumentException $e) {
-                            Notifications::show($notice['title'], $notice['message']);
-                        }
-                    }
-                }
-            });
-        }
-    }
-
     public function updateStatus()
     {
         if ($this->ideService) {
@@ -212,7 +162,7 @@ class ServiceManager
             Logger::info("Update status, endpoint = {$this->getEndpoint()} ...");
 
             $this->ideService->statusAsync(function (ServiceResponse $response) {
-                Logger::info("Update status response = {message: {$response->message()}, data: " . Json::encode($response->data()) . "}");
+                Logger::info("Update status response = {message: {$response->message()}, data: " . Json::encode($response->result()) . "}");
 
                 if ($response->isConnectionRefused()) {
                     $this->changeStatus([
@@ -228,7 +178,7 @@ class ServiceManager
                     $this->connectionOk = true;
 
                     if ($response->isSuccess()) {
-                        $status = $response->data();
+                        $status = $response->result();
                         $this->changeStatus($status);
                     } else {
                         $this->changeStatus([
@@ -266,11 +216,11 @@ class ServiceManager
     }
 
     /**
-     * @return MediaService
+     * @return FileService
      */
-    public function media()
+    public function file()
     {
-        return $this->mediaService;
+        return $this->fileService;
     }
 
     /**

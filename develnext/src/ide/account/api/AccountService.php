@@ -12,9 +12,11 @@ use php\lang\System;
  * @package ide\account\api
  *
  * @method ServiceResponse authAsync($email, $password, $callback)
- * @method ServiceResponse authExternalAsync($confirmKey, $callback)
- * @method ServiceResponse authVkAsync($callback)
- * @method ServiceResponse registerAsync($email, $name, $password, $captchaWord, $callback)
+ * @method ServiceResponse changeLoginAsync($login, $callback = null)
+ * @method ServiceResponse changePasswordAsync($oldPassword, $newPassword, $callback = null)
+ * @method ServiceResponse changeAvatarAsync($fileId, $callback = null)
+ * @method ServiceResponse deleteAvatarAsync($callback = null)
+ * @method ServiceResponse registerAsync($email, $name, $password, $captchaKey, $captchaWord, $callback)
  * @method ServiceResponse confirmAsync($email, $confirmKey, $callback)
  * @method ServiceResponse getAsync($callback)
  * @method ServiceResponse logoutAsync($callback = null)
@@ -45,12 +47,26 @@ class AccountService extends AbstractService
     }
 
     /**
-     * @return UXImage
+     * @return array [string, UXImage]
      */
     public function captcha()
     {
-        $stream = $this->getStream('account/captcha');
-        return $stream ? new UXImage($stream) : null;
+        $conn = $this->getConnection('auth/captcha');
+
+        if ($conn) {
+            $conn->setRequestProperty('Content-Type', 'text/html');
+            $key = $conn->getHeaderField('X-Captcha-Key');
+
+            $stream = $conn->getInputStream();
+
+            if (!$stream || !$key) {
+                return null;
+            }
+
+            return [$key, new UXImage($stream)];
+        }
+
+        return null;
     }
 
     /**
@@ -61,7 +77,44 @@ class AccountService extends AbstractService
      */
     public function get()
     {
-        return $this->execute('account/get', []);
+        return $this->executeGet('auth/account');
+    }
+
+    /**
+     * @param string $newLogin
+     * @return ServiceResponse
+     */
+    public function changeLogin($newLogin)
+    {
+        return $this->execute('auth/account/login', ['login' => $newLogin], 'PUT');
+    }
+
+    /**
+     * @param string $oldPassword
+     * @param string $newPassword
+     * @return ServiceResponse
+     */
+    public function changePassword($oldPassword, $newPassword)
+    {
+        return $this->execute('auth/account/password', ['oldPassword' => $oldPassword, 'newPassword' => $newPassword], 'PUT');
+    }
+
+    /**
+     * @param string $fileId
+     *
+     * @return ServiceResponse
+     */
+    public function changeAvatar($fileId)
+    {
+        return $this->execute('auth/account/avatar', ['fileId' => $fileId], 'PUT');
+    }
+
+    /**
+     * @return ServiceResponse
+     */
+    public function deleteAvatar()
+    {
+        return $this->execute('auth/account/avatar', [], 'DELETE');
     }
 
     /**
@@ -71,13 +124,9 @@ class AccountService extends AbstractService
      */
     public function confirm($email, $confirmKey)
     {
-        return $this->execute('account/confirm', [
-            'email' => $email,
-            'confirmKey' => $confirmKey,
-
-            'deviceId' => $this->getDeviceId(),
-            'osName' => $this->getOsName(),
-            'osUser' => $this->getOsUser(),
+        return $this->execute('auth/confirm', [
+            'login' => $email,
+            'code' => $confirmKey
         ]);
     }
 
@@ -87,8 +136,8 @@ class AccountService extends AbstractService
      */
     public function restorePassword($email)
     {
-        return $this->execute('account/restore-password', [
-            'email' => $email
+        return $this->execute('auth/restore-password', [
+            'login' => $email
         ]);
     }
 
@@ -99,28 +148,30 @@ class AccountService extends AbstractService
      */
     public function restorePasswordConfirm($email, $confirmKey)
     {
-        return $this->execute('account/restore-password-confirm', [
-            'email' => $email,
-            'confirmKey' => $confirmKey
+        return $this->execute('auth/restore-password-confirm', [
+            'login' => $email,
+            'code' => $confirmKey
         ]);
     }
 
     /**
      * @param $email
      * @param $password
+     * @param $captchaKey
      * @param $captchaWord
      * @return ServiceResponse
      * @throws ServiceException
      * @throws ServiceInvalidResponseException
      * @throws ServiceNotAvailableException
      */
-    public function register($email, $name, $password, $captchaWord)
+    public function register($email, $name, $password, $captchaKey, $captchaWord)
     {
-        return $this->execute('account/register', [
+        return $this->execute('auth/register', [
             'email' => $email,
-            'name' => $name,
+            'login' => $name,
             'password' => $password,
-            'captchaWord' => $captchaWord
+            'captchaKey' => $captchaKey,
+            'captchaText' => $captchaWord
         ]);
     }
 
@@ -134,34 +185,17 @@ class AccountService extends AbstractService
      */
     public function auth($email, $password)
     {
-        return $this->execute('account/auth', [
-            'email' => $email,
-            'password' => $password,
-
-            'deviceId' => $this->getDeviceId(),
-            'osName' => $this->getOsName(),
-            'osUser' => $this->getOsUser(),
+        return $this->execute('auth/login', [
+            'login' => $email,
+            'password' => $password
         ]);
     }
 
-    public function authExternal($confirmKey)
-    {
-        return $this->execute('account/auth-external', [
-            'confirmKey' => $confirmKey,
-
-            'deviceId' => $this->getDeviceId(),
-            'osName' => $this->getOsName(),
-            'osUser' => $this->getOsUser(),
-        ]);
-    }
-
-    public function authVk()
-    {
-        return $this->execute('account/auth/vk', []);
-    }
-
+    /**
+     * @return ServiceResponse
+     */
     public function logout()
     {
-        return $this->execute('account/logout', []);
+        return $this->executeGet('auth/logout');
     }
 }

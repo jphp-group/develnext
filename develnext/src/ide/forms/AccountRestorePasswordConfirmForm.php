@@ -56,7 +56,7 @@ class AccountRestorePasswordConfirmForm extends AbstractOnlineIdeForm
 
                 uiLater(function () use ($response) {
                     Notifications::show('Доступ восстановлен', 'Доступ к аккаунту был успешно восстановлен, мы поменяли вам пароль.');
-                    $dialog = new ShowTextDialogForm('Ваш новый пароль для входа', $response->data(), true);
+                    $dialog = new ShowTextDialogForm('Ваш новый пароль для входа', $response->result(), true);
                     $dialog->showDialog();
                 });
             } else {

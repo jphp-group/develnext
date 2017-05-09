@@ -122,7 +122,7 @@ class IconSearchPaneArea extends AbstractFormArea
                 }
             });
 
-            Ide::service()->media()->loadImage($preview, $image);
+            Ide::service()->file()->loadImage($preview, $image);
 
             $this->listHelper->add($image);
         }
@@ -143,7 +143,7 @@ class IconSearchPaneArea extends AbstractFormArea
                     if ($media = $data["media$size"]) {
                         $tasks[] = function ($finish) use ($media, $list, $size) {
                             $fix = $finish;
-                            Ide::service()->media()->getImageAsync($media, function ($file) use ($list, $finish, $size) {
+                            Ide::service()->file()->getImageAsync($media, function ($file) use ($list, $finish, $size) {
                                 if ($file) {
                                     $list->push([$size, $file]);
                                 }
