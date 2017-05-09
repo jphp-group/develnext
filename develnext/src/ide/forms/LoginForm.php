@@ -1,4 +1,5 @@
 <?php
+
 namespace ide\forms;
 
 use ide\account\api\AccountService;
@@ -54,20 +55,7 @@ class LoginForm extends AbstractOnlineIdeForm
                 $this->hidePreloader();
 
                 if ($response->isSuccess()) {
-                    Ide::accountManager()->setAccessToken($response->data());
-                    $this->hide();
-                } else {
-                    $message = $response->message();
-
-                    switch ($message) {
-                        case 'Validation':
-                            $message = 'Введите все данные корректно';
-                            break;
-                    }
-
-                    Notifications::error('Ошибка входа', $message);
-
-                    if ($response->data() == 'RegisterConfirm') {
+                    if ($response->result() == 'RegisterConfirm') {
                         $dialog = new RegisterConfirmForm();
                         $dialog->setEmail($this->emailField->text);
 
@@ -80,36 +68,34 @@ class LoginForm extends AbstractOnlineIdeForm
                         }
                     }
 
+                    Ide::accountManager()->setAccessToken($response->result('id'));
+                    $this->hide();
+                } else {
+                    $message = $response->message();
+
+                    switch ($message) {
+                        case 'PasswordInvalid':
+                            $message = 'Введите корректный пароль';
+                            $this->showError($message, $this->passwordField);
+                            break;
+                        case 'LoginInvalid';
+                            $message = 'Введите корректный email или логин';
+                            $this->showError($message, $this->emailField);
+                            break;
+                        case 'NotFoundLogin':
+                            $message = 'Аккаунт с таким логином или email не зарегистрирован';
+                            $this->showError($message, $this->emailField);
+                            break;
+                        case 'AccessDenied':
+                            $message = 'Вы ввели некорректный пароль';
+                            $this->showError($message, $this->passwordField);
+                            break;
+                    }
+
+                    Notifications::error('Ошибка входа', $message);
                 }
             }
         );
-    }
-
-    /**
-     * @event loginVkButton.action
-     */
-    public function actionLoginVk()
-    {
-        $this->showPreloader('Входим через VK ...');
-
-        Ide::service()->account()->authVkAsync(function (ServiceResponse $response) {
-            if ($response->isSuccess()) {
-                $redirectForm = new LoginVkRedirectForm();
-
-                $url = $response->data();
-
-                $redirectForm->setAuthUrl($url);
-                if ($redirectForm->showDialog()) {
-                    Ide::accountManager()->setAccessToken($redirectForm->getResult());
-                    $this->hide();
-                }
-            } else {
-                $this->loginVkButton->enabled = false;
-                Notifications::error('Ошибка входа', 'Сервис временно недоступен, попробуйте позже или используйте обычную регистрацию.');
-            }
-
-            $this->hidePreloader();
-        });
     }
 
     /**

@@ -10,14 +10,15 @@ use ide\utils\FileUtils;
 use php\io\IOException;
 use php\io\Stream;
 use php\lang\ThreadPool;
+use php\lib\fs;
 
 /**
- * Class MediaService
+ * Class FileService
  * @package ide\account\api
  *
  * @method uploadAsync($file, callable $callback = null)
  */
-class MediaService extends AbstractService
+class FileService extends AbstractService
 {
     /**
      * @var File
@@ -38,7 +39,7 @@ class MediaService extends AbstractService
 
         $this->loadThPool = ThreadPool::create(1, 10, 10 * 1000);
 
-        $this->cachePath = Ide::get()->getFile('cache/account/media');
+        $this->cachePath = Ide::get()->getFile('cache/account/file');
         $this->cachePath->mkdirs();
     }
 
@@ -51,7 +52,7 @@ class MediaService extends AbstractService
      */
     public function upload($file)
     {
-        return parent::upload('media/upload', ['file' => $file]);
+        return parent::upload('file/upload', ['file' => $file]);
     }
 
     /**
@@ -60,7 +61,17 @@ class MediaService extends AbstractService
      */
     public function get($uid)
     {
-        return $this->execute('media/get', ['uid' => $uid]);
+        return $this->executeGet("file/file/$uid");
+    }
+
+    /**
+     * @param $uid
+     * @return ServiceResponse
+     */
+    public function getUrl($uid)
+    {
+        $response = $this->executeGet("file/file/$uid/url");
+        return $response->isSuccess() ? $response->result() : null;
     }
 
     /**
@@ -80,17 +91,21 @@ class MediaService extends AbstractService
         $cacheFilePath = new File($this->cachePath, "/$uid.png");
 
         if (!$cacheFilePath->exists()) {
-            $response = $this->get($uid);
+            $url = $this->getUrl($uid);
 
-            if ($response->isSuccess()) {
+            if ($url) {
                 try {
-                    Stream::putContents($cacheFilePath, Stream::of($response->data()['path'])->readFully());
+                    $size = fs::copy($url, $cacheFilePath);
+                    if ($size < 1) {
+                        throw new IOException('Cannot write');
+                    }
+                    
                 } catch (IOException $e) {
                     Logger::warn("Unable to load media by uid = $uid, error = {$e->getMessage()}");
                     return null;
                 }
             } else {
-                Logger::warn("Unable to load media by uid = $uid, message = {$response->message()}");
+                Logger::warn("Unable to load media by uid = $uid");
                 return null;
             }
         }

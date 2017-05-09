@@ -70,7 +70,7 @@ class SplashForm extends AbstractIdeForm
 
         Ide::get()->on('start', function () {
             Ide::accountManager()->on('update', function ($data) {
-                Ide::service()->media()->getImageAsync($data['avatar'], function ($file) {
+                Ide::service()->file()->getImageAsync($data['avatar'], function ($file) {
                     Ide::get()->setUserConfigValue('splash.avatar', $file);
                 });
 

@@ -42,7 +42,7 @@ class UXImage
      * @param $requiredHeight (optional)
      * @param bool $proportional
      */
-    public function __construct($stream, $requiredWidth, $requiredHeight, $proportional = true) {}
+    public function __construct($stream, $requiredWidth = false, $requiredHeight = false, $proportional = true) {}
 
     /**
      * Возвращает цвет пикселя картинки.

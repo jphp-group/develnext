@@ -6,39 +6,66 @@ use facade\Json;
 class ServiceResponse
 {
     protected $json;
+    protected $code;
 
     /**
      * ServiceResponse constructor.
+     * @param $code
      * @param $json
      */
-    public function __construct($json)
+    public function __construct($code, $json)
     {
         $this->json = $json;
+        $this->code = (int) $code;
+    }
+
+    public function result($field = null)
+    {
+        if ($field) {
+            return $this->json[$field];
+        } else {
+            return $this->json;
+        }
     }
 
     public function data()
     {
-        return $this->json['data'];
+        return $this->result('data');
     }
 
     public function message()
     {
-        return $this->json['message'];
-    }
-
-    public function status()
-    {
-        return $this->json['status'];
+        return $this->result('message');
     }
 
     public function isFail()
     {
-        return $this->json['status'] == 'fail';
+        return $this->code >= 400 && $this->code < 500;
+    }
+
+    public function isNotFound()
+    {
+        return $this->code === 404;
+    }
+
+    public function isBadRequest()
+    {
+        return $this->code === 400;
+    }
+
+    public function isAccessDenied()
+    {
+        return $this->code === 403;
+    }
+
+    public function isInvalidValidation()
+    {
+        return $this->code === 422;
     }
 
     public function isSuccess()
     {
-        return $this->json['status'] == 'success';
+        return $this->code === 200;
     }
 
     public function isNotSuccess()
@@ -48,7 +75,7 @@ class ServiceResponse
 
     public function isError()
     {
-        return $this->json['status'] == 'error';
+        return $this->code >= 500;
     }
 
     public function isConnectionFailed()
@@ -63,6 +90,6 @@ class ServiceResponse
 
     public function toLog()
     {
-        return "{message: {$this->message()}, data = " . Json::encode($this->data(), false) . "}";
+        return "{message: {$this->message()}, result = " . Json::encode($this->result(), false) . "}";
     }
 }

@@ -140,7 +140,7 @@ abstract class AbstractService
                     }
                 }
 
-                $response = new ServiceResponse(Json::decode($data));
+                $response = new ServiceResponse($connection->responseCode, Json::decode($data));
 
                 if ($response->isFail() && $response->message() == "InvalidAuthorization") {
                     Ide::accountManager()->setAccessToken(null);
@@ -152,14 +152,14 @@ abstract class AbstractService
             } catch (SocketException $e) {
                 $this->trigger('exception', [$methodName, $e]);
 
-                return new ServiceResponse([
+                return new ServiceResponse(500, [
                     'status' => 'error',
                     'message' => 'ConnectionRefused'
                 ]);
             } catch (IOException $e) {
                 $this->trigger('exception', [$methodName, $e]);
 
-                return new ServiceResponse([
+                return new ServiceResponse(500, [
                     'status' => 'error',
                     'message' => 'ConnectionFailed: ' . $e->getMessage() . ' line ' . $e->getLine()
                 ]);
@@ -220,31 +220,76 @@ abstract class AbstractService
 
     /**
      * @param $methodName
+     * @param $params
+     * @return ServiceResponse
+     */
+    public function executeGet($methodName, array $params = [])
+    {
+        return $this->execute($methodName . ($params ? '?' . $this->formatUrlencode($params) : ''), [], 'GET');
+    }
+
+    /**
+     * @param array $data
+     * @param string $prefix
+     * @return string
+     */
+    private function formatUrlencode(array $data, $prefix = '')
+    {
+        $str = [];
+
+        foreach ($data as $code => $value) {
+            if (is_array($value)) {
+                $str[] = $this->formatUrlencode($value, $prefix ? "{$prefix}[$code]" : $code);
+            } else {
+                if ($prefix) {
+                    $str[] = "{$prefix}[$code]=" . urlencode($value);
+                } else {
+                    $str[] = "$code=" . urlencode($value);
+                }
+            }
+        }
+
+        return str::join($str, '&');
+    }
+
+    /**
+     * @param $methodName
      * @param $json
-     * @param bool $tryAuth
+     * @param string $method
      * @return ServiceResponse
      * @throws ServiceException
      * @throws ServiceInvalidResponseException
      * @throws ServiceNotAvailableException
      */
-    public function execute($methodName, $json, $tryAuth = true)
+    public function execute($methodName, $json, $method = 'POST')
     {
         try {
             $connection = $this->buildConnection($methodName);
-            $connection->requestMethod = 'POST';
+            $connection->requestMethod = $method;
 
             try {
-                $connection->getOutputStream()->write(Json::encode($json));
+                switch ($method) {
+                    case 'POST':
+                    case 'PUT':
+                    case 'PATCH':
+                        $connection->getOutputStream()->write(Json::encode($json));
+                        break;
+                }
 
-                $data = $connection->getInputStream()->readFully();
+                try {
+                    $connection->connect();
+                    $data = $connection->getInputStream()->readFully();
+                } catch (IOException $e) {
+                    $data = $connection->getErrorStream()->readFully();
+                }
 
                 if (Ide::get()->isDevelopment()) {
                     static $lock;
 
                     if (!$lock) $lock = new SharedValue();
 
-                    $lock->synchronize(function () use ($methodName, $json, $data) {
-                        echo "POST /$methodName [" . Json::encode($json) . "]\n";
+                    $lock->synchronize(function () use ($methodName, $json, $data, $method) {
+                        echo "$method /$methodName [" . Json::encode($json) . "]\n";
                         echo "\t-> [" . $data . "]\n\n";
                     });
                 }
@@ -252,21 +297,23 @@ abstract class AbstractService
                 if ($connection->responseCode != 200) {
                     if ($connection->responseCode >= 500) {
                         throw new ServiceNotAvailableException($connection->responseCode, $data);
-                    } else {
-                        throw new ServiceException($connection->responseCode, $data);
                     }
                 }
 
-                $response = new ServiceResponse(Json::decode($data));
+                try {
+                    $response = new ServiceResponse($connection->responseCode, Json::decode($data));
+                } catch (ProcessorException $e) {
+                    $response = new ServiceResponse($connection->responseCode, $data);
+                }
 
-                if ($response->isFail() && $response->message() == "InvalidAuthorization") {
+                if ($response->isAccessDenied() && $response->message() == "AccountNotFound") {
                     Ide::accountManager()->setAccessToken(null);
                 }
 
                 if ($response->isFail()) {
                     $message = $response->message();
 
-                    if ($message == 'AuthorizationExpired') {
+                    if ($response->isAccessDenied() && $message == 'AccountNotFound') {
                         Logger::info("{$response->message()}, need auth, methodName = {$methodName}, data = {$data}");
 
                         UXApplication::runLater(function () {
@@ -285,7 +332,7 @@ abstract class AbstractService
             } catch (SocketException $e) {
                 $this->trigger('exception', [$methodName, $e]);
 
-                return new ServiceResponse([
+                return new ServiceResponse(500, [
                     'status' => 'error',
                     'message' => 'ConnectionRefused',
                     'data' => $e->getMessage()
@@ -295,7 +342,7 @@ abstract class AbstractService
             } catch (IOException $e) {
                 $this->trigger('exception', [$methodName, $e]);
 
-                return new ServiceResponse([
+                return new ServiceResponse(500, [
                     'status' => 'error',
                     'message' => 'ConnectionFailed',
                     'data' => $e->getMessage()
@@ -318,7 +365,7 @@ abstract class AbstractService
                     throw new Exception("Last parameter must be callable for method $name()");
                 }
 
-                $result = new ServiceResponseFuture([]);
+                $result = new ServiceResponseFuture(0, []);
                 $result->__used = false;
 
                 if (!$this->pool->isShutdown()) {
@@ -349,7 +396,13 @@ abstract class AbstractService
 
     protected function makeUrl($url)
     {
-        return (Ide::service()->getEndpoint() .  "a/" . $url);
+        $endpoint = Ide::service()->getEndpoint();
+
+        if (!str::endsWith($endpoint, '/')) {
+            $endpoint .= '/';
+        }
+
+        return $endpoint . $url;
     }
 
     protected function buildUrlConnection($url)
@@ -365,14 +418,10 @@ abstract class AbstractService
 
         $connection->setRequestProperty("User-Agent", Ide::service()->userAgent());
 
-        if (Ide::service()->getSession()) {
-            $connection->setRequestProperty('Cookie', "JSESSIONID=" . Ide::service()->getSession() . ";");
-        }
-
         $accountManager = Ide::accountManager();
 
         if ($accountManager) {
-            $connection->setRequestProperty("Authorization", $accountManager->getAccessToken());
+            $connection->setRequestProperty("X-Token", $accountManager->getAccessToken());
         }
 
         $connection->connectTimeout = self::CONNECTION_TIMEOUT;

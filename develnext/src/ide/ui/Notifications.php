@@ -81,7 +81,7 @@ class Notifications
 
     public static function showAccountAuthWelcome(array $data)
     {
-        static::show('Добро пожаловать', 'Приветствуем тебя, ' . $data['name'] . ".");
+        static::show('Добро пожаловать', 'Приветствуем тебя, ' . $data['login'] . ".");
     }
 
     public static function showException(\Exception $e)

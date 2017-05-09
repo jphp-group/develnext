@@ -44,14 +44,23 @@ class AccountChangePasswordForm extends AbstractOnlineIdeForm
 
         $this->showPreloader();
 
-        Ide::service()->profile()->updatePasswordAsync($this->oldPasswordField->text, $this->newPasswordField->text, function (ServiceResponse $response) {
+        Ide::service()->account()->changePasswordAsync($this->oldPasswordField->text, $this->newPasswordField->text, function (ServiceResponse $response) {
             if ($response->isSuccess()) {
                 Notifications::show('Смена пароля', 'Ваш пароль был успешно изменен на новый');
                 $this->hide();
             } else {
                 switch ($response->message()) {
-                    case 'Validation':
-                        $message = 'Введите корректные данные';
+                    case 'NewPasswordRequired':
+                        $message = 'Введите новый пароль';
+                        $this->showError($message, $this->newPasswordField);
+                        break;
+                    case 'NewPasswordInvalid':
+                        $message = 'Введите корректный новый пароль';
+                        $this->showError($message, $this->newPasswordField);
+                        break;
+                    case 'OldPasswordInvalid':
+                        $message = 'Старый пароль введен неверно';
+                        $this->showError($message, $this->oldPasswordField);
                         break;
                     default:
                         $message = $response->isFail() ? $response->message() : 'Произошла непредвиденная ошибка, попробуйте повторить действие позже.';

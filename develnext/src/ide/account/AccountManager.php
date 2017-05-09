@@ -88,10 +88,10 @@ class AccountManager
             Ide::service()->account()->getAsync(function (ServiceResponse $response) {
                 if ($response->isSuccess()) {
                     if (!$this->accountData) {
-                        Notifications::showAccountAuthWelcome($response->data());
+                        Notifications::showAccountAuthWelcome($response->result());
                     }
 
-                    $this->accountData = $data = $response->data();
+                    $this->accountData = $data = $response->result();
 
                     $response = Ide::service()->ide()->getLastUpdate('NIGHT');
                     $hash = Ide::get()->getConfig()->get('app.hash');

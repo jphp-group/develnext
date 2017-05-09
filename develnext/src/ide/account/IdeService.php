@@ -15,32 +15,14 @@ use php\lib\str;
  * @package ide\account
  *
  * @method ServiceResponse statusAsync($callback = null)
- * @method ServiceResponse startAsync($callback = null)
- * @method ServiceResponse shutdownAsync($callback)
  * @method ServiceResponse sendErrorAsync(\Exception $e, $callback = null)
  * @method ServiceResponse getLastUpdateAsync($channel, $callback)
- * @method ServiceResponse noticesAsync(callable $callback)
  */
 class IdeService extends AbstractService
 {
     public function status()
     {
-        return $this->execute('ide/status', []);
-    }
-
-    public function start()
-    {
-        return $this->execute('ide/start', []);
-    }
-
-    public function shutdown()
-    {
-        return $this->execute('ide/shutdown', []);
-    }
-
-    public function notices()
-    {
-        return $this->execute('ide/notices', []);
+        return $this->executeGet('ide/status');
     }
 
     /**

@@ -7,7 +7,17 @@ use ide\Ide;
 use ide\ui\Notifications;
 use php\gui\framework\AbstractForm;
 use php\gui\UXDialog;
+use php\gui\UXNode;
+use php\gui\UXTextField;
+use php\gui\UXTooltip;
+use php\lib\arr;
 
+/**
+ * Class RegisterForm
+ * @package ide\forms
+ *
+ * @property UXTextField $captchaField
+ */
 class RegisterForm extends AbstractOnlineIdeForm
 {
     use DialogFormMixin;
@@ -24,7 +34,10 @@ class RegisterForm extends AbstractOnlineIdeForm
      */
     public function updateCaptcha()
     {
-        $this->captcha->image = Ide::service()->account()->captcha();
+        list($key, $image) = Ide::service()->account()->captcha();
+
+        $this->captcha->data('key', $key);
+        $this->captcha->image = $image;
     }
 
     /**
@@ -72,12 +85,38 @@ class RegisterForm extends AbstractOnlineIdeForm
     {
         $this->showPreloader();
 
-        Ide::service()->account()->registerAsync($this->emailField->text, $this->nameField->text, $this->passwordField->text, $this->captchaField->text,
+        Ide::service()->account()->registerAsync($this->emailField->text, $this->nameField->text, $this->passwordField->text, $this->captcha->data('key'), $this->captchaField->text,
             function (ServiceResponse $response) {
                 if ($response->isNotSuccess()) {
                     $this->updateCaptcha();
 
-                    if ($response->message() == 'Validation') {
+                    if ($response->isInvalidValidation()) {
+                        $errors = $response->result('errors');
+
+                        if (arr::has($errors, 'CaptchaInvalid') || arr::has($errors, 'CaptchaNotFound')) {
+                            $this->showError('Неверный код', $this->captchaField);
+                        }
+
+                        if (arr::has($errors, 'PasswordInvalid')) {
+                            $this->showError('Введите корректный пароль', $this->passwordField);
+                        } else if (arr::has($errors, 'PasswordRequired')) {
+                            $this->showError('Введите пароль', $this->passwordField);
+                        }
+
+                        if (arr::has($errors, 'EmailRequired')) {
+                            $this->showError('Введите email', $this->emailField);
+                        } else if (arr::has($errors, 'EmailInvalid')) {
+                            $this->showError('Введите корректный email', $this->emailField);
+                        } else if (arr::has($errors, 'EmailNotUnique')) {
+                            $this->showError('Аккаунт с таким email уже зарегистрирован', $this->emailField);
+                        }
+
+                        if (arr::has($errors, 'LoginRequired')) {
+                            $this->showError('Введите свой псевдоним', $this->nameField);
+                        } else if (arr::has($errors, 'LoginNotUnique')) {
+                            $this->showError('Аккаунт с таким именем уже зарегистирован', $this->nameField);
+                        }
+
                         Notifications::showInvalidValidation();
                     } else {
                         Notifications::error("Ошибка регистрации", $response->message());

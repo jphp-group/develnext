@@ -45,7 +45,7 @@ class RegisterConfirmForm extends AbstractOnlineIdeForm
                 Notifications::show('Регистрация завершена', $response->message(), 'SUCCESS');
                 $this->hidePreloader();
 
-                $this->setResult($response->data());
+                $this->setResult($response->result());
                 $this->hide();
             }
         );

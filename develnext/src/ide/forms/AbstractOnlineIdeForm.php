@@ -7,6 +7,7 @@ use ide\Ide;
 use ide\ui\Notifications;
 use php\gui\UXApplication;
 use php\gui\UXNode;
+use php\gui\UXTooltip;
 
 class AbstractOnlineIdeForm extends AbstractIdeForm
 {
@@ -21,6 +22,18 @@ class AbstractOnlineIdeForm extends AbstractIdeForm
     public function isAuthRequired()
     {
         return false;
+    }
+
+
+    public function showError($errorText, UXNode $node)
+    {
+        $tooltip = new UXTooltip();
+        $tooltip->classes->add('dn-tooltip-error');
+        $tooltip->text = $errorText;
+
+        $tooltip->showByNode($node, 0, $node->height + 2);
+
+        waitAsync(3000, function () use ($tooltip) { $tooltip->hide(); });
     }
 
     /**
