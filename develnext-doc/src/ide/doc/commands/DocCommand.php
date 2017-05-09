@@ -14,6 +14,7 @@ use php\gui\UXButton;
 use php\gui\UXHyperlink;
 use php\gui\UXSeparator;
 use php\gui\UXTextField;
+use php\net\URL;
 
 class DocCommand extends AbstractCommand
 {
@@ -84,9 +85,10 @@ class DocCommand extends AbstractCommand
         $input->text = Ide::get()->getUserConfigValue(__CLASS__ . '.searchQuery', '');
 
         $searchHandle = function () use ($input) {
-            /** @var DocEditor $editor */
-            $param = ['search' => $input->text];
-            FileSystem::openOrRefresh('~doc', $param);
+            $q = URL::encode($input->text);
+
+            Ide::get()->getMainForm()->toast('Сейчас произойдет редирект на страницу поиска ...');
+            browse("https://github.com/jphp-compiler/develnext/search?q=$q&type=Wikis&utf8=✓");
         };
 
         $input->on('keyDown', function (UXKeyEvent $e) use ($searchHandle) {
@@ -97,11 +99,7 @@ class DocCommand extends AbstractCommand
 
         $searchButton->on('action', $searchHandle);
 
-        $hyperlink = new UXHyperlink('Онлайн справка');
-        $hyperlink->style = '-fx-font-size: 14';
-        $hyperlink->on('action', function () { browse('https://github.com/jphp-compiler/develnext/wiki'); });
-
-        $ui = new UXHBox([$hyperlink, new UXSeparator('VERTICAL'), $searchButton, $input, $button]);
+        $ui = new UXHBox([$searchButton, $input, $button]);
         $ui->alignment = 'CENTER_LEFT';
         $ui->spacing = 5;
         $ui->fillHeight = true;
@@ -111,6 +109,7 @@ class DocCommand extends AbstractCommand
 
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
-        FileSystem::openOrRefresh('~doc');
+        Ide::get()->getMainForm()->toast('Сейчас произойдет редирект на страницу ...');
+        browse('https://github.com/jphp-compiler/develnext/wiki');
     }
 }
