@@ -190,7 +190,7 @@ class Ide extends Application
     public function __construct($configPath = null)
     {
         parent::__construct($configPath);
-
+        
         $this->OS = IdeSystem::getOs();
         $this->mode = IdeSystem::getMode();
 

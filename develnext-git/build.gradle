@@ -13,5 +13,6 @@ sourceSets {
 
 
 dependencies {
-    
+    compile "org.develnext.jphp:jphp-runtime:$rootProject.ext.jphpVersion"
+    compile "org.develnext.jphp:jphp-git-ext:$rootProject.ext.jphpVersion"
 }

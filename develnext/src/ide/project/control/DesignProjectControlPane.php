@@ -45,6 +45,12 @@ class DesignProjectControlPane extends AbstractProjectControlPane
         return 'icons/design16.png';
     }
 
+    function getSort()
+    {
+        return 999;
+    }
+
+
     public function save()
     {
         if ($this->editor) {

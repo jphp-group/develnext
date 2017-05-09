@@ -219,6 +219,8 @@ class ProjectSystem
             Ide::get()->setOpenedProject($project);
 
             $project->create();
+            Ide::get()->trigger('loadProject', [$project]);
+
             $project->recover();
             $project->open();
 
@@ -309,6 +311,7 @@ class ProjectSystem
                 }
 
                 Ide::get()->setOpenedProject($project);
+                Ide::get()->trigger('loadProject', [$project]);
 
                 $project->load();
                 $project->recover();

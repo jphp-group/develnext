@@ -1,15 +1,23 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: DIM-S
- * Date: 01.05.2017
- * Time: 14:33
- */
-
 namespace ide\git\project;
 
+use ide\project\AbstractProjectBehaviour;
 
-class GitProjectBehaviour
+class GitProjectBehaviour extends AbstractProjectBehaviour
 {
+    /**
+     * ...
+     */
+    public function inject()
+    {
+    }
 
+    /**
+     * see PRIORITY_* constants
+     * @return int
+     */
+    public function getPriority()
+    {
+        return self::PRIORITY_COMPONENT;
+    }
 }

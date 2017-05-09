@@ -118,7 +118,12 @@ class ProjectEditor extends AbstractEditor
         }
 
         $opened = $this->getOpenedPane();
-        $this->menu->items->setAll($this->controlPanes);
+
+        $this->menu->items->setAll(arr::sort($this->controlPanes, function (AbstractProjectControlPane $a, AbstractProjectControlPane $b) {
+            if ($a->getSort() === $b->getSort()) return 0;
+
+            return ($a->getSort() > $b->getSort()) ? 1 : -1;
+        }));
 
         $this->navigate(reflect::typeOf($opened));
 

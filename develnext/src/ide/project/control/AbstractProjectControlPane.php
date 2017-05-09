@@ -57,6 +57,11 @@ abstract class AbstractProjectControlPane implements MenuViewable
         return -1;
     }
 
+    function getSort()
+    {
+        return 1000;
+    }
+
     /**
      * @return UXNode
      */

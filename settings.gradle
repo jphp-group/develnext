@@ -18,6 +18,7 @@ include 'develnext-java-platform';
 include 'develnext-js-platform';
 include 'develnext-lexer';
 include 'develnext-launcher';
+include 'develnext-git';
 
 include 'jphp-gui-richtext-ext';
 

@@ -13,6 +13,7 @@ use php\lang\Module;
 use php\lang\System;
 use php\lib\fs;
 use php\lib\str;
+use php\time\Time;
 use php\util\Configuration;
 
 /**
@@ -66,12 +67,17 @@ class Application
     /** @var Configuration */
     protected $config;
 
+    /** @var Time */
+    protected $startTime;
+
     /**
      * @param string $configPath
      * @throws Exception
      */
     public function __construct($configPath = null)
     {
+        $this->startTime = Time::now();
+
        // System::setProperty("prism.lcdtext", "false");
         if (Stream::exists('res://.debug/preloader.php')) {
             include 'res://.debug/preloader.php';
@@ -105,6 +111,15 @@ class Application
     public function getName()
     {
         return $this->config->get('app.name');
+    }
+
+    /**
+     * Startup time of the application.
+     * @return Time
+     */
+    public function getStartTime()
+    {
+        return $this->startTime;
     }
 
     /**
@@ -596,7 +611,7 @@ class Application
                     include 'res://.debug/bootstrap.php';
                 }
 
-                Logger::debug("Application start is done.");
+                Logger::debug("Application start is done, time = " . (Time::millis() - $this->startTime->getTime()) . 'ms');
 
                 if ($oldSplash = UXApplication::getSplash()) {
                     if ($this->getConfig()->getBoolean('app.fx.splash.autoHide')) {

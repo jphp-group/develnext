@@ -31,7 +31,7 @@ class UXVBox extends UXPane
      * @param UXNode[] $nodes (optional)
      * @param float|int $spacing
      */
-    public function __construct(array $nodes, $spacing = 0)
+    public function __construct(array $nodes = [], $spacing = 0)
     {
     }
 

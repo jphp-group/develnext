@@ -39,7 +39,6 @@ use ide\project\control\CommonProjectControlPane;
 use ide\project\control\DesignProjectControlPane;
 use ide\project\control\FormsProjectControlPane;
 use ide\project\control\ModulesProjectControlPane;
-use ide\project\control\SpritesProjectControlPane;
 use ide\project\Project;
 use ide\project\ProjectExporter;
 use ide\project\ProjectFile;

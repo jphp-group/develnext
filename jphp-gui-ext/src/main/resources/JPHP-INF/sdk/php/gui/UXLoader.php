@@ -20,7 +20,7 @@ class UXLoader
     /**
      * @param string $location (optional)
      */
-    public function __construct($location) {}
+    public function __construct($location = null) {}
 
     /**
      * @param string|File|Stream $source (optional)

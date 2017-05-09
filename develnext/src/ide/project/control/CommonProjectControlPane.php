@@ -47,6 +47,11 @@ class CommonProjectControlPane extends AbstractProjectControlPane
      */
     protected $init = false;
 
+    function getSort()
+    {
+        return 100;
+    }
+    
     public function getName()
     {
         return "Проект";
