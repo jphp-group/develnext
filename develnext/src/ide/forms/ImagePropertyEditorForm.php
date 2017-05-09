@@ -123,13 +123,13 @@ class ImagePropertyEditorForm extends AbstractIdeForm
 
     public function updateOnlineGallery()
     {
-        $this->onlineSearchPane->children->clear();
+        /*$this->onlineSearchPane->children->clear();
 
         if (!Ide::accountManager()->isAuthorized()) {
             $this->onlineSearchPane->add(new NeedAuthPane());
         } else {
             $this->onlineSearchPane->add($this->searchPaneArea);
-        }
+        } */
     }
 
     public function updateGallery($searchQuery = '')

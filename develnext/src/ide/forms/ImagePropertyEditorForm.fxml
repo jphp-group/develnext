@@ -79,12 +79,12 @@
                         </AnchorPane>
                     </content>
                 </Tab>
-                <Tab style="-fx-font-weight: bold;" styleClass="icon-flat-search" text="Поиск иконок">
+                <!--<Tab style="-fx-font-weight: bold;" styleClass="icon-flat-search" text="Поиск иконок">
                     <content>
                         <AnchorPane id="onlineSearchPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
                                     prefWidth="200.0"/>
                     </content>
-                </Tab>
+                </Tab>-->
             </tabs>
         </TabPane>
         <HBox layoutX="14.0" layoutY="530.0" prefHeight="32.0" prefWidth="652.0" spacing="10.0"
