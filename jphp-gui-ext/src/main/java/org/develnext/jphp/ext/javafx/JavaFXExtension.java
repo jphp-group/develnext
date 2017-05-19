@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
+import javafx.print.Printer;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -49,6 +50,7 @@ import org.develnext.jphp.ext.javafx.classes.effect.*;
 import org.develnext.jphp.ext.javafx.classes.event.*;
 import org.develnext.jphp.ext.javafx.classes.layout.*;
 import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
+import org.develnext.jphp.ext.javafx.classes.print.UXPrinter;
 import org.develnext.jphp.ext.javafx.classes.shape.*;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
@@ -240,6 +242,7 @@ public class JavaFXExtension extends Extension {
         registerCustomControls(scope);
         registerEffectPackage(scope);
         registerAnimationPackage(scope);
+        registerPrinterPackage(scope);
 
         registerEvents(scope);
     }
@@ -270,6 +273,12 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, PathTransition.class, UXPathAnimation.class);
 
         registerWrapperClass(scope, AnimationTimer.class, UXAnimationTimer.class);
+    }
+
+    protected void registerPrinterPackage(CompileScope scope) {
+        MemoryOperation.register(new PaperMemoryOperation());
+
+        registerWrapperClass(scope, Printer.class, UXPrinter.class);
     }
 
     public static boolean isJigsaw() {
