@@ -2,6 +2,7 @@
 namespace ide\editors\form;
 
 use develnext\lexer\token\ArgumentStmtToken;
+use develnext\lexer\token\FunctionStmtToken;
 use develnext\lexer\token\MethodStmtToken;
 use ide\action\ActionEditor;
 use ide\autocomplete\AutoCompleteRegion;
@@ -358,7 +359,7 @@ class IdeEventListPane
 
                 $actionConstructor->getLiveCodeEditor()->getAutoComplete()->getComplete()->on(
                     'addFunctionArgument',
-                    function ($type, ArgumentStmtToken $argument, $index, MethodStmtToken $method, AutoCompleteRegion $region) {
+                    function ($type, ArgumentStmtToken $argument, $index, FunctionStmtToken $method, AutoCompleteRegion $region) {
                         return $this->codeEditor
                             ->getAutoComplete()
                             ->getComplete()
