@@ -110,7 +110,7 @@ class SplashTipSystem
 
         if (self::$first) {
             self::$first = false;
-            return arr::first(self::$databases)->getFirst();
+            return arr::first(self::$databases)->getFirst($lang);
         }
 
         $databases = [];
