@@ -2,12 +2,14 @@ package org.develnext.jphp.ext.javafx.support.tray.models;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.control.PopupControl;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.PopupWindow;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-public class CustomStage extends Stage {
+public class CustomStage extends PopupControl {
     private Location bottomRight;
     private Location bottomLeft;
     private Location topLeft;
@@ -19,12 +21,10 @@ public class CustomStage extends Stage {
 
     private Location location;
 
-    public CustomStage(AnchorPane ap, StageStyle style, double horGap, double verGap) {
+    public CustomStage(AnchorPane ap, double horGap, double verGap) {
         this.ap = ap;
         this.horGap = horGap;
         this.verGap = verGap;
-
-        initStyle(style);
 
         setSize(ap.getPrefWidth(), ap.getPrefHeight());
     }

@@ -10,9 +10,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.develnext.jphp.ext.javafx.support.tray.animations.*;
@@ -36,6 +40,8 @@ public final class TrayNotification {
 
     @FXML
     private AnchorPane rootNode;
+
+    private static Stage tmpStage;
 
     private CustomStage stage;
     private NotificationType notificationType;
@@ -105,9 +111,9 @@ public final class TrayNotification {
     }
 
     private void initStage() {
-        stage = new CustomStage(rootNode, StageStyle.UNDECORATED, horGap, verGap);
-        stage.setScene(new Scene(rootNode));
-        stage.setAlwaysOnTop(true);
+        stage = new CustomStage(rootNode, horGap, verGap);
+        rootNode.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+        stage.getScene().setRoot(rootNode);
 
         setLocation(NotificationLocation.BOTTOM_RIGHT);
 
@@ -243,6 +249,19 @@ public final class TrayNotification {
         return animator().isShowing();
     }
 
+    private Stage getTmpStage() {
+        if (tmpStage == null) {
+            tmpStage = new Stage(StageStyle.UTILITY);
+            tmpStage.setWidth(2);
+            tmpStage.setHeight(2);
+            tmpStage.setX(-999);
+            tmpStage.setY(-999);
+            tmpStage.show();
+        }
+
+        return tmpStage;
+    }
+
     /**
      * Shows and dismisses the tray notification
      * @param dismissDelay How long to delay the start of the dismiss animation
@@ -254,7 +273,7 @@ public final class TrayNotification {
             onShown();
             setLocation(getLocation());
 
-            stage.show();
+            stage.show(getTmpStage());
 
             animator().playSequential(dismissDelay);
         }
@@ -268,7 +287,8 @@ public final class TrayNotification {
             onShown();
 
             setLocation(getLocation());
-            stage.show();
+
+            stage.show(getTmpStage());
 
             animator().playShowAnimation();
         }
@@ -354,12 +374,12 @@ public final class TrayNotification {
      * @param img The image to assign
      */
     public void setTrayIcon(Image img) {
-        stage.getIcons().clear();
-        stage.getIcons().add(img);
+        /*stage.getIcons().clear();
+        stage.getIcons().add(img);*/
     }
 
     public Image getTrayIcon() {
-        return stage.getIcons().get(0);
+        return null; // stage.getIcons().get(0);
     }
 
     /**
@@ -368,7 +388,7 @@ public final class TrayNotification {
      */
     public void setTitle(String txt) {
         lblTitle.setText(txt);
-        stage.setTitle(txt);
+        //stage.setTitle(txt);
     }
 
     public String getTitle() {

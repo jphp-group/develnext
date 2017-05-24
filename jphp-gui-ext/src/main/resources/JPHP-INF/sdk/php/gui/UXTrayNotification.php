@@ -1,6 +1,8 @@
 <?php
 namespace php\gui;
 
+use php\gui\event\UXEvent;
+
 /**
  * Class UXTrayNotification
  * @package php\gui
@@ -41,6 +43,7 @@ class UXTrayNotification
     public $image;
 
     /**
+     * @deprecated
      * @var UXImage
      */
     public $trayIcon;
