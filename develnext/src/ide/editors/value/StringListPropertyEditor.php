@@ -2,6 +2,7 @@
 namespace ide\editors\value;
 
 use ide\forms\FontPropertyEditorForm;
+use ide\Logger;
 use php\gui\event\UXMouseEvent;
 use php\gui\text\UXFont;
 use php\gui\UXList;
@@ -22,7 +23,7 @@ class StringListPropertyEditor extends TextPropertyEditor
                 if ($value instanceof UXList) {
                     return Flow::of($value)->toString("\n");
                 } else {
-                    throw new \Exception("Unable using StringList property editor for non UXList properties");
+                    Logger::warn("Unable using StringList property editor for non UXList properties");
                 }
             },
             function (ElementPropertyEditor $editor, $value) {
