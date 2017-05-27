@@ -810,13 +810,17 @@ public class UXDesigner extends BaseObject {
     public List<Node> getNodesInArea(double x, double y, double w, double h) {
         List<Node> result = new ArrayList<>();
 
+        Point2D pt = area.localToScreen(x, y);
+
         for (Node node : nodes.keySet()) {
-            double nx = node.getLayoutX() - getCenterX(node);
-            double ny = node.getLayoutY() - getCenterY(node);
+            Point2D nodePt = node.getParent().localToScreen(node.getLayoutX(), node.getLayoutY());
+
+            double nx = nodePt.getX() - getCenterX(node);
+            double ny = nodePt.getY() - getCenterY(node);
             double nw = node.getBoundsInLocal().getWidth();
             double nh = node.getBoundsInLocal().getHeight();
 
-            Point2D center = new Point2D(x + Math.round(w / 2), y + Math.round(h / 2));
+            Point2D center = new Point2D(pt.getX() + Math.round(w / 2), pt.getY() + Math.round(h / 2));
             Point2D nCenter = new Point2D(nx + Math.round(nw / 2), ny + Math.round(nh / 2));
 
             double _w, _h = 0;
