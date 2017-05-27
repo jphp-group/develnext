@@ -271,8 +271,10 @@ class ProjectSystem
                     return;
                 }
 
-                if ($project->getConfig()->getIdeVersionHash() > Ide::get()->getVersionHash()) {
-                    $msg = new MessageBoxForm("Проект '{$project->getName()}' создан в более новой версии DevelNext, вы точно хотите его открыть?", [
+                $prVersion = $project->getConfig()->getIdeVersion();
+
+                if (!Ide::get()->isSameVersionIgnorePatch($prVersion) && $project->getConfig()->getIdeVersionHash() > Ide::get()->getVersionHash()) {
+                    $msg = new MessageBoxForm("Проект '{$project->getName()}' создан в более новой версии DevelNext ($prVersion), вы точно хотите его открыть?", [
                         'Нет', 'Да, открыть проект'
                     ]);
 

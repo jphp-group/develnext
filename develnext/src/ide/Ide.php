@@ -32,6 +32,7 @@ use ide\tool\IdeToolManager;
 use ide\ui\LazyLoadingImage;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
+use ide\utils\Json;
 use php\desktop\SystemTray;
 use php\desktop\TrayIcon;
 use php\gui\event\UXKeyboardManager;
@@ -1620,5 +1621,19 @@ class Ide extends Application
     public function disableOpenLastProject()
     {
         $this->disableOpenLastProject = true;
+    }
+
+    public function isSameVersionIgnorePatch($otherVersion)
+    {
+        $version = IdeSystem::getVersionInfo($this->getVersion());
+        $otherVersion = IdeSystem::getVersionInfo($otherVersion);
+
+        $result = $otherVersion['type'] === $version['type'] && $otherVersion['major'] == $version['major']
+            && $otherVersion['minor'] === $version['minor'];
+
+        Logger::debug("isSameVersionIgnorePatch(): " . Json::encode($version) . " with " . Json::encode($otherVersion)
+            . " is " . ($result ? 'true' : 'false'));
+
+        return $result;
     }
 }
