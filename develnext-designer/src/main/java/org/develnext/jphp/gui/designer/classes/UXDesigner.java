@@ -1202,32 +1202,30 @@ public class UXDesigner extends BaseObject {
                         continue;
                     }
 
-                    Point2D localPoint = sel.parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
+                    Point2D localPoint = new Point2D(e.getScreenX(), e.getScreenY());
 
-                    if (localPoint != null) {
-                        double dx = localPoint.getX() - startPoint.getX();
-                        double dy = localPoint.getY() - startPoint.getY();
+                    double dx = localPoint.getX() - startPoint.getX();
+                    double dy = localPoint.getY() - startPoint.getY();
 
-                        Bounds bounds = sel.node.getBoundsInParent();
-                        Bounds layoutBounds = sel.node.getLayoutBounds();
+                    Bounds bounds = sel.node.getBoundsInParent();
+                    Bounds layoutBounds = sel.node.getLayoutBounds();
 
-                        double diffW = bounds.getWidth() - layoutBounds.getWidth();
-                        double diffH = bounds.getHeight() - layoutBounds.getHeight();
+                    double diffW = bounds.getWidth() - layoutBounds.getWidth();
+                    double diffH = bounds.getHeight() - layoutBounds.getHeight();
 
-                        if (sel.node.getEffect() == null) {
-                            sel.dragView.setUserData(new Insets(diffH, 0, 0, diffW));
-                        }
-
-                        double x = sel.node.getLayoutX() + dx;
-                        double y = sel.node.getLayoutY() + dy;
-
-                        if (!e.isAltDown() && snapSizeX > 1 && snapSizeY > 1 && snapEnabled) {
-                            x = Math.round((x / snapSizeX)) * snapSizeX;
-                            y = Math.round((y / snapSizeY)) * snapSizeY;
-                        }
-
-                        sel.drag(x, y);
+                    if (sel.node.getEffect() == null) {
+                        sel.dragView.setUserData(new Insets(diffH, 0, 0, diffW));
                     }
+
+                    double x = sel.node.getLayoutX() + dx;
+                    double y = sel.node.getLayoutY() + dy;
+
+                    if (!e.isAltDown() && snapSizeX > 1 && snapSizeY > 1 && snapEnabled) {
+                        x = Math.round((x / snapSizeX)) * snapSizeX;
+                        y = Math.round((y / snapSizeY)) * snapSizeY;
+                    }
+
+                    sel.drag(x, y);
                 }
 
                 e.consume();
@@ -1271,7 +1269,7 @@ public class UXDesigner extends BaseObject {
                 }
 
                 Pane parent = (Pane) node.getParent();
-                startPoint = parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
+                startPoint = new Point2D(e.getScreenX(), e.getScreenY()); // parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
 
                 for (Selection selection : selections.values()) {
                     selection.dragView.setMouseTransparent(true);
@@ -1626,6 +1624,9 @@ public class UXDesigner extends BaseObject {
             children.removeAll(ltPoint, rtPoint, lbPoint, rbPoint);
 
             children.removeAll(border, sizeText);
+
+            dragView.getChildren().clear();
+            parent.getChildren().remove(dragView);
         }
 
         public Rectangle buildPoint() {
