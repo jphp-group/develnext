@@ -105,6 +105,36 @@ class IdeSystem
     }
 
     /**
+     * @param string $version
+     * @return array
+     */
+    static function getVersionInfo($version)
+    {
+        list($number, $type) = str::split($version, ' ');
+
+        $numbers = str::split($number, '.');
+
+        if (!$type) {
+            $type = 'stable';
+            $major = (int) $numbers[0];
+            $minor = (int) $numbers[1];
+            $patch = (int) $numbers[2];
+        } else {
+            $type = str::split($version, '-')[0];
+            $major = (int) $numbers[0];
+            $minor = (int) $numbers[1];
+            $patch = (int) $type[1];
+        }
+
+        return [
+            'type' => $type,
+            'major' => $major,
+            'minor' => $minor,
+            'patch' => $patch
+        ];
+    }
+
+    /**
      * @var IdeClassLoader
      */
     protected static $loader;
