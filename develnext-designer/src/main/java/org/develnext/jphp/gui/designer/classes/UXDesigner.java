@@ -1061,7 +1061,7 @@ public class UXDesigner extends BaseObject {
 
         node.setOnKeyPressed(area.getOnKeyPressed());
 
-        if (!isWithChildrenNode(node)) {
+        //if (!isWithChildrenNode(node)) {
             node.addEventFilter(DragEvent.DRAG_OVER, event -> {
                 Dragboard dragboard = event.getDragboard();
 
@@ -1138,11 +1138,11 @@ public class UXDesigner extends BaseObject {
 
                 dragged = false;
             });
-        } else {
+        /*} else {
             node.addEventFilter(DragEvent.DRAG_DONE, event -> {
                 dragged = false;
             });
-        }
+        }*/
 
         EventHandler<MouseEvent> onDragDetected = new EventHandler<MouseEvent>() {
             public void handle(MouseEvent e) {
