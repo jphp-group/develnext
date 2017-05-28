@@ -2,3 +2,10 @@
 HBox, VBox, FlowPane {
     -fx-background-color: rgba(0, 0, 0, 0.1);
 }
+
+Canvas {
+    -fx-background-color: rgba(0, 0, 0, 0.1);
+
+    -fx-background-image: url("/.data/img/transparent.png");
+    -fx-background-repeat: repeat;
+}

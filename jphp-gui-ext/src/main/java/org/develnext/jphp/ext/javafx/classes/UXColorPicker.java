@@ -4,6 +4,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;

@@ -12,8 +12,6 @@ use php\gui\text\UXFont;
  */
 class UXGraphicsContext
 {
-
-
     /**
      * @readonly
      * @var UXCanvas
@@ -68,6 +66,11 @@ class UXGraphicsContext
      * @var string
      */
     public $fillRule;
+
+    /**
+     * @var UXColor
+     */
+    public $strokeColor;
 
 
     /**
@@ -276,7 +279,7 @@ class UXGraphicsContext
      * @param $dw (optional)
      * @param $dh (optional)
      */
-    public function drawImage(UXImage $image, $x, $y, $w, $h, $dx, $dy, $dw, $dh) {
+    public function drawImage(UXImage $image, $x, $y, $w = null, $h = null, $dx = null, $dy = null, $dw = null, $dh = null) {
     }
 
     /**

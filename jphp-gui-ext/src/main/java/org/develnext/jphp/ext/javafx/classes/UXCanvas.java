@@ -6,6 +6,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.WritableImage;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import org.develnext.jphp.ext.javafx.support.control.CanvasEx;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Nullable;
@@ -27,6 +28,10 @@ public class UXCanvas<T extends Canvas> extends UXNode<Canvas> {
 
     }
 
+    public UXCanvas(Environment env, CanvasEx wrappedObject) {
+        super(env, wrappedObject);
+    }
+
     public UXCanvas(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
@@ -37,7 +42,7 @@ public class UXCanvas<T extends Canvas> extends UXNode<Canvas> {
 
     @Signature
     public void __construct() {
-        __wrappedObject = new Canvas();
+        __wrappedObject = new CanvasEx();
     }
 
     @Override
@@ -53,6 +58,23 @@ public class UXCanvas<T extends Canvas> extends UXNode<Canvas> {
     @Signature
     public UXGraphicsContext gc(Environment env) {
         return getGraphicsContext(env);
+    }
+
+    @Signature
+    public void save(OutputStream stream) throws IOException {
+        save(stream, "png");
+    }
+
+    @Signature
+    public void save(OutputStream stream, String format) throws IOException {
+        SnapshotParameters param = new SnapshotParameters();
+        param.setDepthBuffer(true);
+        param.setFill(javafx.scene.paint.Color.TRANSPARENT);
+
+        BufferedImage image = SwingFXUtils.fromFXImage(getWrappedObject().snapshot(param, null), null);
+        image = UXImage.convertToCompatible(image);
+
+        ImageIO.write(image, format, stream);
     }
 
     private static BufferedImage imageToBufferedImage(Image image) {

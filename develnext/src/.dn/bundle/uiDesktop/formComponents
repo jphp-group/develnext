@@ -27,6 +27,7 @@ ide\formats\form\elements\WebViewFormElement
 ide\formats\form\elements\TableViewFormElement
 ide\formats\form\elements\PaginationFormElement
 ide\formats\form\elements\RadioGroupPaneFormElement
+ide\formats\form\elements\CanvasFormElement
 
 ide\formats\form\elements\PanelFormElement
 ide\formats\form\elements\TitledPaneFormElement
@@ -90,3 +91,4 @@ ide\formats\form\tags\TableViewFormElementTag
 ide\formats\form\tags\RadioGroupPaneFormElementTag
 ide\formats\form\tags\TreeViewFormElementTag
 ide\formats\form\tags\MediaViewFormElementTag
+ide\formats\form\tags\CanvasFormElementTag

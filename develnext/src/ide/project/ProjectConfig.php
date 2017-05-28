@@ -5,6 +5,7 @@ use Exception;
 use ide\Ide;
 use ide\Logger;
 use ide\systems\FileSystem;
+use ide\systems\IdeSystem;
 use ide\utils\FileUtils;
 use php\format\ProcessorException;
 use php\io\FileStream;
