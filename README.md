@@ -15,7 +15,7 @@
 
 ### How to get the DevelNext IDE distrubutive?
 
-Install JDK, close repo and use the following console commands:
+Install JDK, clone repo and use the following console commands:
 
 ```
 cd /path/to/repo
