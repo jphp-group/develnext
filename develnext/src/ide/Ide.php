@@ -634,10 +634,10 @@ class Ide extends Application
 
         if ($this->language) {
             $this->language->load();
-        }
 
-        if ($altLanguage = $this->languages[$this->language->getAltLang()]) {
-            $altLanguage->load();
+            if ($altLanguage = $this->languages[$this->language->getAltLang()]) {
+                $altLanguage->load();
+            }
         }
 
         $this->setUserConfigValue('ide.language', $ideLanguage);
