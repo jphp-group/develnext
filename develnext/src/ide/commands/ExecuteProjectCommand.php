@@ -242,7 +242,7 @@ class ExecuteProjectCommand extends AbstractCommand
                 try {
                     $classPaths = arr::toList($this->behaviour->getSourceDirectories(), $this->behaviour->getProfileModules(['jar']));
 
-                    $args = ['java', '-cp', str::join($classPaths, File::PATH_SEPARATOR), '-Xmx512m', '-Dfile.encoding=UTF-8', '-Djphp.trace=true', 'org.develnext.jphp.ext.javafx.FXLauncher'];
+                    $args = ['java', '-cp', str::join($classPaths, File::PATH_SEPARATOR), '-XX:+UseG1GC', '-Xms128M', '-Xmx512m', '-Dfile.encoding=UTF-8', '-Djphp.trace=true', 'org.develnext.jphp.ext.javafx.FXLauncher'];
 
                     Logger::debug("Run -> " . str::join($args, ' '));
 
