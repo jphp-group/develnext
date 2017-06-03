@@ -353,3 +353,8 @@
     -fx-padding: 2;
 }
 
+
+.scroll-pane.dn-mosaic-background > .viewport {
+    -fx-background-image: url("/.data/img/transparent-2.png");
+    -fx-background-repeat: repeat;
+}

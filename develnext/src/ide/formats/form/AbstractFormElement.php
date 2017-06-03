@@ -285,4 +285,9 @@ abstract class AbstractFormElement
     public function refreshInspector(UXNode $node, TypeEntry $type)
     {
     }
+
+    public function designHasBeenChanged(UXNode $node, UXDesigner $designer)
+    {
+        // nop.
+    }
 }

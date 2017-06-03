@@ -125,6 +125,10 @@ class GuiFormDumper extends AbstractFormDumper
 
             $layout = $loader->load($stream);
 
+            if (!$layout->backgroundColor) {
+                $layout->backgroundColor = '#f2f2f2';
+            }
+
             if ($layout instanceof UXPane) {
                 $editor->setLayout($layout);
 

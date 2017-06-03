@@ -12,8 +12,6 @@ use php\io\Stream;
  */
 class UXCanvas extends UXNode
 {
-
-
     /**
      * @return UXGraphicsContext
      */
@@ -31,6 +29,19 @@ class UXCanvas extends UXNode
     }
 
     /**
+     * Save image of canvas to file or stream in passed format, by default png.
+     * --RU--
+     * Сохранить изображение полотна в файл или поток в переданном формате, по-умолчанию png.
+     *
+     * @param string|Stream|File $to
+     * @param string $format
+     */
+    public function save($to, $format = 'png')
+    {
+    }
+
+    /**
+     * @deprecated
      * @param string $format png, gif, etc.
      * @param Stream|File|string $output
      * @param callable $callback (bool $success)

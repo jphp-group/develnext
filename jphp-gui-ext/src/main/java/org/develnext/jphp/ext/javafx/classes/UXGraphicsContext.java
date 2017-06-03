@@ -104,6 +104,17 @@ public class UXGraphicsContext extends BaseWrapper<GraphicsContext> {
         return getWrappedObject().getFill() instanceof Color ? (Color) getWrappedObject().getFill() : null;
     }
 
+    @Setter
+    @Signature
+    public void setStrokeColor(@Nullable Color color) {
+        getWrappedObject().setStroke(color);
+    }
+
+    @Getter
+    public Color getStrokeColor() {
+        return getWrappedObject().getStroke() instanceof Color ? (Color) getWrappedObject().getStroke() : null;
+    }
+
     @Getter
     public UXFont getFont(Environment env) {
         return new UXFont(env, getWrappedObject().getFont(), font -> getWrappedObject().setFont(font));

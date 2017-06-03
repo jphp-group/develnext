@@ -79,7 +79,7 @@ class Cache
 
     /**
      * @param string $file
-     * @return UXImage|null
+     * @return UXImage|LazyImage|null
      */
     public static function getImage($file)
     {

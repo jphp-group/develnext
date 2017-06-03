@@ -949,7 +949,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         Logger::info("Start refresh");
 
         $this->eachNode(function (UXNode $node, $nodeId, AbstractFormElement $element = null) {
-            if ($element) {
+            if ($element && !$node->classes->has('x-system-designer-element')) {
                 $this->refreshNode($node);
             }
         });
@@ -1762,6 +1762,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         $viewer = $this->layoutViewer = new UXScrollPane($area);
+        $viewer->classes->add('dn-mosaic-background');
 
         foreach ($this->stylesheets as $stylesheet) {
             $viewer->stylesheets->add($stylesheet);
@@ -2141,6 +2142,16 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $this->saveFormFile();
         $this->_onNodePick();
+
+        $node = $this->designer->pickedNode;
+
+        if ($node) {
+            $element = $this->format->getFormElement($node);
+
+            if ($element) {
+                $element->designHasBeenChanged($node, $this->designer);
+            }
+        }
     }
 
     protected function _onNodePick()

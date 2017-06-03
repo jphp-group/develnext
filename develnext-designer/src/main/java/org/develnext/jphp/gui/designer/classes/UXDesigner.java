@@ -774,6 +774,12 @@ public class UXDesigner extends BaseObject {
             return;
         }
 
+        if (node instanceof Canvas) {
+            ((Canvas) node).setWidth(width);
+            ((Canvas) node).setHeight(height);
+            return;
+        }
+
         node.resize(width, height);
     }
 
