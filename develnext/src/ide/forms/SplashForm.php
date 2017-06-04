@@ -19,6 +19,7 @@ use php\io\Stream;
 use php\lang\Thread;
 use php\lang\ThreadPool;
 use php\lib\str;
+use php\time\Time;
 
 /**
  * @property UXLabel $version
@@ -40,6 +41,13 @@ class SplashForm extends AbstractIdeForm
 
         if ($versionCode) {
             $this->versionCode->text = str::upperFirst($versionCode);
+
+            $now = Time::now()->toString('dd-MM');
+            $specialCode = 'res://.data/img/code/special/' . $now . '.png';
+
+            if (Stream::exists($specialCode)) {
+                $versionCode = "special/$now";
+            }
 
             $codeImg = new UXImageArea(new UXImage('res://.data/img/code/' . $versionCode . '.png'));
             $codeImg->stretch = true;
