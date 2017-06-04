@@ -20,9 +20,14 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ImageView>
-      <Label id="version" alignment="TOP_RIGHT" layoutX="134" layoutY="320" prefHeight="-1" prefWidth="434" text="... version" textAlignment="RIGHT" textFill="white">
+      <Label id="version" alignment="TOP_RIGHT" layoutX="400" layoutY="25" prefHeight="-1" prefWidth="200" text="0.0.0" textAlignment="RIGHT" textFill="white">
          <font>
-            <Font size="14.0" />
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label id="versionCode" alignment="TOP_RIGHT" layoutX="400" layoutY="43" prefHeight="-1" prefWidth="200" text="Unknown" textAlignment="RIGHT" textFill="white">
+         <font>
+            <Font size="20.0" name="System Bold" />
          </font>
       </Label>
       <HBox layoutY="370" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" style="-fx-background-color: #1e4e7a;" alignment="CENTER">

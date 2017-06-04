@@ -18,6 +18,7 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\Thread;
 use php\lang\ThreadPool;
+use php\lib\str;
 
 /**
  * @property UXLabel $version
@@ -34,7 +35,20 @@ class SplashForm extends AbstractIdeForm
 
         $this->centerOnScreen();
 
+        $versionCode = $this->_app->getConfig()->get('app.versionCode');
         $this->version->text = $this->_app->getVersion();
+
+        if ($versionCode) {
+            $this->versionCode->text = str::upperFirst($versionCode);
+
+            $codeImg = new UXImageArea(new UXImage('res://.data/img/code/' . $versionCode . '.png'));
+            $codeImg->stretch = true;
+            $codeImg->smartStretch = true;
+            $codeImg->size = [64, 64];
+            $codeImg->position = [690 - 64 - 14, 14];
+
+            $this->add($codeImg);
+        }
 
         $name = Ide::get()->getUserConfigValue('splash.name');
         $avatar = Ide::get()->getUserConfigValue('splash.avatar');
