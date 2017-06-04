@@ -43,7 +43,7 @@ class TabPaneFormElementTag extends AbstractFormElementTag
 
                 $domTabs->appendChild($domTab);
 
-                $domTab->setAttribute('text', $tab->text);
+                $domTab->setAttribute('text', self::escapeText($tab->text));
 
                 if (!$tab->closable) {
                     $domTab->setAttribute('closable', 'false');
