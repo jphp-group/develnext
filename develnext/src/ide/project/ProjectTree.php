@@ -1,5 +1,6 @@
 <?php
 namespace ide\project;
+use ide\commands\tree\TreeCopyPathCommand;
 use ide\commands\tree\TreeCreateDirectoryCommand;
 use ide\commands\tree\TreeCreateFileCommand;
 use ide\commands\tree\TreeDeleteFileCommand;
@@ -87,6 +88,8 @@ class ProjectTree
         $this->contextMenu->add(new TreeEditInWindowFileCommand($this));
         $this->contextMenu->add(new TreeDeleteFileCommand($this));
         $this->contextMenu->addSeparator();
+        $this->contextMenu->add(new TreeCopyPathCommand($this));
+        $this->contextMenu->add(new TreeCopyPathCommand($this, true));
         $this->contextMenu->add(new TreeShowInExplorerCommand($this));
 
         $this->contextMenu->add(new TreeCreateFileCommand($this), 'new');
