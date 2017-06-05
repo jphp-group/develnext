@@ -34,7 +34,7 @@ class IdeService extends AbstractService
         return $this->execute('ide/get-last-update', ['channel' => $channel]);
     }
 
-    public function sendError(\Exception $e)
+    public function sendError(\Throwable $e)
     {
         $winSize = Ide::get()->getMainForm()->size;
 
