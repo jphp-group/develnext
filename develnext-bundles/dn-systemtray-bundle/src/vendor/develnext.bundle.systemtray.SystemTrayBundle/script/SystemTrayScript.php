@@ -186,6 +186,16 @@ class SystemTrayScript extends AbstractScript
     {
         return SystemTray::isSupported();
     }
+    
+    /**
+     * @param string $caption
+     * @param string $text
+     * @param string $messageType
+     */
+	public function displayMessage($caption, $text, $messageType)
+    {
+        $this->_trayIcon->displayMessage($caption, $text, $messageType);
+    }
 
     /**
      * @return string
