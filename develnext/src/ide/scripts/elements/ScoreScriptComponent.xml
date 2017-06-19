@@ -1,0 +1,16 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="name" value="general" />
+        <property code="initialValue" value="0" />
+    </init>
+
+    <properties group="general" title="Главное">
+        <property code="name" name="Имя счета" editor="text" tooltip="Название счета" />
+        <property code="initialValue" name="Начальное значение" editor="integer" tooltip="Первоначальное значение" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="beforeChange" name="До изменения" kind="ObjectEvent" />
+        <eventType code="afterChange" name="После изменения" kind="ObjectEvent" />
+    </eventTypes>
+</element>

@@ -26,6 +26,11 @@ class ScriptEvent extends \stdClass
     public $usage = 0;
 
     /**
+     * @var bool
+     */
+    private $consumed = false;
+
+    /**
      * ScriptEvent constructor.
      * @param AbstractScript $sender
      * @param null $target
@@ -45,5 +50,21 @@ class ScriptEvent extends \stdClass
     public function isDone()
     {
         return $this->usage <= 0;
+    }
+
+    /**
+     * Consume event.
+     */
+    public function consume()
+    {
+        $this->consumed = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isConsumed()
+    {
+        return $this->consumed;
     }
 }
