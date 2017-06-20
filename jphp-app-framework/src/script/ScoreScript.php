@@ -19,7 +19,7 @@ class ScoreScript extends AbstractScript implements SetTextBehaviour, ValuableBe
     /**
      * @var string
      */
-    public $name = 'general';
+    public $name = 'global';
 
     /**
      * @var int

@@ -1,6 +1,6 @@
 <element extends="ide\scripts\elements\AbstractComponent">
     <init>
-        <property code="name" value="general" />
+        <property code="name" value="global" />
         <property code="initialValue" value="0" />
     </init>
 
