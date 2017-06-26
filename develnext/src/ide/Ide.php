@@ -1102,7 +1102,7 @@ class Ide extends Application
      * @param bool $cache
      * @return UXImageView
      */
-    public function getImage($path, array $size = null, $cache = true)
+    public static function getImage($path, array $size = null, $cache = true)
     {
         if ($path === null) {
             return null;

@@ -67,27 +67,6 @@ class BundleCheckListForm extends AbstractIdeForm
     protected $checkboxes = [];
 
     /**
-     * @var array
-     */
-    protected $groups = [
-        'all' => 'Все',
-        'game' => 'Игра',
-        'network' => 'Интернет, сеть',
-        'database' => 'Данные',
-        'system' => 'Система',
-        'other' => 'Другое',
-    ];
-
-    protected $groupIcons = [
-        'all' => 'icons/all16.png',
-        'game' => 'icons/gameMonitor16.png',
-        'network' => 'icons/web16.png',
-        'database' => 'icons/database16.png',
-        'system' => 'icons/system16.png',
-        'other' => 'icons/blocks16.png',
-    ];
-
-    /**
      * @var ListMenu[]
      */
     protected $tabLists = [];
@@ -101,53 +80,6 @@ class BundleCheckListForm extends AbstractIdeForm
     protected function init()
     {
         parent::init();
-
-        $this->icon->image = ico('bundle32')->image;
-
-        $this->tabs->tabs->clear();
-
-        foreach ($this->groups as $code => $name) {
-            $tab = new UXTab();
-            $tab->text = $name;
-            $tab->graphic = Ide::get()->getImage($this->groupIcons[$code]);
-
-            $tabList = new ListMenu();
-            $tabList->setNameThin(true);
-            $tabList->on('click', function () use ($tabList) {
-                $this->display($tabList->selectedItem);
-            });
-
-            $tabList->setDescriptionGetter(function (IdeLibraryBundleResource $resource) {
-                $text = $this->groups[$resource->getGroup()];
-                return $text;
-            });
-
-            $tabList->setNameGetter(function (IdeLibraryBundleResource $resource) {
-                $text = $resource->getName();
-
-                if ($this->behaviour->hasBundleInAnyEnvironment($resource->getBundle())) {
-                    $text = "$text ✔";
-                }
-
-                return $text;
-            });
-
-            $tabList->setIconGetter(function (IdeLibraryBundleResource $resource) {
-                return $this->groupIcons[$resource->getGroup()];
-            });
-
-            $tab->content = $tabList;
-            $this->tabLists[$code] = $tabList;
-
-            $this->tabs->tabs->add($tab);
-
-            $tab->on('change', function () use ($tabList) {
-                uiLater(function () use ($tabList) {
-                    $tabList->selectedIndex = 0;
-                    $this->display($tabList->selectedItem);
-                });
-            });
-        }
     }
 
 
@@ -158,142 +90,12 @@ class BundleCheckListForm extends AbstractIdeForm
     {
         $this->checkboxes = [];
 
-        foreach ($this->tabLists as $list) {
-            $list->clear();
-        }
-
-        foreach ($this->behaviour->getPublicBundleResources() as $resource) {
-            $this->tabLists['all']->add($resource);
-            $this->tabLists[$resource->getGroup()]->add($resource);
-        }
-
         if ($this->getResult() instanceof IdeLibraryBundleResource) {
             $this->display($this->getResult());
-
-            uiLater(function () {
-                foreach ($this->tabLists['all']->items as $i => $res) {
-                    if ($this->getResult() == $res) {
-                        $this->tabLists['all']->selectedIndex = $i;
-                        $this->tabLists['all']->focusedIndex = $i;
-                        $this->tabLists['all']->scrollTo($i);
-                    }
-                }
-            });
-
-            return;
         } else {
             $this->display(null);
         }
-
-        uiLater(function () {
-            $this->tabLists['all']->selectedIndex = 0;
-            $this->display($this->tabLists['all']->selectedItem);
-        });
-
-        /*foreach ($bundles as $bundle) {
-            $this->checkboxes[reflect::typeOf($bundle)] = $checkbox = new UXCheckbox();
-
-            $checkbox->selected = $this->behaviour->hasBundle(Project::ENV_ALL, reflect::typeOf($bundle));
-            $this->list->items->add([$checkbox, $bundle]);
-        }*/
     }
-
-    /**
-     * @event addBundle.action
-     */
-    public function addBundle()
-    {
-        $dialog = new UXFileChooser();
-        $dialog->extensionFilters = [['description' => 'Пакеты для DevelNext (*.dnbundle)', 'extensions' => ['*.dnbundle']]];
-
-        if ($file = $dialog->showOpenDialog()) {
-            $zip = new ZipFile($file);
-
-            try {
-                $config = new IdeConfiguration($zip->getEntryStream('.resource'), 'UTF-8');
-
-                if (!$config->toArray()) {
-                    UXDialog::showAndWait('Поврежденный или некорректный пакет расширений');
-                    $zip->close();
-                } else {
-                    $this->showPreloader();
-
-                    (new Thread(function () use ($zip, $file) {
-                        try {
-                            $code = fs::nameNoExt($file);
-
-                            $resource = Ide::get()->getLibrary()->makeResource('bundles', $code, true);
-                            $path = fs::parent($resource->getPath()) . "/" . $code;
-
-                            foreach ($zip->getEntryNames() as $name) {
-                                if ($entry = $zip->getEntry($name)) {
-                                    if ($name == '.resource') {
-                                        fs::makeFile($resource->getPath() . ".resource");
-                                        fs::copy($zip->getEntryStream($name), $resource->getPath() . ".resource");
-                                    } else {
-                                        if (str::startsWith($name, "bundle/")) {
-                                            $to = $path . "/" . str::sub($name, 7);
-
-                                            if ($entry->isDirectory()) {
-                                                fs::makeDir($to);
-                                            } else {
-                                                fs::ensureParent($to);
-                                                fs::copy($zip->getEntryStream($name), $to);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            Ide::get()->getLibrary()->updateCategory('bundles');
-
-                            uiLater(function () use ($resource) {
-                                $this->hidePreloader();
-                                $this->doShowing();
-
-                                /** @var IdeLibraryBundleResource $resource */
-                                $resource = Ide::get()->getLibrary()->findResource('bundles', $resource->getPath());
-
-                                if ($env = $this->behaviour->hasBundleInAnyEnvironment($resource->getBundle())) {
-                                    $this->behaviour->removeBundle($resource->getBundle());
-                                    $this->behaviour->addBundle($env, $resource->getBundle());
-                                }
-
-                                $this->display($resource);
-
-                                UXDialog::showAndWait('Для завершения установки пакета перезапустите DevelNext!', 'INFORMATION', $this);
-
-                                //$this->toast('Пакет успешно добавлен в IDE');
-                            });
-                        } finally {
-                            $zip->close();
-                        }
-                    }))->start();
-                }
-            } finally {
-
-            }
-        }
-    }
-
-    /**
-     * @event saveButton.action
-     */
-    /*public function doSave()
-    {
-        $bundles = $this->behaviour->getPublicBundles();
-        $result = [];
-
-        // @var AbstractBundle $bundle
-        foreach ($this->checkboxes as $class => $checkbox) {
-            if ($checkbox->selected && $bundles[$class]) {
-                $result[$class] = $bundles[$class];
-            }
-        }
-
-        $this->setResult($result);
-        $this->hide();
-    } */
 
     /**
      * @event cancelButton.action
@@ -352,7 +154,7 @@ class BundleCheckListForm extends AbstractIdeForm
     {
         if (MessageBoxForm::confirmDelete('пакет расширений ' . $this->displayResource->getName(), $this)) {
             Ide::get()->getLibrary()->delete($this->displayResource);
-            $this->doShowing();
+            $this->hide();
         }
     }
 
