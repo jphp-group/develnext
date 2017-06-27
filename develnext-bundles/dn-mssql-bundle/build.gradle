@@ -1,0 +1,18 @@
+
+project.version = ''
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+sourceSets {
+    main.resources.srcDirs = ['src']
+}
+
+dependencies {
+    compile ('com.microsoft.sqlserver:mssql-jdbc:6.1.0.jre8') {
+        exclude group: 'com.microsoft.azure', module: 'azure-keyvault'
+    }
+}
