@@ -10,3 +10,6 @@
 [submodule "3rd-party/DockFX"]
 	path = 3rd-party/DockFX
 	url = https://github.com/develnext/DockFX
+[submodule "jphp-zip-ext"]
+	path = jphp-zip-ext
+	url = https://github.com/jphp-compiler/jphp-zip-ext.git
