@@ -110,6 +110,7 @@ script\FileScript
 script\MacroScript
 script\MediaPlayerScript
 script\RobotScript
+script\ScoreScript
 script\storage\AbstractStorage
 script\storage\IniStorage
 script\support\NodeHelper

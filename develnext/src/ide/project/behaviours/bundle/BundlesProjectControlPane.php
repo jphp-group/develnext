@@ -1,8 +1,9 @@
 <?php
 namespace ide\project\behaviours\bundle;
 
-use ide\forms\BundleCheckListForm;
+use ide\forms\BundleDetailInfoForm;
 use ide\forms\InputMessageBoxForm;
+use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\IdeConfiguration;
 use ide\library\IdeLibraryBundleResource;
@@ -146,12 +147,26 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
 
             /** @var IdeLibraryBundleResource $resource */
             $resource = $node->data('resource');
-            $this->behaviour->addBundle(Project::ENV_ALL, $resource->getBundle());
-            $this->projectBundleListPane->add($this->makeItemUi($resource));
 
-            $this->availableBundleListPane->removeBySelections();
+            Ide::get()->getMainForm()->showPreloader('Подождите, подключение пакета ...');
 
-            Ide::toast("Пакет расширения '{$resource->getName()}' подключен к проекту");
+            Ide::async(function () use ($resource) {
+                try {
+                    $this->behaviour->addBundle(Project::ENV_ALL, $resource->getBundle());
+                } finally {
+                    uiLater(function () {
+                        Ide::get()->getMainForm()->hidePreloader();
+                    });
+                }
+
+                uiLater(function () use ($resource) {
+                    $this->projectBundleListPane->add($this->makeItemUi($resource));
+
+                    $this->availableBundleListPane->removeBySelections();
+
+                    Ide::toast("Пакет расширения '{$resource->getName()}' подключен к проекту");
+                });
+            });
         });
 
         $label = new UXLabel("Доступные пакеты:");
@@ -203,7 +218,7 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
         $addToLibrary->on('action', [$this, 'addBundleFile']);
         $box->add($addToLibrary);
 
-        $addUrlToLibrary = new UXButton('Добавить пакет по URL');
+        $addUrlToLibrary = new UXButton('Добавить пакет по URL', ico('linkAdd16'));
         $addUrlToLibrary->maxHeight = 999;
         $addUrlToLibrary->on('action', [$this, 'addBundleUrl']);
         $box->add($addUrlToLibrary);
@@ -213,9 +228,9 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
 
     private function makeItemUi(IdeLibraryBundleResource $resource)
     {
-        $item = new ImageBox(72, 52);
+        $item = new ImageBox(92, 52);
         $item->setImage(Ide::getImage($resource->getIcon())->image);
-        $item->setTitle($resource->getName());
+        $item->setTitle($resource->getName() . ' ' . $resource->getVersion());
         $item->setTooltip($resource->getDescription());
         $item->data('resource', $resource);
 
@@ -250,7 +265,11 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
 
     public function showBundleDialog(IdeLibraryBundleResource $resource)
     {
-        $dialog = new BundleCheckListForm($this->behaviour);
+        $dialog = new BundleDetailInfoForm($this->behaviour);
+        $dialog->onUpdate(function () {
+            $this->refresh();
+        });
+
         $dialog->setResult($resource);
         $dialog->showDialog();
 
@@ -268,6 +287,7 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                 if (!$config->toArray()) {
                     UXDialog::showAndWait('Поврежденный или некорректный пакет расширений', 'ERROR');
                     $zip->close();
+                    return false;
                 } else {
 
                     (new Thread(function () use ($zip, $file, $config) {
@@ -310,19 +330,24 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                                     $this->behaviour->addBundle($env, $resource->getBundle());
                                 }
 
-                                UXDialog::showAndWait('Для завершения установки пакета перезапустите DevelNext!', 'INFORMATION', $this);
-                                //$this->toast('Пакет успешно добавлен в IDE');
+                                $msg = new MessageBoxForm('Для завершения установки пакета перезапустите DevelNext!', ['Перезапустить', 'Позже']);
+                                if ($msg->showWarningDialog() && $msg->getResultIndex() == 0) {
+                                    Ide::get()->restart();
+                                }
                             });
                         } finally {
                             $zip->close();
                         }
                     }))->start();
+
+                    return true;
                 }
             } finally {
 
             }
         } catch (ZipException $e) {
             UXDialog::showAndWait('Поврежденный или некорректный файл ZIP пакета расширений', 'ERROR');
+            return false;
         }
     }
 
@@ -338,16 +363,32 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
 
     public function addBundleUrl()
     {
-        $dialog = new InputMessageBoxForm('Добавление пакета по URL', 'URL (ссылка) на пакет расширения');
-
-        $dialog->setResult('http://');
+        $dialog = new InputMessageBoxForm('Добавление пакета по URL', 'Ссылка на пакет расширения (URL):', '* Введите ссылку на *.dnbundle файл');
 
         if ($dialog->showDialog() && $dialog->getResult()) {
             $file = File::createTemp('dnbundle', '.dnbundle');
 
-            fs::copy($dialog->getResult(), $file);
+            Ide::get()->getMainForm()->showPreloader('Подождите, загрузка пакета ...');
 
-            $this->addBundle($file);
+            Ide::async(function () use ($dialog, $file) {
+                fs::copy($dialog->getResult(), $file, null, 1024 * 256);
+
+                uiLater(function () {
+                    Ide::get()->getMainForm()->showPreloader('Подождите, установка пакета ...');
+                });
+
+                if (!$this->addBundle($file)) {
+                    $this->addBundleUrl();
+                }
+
+                if (!$file->delete()) {
+                    $file->deleteOnExit();
+                }
+
+                uiLater(function () {
+                    Ide::get()->getMainForm()->hidePreloader();
+                });
+            });
         }
     }
 

@@ -357,7 +357,7 @@ class MainForm extends AbstractIdeForm
                 if ($result == 'yes') {
                     Logger::info("Remember the last project = yes!");
 
-                    Ide::get()->setUserConfigValue('lastProject', $project->getFile($project->getName() . '.dnproject'));
+                    Ide::get()->setUserConfigValue('lastProject', $project->getProjectFile());
                 } elseif ($result == 'abort') {
                     if ($e) {
                         $e->consume();

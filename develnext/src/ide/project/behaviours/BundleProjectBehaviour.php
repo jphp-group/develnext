@@ -6,7 +6,7 @@ use ide\bundle\AbstractJarBundle;
 use ide\editors\AbstractEditor;
 use ide\editors\ProjectEditor;
 use ide\formats\ProjectFormat;
-use ide\forms\BundleCheckListForm;
+use ide\forms\BundleDetailInfoForm;
 use ide\Ide;
 use ide\IdeConfiguration;
 use ide\library\IdeLibraryBundleResource;
@@ -123,9 +123,9 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     public function doCreate()
     {
-        uiLater(function () {
+        /*uiLater(function () {
             $this->showBundleCheckListDialog();
-        });
+        });*/
     }
 
     public function doCreateEditor(AbstractEditor $editor)
@@ -765,9 +765,18 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         return $this->bundleConfigs[get_class($bundle)];
     }
 
-    public function showBundleCheckListDialog(IdeLibraryBundleResource $resource = null)
+    public function showBundleDetailDialog(IdeLibraryBundleResource $resource = null)
     {
-        $dialog = new BundleCheckListForm($this);
+        if (!$resource) {
+            return;
+        }
+
+        if ($resource && ($resource->isEmbedded() || $resource->isHidden())) {
+            UXDialog::showAndWait("{$resource->getName()} - Системный пакет расширений.");
+            return;
+        }
+
+        $dialog = new BundleDetailInfoForm($this);
         $dialog->setResult($resource);
 
         if ($dialog->showDialog() || true) {
@@ -801,7 +810,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 $uiItem->classes->add('dn-simple-toggle-button');
                 $uiItem->tooltipText = $bundle->getDescription();
                 $uiItem->on('action', function () use ($resource) {
-                    $this->showBundleCheckListDialog($resource);
+                    $this->showBundleDetailDialog($resource);
                 });
 
                 $this->uiPackages->add($uiItem);
