@@ -105,7 +105,17 @@ class IdeLibrary
                         try {
                             $resource = new $type['type']($path);
                             $resource->onRegister($this);
-                            $this->resources[$code][] = $resource;
+
+                            if ($resource->getUniqueId()) {
+                                /** @var IdeLibraryResource $oldResource */
+                                $oldResource = $this->resources[$code][$resource->getUniqueId()];
+
+                                if (!$oldResource || $oldResource->isEmbedded()) {
+                                    $this->resources[$code][$resource->getUniqueId()] = $resource;
+                                }
+                            } else {
+                                $this->resources[$code][] = $resource;
+                            }
                         } catch (\Exception $e) {
                             Logger::exception("Failed to register ($code) resource '$path'", $e);
                         } catch (\Error $e) {
@@ -141,6 +151,20 @@ class IdeLibrary
         }
 
         return null;
+    }
+
+    /**
+     * @param string $category
+     * @param string $uniqueId
+     * @return IdeLibraryResource
+     */
+    public function getResource($category, $uniqueId)
+    {
+        $uniqueId = str::lower($uniqueId);
+        $uniqueId = str::replace($uniqueId, ' ', '_');
+        $uniqueId = str::replace($uniqueId, '-', '_');
+
+        return $this->resources[$category][$uniqueId];
     }
 
     /**
