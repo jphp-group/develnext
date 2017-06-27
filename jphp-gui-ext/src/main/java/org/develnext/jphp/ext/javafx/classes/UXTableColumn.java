@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -104,7 +105,13 @@ public class UXTableColumn extends BaseWrapper<TableColumnBase> {
                 if (value instanceof Memory) {
                     Memory memory = (Memory) value;
 
-                    return new SimpleStringProperty(memory.valueOfIndex(getWrappedObject().getId()).toString());
+                    memory = memory.valueOfIndex(getWrappedObject().getId());
+
+                    if (memory.instanceOf(UXNode.class)) {
+                        return new ReadOnlyObjectWrapper<Node>(memory.toObject(UXNode.class).getWrappedObject());
+                    }
+
+                    return new SimpleStringProperty(memory.toString());
                 }
 
                 return new SimpleStringProperty("");
@@ -127,6 +134,10 @@ public class UXTableColumn extends BaseWrapper<TableColumnBase> {
                         Memory.wrap(env, param.getValue()),
                         ObjectMemory.valueOf(new UXTableColumn(env, param.getTableColumn()))
                 );
+
+                if (result.instanceOf(UXNode.class)) {
+                    return new ReadOnlyObjectWrapper<Node>(result.toObject(UXNode.class).getWrappedObject());
+                }
 
                 return new SimpleStringProperty(result.toString());
             }
