@@ -34,6 +34,14 @@ abstract class IdeLibraryResource implements MenuViewable
     abstract public function getCategory();
 
     /**
+     * @return string
+     */
+    public function getUniqueId()
+    {
+        return null;
+    }
+
+    /**
      * IdeLibraryResource constructor.
      * @param string $path
      */

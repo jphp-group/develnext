@@ -21,6 +21,18 @@ class IdeLibraryBundleResource extends IdeLibraryResource
     /**
      * @return string
      */
+    public function getUniqueId()
+    {
+        $str = str::lower($this->getName());
+        $str = str::replace($str, ' ', '_');
+        $str = str::replace($str, '-', '_');
+
+        return $str;
+    }
+
+    /**
+     * @return string
+     */
     public function getGroup()
     {
         return $this->config->get('group', 'other');
