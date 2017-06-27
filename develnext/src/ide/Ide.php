@@ -55,6 +55,7 @@ use php\io\IOException;
 use php\io\ResourceStream;
 use php\io\Stream;
 use php\lang\IllegalArgumentException;
+use php\lang\Process;
 use php\lang\System;
 use php\lang\Thread;
 use php\lang\ThreadPool;
@@ -1102,7 +1103,7 @@ class Ide extends Application
      * @param bool $cache
      * @return UXImageView
      */
-    public function getImage($path, array $size = null, $cache = true)
+    public static function getImage($path, array $size = null, $cache = true)
     {
         if ($path === null) {
             return null;
@@ -1636,5 +1637,28 @@ class Ide extends Application
             . " is " . ($result ? 'true' : 'false'));
 
         return $result;
+    }
+
+    /**
+     * Restart IDE.
+     */
+    public function restart()
+    {
+        $jrePath = $this->getJrePath();
+
+        $javaBin = 'java';
+
+        if ($jrePath) {
+            $javaBin = "$jrePath/bin/$javaBin";
+        }
+
+        $process = new Process([$javaBin, '-jar', 'DevelNext.jar'], IdeSystem::getOwnFile(''), $this->makeEnvironment());
+        $process->start();
+
+        if (Ide::project()) {
+            Ide::get()->setUserConfigValue('lastProject', Ide::project()->getProjectFile());
+        }
+
+        $this->shutdown();
     }
 }

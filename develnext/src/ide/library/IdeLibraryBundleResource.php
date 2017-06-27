@@ -5,6 +5,7 @@ use ide\Logger;
 use ide\utils\FileUtils;
 use php\desktop\Runtime;
 use php\lib\fs;
+use php\lib\str;
 
 /**
  * Class IdeLibraryBundleResource
@@ -46,15 +47,13 @@ class IdeLibraryBundleResource extends IdeLibraryResource
     {
         parent::onRegister($library);
 
-        $file = ($this->getPath() . "/" . fs::name($this->getPath()) . ".jar");
+        fs::scan($this->getPath(), function ($filename) {
+            if (str::endsWith($filename, '-bundle.jar') || str::endsWith($filename, '.dn.jar')) {
+                Runtime::addJar($filename);
 
-        if (!fs::isFile($file)) {
-            Logger::warn("$file is not exists for bundle registration");
-        }
-
-        Runtime::addJar($file);
-
-        Logger::debug("Add bundle jar '$file'");
+                Logger::debug("Add bundle jar '$filename'");
+            }
+        }, 1);
 
         $class = $this->config->get('class');
 

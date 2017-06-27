@@ -15,67 +15,12 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="581.0" prefWidth="777.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="500" prefWidth="600" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="750.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox spacing="10.0">
-               <children>
-                  <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
-                  <VBox HBox.hgrow="ALWAYS">
-                     <children>
-                        <Label text="Выберите пакеты">
-                           <font>
-                              <Font name="Tahoma Bold" size="12.0" />
-                           </font>
-                        </Label>
-                        <Label text="Выберите нужные вам пакеты расширений в проекте" textFill="#5e5e5e" />
-                     </children>
-                  </VBox>
-                  <Button id="addBundle" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-library" text="Добавить пакет">
-                     <padding>
-                        <Insets left="15.0" right="15.0" />
-                     </padding>
-                  </Button>
-               </children>
-            </HBox>
-            <Separator prefWidth="200.0" />
             <HBox spacing="10.0" VBox.vgrow="ALWAYS">
                <children>
-                  <TabPane id="tabs" prefWidth="300.0" side="LEFT" tabClosingPolicy="UNAVAILABLE">
-                    <tabs>
-                      <Tab text="Все">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="293.0" prefWidth="518.0" />
-                        </content>
-                      </Tab>
-                      <Tab text="Игровые">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                      </Tab>
-                        <Tab text="Интернет, сеть">
-                          <content>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                          </content>
-                        </Tab>
-                        <Tab text="Базы данных">
-                          <content>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                          </content>
-                        </Tab>
-                        <Tab text="Системные">
-                          <content>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                          </content>
-                        </Tab>
-                        <Tab text="Другое">
-                          <content>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                          </content>
-                        </Tab>
-                    </tabs>
-                  </TabPane>
                   <AnchorPane id="content" minWidth="350.0" HBox.hgrow="ALWAYS">
                      <children>
                         <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="420.0" prefViewportWidth="350.0" style="-fx-background-color: transparent;" styleClass="dn-web" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -148,7 +93,7 @@
             </HBox>
          </children>
          <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="0" left="0" right="0" top="0" />
          </padding>
       </VBox>
    </children>

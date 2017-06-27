@@ -26,6 +26,8 @@ jar {
     exclude '.resource'
 }
 
+jar.baseName = name + '.dn'
+
 task bundle(type: Zip, dependsOn: ['clean', 'jar']) {
     println project.buildDir
 

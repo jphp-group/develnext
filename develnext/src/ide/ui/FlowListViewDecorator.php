@@ -245,6 +245,11 @@ class FlowListViewDecorator implements \Countable
         $this->menu->items->add($deleteItem);
     }
 
+    public function clearMenuCommands()
+    {
+        $this->menu->items->clear();
+    }
+
     public function addMenuCommand(AbstractCommand $command)
     {
         $last = $this->menu->items[$this->menu->items->count - 1];

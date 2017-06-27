@@ -5,11 +5,14 @@ use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
 use ide\editors\AbstractEditor;
 use ide\editors\ProjectEditor;
-use ide\forms\BundleCheckListForm;
+use ide\formats\ProjectFormat;
+use ide\forms\BundleDetailInfoForm;
 use ide\Ide;
 use ide\IdeConfiguration;
 use ide\library\IdeLibraryBundleResource;
+use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\behaviours\bundle\BundlesProjectControlPane;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
 use ide\project\ProjectModule;
@@ -24,6 +27,7 @@ use php\gui\layout\UXScrollPane;
 use php\gui\layout\UXVBox;
 use php\gui\UXButton;
 use php\gui\UXCheckbox;
+use php\gui\UXDialog;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\io\File;
@@ -119,9 +123,9 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     public function doCreate()
     {
-        uiLater(function () {
+        /*uiLater(function () {
             $this->showBundleCheckListDialog();
-        });
+        });*/
     }
 
     public function doCreateEditor(AbstractEditor $editor)
@@ -140,10 +144,18 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         foreach ($this->bundles as $env => $bundles) {
             /** @var AbstractBundle $bundle */
             foreach ($bundles as $bundle) {
-                $bundle->onRemove($this->project);
+                try {
+                    $bundle->onRemove($this->project);
+                } catch (\Throwable $e) {
+                    Logger::exception("Error in onRemove event handler, {$e->getMessage()}", $e);
+                }
 
                 foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
-                    $one->onRemove($this->project, $bundle);
+                    try {
+                        $one->onRemove($this->project, $bundle);
+                    } catch (\Throwable $e) {
+                        Logger::exception("Error in onRemove (in dependency) event handler, {$e->getMessage()}", $e);
+                    }
                 }
             }
         }
@@ -190,6 +202,10 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     public function doLoad()
     {
+        /** @var ProjectFormat $projectFormat */
+        $projectFormat = $this->project->getRegisteredFormat(ProjectFormat::class);
+        $projectFormat->addControlPane(new BundlesProjectControlPane($this));
+
         $this->project->getTree()->addValueCreator(function ($path, File $file) {
             if ($file->isDirectory() && str::startsWith($path, '/' . self::VENDOR_DIRECTORY . '/')) {
                 $names = str::split($path, '/', 100);
@@ -630,10 +646,18 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             $this->bundles[$env][$class] = $bundle;
 
             foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
-                $one->onAdd($this->project, $bundle);
+                try {
+                    $one->onAdd($this->project, $bundle);
+                } catch (\Throwable $e) {
+                    Logger::exception("Error in onAdd (in dependency) event handler, {$e->getMessage()}", $e);
+                }
             }
 
-            $bundle->onAdd($this->project);
+            try {
+                $bundle->onAdd($this->project);
+            } catch (\Throwable $e) {
+                Logger::exception("Error in onAdd event handler, {$e->getMessage()}", $e);
+            }
         }
 
         if (!$canRemove) {
@@ -661,10 +685,18 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             /** @var AbstractBundle $bundle */
             if ($bundle = $bundles[$class]) {
                 if (!$removed) {
-                    $bundle->onRemove($this->project);
+                    try {
+                        $bundle->onRemove($this->project);
+                    } catch (\Throwable $e) {
+                        Logger::exception("Error in onRemove event handler, {$e->getMessage()}", $e);
+                    }
 
                     foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
-                        $one->onRemove($this->project, $bundle);
+                        try {
+                            $one->onRemove($this->project, $bundle);
+                        } catch (\Throwable $e) {
+                            Logger::exception("Error in onRemove (in dependency) event handler, {$e->getMessage()}", $e);
+                        }
                     }
                 }
 
@@ -733,9 +765,18 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
         return $this->bundleConfigs[get_class($bundle)];
     }
 
-    public function showBundleCheckListDialog(IdeLibraryBundleResource $resource = null)
+    public function showBundleDetailDialog(IdeLibraryBundleResource $resource = null)
     {
-        $dialog = new BundleCheckListForm($this);
+        if (!$resource) {
+            return;
+        }
+
+        if ($resource && ($resource->isEmbedded() || $resource->isHidden())) {
+            UXDialog::showAndWait("{$resource->getName()} - Системный пакет расширений.");
+            return;
+        }
+
+        $dialog = new BundleDetailInfoForm($this);
         $dialog->setResult($resource);
 
         if ($dialog->showDialog() || true) {
@@ -769,7 +810,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 $uiItem->classes->add('dn-simple-toggle-button');
                 $uiItem->tooltipText = $bundle->getDescription();
                 $uiItem->on('action', function () use ($resource) {
-                    $this->showBundleCheckListDialog($resource);
+                    $this->showBundleDetailDialog($resource);
                 });
 
                 $this->uiPackages->add($uiItem);
@@ -780,7 +821,14 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             $addButton->classes->add('flat-button');
             $addButton->text = 'Изменить';
             $addButton->on('action', function () {
-                $this->showBundleCheckListDialog();
+                /** @var ProjectEditor $projectEditor */
+                $projectEditor = FileSystem::open($this->project->getProjectFile());
+
+                if ($projectEditor instanceof ProjectEditor) {
+                    $projectEditor->navigate(BundlesProjectControlPane::class);
+                } else {
+                    UXDialog::show('Unable to navigate the project editor', 'ERROR');
+                }
             });
             $this->uiPackages->add($addButton);
 
