@@ -19,6 +19,7 @@ use ide\scripts\elements\IniStorageComponent;
 use ide\scripts\elements\MacroScriptComponent;
 use ide\scripts\elements\MediaPlayerScriptComponent;
 use ide\scripts\elements\ModuleScriptComponent;
+use ide\scripts\elements\PrinterScriptComponent;
 use ide\scripts\elements\RobotScriptComponent;
 use ide\scripts\elements\ScoreScriptComponent;
 use ide\scripts\elements\TimerScriptComponent;
@@ -54,6 +55,7 @@ class ScriptModuleFormat extends AbstractFormFormat
         $this->register(new DirectoryChooserScriptComponent());
         $this->register(new MediaPlayerScriptComponent());
         $this->register(new RobotScriptComponent());
+        $this->register(new PrinterScriptComponent());
         $this->register(new IniStorageComponent());
 
         // Context Menu.
