@@ -38,5 +38,7 @@ public class PrinterAttributesMemoryOperation extends MemoryOperation<PrinterAtt
         r.refOfIndex("defaultPrintResolution").assign(resolutionConverter.unconvert(env, trace, attributes.getDefaultPrintResolution()));
 
         r.refOfIndex("defaultPrintSides").assign(attributes.getDefaultPrintSides().name());
+
+        return r;
     }
 }

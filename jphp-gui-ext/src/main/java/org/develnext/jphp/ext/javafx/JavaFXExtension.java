@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.print.Printer;
+import javafx.print.PrinterJob;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -50,7 +51,8 @@ import org.develnext.jphp.ext.javafx.classes.effect.*;
 import org.develnext.jphp.ext.javafx.classes.event.*;
 import org.develnext.jphp.ext.javafx.classes.layout.*;
 import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
-import org.develnext.jphp.ext.javafx.classes.print.UXPrinter;
+import org.develnext.jphp.ext.javafx.classes.printing.UXPrinter;
+import org.develnext.jphp.ext.javafx.classes.printing.UXPrinterJob;
 import org.develnext.jphp.ext.javafx.classes.shape.*;
 import org.develnext.jphp.ext.javafx.classes.text.UXFont;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
@@ -66,7 +68,6 @@ import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
 import php.runtime.memory.support.MemoryOperation;
 
-import java.awt.*;
 import java.awt.event.InputEvent;
 
 public class JavaFXExtension extends Extension {
@@ -277,7 +278,10 @@ public class JavaFXExtension extends Extension {
 
     protected void registerPrinterPackage(CompileScope scope) {
         MemoryOperation.register(new PaperMemoryOperation());
+        MemoryOperation.register(new PrinterAttributesMemoryOperation());
+        MemoryOperation.register(new PrintResolutionMemoryOperation());
 
+        registerWrapperClass(scope, PrinterJob.class, UXPrinterJob.class);
         registerWrapperClass(scope, Printer.class, UXPrinter.class);
     }
 

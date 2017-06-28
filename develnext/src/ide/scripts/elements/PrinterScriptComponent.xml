@@ -1,0 +1,44 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="dialogEnabled" value="1" />
+        <property code="jobName" value="Printer Job" />
+        <property code="copies" value="1" />
+        <property code="printColor" value="DEFAULT" />
+        <property code="printQuality" value="DEFAULT" />
+        <property code="printSides" value="DEFAULT" />
+    </init>
+
+    <properties group="general" title="Главное">
+        <property code="dialogEnabled" name="Показывать диалог" editor="boolean" />
+        <property code="printerName" name="Принтер (Имя)" editor="text" tooltip="Название принтера для печати, если ничего - будет использован принтер по-умолчанию." />
+        <property code="jobName" name="Имя задач" editor="text" />
+        <property code="copies" name="Кол-во копий" editor="integer" />
+
+        <property code="printColor" name="Цвет печати" editor="enum">
+            <variants>
+                <variant value="DEFAULT">По-умолчанию</variant>
+                <variant value="COLOR">Цветная</variant>
+                <variant value="MONOCHROME">Черно-белая</variant>
+            </variants>
+        </property>
+
+        <property code="printQuality" name="Качество печати" editor="enum">
+            <variants>
+                <variant value="DEFAULT">По-умолчанию</variant>
+                <variant value="DRAFT">Черновик</variant>
+                <variant value="LOW">Низкое</variant>
+                <variant value="NORMAL">Нормальное</variant>
+                <variant value="HIGH">Высокое</variant>
+            </variants>
+        </property>
+
+        <property code="printSides" name="Тип печати" editor="enum">
+            <variants>
+                <variant value="DEFAULT">По-умолчанию</variant>
+                <variant value="ONE_SIDED">Односторонняя</variant>
+                <variant value="DUPLEX">Двухсторонняя</variant>
+                <variant value="TUMBLE">Упаковочная</variant>
+            </variants>
+        </property>
+    </properties>
+</element>
