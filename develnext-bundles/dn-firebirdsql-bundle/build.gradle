@@ -1,0 +1,18 @@
+
+project.version = ''
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+sourceSets {
+    main.resources.srcDirs = ['src']
+}
+
+dependencies {
+    compile group: 'org.firebirdsql.jdbc', name: 'jaybird-jdk18', version: '3.0.1'
+    compile group: 'net.java.dev.jna', name: 'jna', version: '4.4.0'
+
+}

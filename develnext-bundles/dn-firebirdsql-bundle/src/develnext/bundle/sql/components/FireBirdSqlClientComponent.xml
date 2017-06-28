@@ -1,0 +1,35 @@
+<element extends="develnext\bundle\sql\components\SqlClientComponent">
+    <init>
+        <property code="host" value="localhost" />
+        <property code="port" value="3050" />
+        <property code="username" value="sysdba" />
+        <property code="password" value="masterkey" />
+        <property code="connectionType" value="DEFAULT" />
+
+        <property code="encoding" value="UTF8" />
+        <property code="charSet" value="UTF8" />
+    </init>
+
+    <properties group="connection" title="Подключение" sort="500">
+        <property code="connectionType" name="Тип соединения" editor="enum" tooltip="Тип соединения к базе данных">
+            <variants>
+                <variant value="DEFAULT">DEFAULT</variant>
+                <variant value="NATIVE">NATIVE</variant>
+                <variant value="LOCAL">LOCAL</variant>
+                <variant value="EMBEDDED">EMBEDDED</variant>
+            </variants>
+        </property>
+
+        <property code="host" name="Хост (host)" editor="text" />
+        <property code="port" name="Порт (port)" editor="integer" />
+        <property code="database" name="Путь к базе" editor="text" tooltip="Путь к файлу БД *.FDB или *.GDB" />
+
+        <property code="username" name="Логин" editor="text" />
+        <property code="password" name="Пароль" editor="text" />
+
+        <property code="sqlDialect" name="SQL Диалект" editor="text" />
+        <property code="roleName" name="Имя роли" editor="text" />
+        <property code="encoding" name="Кодировка БД" editor="text" />
+        <property code="charSet" name="Кодировка клиента" editor="text" />
+    </properties>
+</element>

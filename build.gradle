@@ -190,6 +190,7 @@ project(':develnext') {
         provided project(':develnext-bundles/dn-sqlite-bundle')
         provided project(':develnext-bundles/dn-mysql-bundle')
         provided project(':develnext-bundles/dn-pgsql-bundle')
+        provided project(':develnext-bundles/dn-firebirdsql-bundle')
         provided project(':develnext-bundles/dn-game2d-bundle')
         provided project(':develnext-bundles/dn-systemtray-bundle')
         provided project(':develnext-bundles/dn-hotkey-bundle')
