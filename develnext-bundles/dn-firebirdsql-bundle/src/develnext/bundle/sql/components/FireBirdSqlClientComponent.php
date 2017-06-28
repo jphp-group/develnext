@@ -2,6 +2,7 @@
 namespace develnext\bundle\sql\components;
 
 use bundle\sql\FireBirdSqlClient;
+use ide\Ide;
 use ide\scripts\AbstractScriptComponent;
 
 class FireBirdSqlClientComponent extends AbstractScriptComponent
@@ -45,5 +46,12 @@ class FireBirdSqlClientComponent extends AbstractScriptComponent
     public function getDescription()
     {
         return 'Компонент клиент для работы с firebird базой данных.';
+    }
+
+    public function createElement()
+    {
+        Ide::toast('FireBird Клиент не поддерживает WireCrypt авторизацию из версии 3.0');
+
+        return parent::createElement();
     }
 }

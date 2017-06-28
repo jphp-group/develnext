@@ -771,7 +771,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             return;
         }
 
-        if ($resource && ($resource->isEmbedded() || $resource->isHidden())) {
+        if ($resource && $resource->isHidden()) {
             UXDialog::showAndWait("{$resource->getName()} - Системный пакет расширений.");
             return;
         }
