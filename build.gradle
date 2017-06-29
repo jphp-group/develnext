@@ -204,8 +204,9 @@ project(':develnext') {
         compile "org.develnext.jphp:jphp-json-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-zend-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-sql-ext:$jphpVersion"
-        compile "org.develnext.jphp:jphp-compress-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-debugger:$jphpVersion"
+
+        compile fileTree(dir: 'libs', include: '*.jar')
     }
 }
 

@@ -372,7 +372,7 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
         $dialog->extensionFilters = [['description' => 'Пакеты для DevelNext (*.dnbundle)', 'extensions' => ['*.dnbundle']]];
 
         if ($file = $dialog->showOpenDialog()) {
-            $this->addBundleFile($file);
+            $this->addBundle($file);
         }
     }
 
