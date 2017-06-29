@@ -55,10 +55,8 @@ abstract class AbstractJarBundle extends AbstractBundle
         }
 
         if ($this->bundleDirectory) {
-            $nameDirectory = fs::name($this->bundleDirectory);
-
-            fs::scan($this->bundleDirectory, function ($filename) use (&$result, $nameDirectory) {
-                if (fs::ext($filename) == 'jar' && fs::nameNoExt($filename) != $nameDirectory) {
+            fs::scan($this->bundleDirectory, function ($filename) use (&$result) {
+                if (fs::ext($filename) == 'jar' && !str::endsWith($filename, '-bundle.jar') && !str::endsWith($filename, '.dn.jar')) {
                     $result[] = new ProjectModule($filename, 'jarfile');
                 }
             }, 1);
@@ -74,10 +72,17 @@ abstract class AbstractJarBundle extends AbstractBundle
         parent::onAdd($project, $owner);
 
         if ($this->bundleDirectory) {
-            $nameDirectory = fs::name($this->bundleDirectory);
+            $filename = null;
 
-            if (fs::isFile($file = $this->bundleDirectory . "/$nameDirectory.jar")) {
-                $zipFile = new ZipFile($file);
+            foreach ((new File($this->bundleDirectory))->findFiles() as $file) {
+                if (str::endsWith($file->getName(), '-bundle.jar') || str::endsWith($file->getName(), '.dn.jar')) {
+                    $filename = "$file";
+                    break;
+                }
+            }
+
+            if (fs::isFile($filename)) {
+                $zipFile = new ZipFile($filename);
                 try {
                     $vendorDirectory = $this->getVendorDirectory() . "/";
 

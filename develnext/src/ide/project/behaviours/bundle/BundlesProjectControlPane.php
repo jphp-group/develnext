@@ -30,6 +30,7 @@ use php\gui\UXNode;
 use php\gui\UXSeparator;
 use php\gui\UXTextField;
 use php\io\File;
+use php\io\IOException;
 use php\lang\Thread;
 use php\lib\fs;
 use php\lib\str;
@@ -279,6 +280,10 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
     public function addBundle($file)
     {
         try {
+            uiLater(function () {
+                Ide::get()->getMainForm()->showPreloader('Подождите, установка пакета ...');
+            });
+
             $zip = new ZipFile($file);
 
             try {
@@ -298,6 +303,7 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                                 if (MessageBoxForm::confirm("Данный пакет уже установлен, заменить его новой версией ({$oldResource->getVersion()} -> {$version})?")) {
                                     Ide::get()->getLibrary()->delete($oldResource);
                                 } else {
+                                    Ide::get()->getMainForm()->hidePreloader();
                                     return;
                                 }
                             }
@@ -321,7 +327,11 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                                                     fs::makeDir($to);
                                                 } else {
                                                     fs::ensureParent($to);
-                                                    fs::copy($zip->getEntryStream($name), $to);
+                                                    try {
+                                                        fs::copy($zip->getEntryStream($name), $to);
+                                                    } catch (IOException $e) {
+                                                        // jphp bug.
+                                                    }
                                                 }
                                             }
                                         }
@@ -331,6 +341,7 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                                 Ide::get()->getLibrary()->updateCategory('bundles');
 
                                 uiLater(function () use ($resource) {
+                                    Ide::get()->getMainForm()->hidePreloader();
                                     $this->refresh();
 
                                     $msg = new MessageBoxForm('Для корректного завершения установки пакета перезапустите DevelNext!', ['Перезапустить', 'Позже']);
@@ -361,7 +372,11 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
 
             }
         } catch (ZipException $e) {
-            UXDialog::showAndWait('Поврежденный или некорректный файл ZIP пакета расширений', 'ERROR');
+            uiLater(function () {
+                UXDialog::showAndWait('Поврежденный или некорректный файл ZIP пакета расширений', 'ERROR');
+                Ide::get()->getMainForm()->hidePreloader();
+            });
+
             return false;
         }
     }
@@ -392,9 +407,7 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                     Ide::get()->getMainForm()->showPreloader('Подождите, установка пакета ...');
                 });
 
-                if (!$this->addBundle($file)) {
-                    $this->addBundleUrl();
-                }
+                $this->addBundle($file);
 
                 if (!$file->delete()) {
                     $file->deleteOnExit();
