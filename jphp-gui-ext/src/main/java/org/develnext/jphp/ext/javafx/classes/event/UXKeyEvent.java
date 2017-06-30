@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes.event;
 
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
@@ -45,6 +46,56 @@ public class UXKeyEvent extends UXEvent {
     @Getter
     public String getCodeName() {
         return getWrappedObject().getCode().getName();
+    }
+
+    @Signature
+    public boolean isUndefinedKey() {
+        return getWrappedObject().getCode() == KeyCode.UNDEFINED;
+    }
+
+    @Signature
+    public boolean isArrowKey() {
+        return getWrappedObject().getCode().isArrowKey();
+    }
+
+    @Signature
+    public boolean isDigitKey() {
+        return getWrappedObject().getCode().isDigitKey();
+    }
+
+    @Signature
+    public boolean isFunctionKey() {
+        return getWrappedObject().getCode().isFunctionKey();
+    }
+
+    @Signature
+    public boolean isKeypadKey() {
+        return getWrappedObject().getCode().isKeypadKey();
+    }
+
+    @Signature
+    public boolean isLetterKey() {
+        return getWrappedObject().getCode().isLetterKey();
+    }
+
+    @Signature
+    public boolean isMediaKey() {
+        return getWrappedObject().getCode().isMediaKey();
+    }
+
+    @Signature
+    public boolean isModifierKey() {
+        return getWrappedObject().getCode().isModifierKey();
+    }
+
+    @Signature
+    public boolean isNavigationKey() {
+        return getWrappedObject().getCode().isNavigationKey();
+    }
+
+    @Signature
+    public boolean isWhitespaceKey() {
+        return getWrappedObject().getCode().isWhitespaceKey();
     }
 
     @Signature

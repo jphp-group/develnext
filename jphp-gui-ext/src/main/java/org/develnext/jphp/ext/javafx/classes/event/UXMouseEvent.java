@@ -5,8 +5,10 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Property;
+import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
@@ -52,5 +54,15 @@ public class UXMouseEvent extends UXEvent {
     @Override
     public MouseEvent getWrappedObject() {
         return (MouseEvent) super.getWrappedObject();
+    }
+
+    @Getter
+    public double[] getPosition() {
+        return new double[] { getWrappedObject().getX(), getWrappedObject().getY() };
+    }
+
+    @Signature
+    public boolean isDoubleClick() {
+        return getWrappedObject().getClickCount() >= 2;
     }
 }
