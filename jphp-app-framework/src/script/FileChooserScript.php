@@ -6,17 +6,11 @@ use php\framework\Logger;
 use php\gui\framework\AbstractScript;
 use php\gui\framework\behaviour\TextableBehaviour;
 use php\gui\framework\behaviour\ValuableBehaviour;
-use php\gui\UXApplication;
-use php\gui\UXButton;
-use php\gui\UXDialog;
 use php\gui\UXFileChooser;
-use php\gui\UXNode;
 use php\io\File;
-use php\lang\InterruptedException;
-use php\lang\Thread;
-use php\lib\Items;
+use php\lib\arr;
+use php\lib\fs;
 use php\lib\str;
-use php\xml\DomDocument;
 use script\support\ScriptHelpers;
 
 /**
@@ -75,6 +69,16 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour, Set
     public $multiple = false;
 
     /**
+     * @var string
+     */
+    public $initialDirectory;
+
+    /**
+     * @var string
+     */
+    public $initialFileName;
+
+    /**
      * @var bool
      */
     public $saveDialog = false;
@@ -89,7 +93,7 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour, Set
      */
     public function execute()
     {
-        $anyFilter = false;
+        $extensionFilters = [];
 
         if ($this->filterExtensions || $this->filterName) {
             $extensions = null;
@@ -101,21 +105,20 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour, Set
 
             $extensions = $extensions ?: ['*.*'];
 
-            if ($extensions == ['*.*']) {
-                $anyFilter = true;
-            }
+            $extensionFilters[] = ['description' => $this->filterName ?: $this->filterExtensions, 'extensions' => $extensions];
 
-            $this->_dialog->extensionFilters = [
-                ['description' => $this->filterName ?: $this->filterExtensions, 'extensions' => $extensions]
-            ];
         }
 
-        if (!$anyFilter && $this->filterAny) {
-            $this->_dialog->extensionFilters[] = [
+        if ($this->filterAny && $this->filterExtensions != '*.*') {
+            $extensionFilters[] = [
                 'description' => 'All files (*.*)',
                 'extensions'  => ['*.*']
             ];
         }
+
+        $this->_dialog->extensionFilters = $extensionFilters;
+        $this->_dialog->initialDirectory = $this->initialDirectory;
+        $this->_dialog->initialFileName = $this->initialFileName;
 
         if ($this->multiple) {
             $file = $this->saveDialog ? $this->_dialog->showSaveDialog() : $this->_dialog->showOpenMultipleDialog();
@@ -124,8 +127,10 @@ class FileChooserScript extends AbstractScript implements TextableBehaviour, Set
         }
 
         if ($file !== null) {
-            $this->file = is_array($file) ? Items::first($file) : $file;
+            $this->file = is_array($file) ? arr::first($file) : $file;
             $this->files = is_array($file) ? $file : [$file];
+
+            $this->initialDirectory = fs::parent($this->file);
 
             $this->_adaptValue($this->inputNode, $this->files);
 

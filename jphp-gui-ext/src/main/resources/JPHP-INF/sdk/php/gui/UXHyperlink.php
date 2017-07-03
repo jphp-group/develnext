@@ -9,8 +9,6 @@ namespace php\gui;
  */
 class UXHyperlink extends UXButtonBase
 {
-
-
     /**
      * @var bool
      */
@@ -21,6 +19,14 @@ class UXHyperlink extends UXButtonBase
      * @param UXNode $graphic (optional)
      */
     public function __construct($text, UXNode $graphic)
+    {
+    }
+
+    /**
+     * Implemented to invoke the action event if one is defined. This
+     * function will also set visited to true.
+     */
+    public function fire()
     {
     }
 }

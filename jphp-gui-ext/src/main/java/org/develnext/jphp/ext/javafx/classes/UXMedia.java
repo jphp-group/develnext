@@ -3,6 +3,7 @@ package org.develnext.jphp.ext.javafx.classes;
 import javafx.scene.media.Media;
 import javafx.util.Duration;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;

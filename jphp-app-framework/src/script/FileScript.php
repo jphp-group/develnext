@@ -12,6 +12,8 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lang\Thread;
 use php\lang\ThreadPool;
+use php\lib\fs;
+use php\time\Timer;
 
 /**
  * Class FileScript
@@ -46,59 +48,41 @@ class FileScript extends AbstractScript implements TextableBehaviour, SetTextBeh
      */
     protected $_upd = 0;
 
-    protected $pool;
-
-    /**
-     * FileScript constructor.
-     */
-    public function __construct()
-    {
-        $this->pool = ThreadPool::createSingle();
-    }
-
-
     /**
      * @param $target
      * @return mixed
      */
     protected function applyImpl($target)
     {
-        $timer = new TimerScript();
-        $timer->repeatable = true;
-        $timer->interval = 1000;
-
-        $timer->on('action', function () {
+        Timer::every('0.3s', function () {
             if ($this->watch) {
-                $exists = File::of($this->_path)->exists();
-                $upd = File::of($this->_path)->lastModified();
+                $exists = fs::exists($this->_path);
+                $upd = fs::time($this->_path);
 
                 if ($exists !== $this->_exists) {
                     $this->_exists = $exists;
 
                     if ($exists) {
-                        $this->trigger('create');
+                        $this->_upd = $upd;
+
+                        uiLater(function () {
+                            $this->trigger('make');
+                        });
                     } else {
-                        $this->trigger('delete');
+                        uiLater(function () {
+                            $this->trigger('delete');
+                        });
                     }
-                } elseif ($this->_upd !== 0 && $upd != $this->_upd) {
+                } elseif ($upd != $this->_upd && $exists) {
                     $this->_upd = $upd;
-                    $this->trigger('update');
+
+                    uiLater(function () {
+                        $this->trigger('update');
+                    });
                 }
             }
         });
-
-        $timer->start();
     }
-
-    public function free()
-    {
-        if (File::of($this->_path)->delete()) {
-            $this->_exists = false;
-            $this->_upd = 0;
-            $this->trigger('delete');
-        }
-    }
-
 
     /**
      * @return string
@@ -114,8 +98,9 @@ class FileScript extends AbstractScript implements TextableBehaviour, SetTextBeh
     public function setPath($path)
     {
         $this->_path = $path;
-        $this->_exists = File::of($path)->exists();
-        $this->_upd = File::of($this->_path)->lastModified();
+
+        $this->_upd = fs::time($path);
+        $this->_exists = fs::exists($path);
     }
 
     public function getContent()
@@ -151,6 +136,10 @@ class FileScript extends AbstractScript implements TextableBehaviour, SetTextBeh
         }
     }
 
+    /**
+     * --RU--
+     * Создать директорию для файла.
+     */
     public function mkdirs()
     {
         if ($parent = File::of($this->_path)->getParentFile()) {

@@ -6,11 +6,11 @@
 
     <properties group="general" title="Главное">
         <property code="path" name="Имя файла" editor="text" tooltip="Имя или путь к файлу" />
-        <property code="watch" name="Следить" editor="boolean" tooltip="Следить за файлом" />
+        <property code="watch" name="Следить" editor="boolean" tooltip="Следить за файлом, если нет, события работать не будут" />
     </properties>
 
     <eventTypes>
-        <eventType code="create" name="Создание файла" kind="ObjectEvent" />
+        <eventType code="make" name="Создание файла" kind="ObjectEvent" />
         <eventType code="update" name="Обновление файла" kind="ObjectEvent" />
         <eventType code="delete" name="Удаление файла" kind="ObjectEvent" />
     </eventTypes>

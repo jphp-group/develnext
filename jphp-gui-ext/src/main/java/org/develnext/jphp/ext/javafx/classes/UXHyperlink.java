@@ -1,11 +1,14 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Property;
+import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
@@ -13,6 +16,8 @@ import php.runtime.reflection.ClassEntity;
 public class UXHyperlink extends UXButtonBase {
     interface WrappedInterface {
         @Property boolean visited();
+
+        void fire();
     }
 
     public UXHyperlink(Environment env, Hyperlink wrappedObject) {
@@ -29,18 +34,19 @@ public class UXHyperlink extends UXButtonBase {
     }
 
 
-    @Reflection.Signature
+    @Signature
     public void __construct() {
         __wrappedObject = new Hyperlink();
     }
 
-    @Reflection.Signature
+    @Signature
     public void __construct(String text) {
         __wrappedObject = new Hyperlink(text);
     }
 
-    @Reflection.Signature
+    @Signature
     public void __construct(String text, @Reflection.Nullable Node graphic) {
         __wrappedObject = new Hyperlink(text, graphic);
+        getWrappedObject().fire();
     }
 }

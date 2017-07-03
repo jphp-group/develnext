@@ -251,6 +251,19 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     }
 
     @Getter
+    public double[] getScreenPosition() {
+        return new double[] { getScreenX(), getScreenY() };
+    }
+
+    @Setter
+    public void setScreenPosition(double[] value) {
+        if (value.length >= 2) {
+            setScreenX(value[0]);
+            setScreenY(value[1]);
+        }
+    }
+
+    @Getter
     public double getScreenX() {
         Bounds pt = getWrappedObject().localToScreen(getWrappedObject().getLayoutBounds());
         if (pt == null) {
@@ -280,6 +293,22 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     public void setScreenY(double value) {
         Point2D pt = getWrappedObject().screenToLocal(getScreenX(), value);
         getWrappedObject().setLayoutY(pt.getY());
+    }
+
+    @Getter
+    public double[] getScale() {
+        return new double[] { getWrappedObject().getScaleX(), getWrappedObject().getScaleY() };
+    }
+
+    @Setter
+    public void setScale(Memory value) {
+        if (value.isArray()) {
+            getWrappedObject().setScaleX(value.valueOfIndex(0).toDouble());
+            getWrappedObject().setScaleY(value.valueOfIndex(1).toDouble());
+        } else {
+            getWrappedObject().setScaleX(value.toDouble());
+            getWrappedObject().setScaleY(value.toDouble());
+        }
     }
 
     @Getter(hiddenInDebugInfo = true)

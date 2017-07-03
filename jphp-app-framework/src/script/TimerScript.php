@@ -74,6 +74,12 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
         }
     }
 
+    /**
+     * --RU--
+     * Запустить таймер.
+     *
+     * @param bool $force
+     */
     public function start($force = false)
     {
         if (!$force && $this->isRunning()) {
@@ -99,6 +105,10 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
         }
     }
 
+    /**
+     * --RU--
+     * Остановить таймер.
+     */
     public function stop()
     {
         $this->stopped = true;
@@ -108,6 +118,10 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
         }
     }
 
+    /**
+     * --RU--
+     * Уничтожить и остановить таймер.
+     */
     public function free()
     {
         parent::free();
@@ -115,7 +129,12 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
         $this->stop();
     }
 
-
+    /**
+     * --RU--
+     * Таймер остановлен или нет.
+     *
+     * @return bool
+     */
     public function isStopped()
     {
         return $this->stopped;

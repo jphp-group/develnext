@@ -41,6 +41,16 @@ class DirectoryChooserScript extends AbstractScript implements TextableBehaviour
     /**
      * @var string
      */
+    public $initialDirectory;
+
+    /**
+     * @var string
+     */
+    public $title;
+
+    /**
+     * @var string
+     */
     public $inputNode;
 
     /**
@@ -58,10 +68,17 @@ class DirectoryChooserScript extends AbstractScript implements TextableBehaviour
      */
     public function execute()
     {
+        if ($this->title) {
+            $this->_dialog->title = $this->title;
+        }
+
+        $this->_dialog->initialDirectory = $this->initialDirectory;
+
         $file = $this->_dialog->showDialog();
 
         if ($file !== null) {
             $this->file = $file;
+            $this->initialDirectory = "{$file->getPath()}";
 
             $this->_adaptValue($this->inputNode, $this->file);
 

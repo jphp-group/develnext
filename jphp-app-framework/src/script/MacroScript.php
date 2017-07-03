@@ -3,7 +3,9 @@ namespace script;
 
 use php\gui\framework\AbstractModule;
 use php\gui\framework\AbstractScript;
+use php\gui\UXApplication;
 use php\lang\Thread;
+use php\time\Timer;
 
 /**
  * Class MacroScript
@@ -44,6 +46,13 @@ class MacroScript extends AbstractScript
         }
     }
 
+    /**
+     * Simple call.
+     * --RU--
+     * Выполнить скрипт.
+     *
+     * @return mixed
+     */
     public function call()
     {
         $key = $this->getOwner() instanceof AbstractModule ? $this->getOwner()->id : "";
@@ -61,6 +70,28 @@ class MacroScript extends AbstractScript
         return $e ? $e->result : null;
     }
 
+    /**
+     * Call in UI Thread.
+     * --RU--
+     * Выполнить скрипт в UI потоке.
+     */
+    public function callUiLater()
+    {
+        if (UXApplication::isUiThread()) {
+            $this->call();
+        } else {
+            uiLater([$this, 'call']);
+        }
+    }
+
+    /**
+     * Call in thread.
+     * --RU--
+     * Выполнить скрипт в отдельном потоке (фоном).
+     *
+     * @param callable|null $callback
+     * @return mixed
+     */
     public function callAsync(callable $callback = null)
     {
         if ($this->disabled) {
@@ -74,6 +105,46 @@ class MacroScript extends AbstractScript
                 $callback($result);
             }
         }))->start();
+    }
+
+    /**
+     * Call after time period as in Timer::after().
+     * --RU--
+     * Выполнить скрипт после временного премежутка, см. также Timer::after().
+     *
+     * @param string $period
+     * @param callable $callback
+     * @return Timer
+     */
+    public function callAfter($period, callable $callback = null)
+    {
+        return Timer::after($period, function () use ($callback) {
+            $this->call();
+
+            if ($callback) {
+                $callback();
+            }
+        });
+    }
+
+    /**
+     * Call every time period as in Timer::every().
+     * --RU--
+     * Выполнять скрипт каждый временной премежуток, см. также Timer::every().
+     *
+     * @param string $period
+     * @param callable|null $callback
+     * @return Timer
+     */
+    public function callEvery($period, callable $callback = null)
+    {
+        return Timer::every($period, function () use ($callback) {
+            $this->call();
+
+            if ($callback) {
+                $callback();
+            }
+        });
     }
 
     public function setEnabled($value)

@@ -12,8 +12,11 @@
         <property code="saveDialog" name="Диалог сохранения" editor="boolean" tooltip="Показывать диалог для сохранения файлов" />
         <property code="multiple" name="Множественный" editor="boolean" tooltip="Возможность выбрать в диалоге несколько файлов" />
 
+        <property code="initialDirectory" name="Начальная директория" editor="text" tooltip="Начальная директория для диалога" />
+        <property code="initialFileName" name="Начальное имя" editor="text" tooltip="Начальное имя файла для диалога" />
+
         <property code="filterName" name="Текст фильтра" editor="text" tooltip="Описание фильтра" />
-        <property code="filterExtensions" name="Файловые расширения" editor="enum" editable="1" tooltip="Список расширений файлов через запятую, которые надо выводить в диалоге">
+        <property code="filterExtensions" name="Файловые расширения" editor="text" editable="1" tooltip="Список расширений файлов через запятую, которые надо выводить в диалоге">
             <variants>
                 <variant value="*.*">Любые расширения</variant>
                 <variant value="*.jpg, *.jpeg, *.png, *.gif">Изображения (jpg, png, gif)</variant>
@@ -29,7 +32,7 @@
     </properties>
 
     <eventTypes>
-        <eventType code="action" name="Действие" kind="ObjectEvent" icon="icons/ok16.png" />
+        <eventType code="action" name="Выбор файла" kind="ObjectEvent" icon="icons/ok16.png" />
         <eventType code="cancel" name="Отмена диалога" kind="ObjectEvent" icon="icons/exit16.png" />
     </eventTypes>
 </element>

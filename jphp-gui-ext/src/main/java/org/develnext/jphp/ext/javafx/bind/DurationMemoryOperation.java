@@ -21,6 +21,6 @@ public class DurationMemoryOperation extends MemoryOperation<Duration> {
 
     @Override
     public Memory unconvert(Environment env, TraceInfo trace, Duration arg) throws Throwable {
-        return arg == null ? Memory.NULL : LongMemory.valueOf(arg.isIndefinite() ? -1l : (long) arg.toMillis());
+        return arg == null ? Memory.NULL : LongMemory.valueOf(arg.isIndefinite() ? -1L : (long) arg.toMillis());
     }
 }
