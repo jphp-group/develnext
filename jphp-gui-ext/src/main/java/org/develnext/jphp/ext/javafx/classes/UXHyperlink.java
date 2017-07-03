@@ -47,6 +47,5 @@ public class UXHyperlink extends UXButtonBase {
     @Signature
     public void __construct(String text, @Reflection.Nullable Node graphic) {
         __wrappedObject = new Hyperlink(text, graphic);
-        getWrappedObject().fire();
     }
 }
