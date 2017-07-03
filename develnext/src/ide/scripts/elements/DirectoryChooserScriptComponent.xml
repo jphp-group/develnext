@@ -4,13 +4,18 @@
         <property code="actionNode" value="" />
     </init>
 
-    <properties group="binding" title="Взаимодействие">
+    <properties>
+        <property code="title" name="Заголовок" editor="text" tooltip="Заголовок диалога" />
+        <property code="initialDirectory" name="Начальная директория" editor="text" tooltip="Начальная директория для отображения в диалоге" />
+    </properties>
+
+    <properties group="binding" title="Взаимодействие" sort="1500">
         <property code="inputNode" name="[Вывод]" editor="object" tooltip="ID компонентов, в которые будет выведен результат" />
         <property code="actionNode" name="[Действие]" editor="object" tooltip="ID компонентов, при взаимодействии с которыми, будет открываться диалог" />
     </properties>
 
     <eventTypes>
-        <eventType code="action" name="Действие" kind="ObjectEvent" icon="icons/ok16.png" />
+        <eventType code="action" name="Выбор" kind="ObjectEvent" icon="icons/ok16.png" />
         <eventType code="cancel" name="Отмена диалога" kind="ObjectEvent" icon="icons/exit16.png" />
     </eventTypes>
 </element>

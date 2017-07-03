@@ -42,6 +42,11 @@ public class UXEvent extends BaseWrapper<Event> {
         super(env, clazz);
     }
 
+    @Signature
+    public Object copyFor(Object newSource) {
+        return getWrappedObject().copyFor(newSource, null);
+    }
+
     @Getter
     protected Memory getTarget(Environment env) throws Throwable {
         Object target = getWrappedObject().getTarget();

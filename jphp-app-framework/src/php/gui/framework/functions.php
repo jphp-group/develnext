@@ -64,29 +64,37 @@ function execute($command, $wait = false)
 }
 
 /**
- * Пауза в выполнении кода в млсек.
+ * --RU--
+ * Пауза в выполнении кода в миллисекундах или во временном периоде.
  * 1 сек = 1000 млсек.
- * @param int $millis
+ *
+ * for example '2h 30m 10s' or '2.5s' or '2000' or '1m 30s'
+ *
+ * @param int|string $period
  */
-function wait($millis)
+function wait($period)
 {
-    Thread::sleep($millis);
+    Thread::sleep(\php\time\Timer::parsePeriod($period));
 }
 
 /**
+ * --RU--
  * Ассинхронная пауза в выполнении кода с колбэком.
- * @param int $millis
+ *
+ * @param int|string $period
  * @param callable $callback
  * @return AccurateTimer
  */
-function waitAsync($millis, callable $callback)
+function waitAsync($period, callable $callback)
 {
-    return AccurateTimer::executeAfter($millis, $callback);
+    return AccurateTimer::executeAfter(\php\time\Timer::parsePeriod($period), $callback);
 }
 
 /**
+ * --RU--
  * Выполнить колбэк позже в UI потоке.
  * Необходимо для работы с UI из других паралельных потоков.
+ *
  * @param callable $callback
  */
 function uiLater(callable $callback)

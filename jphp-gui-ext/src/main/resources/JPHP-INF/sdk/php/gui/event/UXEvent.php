@@ -21,6 +21,14 @@ abstract class UXEvent
     public $target;
 
     /**
+     * @param object $newSender
+     * @return UXEvent
+     */
+    public function copyFor($newSender)
+    {
+    }
+
+    /**
      * @return bool
      */
     public function isConsumed() {}

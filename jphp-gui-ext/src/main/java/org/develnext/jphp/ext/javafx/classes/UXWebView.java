@@ -92,7 +92,6 @@ public class UXWebView extends UXParent {
         getWrappedObject().setPrefHeight(v);
     }
 
-
     @Getter
     public double[] getMinSize() {
         return new double[] { getWrappedObject().getMinWidth(), getWrappedObject().getMinHeight() };

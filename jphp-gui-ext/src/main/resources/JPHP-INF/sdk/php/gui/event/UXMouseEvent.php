@@ -21,6 +21,14 @@ class UXMouseEvent extends UXEvent
     public $y;
 
     /**
+     * [x, y] position
+     *
+     * @readonly
+     * @var array
+     */
+    public $position = [0.0, 0.0];
+
+    /**
      * @readonly
      * @var double
      */
@@ -68,4 +76,12 @@ class UXMouseEvent extends UXEvent
      * @var bool
      */
     public $shortcutDown;
+
+    /**
+     * Returns true if clickCount >= 2.
+     * @return bool
+     */
+    public function isDoubleClick()
+    {
+    }
 }

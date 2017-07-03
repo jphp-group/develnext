@@ -107,17 +107,23 @@ abstract class UXNode
     /**
      * @var double
      */
-    public $scaleX;
+    public $scaleX = 1.0;
 
     /**
      * @var double
      */
-    public $scaleY;
+    public $scaleY = 1.0;
 
     /**
      * @var double
      */
-    public $scaleZ;
+    public $scaleZ = 1.0;
+
+    /**
+     * Scale [X, Y]
+     * @var double[]
+     */
+    public $scale = [1.0, 1.0];
 
     /**
      * --RU--
@@ -132,6 +138,14 @@ abstract class UXNode
      * @var double
      */
     public $screenY;
+
+    /**
+     * Screen position [X, Y]
+     * --RU--
+     * Экранная позиция по [X, Y]
+     * @var double[]
+     */
+    public $screenPosition;
 
     /**
      * --RU--
