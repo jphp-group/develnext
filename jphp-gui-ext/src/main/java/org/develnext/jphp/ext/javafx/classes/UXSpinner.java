@@ -5,20 +5,28 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Property;
+import php.runtime.annotation.Reflection.Setter;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
 import php.runtime.reflection.ClassEntity;
 
 @Reflection.Name(JavaFXExtension.NS + "UXSpinner")
-public class UXSpinner extends UXControl<Spinner> {
+public class UXSpinner<T extends Spinner> extends UXControl<Spinner> {
     interface WrappedInterface {
         @Property boolean editable();
         @Property TextField editor();
+
+        void increment();
+        void increment(int steps);
+
+        void decrement();
+        void decrement(int steps);
     }
 
-    public UXSpinner(Environment env, Spinner wrappedObject) {
+    public UXSpinner(Environment env, T wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -29,6 +37,11 @@ public class UXSpinner extends UXControl<Spinner> {
     @Signature
     public void __construct() {
         __wrappedObject = new Spinner<>();
+    }
+
+    @Override
+    public T getWrappedObject() {
+        return (T) super.getWrappedObject();
     }
 
     @Signature

@@ -8,6 +8,7 @@ ide\formats\form\elements\HyperlinkFormElement
 ide\formats\form\elements\TextFieldFormElement
 ide\formats\form\elements\PasswordFieldFormElement
 ide\formats\form\elements\MaskTextFieldFormElement
+ide\formats\form\elements\NumberSpinnerFormElement
 ide\formats\form\elements\DatePickerFormElement
 ide\formats\form\elements\TextAreaFormElement
 ide\formats\form\elements\CheckboxFormElement
@@ -92,3 +93,4 @@ ide\formats\form\tags\RadioGroupPaneFormElementTag
 ide\formats\form\tags\TreeViewFormElementTag
 ide\formats\form\tags\MediaViewFormElementTag
 ide\formats\form\tags\CanvasFormElementTag
+ide\formats\form\tags\NumberSpinnerFormElementTag

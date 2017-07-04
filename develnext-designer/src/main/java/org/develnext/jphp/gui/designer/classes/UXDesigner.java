@@ -728,6 +728,8 @@ public class UXDesigner extends BaseObject {
     }
 
     protected void resizeNode(Node node, double width, double height) {
+
+
         if (node instanceof Region) {
             ((Region) node).setPrefSize(width, height);
             return;
@@ -1063,6 +1065,10 @@ public class UXDesigner extends BaseObject {
 
         if (node instanceof Control) {
             ((Control) node).setContextMenu(contextMenu);
+
+            if (node instanceof Spinner) {
+                ((Spinner) node).getEditor().setContextMenu(contextMenu);
+            }
         }
 
         node.setOnKeyPressed(area.getOnKeyPressed());

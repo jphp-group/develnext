@@ -20,6 +20,33 @@ class UXSpinner extends UXControl
     public $editor;
 
     /**
+     * @readonly
+     * @var mixed
+     */
+    public $value;
+
+    /**
+     * Text field alignment (pos).
+     *
+     * @var string
+     */
+    public $alignment = 'CENTER_LEFT';
+
+    /**
+     * @param int $steps
+     */
+    public function increment($steps = 1)
+    {
+    }
+
+    /**
+     * @param int $steps
+     */
+    public function decrement($steps = 1)
+    {
+    }
+
+    /**
      * @param callable|null $incrementHandler
      * @param callable|null $decrementHandler
      */
