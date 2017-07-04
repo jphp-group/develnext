@@ -50,7 +50,7 @@ class FireBirdSqlClientComponent extends AbstractScriptComponent
 
     public function createElement()
     {
-        Ide::toast('FireBird Клиент не поддерживает WireCrypt авторизацию из версии 3.0');
+        //Ide::toast('FireBird Клиент не поддерживает WireCrypt авторизацию из версии 3.0');
 
         return parent::createElement();
     }
