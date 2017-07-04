@@ -37,6 +37,8 @@ class IdeLanguage
         $this->altLang = $config->get('alt.lang');
 
         $this->restartMessage = $config->get('restart.message');
+        $this->restartYes = $config->get('restart.yes');
+        $this->restartNo = $config->get('restart.no');
     }
 
     /**
@@ -85,6 +87,22 @@ class IdeLanguage
     public function getRestartMessage()
     {
         return $this->restartMessage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRestartNo()
+    {
+        return $this->restartNo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRestartYes()
+    {
+        return $this->restartYes;
     }
 
     /**

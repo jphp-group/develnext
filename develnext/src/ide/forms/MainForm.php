@@ -261,12 +261,16 @@ class MainForm extends AbstractIdeForm
             //$item->enabled = !$ideLanguage || $language->getCode() != $ideLanguage->getCode();
 
             $item->on('action', function () use ($language, $item, $menu) {
-                $msg = new MessageBoxForm($language->getRestartMessage(), ['OK']);
+                $msg = new MessageBoxForm($language->getRestartMessage(), [$language->getRestartYes(), $language->getRestartNo()]);
                 $msg->makeWarning();
                 $msg->showDialog();
 
                 $menu->graphic = Ide::get()->getImage(new UXImage($language->getIcon()));
                 Ide::get()->setUserConfigValue('ide.language', $language->getCode());
+
+                if ($msg->getResultIndex() == 0) {
+                    Ide::get()->restart();
+                }
             });
 
             $menu->items->add($item);
