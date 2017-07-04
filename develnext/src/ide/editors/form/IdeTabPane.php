@@ -375,7 +375,7 @@ class IdeTabPane
 
         if ($this->objectTreeList) {
             $node = $this->objectTreeList->makeUi();
-            UXVBox::setMargin($node, [2, 3]);
+            UXVBox::setMargin($node, [2, 3, 0, 3]);
 
             $this->addCustomNode($node);
         }

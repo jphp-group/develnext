@@ -2228,7 +2228,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $ui = $this->leftTabPane = new IdeTabPane();
 
-        $objectTreeList = new IdeObjectTreeList();
+        $objectTreeList = new IdeObjectTreeList($this->contextMenu);
         $objectTreeList->setTraverseFunc([$this, 'eachNode']);
         $objectTreeList->setLevelOffset(1);
         $objectTreeList->setEmptyItem(new ObjectListEditorItem(

@@ -4,10 +4,13 @@ namespace ide\editors\form;
 use ide\editors\common\ObjectListEditorButtonRender;
 use ide\editors\common\ObjectListEditorCellRender;
 use ide\editors\common\ObjectListEditorItem;
+use ide\editors\menu\ContextMenu;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\event\UXEvent;
+use php\gui\layout\UXHBox;
+use php\gui\UXButton;
 use php\gui\UXComboBox;
 
 /**
@@ -37,6 +40,20 @@ class IdeObjectTreeList
      * @var int
      */
     protected $levelOffset = 0;
+
+    /**
+     * @var ContextMenu
+     */
+    protected $contextMenu;
+
+    /**
+     * IdeObjectTreeList constructor.
+     * @param ContextMenu $contextMenu
+     */
+    public function __construct(ContextMenu $contextMenu = null)
+    {
+        $this->contextMenu = $contextMenu;
+    }
 
     /**
      * @param callable $traverseFunc
@@ -144,6 +161,22 @@ class IdeObjectTreeList
         $ui->onCellRender($handler);
         $ui->onButtonRender(new ObjectListEditorButtonRender());
 
-        return $this->ui = $ui;
+        $this->ui = $ui;
+
+        if ($this->contextMenu) {
+            $btn = new UXButton('', ico('menu16'));
+            $btn->tooltipText = 'Меню выбранного объекта';
+            $btn->maxHeight = 999;
+
+            $btn->on('action', function () use ($btn) {
+                $this->contextMenu->show($btn);
+            });
+
+            UXHBox::setHgrow($ui, 'ALWAYS');
+            $ui->maxWidth = 999;
+            return new UXHBox([$btn, $ui], 1);
+        } else {
+            return $ui;
+        }
     }
 }
