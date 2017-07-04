@@ -12,6 +12,8 @@ use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\control\AbstractProjectControlPane;
 use ide\project\Project;
 use ide\systems\Cache;
+use ide\systems\FileSystem;
+use ide\systems\ProjectSystem;
 use ide\ui\FlowListViewDecorator;
 use ide\ui\ImageBox;
 use ide\ui\ImageExtendedBox;
@@ -140,6 +142,11 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
             }
 
             $this->refresh();
+
+            if ($editor = FileSystem::getSelectedEditor()) {
+                $editor->open();
+                $editor->refresh();
+            }
         });
 
         $this->projectBundleListPane->on('append', function ($index, $indexes) {
@@ -164,6 +171,11 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                     $this->projectBundleListPane->add($this->makeItemUi($resource));
 
                     $this->availableBundleListPane->removeBySelections();
+
+                    if ($editor = FileSystem::getSelectedEditor()) {
+                        $editor->open();
+                        $editor->refresh();
+                    }
 
                     Ide::toast("Пакет расширения '{$resource->getName()}' подключен к проекту");
                 });
