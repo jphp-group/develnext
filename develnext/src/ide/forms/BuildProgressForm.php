@@ -348,9 +348,9 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
     }
 
     /**
-     * @param \Exception $e
+     * @param \Throwable $e
      */
-    public function stopWithException(\Exception $e)
+    public function stopWithException(\Throwable $e)
     {
         $this->processDone = true;
 

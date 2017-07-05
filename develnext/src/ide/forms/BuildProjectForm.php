@@ -53,12 +53,12 @@ class BuildProjectForm extends AbstractIdeForm
                 $titleDescription = new UXLabel($item->getDescription());
                 $titleDescription->style = '-fx-text-fill: gray;';
 
-                $box = new UXHBox([$titleName]);
-                $box->spacing = 0;
+                $box = new UXHBox([$titleName], 5);
+                //$box->spacing = 0;
 
                 if ($item->getConfigForm()) {
                     $settingsLink = new UXHyperlink('(настройки)');
-                    $settingsLink->padding = [0, 5];
+                    //$settingsLink->padding = [0, 5];
                     $settingsLink->on('action', function () use ($item) {
                         $item->showConfigDialog();
                     });

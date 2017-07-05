@@ -2,6 +2,7 @@
 namespace ide\project\behaviours;
 
 use ide\build\AntOneJarBuildType;
+use ide\build\InternalBundleBuildType;
 use ide\build\OneJarBuildType;
 use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
@@ -34,6 +35,7 @@ class RunBuildProjectBehaviour extends AbstractProjectBehaviour
         $buildProjectCommand->register(new SetupWindowsApplicationBuildType());
         //$buildProjectCommand->register(new OneJarBuildType());
         $buildProjectCommand->register(new AntOneJarBuildType());
+        $buildProjectCommand->register(new InternalBundleBuildType());
 
         Ide::get()->registerCommand(new ExecuteProjectCommand($this));
         Ide::get()->registerCommand($buildProjectCommand);
