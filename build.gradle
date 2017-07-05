@@ -173,6 +173,7 @@ project(':develnext') {
         compile project(':jphp-desktop-ext')
         compile project(':jphp-systemtray-ext')
         compile project(':jphp-parser')
+        compile project(':jphp-zip-ext/jphp-zip-ext')
         compile project(':develnext-doc')
         compile project(':develnext-store')
         compile project(':develnext-java-platform')
@@ -201,12 +202,13 @@ project(':develnext') {
         compile project(':develnext-stubs/dn-zend-php-sdk')
 
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
+        //compile "org.develnext.jphp:jphp-zip-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-json-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-zend-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-sql-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-debugger:$jphpVersion"
 
-        compile fileTree(dir: 'libs', include: '*.jar')
+        //compile fileTree(dir: 'libs', include: '*.jar')
     }
 }
 

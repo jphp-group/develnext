@@ -191,7 +191,11 @@ class FileUtils
      */
     public static function copyFile($origin, $dest)
     {
-        UiUtils::checkIO("copyFile(): $origin -> $dest");
+        if ($origin instanceof Stream) {
+            UiUtils::checkIO("copyFile(): Stream({$origin->getPath()}) -> $dest");
+        } else {
+            UiUtils::checkIO("copyFile(): $origin -> $dest");
+        }
 
         try {
             //Logger::warn("Copy $origin -> $dest");
@@ -199,9 +203,9 @@ class FileUtils
 
             $time = Time::millis();
 
-            $size = fs::size($origin);
+            $size = $origin instanceof Stream ? -1 : fs::size($origin);
 
-            if ($size < 1024 * 1024 * 32) {
+            if ($size < 1024 * 1024 * 32 && $size > 0) {
                 Stream::putContents($dest, fs::get($origin));
                 $result = $size;
             } else {
@@ -218,7 +222,12 @@ class FileUtils
             //Stream::putContents($dest, fs::get($origin));
             return $result;
         } catch (IOException $e) {
-            Logger::warn("Unable copy $origin to $dest, {$e->getMessage()}");
+            if ($origin instanceof Stream) {
+                Logger::warn("Unable copy Stream({$origin->getPath()}) to $dest, {$e->getMessage()}");
+            } else {
+                Logger::warn("Unable copy $origin to $dest, {$e->getMessage()}");
+            }
+
             return -1;
         }
     }

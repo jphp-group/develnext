@@ -38,3 +38,6 @@ include 'develnext-bundles/dn-controlfx-bundle'
 include 'develnext-stubs/dn-php-sdk'
 include 'develnext-stubs/dn-jphp-sdk'
 include 'develnext-stubs/dn-zend-php-sdk'
+
+include 'jphp-zip-ext'
+include 'jphp-zip-ext/jphp-zip-ext'

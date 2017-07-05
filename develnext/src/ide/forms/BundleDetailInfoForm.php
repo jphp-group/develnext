@@ -10,7 +10,6 @@ use ide\library\IdeLibraryBundleResource;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\Project;
 use ide\ui\ListMenu;
-use php\compress\ZipFile;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;

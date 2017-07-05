@@ -171,11 +171,16 @@ class MessageBoxForm extends AbstractIdeForm
         return $dialog->showDialog() && $dialog->getResultIndex() == 0;
     }
 
-
     static function confirmExit($owner = null)
     {
         $dialog = new static("Вы уверены, что хотите выйти?", ['Да, выйти', 'Нет'], $owner);
 
         return $dialog->showDialog() && $dialog->getResultIndex() == 0;
+    }
+
+    static function warning($message, $owner = null)
+    {
+        $dialog = new static($message, ['OK'], $owner);
+        return $dialog->showWarningDialog();
     }
 }

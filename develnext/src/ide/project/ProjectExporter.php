@@ -2,6 +2,7 @@
 namespace ide\project;
 use ide\utils\FileUtils;
 use php\compress\ArchiveOutputStream;
+use php\compress\ZipFile;
 use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
@@ -104,32 +105,20 @@ class ProjectExporter
     }
 
     /**
-     * @param $zipFile
+     * @param string  $zipFile
      */
     public function save($zipFile)
     {
-        if ($parent = File::of($zipFile)->getParentFile()) {
-            $parent->mkdirs();
-        }
+        fs::ensureParent($zipFile);
 
-        $out = new ArchiveOutputStream('zip', $zipFile);
+        $zip = ZipFile::create($zipFile);
 
         foreach ($this->files as $name => $file) {
             $file = File::of($file);
 
             if ($file->exists()) {
-                $contents = Stream::getContents($file);
-
-                $entity = $out->createEntry($file, $name);
-                $entity->setSize(Str::length($contents));
-
-                $out->addEntry($entity);
-                $out->write($contents);
-
-                $out->closeEntry();
+                $zip->add($name, $file);
             }
         }
-
-        $out->close();
     }
 }

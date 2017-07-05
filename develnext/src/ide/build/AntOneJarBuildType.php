@@ -15,6 +15,7 @@ use ide\utils\FileUtils;
 use php\compress\ZipFile;
 use php\io\File;
 use php\io\IOException;
+use php\io\Stream;
 use php\lang\Process;
 use php\lib\arr;
 use php\lib\fs;
@@ -156,12 +157,15 @@ class AntOneJarBuildType extends AbstractBuildType
 
                 try {
                     $zipFile = new ZipFile($module->getId());
-                    if ($extContent = $zipFile->getEntryContent('META-INF/services/php.runtime.ext.support.Extension')) {
-                        $extList .= $extContent . "\n\n";
+
+                    if ($zipFile->has('META-INF/services/php.runtime.ext.support.Extension')) {
+                        $zipFile->read('META-INF/services/php.runtime.ext.support.Extension', function ($stat, Stream $stream) use (&$extList) {
+                            $extList .= "$stream" . "\n\n";
+                        });
                     } else {
                         Logger::info("Skip extensions list for module {$module->getId()}");
                     }
-                    $zipFile->close();
+
                 } catch (IOException $e) {
                     Logger::warn("Unable to read zip data from {$module->getId()}, {$e->getMessage()}");
                 }

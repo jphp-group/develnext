@@ -25,6 +25,7 @@ use php\gui\UXLabel;
 use php\io\File;
 use php\io\FileStream;
 use php\io\IOException;
+use php\io\Stream;
 use php\lang\Environment;
 use php\lang\Module;
 use php\lang\Package;
@@ -365,10 +366,14 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
             foreach ($zipLibraries as $library) {
                 $zip = new ZipFile($library);
-                foreach ($zip->getEntryNames() as $name) {
+                foreach ($zip->statAll() as $stat) {
+                    $name = $stat['name'];
+
                     if (str::startsWith($name, '.packages/') && fs::ext($name) == 'pkg') {
-                        $package = FrameworkPackageLoader::makeFrom($zip->getEntryStream($name));
-                        $scope->setPackage(fs::nameNoExt($name), $package);
+                        $zip->read($stat['name'], function (array $stat, Stream $stream) use ($name, $scope) {
+                            $package = FrameworkPackageLoader::makeFrom($stream);
+                            $scope->setPackage(fs::nameNoExt($name), $package);
+                        });
                     }
                 }
             }
@@ -494,49 +499,52 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                     continue;
                 }
 
-                $jar = new JarArchive($library);
+                $jar = new ZipFile($library);
 
-                foreach ($jar->getEntries() as $entry) {
-                    if (str::startsWith($entry->getName(), 'JPHP-INF/')) {
+                foreach ($jar->statAll() as $stat) {
+                    list($name) = [$stat['name']];
+
+                    if (str::startsWith($name, 'JPHP-INF/')) {
                         continue;
                     }
 
-                    if (fs::ext($entry->getName()) == 'php') {
-                        $compiled = new File($generatedDirectory, '/' . fs::pathNoExt($entry->getName()) . ".phb");
+                    if (fs::ext($name) == 'php') {
+                        $compiled = new File($generatedDirectory, '/' . fs::pathNoExt($name) . ".phb");
 
                         if (!$compiled->exists()) {
                             if ($compiled->getParentFile() && !$compiled->getParentFile()->isDirectory()) {
                                 $compiled->getParentFile()->mkdirs();
                             }
 
-                            $stream = $jar->getEntryStream($entry->getName());
-                            $className = fs::pathNoExt($entry->getName());
-                            $className = str::replace($className, '/', '\\');
+                            $jar->read($name, function ($_, Stream $stream) use ($name, $compiled, $log, $scope) {
+                                $className = fs::pathNoExt($name);
+                                $className = str::replace($className, '/', '\\');
 
-                            try {
-                                $done = $scope->execute(function () use ($stream, $compiled, $className, $log) {
-                                    if (!class_exists($className, false)) {
-                                        try {
-                                            $module = new Module($stream, false);
-                                            $module->dump($compiled, true);
-                                            return true;
-                                        } catch (Error $e) {
-                                            if ($log) {
-                                                $log("[ERROR] Unable to compile '{$className}', {$e->getMessage()}, on line {$e->getLine()}");
-                                                return false;
+                                try {
+                                    $done = $scope->execute(function () use ($stream, $compiled, $className, $log) {
+                                        if (!class_exists($className, false)) {
+                                            try {
+                                                $module = new Module($stream, false);
+                                                $module->dump($compiled, true);
+                                                return true;
+                                            } catch (Error $e) {
+                                                if ($log) {
+                                                    $log("[ERROR] Unable to compile '{$className}', {$e->getMessage()}, on line {$e->getLine()}");
+                                                    return false;
+                                                }
                                             }
                                         }
+
+                                        return false;
+                                    });
+
+                                    if ($log && $done) {
+                                        $log(":compile {$name}");
                                     }
-
-                                    return false;
-                                });
-
-                                if ($log && $done) {
-                                    $log(":compile {$entry->getName()}");
+                                } finally {
+                                    $stream->close();
                                 }
-                            } finally {
-                                $stream->close();
-                            }
+                            });
                         }
                     }
                 }

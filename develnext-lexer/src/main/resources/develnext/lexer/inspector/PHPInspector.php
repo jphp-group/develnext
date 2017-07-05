@@ -18,11 +18,9 @@ use develnext\lexer\token\MethodStmtToken;
 use develnext\lexer\token\SimpleToken;
 use develnext\lexer\Tokenizer;
 use ide\Ide;
-use php\compress\ArchiveEntry;
-use php\compress\ArchiveInputStream;
+use php\compress\ZipFile;
 use php\framework\Logger;
 use php\io\File;
-use php\io\IOException;
 use php\io\Stream;
 use php\lang\Environment;
 use php\lang\JavaException;
@@ -106,35 +104,22 @@ class PHPInspector extends AbstractInspector
 
     protected function loadZipSource($path, array $options = [], $unload = false)
     {
-        $archive = new ArchiveInputStream('zip', $path);
-        $entries = [];
-
         try {
-            while ($entry = $archive->nextEntry()) {
-                $entries[] = $entry;
-            }
-        } catch (IOException $e) {
-            return;
-        }
+            $zip = new ZipFile($path);
 
-        $archive->close();
+            foreach ($zip->statAll() as $stat) {
+                $name = $stat['name'];
 
-        $archive = new ArchiveInputStream('zip', $path);
-
-        try {
-            while ($entry = $archive->nextEntry()) {
-                /** @var ArchiveEntry $entry */
-                $entry = arr::shift($entries);
-
-                if (arr::has($this->extensions, fs::ext($entry->getName()))) {
-                    if (!$this->loadPhpSource($archive, $entry->getName(), $options, $unload)) {
-                    }
+                if (arr::has($this->extensions, fs::ext($name))) {
+                    $zip->read($name, function ($stat, Stream $stream) use ($name, $path, $options, $unload) {
+                        if (!$this->loadPhpSource($stream, $name, $options, $unload)) {
+                            // nop.
+                        }
+                    });
                 }
             }
-
-            $archive->close();
-        } catch (IOException $e) {
-            return;
+        } catch (\Exception $e) {
+            ;
         }
     }
 

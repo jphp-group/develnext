@@ -90,14 +90,12 @@ class ServiceManager
         $this->accountService = new AccountService();
         $this->profileService = new ProfileService();
         $this->ideService = new IdeService();
-        $this->projectService = new ProjectService();
         $this->projectArchiveService = new ProjectArchiveService();
         $this->noticeService = new NoticeService();
         $this->fileService = new FileService();
         $this->iconService = new IconService();
 
         $this->accountService->on('exception', function () { $this->updateStatus(); });
-        $this->projectService->on('exception', function () { $this->updateStatus(); });
         $this->ideService->on('exception', function ($methodName) {
             if ($methodName != 'ide/status') {
                 $this->updateStatus();

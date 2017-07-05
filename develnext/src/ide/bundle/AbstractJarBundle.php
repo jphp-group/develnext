@@ -2,14 +2,9 @@
 namespace ide\bundle;
 
 use ide\Ide;
-use ide\Logger;
-use ide\project\behaviours\GradleProjectBehaviour;
-use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\Project;
 use ide\project\ProjectModule;
 use ide\utils\FileUtils;
-use php\compress\ArchiveEntry;
-use php\compress\ArchiveInputStream;
 use php\compress\ZipFile;
 use php\io\File;
 use php\io\IOException;
@@ -86,24 +81,31 @@ abstract class AbstractJarBundle extends AbstractBundle
                 try {
                     $vendorDirectory = $this->getVendorDirectory() . "/";
 
-                    foreach ($zipFile->getEntryNames() as $name) {
+                    foreach ($zipFile->statAll() as $stat) {
+                        $name = $stat['name'];
+
                         if ($name == "$vendorDirectory.vendor") {
                             continue;
                         }
 
                         if (str::startsWith($name, $vendorDirectory)) {
-                            $zipEntry = $zipFile->getEntry($name);
-
-                            if ($zipEntry->isDirectory()) {
+                            if ($stat['directory']) {
                                 continue;
                             }
 
-                            $this->copyVendorResource(FileUtils::relativePath($vendorDirectory, $name));
+                            $zipFile->read($name, function ($_, Stream $stream) use ($vendorDirectory, $name) {
+                                 FileUtils::copyFile(
+                                     $stream,
+                                     $this->getProjectVendorDirectory()->getPath() . "/" . FileUtils::relativePath($vendorDirectory, $name)
+                                 );
+                            });
+
+                            //$this->copyVendorResource();
                         }
                     }
 
                 } finally {
-                    $zipFile->close();
+
                 }
             }
         }

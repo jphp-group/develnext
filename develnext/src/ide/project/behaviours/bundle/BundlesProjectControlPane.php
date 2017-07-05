@@ -1,4 +1,5 @@
 <?php
+
 namespace ide\project\behaviours\bundle;
 
 use ide\forms\BundleDetailInfoForm;
@@ -33,6 +34,7 @@ use php\gui\UXSeparator;
 use php\gui\UXTextField;
 use php\io\File;
 use php\io\IOException;
+use php\io\Stream;
 use php\lang\Thread;
 use php\lib\fs;
 use php\lib\str;
@@ -129,7 +131,7 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
         $this->projectBundleListPane = new FlowListViewDecorator();
         $this->projectBundleListPane->setEmptyListText('Перетащите сюда необходимые пакеты расширений ...');
         $pane = $this->projectBundleListPane->getPane();
-        
+
         $pane->minHeight = 212;
         $pane->height = 212;
         $pane->maxHeight = 212;
@@ -299,93 +301,117 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
             $zip = new ZipFile($file);
 
             try {
-                $config = new IdeConfiguration($zip->getEntryStream('.resource'), 'UTF-8');
+                if (!$zip->has('.resource')) {
+                    uiLater(function () {
+                        MessageBoxForm::warning('Поврежденный или некорректный пакет расширений, т.к. файл .resource отсутствует.');
+                    });
 
-                if (!$config->toArray()) {
-                    UXDialog::showAndWait('Поврежденный или некорректный пакет расширений', 'ERROR');
-                    $zip->close();
                     return false;
-                } else {
-                    uiLater(function () use ($config, $zip, $file) {
-                        $version = $config->get('version', '1.0');
-                        $code = $config->get("name") . '~' . $version;
+                }
 
-                        if ($oldResource = Ide::get()->getLibrary()->getResource('bundles', $config->get("name"))) {
-                            if (!$oldResource->isEmbedded()) {
-                                if (MessageBoxForm::confirm("Данный пакет уже установлен, заменить его новой версией ({$oldResource->getVersion()} -> {$version})?")) {
-                                    Ide::get()->getLibrary()->delete($oldResource);
-                                } else {
-                                    Ide::get()->getMainForm()->hidePreloader();
-                                    return;
-                                }
+                /** @var IdeConfiguration $config */
+                $config = null;
+                $exit = false;
+
+                $zip->read('.resource', function ($stat, Stream $stream) use (&$exit, &$config) {
+                    $config = new IdeConfiguration($stream, $stat['name']);
+
+                    if (!$config->toArray()) {
+                        uiLater(function () {
+                            MessageBoxForm::warning('Поврежденный или некорректный пакет расширений, в конфиге .resource нет данных.');
+                        });
+
+                        $exit = true;
+                        return;
+                    }
+                });
+
+                if ($exit) return false;
+
+                uiLater(function () use ($config, $zip, $file) {
+                    $version = $config->get('version', '1.0');
+                    $code = $config->get("name") . '~' . $version;
+
+                    if ($oldResource = Ide::get()->getLibrary()->getResource('bundles', $config->get("name"))) {
+                        if (!$oldResource->isEmbedded()) {
+                            if (MessageBoxForm::confirm("Данный пакет уже установлен, заменить его новой версией ({$oldResource->getVersion()} -> {$version})?")) {
+                                Ide::get()->getLibrary()->delete($oldResource);
+                            } else {
+                                Ide::get()->getMainForm()->hidePreloader();
+                                return;
                             }
                         }
+                    }
 
-                        (new Thread(function () use ($zip, $file, $config, $code) {
-                            try {
-                                $resource = Ide::get()->getLibrary()->makeResource('bundles', $code, true);
-                                $path = fs::parent($resource->getPath()) . "/" . $code;
+                    (new Thread(function () use ($zip, $file, $config, $code) {
+                        try {
+                            $resource = Ide::get()->getLibrary()->makeResource('bundles', $code, true);
+                            $path = fs::parent($resource->getPath()) . "/" . $code;
 
-                                foreach ($zip->getEntryNames() as $name) {
-                                    if ($entry = $zip->getEntry($name)) {
-                                        if ($name == '.resource') {
-                                            fs::makeFile($resource->getPath() . ".resource");
-                                            fs::copy($zip->getEntryStream($name), $resource->getPath() . ".resource");
+                            foreach ($zip->statAll() as $stat) {
+                                $name = $stat['name'];
+
+                                if ($name == '.resource') {
+                                    fs::makeFile($resource->getPath() . ".resource");
+
+                                    $zip->read($name, function ($_, Stream $stream) use ($resource) {
+                                        fs::copy($stream, $resource->getPath() . ".resource");
+                                    });
+                                } else {
+                                    if (str::startsWith($name, "bundle/")) {
+                                        $to = $path . "/" . str::sub($name, 7);
+
+                                        if ($stat['directory']) {
+                                            fs::makeDir($to);
                                         } else {
-                                            if (str::startsWith($name, "bundle/")) {
-                                                $to = $path . "/" . str::sub($name, 7);
-
-                                                if ($entry->isDirectory()) {
-                                                    fs::makeDir($to);
-                                                } else {
-                                                    fs::ensureParent($to);
-                                                    try {
-                                                        fs::copy($zip->getEntryStream($name), $to);
-                                                    } catch (IOException $e) {
-                                                        // jphp bug.
-                                                    }
-                                                }
+                                            fs::ensureParent($to);
+                                            try {
+                                                $zip->read($name, function ($_, Stream $stream) use ($to) {
+                                                    fs::copy($stream, $to);
+                                                });
+                                            } catch (IOException $e) {
+                                                // jphp bug.
                                             }
                                         }
                                     }
                                 }
-
-                                Ide::get()->getLibrary()->updateCategory('bundles');
-
-                                uiLater(function () use ($resource) {
-                                    Ide::get()->getMainForm()->hidePreloader();
-                                    $this->refresh();
-
-                                    $msg = new MessageBoxForm('Для корректного завершения установки пакета перезапустите DevelNext!', ['Перезапустить', 'Позже']);
-
-                                    if ($msg->showWarningDialog() && $msg->getResultIndex() == 0) {
-                                        Ide::get()->restart();
-                                    }
-
-                                    /** @var IdeLibraryBundleResource $resource */
-                                    $resource = Ide::get()->getLibrary()->getResource('bundles', $resource->getUniqueId());
-
-                                    if ($resource && $resource->getBundle()) {
-                                        if ($env = $this->behaviour->hasBundleInAnyEnvironment($resource->getBundle())) {
-                                            $this->behaviour->removeBundle($resource->getBundle());
-                                            $this->behaviour->addBundle($env, $resource->getBundle());
-                                        }
-                                    }
-                                });
-                            } finally {
-                                $zip->close();
                             }
-                        }))->start();
-                    });
 
-                    return true;
-                }
+                            Ide::get()->getLibrary()->updateCategory('bundles');
+
+                            uiLater(function () use ($resource) {
+                                Ide::get()->getMainForm()->hidePreloader();
+                                $this->refresh();
+
+                                $msg = new MessageBoxForm('Для корректного завершения установки пакета перезапустите DevelNext!', ['Перезапустить', 'Позже']);
+
+                                if ($msg->showWarningDialog() && $msg->getResultIndex() == 0) {
+                                    Ide::get()->restart();
+                                }
+
+                                /** @var IdeLibraryBundleResource $resource */
+                                $resource = Ide::get()->getLibrary()->getResource('bundles', $resource->getUniqueId());
+
+                                if ($resource && $resource->getBundle()) {
+                                    if ($env = $this->behaviour->hasBundleInAnyEnvironment($resource->getBundle())) {
+                                        $this->behaviour->removeBundle($resource->getBundle());
+                                        $this->behaviour->addBundle($env, $resource->getBundle());
+                                    }
+                                }
+                            });
+                        } finally {
+                            ;
+                        }
+                    }))->start();
+                });
+
+                return true;
             } finally {
 
             }
         } catch (ZipException $e) {
             uiLater(function () {
-                UXDialog::showAndWait('Поврежденный или некорректный файл ZIP пакета расширений', 'ERROR');
+                MessageBoxForm::warning('Поврежденный или некорректный файл ZIP пакета расширений');
                 Ide::get()->getMainForm()->hidePreloader();
             });
 
