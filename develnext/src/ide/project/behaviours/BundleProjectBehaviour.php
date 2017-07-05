@@ -7,6 +7,7 @@ use ide\editors\AbstractEditor;
 use ide\editors\ProjectEditor;
 use ide\formats\ProjectFormat;
 use ide\forms\BundleDetailInfoForm;
+use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\IdeConfiguration;
 use ide\library\IdeLibraryBundleResource;
@@ -645,7 +646,18 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
             $this->bundles[$env][$class] = $bundle;
 
-            foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
+            $dependenciesOfBundle = $this->getDependenciesOfBundle($env, $bundle);
+
+            foreach ($dependenciesOfBundle as $one) {
+                // include public dep
+                if ($resource = $this->getResourceOfBundle($one)) {
+                    if (!$resource->isHidden()) {
+                        $this->addBundle($env, $resource->getBundle());
+                        continue;
+                    }
+                }
+
+                // include hidden dep
                 try {
                     $one->onAdd($this->project, $bundle);
                 } catch (\Throwable $e) {
@@ -658,13 +670,13 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
             } catch (\Throwable $e) {
                 Logger::exception("Error in onAdd event handler, {$e->getMessage()}", $e);
             }
+
+            $this->project->clearIdeCache('bytecode');
         }
 
         if (!$canRemove) {
             $this->bundlesCannotBeRemoved[$class] = $class;
         }
-
-        $this->project->clearIdeCache('bytecode');
     }
 
     /**
@@ -691,7 +703,16 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                         Logger::exception("Error in onRemove event handler, {$e->getMessage()}", $e);
                     }
 
-                    foreach ($this->getDependenciesOfBundle($env, $bundle) as $one) {
+                    $dependenciesOfBundle = $this->getDependenciesOfBundle($env, $bundle);
+
+                    foreach ($dependenciesOfBundle as $one) {
+                        // do not remove public dep.
+                        if ($resource = $this->getResourceOfBundle($one)) {
+                            if (!$resource->isHidden()) {
+                                continue;
+                            }
+                        }
+
                         try {
                             $one->onRemove($this->project, $bundle);
                         } catch (\Throwable $e) {

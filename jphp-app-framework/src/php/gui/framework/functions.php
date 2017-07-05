@@ -102,6 +102,19 @@ function uiLater(callable $callback)
     UXApplication::runLater($callback);
 }
 
+/**
+ * --RU--
+ * Выполнить колбэк позже в UI потоке и ждать его выполнения и результата.
+ * Необходимо для работы с UI из других паралельных потоков.
+ *
+ * @param callable $callback
+ * @return mixed
+ */
+function uiLaterAndWait(callable $callback)
+{
+    return UXApplication::runLaterAndWait($callback);
+}
+
 function uiValue($object)
 {
     if (!$object) {

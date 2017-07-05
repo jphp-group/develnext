@@ -81,6 +81,14 @@ class UXApplication
     }
 
     /**
+     * @param callable $callback
+     * @return mixed
+     */
+    public static function runLaterAndWait(callable $callback)
+    {
+    }
+
+    /**
      * Splash form if it set in launcher.conf via option fx.splash=/path/to/image.png
      * @return UXForm|null
      */

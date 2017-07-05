@@ -26,6 +26,9 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXApplication")
@@ -135,6 +138,36 @@ public class UXApplication extends BaseWrapper<Application> {
     }
 
     @Signature
+    public static Memory runLaterAndWait(final Invoker callback) throws Throwable {
+        if (isShutdown()) {
+            return Memory.NULL;
+        }
+
+        if (Platform.isFxApplicationThread()) {
+            return callback.call();
+        }
+
+        new JFXPanel();
+
+        FutureTask<Memory> futureTask = new FutureTask<>(() -> {
+            try {
+                return callback.callNoThrow();
+            } catch (Exception e) {
+                callback.getEnvironment().catchUncaught(e);
+                return Memory.NULL;
+            }
+        });
+
+        Platform.runLater(futureTask);
+
+        try {
+            return futureTask.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new CriticalException(e);
+        }
+    }
+
+    @Signature
     public static void runLater(final Invoker callback) {
         if (isShutdown()) {
             return;
@@ -142,14 +175,11 @@ public class UXApplication extends BaseWrapper<Application> {
 
         new JFXPanel();
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    callback.callNoThrow();
-                } catch (Exception e) {
-                    callback.getEnvironment().catchUncaught(e);
-                }
+        Platform.runLater(() -> {
+            try {
+                callback.callNoThrow();
+            } catch (Exception e) {
+                callback.getEnvironment().catchUncaught(e);
             }
         });
     }
