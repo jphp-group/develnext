@@ -189,6 +189,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
                 if ($bundleResource) {
                     $config->set('version', $bundleResource->getVersion());
+                    $config->set('name', $bundleResource->getName());
                 }
 
                 $bundle->onSave($this->project, $config);
@@ -232,6 +233,8 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
         $files = $this->project->getIdeFile("bundles/")->findFiles();
 
+        $unknownBundles = [];
+
         foreach ($files as $file) {
             if (fs::ext($file) == 'conf' && fs::isFile($file)) {
                 $config = $this->project->getIdeConfig("bundles/" . fs::name($file));
@@ -255,8 +258,23 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                             $this->addBundle($config->get('env') ?: Project::ENV_ALL, $class);
                         }
                     }
+                } else {
+                    $unknownBundles[$class] = $config;
                 }
             }
+        }
+
+        if ($unknownBundles) {
+            $text = [];
+
+            foreach ($unknownBundles as $class => $config) {
+                $text[] = $config->get('name', $class) . " " . $config->get('version', '1.0');
+            }
+
+            $text = " - " . str::join($text, "\n - ");
+
+            $warning = new MessageBoxForm("Данный проект не будет работать корректно, т.к. содержит неизвестные пакеты расширений: \n\n$text", ['ОК, Игнорировать']);
+            $warning->showWarningDialog();
         }
     }
 
