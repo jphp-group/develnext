@@ -8,6 +8,7 @@ use ide\utils\FileUtils;
 use php\compress\ZipFile;
 use php\io\File;
 use php\io\IOException;
+use php\io\MiscStream;
 use php\io\Stream;
 use php\lib\arr;
 use php\lib\fs;
@@ -93,14 +94,13 @@ abstract class AbstractJarBundle extends AbstractBundle
                                 continue;
                             }
 
-                            $zipFile->read($name, function ($_, Stream $stream) use ($vendorDirectory, $name) {
-                                 FileUtils::copyFile(
-                                     $stream,
-                                     $this->getProjectVendorDirectory()->getPath() . "/" . FileUtils::relativePath($vendorDirectory, $name)
-                                 );
-                            });
+                            $dest = $this->getProjectVendorDirectory()->getPath() . "/" . FileUtils::relativePath($vendorDirectory, $name);
 
-                            //$this->copyVendorResource();
+                            FileUtils::copyFileFromZipAsync($filename, $name, $dest, function ($result) use ($project, $dest) {
+                                if ($result > -1) {
+                                    $project->loadSourceForInspector($dest);
+                                }
+                            });
                         }
                     }
 

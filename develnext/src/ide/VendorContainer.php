@@ -26,6 +26,10 @@ trait VendorContainer
         return "res://vendor/" . $this->getVendorName() . "/$name";
     }
 
+    /**
+     * @deprecated
+     * @return bool
+     */
     function copyVendorDirectory()
     {
         try {

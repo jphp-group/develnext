@@ -1202,8 +1202,8 @@ class Project
 
         $x = 2;
 
-        while (Files::exists($directory . '/' . $name)) {
-            $name = FileUtils::stripExtension($file->getName()) . ($x++) . '.' . FileUtils::getExtension($file->getName());
+        while (fs::exists($directory . '/' . $name)) {
+            $name = fs::pathNoExt($file->getName()) . ($x++) . '.' . fs::ext($file->getName());
         }
 
         $newFile = "$directory/$name";

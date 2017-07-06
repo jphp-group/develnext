@@ -215,7 +215,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
         $this->project->eachSrcFile(function (ProjectFile $file) {
             if (str::endsWith($file, '.php.source')) {
-                FileUtils::copyFile($file, fs::pathNoExt($file));
+                FileUtils::copyFileAsync($file, fs::pathNoExt($file));
                 fs::delete($file);
             }
         });

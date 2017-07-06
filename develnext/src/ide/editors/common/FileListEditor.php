@@ -200,12 +200,14 @@ class FileListEditor extends UXVBox
                 }
             }
 
-            if (FileUtils::copyFile($file, $newFile) == -1) {
-                Notifications::errorCopyFile($file);
-            }
+            FileUtils::copyFileAsync($file, $newFile, function ($result) use ($file, $newFile) {
+                if ($result == -1) {
+                    Notifications::errorCopyFile($file);
+                }
 
-            $this->update();
-            $this->setValue($newFile);
+                $this->update();
+                $this->setValue($newFile);
+            });
         }
     }
 

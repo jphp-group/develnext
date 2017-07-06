@@ -4,6 +4,7 @@ namespace ide\utils;
 use ide\Ide;
 use ide\Logger;
 use ide\ui\Notifications;
+use php\compress\ZipFile;
 use php\gui\UXApplication;
 use php\gui\UXDialog;
 use php\io\File;
@@ -185,6 +186,67 @@ class FileUtils
     }
 
     /**
+     * @param string $zipFile
+     * @param string $innerPath
+     * @param $dest
+     * @return int
+     */
+    public static function copyFileFromZip($zipFile, $innerPath, $dest)
+    {
+        $zip = new ZipFile($zipFile);
+
+        $result = -1;
+
+        if (!$zip->has($innerPath)) {
+            Logger::warn("copyFileFromZip(): ZipFile ($zipFile) doesn't have entry ('$innerPath')");
+            return $result;
+        }
+
+        $zip->read($innerPath, function ($stat, Stream $stream) use ($dest, &$result) {
+            $result = FileUtils::copyFile($stream, $dest);
+        });
+
+        return $result;
+    }
+
+    /**
+     * @param $zipFile
+     * @param $innerPath
+     * @param $dest
+     * @param callable $finish
+     */
+    public static function copyFileFromZipAsync($zipFile, $innerPath, $dest, callable $finish = null)
+    {
+        Ide::async(function () use ($zipFile, $innerPath, $dest) {
+            return FileUtils::copyFileFromZip($zipFile, $innerPath, $dest);
+        }, function ($result) use ($finish) {
+            if ($finish) {
+                uiLater(function () use ($result, $finish) {
+                    $finish($result);
+                });
+            }
+        });
+    }
+
+    /**
+     * @param $origin
+     * @param $dest
+     * @param callable $finish
+     */
+    public static function copyFileAsync($origin, $dest, callable $finish = null)
+    {
+        Ide::async(function () use ($origin, $dest) {
+            return FileUtils::copyFile($origin, $dest);
+        }, function ($result) use ($finish) {
+            if ($finish) {
+                uiLater(function () use ($result, $finish) {
+                    $finish($result);
+                });
+            }
+        });
+    }
+
+    /**
      * @param $origin
      * @param $dest
      * @return int
@@ -216,16 +278,18 @@ class FileUtils
                 $time = Time::millis() - $time;
 
                 if ($time > 150) {
-                    Logger::warn("Slow copy file [$time ms, size = $size b] in ui thread, $origin -> $dest");
+                    Logger::warn("Slow copy file [$time ms, size = $size b] in UI thread, $origin -> $dest");
                 }
             }
             //Stream::putContents($dest, fs::get($origin));
             return $result;
         } catch (IOException $e) {
+            $inThread = UXApplication::isUiThread() ? " (in UI thread)" : "";
+
             if ($origin instanceof Stream) {
-                Logger::warn("Unable copy Stream({$origin->getPath()}) to $dest, {$e->getMessage()}");
+                Logger::warn("Unable copy$inThread Stream({$origin->getPath()}) to $dest, {$e->getMessage()}");
             } else {
-                Logger::warn("Unable copy $origin to $dest, {$e->getMessage()}");
+                Logger::warn("Unable copy$inThread $origin to $dest, {$e->getMessage()}");
             }
 
             return -1;

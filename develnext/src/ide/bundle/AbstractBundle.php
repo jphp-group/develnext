@@ -130,9 +130,8 @@ abstract class AbstractBundle
         }
 
         $this->deleteVendorDirectory();
-        $this->copyVendorDirectory();
-
-        $project->loadDirectoryForInspector($this->getProjectVendorDirectory());
+        // $this->copyVendorDirectory();
+        //$project->loadDirectoryForInspector($this->getProjectVendorDirectory());
     }
 
     /**
