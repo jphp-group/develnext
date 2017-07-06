@@ -37,6 +37,7 @@ ide\formats\form\elements\TabPaneFormElement
 ide\formats\form\elements\HBoxFormElement
 ide\formats\form\elements\VBoxFormElement
 ide\formats\form\elements\FlowPaneFormElement
+ide\formats\form\elements\TilePaneFormElement
 
 ide\formats\form\elements\RectangleFormElement
 ide\formats\form\elements\CircleFormElement
@@ -94,3 +95,4 @@ ide\formats\form\tags\TreeViewFormElementTag
 ide\formats\form\tags\MediaViewFormElementTag
 ide\formats\form\tags\CanvasFormElementTag
 ide\formats\form\tags\NumberSpinnerFormElementTag
+ide\formats\form\tags\TilePaneFormElementTag

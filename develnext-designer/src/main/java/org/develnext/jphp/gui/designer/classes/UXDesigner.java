@@ -1030,7 +1030,7 @@ public class UXDesigner extends BaseObject {
 
     protected boolean isWithChildrenNode(Node node) {
         return node instanceof AnchorPane || node instanceof VBox || node instanceof HBox || node instanceof FlowPane
-                || node instanceof TitledPane
+                || node instanceof TitledPane || node instanceof TilePane || node instanceof StackPane || node instanceof GridPane
                 || node instanceof TabPane || node instanceof ScrollPane;
     }
 

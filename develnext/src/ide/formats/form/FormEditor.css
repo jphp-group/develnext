@@ -1,4 +1,4 @@
 
-HBox, VBox, FlowPane {
+HBox, VBox, FlowPane, TilePane, GridPane, StackPane {
     -fx-background-color: rgba(0, 0, 0, 0.1);
 }

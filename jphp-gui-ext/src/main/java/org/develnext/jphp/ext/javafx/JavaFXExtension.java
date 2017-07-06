@@ -134,6 +134,7 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, FragmentPane.class, UXFragmentPane.class);
         registerWrapperClass(scope, HBox.class, UXHBox.class);
         registerWrapperClass(scope, FlowPane.class, UXFlowPane.class);
+        registerWrapperClass(scope, TilePane.class, UXTilePane.class);
 
         registerWrapperClass(scope, Labeled.class, UXLabeled.class);
         registerWrapperClass(scope, ButtonBase.class, UXButtonBase.class);

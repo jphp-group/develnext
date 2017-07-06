@@ -1,0 +1,26 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="orientation" name="Ориентация" editor="enum">
+            <variants>
+                <variant value="HORIZONTAL">Горизонтальная</variant>
+                <variant value="VERTICAL">Вертикальная</variant>
+            </variants>
+        </property>
+        <property code="hgap" name="Горизонтальный интервал" editor="float" />
+        <property code="vgap" name="Вертикальный интервал" editor="float" />
+
+        <property code="alignment" name="Выравнивание общее" editor="position" tooltip="Глобальное выравнивание всех плиток на слое" />
+        <property code="tileAlignment" name="Выравнивание плитки" editor="position" tooltip="Выравнивание внутри каждой плитки" />
+
+        <property code="prefTileWidth" name="Ширина плитки" editor="float" />
+        <property code="prefTileHeight" name="Высота плитки" editor="float" />
+
+        <!--<property code="prefColumns" name="Кол-во колонок" editor="integer" tooltip="Количество плиток по горизонтали" />
+        <property code="prefRows" name="Кол-во строк" editor="integer" tooltip="Количество плиток по вертикали" />-->
+
+        <property code="paddingTop" name="Отступ (верх)" editor="float" />
+        <property code="paddingRight" name="Отступ (право)" editor="float" />
+        <property code="paddingBottom" name="Отступ (низ)" editor="float" />
+        <property code="paddingLeft" name="Отступ (лево)" editor="float" />
+    </properties>
+</element>
