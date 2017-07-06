@@ -7,5 +7,16 @@
         <property code="editable" name="Редактируемое" editor="boolean" />
 
         <property code="alignment" name="Выравнивание" editor="position" />
+
+        <property code="arrowsStyle" name="Стиль стрелок" editor="enum">
+            <variants>
+                <variant value="RIGHT_VERTICAL">Справа, Вертикальные</variant>
+                <variant value="RIGHT_HORIZONTAL">Справа, Горизонтальные</variant>
+                <variant value="LEFT_VERTICAL">Слева, Вертикальные</variant>
+                <variant value="LEFT_HORIZONTAL">Слева, Горизонтальные</variant>
+                <variant value="SPLIT_VERTICAL">Сверху и снизу</variant>
+                <variant value="SPLIT_HORIZONTAL">Слева и справа</variant>
+            </variants>
+        </property>
     </properties>
 </element>

@@ -18,6 +18,7 @@ public class UXNumberSpinner extends UXSpinner<NumberSpinner> {
         @Property int max();
         @Property int step();
         @Property int initial();
+        @Property NumberSpinner.ArrowsStyle arrowsStyle();
     }
 
     public UXNumberSpinner(Environment env, NumberSpinner wrappedObject) {

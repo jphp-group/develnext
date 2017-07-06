@@ -28,5 +28,6 @@ class NumberSpinnerFormElementTag extends AbstractFormElementTag
         $element->setAttribute('step', $node->step);
         $element->setAttribute('initial', $node->initial);
         $element->setAttribute('alignment', $node->alignment);
+        $element->setAttribute('arrowsStyle', $node->arrowsStyle);
     }
 }

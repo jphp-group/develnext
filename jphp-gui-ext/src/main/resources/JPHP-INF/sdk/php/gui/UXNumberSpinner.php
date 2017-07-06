@@ -31,4 +31,11 @@ class UXNumberSpinner extends UXSpinner
      * @var int
      */
     public $value = 0;
+
+    /**
+     * RIGHT_VERTICAL, RIGHT_HORIZONTAL, LEFT_VERTICAL, LEFT_HORIZONTAL, SPLIT_VERTICAL, SPLIT_HORIZONTAL
+     *
+     * @var string
+     */
+    public $arrowsStyle = 'RIGHT_VERTICAL';
 }
