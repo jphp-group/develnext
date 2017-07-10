@@ -41,3 +41,4 @@ include 'develnext-stubs/dn-zend-php-sdk'
 
 include 'jphp-zip-ext'
 include 'jphp-zip-ext/jphp-zip-ext'
+include 'jphp-zip-ext/dn-zip-bundle'

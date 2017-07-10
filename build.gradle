@@ -54,8 +54,16 @@ allprojects {
 }
 
 subprojects {
-    if (it.name.startsWith("develnext-bundles")) {
-        if (file("$projectDir/.resource").exists()) {
+    if (it.name.startsWith("develnext-bundles") || it.name.endsWith("-bundle")) {
+        println "-> Detecting bundle '$it.name' ...";
+
+        def resFile = file("$projectDir/.resource")
+
+        if (!resFile.exists()) {
+            resFile = file("$projectDir/src/.resource")
+        }
+
+        if (resFile.exists()) {
             def dirName = file(it.name).name;
             def bundleDir = "${projectDir}/../../develnext/misc/library/bundles/${dirName}/";
 
@@ -75,7 +83,7 @@ subprojects {
                     }
 
                     copy {
-                        from "$projectDir/.resource"
+                        from resFile
                         into "$bundleDir/.."
                         rename ".resource", "${dirName}.resource"
                     }
@@ -103,6 +111,8 @@ subprojects {
                     }
                 }
             }
+        } else {
+            println "WARNING, Bundle '$it.name' doesn't have '$projectDir/.resource' file!";
         }
     }
 }
@@ -195,6 +205,7 @@ project(':develnext') {
         provided project(':develnext-bundles/dn-game2d-bundle')
         provided project(':develnext-bundles/dn-systemtray-bundle')
         provided project(':develnext-bundles/dn-hotkey-bundle')
+        provided project(':jphp-zip-ext/dn-zip-bundle')
         //provided project(':develnext-bundles/dn-controlfx-bundle')
 
         // stubs.
