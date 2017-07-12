@@ -13,6 +13,7 @@ import org.develnext.jphp.core.tokenizer.token.expr.CommaToken;
 import org.develnext.jphp.core.tokenizer.token.expr.OperatorExprToken;
 import org.develnext.jphp.core.tokenizer.token.expr.operator.*;
 import org.develnext.jphp.core.tokenizer.token.expr.value.*;
+import org.develnext.jphp.core.tokenizer.token.stmt.ImplementsStmtToken;
 import org.develnext.jphp.core.tokenizer.token.stmt.StmtToken;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.develnext.jphp.gui.designer.editor.syntax.CodeAreaGutterNote;
@@ -75,6 +76,7 @@ public class PhpCodeArea extends AbstractCodeArea {
         put(BooleanOr2ExprToken.class, KEYWORD);
         put(BooleanXorExprToken.class, KEYWORD);
         put(OpenTagToken.class, KEYWORD);
+        put(ImplementsStmtToken.class, KEYWORD);
 
         put(OperatorExprToken.class, OPERATOR);
     }};
