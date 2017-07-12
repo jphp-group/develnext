@@ -32,14 +32,13 @@ import org.develnext.jphp.ext.javafx.support.UserData;
 import org.develnext.jphp.ext.javafx.support.control.FragmentPane;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
+import php.runtime.env.CallStackItem;
 import php.runtime.env.Environment;
 import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
+import php.runtime.invoke.ObjectInvokeHelper;
 import php.runtime.lang.BaseWrapper;
-import php.runtime.memory.ArrayMemory;
-import php.runtime.memory.DoubleMemory;
-import php.runtime.memory.ObjectMemory;
-import php.runtime.memory.StringMemory;
+import php.runtime.memory.*;
 import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
 
@@ -806,12 +805,22 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     }
 
     @Signature
-    public Memory __isset(String name) {
+    public Memory __isset(Environment env, String name) throws Throwable {
         if (data("--property-" + name).isNotNull()) {
             return Memory.TRUE;
         }
 
-        return Memory.FALSE;
+        // jphp hack
+        CallStackItem callStackItem = env.peekCall(0);
+
+        if (callStackItem != null) {
+            callStackItem.classEntity = callStackItem.staticClassEntity;
+            callStackItem.clazz = callStackItem.staticClazz;
+        }
+
+        Memory memory = getReflection().getProperty(env, env.trace(), this, name, null, 0);
+
+        return memory.isNotNull() ? Memory.TRUE : Memory.FALSE;
     }
 
     @Override
