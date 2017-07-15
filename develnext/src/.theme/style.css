@@ -109,6 +109,7 @@
 .dn-list-item:hover { -fx-border-color: red; }
 
 .dn-list-menu { -fx-background-insets: 0; -fx-focus-color: -fx-control-inner-background; -fx-faint-focus-color: -fx-control-inner-background; }
+
 .dn-list-menu-title { -fx-font-weight: bold; -fx-padding: 0; -fx-text-fill: #131313; }
 .dn-list-menu-description { -fx-text-fill: gray; }
 .dn-list-menu-count { -fx-background-color: gray; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 2px 5px; -fx-background-radius: 3px; }

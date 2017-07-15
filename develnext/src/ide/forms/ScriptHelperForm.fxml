@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="358.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox id="dialogHeader" spacing="10.0">
+               <children>
+                  <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label text="Генераторы скриптов">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label text="Мастер для генерации скриптов в контексте выделенного элемента DevelNext" textFill="#757575" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+            <VBox id="dialogContainer" prefHeight="350.0" spacing="15.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <HBox minHeight="32.0" prefHeight="32.0" prefWidth="520.0" spacing="10.0">
+                     <children>
+                        <Button id="searchBtn" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-flat-search">
+                           <padding>
+                              <Insets left="15.0" right="15.0" />
+                           </padding>
+                        </Button>
+                        <TextField id="searchField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="296.0" promptText="поиск генератора скрипта ..." HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+                  <ListView id="list" prefHeight="278.0" prefWidth="520.0" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+            <Separator prefWidth="200.0" />
+            <HBox id="dialogFooter" alignment="CENTER_LEFT" minHeight="35.0" prefHeight="35.0" spacing="10.0">
+               <children>
+                  <Button id="genButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-ok" text="Сгенерировать">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+                  <Button id="cancelButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Закрыть">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>

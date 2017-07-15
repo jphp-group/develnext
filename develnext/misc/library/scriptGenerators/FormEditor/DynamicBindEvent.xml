@@ -1,0 +1,19 @@
+<scriptGenerator>
+    <name>Добавление события</name>
+    <description>Добавление скрипта события для объекта во время выполнения</description>
+    <author>DevelNext</author>
+    <authorSite>http://develnext.org</authorSite>
+    <context>FormEditor.objectEvent</context>
+
+    <source syntax="php"><![CDATA[
+$this->bind('#object.id#.#event.code#', function (#event.class# $e) {
+    // здесь код скрипта события (#event.name#) для объекта '#object.id#'
+});
+    ]]></source>
+
+    <source syntax="php" param="form"><![CDATA[
+$this->bind('#event.code#', function (#event.class# $e) {
+    // здесь код скрипта события (#event.name#) для формы
+});
+    ]]></source>
+</scriptGenerator>

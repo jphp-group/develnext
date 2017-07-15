@@ -5,6 +5,7 @@ use php\gui\effect\UXEffect;
 use php\gui\effect\UXEffectPipeline;
 use php\gui\event\UXEvent;
 use php\lang\IllegalArgumentException;
+use php\gui\UXList;
 
 /**
  * Class UXNode

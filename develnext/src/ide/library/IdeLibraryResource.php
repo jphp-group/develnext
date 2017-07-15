@@ -29,6 +29,11 @@ abstract class IdeLibraryResource implements MenuViewable
     protected $config;
 
     /**
+     * @var bool
+     */
+    protected $valid;
+
+    /**
      * @return string
      */
     abstract public function getCategory();
@@ -53,12 +58,15 @@ abstract class IdeLibraryResource implements MenuViewable
             try {
                 $this->config = new Configuration();
                 $this->config->load($path . '.resource');
+                $this->valid = true;
             } catch (IOException $e) {
                 $this->config = new Configuration();
                 Logger::warn("Unable to read '$path.resource' file - " . $e->getMessage());
+                $this->valid = false;
             }
         } else {
             $this->config = new Configuration();
+            $this->valid = false;
         }
     }
 
@@ -205,5 +213,11 @@ abstract class IdeLibraryResource implements MenuViewable
         return -1;
     }
 
-
+    /**
+     * @return bool
+     */
+    function isValid()
+    {
+        return $this->valid;
+    }
 }

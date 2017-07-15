@@ -1,0 +1,12 @@
+<scriptGenerator>
+    <name>Выполнить событие (1 способ)</name>
+    <description>Вручную выполнить код события, вызвать триггер события.</description>
+    <author>DevelNext</author>
+    <authorSite>http://develnext.org</authorSite>
+    <context>FormEditor.objectEvent</context>
+    <source syntax="php"><![CDATA[
+// Выполняет метод события ...
+$this->#event.methodName#();
+
+    ]]></source>
+</scriptGenerator>

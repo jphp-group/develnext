@@ -38,6 +38,10 @@ class IdeLibrary
             'title' => 'Пакеты расширений',
             'type' => 'ide\library\IdeLibraryBundleResource',
         ],
+        'scriptGenerators' => [
+            'title' => 'Генераторы скриптов',
+            'type' => 'ide\library\IdeLibraryScriptGeneratorResource'
+        ]
     ];
 
     /**
@@ -96,7 +100,7 @@ class IdeLibrary
                 Logger::info("Scan library resource directory - $directory/$code, type = $type[type]");
 
                 fs::scan("$directory/$code", function ($filename) use ($code, $type) {
-                    if (Str::endsWith($filename, '.resource')) {
+                    if (Str::endsWith($filename, '.resource') || Str::endsWith($filename, '.xml')) {
                         $path = fs::pathNoExt($filename);
 
                         Logger::info("Add library ($code) resource $filename, type = $type[type]");
