@@ -3,6 +3,8 @@ namespace ide\formats\form\elements;
 
 use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormElement;
+use ide\formats\form\scriptgen\LoadFragmentScriptGenerator;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use php\gui\designer\UXDesignProperties;
 use php\gui\framework\AbstractForm;
 use php\gui\UXNode;
@@ -40,6 +42,14 @@ class FormFormElement extends AbstractFormElement
         }
 
         return $node;
+    }
+
+    public function getScriptGenerators()
+    {
+        return [
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/FadeOutFormNextScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/LoadInFragmentScriptGen')
+        ];
     }
 
     /**

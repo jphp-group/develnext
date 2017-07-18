@@ -1143,7 +1143,7 @@ class IdeEventListPaneScriptHelperCommand extends AbstractMenuCommand
             'object.id' => $this->eventPane->getTargetId()
         ];
 
-        $dialog = new ScriptHelperForm('FormEditor.objectEvent', $model, $this->eventPane->getTargetId() ? '' : 'form');
+        $dialog = new ScriptHelperForm('FormEditor.objectEvent', $model, $this->eventPane->getTargetId() ? '' : 'idEmpty');
         $dialog->showDialog();
     }
 

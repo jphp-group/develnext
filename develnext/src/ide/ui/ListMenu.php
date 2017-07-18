@@ -17,6 +17,8 @@ class ListMenu extends UXListView
 
     protected $nameThin = false;
 
+    protected $thin = false;
+
     public function __construct()
     {
         parent::__construct();
@@ -43,6 +45,23 @@ class ListMenu extends UXListView
     public function setNameThin($nameThin)
     {
         $this->nameThin = $nameThin;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isThin()
+    {
+        return $this->thin;
+    }
+
+    /**
+     * @param bool $thin
+     */
+    public function setThin($thin)
+    {
+        $this->thin = $thin;
+        $this->fixedCellSize = $thin ? 40 : 50;
     }
 
     public function getDescriptionOfItem(MenuViewable $item)

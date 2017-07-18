@@ -7,10 +7,9 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane prefHeight="358.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox id="dialogHeader" spacing="10.0">
                <children>
@@ -28,9 +27,9 @@
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
-            <VBox id="dialogContainer" prefHeight="350.0" spacing="15.0" VBox.vgrow="ALWAYS">
+            <VBox id="dialogContainer" prefHeight="350.0" spacing="5.0" VBox.vgrow="ALWAYS">
                <children>
-                  <HBox minHeight="32.0" prefHeight="32.0" prefWidth="520.0" spacing="10.0">
+                  <HBox minHeight="30.0" prefHeight="30.0" prefWidth="520.0" spacing="5.0">
                      <children>
                         <Button id="searchBtn" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-flat-search">
                            <padding>
@@ -44,7 +43,7 @@
                </children>
             </VBox>
             <Separator prefWidth="200.0" />
-            <HBox id="dialogFooter" alignment="CENTER_LEFT" minHeight="35.0" prefHeight="35.0" spacing="10.0">
+            <HBox id="dialogFooter" alignment="CENTER_LEFT" minHeight="30.0" prefHeight="30.0" spacing="5.0">
                <children>
                   <Button id="genButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-ok" text="Сгенерировать">
                      <font>
@@ -63,7 +62,7 @@
             </HBox>
          </children>
          <padding>
-            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
       </VBox>
    </children>

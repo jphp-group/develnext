@@ -9,7 +9,9 @@ use ide\editors\value\PositionPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
 use ide\formats\form\AbstractFormElement;
+use ide\formats\form\scriptgen\RandomTextScriptGenerator;
 use ide\Ide;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use ide\systems\Cache;
 use php\gui\designer\UXDesignProperties;
 use php\gui\designer\UXDesignPropertyEditor;
@@ -99,5 +101,12 @@ abstract class LabeledFormElement extends AbstractFormElement
             $data = DataUtils::get($node);
             $data->set('graphic', $imgFile->getSrcRelativePath());
         }
+    }
+
+    public function getScriptGenerators()
+    {
+        return [
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/RandomTextScriptGen')
+        ];
     }
 }

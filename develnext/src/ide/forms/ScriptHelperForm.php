@@ -6,6 +6,7 @@ use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\library\IdeLibraryScriptGeneratorResource;
+use ide\Logger;
 use ide\ui\ListMenu;
 use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXHBox;
@@ -42,10 +43,16 @@ class ScriptHelperForm extends AbstractIdeForm
      * @var array
      */
     protected $model;
+
     /**
      * @var string
      */
     private $param;
+
+    /**
+     * @var IdeLibraryScriptGeneratorResource[]
+     */
+    private $resources;
 
     /**
      * ScriptHelperForm constructor.
@@ -56,6 +63,8 @@ class ScriptHelperForm extends AbstractIdeForm
     public function __construct($context, array $model = [], $param = '')
     {
         parent::__construct();
+
+        Logger::info("Create script helper (param = $param)");
 
         $this->context = $context;
         $this->model = $model;
@@ -77,6 +86,8 @@ class ScriptHelperForm extends AbstractIdeForm
                 $this->doGen();
             }
         });
+        //$list->setThin(true);
+        //$list->setNameThin(true);
 
         UXVBox::setVgrow($list, 'ALWAYS');
     }
@@ -138,9 +149,25 @@ class ScriptHelperForm extends AbstractIdeForm
         $this->hide();
     }
 
+    /**
+     * @param IdeLibraryScriptGeneratorResource[] $resources
+     */
+    public function setResources(array $resources)
+    {
+        $this->resources = $resources;
+    }
+
     public function displayList($searchQuery = null)
     {
         $this->list->items->clear();
+
+        foreach ($this->resources as $resource) {
+            if (!$resource->getSource($this->param)) continue;
+
+            if (!str::trim($searchQuery) || str::posIgnoreCase($resource->getName(), $searchQuery) > -1) {
+                $this->list->items->add($resource);
+            }
+        }
 
         $resources = Ide::get()->getLibrary()->getResources('scriptGenerators');
 
@@ -148,7 +175,7 @@ class ScriptHelperForm extends AbstractIdeForm
         foreach ($resources as $resource) {
             if (!$resource->hasContext($this->context)) continue;
 
-            //if (!$resource->getSource($resource)) continue;
+            if (!$resource->getSource($this->param)) continue;
 
             if (!str::trim($searchQuery) || str::posIgnoreCase($resource->getName(), $searchQuery) > -1) {
                 $this->list->items->add($resource);

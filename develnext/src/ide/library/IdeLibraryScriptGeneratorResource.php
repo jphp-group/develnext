@@ -75,7 +75,7 @@ class IdeLibraryScriptGeneratorResource extends IdeLibraryResource
 
         /** @var DomElement $one */
         foreach ($sources as $one) {
-            if ($one->getAttribute('param') == $param) {
+            if ($one->getAttribute('param') == $param || $one->getAttribute('param') == '~') {
                 return $one->getTextContent();
             }
         }
@@ -97,7 +97,13 @@ class IdeLibraryScriptGeneratorResource extends IdeLibraryResource
 
     public function hasContext($context)
     {
-        return arr::has($this->getContexts(), $context);
+        foreach ($this->getContexts() as $one) {
+            if (str::startsWith($context, $one)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -10,6 +10,7 @@ use ide\formats\form\context\DeleteMenuCommand;
 use ide\formats\form\context\LockMenuCommand;
 use ide\formats\form\context\PasteMenuCommand;
 use ide\formats\form\context\RelocationMenuCommand;
+use ide\formats\form\context\ScriptHelperMenuCommand;
 use ide\formats\form\context\SelectAllMenuCommand;
 use ide\formats\form\context\ToBackMenuCommand;
 use ide\formats\form\context\ToFrontMenuCommand;
@@ -47,6 +48,8 @@ class GuiFormFormat extends AbstractFormFormat
         $this->register(new ToFrontMenuCommand());
         $this->register(new ToBackMenuCommand());
         $this->register(new LockMenuCommand());
+
+        $this->register(new ScriptHelperMenuCommand('FormEditor.objectItem'));
 
         $this->registerRelocationCommands();
         $this->registerRefactor();

@@ -6,6 +6,7 @@ use ide\behaviour\AbstractBehaviourSpec;
 use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use ide\Logger;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignProperties;
@@ -59,6 +60,14 @@ abstract class AbstractFormElement
     public function canBePrototype()
     {
         return !$this->isLayout();
+    }
+
+    /**
+     * @return IdeLibraryScriptGeneratorResource[]
+     */
+    public function getScriptGenerators()
+    {
+        return [];
     }
 
     abstract public function isOrigin($any);

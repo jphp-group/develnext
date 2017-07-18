@@ -4,9 +4,16 @@
     <author>DevelNext</author>
     <authorSite>http://develnext.org</authorSite>
     <context>FormEditor.objectEvent</context>
+
     <source syntax="php"><![CDATA[
 // Стригерить событие объекта ...
 $this->#object.id#->trigger('#event.code#');
+
+    ]]></source>
+
+    <source syntax="php" param="idEmpty"><![CDATA[
+// Стригерить событие формы ...
+$this->trigger('#event.code#');
 
     ]]></source>
 </scriptGenerator>

@@ -4,7 +4,8 @@
     <author>DevelNext</author>
     <authorSite>http://develnext.org</authorSite>
     <context>FormEditor.objectEvent</context>
-    <source syntax="php"><![CDATA[
+
+    <source syntax="php" param="~"><![CDATA[
 // Выполняет метод события ...
 $this->#event.methodName#();
 
