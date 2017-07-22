@@ -1,0 +1,26 @@
+<scriptGenerator>
+    <name>Поиск строки</name>
+    <description>Поиск строки из списка</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем классы если необходимо.
+// use std;
+
+// Что будем искать (какой текст ...)
+$searchText = $this->edit->text;
+
+// Массив из найденного, результат.
+$result = [];
+
+// Используем свойство items для управления списком ...
+foreach ($this->#object.id#->items as $item) {
+    if (str::contains($item, $searchText)) {
+        $result[] = $item;
+    }
+}
+
+// Выводим найденное.
+pre($result);
+    ]]></source>
+</scriptGenerator>

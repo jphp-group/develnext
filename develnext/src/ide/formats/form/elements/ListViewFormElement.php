@@ -2,6 +2,7 @@
 namespace ide\formats\form\elements;
 
 use ide\formats\form\AbstractFormElement;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use php\gui\UXListView;
 use php\gui\UXNode;
 
@@ -30,6 +31,17 @@ class ListViewFormElement extends AbstractFormElement
     {
         return "listView%s";
     }
+
+    public function getScriptGenerators()
+    {
+        return [
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/AddNewItemListViewScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/AddFirstNewItemListViewScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/SearchItemsListViewScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/ClearItemsListScriptGen'),
+        ];
+    }
+
 
     /**
      * @return UXNode

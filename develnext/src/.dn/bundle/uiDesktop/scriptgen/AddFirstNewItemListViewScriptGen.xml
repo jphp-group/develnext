@@ -1,0 +1,10 @@
+<scriptGenerator>
+    <name>Добавить строку в начало</name>
+    <description>Добавить новую строку в начало списка</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Используем свойство items для управления списком ...
+$this->#object.id#->items->insert(0, "Новая строка");
+    ]]></source>
+</scriptGenerator>

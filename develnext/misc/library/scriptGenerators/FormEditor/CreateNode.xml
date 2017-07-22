@@ -6,7 +6,7 @@
     <context>FormEditor.objectItem</context>
 
     <source syntax="php"><![CDATA[
-// Импортируем класс если нужно (разкоментировать).
+// Импортируем класс если нужно (раскомментировать).
 // use #type.import#;
 // или
 // use gui;

@@ -1,0 +1,10 @@
+<scriptGenerator>
+    <name>Добавить строку в конец</name>
+    <description>Добавить новую строку в конец списка</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Используем свойство items для управления списком ...
+$this->#object.id#->items->add("Новая строка");
+    ]]></source>
+</scriptGenerator>

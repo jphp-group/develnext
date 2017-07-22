@@ -1,0 +1,30 @@
+<scriptGenerator>
+    <name>Простая печать</name>
+    <description>Простая печать компонента</description>
+    <context>ModuleEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем классы если нужно.
+// use std, gui, framework;
+
+// Проверяем, есть ли возможность печати.
+if (!$this->#object.id#->isAvailable()) {
+    alert('Печать недоступна, принтер не обнаружен.');
+    return;
+}
+
+// Создаем UI компонент, который надо напечатать.
+$label = new UXLabel('Текст для печати');
+
+// Определяем название задания для печати ...
+$this->#object.id#->jobName = 'Печать компонента';
+
+// Отправляем на печать ...
+$success = $this->#object.id#->print($label);
+
+// Проверяем результат отправки на печать
+if ($success) {
+    alert('Текст успешно отправлен на печать ...');
+}
+    ]]></source>
+</scriptGenerator>

@@ -106,7 +106,8 @@ abstract class LabeledFormElement extends AbstractFormElement
     public function getScriptGenerators()
     {
         return [
-            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/RandomTextScriptGen')
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/RandomTextScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/LoadGraphicFromFileScriptGen'),
         ];
     }
 }

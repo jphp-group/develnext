@@ -1,0 +1,14 @@
+<scriptGenerator>
+    <name>Загрузить изображение из файла</name>
+    <description>Загрузить изображение из файла в компонент</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем классы если нужно
+// use gui; или use php\gui\UXImage;
+
+$image = new UXImage('путь к файлу jpg, png, gif');
+$this->#object.id#->image = $image;
+
+    ]]></source>
+</scriptGenerator>

@@ -3,6 +3,7 @@ namespace ide\formats\form\elements;
 
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use ide\Logger;
 use ide\project\Project;
 use ide\systems\Cache;
@@ -212,4 +213,13 @@ class ImageViewFormElement extends AbstractFormElement
         return $any instanceof UXImageArea
             || $any instanceof UXImageView;
     }
+
+    public function getScriptGenerators()
+    {
+        return [
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/LoadImageFromFileScriptGen'),
+        ];
+    }
+
+
 }

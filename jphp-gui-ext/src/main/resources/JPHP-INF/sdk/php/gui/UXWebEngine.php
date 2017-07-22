@@ -74,7 +74,7 @@ abstract class UXWebEngine
      * @param string $content
      * @param string $contentType (optional)
      */
-    public function loadContent($content, $contentType) {}
+    public function loadContent($content, $contentType = null) {}
 
     /**
      * ...

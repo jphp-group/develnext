@@ -1,0 +1,37 @@
+<scriptGenerator>
+    <name>Создать поведение</name>
+    <description>Создать поведение для объекта во время выполнения</description>
+    <context>Editor.behaviour</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем класс если нужно (раскомментировать).
+// use #type.import#;
+// или
+// use gui;
+
+// Создаем поведение.
+$#type.code# = new #type.class#();
+
+// здесь можно назначить свойства поведению ...
+
+// Применяем поведение к объекту.
+$#type.code#->apply($this->#object.id#);
+
+    ]]></source>
+
+    <source syntax="php" param="idEmpty"><![CDATA[
+// Импортируем класс если нужно (раскомментировать).
+// use #type.import#;
+// или
+// use gui;
+
+// Создаем поведение.
+$#type.code# = new #type.class#();
+
+// здесь можно назначить свойства поведению ...
+
+// Применяем поведение к форме.
+$#type.code#->apply($this);
+
+    ]]></source>
+</scriptGenerator>

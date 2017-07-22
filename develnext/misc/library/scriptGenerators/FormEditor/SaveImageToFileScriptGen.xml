@@ -1,0 +1,39 @@
+<scriptGenerator>
+    <name>Скриншот компонента</name>
+    <description>Сохранить изображение компонента в графический файл</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем классы если нужно
+// use std; или use php\lib\fs;
+
+// Делаем скриншот компонента ...
+$image = $this->#object.id#->snapshot();
+
+// Задаем путь к сохраняемой картинке ...
+$filename = 'путь к jpg, png, gif';
+
+// Создаем папку для файла, если ее нет ...
+fs::ensureParent($filename);
+
+// Сохраняем изображение в файл.
+$image->save($filename, fs::ext($filename));
+    ]]></source>
+
+    <source syntax="php" param="idEmpty"><![CDATA[
+// Импортируем классы если нужно
+// use std; или use php\lib\fs;
+
+// Делаем скриншот формы ...
+$image = $this->layout->snapshot();
+
+// Задаем путь к сохраняемой картинке ...
+$filename = 'путь к jpg, png, gif';
+
+// Создаем папку для файла, если ее нет ...
+fs::ensureParent($filename);
+
+// Сохраняем изображение в файл.
+$image->save($filename, fs::ext($filename));
+    ]]></source>
+</scriptGenerator>
