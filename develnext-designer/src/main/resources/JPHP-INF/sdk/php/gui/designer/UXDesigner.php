@@ -51,6 +51,11 @@ class UXDesigner
     public $snapEnabled = true;
 
     /**
+     * @var float
+     */
+    public $zoom = 1.0;
+
+    /**
      * @var bool
      */
     public $helpersEnabled = true;

@@ -94,6 +94,8 @@ public class UXDesigner extends BaseObject {
 
     protected boolean disabled = false;
 
+    protected double zoom = 1.0;
+
     public UXDesigner(Environment env, ClassEntity clazz) {
         super(env, clazz);
     }
@@ -343,6 +345,16 @@ public class UXDesigner extends BaseObject {
     @Setter
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
+    }
+
+    @Getter
+    public double getZoom() {
+        return zoom;
+    }
+
+    @Setter
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
     }
 
     @Getter
@@ -1229,8 +1241,8 @@ public class UXDesigner extends BaseObject {
                         sel.dragView.setUserData(new Insets(diffH, 0, 0, diffW));
                     }
 
-                    double x = sel.node.getLayoutX() + dx;
-                    double y = sel.node.getLayoutY() + dy;
+                    double x = sel.node.getLayoutX() + dx/zoom;
+                    double y = sel.node.getLayoutY() + dy/zoom;
 
                     if (!e.isAltDown() && snapSizeX > 1 && snapSizeY > 1 && snapEnabled) {
                         x = Math.round((x / snapSizeX)) * snapSizeX;
