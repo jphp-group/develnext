@@ -1,0 +1,17 @@
+<scriptGenerator>
+    <name>Добавить запись в таблицу</name>
+    <description>Добавить новую запись в таблицу в конец списка</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем классы если нужно
+// use gui;
+
+// Добавляем запись, учитывая каждую колонку.
+$this->#object.id#->items->add([
+    'id' => 1,
+    'name' => 'Имя',
+    'value' => 'Значение',
+]);
+    ]]></source>
+</scriptGenerator>

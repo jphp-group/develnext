@@ -1,0 +1,23 @@
+<scriptGenerator>
+    <name>Нарисовать SVG</name>
+    <description>Нарисовать рисунок на основе SVG данных</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Получаем полотно для рисования.
+$gc = $this->canvas->gc();
+
+$gc->fillColor = 'red'; // цвет заливки
+$gc->strokeColor = 'blue'; // цвет окантовки
+$gc->lineWidth = 3; // ширина линии окантовки.
+
+// Добавляем SVG выражение к пути, рисуем треугольник.
+$gc->appendSVGPath('M 50 50 L 150 50 L 100 150 z');
+
+// Рисиуем заливку.
+$gc->fill();
+
+// Рисуем окантовку (линии).
+$gc->stroke();
+    ]]></source>
+</scriptGenerator>

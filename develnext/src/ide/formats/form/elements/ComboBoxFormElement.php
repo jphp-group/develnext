@@ -71,6 +71,7 @@ class ComboBoxFormElement extends AbstractFormElement
             new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/AddFirstNewItemListViewScriptGen'),
             new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/SearchItemsListViewScriptGen'),
             new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/ClearItemsListScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/SetCellFactoryComboBoxScriptGen'),
         ];
     }
 }

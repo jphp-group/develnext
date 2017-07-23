@@ -86,9 +86,9 @@ class SourceCodePreviewForm extends UXForm
 
         $lines = str::lines($source);
 
-        $this->minWidth = 600;
+        $this->minWidth = 800;
         $this->minHeight = 200;
-        $this->height = min(600, sizeof($lines) * 20 + 90);
+        $this->height = min(700, sizeof($lines) * 20 + 90);
         $this->title = 'Исходный код, скрипт (' . str::upper($syntax) . ')';
     }
 }

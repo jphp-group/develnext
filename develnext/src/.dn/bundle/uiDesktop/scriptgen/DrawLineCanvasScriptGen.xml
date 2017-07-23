@@ -1,0 +1,25 @@
+<scriptGenerator>
+    <name>Нарисовать линию</name>
+    <description>Нарисовать простую линию</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Получаем полотно для рисования.
+$gc = $this->#object.id#->gc();
+
+// Задаем цвет линии.
+$gc->strokeColor = 'red';
+
+// Задаем жирность линии в 3 пикселя.
+$gc->lineWidth = 3;
+
+// Начало линии X, Y
+$gc->moveTo(0, 0);
+
+// Конец линии X, Y
+$gc->lineTo(#object.width#, #object.height#);
+
+// Рисиуем линию.
+$gc->stroke();
+    ]]></source>
+</scriptGenerator>

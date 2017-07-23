@@ -1,0 +1,37 @@
+<scriptGenerator>
+    <name>Выводить список с иконками</name>
+    <description>Делает возможным вывод иконок в списке</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем классы если нужно
+// use gui;
+
+// Задаем список вывода каждого элемента в списке ...
+// Инитиализируем это только один раз, например в событии загрузки компонента!
+$this->#object.id#->setCellFactory(function (UXListCell $cell, $item) {
+    $cell->text = null;
+    $cell->graphic = null;
+
+    if ($item) {
+        // достаем текст
+        $label = new UXLabel($item[0]);
+
+        // достаем иконку если есть
+        if ($item[1]) {
+            $label->graphic = new UXImageView(new UXImage($item[1]));
+        }
+
+        $cell->graphic = $label;
+    }
+});
+
+// ---------
+
+// Теперь в любом месте можно добавлять иконку и текст в списке:
+$this->#object.id#->items->add(['Текст 1', 'images/icon.png']);
+$this->#object.id#->items->add(['Текст без иконки']);
+
+// Все элементы попадут в функцию setCellFactory() для отрисовки.
+    ]]></source>
+</scriptGenerator>
