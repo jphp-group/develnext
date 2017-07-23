@@ -13,6 +13,7 @@ use ide\formats\form\elements\GamePaneFormElement;
 use ide\formats\form\elements\PanelFormElement;
 use ide\formats\form\elements\ScrollPaneFormElement;
 use ide\formats\form\tags\GamePaneFormElementTag;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use ide\scripts\AbstractScriptComponent;
 use php\gui\UXNode;
 
@@ -61,4 +62,13 @@ class GameSceneBehaviourSpec extends AbstractBehaviourSpec
         return ($target instanceof FormFormElement)
                 || ($target instanceof GamePaneFormElement);
     }
+
+    public function getScriptGenerators()
+    {
+        return [
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/game2d/scriptGenerators/LoadSceneScriptGen'),
+        ];
+    }
+
+
 }

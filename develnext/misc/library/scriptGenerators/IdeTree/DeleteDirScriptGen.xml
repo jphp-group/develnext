@@ -1,0 +1,23 @@
+<scriptGenerator>
+    <name>Удалить директорию</name>
+    <description>Полностью удалить директорию с её содержимым.</description>
+    <context>IdeTree.directory</context>
+
+    <source syntax="php" param="~"><![CDATA[
+// Импортируем классы если нужно
+// use std, gui;
+
+$dir = '#file.relPath#';
+
+// Очищаем директорию от содержимого.
+fs::clean($dir);
+
+// Удаляем саму директорию.
+$success = fs::delete($dir);
+
+// Если не удалось все удалить ...
+if (!$success) {
+    alert('Не удалось удалить директорию, произошла ошибка.')
+}
+    ]]></source>
+</scriptGenerator>

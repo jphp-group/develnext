@@ -1,0 +1,16 @@
+<scriptGenerator>
+    <name>Поменять игровую сцену</name>
+    <description>Загрузить другую форму на игровую сцену</description>
+
+    <context>Editor.behaviour.phys</context>
+
+    <source syntax="php"><![CDATA[
+// Загружаем форму OtherForm на сцену
+$this->#object.id#->#type.code#->loadScene('OtherForm');
+    ]]></source>
+
+    <source syntax="php" param="idEmpty"><![CDATA[
+// Загружаем форму OtherForm на сцену
+$this->#type.code#->loadScene('OtherForm');
+    ]]></source>
+</scriptGenerator>

@@ -252,6 +252,7 @@ class IdeBehaviourPane
             ];
 
             $dlg = new ScriptHelperForm('Editor.behaviour.' . $behaviour->getCode(), $model, $this->targetId ? '' : 'idEmpty');
+            $dlg->setResources($spec->getScriptGenerators());
             $dlg->showDialog();
         });
 

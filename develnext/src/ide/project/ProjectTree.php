@@ -6,8 +6,10 @@ use ide\commands\tree\TreeCreateFileCommand;
 use ide\commands\tree\TreeDeleteFileCommand;
 use ide\commands\tree\TreeEditFileCommand;
 use ide\commands\tree\TreeEditInWindowFileCommand;
+use ide\commands\tree\TreeScriptHelperMenuCommand;
 use ide\commands\tree\TreeShowInExplorerCommand;
 use ide\editors\menu\ContextMenu;
+use ide\formats\form\context\ScriptHelperMenuCommand;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
@@ -91,6 +93,7 @@ class ProjectTree
         $this->contextMenu->add(new TreeCopyPathCommand($this));
         $this->contextMenu->add(new TreeCopyPathCommand($this, true));
         $this->contextMenu->add(new TreeShowInExplorerCommand($this));
+        $this->contextMenu->add(new TreeScriptHelperMenuCommand($this));
 
         $this->contextMenu->add(new TreeCreateFileCommand($this), 'new');
         $this->contextMenu->addSeparator('new');

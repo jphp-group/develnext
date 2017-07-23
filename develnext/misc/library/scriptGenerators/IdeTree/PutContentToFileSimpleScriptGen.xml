@@ -1,0 +1,20 @@
+<scriptGenerator>
+    <name>Записать строку в файл (упрощенный вариант)</name>
+    <description>Записать любой текст в файл, перезаписав его</description>
+    <context>IdeTree.file</context>
+
+    <source syntax="php" param="~"><![CDATA[
+// Импортируем классы если нужно
+// use gui;
+
+$text = 'Текст для записи в файл';
+
+// Пишем текст в файл ...
+$result = file_put_contents('#file.relPath#', $text);
+
+// Если произошла ошибка ...
+if ($result === false) {
+    alert('Ошибка записи в файл.');
+}
+    ]]></source>
+</scriptGenerator>

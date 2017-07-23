@@ -41,6 +41,7 @@ public class AutoBracketsHotkey extends AbstractHotkey {
         int pos = area.getCaretPosition();
 
         if (area.getText().isEmpty()) return false;
+        if (pos == 0) return false;
 
         String ch = area.getText(pos - 1, pos);
         char nextCh = area.getText().length() >= pos + 1 ? area.getText(pos, pos + 1).charAt(0) : '\0';

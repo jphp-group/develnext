@@ -1,6 +1,6 @@
 <scriptGenerator>
-    <name>Скриншот компонента</name>
-    <description>Сохранить изображение компонента в графический файл</description>
+    <name>Скриншот компонента в файл</name>
+    <description>Сохранить изображение компонента в графический файл jpg, gif или png</description>
     <context>FormEditor.objectItem</context>
 
     <source syntax="php"><![CDATA[
