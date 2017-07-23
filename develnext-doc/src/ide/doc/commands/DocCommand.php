@@ -88,7 +88,7 @@ class DocCommand extends AbstractCommand
             $q = URL::encode($input->text);
 
             Ide::get()->getMainForm()->toast('Сейчас произойдет редирект на страницу поиска ...');
-            browse("https://github.com/jphp-compiler/develnext/search?q=$q&type=Wikis&utf8=✓");
+            browse("https://hub.develnext.org/wiki/?q=$q");
         };
 
         $input->on('keyDown', function (UXKeyEvent $e) use ($searchHandle) {
@@ -110,6 +110,6 @@ class DocCommand extends AbstractCommand
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
         Ide::get()->getMainForm()->toast('Сейчас произойдет редирект на страницу ...');
-        browse('https://github.com/jphp-compiler/develnext/wiki');
+        browse('https://hub.develnext.org/wiki/');
     }
 }
