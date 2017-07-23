@@ -67,7 +67,7 @@ class ShareProjectArea extends AbstractFormArea
                 $this->content->add($this->_syncPane);
 
                 $this->updatedAtLabel->text = TimeUtils::getUpdateAt($data['updatedAt']);
-                $this->setUrl($data['sharedUrl']);
+                $this->setUrl('https://hub.develnext.org/project/' . $data['uid']);
             } else {
                 $this->content->add($this->_nonSyncPane);
             }
