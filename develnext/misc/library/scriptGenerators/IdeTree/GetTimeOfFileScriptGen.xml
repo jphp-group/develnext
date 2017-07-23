@@ -1,0 +1,22 @@
+<scriptGenerator>
+    <name>Вывести время изменения файла</name>
+    <description>Получить и вывести время + дату последнего изменения файла</description>
+    <context>IdeTree.file</context>
+
+    <source syntax="php" param="~"><![CDATA[
+// Импортируем классы если нужно
+// use std, gui;
+
+// Получаем время изменения в миллисекундах.
+$fsTime = fs::time('#file.relPath#');
+
+// Создаем объект времени для форматирования.
+$time = new Time($fsTime);
+
+// Форматируем дату в человеческий вид.
+$displayTime = $time->toString('dd.MM.yyyy HH:mm');
+
+// Показываем результат.
+alert($displayTime);
+    ]]></source>
+</scriptGenerator>

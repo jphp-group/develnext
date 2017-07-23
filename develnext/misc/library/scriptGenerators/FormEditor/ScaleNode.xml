@@ -1,0 +1,17 @@
+<scriptGenerator>
+    <name>Изменить масштаб</name>
+    <description>Увеличить или уменьшить масштаб (scale) компонента</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Масштаб - в 2.5 раза увеличим компонент.
+$scale = 2.5;
+
+// Задаем масштаб по оси X (по горизонтале).
+$this->#object.id#->scaleX = $scale;
+
+// Задаем масштаб по оси Y (по вертикале).
+$this->#object.id#->scaleY = $scale;
+
+    ]]></source>
+</scriptGenerator>

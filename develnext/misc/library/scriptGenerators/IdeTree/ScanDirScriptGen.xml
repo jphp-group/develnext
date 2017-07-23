@@ -1,0 +1,16 @@
+<scriptGenerator>
+    <name>Просканировать директорию</name>
+    <description>Пройтись по всем файлам и папкам внутри директории</description>
+    <context>IdeTree.directory</context>
+
+    <source syntax="php" param="~"><![CDATA[
+// Импортируем классы если нужно
+// use std, gui; или use php\io\File;
+
+// Начинаем сканировать ...
+fs::scan('#file.relPath#', function ($path) {
+    // Выводим найденный файл/папку
+    echo $path, "\n";
+});
+    ]]></source>
+</scriptGenerator>

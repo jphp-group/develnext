@@ -1,0 +1,24 @@
+<scriptGenerator>
+    <name>Прочитать файл в строку</name>
+    <description>Прочитать содержимое файла и записать как строку в переменную</description>
+    <context>IdeTree.file</context>
+
+    <source syntax="php" param="~"><![CDATA[
+// Импортируем классы если нужно
+// use std, gui; или use php\lib\fs;
+
+// Указываем кодировку файла.
+$encoding = 'UTF-8';
+
+// Считываем содержимое файла и сохраняем в переменную.
+$content = fs::get('#file.needPath#', $encoding);
+
+// Если файл прочитан успешно ...
+if ($content !== false) {
+    // Выводим переменную в поле для текста.
+    $this->textArea->text = $content;
+} else {
+    alert('Ошибка чтения файла');
+}
+    ]]></source>
+</scriptGenerator>

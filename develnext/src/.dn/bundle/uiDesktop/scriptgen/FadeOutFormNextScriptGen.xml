@@ -1,0 +1,24 @@
+<scriptGenerator>
+    <name>Плавная смена формы</name>
+    <description>Плавно скрыть текущую форму и показать другую</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php" param="idEmpty"><![CDATA[
+// Импортировать классы если нужно
+// use framework, #project.package#;
+
+// Время анимации (2 сек).
+$time = 2000;
+
+// Скрываем текующую форму за 2 секунды (2000 млсек) ...
+Animation::fadeOut($this, $time);
+
+// Начинаем показывать форму OtherForm ...
+$otherForm = $this->form('OtherForm');
+$otherForm->opacity = 0; // делаем её прозрачной
+$otherForm->show(); // заведомо показываем
+
+// Применяем анимацию fade in для плавного появления.
+Animation::fadeIn($otherForm, $time);
+    ]]></source>
+</scriptGenerator>

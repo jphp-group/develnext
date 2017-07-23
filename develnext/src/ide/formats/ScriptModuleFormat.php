@@ -5,6 +5,7 @@ use ide\editors\AbstractEditor;
 use ide\editors\form\FormNamedBlock;
 use ide\editors\ScriptModuleEditor;
 use ide\formats\form\context\DeleteMenuCommand;
+use ide\formats\form\context\ScriptHelperMenuCommand;
 use ide\formats\form\context\SelectAllMenuCommand;
 use ide\forms\InputMessageBoxForm;
 use ide\Ide;
@@ -60,6 +61,9 @@ class ScriptModuleFormat extends AbstractFormFormat
 
         // Context Menu.
         $this->register(new SelectAllMenuCommand());
+
+        $this->register(new ScriptHelperMenuCommand('ModuleEditor.objectItem'));
+
         $this->register(new DeleteMenuCommand());
 
         RefactorSystem::onRename(self::REFACTOR_ELEMENT_ID_TYPE, function ($target, $newId) {

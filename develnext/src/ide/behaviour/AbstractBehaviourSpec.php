@@ -4,6 +4,7 @@ namespace ide\behaviour;
 use ide\action\AbstractSimpleActionType;
 use ide\editors\value\ElementPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use ide\utils\FileUtils;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\UXNode;
@@ -193,5 +194,13 @@ abstract class AbstractBehaviourSpec
      */
     public function deleteSelf(UXNode $node, AbstractBehaviour $behaviour)
     {
+    }
+
+    /**
+     * @return IdeLibraryScriptGeneratorResource[]
+     */
+    public function getScriptGenerators()
+    {
+        return [];
     }
 }

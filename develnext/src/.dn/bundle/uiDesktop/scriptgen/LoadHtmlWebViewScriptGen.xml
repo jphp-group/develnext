@@ -1,0 +1,15 @@
+<scriptGenerator>
+    <name>Загрузить HTML</name>
+    <description>Загрузить HTML текст в браузер</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// ВНИМАНИЕ, скрипт работает только при отображаемом визуально браузере!
+
+// Какой-нибудь html текст ...
+$html = '<b>Привет Мир</b>';
+
+// Используем engine и метод для загрузки контента.
+$this->#object.id#->engine->loadContent($html, 'text/html');
+    ]]></source>
+</scriptGenerator>

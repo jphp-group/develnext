@@ -3,6 +3,7 @@ namespace ide\formats\form\elements;
 
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXWebEvent;
 use php\gui\UXNode;
@@ -60,4 +61,14 @@ class WebViewFormElement extends AbstractFormElement
     {
         return $any instanceof UXWebView;
     }
+
+    public function getScriptGenerators()
+    {
+        return [
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/LoadHtmlWebViewScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/HistoryListWebViewScriptGen'),
+        ];
+    }
+
+
 }

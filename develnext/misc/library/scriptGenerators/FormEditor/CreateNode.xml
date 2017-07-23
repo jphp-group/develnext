@@ -1,0 +1,27 @@
+<scriptGenerator>
+    <name>Создать объект</name>
+    <description>Создает подобный объект во время выполнения</description>
+    <author>DevelNext</author>
+    <authorSite>http://develnext.org</authorSite>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем класс если нужно (раскомментировать).
+// use #type.import#;
+// или
+// use gui;
+
+// Создаем объект
+$#type.id# = new #object.class#();
+
+// Задаем размер объекту
+$#type.id#->size = [#object.width#, #object.height#];
+
+// Задаем позицию x, y объекту
+$#type.id#->position = [#object.x#, #object.y#];
+
+// Добавляем объект на форму
+$this->add($#type.id#);
+
+    ]]></source>
+</scriptGenerator>

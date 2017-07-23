@@ -1,0 +1,27 @@
+<scriptGenerator>
+    <name>Получить список файлов</name>
+    <description>Получить список файлов и папок директории первого уровня</description>
+    <context>IdeTree.directory</context>
+
+    <source syntax="php" param="~"><![CDATA[
+// Импортируем классы если нужно
+// use std, gui; или use php\io\File;
+
+$dir = new File('#file.relPath#');
+
+// Получаем список файлов и папок директории
+// ... только первого уровня.
+$files = $dir->findFiles();
+
+// Проходимся по каждому найденному элементу ...
+foreach ($files as $file) {
+    // добавляем в UI список
+    $this->listView->items->add($file->getName());
+
+    // если это директория ...
+    if ($file->isDirectory()) {
+        // ...
+    }
+}
+    ]]></source>
+</scriptGenerator>

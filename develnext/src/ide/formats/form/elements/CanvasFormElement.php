@@ -3,6 +3,7 @@ namespace ide\formats\form\elements;
 
 use develnext\lexer\inspector\entry\TypeEntry;
 use ide\formats\form\AbstractFormElement;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use ide\systems\Cache;
 use php\gui\designer\UXDesigner;
 use php\gui\UXCanvas;
@@ -82,5 +83,13 @@ class CanvasFormElement extends AbstractFormElement
     public function refreshNode(UXNode $node, UXDesigner $designer)
     {
         $this->designHasBeenChanged($node, $designer);
+    }
+
+    public function getScriptGenerators()
+    {
+        return [
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/DrawLineCanvasScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/DrawSVGCanvasScriptGen'),
+        ];
     }
 }

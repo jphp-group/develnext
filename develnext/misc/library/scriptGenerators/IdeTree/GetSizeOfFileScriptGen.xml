@@ -1,0 +1,16 @@
+<scriptGenerator>
+    <name>Вывести размер файла</name>
+    <description>Получить и вывести размер файла</description>
+    <context>IdeTree.file</context>
+
+    <source syntax="php" param="~"><![CDATA[
+// Импортируем классы если нужно
+// use std, gui;
+
+// Получаем размер файла в байтах.
+$size = fs::size('#file.relPath#');
+
+// Показываем результат.
+alert("Размер файла = $size (байт)");
+    ]]></source>
+</scriptGenerator>

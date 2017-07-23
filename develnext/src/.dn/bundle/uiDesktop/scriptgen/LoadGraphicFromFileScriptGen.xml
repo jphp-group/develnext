@@ -1,0 +1,14 @@
+<scriptGenerator>
+    <name>Загрузить иконку из файла</name>
+    <description>Загрузить изображение из файла в иконку компонента</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем классы если нужно
+// use gui; или use php\gui\UXImage, php\gui\UXImageView;
+
+$image = new UXImage('путь к файлу jpg, png, gif');
+$this->#object.id#->graphic = new UXImageView($image);
+
+    ]]></source>
+</scriptGenerator>

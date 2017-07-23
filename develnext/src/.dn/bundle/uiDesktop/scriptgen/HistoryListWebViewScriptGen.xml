@@ -1,0 +1,16 @@
+<scriptGenerator>
+    <name>История посещений</name>
+    <description>Получить и вывести историю посещений браузера</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Используем engine и метод для загрузки контента.
+$history = $this->#object.id#->engine->history;
+
+// Получаем массив истории посещений
+$entries = $history->getEntries();
+
+// Выводим результат ...
+pre($entries);
+    ]]></source>
+</scriptGenerator>

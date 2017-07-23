@@ -15,6 +15,7 @@ use ide\formats\form\event\AbstractEventKind;
 use ide\formats\form\SourceEventManager;
 use ide\forms\ActionConstructorForm;
 use ide\forms\MessageBoxForm;
+use ide\forms\ScriptHelperForm;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
@@ -41,6 +42,7 @@ use php\gui\UXNode;
 use php\gui\UXScreen;
 use php\gui\UXTab;
 use php\lang\IllegalStateException;
+use php\lib\arr;
 use php\lib\Items;
 use php\lib\Str;
 use timer\AccurateTimer;
@@ -417,6 +419,7 @@ class IdeEventListPane
         $this->contextMenu->add(new IdeEventListPaneChangeCommand($this));
         $this->contextMenu->add(new IdeEventListPaneOpenInConstructorCommand($this));
         $this->contextMenu->add(new IdeEventListPaneOpenInPhpEditorCommand($this));
+        $this->contextMenu->add(new IdeEventListPaneScriptHelperCommand($this));
         $this->contextMenu->add(new IdeEventListPaneDeleteCommand($this));
     }
 
@@ -706,6 +709,19 @@ class IdeEventListPane
         $selected = Items::first($this->uiList->selectedItems);
 
         return $selected ? $selected['eventCode'] : null;
+    }
+
+    /**
+     * @return array|null
+     * @throws IllegalStateException
+     */
+    public function getSelected()
+    {
+        if (!$this->ui) throw new IllegalStateException();
+
+        $selected = Items::first($this->uiList->selectedItems);
+
+        return $selected ? $selected : null;
     }
 
     public function setSelectedCode($eventCode)
@@ -1070,5 +1086,74 @@ class IdeEventListPaneDeleteCommand extends AbstractMenuCommand
     public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
     {
         $item->disable = !$this->eventPane->getSelectedCode();
+    }
+}
+
+
+class IdeEventListPaneScriptHelperCommand extends AbstractMenuCommand
+{
+    /** @var IdeEventListPane */
+    protected $eventPane;
+
+    /**
+     * IdeEventListPaneDeleteCommand constructor.
+     * @param IdeEventListPane $eventPane
+     */
+    public function __construct(IdeEventListPane $eventPane)
+    {
+        $this->eventPane = $eventPane;
+    }
+
+    public function getName()
+    {
+        return 'Сгенерировать скрипт';
+    }
+
+    public function getIcon()
+    {
+        return 'icons/scriptHelper16.png';
+    }
+
+    public function getAccelerator()
+    {
+        return 'F3';
+    }
+
+    public function onExecute($e = null, AbstractEditor $editor = null)
+    {
+        $event = $this->eventPane->getSelected();
+
+        $eventClass = $event['type']['kind']->getArguments()[0][0];
+
+        if ($eventClass) {
+            $eventClass = "\\$eventClass";
+        } else {
+            $eventClass = "\\php\\gui\\UXEvent";
+        }
+
+        $model = [
+            'event.code' => $event['eventCode'],
+            'event.name' => $event['type']['name'],
+            'event.methodName' => $event['info']['methodName'],
+            'event.className' => $event['info']['className'],
+            'event.paramName' => $event['paramName'],
+            'event.class' => arr::last(str::split($eventClass, '\\')),
+            'event.fullClass' => $eventClass,
+            'event.fullClassImport' => str::sub($eventClass, 1),
+            'object.id' => $this->eventPane->getTargetId()
+        ];
+
+        $dialog = new ScriptHelperForm('FormEditor.objectEvent', $model, $this->eventPane->getTargetId() ? '' : 'idEmpty');
+        $dialog->showDialog();
+    }
+
+    public function onBeforeShow(UXMenuItem $item, AbstractEditor $editor = null)
+    {
+        $item->disable = !$this->eventPane->getSelectedCode();
+    }
+
+    public function withSeparator()
+    {
+        return true;
     }
 }

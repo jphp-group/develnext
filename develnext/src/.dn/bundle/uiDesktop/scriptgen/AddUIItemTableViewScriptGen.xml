@@ -1,0 +1,19 @@
+<scriptGenerator>
+    <name>Добавить запись с картинкой</name>
+    <description>Добавить новую запись с картинкой в таблицу</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем классы если нужно
+// use gui;
+
+// Добавляем запись, учитывая каждую колонку.
+$this->#object.id#->items->add([
+    'id' => 1,
+    'name' => 'Имя',
+
+    // Указываем в качестве значения UI компонент-картинку.
+    'value' => new UXImageView(new UXImage('images/icon.png')),
+]);
+    ]]></source>
+</scriptGenerator>

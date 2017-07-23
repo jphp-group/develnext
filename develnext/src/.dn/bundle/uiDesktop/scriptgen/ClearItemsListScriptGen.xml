@@ -1,0 +1,14 @@
+<scriptGenerator>
+    <name>Очистить список</name>
+    <description>Удалить все элементы из списка</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Используем метод clear() ...
+$this->#object.id#->items->clear();
+
+// или присваиваем списку пустой массив.
+$this->#object.id#->items->setAll([]);
+
+    ]]></source>
+</scriptGenerator>

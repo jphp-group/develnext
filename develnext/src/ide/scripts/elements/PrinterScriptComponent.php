@@ -1,6 +1,7 @@
 <?php
 namespace ide\scripts\elements;
 
+use ide\library\IdeLibraryScriptGeneratorResource;
 use ide\scripts\AbstractScriptComponent;
 use ide\scripts\ScriptComponentContainer;
 use script\PrinterScript;
@@ -52,4 +53,13 @@ class PrinterScriptComponent extends AbstractScriptComponent
     {
         return $any instanceof PrinterScriptComponent;
     }
+
+    public function getScriptGenerators()
+    {
+        return [
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/module/PrintNodeSimpleScriptGen'),
+        ];
+    }
+
+
 }

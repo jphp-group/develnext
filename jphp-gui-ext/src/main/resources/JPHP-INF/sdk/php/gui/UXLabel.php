@@ -20,5 +20,5 @@ class UXLabel extends UXLabeled
      * @param string $text (optional)
      * @param UXNode $graphic (optional)
      */
-    public function __construct($text, UXNode $graphic) {}
+    public function __construct($text = '', UXNode $graphic = null) {}
 }

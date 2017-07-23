@@ -1,0 +1,15 @@
+<scriptGenerator>
+    <name>Генератор текста</name>
+    <description>Задать объекту случайный текст из набора символов</description>
+    <author>DevelNext</author>
+    <authorSite>http://develnext.org</authorSite>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Импортируем класс str если нужно
+// use php\lib\str; или use std;
+
+// Сгенерировать текст из 8 символов и букв A, B, C, D, E и F.
+$this->#object.id#->text = str::random(8, "ABCDEF");
+    ]]></source>
+</scriptGenerator>

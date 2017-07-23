@@ -1,0 +1,17 @@
+<scriptGenerator>
+    <name>Форма в фрагменте</name>
+    <description>Загрузить форму в компонент 'фрагмент формы'</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php" param="idEmpty"><![CDATA[
+// Импортировать класс если нужно
+// use #project.package#;
+
+// Создать новую форму.
+$form = new #source.class#();
+
+// Показать форму в фрагменте.
+$form->showInFragment($this->fragment);
+
+    ]]></source>
+</scriptGenerator>

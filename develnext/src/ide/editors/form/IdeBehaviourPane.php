@@ -7,6 +7,7 @@ use ide\editors\value\BooleanPropertyEditor;
 use ide\editors\value\ElementPropertyEditor;
 use ide\forms\BehaviourCreateForm;
 use ide\forms\MessageBoxForm;
+use ide\forms\ScriptHelperForm;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
@@ -23,6 +24,8 @@ use php\gui\UXLabeled;
 use php\gui\UXNode;
 use php\gui\UXTab;
 use php\gui\UXTitledPane;
+use php\lib\arr;
+use php\lib\str;
 use php\util\Flow;
 
 /**
@@ -131,7 +134,7 @@ class IdeBehaviourPane
                 ]);
 
                 if ($spec->isDeletable()) {
-                    $this->initDeleteBehaviourButton($groupPane, $spec);
+                    $this->initDeleteBehaviourButton($groupPane, $spec, $behaviour);
                 }
 
                 $groupPane->graphic->spacing = 4;
@@ -197,7 +200,7 @@ class IdeBehaviourPane
         return $this->lastUi = $box;
     }
 
-    protected function initDeleteBehaviourButton(UXTitledPane $pane, AbstractBehaviourSpec $spec)
+    protected function initDeleteBehaviourButton(UXTitledPane $pane, AbstractBehaviourSpec $spec, AbstractBehaviour $behaviour)
     {
         $box = new UXHBox();
 
@@ -229,7 +232,33 @@ class IdeBehaviourPane
             }
         });
 
+        $scLab = new UXLabel('', ico('scriptHelper16'));
+        $scLab->cursor = 'HAND';
+        $scLab->tooltipText = 'Сгенерировать скрипт';
+
+        $scLab->on('click', function (UXEvent $e) use ($spec, $behaviour, $pane) {
+            uiLater(function () use ($pane) {
+                $pane->expanded = !$pane->expanded;
+            });
+
+            $model = [
+                'object.id' => $this->targetId,
+                'type.name' => $spec->getName(),
+                'type.class' => arr::last(str::split($spec->getType(), '\\')),
+                'type.fullClass' => '\\' . $spec->getType(),
+                'type.import' => $spec->getType(),
+                'type.code' => $behaviour->getCode(),
+                'project.package' => Ide::project()->getPackageName()
+            ];
+
+            $dlg = new ScriptHelperForm('Editor.behaviour.' . $behaviour->getCode(), $model, $this->targetId ? '' : 'idEmpty');
+            $dlg->setResources($spec->getScriptGenerators());
+            $dlg->showDialog();
+        });
+
+        $box->add($scLab);
         $box->add($button);
+
         $pane->graphic->add($box);
     }
 

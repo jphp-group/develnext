@@ -1,0 +1,19 @@
+<scriptGenerator>
+    <name>Получить хеш файла</name>
+    <description>Получить хеш файла MD5, SHA-1, SHA-256 и т.д.</description>
+    <context>IdeTree.file</context>
+
+    <source syntax="php" param="~"><![CDATA[
+// Импортируем классы если нужно
+// use std; или use php\lib\fs;
+
+// Алгоритм хеширования, варианты - MD5, SHA-1, SHA-256, SHA-512
+$algorithm = 'SHA-256';
+
+// Получаем хеш файла.
+$hash = fs::hash('#file.needPath#', $algorithm);
+
+// Выводим результат в консоль.
+echo "Хеш файла #file.name# = $hash", "\n";
+    ]]></source>
+</scriptGenerator>

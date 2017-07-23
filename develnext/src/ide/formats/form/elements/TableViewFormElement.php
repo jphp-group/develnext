@@ -9,6 +9,7 @@ use ide\editors\value\PositionPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
 use ide\editors\value\TextPropertyEditor;
 use ide\formats\form\AbstractFormElement;
+use ide\library\IdeLibraryScriptGeneratorResource;
 use php\gui\designer\UXDesignProperties;
 use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\layout\UXHBox;
@@ -100,5 +101,13 @@ class TableViewFormElement extends LabeledFormElement
     public function isOrigin($any)
     {
         return $any instanceof UXTableView;
+    }
+
+    public function getScriptGenerators()
+    {
+        return [
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/AddItemTableViewScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/AddUIItemTableViewScriptGen'),
+        ];
     }
 }
