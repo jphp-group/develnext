@@ -90,6 +90,7 @@ class CanvasFormElement extends AbstractFormElement
         return [
             new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/DrawLineCanvasScriptGen'),
             new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/DrawSVGCanvasScriptGen'),
+            new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/SaveImageToFileCanvasScriptGen'),
         ];
     }
 }

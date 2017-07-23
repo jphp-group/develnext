@@ -1,0 +1,16 @@
+<scriptGenerator>
+    <name>Сохранить рисунок</name>
+    <description>Сохранить нарисованное изображение canvas в файл</description>
+    <context>FormEditor.objectItem</context>
+
+    <source syntax="php"><![CDATA[
+// Задаем путь к сохраняемой картинке ...
+$filename = 'путь к jpg, png, gif';
+
+// Создаем папку для файла, если ее нет ...
+fs::ensureParent($filename);
+
+// Сохраняем изображение в файл.
+$this->#object.id#->save($filename, fs::ext($filename));
+    ]]></source>
+</scriptGenerator>
