@@ -60,7 +60,7 @@ class UXAlert
     }
 
     /**
-     * @return string|null
+     * @return mixed
      */
     public function showAndWait()
     {
