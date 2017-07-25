@@ -1,4 +1,5 @@
 <?php
+
 namespace bundle\http;
 
 use php\format\JsonProcessor;
@@ -389,27 +390,31 @@ class HttpClient extends AbstractScript
 
     protected function connect(URLConnection $connection, $body)
     {
-        if ($body) {
-            if ($body instanceof Stream) {
-                $readFully = $body->readFully();
-                $connection->setRequestProperty('Content-Length', str::length($readFully));
-                $connection->getOutputStream()->write($readFully);
-                $readFully = null;
-            } else {
-                $connection->setRequestProperty('Content-Length', str::length($body));
-                $connection->getOutputStream()->write($body);
-            }
-        }
-
         $response = new HttpResponse();
 
         try {
+            if ($body) {
+                if ($body instanceof Stream) {
+                    $readFully = $body->readFully();
+                    $connection->setRequestProperty('Content-Length', str::length($readFully));
+                    $connection->getOutputStream()->write($readFully);
+                    $readFully = null;
+                } else {
+                    $connection->setRequestProperty('Content-Length', str::length($body));
+                    $connection->getOutputStream()->write($body);
+                }
+            }
+
             $connection->connect();
             $inStream = $connection->getInputStream();
         } catch (IOException $e) {
             $inStream = $connection->getErrorStream();
         } catch (SocketException $e) {
             $response->statusCode(500);
+            $response->statusMessage($e->getMessage());
+            $inStream = new MemoryStream();
+        } catch (\Exception $e) {
+            $response->statusCode(599);
             $response->statusMessage($e->getMessage());
             $inStream = new MemoryStream();
         }
@@ -446,6 +451,9 @@ class HttpClient extends AbstractScript
         } catch (SocketException $e) {
             $response->statusCode(500);
             $response->statusMessage($e->getMessage());
+        } catch (\Exception $e) {
+            $response->statusCode(599);
+            $response->statusMessage($e->getMessage());
         }
 
         if ($response->isSuccess()) {
@@ -466,7 +474,7 @@ class HttpClient extends AbstractScript
             });
         }
 
-        if ($response->isNotFound())  {
+        if ($response->isNotFound()) {
             uiLater(function () use ($response) {
                 $this->trigger('errorNotFound', ['response' => $response]);
             });
