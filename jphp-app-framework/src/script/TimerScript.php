@@ -174,8 +174,10 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
         if ($interval != $this->interval) {
             $this->interval = $interval;
 
-            $this->stop();
-            $this->start();
+            if ($this->isRunning()) {
+                $this->stop();
+                $this->start();
+            }
         }
     }
 
@@ -195,8 +197,10 @@ class TimerScript extends AbstractScript implements ValuableBehaviour
         if ($repeatable != $this->repeatable) {
             $this->repeatable = $repeatable;
 
-            $this->stop();
-            $this->start();
+            if ($this->isRunning()) {
+                $this->stop();
+                $this->start();
+            }
         }
     }
 
