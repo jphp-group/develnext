@@ -54,6 +54,10 @@ allprojects {
 }
 
 subprojects {
+    def dirName = file(it.name).name;
+    def bundleDirRoot = "${projectDir}/../../develnext/misc/library/bundles/";
+    def bundleDir = "${bundleDirRoot}/${dirName}/";
+
     if (it.name.startsWith("develnext-bundles") || it.name.endsWith("-bundle")) {
         println "-> Detecting bundle '$it.name' ...";
 
@@ -64,18 +68,17 @@ subprojects {
         }
 
         if (resFile.exists()) {
-            def dirName = file(it.name).name;
-            def bundleDir = "${projectDir}/../../develnext/misc/library/bundles/${dirName}/";
-
             clean {
                 delete bundleDir
             }
+
+            def pr = it;
 
             jar {
                 doLast {
                     copy {
                         from jar.archivePath
-                        from(configurations.runtime) {
+                        from(pr.configurations.runtime) {
                             exclude '**/jphp-runtime-*.jar'
                         }
 
