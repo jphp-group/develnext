@@ -1,0 +1,66 @@
+.root {
+    -fx-base: rgb(74, 81, 86);
+    -fx-focus-color: #ffa83e;
+    -fx-faint-focus-color: rgba(255, 168, 62, 0.33);
+
+    -fx-background: rgb(91, 99, 110);
+    -fx-control-inner-background: derive(-fx-base,-10%);
+
+    -fx-accent: derive(-fx-base, 20%);
+
+    -fx-dark-text-color: #efefef;
+    -fx-mid-text-color: derive(-fx-dark-text-color, 15%);
+    -fx-light-text-color: derive(-fx-dark-text-color, 30%);
+
+    -fx-default-button: derive(-fx-focus-color, -20%);
+}
+
+.tree-view {
+    -fx-background-color: -fx-background;
+}
+
+.dn-web {
+    -fx-background-color: -fx-background;
+}
+
+.dn-simple-toggle-button:hover { -fx-background-color: #e58826; -fx-border-color: #a75511; }
+.dn-simple-toggle-button:selected { -fx-background-color: silver; -fx-border-color: gray; }
+.dn-simple-toggle-button, .dn-simple-button {
+    -fx-background-color: -fx-background;
+    -fx-border-color: -fx-base;
+}
+
+.flat-button { -fx-background-color: -fx-shadow-highlight-color; }
+.flat-button:hover { -fx-background-color: -fx-base; }
+
+.context-menu {
+    -fx-background-color: -fx-base;
+    -fx-border-color: gray;
+    -fx-border-width: 1px;
+}
+
+.menu-item:focused {
+    -fx-background: -fx-selection-bar;
+    -fx-background-color: -fx-background;
+    -fx-text-fill:  -fx-text-background-color;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * TabPane                                                                     *
+ *                                                                             *
+ ******************************************************************************/
+
+
+.dn-file-tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {
+    -fx-text-fill: #e58826;
+}
+
+.dn-file-tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    /*-fx-background-color: -fx-outer-border, -fx-inner-border, -fx-background; */
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-background;
+}
+
+.dn-file-tab-pane:top > .tab-header-area > .tab-header-background {
+    -fx-border-color: -fx-base, -fx-base;
+}

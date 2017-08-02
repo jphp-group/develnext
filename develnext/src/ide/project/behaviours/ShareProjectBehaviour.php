@@ -132,7 +132,7 @@ class ShareProjectBehaviour extends AbstractProjectBehaviour
         $ui->spacing = 5;
 
         $pane = $editor->addSettingsPane($ui);
-        $pane->backgroundColor = 'white';
+        $pane->classes->add('dn-web');
 
         $this->uiSettings = $ui;
     }

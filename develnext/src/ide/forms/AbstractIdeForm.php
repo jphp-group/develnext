@@ -18,6 +18,8 @@ use php\util\Regex;
 /**
  * Class AbstractIdeForm
  * @package ide\forms
+ *
+ * @property Ide $_app
  */
 class AbstractIdeForm extends AbstractForm
 {
@@ -46,6 +48,27 @@ class AbstractIdeForm extends AbstractForm
 
             Ide::get()->trigger('hideForm', [$this]);
         }, __CLASS__);
+
+        $this->_app->on('setThemeStyle', function ($oldRes, $newRes) {
+            $this->resetIdeThemeStyle($oldRes);
+            $this->setIdeThemeStyle($newRes);
+        });
+
+        $this->setIdeThemeStyle($this->_app->getThemeStyle());
+    }
+
+    protected function resetIdeThemeStyle($oldResource)
+    {
+        if ($oldResource) {
+            $this->removeStylesheet($oldResource);
+        }
+    }
+
+    protected function setIdeThemeStyle($newResource)
+    {
+        if ($newResource) {
+            $this->addStylesheet($newResource);
+        }
     }
 
     protected function init()

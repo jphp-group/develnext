@@ -2,15 +2,21 @@
 namespace ide\editors\value;
 
 use ide\editors\FormEditor;
+use ide\editors\menu\ContextMenu;
+use ide\editors\value\scriptgen\SetPropertyScriptGen;
+use ide\formats\form\context\ScriptHelperMenuCommand;
 use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
 use ide\systems\FileSystem;
 use php\gui\designer\UXDesignPropertyEditor;
+use php\gui\event\UXMouseEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
 use php\gui\framework\DataUtils;
 use php\gui\text\UXFont;
 use php\gui\UXApplication;
+use php\gui\UXControl;
 use php\gui\UXNode;
+use php\gui\UXParent;
 use php\gui\UXTableCell;
 use php\lang\IllegalArgumentException;
 use php\lang\JavaException;
@@ -159,6 +165,35 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
         return $value;
     }
 
+    public function showContextMenu(UXNode $node)
+    {
+        $value = $this->getNormalizedValue($this->getValue());
+
+        $model = [
+            'prop.type'  => $this->getCode(),
+            'prop.value' => var_export($value, true),
+            'prop.code'  => $this->code,
+        ];
+
+        $contextMenu = new ContextMenu(FileSystem::getSelectedEditor(), [
+            new ScriptHelperMenuCommand('Editor.property.' . $this->getCode(), $model, [
+                new SetPropertyScriptGen($this, $value)
+            ])
+        ]);
+
+        $contextMenu->show($node);
+    }
+
+    public function linkContextMenu(UXNode $node)
+    {
+        $node->on('click', function (UXMouseEvent $e) use ($node) {
+            if ($e->button == 'SECONDARY') {
+                $this->showContextMenu($node);
+                $e->consume();
+            }
+        }, 'contextMenu');
+    }
+
     /**
      * @param UXTableCell $cell
      * @param bool $empty
@@ -168,7 +203,21 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     public function update(UXTableCell $cell, $empty)
     {
         $cell->graphic = $this->content;
-        $this->updateUi($this->getNormalizedValue($this->getValue()), true);
+
+        $value = $this->getNormalizedValue($this->getValue());
+
+        $this->linkContextMenu($cell);
+        $this->linkContextMenu($this->content);
+
+        if ($this->content instanceof UXParent) {
+            foreach ($this->content->childrenUnmodifiable as $one) {
+                if ($one) {
+                    $this->linkContextMenu($one);
+                }
+            }
+        }
+
+        $this->updateUi($value, true);
     }
 
     public function setAsFormConfigProperty($defaultValue, $realCode = null)

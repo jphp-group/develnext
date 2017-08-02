@@ -54,6 +54,11 @@ class DoubleArrayPropertyEditor extends ElementPropertyEditor
             $this->{"{$name}Spinner"} = $spinner;
         }
 
+        $this->linkContextMenu($this->firstFieldSpinner);
+        $this->linkContextMenu($this->secondFieldSpinner);
+        $this->linkContextMenu($this->firstFieldSpinner->editor);
+        $this->linkContextMenu($this->secondFieldSpinner->editor);
+
         $box = new UXHBox([$this->firstFieldSpinner, $this->secondFieldSpinner]);
         $box->spacing = 3;
 

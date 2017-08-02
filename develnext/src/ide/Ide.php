@@ -188,6 +188,7 @@ class Ide extends Application
      * @var string
      */
     protected $mode = 'prod';
+    private $themeStyle;
 
     public function __construct($configPath = null)
     {
@@ -568,6 +569,25 @@ class Ide extends Application
         }
 
         return $jrePath && $jrePath->exists() ? $jrePath->getCanonicalFile() : null;
+    }
+
+    /**
+     * @param string $resource
+     */
+    public function setThemeStyle($resource)
+    {
+        $old = $this->themeStyle;
+        $this->themeStyle = $resource;
+
+        $this->trigger('setThemeStyle', [$old, $resource]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getThemeStyle()
+    {
+        return $this->themeStyle;
     }
 
     /**

@@ -20,7 +20,7 @@ use php\lib\str;
  *
  * @property UXImageArea $avatarArea
  */
-class AccountProfileEditForm extends AbstractForm
+class AccountProfileEditForm extends AbstractIdeForm
 {
     /**
      * @var bool

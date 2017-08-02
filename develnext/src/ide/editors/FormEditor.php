@@ -1764,6 +1764,10 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $viewer = $this->layoutViewer = new UXScrollPane($area);
         $viewer->classes->add('dn-mosaic-background');
 
+        $this->layoutViewer->stylesheets->add('/com/sun/javafx/scene/control/skin/modena/modena.css');
+        $this->layoutViewer->stylesheets->add('/php/gui/framework/style.css');
+        $this->layoutViewer->stylesheets->add('/.theme/style-editor.css');
+
         foreach ($this->stylesheets as $stylesheet) {
             $viewer->stylesheets->add($stylesheet);
         }

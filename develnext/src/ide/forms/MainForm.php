@@ -92,7 +92,7 @@ class MainForm extends AbstractIdeForm
 
         $this->bottom = $this->bottomSpoiler;
 
-        foreach ($this->contentVBox->children as $one) {
+        foreach ($this->wrapHeadPane->children as $one) {
             if ($one instanceof UXMenuBar) {
                 $this->mainMenu = $one;
                 break;

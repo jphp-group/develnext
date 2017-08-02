@@ -90,8 +90,8 @@ class FlowListViewDecorator implements \Countable
         $pane->hgap = 10;
         $pane->vgap = 10;
         $pane->padding = 10;
-        $pane->backgroundColor = UXColor::of('white');
 
+        $pane->classes->add('dn-web');
         $pane->classes->add('flow-list-view');
 
         $pane->on('mouseDown', function (UXMouseEvent $e) {
