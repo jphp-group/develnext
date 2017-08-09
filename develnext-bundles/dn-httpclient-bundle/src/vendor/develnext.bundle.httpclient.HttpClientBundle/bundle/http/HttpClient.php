@@ -424,7 +424,13 @@ class HttpClient extends AbstractScript
         switch ($this->responseType) {
             case 'JSON':
                 $data = $inStream->readFully();
-                $body = (new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS))->parse($data);
+                try {
+                    $body = (new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS))->parse($data);
+                } catch (\php\format\ProcessorException $e) {
+                    $response->statusCode(400);
+                    $response->statusMessage($e->getMessage());
+                }
+
                 break;
 
             case 'TEXT':
