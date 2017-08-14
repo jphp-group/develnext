@@ -13,6 +13,7 @@ use php\gui\printing\UXPrinterJob;
 use php\gui\UXImage;
 use php\gui\UXNode;
 use php\gui\UXScreen;
+use php\gui\UXWebView;
 use php\gui\UXWindow;
 use php\lib\reflect;
 use php\lib\str;
@@ -199,7 +200,12 @@ class PrinterScript extends AbstractScript
             }
         }
 
-        $success = $job->print($object);
+        if ($object instanceof UXWebView) {
+            $object->engine->print($job);
+            $success = $job->getJobStatus() == 'PRINTING';
+        } else {
+            $success = $job->print($object);
+        }
 
         if ($success) {
             $job->end();
