@@ -20,6 +20,19 @@ Install JDK, clone repo and use the following console commands:
 ```
 cd /path/to/repo
 
+// fetch all submodules (jphp, richtextfx, etc.)
+git submodule update --init
+
+// install rich text fx
+cd 3rd-party/RichTextFX
+./gradlew install
+
+// install jphp
+cd ../3rd-party/jphp
+./gradlew install
+
+cd ../../
+
 // for windows
 ./gradlew distIdeWindows
 
@@ -39,6 +52,19 @@ Under MPL 2.0 (https://www.mozilla.org/MPL/2.0/)
 
 ```
 cd /path/to/repo
+
+// fetch all submodules (jphp, richtextfx, etc.)
+git submodule update --init
+
+// install rich text fx
+cd 3rd-party/RichTextFX
+./gradlew install
+
+// install jphp
+cd ../3rd-party/jphp
+./gradlew install
+
+cd ../../
 
 // for windows
 ./gradlew distIdeWindows
