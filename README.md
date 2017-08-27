@@ -25,16 +25,16 @@ git submodule update --init
 
 // install rich text fx
 cd 3rd-party/RichTextFX
-./gradlew install
+"../../gradlew" install
 
 // install jphp
 cd ../3rd-party/jphp
-./gradlew install
+"../../gradlew" install
 
 cd ../../
 
 // for windows
-./gradlew distIdeWindows
+gradlew distIdeWindows
 
 // for linux
 ./gradlew distIdeLinux
