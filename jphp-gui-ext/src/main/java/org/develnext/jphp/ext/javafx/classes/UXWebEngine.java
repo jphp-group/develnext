@@ -183,4 +183,9 @@ public class UXWebEngine extends BaseWrapper<WebEngine> {
             throw new IllegalArgumentException("Unable to find the '"+event+"' event type");
         }
     }
+
+    @Signature
+    public void print(PrinterJob printerJob) {
+        getWrappedObject().print(printerJob);
+    }
 }

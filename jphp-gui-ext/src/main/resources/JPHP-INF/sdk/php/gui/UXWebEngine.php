@@ -1,6 +1,7 @@
 <?php
 namespace php\gui;
 
+use php\gui\printing\UXPrinterJob;
 use php\xml\DomDocument;
 
 /**
@@ -118,6 +119,13 @@ abstract class UXWebEngine
      * @param callable $handler (UXWebEngine $self, $old, $new)
      */
     public function watchState(callable $handler)
+    {
+    }
+
+    /**
+     * @param UXPrinterJob $printerJob
+     */
+    public function print(UXPrinterJob $printerJob)
     {
     }
 
