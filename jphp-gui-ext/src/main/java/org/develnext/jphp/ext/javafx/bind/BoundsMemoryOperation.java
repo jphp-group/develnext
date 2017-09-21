@@ -37,6 +37,10 @@ public class BoundsMemoryOperation extends MemoryOperation<Bounds> {
         r.refOfIndex("y").assign(arg.getMinY());
         r.refOfIndex("z").assign(arg.getMinZ());
 
+        r.refOfIndex("maxX").assign(arg.getMaxX());
+        r.refOfIndex("maxY").assign(arg.getMaxY());
+        r.refOfIndex("maxZ").assign(arg.getMaxZ());
+
         return r.toConstant();
     }
 }

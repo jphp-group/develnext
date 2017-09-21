@@ -69,7 +69,7 @@ public class UXRichTextArea extends UXRegion<InlineCssTextArea> {
         getWrappedObject().clear();
     }
 
-    @Setter
+    /*@Setter
     public void setPopupWindow(@Reflection.Nullable PopupWindow popupWindow) {
         getWrappedObject().setPopupWindow(popupWindow);
     }
@@ -77,7 +77,7 @@ public class UXRichTextArea extends UXRegion<InlineCssTextArea> {
     @Setter
     public PopupWindow getPopupWindow() {
         return getWrappedObject().getPopupWindow();
-    }
+    }*/
 
     @Signature
     public void selectLine() {

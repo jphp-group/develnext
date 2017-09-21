@@ -272,8 +272,14 @@ class AutoCompletePane
 
             if ($this->area instanceof UXSyntaxTextArea) {
                 list($x, $y) = $this->area->getCaretScreenPosition();
+                $x += 20;
+                $y += 20;
             } else {
-                $x = $y = null;
+                $caretBounds = $this->area->caretBounds;
+                list($x, $y) = [$caretBounds['x'], $caretBounds['y']];
+
+                $x += $caretBounds['width'];
+                $y += $caretBounds['height'];
             }
 
             if ($string = $this->getString()) {
@@ -310,7 +316,7 @@ class AutoCompletePane
                     }
 
                     if ($this->list->items->count) {
-                        $this->show($x + 45, $y + 20);
+                        $this->show($x, $y);
                     } else {
                         //Logger::debug("No auto complete items for: $string");
                         $this->hide();
@@ -349,7 +355,7 @@ class AutoCompletePane
             $this->ui->layout->maxHeight = $size * ($this->list->fixedCellSize) + 6 + 2 + $this->list->fixedCellSize;
 
             if ($this->area instanceof UXAbstractCodeArea) {
-                $this->ui->show($this->area->form);
+                $this->ui->show($this->area->form, $x, $y);
             } else {
                 $this->ui->show($this->area->form, $x, $y);
             }
