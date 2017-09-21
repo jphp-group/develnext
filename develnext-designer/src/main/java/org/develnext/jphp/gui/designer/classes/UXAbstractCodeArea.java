@@ -66,7 +66,7 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
         @Property int tabSize();
         @Property boolean showGutter();
         @Property double lineHeight();
-        @Property @Nullable PopupWindow popupWindow();
+        //@Property @Nullable PopupWindow popupWindow();
 
         void showPopup();
         void hidePopup();

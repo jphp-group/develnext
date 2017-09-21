@@ -97,18 +97,24 @@ class IdeToolManager
                 }
 
                 $installer = $this->installer($tool);
-                $installer->on('done', function ($success) use (&$run, $tool, $callback) {
+                $doneCallback = function ($success) use (&$run, $tool, $callback) {
                     if ($success) {
                         $run();
                     } else {
                         $callback(false, $tool);
                     }
-                }, __CLASS__);
+                };
 
-                uiLater(function () use ($installer) {
-                    new ToolInstallForm($installer);
-                    $installer->run();
-                });
+                if ($installer) {
+                    $installer->on('done', $doneCallback, __CLASS__);
+
+                    uiLater(function () use ($installer) {
+                        new ToolInstallForm($installer);
+                        $installer->run();
+                    });
+                } else {
+                    $doneCallback(true);
+                }
             } else {
                 $callback(true);
             }
