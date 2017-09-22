@@ -292,7 +292,7 @@ class Ide extends Application
                 });
 
                 $this->serviceManager->on('privateDisable', function () {
-                    Notifications::showAccountUnavailable();
+                    //Notifications::showAccountUnavailable();
                 });
 
                 $this->serviceManager->updateStatus();

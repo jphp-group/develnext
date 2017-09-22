@@ -52,7 +52,7 @@ class MyAccountCommand extends AbstractCommand
 
         Ide::service()->on('privateDisable', function () {
             $this->accountButton->enabled = false;
-            $this->accountImage->image = Ide::get()->getImage('noAvatar.jpg')->image;
+            //$this->accountImage->image = Ide::get()->getImage('noAvatar.jpg')->image;
         }, __CLASS__);
 
         Ide::accountManager()->on('update', function ($data) {
