@@ -19,6 +19,7 @@ import javafx.css.CssMetaData;
 import javafx.css.SimpleStyleableObjectProperty;
 import javafx.css.Styleable;
 import javafx.css.StyleableProperty;
+import javafx.css.converter.PaintConverter;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -26,8 +27,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.StrokeType;
-
-import com.sun.javafx.css.converters.PaintConverter;
 
 /**
  * Marks a Tab-Position

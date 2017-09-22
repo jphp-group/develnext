@@ -1,16 +1,11 @@
 package org.develnext.jphp.ext.javafx.support;
 
-import com.sun.javafx.scene.control.skin.*;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.WeakInvalidationListener;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.Tab;
+import javafx.scene.control.skin.MenuBarSkin;
 
 import java.lang.reflect.Field;
 
-public class FixMenuSkinBar extends com.sun.javafx.scene.control.skin.MenuBarSkin {
+public class FixMenuSkinBar extends MenuBarSkin {
     public FixMenuSkinBar(MenuBar control) {
         super(control);
 

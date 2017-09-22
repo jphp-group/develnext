@@ -1,8 +1,6 @@
 package org.develnext.jphp.ext.systemtray.classes;
 
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.*;
-import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import org.develnext.jphp.ext.javafx.support.EventProvider;
 import org.develnext.jphp.ext.systemtray.SystemTrayExtension;
@@ -14,8 +12,6 @@ import php.runtime.lang.BaseWrapper;
 import php.runtime.reflection.ClassEntity;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 @Name("TrayIcon")
 @Reflection.Namespace(SystemTrayExtension.NS)

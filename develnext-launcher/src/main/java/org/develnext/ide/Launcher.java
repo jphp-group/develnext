@@ -1,8 +1,5 @@
 package org.develnext.ide;
 
-import javafx.application.Platform;
-import javafx.embed.swing.SwingNode;
-
 import javax.swing.*;
 import java.io.*;
 import java.net.URISyntaxException;

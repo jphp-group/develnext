@@ -19,6 +19,7 @@ import javafx.css.CssMetaData;
 import javafx.css.SimpleStyleableObjectProperty;
 import javafx.css.Styleable;
 import javafx.css.StyleableProperty;
+import javafx.css.converter.PaintConverter;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.TabPane;
@@ -28,8 +29,6 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
-
-import com.sun.javafx.css.converters.PaintConverter;
 
 /**
  * Marker which can be used to show an insert position {@link TabPane}
@@ -123,7 +122,8 @@ public final class PositionMarker extends Group {
 		return fillProperty().get();
 	}
 
-	private static final CssMetaData<PositionMarker, Paint> FILL = new CssMetaData<PositionMarker, Paint>("-fx-fill", PaintConverter.getInstance(), Color.rgb(0, 139, 255)) { //$NON-NLS-1$
+	private static final CssMetaData<PositionMarker, Paint> FILL = new CssMetaData<PositionMarker, Paint>(
+			"-fx-fill", PaintConverter.getInstance(), Color.rgb(0, 139, 255)) { //$NON-NLS-1$
 
 		@Override
 		public boolean isSettable(PositionMarker node) {
