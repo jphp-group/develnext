@@ -10,3 +10,6 @@
 [submodule "jphp-zip-ext"]
 	path = jphp-zip-ext
 	url = https://github.com/jphp-compiler/jphp-zip-ext.git
+[submodule "3rd-party/Flowless"]
+	path = 3rd-party/Flowless
+	url = https://github.com/TomasMikula/Flowless.git

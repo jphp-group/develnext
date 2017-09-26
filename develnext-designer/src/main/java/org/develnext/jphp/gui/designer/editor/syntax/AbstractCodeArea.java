@@ -7,6 +7,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.input.*;
 import org.develnext.jphp.gui.designer.editor.inspect.AbstractInspector;
@@ -14,9 +15,7 @@ import org.develnext.jphp.gui.designer.editor.syntax.hotkey.*;
 import org.develnext.jphp.gui.designer.editor.syntax.popup.CodeAreaContextMenu;
 import org.develnext.jphp.gui.designer.editor.syntax.popup.CodeAreaPopup;
 import org.fxmisc.flowless.VirtualFlow;
-import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.PopupAlignment;
 import org.fxmisc.richtext.model.RichTextChange;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
@@ -24,15 +23,12 @@ import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.wellbehaved.event.EventPattern;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
-import org.reactfx.util.Try;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 import static org.fxmisc.wellbehaved.event.EventPattern.keyReleased;
@@ -65,16 +61,16 @@ abstract public class AbstractCodeArea extends CodeArea {
         setTabSize(4);
         setShowGutter(true);
 
-        setPopupWindow(popup);
         setOnContextMenuRequested(e -> {
             contextMenu.show(this, e.getScreenX(), e.getScreenY());
         });
 
+
         Nodes.addInputMap(this, InputMap.consume(keyPressed(KeyCode.ESCAPE), e -> contextMenu.hide()));
         Nodes.addInputMap(this, InputMap.consume(mouseClicked(MouseButton.PRIMARY), e -> contextMenu.hide()));
 
-        setPopupAlignment(PopupAlignment.CARET_BOTTOM);
-        setPopupAnchorOffset(new Point2D(4, 4));
+        /*setPopupAlignment(PopupAlignment.CARET_BOTTOM);
+        setPopupAnchorOffset(new Point2D(4, 4));*/
 
         getStyleClass().addAll("syntax-text-area");
 
