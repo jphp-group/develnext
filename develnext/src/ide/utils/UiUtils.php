@@ -42,9 +42,17 @@ class UiUtils
         foreach ($commands as $name => $command) {
             if ($command == '-' || $command instanceof SeparatorCommand) {
                 $ui = new UXSeparator();
-                $ui->orientation = 'VERTICAL';
-                $ui->width = 4;
-                $ui->paddingLeft = 2;
+
+                if ($horizontal) {
+                    $ui->orientation = 'VERTICAL';
+                    $ui->width = 4;
+                    $ui->paddingLeft = 2;
+                } else {
+                    $ui->orientation = 'HORIZONTAL';
+                    $ui->height = 4;
+                    $ui->paddingTop = 2;
+                }
+
                 $ui->maxSize = [20, 20];
             } else {
                 if (!$command->getName() && !$command->getIcon()) {
@@ -52,6 +60,11 @@ class UiUtils
                 }
 
                 $ui = $command->makeUiForHead();
+
+                if (!$ui) {
+                    $ui = $command->makeGlyphButton();
+                    $ui->text = $command->getName();
+                }
             }
 
             if ($ui) {

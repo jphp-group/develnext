@@ -7,6 +7,7 @@ use ide\bundle\std\UIDesktopBundle;
 use ide\editors\FormEditor;
 use ide\Logger;
 use ide\project\AbstractProjectTemplate;
+use ide\project\behaviours\BackupProjectBehaviour;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\behaviours\JavaPlatformBehaviour;
@@ -70,6 +71,10 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
         if (!$project->hasBehaviour(ShareProjectBehaviour::class)) {
             $project->register(new ShareProjectBehaviour(), false);
+        }
+
+        if (!$project->hasBehaviour(BackupProjectBehaviour::class)) {
+            $project->register(new BackupProjectBehaviour(), false);
         }
 
         $ideVersionHash = $project->getConfig()->getIdeVersionHash();
@@ -215,6 +220,7 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
         $project->register(new RunBuildProjectBehaviour());
         $project->register(new ShareProjectBehaviour());
+        $project->register(new BackupProjectBehaviour());
 
         $project->setIgnoreRules([
             '*.log', '*.tmp'
@@ -232,7 +238,7 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
 
             $rules = [
                 '# Ignore rules for GIT (github.com, bitbucket.com, etc.)', '',
-                '/.dn/cache', '/.dn/ide.lock', '/.dn/tmp', '/.dn/index.json',
+                '/.dn/cache', '/.dn/ide.lock', '/.dn/tmp', '/.dn/index.json', '/.dn/backup',
                 '',
                 '/vendor', '/src_generated', '/src/JPHP-INF', '/src/.debug', '/build', '/build.xml', '/build.gradle', '/settings.gradle',
                 '',

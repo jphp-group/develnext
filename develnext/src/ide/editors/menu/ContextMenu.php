@@ -65,7 +65,16 @@ class ContextMenu
         $this->root->on('showing', [$this, 'doShowing']);
 
         foreach ($commands as $command) {
-            $this->add($command);
+            if ($command == '-') {
+                $this->root->items->add(UXMenuItem::createSeparator());
+                continue;
+            }
+
+            if ($command instanceof AbstractMenuCommand) {
+                $this->add($command);
+            } else {
+                $this->addCommand($command);
+            }
         }
     }
 

@@ -102,9 +102,19 @@ class ProjectEditor extends AbstractEditor
     public function refresh()
     {
         parent::refresh();
+
+        if ($pane = $this->getOpenedPane()) {
+            $pane->refresh();
+
+            $index = $this->menu->selectedIndex;
+
+            $this->menu->items->setAll($this->controlPanes);
+
+            $this->menu->focusedIndex = $this->menu->selectedIndex = $index;
+        }
     }
 
-    public function open()
+    public function open($param = null)
     {
         parent::open();
 

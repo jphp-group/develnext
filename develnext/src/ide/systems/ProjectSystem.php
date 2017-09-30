@@ -326,6 +326,7 @@ class ProjectSystem
                 Ide::get()->trigger('openProject', [$project]);
 
                 Logger::info("Finish opening project.");
+                return $project;
             } catch (IOException $e) {
                 ProjectSystem::close(false);
                 Ide::get()->getMainForm()->hidePreloader();
@@ -338,6 +339,8 @@ class ProjectSystem
             ProjectSystem::closeWithWelcome(false);
             Notifications::error('Поврежденный проект', 'Проект "' . fs::nameNoExt($fileName) . '" невозможно открыть, он поврежден или создан в новой версии DevelNext.');
         }
+
+        return null;
     }
 
     /**

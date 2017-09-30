@@ -1,6 +1,7 @@
 <?php
 namespace ide;
 
+use ide\misc\AbstractEntity;
 use php\io\IOException;
 use php\lib\fs;
 use php\util\Configuration;
