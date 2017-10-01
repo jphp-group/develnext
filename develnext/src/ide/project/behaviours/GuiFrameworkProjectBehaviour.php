@@ -707,7 +707,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     private function applyStylesheetToEditor(AbstractEditor $editor)
     {
         $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
-        $path = "file:///" . str::replace($styleFile, "\\", "/");
+
+        $path = $styleFile->toUrl();
 
         $resource = new ResourceStream('/ide/formats/form/FormEditor.css');
 
@@ -715,6 +716,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $editor->removeStylesheet($path);
 
         $editor->addStylesheet($resource->toExternalForm());
+
         if (fs::isFile($styleFile)) {
             $editor->addStylesheet($path);
         }
@@ -728,6 +730,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             });
             return;
         }
+
+        Logger::info("Reload stylesheet");
 
         $this->saveStylesheet();
 
