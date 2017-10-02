@@ -27,7 +27,7 @@ class UXCheckbox extends UXButtonBase
     public $allowIndeterminate;
 
     /**
-     * @param string $text (optional)
+     * @param string $text [optional]
      */
     public function __construct($text) {}
 }

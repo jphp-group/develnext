@@ -1,0 +1,10 @@
+<element extends="ButtonFormElement">
+    <properties>
+        <property code="buttonType" name="Тип кнопки" editor="enum">
+            <variants>
+                <variant value="FLAT">FLAT</variant>
+                <variant value="RAISED">RAISED</variant>
+            </variants>
+        </property>
+    </properties>
+</element>
