@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes.layout;
 
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
@@ -33,6 +34,13 @@ public class UXScrollPane<T extends ScrollPane> extends UXControl<ScrollPane> {
 
     public UXScrollPane(Environment env, T wrappedObject) {
         super(env, wrappedObject);
+        // hack for the correct view font with not non-integer value
+        wrappedObject.setCache(false);
+        wrappedObject.getChildrenUnmodifiable().addListener((ListChangeListener) c -> {
+            for (Node n : wrappedObject.getChildrenUnmodifiable()) {
+                n.setCache(false);
+            }
+        });
     }
 
     public UXScrollPane(Environment env, ClassEntity clazz) {

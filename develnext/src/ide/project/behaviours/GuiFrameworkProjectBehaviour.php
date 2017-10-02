@@ -64,6 +64,7 @@ use php\gui\UXTextField;
 use php\io\File;
 use php\io\IOException;
 use php\io\ResourceStream;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\reflect;
 use php\lib\str;
@@ -290,8 +291,8 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $menu->addSeparator('new');
         $menu->add(new CreateFormProjectCommand($tree), 'new');
-        $menu->add(new CreateScriptModuleProjectCommand($tree), 'new');
-        $menu->add(new CreateGameSpriteProjectCommand($tree), 'new');
+        $menu->add(new CreateScriptModuleProjectCommand(), 'new');
+        $menu->add(new CreateGameSpriteProjectCommand(), 'new');
     }
 
     /**
@@ -594,6 +595,10 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             'src/.forms', 'src/.scripts', 'src/.system', 'src/.debug', 'src/JPHP-INF'
         ]);
 
+        $tree->addIgnorePaths([
+            "{$this->project->getSrcDirectory()}/.theme/skin"
+        ]);
+
         $tree->addIgnoreFilter(function ($file) {
             if (fs::ext($file) == 'conf') {
                 if (fs::isFile(fs::pathNoExt($file) . '.fxml')) {
@@ -708,14 +713,37 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     {
         $styleFile = $this->project->getSrcFile('.theme/style.fx.css');
 
+        /** @var File[] $skinFiles */
+        $skinFiles = fs::scan($this->project->getSrcFile('.theme/skin/'), [
+            'extensions' => ['css'], 'excludeDirs' => true
+        ], 1);
+
         $path = $styleFile->toUrl();
 
-        $resource = new ResourceStream('/ide/formats/form/FormEditor.css');
+        $stylesheets = $editor->getStylesheets();
+        foreach ($stylesheets as $stylesheet) {
+            $editor->removeStylesheet($stylesheet);
+        }
 
+        $resource = new ResourceStream('/ide/formats/form/FormEditor.css');
         $editor->removeStylesheet($resource->toExternalForm());
         $editor->removeStylesheet($path);
-
         $editor->addStylesheet($resource->toExternalForm());
+
+        $guiStyles = $this->project->fetchNamedList('guiStyles');
+        foreach ($guiStyles as $resPath => $filePath) {
+            $editor->addStylesheet($filePath);
+        }
+
+        /*foreach ($stylesheets as $stylesheet) {
+            if (str::contains($stylesheet, '/skin/')) {
+                $editor->removeStylesheet($stylesheet);
+            }
+        }*/
+
+        foreach ($skinFiles as $file) {
+            $editor->addStylesheet($file->toUrl());
+        }
 
         if (fs::isFile($styleFile)) {
             $editor->addStylesheet($path);
@@ -825,6 +853,22 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $code .= "\n\$app->loadModules(" . var_export($moduleClasses, true) . ');';
+
+        $guiStyles = $this->project->fetchNamedList('guiStyles');
+        foreach ($guiStyles as $resPath => $filePath) {
+            $code .= "\n\$app->addStyle('$resPath');";
+        }
+
+        /** @var File[] $skinFiles */
+        $skinFiles = fs::scan($this->project->getSrcFile('.theme/skin/'), [
+            'extensions' => ['css'], 'excludeDirs' => true
+        ], 1);
+
+        foreach ($skinFiles as $skinFile) {
+            $name = str::replace($skinFile->getName(), ' ', '%20');
+            $code .= "\n\$app->addStyle('/.theme/skin/{$name}');";
+        }
+
         $code .= "\n\$app->addStyle('/.theme/style.fx.css');";
 
         $template->setInnerCode($code);

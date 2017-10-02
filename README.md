@@ -23,18 +23,22 @@ cd /path/to/repo
 // fetch all submodules (jphp, richtextfx, etc.)
 git submodule update --init
 
+// install flowless
+cd 3rd-party/Flowless
+"../../gradlew" install
+
 // install rich text fx
 cd 3rd-party/RichTextFX
-./gradlew install
+"../../gradlew" install
 
 // install jphp
 cd ../3rd-party/jphp
-./gradlew install
+"../../gradlew" install
 
 cd ../../
 
 // for windows
-./gradlew distIdeWindows
+gradlew distIdeWindows
 
 // for linux
 ./gradlew distIdeLinux

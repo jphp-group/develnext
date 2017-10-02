@@ -158,6 +158,11 @@ class Project
     protected $inspectorLoaderThreadPoll;
 
     /**
+     * @var callable[]
+     */
+    private $listHandlers = [];
+
+    /**
      * Project constructor.
      *
      * @param string $rootDir
@@ -645,21 +650,80 @@ class Project
     }
 
     /**
+     * @param string $nameList
+     * @return array
+     */
+    public function fetchNamedList($nameList)
+    {
+        $result = [];
+
+        foreach ((array) $this->listHandlers[$nameList] as $handler) {
+            $result = array_merge($result, (array) $handler());
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $listName
+     * @param callable $handler
+     * @param string $group
+     * @return string
+     */
+    public function onList($listName, callable $handler, $group = null)
+    {
+        $uid = $group ?: str::uuid();
+
+        $this->listHandlers[$listName][$uid] = $handler;
+
+        return $uid;
+    }
+
+    /**
+     * @param $listName
+     * @param null $group
+     */
+    public function offList($listName, $group = null)
+    {
+        if ($group) {
+            unset($this->listHandlers[$listName][$group]);
+        } else {
+            unset($this->listHandlers[$listName]);
+        }
+    }
+
+    /**
      * @param string $event
      * @param callable $callback
+     * @param string $group
+     * @return string
      */
-    public function on($event, callable $callback)
+    public function on($event, callable $callback, $group = null)
     {
-        $this->handlers[$event][] = $callback;
+        $uid = $group ?: str::uuid();
+        $this->handlers[$event][$uid] = $callback;
+
+        return $uid;
+    }
+
+    /**
+     * @param string $event
+     * @param string $group
+     */
+    public function off($event, $group)
+    {
+        unset($this->handlers[$event][$group]);
     }
 
     /**
      * @param $event
      * @param array ...$args
+     * @return mixed
      */
     public function trigger($event, ...$args)
     {
         $onLast = [];
+        $result = null;
 
         foreach ((array) $this->handlers[$event] as $handler) {
             $result = $handler(...$args);
@@ -677,6 +741,8 @@ class Project
         foreach ($onLast as $handler) {
             $handler(...$args);
         }
+
+        return $result;
     }
 
     /**

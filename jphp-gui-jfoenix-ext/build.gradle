@@ -1,0 +1,8 @@
+project.version = '1.0'
+
+dependencies {
+    compile "org.develnext.jphp:jphp-runtime:$rootProject.ext.jphpVersion"
+    compile project(':jphp-gui-ext')
+
+    compile fileTree(dir: 'libs', include: '*.jar')
+}

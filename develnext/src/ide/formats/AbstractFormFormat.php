@@ -13,7 +13,9 @@ use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
 use php\lang\Thread;
 use php\lang\ThreadPool;
+use php\lib\arr;
 use php\lib\fs;
+use php\lib\reflect;
 use php\lib\Str;
 use php\lib\String;
 
@@ -93,13 +95,34 @@ abstract class AbstractFormFormat extends AbstractFormat
             return $element;
         }
 
+        /** @var AbstractFormElement[] $candidates */
+        $candidates = [];
+
         foreach ($this->formElements as $element) {
             if ($element->isOrigin($any)) {
-                return $element;
+                $candidates[] = $element;
             }
         }
 
-        return null;
+        if (sizeof($candidates) == 1) {
+            return arr::first($candidates);
+        }
+
+        if (!$candidates) {
+            return null;
+        }
+
+        $anyClass = is_object($any) ? reflect::typeOf($any) : $any;
+
+        foreach ($candidates as $candidate) {
+            $class = $candidate->getElementClass();
+
+            if ($anyClass === $class) {
+                return $candidate;
+            }
+        }
+
+        return arr::last($candidates);
     }
 
     /**
