@@ -226,107 +226,98 @@ public class UXDesigner extends BaseObject {
 
     @Signature
     public void addSelectionControl(Node node) {
-        node.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (disabled) return;
+        node.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+            if (disabled) return;
 
-                if (isEditing()) {
-                    return;
+            if (isEditing()) {
+                return;
+            }
+
+            if (contextMenu != null && event.getButton() == MouseButton.SECONDARY) {
+                if (contextMenu.isShowing()) {
+                    contextMenu.setX(event.getSceneX());
+                    contextMenu.setY(event.getSceneY());
+                } else {
+                    contextMenu.show(area, event.getScreenX(), event.getScreenY());
                 }
 
-                if (contextMenu != null && event.getButton() == MouseButton.SECONDARY) {
-                    if (contextMenu.isShowing()) {
-                        contextMenu.setX(event.getSceneX());
-                        contextMenu.setY(event.getSceneY());
-                    } else {
-                        contextMenu.show(area, event.getScreenX(), event.getScreenY());
-                    }
+                event.consume();
+                return;
+            }
 
-                    event.consume();
-                    return;
+            if (selectionEnabled) {
+                selectionRectangle.setX(event.getScreenX());
+                selectionRectangle.setY(event.getScreenY());
+
+                selectionRectanglePoint = new Point2D(event.getScreenX(), event.getScreenY());
+
+                selectionRectangle.setWidth(1);
+                selectionRectangle.setHeight(1);
+            }
+            //event.consume();
+        });
+
+
+        node.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
+            if (disabled) return;
+
+            if (isEditing()) {
+                return;
+            }
+
+            if (selectionEnabled && selectionRectanglePoint != null) {
+                double width = event.getScreenX() - selectionRectanglePoint.getX();
+                double height = event.getScreenY() - selectionRectanglePoint.getY();
+
+                selectionRectangle.setWidth(Math.abs(width));
+                selectionRectangle.setHeight(Math.abs(height));
+
+                if (width < 0) {
+                    selectionRectangle.setX(selectionRectanglePoint.getX() + width);
+                } else {
+                    selectionRectangle.setX(selectionRectanglePoint.getX());
                 }
 
-                if (selectionEnabled) {
-                    selectionRectangle.setX(event.getScreenX());
-                    selectionRectangle.setY(event.getScreenY());
-
-                    selectionRectanglePoint = new Point2D(event.getScreenX(), event.getScreenY());
-
-                    selectionRectangle.setWidth(1);
-                    selectionRectangle.setHeight(1);
+                if (height < 0) {
+                    selectionRectangle.setY(selectionRectanglePoint.getY() + height);
+                } else {
+                    selectionRectangle.setY(selectionRectanglePoint.getY());
                 }
+
+                if (Math.abs(width) > 2 && Math.abs(height) > 2) {
+                    selectionRectangle.show();
+                }
+
                 //event.consume();
             }
         });
 
+        node.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+            if (disabled) return;
 
-        node.addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (disabled) return;
-
-                if (isEditing()) {
-                    return;
-                }
-
-                if (selectionEnabled && selectionRectanglePoint != null) {
-                    double width = event.getScreenX() - selectionRectanglePoint.getX();
-                    double height = event.getScreenY() - selectionRectanglePoint.getY();
-
-                    selectionRectangle.setWidth(Math.abs(width));
-                    selectionRectangle.setHeight(Math.abs(height));
-
-                    if (width < 0) {
-                        selectionRectangle.setX(selectionRectanglePoint.getX() + width);
-                    } else {
-                        selectionRectangle.setX(selectionRectanglePoint.getX());
-                    }
-
-                    if (height < 0) {
-                        selectionRectangle.setY(selectionRectanglePoint.getY() + height);
-                    } else {
-                        selectionRectangle.setY(selectionRectanglePoint.getY());
-                    }
-
-                    if (Math.abs(width) > 2 && Math.abs(height) > 2) {
-                        selectionRectangle.show();
-                    }
-
-                    //event.consume();
-                }
+            if (isEditing()) {
+                return;
             }
-        });
 
-        node.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (disabled) return;
+            if (tmpLock) {
+                tmpLock = false;
+                return;
+            }
 
-                if (isEditing()) {
-                    return;
-                }
+            selectionRectangle.hide();
+            selectionRectanglePoint = null;
 
-                if (tmpLock) {
-                    tmpLock = false;
-                    return;
-                }
+            if (!event.isShiftDown() || !event.isControlDown() || !(node.getParent() instanceof AnchorPane)) {
+                unselectAll();
+            }
 
-                selectionRectangle.hide();
-                selectionRectanglePoint = null;
+            if (selectionEnabled) {
+                Point2D fromXY = area.screenToLocal(selectionRectangle.getX(), selectionRectangle.getY());
+                double width = selectionRectangle.getWidth();
+                double height = selectionRectangle.getHeight();
 
-                if (!event.isShiftDown() || !event.isControlDown() || !(node.getParent() instanceof AnchorPane)) {
-                    unselectAll();
-                }
-
-                if (selectionEnabled) {
-                    Point2D fromXY = area.screenToLocal(selectionRectangle.getX(), selectionRectangle.getY());
-                    double width = selectionRectangle.getWidth();
-                    double height = selectionRectangle.getHeight();
-
-                    for (Node node : getNodesInArea(fromXY.getX(), fromXY.getY(), width, height)) {
-                        selectNode(node);
-                    }
+                for (Node node1 : getNodesInArea(fromXY.getX(), fromXY.getY(), width, height)) {
+                    selectNode(node1);
                 }
             }
         });
@@ -1065,6 +1056,9 @@ public class UXDesigner extends BaseObject {
         return null;
     }
 
+
+    private Deque<Node> pressedNodes = new LinkedList<>();
+
     @Signature
     public void registerNode(final Node node) {
         if (nodes.containsKey(node)) {
@@ -1086,82 +1080,82 @@ public class UXDesigner extends BaseObject {
         node.setOnKeyPressed(area.getOnKeyPressed());
 
         //if (!isWithChildrenNode(node)) {
-            node.addEventFilter(DragEvent.DRAG_OVER, event -> {
-                Dragboard dragboard = event.getDragboard();
+        node.addEventFilter(DragEvent.DRAG_OVER, event -> {
+            Dragboard dragboard = event.getDragboard();
 
-                if (getSelection(dragboard) != null) {
-                    event.acceptTransferModes(TransferMode.ANY);
-                }
-            });
+            if (getSelection(dragboard) != null) {
+                event.acceptTransferModes(TransferMode.ANY);
+            }
+        });
 
-            node.addEventFilter(DragEvent.DRAG_ENTERED, event -> {
-               // if (event.isAccepted()) {
-                    Selection selection = getSelection(event.getDragboard());
+        node.addEventFilter(DragEvent.DRAG_ENTERED, event -> {
+            // if (event.isAccepted()) {
+            Selection selection = getSelection(event.getDragboard());
 
-                    if (selection != null && node != selection.node) {
-                        Bounds nodeBounds = node.getLayoutBounds();
-                        Bounds nodeScreenBounds = node.localToScreen(nodeBounds);
+            if (selection != null && node != selection.node) {
+                Bounds nodeBounds = node.getLayoutBounds();
+                Bounds nodeScreenBounds = node.localToScreen(nodeBounds);
 
-                        Rectangle rectangle = new Rectangle(nodeBounds.getWidth(), nodeBounds.getHeight());
-                        rectangle.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
-                        rectangle.setStrokeWidth(3);
-                        rectangle.setStroke(Color.LIGHTBLUE);
-                        rectangle.setStrokeType(StrokeType.INSIDE);
-                        rectangle.setStrokeLineCap(StrokeLineCap.SQUARE);
-                        rectangle.setFill(new Color(1, 1, 1, 0.3));
-                        rectangle.setMouseTransparent(true);
+                Rectangle rectangle = new Rectangle(nodeBounds.getWidth(), nodeBounds.getHeight());
+                rectangle.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
+                rectangle.setStrokeWidth(3);
+                rectangle.setStroke(Color.LIGHTBLUE);
+                rectangle.setStrokeType(StrokeType.INSIDE);
+                rectangle.setStrokeLineCap(StrokeLineCap.SQUARE);
+                rectangle.setFill(new Color(1, 1, 1, 0.3));
+                rectangle.setMouseTransparent(true);
 
-                        node.setUserData(rectangle);
+                node.setUserData(rectangle);
 
-                        Bounds pt = area.screenToLocal(nodeScreenBounds);
-                        rectangle.relocate(pt.getMinX(), pt.getMinY());
+                Bounds pt = area.screenToLocal(nodeScreenBounds);
+                rectangle.relocate(pt.getMinX(), pt.getMinY());
 
-                        area.getChildren().add(rectangle);
-                        return;
-                    }
+                area.getChildren().add(rectangle);
+                return;
+            }
 
-                    event.getDragboard().setDragView(null);
-               // }
-            });
+            event.getDragboard().setDragView(null);
+            // }
+        });
 
-            node.addEventFilter(DragEvent.DRAG_EXITED, event -> {
-                if (node.getUserData() instanceof Rectangle) {
-                    area.getChildren().remove(node.getUserData());
-                }
-            });
+        node.addEventFilter(DragEvent.DRAG_EXITED, event -> {
+            if (node.getUserData() instanceof Rectangle) {
+                area.getChildren().remove(node.getUserData());
+            }
+        });
 
-            node.addEventFilter(DragEvent.DRAG_DONE, Event::consume);
-            node.addEventFilter(DragEvent.DRAG_DROPPED, event -> {
-                Dragboard dragboard = event.getDragboard();
+        node.addEventFilter(DragEvent.DRAG_DONE, Event::consume);
+        node.addEventFilter(DragEvent.DRAG_DROPPED, event -> {
+            Dragboard dragboard = event.getDragboard();
 
-                Selection selection = getSelection(dragboard);
+            Selection selection = getSelection(dragboard);
 
-                if (selection != null) {
-                    if (node == selection.node) {
-                        return;
-                    }
-
-                    ObservableList<Node> children = selection.parent.getChildren();
-                    int index = children.indexOf(node);
-
-                    if (index > -1) {
-                        children.remove(selection.node);
-                        children.add(index, selection.node);
-
-                        selection.update();
-                        event.consume();
-
-                        if (onChanged != null) {
-                            onChanged.callAny();
-                        }
-                    }
+            if (selection != null) {
+                if (node == selection.node) {
+                    return;
                 }
 
-                tmpLock = true;
-                Platform.runLater(() -> tmpLock = false);
+                ObservableList<Node> children = selection.parent.getChildren();
+                int index = children.indexOf(node);
 
-                dragged = false;
-            });
+                if (index > -1) {
+                    children.remove(selection.node);
+                    children.add(index, selection.node);
+
+                    selection.update();
+                    event.consume();
+
+                    if (onChanged != null) {
+                        onChanged.callAny();
+                    }
+                }
+            }
+
+            tmpLock = true;
+            Platform.runLater(() -> tmpLock = false);
+
+            dragged = false;
+        });
         /*} else {
             node.addEventFilter(DragEvent.DRAG_DONE, event -> {
                 dragged = false;
@@ -1193,12 +1187,6 @@ public class UXDesigner extends BaseObject {
                     if (selection.parent instanceof AnchorPane) {
                         selection.parent.getChildren().add(selection.dragView);
                     } else {
-                        ObservableList<Node> children = selection.parent.getChildren();
-                        //int index = children.indexOf(selection.node);
-
-                        //children.add(index, selection.dragView);
-                        //children.remove(index + 1);
-
                         Dragboard dragboard = selection.node.startDragAndDrop(TransferMode.ANY);
 
                         ClipboardContent content = new ClipboardContent();
@@ -1215,174 +1203,163 @@ public class UXDesigner extends BaseObject {
         //node.setOnDragDetected(onDragDetected);
         node.addEventFilter(MouseEvent.DRAG_DETECTED, onDragDetected);
 
-        EventHandler<MouseEvent> onMouseDragged = new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent e) {
-                if (e.getButton() != MouseButton.PRIMARY) {
-                    return;
-                }
-
-                for (Selection sel : selections.values()) {
-                    if (getNodeLock(sel.getNode()) || isNodeParentSelected(sel.getNode())) {
-                        continue;
-                    }
-
-                    Point2D localPoint = new Point2D(e.getScreenX(), e.getScreenY());
-
-                    double dx = localPoint.getX() - startPoint.getX();
-                    double dy = localPoint.getY() - startPoint.getY();
-
-                    Bounds bounds = sel.node.getBoundsInParent();
-                    Bounds layoutBounds = sel.node.getLayoutBounds();
-
-                    double diffW = bounds.getWidth() - layoutBounds.getWidth();
-                    double diffH = bounds.getHeight() - layoutBounds.getHeight();
-
-                    if (sel.node.getEffect() == null) {
-                        sel.dragView.setUserData(new Insets(diffH, 0, 0, diffW));
-                    }
-
-                    double x = sel.node.getLayoutX() + dx/zoom;
-                    double y = sel.node.getLayoutY() + dy/zoom;
-
-                    if (!e.isAltDown() && snapSizeX > 1 && snapSizeY > 1 && snapEnabled) {
-                        x = Math.round((x / snapSizeX)) * snapSizeX;
-                        y = Math.round((y / snapSizeY)) * snapSizeY;
-                    }
-
-                    sel.drag(x, y);
-                }
-
-                e.consume();
+        EventHandler<MouseEvent> onMouseDragged = e -> {
+            if (e.getButton() != MouseButton.PRIMARY) {
+                return;
             }
+
+            for (Selection sel : selections.values()) {
+                if (getNodeLock(sel.getNode()) || isNodeParentSelected(sel.getNode())) {
+                    continue;
+                }
+
+                Point2D localPoint = new Point2D(e.getScreenX(), e.getScreenY());
+
+                double dx = localPoint.getX() - startPoint.getX();
+                double dy = localPoint.getY() - startPoint.getY();
+
+                Bounds bounds = sel.node.getBoundsInParent();
+                Bounds layoutBounds = sel.node.getLayoutBounds();
+
+                double diffW = bounds.getWidth() - layoutBounds.getWidth();
+                double diffH = bounds.getHeight() - layoutBounds.getHeight();
+
+                if (sel.node.getEffect() == null) {
+                    sel.dragView.setUserData(new Insets(diffH, 0, 0, diffW));
+                }
+
+                double x = sel.node.getLayoutX() + dx / zoom;
+                double y = sel.node.getLayoutY() + dy / zoom;
+
+                if (!e.isAltDown() && snapSizeX > 1 && snapSizeY > 1 && snapEnabled) {
+                    x = Math.round((x / snapSizeX)) * snapSizeX;
+                    y = Math.round((y / snapSizeY)) * snapSizeY;
+                }
+
+                sel.drag(x, y);
+            }
+
+            e.consume();
         };
         //node.setOnMouseDragged(onMouseDragged);
         node.addEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
 
-        EventHandler<MouseEvent> onMousePressed = new EventHandler<MouseEvent>() {
-            public void handle(final MouseEvent e) {
-                final Node node = (Node) e.getSource();
+        EventHandler<MouseEvent> onMousePressed = e -> {
+            final Node node1 = (Node) e.getSource();
 
-                /*Node intersectedNode = e.getPickResult().getIntersectedNode();
-
-                if (intersectedNode != null && intersectedNode != node && isWithChildrenNode(intersectedNode)) {
-                    //return;
-                } else { */
-                if (onNodeClick != null) {
-                    if (onNodeClick.callAny(e).toBoolean()) {
-                        return;
-                    }
+            if (onNodeClick != null) {
+                if (onNodeClick.callAny(e).toBoolean()) {
+                    return;
                 }
-                //}
+            }
 
-                if (!dragged) {
-                    boolean isSelected = selections.get(node) != null;
+            if (!dragged) {
+                pressedNodes.add(node1);
 
-                    {
-                        if (!isSelected && !e.isShiftDown()) {
+                Platform.runLater(() -> {
+                    if (pressedNodes.size() > 0) {
+                        Node first = pressedNodes.peekLast();
+
+                        boolean isSelected = selections.get(first) != null;
+
+                        if (!isSelected && !e.isShiftDown() && !e.isControlDown()) {
                             UXDesigner.this.unselectAll();
                         }
 
                         if (!isSelected) {
-                            UXDesigner.this.selectNode(node, e);
+                            UXDesigner.this.selectNode(first, e);
                         } else {
-                            if (e.isShiftDown()) {
-                                UXDesigner.this.unselectNode(node);
+                            if (e.isShiftDown() || e.isControlDown()) {
+                                UXDesigner.this.unselectNode(first);
                             }
                         }
                     }
-                }
 
-                Pane parent = (Pane) node.getParent();
-                startPoint = new Point2D(e.getScreenX(), e.getScreenY()); // parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
-
-                for (Selection selection : selections.values()) {
-                    selection.dragView.setMouseTransparent(true);
-                    selection.drag(selection.node.getLayoutX(), selection.node.getLayoutY(), false);
-                }
-
-                if (!isWithChildrenNode(node)) {
-                    e.consume();
-                }
-
-                picked = node;
+                    pressedNodes.clear();
+                });
             }
+
+            startPoint = new Point2D(e.getScreenX(), e.getScreenY()); // parent.sceneToLocal(new Point2D(e.getSceneX(), e.getSceneY()));
+
+            for (Selection selection : selections.values()) {
+                selection.dragView.setMouseTransparent(true);
+                selection.drag(selection.node.getLayoutX(), selection.node.getLayoutY(), false);
+            }
+
+            if (!isWithChildrenNode(node1)) {
+                e.consume();
+            }
+
+            picked = node1;
         };
 
         //node.setOnMousePressed(onMousePressed);
         node.addEventFilter(MouseEvent.MOUSE_PRESSED, onMousePressed);
 
-        EventHandler<MouseEvent> onMouseReleased = new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent e) {
-                if (dragged) {
-                    List<Selection> skipSelections = new ArrayList<>();
+        EventHandler<MouseEvent> onMouseReleased = e -> {
+            if (dragged) {
+                List<Selection> skipSelections = new ArrayList<>();
 
-                    for (Selection selection : selections.values()) {
-                        selection.node.setMouseTransparent(false);
-                        selection.node.setCursor(Cursor.DEFAULT);
+                for (Selection selection : selections.values()) {
+                    selection.node.setMouseTransparent(false);
+                    selection.node.setCursor(Cursor.DEFAULT);
 
-                        if (isNodeParentSelected(selection.node)) {
-                            skipSelections.add(selection);
-                            continue;
-                        }
+                    if (isNodeParentSelected(selection.node)) {
+                        skipSelections.add(selection);
+                        continue;
+                    }
 
-                        if (!getNodeLock(selection.node) && !isNodeParentSelected(selection.node)) {
-                            if (selection.parent instanceof AnchorPane) {
-                                Object userData = selection.dragView.getUserData();
+                    if (!getNodeLock(selection.node) && !isNodeParentSelected(selection.node)) {
+                        if (selection.parent instanceof AnchorPane) {
+                            Object userData = selection.dragView.getUserData();
 
-                                double x = selection.dragView.getLayoutX();
-                                double y = selection.dragView.getLayoutY();
+                            double x = selection.dragView.getLayoutX();
+                            double y = selection.dragView.getLayoutY();
 
-                                if (userData instanceof Insets) {
-                                    x += ((Insets) userData).getLeft();
-                                    y += ((Insets) userData).getTop();
-                                }
-
-                                selection.drag(x, y, false);
-                                relocateNode(selection.node, x - getCenterX(node), y - getCenterY(node));
-                            } else {
-                                int index = selection.parent.getChildren().indexOf(selection.dragView);
-                                selection.parent.getChildren().add(index, selection.node);
+                            if (userData instanceof Insets) {
+                                x += ((Insets) userData).getLeft();
+                                y += ((Insets) userData).getTop();
                             }
+
+                            selection.drag(x, y, false);
+                            relocateNode(selection.node, x - getCenterX(node), y - getCenterY(node));
+                        } else {
+                            int index = selection.parent.getChildren().indexOf(selection.dragView);
+                            selection.parent.getChildren().add(index, selection.node);
                         }
-
-                        selection.update();
-                        selection.parent.getChildren().remove(selection.dragView);
                     }
 
-                    for (Selection skipSelection : skipSelections) {
-                        skipSelection.update();
-                    }
-
-                    if (onChanged != null) {
-                        onChanged.callAny();
-                    }
-
-                    //if (e.getButton() == MouseButton.PRIMARY) {
-                    e.consume();
-                    //}
-                } else {
-                    for (Selection selection : selections.values()) {
-                        selection.update();
-                    }
+                    selection.update();
+                    selection.parent.getChildren().remove(selection.dragView);
                 }
 
-                checkContextMenu(e, node);
+                for (Selection skipSelection : skipSelections) {
+                    skipSelection.update();
+                }
+
+                if (onChanged != null) {
+                    onChanged.callAny();
+                }
 
                 //if (e.getButton() == MouseButton.PRIMARY) {
                 e.consume();
                 //}
-
-                tmpLock = true;
-
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        tmpLock = false;
-                    }
-                });
-
-                dragged = false;
+            } else {
+                for (Selection selection : selections.values()) {
+                    selection.update();
+                }
             }
+
+            checkContextMenu(e, node);
+
+            //if (e.getButton() == MouseButton.PRIMARY) {
+            e.consume();
+            //}
+
+            tmpLock = true;
+            Platform.runLater(() -> tmpLock = false);
+
+            dragged = false;
         };
 
         //node.setOnMouseReleased(onMouseReleased);
@@ -1788,7 +1765,7 @@ public class UXDesigner extends BaseObject {
                 }
 
                 //if (!(parent instanceof AnchorPane)) {
-                    runLater(Selection.this::update, 100);
+                runLater(Selection.this::update, 100);
                 //}
 
                 if (onChanged != null) {

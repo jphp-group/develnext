@@ -202,16 +202,24 @@ class MainForm extends AbstractIdeForm
      * @param string $id
      * @param string $text
      * @param bool $prepend
+     * @return UXMenu
      * @throws IdeException
      */
     public function defineMenuGroup($id, $text, $prepend = false)
     {
         $id = str::upperFirst($id);
 
-        $menu = $this->{"menu$id"};
+        $menu = null;
+
+        foreach ($this->mainMenu->menus as $one) {
+            if ($one->id == "menu$id") {
+                $menu = $one;
+                break;
+            }
+        }
 
         if ($menu == null) {
-            $menu = new UXMenu();
+            $menu = new UXMenu($text);
             $menu->id = "menu$id";
 
             if ($prepend) {
@@ -220,12 +228,10 @@ class MainForm extends AbstractIdeForm
                 $this->mainMenu->menus->add($menu);
             }
         } else {
-            if (!($menu instanceof UXMenu)) {
-                throw new IdeException("Invalid menu class for id = 'menu$id'");
-            }
+            $menu->text = $text;
         }
 
-        $menu->text = $text;
+        return $menu;
     }
 
     /**

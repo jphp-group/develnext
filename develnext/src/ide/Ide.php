@@ -329,6 +329,8 @@ class Ide extends Application
     }
 
     /**
+     * Запустить коллбэка в очереди потоков IDE.
+     *
      * @param callable $callback
      * @param callable|null $after
      */
@@ -373,6 +375,8 @@ class Ide extends Application
     }
 
     /**
+     * Менеджер тулов/утилит.
+     *
      * @return IdeToolManager
      */
     public function getToolManager()
@@ -381,6 +385,8 @@ class Ide extends Application
     }
 
     /**
+     * Утилита для локализации.
+     *
      * @return L10n
      */
     public function getL10n()
@@ -394,6 +400,8 @@ class Ide extends Application
     }
 
     /**
+     * Текущий язык.
+     *
      * @return IdeLanguage
      */
     public function getLanguage()
@@ -402,6 +410,8 @@ class Ide extends Application
     }
 
     /**
+     * Списки доступных языков IDE.
+     *
      * @return IdeLanguage[]
      */
     public function getLanguages()
@@ -492,6 +502,11 @@ class Ide extends Application
         //throw new \Exception("Unable to find gradle bin");
     }
 
+    /**
+     * Вернуть путь к папке tools IDE.
+     *
+     * @return null|string
+     */
     public function getToolPath()
     {
         $launcher = System::getProperty('develnext.launcher');
@@ -515,6 +530,11 @@ class Ide extends Application
         return $file;
     }
 
+    /**
+     * Вернуть путь к apache ant тулу IDE.
+     *
+     * @return null|File
+     */
     public function getApacheAntPath()
     {
         $antPath = new File($this->getToolPath(), '/apache-ant');
@@ -530,6 +550,12 @@ class Ide extends Application
         return $antPath && $antPath->exists() ? $antPath->getCanonicalFile() : null;
     }
 
+    /**
+     * Вернуть путь к Gradle дистрибутиву.
+     *
+     * @deprecated не используется больше!
+     * @return null|File
+     */
     public function getGradlePath()
     {
         $gradlePath = new File($this->getToolPath(), '/gradle');
@@ -545,6 +571,11 @@ class Ide extends Application
         return $gradlePath && $gradlePath->exists() ? $gradlePath->getCanonicalFile() : null;
     }
 
+    /**
+     * Вернуть путь к JRE среды (Java Runtime Environment).
+     *
+     * @return null|File
+     */
     public function getJrePath()
     {
         $path = $this->getToolPath();
@@ -571,6 +602,8 @@ class Ide extends Application
     }
 
     /**
+     * Dev режим работы IDE?
+     *
      * @return bool
      */
     public function isDevelopment()
@@ -579,6 +612,8 @@ class Ide extends Application
     }
 
     /**
+     * Prod режим работы IDE?
+     *
      * @return bool
      */
     public function isProduction()
@@ -587,6 +622,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть splash форму IDE.
+     *
      * @return SplashForm
      */
     public function getSplash()
@@ -594,6 +631,11 @@ class Ide extends Application
         return $this->splash;
     }
 
+    /**
+     * Задать заголовок главной формы IDE.
+     *
+     * @param $value
+     */
     public function setTitle($value)
     {
         $title = $this->getName() . ' ' . $this->getVersion();
@@ -645,6 +687,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть именнованный конфиг из системной папки IDE.
+     *
      * @param string $name
      * @return IdeConfiguration
      */
@@ -666,6 +710,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть значение глобального конфига, из ide.conf.
+     *
      * @param string $key
      * @param mixed $def
      *
@@ -677,6 +723,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть значение глобального конфига в виде массива, из ide.conf.
+     *
      * @param string $key
      * @param mixed $def
      *
@@ -692,6 +740,8 @@ class Ide extends Application
     }
 
     /**
+     * Задать глобальную настройку для IDE, запишет в конфиг ide.conf.
+     *
      * @param $key
      * @param $value
      */
@@ -701,6 +751,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть файл из папки, где находится сама IDE.
+     *
      * @param string $path
      *
      * @return File
@@ -715,6 +767,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть файл из системной папки IDE.
+     *
      * @param string $path
      *
      * @return File
@@ -725,6 +779,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть файлы из директории, отвечающие формату.
+     *
      * @param AbstractFormat|string $format
      * @param string $directory
      * @return \string[]
@@ -752,6 +808,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть текущий лог файл IDE.
+     *
      * @return File
      */
     public function getLogFile()
@@ -762,7 +820,7 @@ class Ide extends Application
     }
 
     /**
-     *
+     * Очистить специализированную папку IDE от логов и кэша.
      */
     public function cleanup()
     {
@@ -784,6 +842,8 @@ class Ide extends Application
     }
 
     /**
+     * Создать временный файл с специализированной папке IDE.
+     *
      * @param string $suffix
      * @return File
      */
@@ -805,7 +865,9 @@ class Ide extends Application
     }
 
     /**
-     * @return project\AbstractProjectTemplate[]
+     * Вернуть список всех зарегистрированных шаблонов проекта.
+     *
+     * @return AbstractProjectTemplate[]
      */
     public function getProjectTemplates()
     {
@@ -813,6 +875,8 @@ class Ide extends Application
     }
 
     /**
+     * Зарегистрировать шаблон проекта.
+     *
      * @param AbstractProjectTemplate $template
      */
     public function registerProjectTemplate(AbstractProjectTemplate $template)
@@ -886,6 +950,12 @@ class Ide extends Application
         unset($this->navigation[$class]);
     }
 
+    /**
+     * Отменить регистрацию одной команды по ее имени класса.
+     *
+     * @param $commandClass
+     * @param bool $ignoreAlways
+     */
     public function unregisterCommand($commandClass, $ignoreAlways = true)
     {
         /** @var MainForm $mainForm */
@@ -938,6 +1008,9 @@ class Ide extends Application
         unset($this->commands[$commandClass]);
     }
 
+    /**
+     * Отменить регистрацию всех команд.
+     */
     public function unregisterCommands()
     {
         /** @var MainForm $mainForm */
@@ -953,6 +1026,8 @@ class Ide extends Application
     }
 
     /**
+     * Выполнить зарегистрированную команду по названию ее класса.
+     *
      * @param $commandClass
      */
     public function executeCommand($commandClass)
@@ -969,6 +1044,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть команду по ее классу.
+     *
      * @param string $commandClass class or uid
      * @return AbstractCommand|null
      */
@@ -986,6 +1063,8 @@ class Ide extends Application
     }
 
     /**
+     * Зарегистрировать IDE команду.
+     *
      * @param AbstractCommand $command
      * @param null $category
      */
@@ -1097,6 +1176,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть изображение из ресурсов IDE /.data/img/
+     *
      * @param string $path
      *
      * @param array $size
@@ -1144,6 +1225,13 @@ class Ide extends Application
         return $result;
     }
 
+    /**
+     * Вернуть зарегистрированный формат по его классу.
+     * В приоритете форматы, зарегистирированные в проекте, а уже затем - глобальные форматы.
+     *
+     * @param $class
+     * @return AbstractFormat
+     */
     public function getRegisteredFormat($class)
     {
         if ($project = $this->getOpenedProject()) {
@@ -1156,6 +1244,8 @@ class Ide extends Application
     }
 
     /**
+     * Найти формат для редактирования файла/пути.
+     *
      * @param $path
      *
      * @return AbstractFormat|null
@@ -1182,6 +1272,8 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть текущий открытый проект.
+     *
      * @return Project
      */
     public function getOpenedProject()
@@ -1190,6 +1282,8 @@ class Ide extends Application
     }
 
     /**
+     * Задать открытый проект.
+     *
      * @param Project $openedProject
      */
     public function setOpenedProject($openedProject = null)
@@ -1204,6 +1298,7 @@ class Ide extends Application
     }
 
     /**
+     * @deprecated
      * @param string $query
      * @return bool
      */
@@ -1221,6 +1316,7 @@ class Ide extends Application
     }
 
     /**
+     * @deprecated
      * @param $query
      * @return callable
      */
@@ -1232,6 +1328,9 @@ class Ide extends Application
     }
 
     /**
+     * Создать редактор для редактирования файла, формат по-умолчанию определяется автоматически,
+     * с помощью ранее зарегистрированных редакторов.
+     *
      * @param $path
      *
      * @param array $options
@@ -1271,6 +1370,12 @@ class Ide extends Application
         return $this->accountManager;
     }
 
+    /**
+     * Зарегистрировать расширение IDE (по названию класса или его экземпляру).
+     *
+     * @param string|AbstractExtension $extension
+     * @throws IdeException
+     */
     public function registerExtension($extension)
     {
         if (is_string($extension)) {
@@ -1403,6 +1508,12 @@ class Ide extends Application
         });
     }
 
+    /**
+     * Добавить коллбэка, выполняющийся после старта и показа IDE.
+     * Если IDE уже была показана, коллбэк будет выполнен немедленно.
+     *
+     * @param callable $handle
+     */
     public function afterShow(callable $handle)
     {
         if ($this->isLaunched()) {
@@ -1413,6 +1524,7 @@ class Ide extends Application
     }
 
     /**
+     * Находится ли IDE в спящем режиме (т.е. не используется).
      * @return boolean
      */
     public function isIdle()
@@ -1421,6 +1533,7 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть главную форму.
      * @return MainForm
      */
     public function getMainForm()
@@ -1439,6 +1552,7 @@ class Ide extends Application
     }
 
     /**
+     * Вернуть открытый проект.
      * @return Project
      */
     public static function project()
@@ -1463,6 +1577,8 @@ class Ide extends Application
     }
 
     /**
+     * Показать toast сообщение на главной форме IDE.
+     *
      * @param $text
      * @param int $timeout
      */
@@ -1471,6 +1587,9 @@ class Ide extends Application
         Ide::get()->getMainForm()->toast($text, $timeout);
     }
 
+    /**
+     * Завершить работу IDE.
+     */
     public function shutdown()
     {
         $done = false;
@@ -1572,20 +1691,6 @@ class Ide extends Application
     }
 
     /**
-     * @param string $include
-     *
-     * @return File
-     */
-    public function getIncludeFile($include)
-    {
-        if ($this->isDevelopment()) {
-            return $this->getOwnFile("misc/include/" . $include);
-        } else {
-            return $this->getOwnFile("include/" . $include);
-        }
-    }
-
-    /**
      * @param $argv
      * @return bool
      */
@@ -1620,11 +1725,20 @@ class Ide extends Application
         return false;
     }
 
+    /**
+     * Отключить открытие последнего редактируемого проекта.
+     * Можно применять при старте IDE, чтобы отменить загрузку предыдущего проекта.
+     */
     public function disableOpenLastProject()
     {
         $this->disableOpenLastProject = true;
     }
 
+    /**
+     * Сравнить версию с версией IDE.
+     * @param $otherVersion
+     * @return bool
+     */
     public function isSameVersionIgnorePatch($otherVersion)
     {
         $version = IdeSystem::getVersionInfo($this->getVersion());
@@ -1640,7 +1754,7 @@ class Ide extends Application
     }
 
     /**
-     * Restart IDE.
+     * Restart IDE, запустить рестарт IDE, работает только в production режиме.
      */
     public function restart()
     {

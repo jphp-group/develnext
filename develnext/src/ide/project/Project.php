@@ -655,7 +655,7 @@ class Project
 
     /**
      * @param $event
-     * @param ...$args
+     * @param array ...$args
      */
     public function trigger($event, ...$args)
     {

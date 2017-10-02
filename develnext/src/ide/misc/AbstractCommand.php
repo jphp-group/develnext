@@ -7,6 +7,7 @@ use php\gui\event\UXMouseEvent;
 use php\gui\UXButton;
 use php\gui\UXMenuItem;
 use php\gui\UXSeparator;
+use php\lib\str;
 
 /**
  * Class AbstractCommand
@@ -207,7 +208,17 @@ class SimpleSingleCommand extends AbstractCommand
      */
     protected $always = false;
 
+    /**
+     * @var string
+     */
     protected $accelerator = null;
+
+    /**
+     * @var bool
+     */
+    protected $afterSeparator = false, $beforeSeparator = false;
+
+    protected $id;
 
     /**
      * ClosureCommand constructor.
@@ -219,10 +230,58 @@ class SimpleSingleCommand extends AbstractCommand
      */
     public function __construct($name, $icon, callable $onExecute, $accelerator = null)
     {
+        $this->id = str::uuid();
         $this->name = $name;
         $this->icon = $icon;
         $this->onExecute = $onExecute;
         $this->accelerator = $accelerator;
+    }
+
+    public function getUniqueId()
+    {
+        return $this->id;
+    }
+
+    public function withAfterSeparator()
+    {
+        return $this->afterSeparator;
+    }
+
+    public function withBeforeSeparator()
+    {
+        return $this->beforeSeparator;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAfterSeparator()
+    {
+        return $this->afterSeparator;
+    }
+
+    /**
+     * @param bool $afterSeparator
+     */
+    public function setAfterSeparator($afterSeparator)
+    {
+        $this->afterSeparator = $afterSeparator;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBeforeSeparator()
+    {
+        return $this->beforeSeparator;
+    }
+
+    /**
+     * @param bool $beforeSeparator
+     */
+    public function setBeforeSeparator($beforeSeparator)
+    {
+        $this->beforeSeparator = $beforeSeparator;
     }
 
     public function getName()
@@ -243,6 +302,10 @@ class SimpleSingleCommand extends AbstractCommand
 
             if ($this->textVisible) {
                 $button->text = $this->getName();
+
+                if ($button->text) {
+                    $button->paddingLeft = $button->paddingRight = 10;
+                }
             }
 
             return $button;

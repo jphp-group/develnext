@@ -2081,7 +2081,12 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $this->leftPaneUi->refreshObjectTreeList($this->getNodeId($node));
         }
 
-        waitAsync(100, function () {
+        waitAsync(1, function () use ($node) {
+            $this->designer->unselectAll();
+            $this->designer->selectNode($node);
+        });
+
+        waitAsync(100, function () use ($node) {
             $this->designer->update();
         });
 
