@@ -4,21 +4,19 @@ namespace php\gui;
 use php\gui\paint\UXColor;
 
 /**
- * Class UXMaterialButton
  * @package php\gui
  *
  * @packages gui, javafx
  */
-class UXMaterialButton extends UXButton
+class UXMaterialPasswordField extends UXPasswordField
 {
     /**
-     * FLAT, RAISED
-     * @var string
+     * @var UXColor
      */
-    public $buttonType = 'FLAT';
+    public $focusColor;
 
     /**
      * @var UXColor
      */
-    public $ripplerFill;
+    public $unfocusColor;
 }

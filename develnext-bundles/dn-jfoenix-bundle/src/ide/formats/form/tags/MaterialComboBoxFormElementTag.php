@@ -8,33 +8,35 @@ use php\gui\UXButton;
 use php\gui\UXImageArea;
 use php\gui\UXImageView;
 use php\gui\UXMaterialButton;
-use php\gui\UXMaterialCheckbox;
+use php\gui\UXMaterialComboBox;
 use php\gui\UXRating;
 use php\gui\UXToggleSwitch;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 
-class MaterialCheckboxFormElementTag extends AbstractFormElementTag
+class MaterialComboBoxFormElementTag extends AbstractFormElementTag
 {
     public function getTagName()
     {
-        return 'com.jfoenix.controls.JFXCheckBox';
+        return 'com.jfoenix.controls.JFXComboBox';
     }
 
     public function getElementClass()
     {
-        return UXMaterialCheckbox::class;
+        return UXMaterialComboBox::class;
     }
 
     public function writeAttributes($node, DomElement $element)
     {
-        /** @var UXMaterialCheckbox $node */
-        if ($node->checkedColor) {
-            $element->setAttribute('checkedColor', $node->checkedColor);
+        /** @var UXMaterialComboBox $node */
+        $element->setAttribute('labelFloat', $node->labelFloat);
+
+        if ($node->focusColor) {
+            $element->setAttribute('focusColor', $node->focusColor->getWebValue());
         }
 
-        if ($node->uncheckedColor) {
-            $element->setAttribute('unCheckedColor', $node->uncheckedColor);
+        if ($node->unfocusColor) {
+            $element->setAttribute('unFocusColor', $node->unfocusColor->getWebValue());
         }
     }
 }

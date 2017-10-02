@@ -4,11 +4,13 @@ namespace ide\formats\form\elements;
 use ide\formats\form\AbstractFormElement;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXMaterialButton;
+use php\gui\UXMaterialComboBox;
+use php\gui\UXMaterialTextField;
 use php\gui\UXNode;
 use php\gui\UXRating;
 use php\gui\UXToggleSwitch;
 
-class MaterialButtonFormElement extends ButtonFormElement
+class MaterialTextFieldFormElement extends TextFieldFormElement
 {
     public function getGroup()
     {
@@ -17,17 +19,17 @@ class MaterialButtonFormElement extends ButtonFormElement
 
     public function getName()
     {
-        return 'Material Кнопка';
+        return 'Material ' . parent::getName();
     }
 
     public function getElementClass()
     {
-        return UXMaterialButton::class;
+        return UXMaterialTextField::class;
     }
 
     public function isOrigin($any)
     {
-        return $any instanceof UXMaterialButton;
+        return $any instanceof UXMaterialTextField;
     }
 
     /**
@@ -35,8 +37,6 @@ class MaterialButtonFormElement extends ButtonFormElement
      */
     public function createElement()
     {
-        $button = new UXMaterialButton();
-        $button->text = 'Button';
-        return $button;
+        return new UXMaterialTextField();
     }
 }

@@ -8,30 +8,34 @@ use php\gui\UXButton;
 use php\gui\UXImageArea;
 use php\gui\UXImageView;
 use php\gui\UXMaterialButton;
+use php\gui\UXMaterialComboBox;
+use php\gui\UXMaterialTextField;
 use php\gui\UXRating;
 use php\gui\UXToggleSwitch;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 
-class MaterialButtonFormElementTag extends AbstractFormElementTag
+class MaterialTextFieldFormElementTag extends AbstractFormElementTag
 {
     public function getTagName()
     {
-        return 'com.jfoenix.controls.JFXButton';
+        return 'com.jfoenix.controls.JFXTextField';
     }
 
     public function getElementClass()
     {
-        return UXMaterialButton::class;
+        return UXMaterialTextField::class;
     }
 
     public function writeAttributes($node, DomElement $element)
     {
-        /** @var UXMaterialButton $node */
-        $element->setAttribute('buttonType', $node->buttonType);
+        /** @var UXMaterialTextField $node */
+        if ($node->focusColor) {
+            $element->setAttribute('focusColor', $node->focusColor->getWebValue());
+        }
 
-        if ($node->ripplerFill) {
-            $element->setAttribute('ripplerFill', $node->ripplerFill->getWebValue());
+        if ($node->unfocusColor) {
+            $element->setAttribute('unFocusColor', $node->unfocusColor->getWebValue());
         }
     }
 }

@@ -720,18 +720,26 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
         $path = $styleFile->toUrl();
 
+        $stylesheets = $editor->getStylesheets();
+        foreach ($stylesheets as $stylesheet) {
+            $editor->removeStylesheet($stylesheet);
+        }
+
         $resource = new ResourceStream('/ide/formats/form/FormEditor.css');
         $editor->removeStylesheet($resource->toExternalForm());
         $editor->removeStylesheet($path);
         $editor->addStylesheet($resource->toExternalForm());
 
-        $stylesheets = $editor->getStylesheets();
+        $guiStyles = $this->project->fetchNamedList('guiStyles');
+        foreach ($guiStyles as $resPath => $filePath) {
+            $editor->addStylesheet($filePath);
+        }
 
-        foreach ($stylesheets as $stylesheet) {
+        /*foreach ($stylesheets as $stylesheet) {
             if (str::contains($stylesheet, '/skin/')) {
                 $editor->removeStylesheet($stylesheet);
             }
-        }
+        }*/
 
         foreach ($skinFiles as $file) {
             $editor->addStylesheet($file->toUrl());
@@ -845,6 +853,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         $code .= "\n\$app->loadModules(" . var_export($moduleClasses, true) . ');';
+
+        $guiStyles = $this->project->fetchNamedList('guiStyles');
+        foreach ($guiStyles as $resPath => $filePath) {
+            $code .= "\n\$app->addStyle('$resPath');";
+        }
 
         /** @var File[] $skinFiles */
         $skinFiles = fs::scan($this->project->getSrcFile('.theme/skin/'), [

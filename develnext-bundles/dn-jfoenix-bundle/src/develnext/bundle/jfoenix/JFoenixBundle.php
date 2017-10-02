@@ -25,12 +25,13 @@ class JFoenixBundle extends AbstractJarBundle
         /** @var GuiFormFormat $format */
         $format = Ide::get()->getRegisteredFormat(GuiFormFormat::class);
 
-        if ($format) {
-            /*$format->getDumper()->on('appendImports', function ($nodes, DomDocument $document) {
-                $import = $document->createProcessingInstruction('import', 'org.controlsfx.control.*');
-                $document->insertBefore($import, $document->getDocumentElement());
-            }, __CLASS__);*/
+        $project->onList('guiStyles', function () {
+            return [
+                '/jfoenix-custom.fx.css' => $this->getProjectVendorFile('jfoenix-custom.fx.css')->toUrl()
+            ];
+        }, __CLASS__);
 
+        if ($format) {
             $format->registerInternalList('.dn/bundle/jfoenix/formComponents');
         }
     }
@@ -39,11 +40,12 @@ class JFoenixBundle extends AbstractJarBundle
     {
         parent::onRemove($project, $owner);
 
+        $project->offList('guiStyles', __CLASS__);
+
         /** @var GuiFormFormat $format */
         $format = Ide::get()->getRegisteredFormat(GuiFormFormat::class);
 
         if ($format) {
-            //$format->getDumper()->off('appendImports', __CLASS__);
             $format->unregisterInternalList('.dn/bundle/jfoenix/formComponents');
         }
     }

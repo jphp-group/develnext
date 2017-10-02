@@ -1,5 +1,6 @@
 <element extends="ButtonFormElement">
     <properties>
+        <property code="ripplerFill" name="Цвет пульсации" editor="color" />
         <property code="buttonType" name="Тип кнопки" editor="enum">
             <variants>
                 <variant value="FLAT">FLAT</variant>

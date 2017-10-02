@@ -3,12 +3,15 @@ package org.develnext.jphp.ext.javafx.jfoenix.classes;
 import com.jfoenix.controls.JFXButton;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.javafx.classes.UXButton;
 import org.develnext.jphp.ext.javafx.classes.UXNode;
 import org.develnext.jphp.ext.javafx.jfoenix.JFoenixExtension;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Namespace;
 import php.runtime.annotation.Reflection.Property;
+import php.runtime.annotation.Reflection.Setter;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
 
@@ -48,5 +51,15 @@ public class UXMaterialButton extends UXButton {
     @Override
     public JFXButton getWrappedObject() {
         return (JFXButton) super.getWrappedObject();
+    }
+
+    @Getter
+    public Color getRipplerFill() {
+        return (Color) getWrappedObject().getRipplerFill();
+    }
+
+    @Setter
+    public void setRipplerFill(Color color) {
+        getWrappedObject().setRipplerFill(color);
     }
 }

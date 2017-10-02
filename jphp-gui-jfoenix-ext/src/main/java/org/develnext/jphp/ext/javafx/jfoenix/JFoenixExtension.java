@@ -1,9 +1,7 @@
 package org.develnext.jphp.ext.javafx.jfoenix;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXCheckBox;
-import org.develnext.jphp.ext.javafx.jfoenix.classes.UXMaterialButton;
-import org.develnext.jphp.ext.javafx.jfoenix.classes.UXMaterialCheckbox;
+import com.jfoenix.controls.*;
+import org.develnext.jphp.ext.javafx.jfoenix.classes.*;
 import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
 
@@ -24,5 +22,10 @@ public class JFoenixExtension extends Extension {
     public void onRegister(CompileScope compileScope) {
         registerWrapperClass(compileScope, JFXButton.class, UXMaterialButton.class);
         registerWrapperClass(compileScope, JFXCheckBox.class, UXMaterialCheckbox.class);
+        registerWrapperClass(compileScope, JFXComboBox.class, UXMaterialComboBox.class);
+        registerWrapperClass(compileScope, JFXTextField.class, UXMaterialTextField.class);
+        registerWrapperClass(compileScope, JFXPasswordField.class, UXMaterialPasswordField.class);
+        registerWrapperClass(compileScope, JFXTextArea.class, UXMaterialTextArea.class);
+        registerWrapperClass(compileScope, JFXProgressBar.class, UXMaterialProgressBar.class);
     }
 }
