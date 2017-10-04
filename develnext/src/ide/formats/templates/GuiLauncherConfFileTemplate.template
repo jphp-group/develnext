@@ -1,6 +1,6 @@
 # MAIN CONFIGURATION
 
-bootstrap.file = JPHP-INF/.bootstrap
+bootstrap.file = res://JPHP-INF/.bootstrap
 
 fx.splash=#FX_SPLASH#
 fx.splash.alwaysOnTop=#FX_SPLASH_ALWAYS_ON_TOP#

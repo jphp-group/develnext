@@ -167,7 +167,7 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
     /**
      * @param array $tasksOrProcesses
      */
-    public function watch(array $tasksOrProcesses)
+    public function watchProcesses(array $tasksOrProcesses)
     {
         $tasks = new SharedQueue($tasksOrProcesses);
 
