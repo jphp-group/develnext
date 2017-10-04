@@ -44,7 +44,7 @@ class UXComboBox extends UXComboBoxBase
     public $visibleRowCount;
 
     /**
-     * @param array|Traversable $items (optional)
+     * @param array|Traversable $items [optional]
      */
     public function __construct($items) {}
 

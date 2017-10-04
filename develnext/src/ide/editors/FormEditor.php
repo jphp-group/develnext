@@ -1,9 +1,7 @@
 <?php
 namespace ide\editors;
 
-use develnext\lexer\inspector\entry\ArgumentEntry;
 use develnext\lexer\inspector\entry\ExtendTypeEntry;
-use develnext\lexer\inspector\entry\MethodEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
 use develnext\lexer\inspector\entry\TypePropertyEntry;
 use develnext\lexer\token\ArgumentStmtToken;
@@ -26,16 +24,12 @@ use ide\editors\menu\ContextMenu;
 use ide\editors\value\BooleanPropertyEditor;
 use ide\editors\value\DoubleArrayPropertyEditor;
 use ide\editors\value\SimpleTextPropertyEditor;
-use ide\formats\AbstractFormat;
 use ide\formats\AbstractFormFormat;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElement;
-use ide\formats\form\elements\ImageViewFormElement;
 use ide\formats\form\SourceEventManager;
-use ide\formats\FormFormat;
 use ide\formats\GuiFormFormat;
 use ide\formats\PhpCodeFormat;
-use ide\forms\InputMessageBoxForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
@@ -55,7 +49,6 @@ use php\gui\designer\UXDesignPane;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXDragEvent;
 use php\gui\event\UXEvent;
-use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\DataUtils;
@@ -69,8 +62,6 @@ use php\gui\UXApplication;
 use php\gui\UXCustomNode;
 use php\gui\UXData;
 use php\gui\UXGroup;
-use php\gui\UXImage;
-use php\gui\UXImageArea;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXSplitPane;
@@ -87,7 +78,6 @@ use php\lib\fs;
 use php\lib\Items;
 use php\lib\reflect;
 use php\lib\Str;
-use php\lib\String;
 use php\time\Time;
 use php\util\Configuration;
 use php\util\Flow;
@@ -1201,7 +1191,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $this->actionsPane = $ui = new IdeActionsPane($this->designer, $designPane);
 
-        $ui->on('change', function () {
+        $ui->getEventHandler()->on('change', function () {
             $this->save();
         });
 

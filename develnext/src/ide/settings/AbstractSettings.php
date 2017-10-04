@@ -41,7 +41,7 @@ abstract class AbstractSettings
      */
     public function save()
     {
-        $this->getConfig()->save();
+        $this->getConfig()->saveFile();
     }
 
     /**
@@ -49,7 +49,7 @@ abstract class AbstractSettings
      */
     public function load()
     {
-        $this->getConfig()->load();
+        $this->getConfig()->loadFile();
     }
 
     public function onRegister()

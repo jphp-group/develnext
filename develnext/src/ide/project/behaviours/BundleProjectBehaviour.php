@@ -193,7 +193,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
                 }
 
                 $bundle->onSave($this->project, $config);
-                $config->save();
+                $config->saveFile();
             }
         }
 

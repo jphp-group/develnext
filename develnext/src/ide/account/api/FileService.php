@@ -50,7 +50,7 @@ class FileService extends AbstractService
      * @throws ServiceInvalidResponseException
      * @throws ServiceNotAvailableException
      */
-    public function upload($file)
+    public function uploadFile($file)
     {
         return parent::upload('file/upload', ['file' => $file]);
     }

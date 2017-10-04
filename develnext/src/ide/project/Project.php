@@ -895,7 +895,7 @@ class Project
         $config = $this->ideConfigs[$name];
 
         if ($config) {
-            $config->save();
+            $config->saveFile();
         }
     }
 
@@ -914,7 +914,7 @@ class Project
 
         foreach ($this->ideConfigs as $name => $config) {
             if ($config->isAutoSave()) {
-                $config->save();
+                $config->saveFile();
             }
         }
 

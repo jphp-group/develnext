@@ -180,7 +180,7 @@ class BackupProjectBehaviour extends AbstractProjectBehaviour
             $config->set($code, $value);
         }
 
-        $config->save();
+        $config->saveFile();
     }
 
     /**
@@ -273,7 +273,7 @@ class BackupProjectBehaviour extends AbstractProjectBehaviour
         $config->set('name', $name);
         $config->set('description', $description);
         $config->set('createdAt', Time::millis());
-        $config->save();
+        $config->saveFile();
 
         $backup = new Backup();
         $backup->setName($name);
