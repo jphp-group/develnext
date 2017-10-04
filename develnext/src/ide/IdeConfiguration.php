@@ -3,6 +3,7 @@ namespace ide;
 
 use ide\misc\AbstractEntity;
 use php\io\IOException;
+use php\io\Stream;
 use php\lib\fs;
 use php\util\Configuration;
 
@@ -38,7 +39,7 @@ class IdeConfiguration extends Configuration
         $this->fileName = $fileName;
         $this->shortName = $shortName ?: fs::name($fileName);
 
-        $this->load();
+        $this->loadFile();
     }
 
     /**
@@ -57,7 +58,7 @@ class IdeConfiguration extends Configuration
         return $this->shortName;
     }
 
-    public function save()
+    public function saveFile()
     {
         try {
             fs::ensureParent($this->fileName);
@@ -70,7 +71,7 @@ class IdeConfiguration extends Configuration
         }
     }
 
-    public function load()
+    public function loadFile()
     {
         try {
             parent::load($this->fileName);

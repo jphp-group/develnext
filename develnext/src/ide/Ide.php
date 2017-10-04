@@ -1632,7 +1632,7 @@ class Ide extends Application
 
         foreach ($this->configurations as $name => $config) {
             if ($config->isAutoSave()) {
-                $config->save();
+                $config->saveFile();
             }
         }
 

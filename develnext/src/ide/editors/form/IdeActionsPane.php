@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\form;
 
+use ide\misc\EventHandler;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
@@ -19,8 +20,6 @@ use php\lib\str;
 
 class IdeActionsPane extends UXHBox
 {
-    use EventHandlerBehaviour;
-
     protected $zoomSelect;
 
     /**
@@ -63,9 +62,16 @@ class IdeActionsPane extends UXHBox
      */
     private $designPane;
 
+    /**
+     * @var EventHandler
+     */
+    private $eventHandler;
+
     public function __construct(UXDesigner $designer, UXDesignPane $designPane)
     {
         parent::__construct();
+
+        $this->eventHandler = new EventHandler();
 
         $this->designer = $designer;
         $ui = $this;
@@ -86,7 +92,7 @@ class IdeActionsPane extends UXHBox
         $dotsButton->on('action', function () use ($dotsButton) {
             $this->designer->snapType = 'DOTS';
             $dotsButton->selected = true;
-            $this->trigger('change');
+            $this->eventHandler->trigger('change');
         });
 
         $gridButton = $this->snapGridButton = new UXToggleButton();
@@ -96,7 +102,7 @@ class IdeActionsPane extends UXHBox
         $gridButton->on('action', function () use ($gridButton) {
             $this->designer->snapType = 'GRID';
             $gridButton->selected = true;
-            $this->trigger('change');
+            $this->eventHandler->trigger('change');
         });
 
         $emptyButton = $this->snapEmptyButton = new UXToggleButton();
@@ -106,7 +112,7 @@ class IdeActionsPane extends UXHBox
         $emptyButton->on('action', function () use ($emptyButton) {
             $this->designer->snapType = 'HIDDEN';
             $emptyButton->selected = true;
-            $this->trigger('change');
+            $this->eventHandler->trigger('change');
         });
 
 
@@ -126,7 +132,7 @@ class IdeActionsPane extends UXHBox
             $value = (int) $value;
             if ($value > 0 && $this->designer->snapSizeX != $value) {
                 $this->designer->snapSizeX = $value;
-                $this->trigger('change');
+                $this->eventHandler->trigger('change');
             }
         });
 
@@ -145,7 +151,7 @@ class IdeActionsPane extends UXHBox
             $value = (int) $value;
             if ($value > 0 && $this->designer->snapSizeY != $value) {
                 $this->designer->snapSizeY = $value;
-                $this->trigger('change');
+                $this->eventHandler->trigger('change');
             }
         });
 
@@ -159,6 +165,14 @@ class IdeActionsPane extends UXHBox
         $this->makeZoomPane();
         $this->makeAlignPane();
         $this->designPane = $designPane;
+    }
+
+    /**
+     * @return EventHandler
+     */
+    public function getEventHandler(): EventHandler
+    {
+        return $this->eventHandler;
     }
 
     protected function makeZoomPane()
@@ -183,7 +197,7 @@ class IdeActionsPane extends UXHBox
             $zoom = round($zoomList[$zoomSelect->selectedIndex] / 100, 2);
             $this->designPane->zoom = $zoom;
             $this->designer->zoom = $zoom;
-            $this->trigger('change');
+            $this->eventHandler->trigger('change');
         });
 
         $this->add($this->zoomSelect);
@@ -243,7 +257,7 @@ class IdeActionsPane extends UXHBox
 
     public function setSnapType($type)
     {
-        $this->lockHandles();
+        $this->eventHandler->lockHandles();
 
         try {
             switch ($this->designer->snapType = $type) {
@@ -263,7 +277,7 @@ class IdeActionsPane extends UXHBox
             $this->snapTypeButtons->selected = $this->snapDotsButton;
         }
 
-        $this->unlockHandles();
+        $this->eventHandler->unlockHandles();
     }
 
     public function setConfig(array $config)
@@ -311,10 +325,10 @@ class IdeActionsPane extends UXHBox
             $zoom = 100;
         }
 
-        $this->lockHandles();
+        $this->eventHandler->lockHandles();
         $this->zoomSelect->value = "$zoom%";
         $this->designer->zoom = $this->designPane->zoom = $zoom / 100;
-        $this->unlockHandles();
+        $this->eventHandler->unlockHandles();
     }
 
     public function setSnapSizeX($x)
@@ -323,10 +337,10 @@ class IdeActionsPane extends UXHBox
             $x = 8;
         }
 
-        $this->lockHandles();
+        $this->eventHandler->lockHandles();
         $this->snapXInput->text = (int) $x;
         $this->designer->snapSizeX = (int) $x;
-        $this->unlockHandles();
+        $this->eventHandler->unlockHandles();
     }
 
     public function getSnapSizeX()
@@ -340,10 +354,10 @@ class IdeActionsPane extends UXHBox
             $y = 8;
         }
 
-        $this->lockHandles();
+        $this->eventHandler->lockHandles();
         $this->snapYInput->text = (int) $y;
         $this->designer->snapSizeY = (int) $y;
-        $this->unlockHandles();
+        $this->eventHandler->unlockHandles();
     }
 
     public function getSnapSizeY()

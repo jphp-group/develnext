@@ -74,12 +74,12 @@ class BackupConfiguration extends AbstractEntity
             $this->configuration->set($key, $value);
         }
 
-        $this->configuration->save();
+        $this->configuration->saveFile();
     }
 
     public function load()
     {
-        $this->configuration->load();
+        $this->configuration->loadFile();
         $this->setProperties($this->configuration->toArray());
     }
 

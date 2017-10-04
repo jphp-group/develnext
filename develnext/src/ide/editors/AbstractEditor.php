@@ -103,7 +103,7 @@ abstract class AbstractEditor
             if ($file->isInRootDir()) {
                 $name = str::replace(get_class($this), "\\", "/") . "/" . $file->getRelativePath() . ".conf";
 
-                Ide::project()->getIdeConfig($name)->save();
+                Ide::project()->getIdeConfig($name)->saveFile();
             }
         }
     }
