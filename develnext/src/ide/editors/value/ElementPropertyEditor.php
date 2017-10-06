@@ -15,6 +15,8 @@ use php\gui\UXTableCell;
 use php\lang\IllegalArgumentException;
 use php\lang\JavaException;
 use php\lib\arr;
+use php\lib\str;
+use php\util\Regex;
 use php\xml\DomElement;
 
 /**
@@ -273,19 +275,44 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     public function setAsCssProperty($realCode = null)
     {
         $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode) {
-            $target = $this->designProperties->target;
-            $target->css($editor->code, $editor->getCssNormalizedValue($value));
+            $pattern = Regex::quote($editor->code) . "[ ]{0,}\\:[ ]{0,}(.+)\\;";
+            $pattern = Regex::of($pattern, Regex::MULTILINE | Regex::CASE_INSENSITIVE);
 
-            if ($realCode) {
-                $target->{$realCode} = $value;
+            $target = $this->designProperties->target;
+
+            $style = $target->style;
+            $regex = $pattern->with($style);
+
+            if ($regex->find()) {
+                $regex->reset();
+                $style = $regex->replaceGroup(1, $editor->getCssNormalizedValue($value));
+            } else {
+                $style .= "$editor->code: {$editor->getCssNormalizedValue($value)};\n";
             }
+
+            $target->style = $style;
+
+            /*if ($realCode) {
+                $target->{$realCode} = $value;
+            }*/
 
             $this->trigger('change');
         };
 
         $this->getter = function (ElementPropertyEditor $editor) {
+            $pattern = Regex::quote($editor->code) . "[ ]{0,}\\:[ ]{0,}(.+)\\;";
+            $pattern = Regex::of($pattern, Regex::MULTILINE | Regex::CASE_INSENSITIVE);
+
             $target = $this->designProperties->target;
-            return $target->css($editor->code);
+            $style = $target->style;
+
+            $regex = $pattern->with($style);
+
+            if ($regex->find()) {
+                return $regex->group(1);
+            }
+
+            return null;
         };
 
         return $this;

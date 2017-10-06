@@ -37,6 +37,7 @@ class MaterialButtonFormElement extends ButtonFormElement
     {
         $button = new UXMaterialButton();
         $button->text = 'Button';
+        $button->buttonType = 'RAISED';
         return $button;
     }
 }

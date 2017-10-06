@@ -4,5 +4,6 @@ dependencies {
     compile "org.develnext.jphp:jphp-runtime:$rootProject.ext.jphpVersion"
     compile project(':jphp-gui-ext')
 
-    compile fileTree(dir: 'libs', include: '*.jar')
+    //compile fileTree(dir: 'libs', include: '*.jar')
+    compile group: 'com.jfoenix', name: 'jfoenix', version: '1.9.1'
 }
