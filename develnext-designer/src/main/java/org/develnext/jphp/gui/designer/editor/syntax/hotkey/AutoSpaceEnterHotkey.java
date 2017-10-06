@@ -4,7 +4,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.fxmisc.richtext.model.Paragraph;
-import org.fxmisc.richtext.model.StyledText;
 import php.runtime.common.StringUtils;
 
 import java.util.Collection;
@@ -30,7 +29,7 @@ public class AutoSpaceEnterHotkey extends AbstractHotkey {
             }
         }
 
-        Paragraph<Collection<String>, StyledText<Collection<String>>, Collection<String>> paragraph = area.getParagraph(currentParagraph);
+        Paragraph<Collection<String>, String, Collection<String>> paragraph = area.getParagraph(currentParagraph);
 
         StringBuilder prefix = new StringBuilder("\n");
         String text = paragraph.getText().substring(0, area.getCaretColumn());
@@ -50,13 +49,13 @@ public class AutoSpaceEnterHotkey extends AbstractHotkey {
 
         if (text.trim().endsWith("/**")) {
             try {
-                Paragraph<Collection<String>, StyledText<Collection<String>>, Collection<String>> nextParagraph = area.getParagraph(currentParagraph + 1);
+                Paragraph<Collection<String>, String, Collection<String>> nextParagraph = area.getParagraph(currentParagraph + 1);
                 String nextParagraphText = nextParagraph.getText();
 
                 if (!nextParagraphText.trim().startsWith("*")) {
                     offset = -(prefix.length() + 3);
 
-                    prefix.append(" *").append(" " + prefix.toString()).append("/");
+                    prefix.append(" *").append(" ").append(prefix.toString()).append("/");
                 } else {
                     prefix.append(" * ");
                 }

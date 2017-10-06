@@ -67,4 +67,25 @@ class FunctionStmtToken extends SimpleToken
     public function getTypeInfo(SimpleToken $token)
     {
     }
+
+    /**
+     * @return bool
+     */
+    public function isReturnOptional()
+    {
+    }
+
+    /**
+     * @return string
+     */
+    public function getReturnHintType()
+    {
+    }
+
+    /**
+     * @return string
+     */
+    public function getReturnHintTypeClass()
+    {
+    }
 }

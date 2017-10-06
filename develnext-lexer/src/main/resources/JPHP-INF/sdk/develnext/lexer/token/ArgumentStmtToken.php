@@ -26,7 +26,7 @@ class ArgumentStmtToken extends SimpleToken
     }
 
     /**
-     * @return string ANY, STRING, INT, DOUBLE, NUMBER, BOOLEAN, SCALAR, ARRAY, OBJECT, CALLABLE, VARARG, TRAVERSABLE
+     * @return string ANY, STRING, INT, DOUBLE, ITERABLE, SELF, VOID, BOOLEAN, SCALAR, ARRAY, OBJECT, CALLABLE, VARARG, TRAVERSABLE
      */
     public function getHintType()
     {
@@ -36,6 +36,13 @@ class ArgumentStmtToken extends SimpleToken
      * @return NameToken
      */
     public function getHintTypeClass()
+    {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOptional()
     {
     }
 }

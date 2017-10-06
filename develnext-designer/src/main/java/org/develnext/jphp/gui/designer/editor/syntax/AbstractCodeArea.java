@@ -1,14 +1,10 @@
 package org.develnext.jphp.gui.designer.editor.syntax;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.geometry.Bounds;
-import javafx.geometry.Point2D;
 import javafx.scene.input.*;
 import org.develnext.jphp.gui.designer.editor.inspect.AbstractInspector;
 import org.develnext.jphp.gui.designer.editor.syntax.hotkey.*;
@@ -19,7 +15,6 @@ import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.model.RichTextChange;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
-import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.wellbehaved.event.EventPattern;
 import org.fxmisc.wellbehaved.event.InputMap;
 import org.fxmisc.wellbehaved.event.Nodes;
@@ -77,9 +72,9 @@ abstract public class AbstractCodeArea extends CodeArea {
         executor = Executors.newSingleThreadExecutor();
 
         richChanges()
-                .filter(new Predicate<RichTextChange<Collection<String>, StyledText<Collection<String>>, Collection<String>>>() {
+                .filter(new Predicate<RichTextChange<Collection<String>, String, Collection<String>>>() {
                     @Override
-                    public boolean test(RichTextChange<Collection<String>, StyledText<Collection<String>>, Collection<String>> ch) {
+                    public boolean test(RichTextChange<Collection<String>, String, Collection<String>> ch) {
                         return !ch.getInserted().equals(ch.getRemoved());
                     }
                 }) // XXX

@@ -21,6 +21,7 @@ public class PArgumentStmtToken extends PSimpleToken<ArgumentStmtToken> {
         ExprStmtToken getValue();
         HintType getHintType();
         NameToken getHintTypeClass();
+        boolean isOptional();
 
         boolean isReference();
         boolean isVariadic();

@@ -11,6 +11,7 @@ import org.develnext.jphp.core.tokenizer.token.stmt.FunctionStmtToken;
 import org.develnext.lexer.jphp.DevelNextLexerExtension;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Signature;
+import php.runtime.common.HintType;
 import php.runtime.common.Modifier;
 import php.runtime.env.Environment;
 import php.runtime.reflection.ClassEntity;
@@ -25,6 +26,10 @@ public class PFunctionStmtToken<T extends FunctionStmtToken> extends PSimpleToke
     interface WrappedInterface {
         String getFulledName();
         Modifier getModifier();
+
+        boolean isReturnOptional();
+        HintType getReturnHintType();
+        NameToken getReturnHintTypeClass();
     }
 
     public PFunctionStmtToken(Environment env, T wrappedObject) {
