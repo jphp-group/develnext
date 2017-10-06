@@ -19,7 +19,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.BlendMode;
-import javafx.scene.effect.Effect;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
@@ -1168,33 +1167,39 @@ public class UXDesigner extends BaseObject {
                     return;
                 }
 
-                for (final Selection selection : selections.values()) {
-                    if (getNodeLock(selection.getNode()) || isNodeParentSelected(selection.getNode())) {
+                for (final Selection sel : selections.values()) {
+                    if (getNodeLock(sel.getNode()) || isNodeParentSelected(sel.getNode())) {
                         continue;
                     }
 
                     dragged = true;
 
+                    Bounds layoutBounds = sel.node.getLayoutBounds();
+
                     SnapshotParameters snapParams = new SnapshotParameters();
+
+                    double minX = sel.node.getLayoutX();
+                    double minY = sel.node.getLayoutY();
+
+                    // Viewport для тех случаев, если у компоненты будут эффекты.
+                    snapParams.setViewport(new Rectangle2D(
+                            minX, minY, layoutBounds.getWidth(), layoutBounds.getHeight()
+                    ));
+
                     snapParams.setFill(Color.TRANSPARENT);
 
-                    final Effect effect = selection.node.getEffect();
-                    selection.node.setEffect(null);
+                    sel.dragView.getChildren().setAll(new ImageView(sel.node.snapshot(snapParams, null)));
+                    sel.dragView.setStyle("-fx-opacity: 0.7; -fx-border-width: 1px; -fx-border-color: black; -fx-border-style: dashed; -fx-background-color: transparent");
 
-                    selection.dragView.getChildren().setAll(new ImageView(selection.node.snapshot(snapParams, null)));
-                    selection.dragView.setStyle("-fx-opacity: 0.7; -fx-border-width: 1px; -fx-border-color: black; -fx-border-style: dashed; -fx-background-color: transparent");
-
-                    if (selection.parent instanceof AnchorPane) {
-                        selection.parent.getChildren().add(selection.dragView);
+                    if (sel.parent instanceof AnchorPane) {
+                        sel.parent.getChildren().add(sel.dragView);
                     } else {
-                        Dragboard dragboard = selection.node.startDragAndDrop(TransferMode.ANY);
+                        Dragboard dragboard = sel.node.startDragAndDrop(TransferMode.ANY);
 
                         ClipboardContent content = new ClipboardContent();
-                        content.putRtf(selection.node.getId());
+                        content.putRtf(sel.node.getId());
                         dragboard.setContent(content);
                     }
-
-                    selection.node.setEffect(effect);
                 }
 
                 e.consume();
@@ -1223,10 +1228,6 @@ public class UXDesigner extends BaseObject {
 
                 double diffW = bounds.getWidth() - layoutBounds.getWidth();
                 double diffH = bounds.getHeight() - layoutBounds.getHeight();
-
-                if (sel.node.getEffect() == null) {
-                    sel.dragView.setUserData(new Insets(diffH, 0, 0, diffW));
-                }
 
                 double x = sel.node.getLayoutX() + dx / zoom;
                 double y = sel.node.getLayoutY() + dy / zoom;
@@ -1311,15 +1312,8 @@ public class UXDesigner extends BaseObject {
 
                     if (!getNodeLock(selection.node) && !isNodeParentSelected(selection.node)) {
                         if (selection.parent instanceof AnchorPane) {
-                            Object userData = selection.dragView.getUserData();
-
                             double x = selection.dragView.getLayoutX();
                             double y = selection.dragView.getLayoutY();
-
-                            if (userData instanceof Insets) {
-                                x += ((Insets) userData).getLeft();
-                                y += ((Insets) userData).getTop();
-                            }
 
                             selection.drag(x, y, false);
                             relocateNode(selection.node, x - getCenterX(node), y - getCenterY(node));
@@ -1722,47 +1716,40 @@ public class UXDesigner extends BaseObject {
 
                 resizePoint = null;
 
-                Effect effect = node.getEffect();
-                node.setEffect(null);
+                final double centerX = getCenterX(node);
+                final double centerY = getCenterY(node);
 
-                try {
-                    final double centerX = getCenterX(node);
-                    final double centerY = getCenterY(node);
+                Bounds bounds = node.getBoundsInLocal();
+                Bounds borderBounds = border.getBoundsInLocal();
 
-                    Bounds bounds = node.getBoundsInLocal();
-                    Bounds borderBounds = border.getBoundsInLocal();
-
-                    if (resizeW != bounds.getWidth()) {
-                        if (resizeX == nodeX) {
-                            if (AnchorPane.getRightAnchor(node) != null) {
-                                double offset = resizeW - bounds.getWidth();
-                                AnchorPane.setRightAnchor(node, AnchorPane.getRightAnchor(node) - offset);
-                            }
-                        } else {
-                            if (AnchorPane.getLeftAnchor(node) != null) {
-                                AnchorPane.setLeftAnchor(node, (double) resizeX);
-                            }
+                if (resizeW != bounds.getWidth()) {
+                    if (resizeX == nodeX) {
+                        if (AnchorPane.getRightAnchor(node) != null) {
+                            double offset = resizeW - bounds.getWidth();
+                            AnchorPane.setRightAnchor(node, AnchorPane.getRightAnchor(node) - offset);
+                        }
+                    } else {
+                        if (AnchorPane.getLeftAnchor(node) != null) {
+                            AnchorPane.setLeftAnchor(node, (double) resizeX);
                         }
                     }
-
-                    if (resizeH != bounds.getHeight()) {
-                        if (resizeY == nodeY) {
-                            if (AnchorPane.getBottomAnchor(node) != null) {
-                                double offset = resizeH - bounds.getHeight();
-                                AnchorPane.setBottomAnchor(node, AnchorPane.getBottomAnchor(node) - offset);
-                            }
-                        } else {
-                            if (AnchorPane.getTopAnchor(node) != null) {
-                                AnchorPane.setTopAnchor(node, (double) resizeY);
-                            }
-                        }
-                    }
-
-                    resizeNode(node, resizeW, resizeH);
-                    node.relocate(resizeX - centerX, resizeY - centerY);
-                } finally {
-                    node.setEffect(effect);
                 }
+
+                if (resizeH != bounds.getHeight()) {
+                    if (resizeY == nodeY) {
+                        if (AnchorPane.getBottomAnchor(node) != null) {
+                            double offset = resizeH - bounds.getHeight();
+                            AnchorPane.setBottomAnchor(node, AnchorPane.getBottomAnchor(node) - offset);
+                        }
+                    } else {
+                        if (AnchorPane.getTopAnchor(node) != null) {
+                            AnchorPane.setTopAnchor(node, (double) resizeY);
+                        }
+                    }
+                }
+
+                resizeNode(node, resizeW, resizeH);
+                node.relocate(resizeX - centerX, resizeY - centerY);
 
                 //if (!(parent instanceof AnchorPane)) {
                 runLater(Selection.this::update, 100);
