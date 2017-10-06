@@ -24,12 +24,14 @@ abstract class PhpCompleteUtils
                 $item = "&$item";
             }
 
-            if ($one->isArray()) {
-                $item = "array $item";
-            } elseif ($one->isCallable()) {
-                $item = "callable $item";
-            } elseif ($one->getClass()) {
-                $item = "{$one->getClass()->getName()} $item";
+            if ($one->hasType()) {
+                $type = $one->getType();
+
+                $item = "{$type} $item";
+
+                if ($type->allowsNull()) {
+                    $item = "?$item";
+                }
             }
 
             if ($one->isOptional()) {
@@ -89,6 +91,10 @@ abstract class PhpCompleteUtils
                 $item = "$arg->type $item";
             }
 
+            if ($arg->nullable) {
+                $item = "?$item";
+            }
+
             if ($arg->value) {
                 $item = "$item = $arg->value";
             }
@@ -108,10 +114,12 @@ abstract class PhpCompleteUtils
         }
 
         if ($method->data['returnType']) {
+            $prefix = $method->data['returnNullable'] ? '?' : '';
+
             if ($description) {
-                $description = "$description: {$method->data['returnType']}";
+                $description = "$description: $prefix{$method->data['returnType']}";
             } else {
-                $description = $method->data['returnType'];
+                $description = $prefix . $method->data['returnType'];
             }
         }
 

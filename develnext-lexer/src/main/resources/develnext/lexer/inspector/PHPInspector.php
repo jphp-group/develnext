@@ -313,11 +313,11 @@ class PHPInspector extends AbstractInspector
                 'optional' => false,
             ];
 
-            if ($one['description'] == '(optional)') {
+            if ($one['description'] == '[optional]') {
                 $one['description'] = '';
                 $one['optional'] = true;
             } else {
-                if (str::startsWith($one['description'], '(optional)')) {
+                if (str::startsWith($one['description'], '[optional]')) {
                     $one['description'] = str::trim(str::sub($one['description'], 10));
                     $one['optional'] = true;
                 }
@@ -496,7 +496,15 @@ class PHPInspector extends AbstractInspector
 
         if ($data['return']) {
             $entry->data['returnType'] = $data['return'];
+        } else {
+            if ($hintType = $token->getReturnHintType()) {
+                $entry->data['returnType'] = str::lower($hintType);
+            } else if ($cls = $token->getReturnHintTypeClass()) {
+                $entry->data['returnType'] = $cls;
+            }
         }
+
+        $entry->data['returnNullable'] = $token->isReturnOptional();
 
         foreach ((array) $data['params'] as $name => $info) {
             if ($arg = $entry->arguments[$name]) {
@@ -541,6 +549,7 @@ class PHPInspector extends AbstractInspector
         $e->value = $arg->getValue() ? $arg->getValue()->getExprString() : null;
         $e->type = $arg->getHintTypeClass() ? $arg->getHintTypeClass()->getWord() : str::lower($arg->getHintType());
         $e->optional = !!$arg->getValue();
+        $e->nullable = $arg->isOptional();
 
         if ($arg->getHintType() == 'VARARG') {
             $e->optional = true;

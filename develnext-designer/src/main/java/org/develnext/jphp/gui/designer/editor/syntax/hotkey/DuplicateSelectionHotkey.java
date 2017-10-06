@@ -5,7 +5,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.fxmisc.richtext.model.Paragraph;
-import org.fxmisc.richtext.model.StyledText;
 import org.fxmisc.richtext.model.TwoDimensional;
 
 import java.util.Collection;
@@ -16,7 +15,7 @@ public class DuplicateSelectionHotkey extends AbstractHotkey {
         if (area.getSelection().getLength() == 0) {
             int currentParagraph = area.getCurrentParagraph();
 
-            Paragraph<Collection<String>, StyledText<Collection<String>>, Collection<String>> paragraph = area.getParagraph(currentParagraph);
+            Paragraph<Collection<String>, String, Collection<String>> paragraph = area.getParagraph(currentParagraph);
 
             int caretColumn = area.getCaretColumn();
 

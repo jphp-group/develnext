@@ -12,4 +12,5 @@ class ArgumentEntry extends AbstractEntry
     public $type;
 
     public $optional = false;
+    public $nullable = false;
 }
