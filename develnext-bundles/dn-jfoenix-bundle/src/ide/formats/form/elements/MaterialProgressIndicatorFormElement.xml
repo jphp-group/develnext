@@ -1,0 +1,9 @@
+<element extends="ProgressIndicatorFormElement">
+    <properties>
+        <property code="radius" name="Радиус" editor="floatSlider" min="1" max="128" />
+
+        <property code="-fx-progress-color" editor="none" />
+
+        <property code="progress" editor="none" />
+    </properties>
+</element>

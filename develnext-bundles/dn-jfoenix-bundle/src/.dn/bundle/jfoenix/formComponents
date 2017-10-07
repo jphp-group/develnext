@@ -7,7 +7,10 @@ ide\formats\form\elements\MaterialPasswordFieldFormElement
 ide\formats\form\elements\MaterialTextAreaFormElement
 ide\formats\form\elements\MaterialColorPickerFormElement
 ide\formats\form\elements\MaterialDatePickerFormElement
+ide\formats\form\elements\MaterialTimePickerFormElement
+ide\formats\form\elements\MaterialSliderFormElement
 ide\formats\form\elements\MaterialProgressBarFormElement
+ide\formats\form\elements\MaterialProgressIndicatorFormElement
 ide\formats\form\elements\MaterialTabPaneFormElement
 
 ide\formats\form\tags\MaterialButtonFormElementTag
@@ -21,3 +24,6 @@ ide\formats\form\tags\MaterialProgressBarFormElementTag
 ide\formats\form\tags\MaterialTabPaneFormElementTag
 ide\formats\form\tags\MaterialColorPickerFormElementTag
 ide\formats\form\tags\MaterialDatePickerFormElementTag
+ide\formats\form\tags\MaterialTimePickerFormElementTag
+ide\formats\form\tags\MaterialSliderFormElementTag
+ide\formats\form\tags\MaterialProgressIndicatorFormElementTag

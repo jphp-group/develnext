@@ -41,6 +41,12 @@ public class UXDatePicker extends UXComboBoxBase<DatePicker> {
         __wrappedObject = new DatePicker();
     }
 
+    private void initFormat() {
+        if (getWrappedObject().getConverter() == null) {
+            getWrappedObject().setConverter(new CustomConverter("yyyy-MM-dd"));
+        }
+    }
+
     @Setter
     public void setFormat(String value) {
         getWrappedObject().setConverter(new CustomConverter(value));
@@ -48,6 +54,8 @@ public class UXDatePicker extends UXComboBoxBase<DatePicker> {
 
     @Getter
     public String getFormat() {
+        initFormat();
+
         StringConverter<LocalDate> converter = getWrappedObject().getConverter();
 
         if (converter instanceof CustomConverter) {
@@ -59,6 +67,8 @@ public class UXDatePicker extends UXComboBoxBase<DatePicker> {
 
     @Getter
     public WrapTime getValueAsTime(Environment env) {
+        initFormat();
+
         LocalDate value = getWrappedObject().getValue();
 
         if (value == null) {
@@ -70,6 +80,8 @@ public class UXDatePicker extends UXComboBoxBase<DatePicker> {
 
     @Setter
     public void setValueAsTime(Environment env, @Nullable WrapTime time) {
+        initFormat();
+
         if (time == null) {
             getWrappedObject().setValue(null);
         } else {
@@ -81,6 +93,8 @@ public class UXDatePicker extends UXComboBoxBase<DatePicker> {
 
     @Override
     protected Memory getValue(Environment env) {
+        initFormat();
+
         if (getWrappedObject().getConverter() == null) {
             return StringMemory.valueOf(getWrappedObject().getValue().toString());
         }
@@ -91,6 +105,8 @@ public class UXDatePicker extends UXComboBoxBase<DatePicker> {
     @Override
     @Signature
     protected void setValue(Environment env, Memory value) {
+        initFormat();
+
         if (value.toString().isEmpty()) {
             getWrappedObject().setValue(null);
         } else {

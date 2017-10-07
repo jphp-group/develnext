@@ -37,6 +37,9 @@ public class JFoenixExtension extends Extension {
         registerWrapperClass(compileScope, JFXTabPaneFixed.class, UXMaterialTabPane.class);
         registerWrapperClass(compileScope, JFXColorPicker.class, UXMaterialColorPicker.class);
         registerWrapperClass(compileScope, JFXDatePicker.class, UXMaterialDatePicker.class);
+        registerWrapperClass(compileScope, JFXTimePicker.class, UXMaterialTimePicker.class);
+        registerWrapperClass(compileScope, JFXSlider.class, UXMaterialSlider.class);
+        registerWrapperClass(compileScope, JFXSpinner.class, UXMaterialProgressIndicator.class);
 
         EventProvider.register(new JFXTabPaneEventProvider());
     }

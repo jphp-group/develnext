@@ -1,0 +1,10 @@
+<element extends="SliderFormElement">
+    <properties>
+        <property code="indicatorPosition" name="Позиция индикатора" editor="enum">
+            <variants>
+                <variant value="LEFT">Левая</variant>
+                <variant value="RIGHT">Правая</variant>
+            </variants>
+        </property>
+    </properties>
+</element>
