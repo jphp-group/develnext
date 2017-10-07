@@ -326,22 +326,23 @@ class FormElementConfig
                     if ($editor) {
                         $realCode = $property->getAttribute('realCode');
 
+                        if ($realCode) {
+                            $tooltip = "[ ->$realCode ]";
+                        } else {
+                            $tooltip = "[ ->$code ]";
+                        }
+
                         if ($property->getAttribute('virtual')) {
                             $editor->setAsDataProperty($realCode);
                         }
 
                         if ($property->getAttribute('css')) {
                             $editor->setAsCssProperty($realCode);
+                            $tooltip = "[css $code]";
                         }
 
                         if ($property->getAttribute('formConfig')) {
                             $editor->setAsFormConfigProperty($property->getAttribute('defaultValue'), $realCode);
-                        }
-
-                        if ($realCode) {
-                            $tooltip = "[ ->$realCode ]";
-                        } else {
-                            $tooltip = "[ ->$code ]";
                         }
 
                         if ($property->getAttribute('tooltip')) {

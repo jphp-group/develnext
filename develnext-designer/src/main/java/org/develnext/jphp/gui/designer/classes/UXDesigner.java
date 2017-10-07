@@ -730,61 +730,77 @@ public class UXDesigner extends BaseObject {
     }
 
     protected void resizeNode(Node node, double width, double height) {
+        Double topAnchor = AnchorPane.getTopAnchor(node);
+        Double bottomAnchor = AnchorPane.getBottomAnchor(node);
+        Double leftAnchor = AnchorPane.getLeftAnchor(node);
+        Double rightAnchor = AnchorPane.getRightAnchor(node);
 
+        AnchorPane.setTopAnchor(node, null);
+        AnchorPane.setBottomAnchor(node, null);
+        AnchorPane.setLeftAnchor(node, null);
+        AnchorPane.setRightAnchor(node, null);
 
-        if (node instanceof Region) {
-            ((Region) node).setPrefSize(width, height);
-            return;
+        try {
+            if (node instanceof Region) {
+                node.resize(width, height); // fix.
+                ((Region) node).setPrefSize(width, height);
+                return;
+            }
+
+            if (node instanceof ImageView) {
+                ((ImageView) node).setFitWidth(width);
+                ((ImageView) node).setFitHeight(height);
+                return;
+            }
+
+            if (node instanceof MediaView) {
+                ((MediaView) node).setFitWidth(width);
+                ((MediaView) node).setFitHeight(height);
+                return;
+            }
+
+            if (node instanceof Rectangle) {
+                ((Rectangle) node).setWidth(width);
+                ((Rectangle) node).setHeight(height);
+                return;
+            }
+
+            if (node instanceof Circle) {
+                double radius = (width < height ? width : height) / 2;
+                ((Circle) node).setRadius(radius);
+                return;
+            }
+
+            if (node instanceof Ellipse) {
+                ((Ellipse) node).setRadiusX(width / 2);
+                ((Ellipse) node).setRadiusY(height / 2);
+                return;
+            }
+
+            if (node instanceof Polygon) {
+                UXPolygon.setWidth((Polygon) node, width);
+                UXPolygon.setHeight((Polygon) node, height);
+                return;
+            }
+
+            if (node instanceof WebView) {
+                ((WebView) node).setPrefSize(width, height);
+                return;
+            }
+
+            if (node instanceof Canvas) {
+                ((Canvas) node).setWidth(width);
+                ((Canvas) node).setHeight(height);
+                return;
+            }
+
+            node.resize(width, height);
+        } finally {
+            AnchorPane.setTopAnchor(node, topAnchor);
+            AnchorPane.setBottomAnchor(node, bottomAnchor);
+            AnchorPane.setLeftAnchor(node, leftAnchor);
+            AnchorPane.setRightAnchor(node, rightAnchor);
         }
-
-        if (node instanceof ImageView) {
-            ((ImageView) node).setFitWidth(width);
-            ((ImageView) node).setFitHeight(height);
-            return;
-        }
-
-        if (node instanceof MediaView) {
-            ((MediaView) node).setFitWidth(width);
-            ((MediaView) node).setFitHeight(height);
-            return;
-        }
-
-        if (node instanceof Rectangle) {
-            ((Rectangle) node).setWidth(width);
-            ((Rectangle) node).setHeight(height);
-            return;
-        }
-
-        if (node instanceof Circle) {
-            double radius = (width < height ? width : height) / 2;
-            ((Circle) node).setRadius(radius);
-            return;
-        }
-
-        if (node instanceof Ellipse) {
-            ((Ellipse) node).setRadiusX(width / 2);
-            ((Ellipse) node).setRadiusY(height / 2);
-            return;
-        }
-
-        if (node instanceof Polygon) {
-            UXPolygon.setWidth((Polygon) node, width);
-            UXPolygon.setHeight((Polygon) node, height);
-            return;
-        }
-
-        if (node instanceof WebView) {
-            ((WebView) node).setPrefSize(width, height);
-            return;
-        }
-
-        if (node instanceof Canvas) {
-            ((Canvas) node).setWidth(width);
-            ((Canvas) node).setHeight(height);
-            return;
-        }
-
-        node.resize(width, height);
     }
 
     @Signature

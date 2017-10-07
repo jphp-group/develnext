@@ -103,6 +103,9 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
         @Property
         boolean cache();
 
+        @Property
+        CacheHint cacheHint();
+
         //@Property boolean disable();
         @Property
         boolean disabled();
@@ -622,7 +625,13 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             return null;
         }
 
-        return MemoryOperation.get(result.getClass(), null).unconvert(env, trace, result);
+        MemoryOperation operation = MemoryOperation.get(result.getClass(), null);
+
+        if (operation == null) {
+            return null;
+        }
+
+        return operation.unconvert(env, trace, result);
     }
 
     @Signature

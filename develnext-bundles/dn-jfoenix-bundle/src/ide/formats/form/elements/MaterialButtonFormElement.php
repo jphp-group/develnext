@@ -38,6 +38,8 @@ class MaterialButtonFormElement extends ButtonFormElement
         $button = new UXMaterialButton();
         $button->text = 'Button';
         $button->buttonType = 'RAISED';
+        $button->style = '-fx-background-color: white';
+
         return $button;
     }
 }

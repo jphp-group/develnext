@@ -20,7 +20,7 @@ class MaterialTextAreaFormElementTag extends AbstractFormElementTag
 {
     public function getTagName()
     {
-        return 'com.jfoenix.controls.JFXTextArea';
+        return 'org.develnext.jphp.ext.javafx.jfoenix.support.JFXTextAreaFixed';
     }
 
     public function getElementClass()

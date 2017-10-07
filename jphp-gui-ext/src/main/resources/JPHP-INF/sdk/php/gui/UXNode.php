@@ -38,6 +38,17 @@ abstract class UXNode
     public $parent;
 
     /**
+     * @var bool
+     */
+    public $cache = false;
+
+    /**
+     * DEFAULT, SPEED, QUALITY, SCALE, ROTATE, SCALE_AND_ROTATE
+     * @var string
+     */
+    public $cacheHint = 'DEFAULT';
+
+    /**
      * --RU--
      * Эффекты компонента.
      * @var UXEffectPipeline

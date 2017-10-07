@@ -8,6 +8,8 @@ import javafx.scene.paint.Color;
 import org.develnext.jphp.ext.javafx.classes.UXTextArea;
 import org.develnext.jphp.ext.javafx.classes.UXTextField;
 import org.develnext.jphp.ext.javafx.jfoenix.JFoenixExtension;
+import org.develnext.jphp.ext.javafx.jfoenix.support.JFXTextAreaFixed;
+import org.develnext.jphp.ext.javafx.jfoenix.support.JFXTextAreaSkin;
 import php.runtime.annotation.Reflection.Getter;
 import php.runtime.annotation.Reflection.Namespace;
 import php.runtime.annotation.Reflection.Setter;
@@ -20,7 +22,7 @@ public class UXMaterialTextArea extends UXTextArea {
     interface WrappedInterface {
     }
 
-    public UXMaterialTextArea(Environment env, JFXTextArea wrappedObject) {
+    public UXMaterialTextArea(Environment env, JFXTextAreaFixed wrappedObject) {
         super(env, wrappedObject);
     }
 
@@ -31,18 +33,18 @@ public class UXMaterialTextArea extends UXTextArea {
     @Override
     @Signature
     public void __construct() {
-        __wrappedObject = new JFXTextArea();
+        __wrappedObject = new JFXTextAreaFixed();
     }
 
     @Override
     @Signature
     public void __construct(String text) {
-        __wrappedObject = new JFXTextArea(text);
+        __wrappedObject = new JFXTextAreaFixed(text);
     }
 
     @Override
-    public JFXTextArea getWrappedObject() {
-        return (JFXTextArea) super.getWrappedObject();
+    public JFXTextAreaFixed getWrappedObject() {
+        return (JFXTextAreaFixed) super.getWrappedObject();
     }
 
     @Getter

@@ -285,9 +285,15 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
 
             if ($regex->find()) {
                 $regex->reset();
-                $style = $regex->replaceGroup(1, $editor->getCssNormalizedValue($value));
+                if ($value) {
+                    $style = $regex->replaceGroup(1, $editor->getCssNormalizedValue($value));
+                } else {
+                    $style = $regex->replaceGroup(0, '');
+                }
             } else {
-                $style .= "$editor->code: {$editor->getCssNormalizedValue($value)};\n";
+                if ($value) {
+                    $style .= "$editor->code: {$editor->getCssNormalizedValue($value)};\n";
+                }
             }
 
             $target->style = $style;
@@ -295,6 +301,11 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
             /*if ($realCode) {
                 $target->{$realCode} = $value;
             }*/
+
+            /** @var ElementPropertyEditor $styleEditor */
+            if ($styleEditor = $this->designProperties->getEditorByCode('style')) {
+                $styleEditor->updateUi($style);
+            }
 
             $this->trigger('change');
         };

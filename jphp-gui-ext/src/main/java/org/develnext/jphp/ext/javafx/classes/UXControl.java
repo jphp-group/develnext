@@ -67,6 +67,7 @@ public class UXControl<T extends Control> extends UXRegion<Control> {
     public void setSize(double[] size) {
         if (size.length >= 2) {
             getWrappedObject().setPrefSize(size[0], size[1]);
+            getWrappedObject().resize(size[0], size[1]);
         }
     }
 
