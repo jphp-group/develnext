@@ -1,0 +1,7 @@
+<element extends="ComboBoxFormElement">
+    <properties group="style" title="Стиль">
+        <property code="labelFloat" name="Плавующий текст" editor="boolean" />
+        <property code="focusColor" name="Цвет фокуса" editor="color" />
+        <property code="unfocusColor" name="Цвет потери фокуса" editor="color" />
+    </properties>
+</element>

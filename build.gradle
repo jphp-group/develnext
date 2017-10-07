@@ -209,6 +209,7 @@ project(':develnext') {
         provided project(':develnext-bundles/dn-systemtray-bundle')
         provided project(':develnext-bundles/dn-hotkey-bundle')
         provided project(':jphp-zip-ext/dn-zip-bundle')
+        provided project(':develnext-bundles/dn-jfoenix-bundle')
         //provided project(':develnext-bundles/dn-controlfx-bundle')
 
         // stubs.

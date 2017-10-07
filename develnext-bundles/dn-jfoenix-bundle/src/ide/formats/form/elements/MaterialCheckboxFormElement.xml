@@ -1,0 +1,6 @@
+<element extends="CheckboxFormElement">
+    <properties group="style" title="Стиль">
+        <property code="checkedColor" name="Отмеченный цвет" editor="color" />
+        <property code="uncheckedColor" name="Неотмеченный цвет" editor="color" />
+    </properties>
+</element>

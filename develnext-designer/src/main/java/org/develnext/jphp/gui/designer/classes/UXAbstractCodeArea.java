@@ -131,8 +131,12 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
 
     @Setter
     public void setCaretPosition(int value) {
-        getWrappedObject().moveTo(value);
-        getWrappedObject().requestFollowCaret();
+        try {
+            getWrappedObject().moveTo(value);
+            getWrappedObject().requestFollowCaret();
+        } catch (IndexOutOfBoundsException e) {
+            // nop.
+        }
     }
 
     @Getter

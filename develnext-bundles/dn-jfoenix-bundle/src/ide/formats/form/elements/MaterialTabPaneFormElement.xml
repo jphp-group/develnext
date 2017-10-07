@@ -1,0 +1,10 @@
+<element extends="TabPaneFormElement">
+    <properties group="style" title="Стиль">
+        <property code="-fx-background-color" name="Цвет фона" editor="color" css="1" />
+        <property code="disableAnimation" name="Отключить анимацию" editor="boolean" />
+
+        <property code="side" editor="none" />
+        <property code="tabClosingPolicy" editor="none" />
+        <property code="draggable" editor="none" />
+    </properties>
+</element>

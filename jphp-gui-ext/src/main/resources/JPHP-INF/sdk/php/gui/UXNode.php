@@ -38,6 +38,17 @@ abstract class UXNode
     public $parent;
 
     /**
+     * @var bool
+     */
+    public $cache = false;
+
+    /**
+     * DEFAULT, SPEED, QUALITY, SCALE, ROTATE, SCALE_AND_ROTATE
+     * @var string
+     */
+    public $cacheHint = 'DEFAULT';
+
+    /**
      * --RU--
      * Эффекты компонента.
      * @var UXEffectPipeline
@@ -296,7 +307,7 @@ abstract class UXNode
     /**
      * Getter and Setter for object data
      * @param string $name
-     * @param mixed $value (optional)
+     * @param mixed $value [optional]
      * @return mixed
      */
     public function data($name, $value)
@@ -439,9 +450,9 @@ abstract class UXNode
     }
 
     /**
-     * @param string|array $name (optional)
-     * @param string $value (optional)
-     * @return string|array|void
+     * @param string|array $name [optional]
+     * @param string $value [optional]
+     * @return string|void
      */
     public function css($name, $value)
     {

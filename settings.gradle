@@ -3,6 +3,7 @@ include 'develnext-designer';
 
 include 'jphp-gui-ext',
         'jphp-gui-controlfx-ext',
+        'jphp-gui-jfoenix-ext',
         'jphp-desktop-ext',
         'jphp-desktop-hotkey-ext',
         'jphp-app-framework',
@@ -32,6 +33,7 @@ include 'develnext-bundles/dn-firebirdsql-bundle'
 include 'develnext-bundles/dn-game2d-bundle'
 include 'develnext-bundles/dn-systemtray-bundle'
 include 'develnext-bundles/dn-hotkey-bundle'
+include 'develnext-bundles/dn-jfoenix-bundle'
 include 'develnext-bundles/dn-controlfx-bundle'
 
 // stubs

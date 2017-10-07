@@ -15,6 +15,8 @@ use php\gui\UXTableCell;
 use php\lang\IllegalArgumentException;
 use php\lang\JavaException;
 use php\lib\arr;
+use php\lib\str;
+use php\util\Regex;
 use php\xml\DomElement;
 
 /**
@@ -274,10 +276,12 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     {
         $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode) {
             $target = $this->designProperties->target;
-            $target->css($editor->code, $editor->getCssNormalizedValue($value));
 
-            if ($realCode) {
-                $target->{$realCode} = $value;
+            $target->css($editor->code, $value ? $editor->getCssNormalizedValue($value) : null);
+
+            /** @var ElementPropertyEditor $styleEditor */
+            if ($styleEditor = $this->designProperties->getEditorByCode('style')) {
+                $styleEditor->updateUi($target->style);
             }
 
             $this->trigger('change');
@@ -285,6 +289,7 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
 
         $this->getter = function (ElementPropertyEditor $editor) {
             $target = $this->designProperties->target;
+
             return $target->css($editor->code);
         };
 

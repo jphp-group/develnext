@@ -209,6 +209,9 @@ class GuiFormDumper extends AbstractFormDumper
         $import = $document->createProcessingInstruction('import', 'javafx.scene.shape.*');
         $document->insertBefore($import, $document->getDocumentElement());
 
+        $import = $document->createProcessingInstruction('import', 'javafx.scene.paint.*');
+        $document->insertBefore($import, $document->getDocumentElement());
+
         $import = $document->createProcessingInstruction('import', 'javafx.scene.web.*');
         $document->insertBefore($import, $document->getDocumentElement());
 

@@ -3,6 +3,7 @@ namespace ide;
 
 use ide\project\Project;
 use ide\utils\FileUtils;
+use php\io\File;
 use php\io\IOException;
 use php\io\Stream;
 use php\lib\reflect;
@@ -70,9 +71,23 @@ trait VendorContainer
         FileUtils::copyFile($vendorResource, $file);
     }
 
+    /**
+     * Возвращает директорию вендора в проекте.
+     *
+     * @return project\ProjectFile|\php\io\File
+     */
     function getProjectVendorDirectory()
     {
         return Ide::project()->getFile("vendor/{$this->getVendorName()}");
+    }
+
+    /**
+     * @param string $path
+     * @return File
+     */
+    function getProjectVendorFile($path)
+    {
+        return new File("{$this->getProjectVendorDirectory()}/$path");
     }
 
     function copyVendorResource($name)

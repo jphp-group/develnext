@@ -1,0 +1,16 @@
+<element extends="DatePickerFormElement">
+    <properties>
+        <property code="defaultColor" name="Цвет по-умолчанию" editor="color" />
+        <property code="overlay" name="Перекрытие" editor="boolean" />
+        <property code="hourView24" name="24 часа" editor="boolean" />
+
+        <property code="format" name="Формат" editor="enum" defaultValue="dd.MM.yyyy">
+            <variants>
+                <variant value="HH:mm">[14:08]</variant>
+                <variant value="HH.mm">[14.08]</variant>
+                <variant value="HH,mm">[14,08]</variant>
+                <variant value="HH/mm">[14/08]</variant>
+            </variants>
+        </property>
+    </properties>
+</element>

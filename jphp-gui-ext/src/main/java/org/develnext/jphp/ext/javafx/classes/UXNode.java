@@ -38,6 +38,7 @@ import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
 import php.runtime.invoke.ObjectInvokeHelper;
 import php.runtime.lang.BaseWrapper;
+import php.runtime.lang.ForeachIterator;
 import php.runtime.memory.*;
 import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
@@ -45,6 +46,8 @@ import php.runtime.reflection.ClassEntity;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXNode")
@@ -102,6 +105,9 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
 
         @Property
         boolean cache();
+
+        @Property
+        CacheHint cacheHint();
 
         //@Property boolean disable();
         @Property
@@ -578,6 +584,67 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     }
 
     @Signature
+    public Memory css(Environment env, Memory name) {
+        if (name.isArray()) {
+            ForeachIterator iterator = name.getNewIterator(env);
+
+            while (iterator.next()) {
+                css(iterator.getStringKey(), iterator.getValue());
+            }
+
+            return Memory.NULL;
+        } else {
+            String property = name.toString();
+            String style = getWrappedObject().getStyle();
+
+            Pattern pattern = Pattern.compile(
+                    Pattern.quote(property) + "[ ]{0,}\\:[ ]{0,}(.+)\\;",
+                    Pattern.MULTILINE | Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+            );
+
+            Matcher matcher = pattern.matcher(style);
+
+            if (matcher.find()) {
+                return StringMemory.valueOf(matcher.group(1));
+            }
+
+            return Memory.NULL;
+        }
+    }
+
+    @Signature
+    public Memory css(String property, Memory value) {
+        String style = getWrappedObject().getStyle();
+
+        Pattern pattern = Pattern.compile(
+                Pattern.quote(property) + "[ ]{0,}\\:[ ]{0,}(.+)\\;",
+                Pattern.MULTILINE | Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+        );
+
+        Matcher matcher = pattern.matcher(style);
+
+        if (matcher.find()) {
+            matcher.reset();
+
+            if (value.isNull()) {
+                style = matcher.replaceFirst("");
+            } else {
+                style = matcher.replaceFirst(property + ": " + value + ";");
+            }
+        } else {
+            if (value.isNull()) {
+                return Memory.NULL;
+            }
+
+            style = style + "\n" + property + ": " + value + ";";
+        }
+
+        getWrappedObject().setStyle(style);
+
+        return Memory.NULL;
+    }
+
+    @Signature
     public Memory data(String name) {
         return JavaFxUtils.data(getWrappedObject(), name);
     }
@@ -622,7 +689,13 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
             return null;
         }
 
-        return MemoryOperation.get(result.getClass(), null).unconvert(env, trace, result);
+        MemoryOperation operation = MemoryOperation.get(result.getClass(), null);
+
+        if (operation == null) {
+            return null;
+        }
+
+        return operation.unconvert(env, trace, result);
     }
 
     @Signature

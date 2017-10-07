@@ -1,0 +1,12 @@
+<element extends="ButtonFormElement">
+    <properties group="style" title="Стиль">
+        <property code="-fx-background-color" name="Цвет кнопки" editor="color" css="1" />
+        <property code="ripplerFill" name="Цвет пульсации" editor="color" />
+        <!--<property code="buttonType" name="Тип кнопки" editor="enum">
+            <variants>
+                <variant value="FLAT">FLAT</variant>
+                <variant value="RAISED">RAISED</variant>
+            </variants>
+        </property>-->
+    </properties>
+</element>

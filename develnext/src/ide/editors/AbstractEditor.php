@@ -226,6 +226,16 @@ abstract class AbstractEditor
     }
 
     /**
+     * Вернуть стили редактора.
+     *
+     * @return string[]
+     */
+    public function getStylesheets()
+    {
+        return $this->stylesheets;
+    }
+
+    /**
      * @param AbstractFormat $format
      */
     public function setFormat($format)

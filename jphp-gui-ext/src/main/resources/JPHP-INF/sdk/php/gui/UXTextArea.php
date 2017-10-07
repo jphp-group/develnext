@@ -34,7 +34,7 @@ class UXTextArea extends UXTextInputControl
     public $prefColumnCount;
 
     /**
-     * @param string $text (optional)
+     * @param string $text [optional]
      */
     public function __construct($text) {}
 }
