@@ -275,55 +275,22 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
     public function setAsCssProperty($realCode = null)
     {
         $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode) {
-            $pattern = Regex::quote($editor->code) . "[ ]{0,}\\:[ ]{0,}(.+)\\;";
-            $pattern = Regex::of($pattern, Regex::MULTILINE | Regex::CASE_INSENSITIVE);
-
             $target = $this->designProperties->target;
 
-            $style = $target->style;
-            $regex = $pattern->with($style);
-
-            if ($regex->find()) {
-                $regex->reset();
-                if ($value) {
-                    $style = $regex->replaceGroup(1, $editor->getCssNormalizedValue($value));
-                } else {
-                    $style = $regex->replaceGroup(0, '');
-                }
-            } else {
-                if ($value) {
-                    $style .= "$editor->code: {$editor->getCssNormalizedValue($value)};\n";
-                }
-            }
-
-            $target->style = $style;
-
-            /*if ($realCode) {
-                $target->{$realCode} = $value;
-            }*/
+            $target->css($editor->code, $value ? $editor->getCssNormalizedValue($value) : null);
 
             /** @var ElementPropertyEditor $styleEditor */
             if ($styleEditor = $this->designProperties->getEditorByCode('style')) {
-                $styleEditor->updateUi($style);
+                $styleEditor->updateUi($target->style);
             }
 
             $this->trigger('change');
         };
 
         $this->getter = function (ElementPropertyEditor $editor) {
-            $pattern = Regex::quote($editor->code) . "[ ]{0,}\\:[ ]{0,}(.+)\\;";
-            $pattern = Regex::of($pattern, Regex::MULTILINE | Regex::CASE_INSENSITIVE);
-
             $target = $this->designProperties->target;
-            $style = $target->style;
 
-            $regex = $pattern->with($style);
-
-            if ($regex->find()) {
-                return $regex->group(1);
-            }
-
-            return null;
+            return $target->css($editor->code);
         };
 
         return $this;

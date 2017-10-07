@@ -256,7 +256,11 @@ class FormElementConfig
 
         foreach ($tree as $one) {
             foreach ($one->properties as $code => $property) {
-                $properties[$code] = $property;
+                if ($property['editor'] == 'none') {
+                    unset($properties[$code]);
+                } else {
+                    $properties[$code] = $property;
+                }
             }
         }
 
@@ -359,19 +363,21 @@ class FormElementConfig
                     $group = 'general';
                 }
 
+                $editor = $property->getAttribute('editor');
+
                 $this->properties[$code] = [
-                    'code'          => $code,
-                    'group'         => $group,
-                    'name'          => $name,
-                    'editor'        => $property->getAttribute('editor'),
+                    'code' => $code,
+                    'group' => $group,
+                    'name' => $name,
+                    'editor' => $editor,
                     'editorFactory' => $editorFactory,
 
-                    'tooltip'       => $property->getAttribute('tooltip'),
-                    'realCode'      => $property->getAttribute('realCode'),
+                    'tooltip' => $property->getAttribute('tooltip'),
+                    'realCode' => $property->getAttribute('realCode'),
 
-                    'isCss'         => $property->getAttribute('css'),
-                    'isVirtual'     => $property->getAttribute('virtual'),
-                    'isFormConfig'  => $property->getAttribute('formConfig'),
+                    'isCss' => $property->getAttribute('css'),
+                    'isVirtual' => $property->getAttribute('virtual'),
+                    'isFormConfig' => $property->getAttribute('formConfig'),
                 ];
             }
         }

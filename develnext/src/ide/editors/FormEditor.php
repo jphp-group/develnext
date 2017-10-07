@@ -1539,22 +1539,24 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
     {
         $func = function ($nodes, $level = 0) use ($callback, &$func) {
             foreach ($nodes as $node) {
-                if ($node instanceof UXData || $node->classes->has('ignore')) {
-                    continue;
-                }
+                if ($node) {
+                    if ($node instanceof UXData || $node->classes->has('ignore')) {
+                        continue;
+                    }
 
-                $nodeId = $this->getNodeId($node);
+                    $nodeId = $this->getNodeId($node);
 
-                /*if (!$nodeId) {
-                    continue;
-                }*/
+                    /*if (!$nodeId) {
+                        continue;
+                    }*/
 
-                $element = $this->format->getFormElement($node);
+                    $element = $this->format->getFormElement($node);
 
-                $callback($node, $nodeId, $element, $level);
+                    $callback($node, $nodeId, $element, $level);
 
-                if ($element && $element->isLayout()) {
-                    $func($element->getLayoutChildren($node), $level + 1);
+                    if ($element && $element->isLayout()) {
+                        $func($element->getLayoutChildren($node), $level + 1);
+                    }
                 }
             }
         };

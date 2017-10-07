@@ -135,7 +135,7 @@ abstract class UXWindow
      * --RU--
      * Пополнительные данные окна (геттер и сеттер).
      * @param string $name
-     * @param mixed $value (optional)
+     * @param mixed $value [optional]
      * @return mixed
      */
     public function data($name, $value)

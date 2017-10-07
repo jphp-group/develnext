@@ -22,7 +22,7 @@ class UXColorPicker extends UXComboBoxBase
     public $value;
 
     /**
-     * @param UXColor $color (optional)
+     * @param UXColor $color [optional]
      */
     public function __construct(UXColor $color) {}
 }

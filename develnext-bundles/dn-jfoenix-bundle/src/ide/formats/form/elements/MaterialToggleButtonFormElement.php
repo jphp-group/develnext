@@ -4,11 +4,12 @@ namespace ide\formats\form\elements;
 use ide\formats\form\AbstractFormElement;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXMaterialButton;
+use php\gui\UXMaterialToggleButton;
 use php\gui\UXNode;
 use php\gui\UXRating;
 use php\gui\UXToggleSwitch;
 
-class MaterialButtonFormElement extends ButtonFormElement
+class MaterialToggleButtonFormElement extends ToggleButtonFormElement
 {
     public function getGroup()
     {
@@ -17,17 +18,17 @@ class MaterialButtonFormElement extends ButtonFormElement
 
     public function getName()
     {
-        return 'Material Кнопка';
+        return 'Material ' . parent::getName();
     }
 
     public function getElementClass()
     {
-        return UXMaterialButton::class;
+        return UXMaterialToggleButton::class;
     }
 
     public function isOrigin($any)
     {
-        return $any instanceof UXMaterialButton;
+        return $any instanceof UXMaterialToggleButton;
     }
 
     /**
@@ -35,11 +36,7 @@ class MaterialButtonFormElement extends ButtonFormElement
      */
     public function createElement()
     {
-        $button = new UXMaterialButton();
-        $button->text = 'Button';
-        $button->buttonType = 'RAISED';
-        $button->style = '-fx-background-color: white;';
-
+        $button = new UXMaterialToggleButton();
         return $button;
     }
 }

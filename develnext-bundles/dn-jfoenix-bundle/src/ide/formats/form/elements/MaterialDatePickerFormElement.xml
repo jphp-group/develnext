@@ -1,0 +1,7 @@
+<element extends="DatePickerFormElement">
+
+    <properties>
+        <property code="defaultColor" name="Цвет по-умолчанию" editor="color" />
+        <property code="overlay" name="Перекрытие" editor="boolean" />
+    </properties>
+</element>

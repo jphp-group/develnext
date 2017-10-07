@@ -1,6 +1,8 @@
 <?php
 namespace php\gui;
 
+use php\time\Time;
+
 /**
  * Class UXDatePicker
  * @package php\gui
@@ -8,8 +10,6 @@ namespace php\gui;
  */
 class UXDatePicker extends UXComboBoxBase
 {
-
-
     /**
      * @readonly
      * @var UXTextField
@@ -25,4 +25,9 @@ class UXDatePicker extends UXComboBoxBase
      * @var bool
      */
     public $showWeekNumbers;
+
+    /**
+     * @var Time
+     */
+    public $valueAsTime;
 }

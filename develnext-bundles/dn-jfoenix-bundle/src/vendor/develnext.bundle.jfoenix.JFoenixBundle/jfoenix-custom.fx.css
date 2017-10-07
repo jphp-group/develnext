@@ -20,3 +20,39 @@
     -fx-background-radius: 0, 0, 0;
     -fx-background-color: transparent;
 }
+
+
+.jfx-tab-pane {
+}
+
+.jfx-tab-pane .headers-region {
+    -fx-background-color: #4059A9;
+}
+
+.jfx-tab-pane .tab-header-background {
+    -fx-background-color: #4059A9;
+    -fx-background-radius: 0;
+}
+
+.jfx-tab-pane .tab-header-area .jfx-rippler {
+    -jfx-rippler-fill: white;
+}
+
+.jfx-tab-pane .tab-selected-line {
+    -fx-background-color: #00e0cb;
+    -fx-pref-height: 3;
+}
+
+.jfx-tab-pane .tab {
+    -fx-cursor: hand;
+}
+
+.jfx-tab-pane .tab .tab-label {
+    -fx-font-weight: normal;
+    -fx-text-fill: white;
+    -fx-font-size: 13;
+}
+
+.jfx-tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+}

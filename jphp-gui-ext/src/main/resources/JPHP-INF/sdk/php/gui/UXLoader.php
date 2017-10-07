@@ -18,12 +18,12 @@ class UXLoader
     public $location;
 
     /**
-     * @param string $location (optional)
+     * @param string $location [optional]
      */
     public function __construct($location) {}
 
     /**
-     * @param string|File|Stream $source (optional)
+     * @param string|File|Stream $source [optional]
      * @return UXNode
      */
     public function load($source) {}

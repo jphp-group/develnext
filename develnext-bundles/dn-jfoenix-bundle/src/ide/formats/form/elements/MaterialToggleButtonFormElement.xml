@@ -1,0 +1,12 @@
+<element extends="ToggleButtonFormElement">
+    <properties group="style" title="Стиль">
+        <property code="unToggleColor" name="Цвет" editor="color" />
+        <property code="unToggleLineColor" name="Цвет линии" editor="color" />
+        <property code="toggleColor" name="Выделенный цвет" editor="color" />
+        <property code="toggleLineColor" name="Выделенный цвет линии" editor="color" />
+    </properties>
+
+    <properties>
+        <property code="graphic" editor="none" />
+    </properties>
+</element>

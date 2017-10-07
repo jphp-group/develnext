@@ -7,12 +7,16 @@ import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
+import php.runtime.ext.core.classes.time.WrapTime;
 import php.runtime.memory.StringMemory;
 import php.runtime.reflection.ClassEntity;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 
 @Name(JavaFXExtension.NS + "UXDatePicker")
 public class UXDatePicker extends UXComboBoxBase<DatePicker> {
@@ -51,6 +55,28 @@ public class UXDatePicker extends UXComboBoxBase<DatePicker> {
         }
 
         return null;
+    }
+
+    @Getter
+    public WrapTime getValueAsTime(Environment env) {
+        LocalDate value = getWrappedObject().getValue();
+
+        if (value == null) {
+            return null;
+        }
+
+        return new WrapTime(env, Date.from(value.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+    }
+
+    @Setter
+    public void setValueAsTime(Environment env, @Nullable WrapTime time) {
+        if (time == null) {
+            getWrappedObject().setValue(null);
+        } else {
+            getWrappedObject().setValue(
+                    Instant.ofEpochMilli(time.getDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate()
+            );
+        }
     }
 
     @Override
@@ -94,6 +120,7 @@ public class UXDatePicker extends UXComboBoxBase<DatePicker> {
         {
             if(localDate==null)
                 return "";
+
             return dateTimeFormatter.format(localDate);
         }
 

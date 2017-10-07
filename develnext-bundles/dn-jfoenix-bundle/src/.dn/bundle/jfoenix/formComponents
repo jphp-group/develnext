@@ -1,15 +1,23 @@
 ide\formats\form\elements\MaterialButtonFormElement
+ide\formats\form\elements\MaterialToggleButtonFormElement
 ide\formats\form\elements\MaterialCheckboxFormElement
 ide\formats\form\elements\MaterialComboBoxFormElement
 ide\formats\form\elements\MaterialTextFieldFormElement
 ide\formats\form\elements\MaterialPasswordFieldFormElement
 ide\formats\form\elements\MaterialTextAreaFormElement
+ide\formats\form\elements\MaterialColorPickerFormElement
+ide\formats\form\elements\MaterialDatePickerFormElement
 ide\formats\form\elements\MaterialProgressBarFormElement
+ide\formats\form\elements\MaterialTabPaneFormElement
 
 ide\formats\form\tags\MaterialButtonFormElementTag
+ide\formats\form\tags\MaterialToggleButtonFormElementTag
 ide\formats\form\tags\MaterialCheckboxFormElementTag
 ide\formats\form\tags\MaterialComboBoxFormElementTag
 ide\formats\form\tags\MaterialTextFieldFormElementTag
 ide\formats\form\tags\MaterialPasswordFieldFormElementTag
 ide\formats\form\tags\MaterialTextAreaFormElementTag
 ide\formats\form\tags\MaterialProgressBarFormElementTag
+ide\formats\form\tags\MaterialTabPaneFormElementTag
+ide\formats\form\tags\MaterialColorPickerFormElementTag
+ide\formats\form\tags\MaterialDatePickerFormElementTag

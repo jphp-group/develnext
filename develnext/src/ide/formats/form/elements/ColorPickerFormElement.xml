@@ -1,5 +1,7 @@
 <element extends="ComboBoxBaseFormElement">
     <properties>
-        <property code="value" editor="none" />
+        <property code="value" name="Цвет" editor="color" />
+        <property code="editable" editor="none" />
+        <property code="promptText" editor="none" />
     </properties>
 </element>
