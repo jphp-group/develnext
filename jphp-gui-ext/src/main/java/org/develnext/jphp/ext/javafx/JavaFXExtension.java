@@ -1,7 +1,6 @@
 package org.develnext.jphp.ext.javafx;
 
 import javafx.animation.*;
-import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -68,8 +67,6 @@ import php.runtime.env.CompileScope;
 import php.runtime.ext.support.Extension;
 import php.runtime.memory.support.MemoryOperation;
 
-import java.awt.event.InputEvent;
-
 public class JavaFXExtension extends Extension {
     public final static String NS = "php\\gui\\";
 
@@ -103,7 +100,6 @@ public class JavaFXExtension extends Extension {
 
         registerWrapperClass(scope, ObservableValue.class, UXValue.class);
         registerWrapperClass(scope, ObservableList.class, UXList.class);
-        registerWrapperClass(scope, Application.class, UXApplication.class);
         registerWrapperClass(scope, Screen.class, UXScreen.class);
 
         registerWrapperClass(scope, Font.class, UXFont.class);
@@ -221,7 +217,13 @@ public class JavaFXExtension extends Extension {
         registerWrapperClass(scope, ContextMenuEvent.class, UXContextMenuEvent.class);
         registerWrapperClass(scope, DragEvent.class, UXDragEvent.class);
         registerWrapperClass(scope, WebEvent.class, UXWebEvent.class);
-        registerWrapperClass(scope, WebErrorEvent.class, UXWebErrorEvent.class);
+
+        if (isAndroid()) {
+            // nop.
+        } else {
+            registerWrapperClass(scope, WebErrorEvent.class, UXWebErrorEvent.class);
+        }
+
         registerWrapperClass(scope, ScrollEvent.class, UXScrollEvent.class);
 
         registerWrapperClass(scope, FXMLLoader.class, UXLoader.class);
@@ -245,7 +247,10 @@ public class JavaFXExtension extends Extension {
         registerCustomControls(scope);
         registerEffectPackage(scope);
         registerAnimationPackage(scope);
-        registerPrinterPackage(scope);
+
+        if (!isAndroid()) {
+            registerPrinterPackage(scope);
+        }
 
         registerEvents(scope);
     }
@@ -290,6 +295,15 @@ public class JavaFXExtension extends Extension {
     public static boolean isJigsaw() {
         String property = System.getProperty("java.version");
         return property.startsWith("9-") || property.startsWith("9.");
+    }
+
+    public static boolean isAndroid() {
+        try {
+            Class.forName("android.app.Activity");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     protected void registerEvents(CompileScope scope) {

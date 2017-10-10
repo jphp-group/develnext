@@ -6,6 +6,7 @@ include 'jphp-gui-ext',
         'jphp-gui-jfoenix-ext',
         'jphp-desktop-ext',
         'jphp-desktop-hotkey-ext',
+        'jphp-android-ext',
         'jphp-app-framework',
         'jphp-game-ext',
         'jphp-systemtray-ext',
@@ -44,3 +45,5 @@ include 'develnext-stubs/dn-zend-php-sdk'
 include 'jphp-zip-ext'
 include 'jphp-zip-ext/jphp-zip-ext'
 include 'jphp-zip-ext/dn-zip-bundle'
+
+include 'sandbox-android'

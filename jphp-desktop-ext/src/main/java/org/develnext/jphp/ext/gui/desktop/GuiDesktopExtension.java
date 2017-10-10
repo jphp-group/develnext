@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.gui.desktop;
 
+import javafx.application.Application;
 import org.develnext.jphp.ext.gui.desktop.classes.*;
 import org.develnext.jphp.ext.gui.desktop.classes.Robot;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
@@ -24,6 +25,8 @@ public class GuiDesktopExtension extends JavaFXExtension {
 
     @Override
     public void onRegister(CompileScope scope) {
+        registerWrapperClass(scope, Application.class, UXApplication.class);
+
         registerClass(scope, Mouse.class);
         registerClass(scope, MouseEx.class);
         registerClass(scope, org.develnext.jphp.ext.gui.desktop.classes.Runtime.class);

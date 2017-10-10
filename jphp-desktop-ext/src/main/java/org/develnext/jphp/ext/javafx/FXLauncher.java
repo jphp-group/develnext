@@ -4,21 +4,14 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.develnext.jphp.ext.javafx.classes.UXImage;
 import org.develnext.jphp.ext.javafx.support.ImageViewEx;
 import php.runtime.Memory;
-import php.runtime.lang.spl.exception.RuntimeException;
 import php.runtime.launcher.Launcher;
 
 import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.InputStream;
 
 public class FXLauncher extends Launcher {

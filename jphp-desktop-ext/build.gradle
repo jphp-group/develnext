@@ -1,5 +1,7 @@
 
 dependencies {
     compile project(":jphp-gui-ext")
+
+    compile "org.develnext.jphp:jphp-core:$rootProject.ext.jphpVersion"
     compile "org.develnext.jphp:jphp-runtime:$rootProject.ext.jphpVersion"
 }
