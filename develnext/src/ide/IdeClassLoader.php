@@ -122,6 +122,7 @@ class IdeClassLoader extends ClassLoader
                     $module->dump($fileCompiled, true);
                 }
 
+                $module->cleanData();
                 break;
             } catch (IOException $e) {
                 continue;
