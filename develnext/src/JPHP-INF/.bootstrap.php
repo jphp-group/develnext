@@ -7,10 +7,15 @@ use ide\IdeClassLoader;
 use ide\Logger;
 use ide\systems\IdeSystem;
 use php\gui\UXDialog;
+use php\lang\System;
 
-$cache = !IdeSystem::isDevelopment();
+$cache = true;//!IdeSystem::isDevelopment();
 
-$cache = false; //  TODO delete it.
+if (System::getProperty('develnext.noCodeCache')) {
+    $cache = false;
+}
+
+//$cache = true; //  TODO delete it.
 
 $loader = new IdeClassLoader($cache, IdeSystem::getOwnLibVersion());
 $loader->register(true);

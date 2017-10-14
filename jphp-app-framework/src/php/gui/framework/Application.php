@@ -73,6 +73,11 @@ class Application
     protected $config;
 
     /**
+     * @var bool
+     */
+    protected $shutdown;
+
+    /**
      * @param string $configPath
      * @throws Exception
      */
@@ -656,9 +661,16 @@ class Application
      */
     public function shutdown()
     {
+        $this->shutdown = true;
+
         Logger::info("Application shutdown");
 
         UXApplication::shutdown();
+    }
+
+    public function isShutdown()
+    {
+        return $this->shutdown;
     }
 
     /**

@@ -7,6 +7,7 @@ use php\io\File;
 use php\lang\System;
 use php\lib\fs;
 use php\lib\str;
+use php\time\Time;
 
 class IdeSystem
 {
@@ -102,6 +103,70 @@ class IdeSystem
         }
 
         return File::of("$ideHome/$path");
+    }
+
+    /**
+     * @return File
+     */
+    static function getByteCodeCacheDir()
+    {
+        static $byteCodeCacheDir;
+
+        if (!$byteCodeCacheDir) {
+            $dir = IdeSystem::getFile("cache/bytecode_v" . IdeClassLoader::VERSION);
+
+            if (!$dir->isDirectory()) {
+                return $dir;
+            }
+
+            $time = Time::millis();
+
+            $index = 1;
+
+            while (true) {
+                $lockFile = new File($dir, "/ide.lock");
+
+                if ($lockFile->exists()) {
+                    $timestamp = (int) str::trim(fs::get($lockFile));
+
+                    $diff = $time - $timestamp;
+
+                    if ($diff < 15 * 1000) {
+                        $index++;
+
+                        $dir = self::getFile("cache/bytecode_v" . IdeClassLoader::VERSION . "@$index");
+
+                        if (!$dir->isDirectory()) {
+                            break;
+                        }
+                    } else {
+                        fs::delete($lockFile);
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            return $byteCodeCacheDir = $dir;
+        } else {
+            return $byteCodeCacheDir;
+        }
+    }
+
+    /**
+     * Очищает от кэша IDE.
+     * @param $path
+     */
+    static function clearCache($path)
+    {
+        $file = self::getFile("cache/$path");
+
+        if ($file->isDirectory()) {
+            fs::clean($file);
+        }
+
+        fs::delete($file);
     }
 
     /**

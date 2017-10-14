@@ -8,16 +8,19 @@ use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\IdeConfiguration;
 use ide\library\IdeLibraryBundleResource;
+use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\project\behaviours\BundleProjectBehaviour;
 use ide\project\control\AbstractProjectControlPane;
 use ide\project\Project;
 use ide\systems\Cache;
 use ide\systems\FileSystem;
+use ide\systems\IdeSystem;
 use ide\systems\ProjectSystem;
 use ide\ui\FlowListViewDecorator;
 use ide\ui\ImageBox;
 use ide\ui\ImageExtendedBox;
+use ide\utils\FileUtils;
 use ide\utils\UiUtils;
 use php\compress\ZipException;
 use php\compress\ZipFile;
@@ -291,8 +294,10 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
         $this->refresh();
     }
 
-    public function addBundle($file)
+    public function addBundle($file, callable $callback = null)
     {
+        if (!$callback) $callback = function ($result) {};
+
         try {
             uiLater(function () {
                 Ide::get()->getMainForm()->showPreloader('Подождите, установка пакета ...');
@@ -305,6 +310,8 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                     uiLater(function () {
                         MessageBoxForm::warning('Поврежденный или некорректный пакет расширений, т.к. файл .resource отсутствует.');
                     });
+
+                    $callback(false);
 
                     return false;
                 }
@@ -326,24 +333,29 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                     }
                 });
 
-                if ($exit) return false;
+                if ($exit) {
+                    $callback(false);
+                    return false;
+                }
 
-                uiLater(function () use ($config, $zip, $file) {
+                uiLater(function () use ($config, $zip, $file, $callback) {
                     $version = $config->get('version', '1.0');
                     $code = $config->get("name") . '~' . $version;
 
                     if ($oldResource = Ide::get()->getLibrary()->getResource('bundles', $config->get("name"))) {
                         if (!$oldResource->isEmbedded()) {
                             if (MessageBoxForm::confirm("Данный пакет уже установлен, заменить его новой версией ({$oldResource->getVersion()} -> {$version})?")) {
+                                IdeSystem::getLoader()->invalidateByteCodeCache();
                                 Ide::get()->getLibrary()->delete($oldResource);
                             } else {
                                 Ide::get()->getMainForm()->hidePreloader();
+                                $callback(false);
                                 return;
                             }
                         }
                     }
 
-                    (new Thread(function () use ($zip, $file, $config, $code) {
+                    (new Thread(function () use ($zip, $file, $config, $code, $callback) {
                         try {
                             $resource = Ide::get()->getLibrary()->makeResource('bundles', $code, true);
                             $path = fs::parent($resource->getPath()) . "/" . $code;
@@ -399,6 +411,8 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
                                     }
                                 }
                             });
+
+                            $callback(false);
                         } finally {
                             ;
                         }
@@ -434,25 +448,32 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
         $dialog = new InputMessageBoxForm('Добавление пакета по URL', 'Ссылка на пакет расширения (URL):', '* Введите ссылку на *.dnbundle файл');
 
         if ($dialog->showDialog() && $dialog->getResult()) {
-            $file = File::createTemp('dnbundle', '.dnbundle');
+            $file = Ide::get()->createTempFile('.dnbundle');
 
             Ide::get()->getMainForm()->showPreloader('Подождите, загрузка пакета ...');
 
             Ide::async(function () use ($dialog, $file) {
-                fs::copy($dialog->getResult(), $file, null, 1024 * 256);
+                FileUtils::copyFile($dialog->getResult(), $file);
+
+                if (!fs::exists($file)) {
+                    uiLater(function () {
+                        UXDialog::show('Ошибка загрузки пакета');
+                    });
+                    return;
+                }
 
                 uiLater(function () {
                     Ide::get()->getMainForm()->showPreloader('Подождите, установка пакета ...');
                 });
 
-                $this->addBundle($file);
+                $this->addBundle($file, function () use ($file) {
+                    if (!$file->delete()) {
+                        $file->deleteOnExit();
+                    }
 
-                if (!$file->delete()) {
-                    $file->deleteOnExit();
-                }
-
-                uiLater(function () {
-                    Ide::get()->getMainForm()->hidePreloader();
+                    uiLater(function () {
+                        Ide::get()->getMainForm()->hidePreloader();
+                    });
                 });
             });
         }

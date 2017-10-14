@@ -14,6 +14,7 @@ use php\lib\fs;
 use php\lib\reflect;
 use php\lib\str;
 use php\time\Time;
+use php\time\Timer;
 
 class IdeClassLoader extends ClassLoader
 {
@@ -57,7 +58,7 @@ class IdeClassLoader extends ClassLoader
      */
     public function __construct($cache = true, $version = null)
     {
-        $this->cacheBytecodeDir = $cacheBytecodeDir = IdeSystem::getFile("cache/bytecode_v" . self::VERSION);
+        $this->cacheBytecodeDir = $cacheBytecodeDir = IdeSystem::getByteCodeCacheDir();
         $versionFile = new File($cacheBytecodeDir, "/version");
 
         try {
@@ -71,14 +72,39 @@ class IdeClassLoader extends ClassLoader
 
 
         if ($this->cache) {
+            $lockFile = new File($cacheBytecodeDir, "/ide.lock");
+
+            $updateLockFile = function () use ($lockFile) {
+                if (class_exists(Ide::class, false)) {
+                    if (!Ide::isCreated() || !Ide::get()->isIdle()) {
+                        try {
+                            Logger::debug("Update cache lock file: $lockFile");
+                            Stream::putContents($lockFile, Time::millis());
+                        } catch (IOException $e) {
+                            Logger::warn("Failed to update cache lock file: $lockFile, {$e->getMessage()}");
+                        }
+                    }
+                }
+            };
+
+            Timer::after('1s', $updateLockFile);
+
+            Timer::every('7s', function (Timer $self) use ($updateLockFile) {
+                if (Ide::get()->isShutdown()) {
+                    $self->cancel();
+                } else {
+                    $updateLockFile();
+                }
+            });
+
             echo "LOADER cached version = $cacheVersion\n\nLOADER new version    = $version", "\n";
         }
 
         if ($this->version != $cacheVersion || !$cacheVersion) {
             $this->reloadCache = true;
             echo "LOADER reloading ...\n";
-            FileUtils::deleteDirectory($cacheBytecodeDir);
-            $cacheBytecodeDir->mkdirs();
+            fs::clean($cacheBytecodeDir);
+            fs::makeDir($cacheBytecodeDir);
 
             try {
                 Stream::putContents($versionFile, $this->version);
@@ -89,13 +115,50 @@ class IdeClassLoader extends ClassLoader
         }
     }
 
+    public function clearByteCodeCache()
+    {
+        fs::clean($this->cacheBytecodeDir);
+        fs::delete($this->cacheBytecodeDir);
+    }
+
+    public function invalidateByteCodeCache()
+    {
+        if (class_exists(Logger::class, false)) {
+            Logger::info("Start invalidate byte code cache");
+        }
+
+        $dirs = fs::scan(
+            IdeSystem::getFile("cache/"), ['excludeFiles' => true, 'namePattern' => '^bytecode_v.*'], 1
+        );
+
+        foreach ($dirs as $dir) {
+            fs::delete("$dir/version");
+
+            if (class_exists(Logger::class, false)) {
+                Logger::info("Invalidate byte code cache: $dir");
+            }
+        }
+
+        if (class_exists(Logger::class, false)) {
+            Logger::info("Finish invalidate byte code cache");
+        }
+    }
+
     public function addClassPath($path)
     {
+        if (class_exists(Logger::class, false)) {
+            Logger::info("Add class path: $path");
+        }
+
         $this->classPaths[FileUtils::hashName($path)] = FileUtils::normalizeName($path);
     }
 
     public function removeClassPath($path)
     {
+        if (class_exists(Logger::class, false)) {
+            Logger::info("Remove class path: $path");
+        }
+
         unset($this->classPaths[FileUtils::hashName($path)]);
     }
 
@@ -106,6 +169,11 @@ class IdeClassLoader extends ClassLoader
                 $t = Time::millis();
 
                 $filename = "res://$path/$name.php";
+
+                /*if (class_exists(Logger::class, false)) {
+                    Logger::warn("Make module '$filename'");
+                }*/
+
                 $module = new Module(Stream::of($filename));
                 $module->call();
 

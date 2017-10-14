@@ -1592,6 +1592,8 @@ class Ide extends Application
      */
     public function shutdown()
     {
+        $this->shutdown = true;
+
         $done = false;
 
         $shutdownTh = (new Thread(function () use (&$done) {
