@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?import javafx.scene.*?><?import javafx.collections.*?><?import javafx.scene.layout.*?><?import javafx.scene.control.*?><?import javafx.scene.text.*?><?import javafx.scene.image.*?><?import javafx.scene.shape.*?><?import javafx.scene.paint.*?><?import javafx.scene.web.*?><?import javafx.geometry.*?><?import java.lang.*?><?import org.develnext.jphp.ext.javafx.classes.data.*?><?import org.develnext.jphp.ext.javafx.support.*?><?import org.develnext.jphp.ext.javafx.support.control.*?><?import org.develnext.jphp.ext.game.support.*?><AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" focusTraversable="false" id="" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="528" prefWidth="768" styleClass="">
+  <children>
+    <Panel AnchorPane.bottomAnchor="8" AnchorPane.leftAnchor="232" AnchorPane.rightAnchor="8" AnchorPane.topAnchor="8" backgroundColor="#ffffff" borderColor="#c0c0c0" borderRadius="0" borderStyle="SOLID" borderWidth="1" focusTraversable="false" id="panel" layoutX="232" layoutY="8" maxHeight="-1" maxWidth="-1" minHeight="-1" minWidth="-1" prefHeight="512" prefWidth="528" styleClass="" titleColor="#333333" titleOffset="0" titlePosition="TOP_LEFT">
+      <children>
+        <Separator AnchorPane.bottomAnchor="271" AnchorPane.leftAnchor="7" AnchorPane.rightAnchor="7" focusTraversable="false" id="separator" layoutX="8" layoutY="224" orientation="HORIZONTAL" prefHeight="16" prefWidth="512" styleClass="separator "/>
+        <Data cursor="DEFAULT" enabled="1" id="data-separator" visible="1"/>
+        <LabelEx AnchorPane.bottomAnchor="286" alignment="CENTER_LEFT" autoSize="true" contentDisplay="LEFT" ellipsisString="..." focusTraversable="false" graphicTextGap="4" id="labelAlt" layoutX="8" layoutY="208" prefHeight="15.9609375" prefWidth="90.322265625" styleClass="label " text="Демонстрация:" textAlignment="LEFT" textFill="#333333" underline="false" wrapText="false">
+          <font>
+            <Font name="System Bold" size="12"/>
+          </font>
+        </LabelEx>
+        <Data cursor="DEFAULT" enabled="1" id="data-labelAlt" visible="1"/>
+        <Panel AnchorPane.bottomAnchor="7" AnchorPane.leftAnchor="8" AnchorPane.rightAnchor="1" backgroundColor="#ffffff" borderColor="#c0c0c0" borderRadius="0" borderStyle="SOLID" borderWidth="0" focusTraversable="false" id="panelAlt" layoutX="9" layoutY="240" maxHeight="-1" maxWidth="-1" minHeight="-1" minWidth="-1" prefHeight="264" prefWidth="517" styleClass="" titleColor="#333333" titleOffset="15" titlePosition="TOP_LEFT">
+          <children>
+            <ToggleButton AnchorPane.leftAnchor="168" AnchorPane.rightAnchor="5" alignment="CENTER" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="4" id="toggleButton" layoutX="168" layoutY="0" prefHeight="32" prefWidth="256" selected="true" styleClass="toggle-button " text="Кнопка-переключатель" textAlignment="LEFT" textFill="#333333" underline="false" wrapText="false">
+              <font>
+                <Font name="System Regular" size="15"/>
+              </font>
+            </ToggleButton>
+            <Data cursor="DEFAULT" enabled="1" id="data-toggleButton" visible="1"/>
+            <Button alignment="CENTER" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="4" id="button" layoutX="0" layoutY="0" prefHeight="32" prefWidth="152" styleClass="button " text="Кнопка" textAlignment="CENTER" textFill="#333333" underline="false" wrapText="false">
+              <font>
+                <Font name="System Regular" size="15"/>
+              </font>
+            </Button>
+            <Data cursor="DEFAULT" enabled="1" id="data-button" visible="1"/>
+            <TextField AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="189" alignment="CENTER_LEFT" editable="true" focusTraversable="true" id="edit" layoutX="0" layoutY="136" prefColumnCount="12" prefHeight="32" prefWidth="328" promptText="поле ввода" styleClass="text-input text-field " text="">
+              <font>
+                <Font name="System Regular" size="15"/>
+              </font>
+            </TextField>
+            <Data cursor="DEFAULT" enabled="1" id="data-edit" visible="1"/>
+            <ComboBox AnchorPane.leftAnchor="208" AnchorPane.rightAnchor="5" editable="false" focusTraversable="true" id="combobox" layoutX="208" layoutY="40" prefHeight="31" prefWidth="216" promptText="Пункт 1Пункт 2Пункт 3" styleClass="combo-box-base combo-box " value="Выпадаающий список" visibleRowCount="10">
+              <items xmlns:fx="http://javafx.com/fxml">
+                <FXCollections fx:factory="observableArrayList"/>
+              </items>
+            </ComboBox>
+            <Data cursor="DEFAULT" enabled="1" id="data-combobox" visible="1"/>
+            <Slider AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="7" blockIncrement="10" focusTraversable="true" id="slider" layoutX="0" layoutY="184" majorTickUnit="25" max="100" min="0" orientation="HORIZONTAL" prefHeight="45" prefWidth="504" showTickLabels="true" showTickMarks="true" snapToTicks="true" styleClass="slider " value="0"/>
+            <Data cursor="DEFAULT" enabled="1" id="data-slider" visible="1"/>
+            <CheckBox AnchorPane.rightAnchor="181" alignment="CENTER_LEFT" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="4" id="checkbox" layoutX="224" layoutY="80" prefHeight="32" prefWidth="112" selected="true" styleClass="check-box " text="Флажок" textAlignment="LEFT" textFill="#333333" underline="false" wrapText="false">
+              <font>
+                <Font name="System Regular" size="15"/>
+              </font>
+            </CheckBox>
+            <Data cursor="DEFAULT" enabled="1" id="data-checkbox" visible="1"/>
+            <ProgressBar AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="5" focusTraversable="false" id="progressBar" layoutX="0" layoutY="232" prefHeight="32" prefWidth="512" progress="0.55" styleClass="progress-bar "/>
+            <Data cursor="DEFAULT" enabled="1" id="data-progressBar" visible="1"/>
+            <ColorPicker focusTraversable="true" id="colorPicker" layoutX="0" layoutY="40" prefHeight="32" prefWidth="192" styleClass="combo-box-base color-picker "/>
+            <Data cursor="DEFAULT" enabled="1" id="data-colorPicker" visible="1"/>
+            <DatePicker AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="309" editable="true" focusTraversable="true" id="dateEdit" layoutX="0" layoutY="80" prefHeight="32" prefWidth="120" promptText="" showWeekNumbers="false">
+              <styleClass xmlns:fx="http://javafx.com/fxml">
+                <String fx:value="combo-box-base"/>
+                <String fx:value="date-picker"/>
+                <String fx:value="combo-box-base"/>
+                <String fx:value="date-picker"/>
+              </styleClass>
+            </DatePicker>
+            <Data cursor="DEFAULT" enabled="1" format="dd.MM.yyyy" id="data-dateEdit" value="01.01.2000" visible="1"/>
+            <LabelEx AnchorPane.rightAnchor="13" alignment="CENTER_LEFT" autoSize="false" contentDisplay="LEFT" ellipsisString="..." focusTraversable="false" graphicTextGap="4" id="label3" layoutX="344" layoutY="136" prefHeight="32" prefWidth="160" styleClass="label " text="Текстовое сообщение" textAlignment="LEFT" textFill="#333333" underline="false" wrapText="false">
+              <font>
+                <Font name="System Regular" size="15"/>
+              </font>
+            </LabelEx>
+            <Data cursor="DEFAULT" enabled="1" id="data-label3" visible="1"/>
+            <Hyperlink AnchorPane.rightAnchor="13" alignment="CENTER_RIGHT" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="4" id="link" layoutX="336" layoutY="232" prefHeight="32" prefWidth="168" styleClass="hyperlink " text="www.develnext.org" textAlignment="LEFT" wrapText="false">
+              <font>
+                <Font name="System Regular" size="15"/>
+              </font>
+            </Hyperlink>
+            <Data cursor="DEFAULT" enabled="1" id="data-link" visible="1"/>
+            <RadioGroupPane AnchorPane.rightAnchor="13" alignment="TOP_LEFT" focusTraversable="false" id="radioGroup" layoutX="344" layoutY="80" maxHeight="-1" maxWidth="-1" minHeight="-1" minWidth="-1" orientation="VERTICAL" prefHeight="48" prefWidth="160" selectedIndex="1" spacing="5" styleClass="" textColor="#000000">
+              <children/>
+              <font>
+                <Font name="System Regular" size="15"/>
+              </font>
+              <items xmlns:fx="http://javafx.com/fxml">
+                <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="Переключатели 1"/>
+                  <String fx:value="Переключатели 2"/>
+                </FXCollections>
+              </items>
+            </RadioGroupPane>
+            <Data cursor="DEFAULT" enabled="1" id="data-radioGroup" visible="1"/>
+          </children>
+          <titleFont>
+            <Font name="System Regular" size="15"/>
+          </titleFont>
+        </Panel>
+        <Data cursor="DEFAULT" enabled="1" id="data-panelAlt" visible="1"/>
+        <LabelEx alignment="CENTER_LEFT" autoSize="false" contentDisplay="LEFT" ellipsisString="..." focusTraversable="false" graphicTextGap="4" id="label4" layoutX="8" layoutY="8" prefHeight="16" prefWidth="96" styleClass="label " text="О скине:" textAlignment="LEFT" textFill="#333333" underline="false" wrapText="false">
+          <font>
+            <Font name="System Bold" size="12"/>
+          </font>
+        </LabelEx>
+        <Data cursor="DEFAULT" enabled="1" id="data-label4" visible="1"/>
+        <Separator focusTraversable="false" id="separatorAlt" layoutX="8" layoutY="24" orientation="HORIZONTAL" prefHeight="8" prefWidth="512" styleClass="separator "/>
+        <Data cursor="DEFAULT" enabled="1" id="data-separatorAlt" visible="1"/>
+      </children>
+      <titleFont>
+        <Font name="System Regular" size="12"/>
+      </titleFont>
+    </Panel>
+    <Data cursor="DEFAULT" enabled="1" id="data-panel" visible="1"/>
+    <ListViewEx AnchorPane.bottomAnchor="8" AnchorPane.leftAnchor="8" AnchorPane.topAnchor="72" editable="false" fixedCellSize="-1" focusTraversable="true" id="listView" layoutX="8" layoutY="72" prefHeight="360" prefWidth="216" styleClass="list-view ">
+      <items xmlns:fx="http://javafx.com/fxml">
+        <FXCollections fx:factory="observableArrayList">
+          <String fx:value="Без темы"/>
+          <String fx:value="Dark Theme"/>
+          <String fx:value="Light Theme"/>
+          <String fx:value="Banana"/>
+          <String fx:value="Silver"/>
+          <String fx:value="Windows XP"/>
+          <String fx:value="Office Theme"/>
+        </FXCollections>
+      </items>
+    </ListViewEx>
+    <Data cursor="DEFAULT" enabled="1" id="data-listView" visible="1"/>
+    <LabelEx alignment="CENTER_LEFT" autoSize="false" contentDisplay="LEFT" ellipsisString="..." focusTraversable="false" graphicTextGap="4" id="label" layoutX="8" layoutY="8" prefHeight="21" prefWidth="208" styleClass="label " text="Список скинов:" textAlignment="LEFT" textFill="#333333" underline="false" wrapText="false">
+      <font>
+        <Font name="System Bold" size="12"/>
+      </font>
+    </LabelEx>
+    <Data cursor="DEFAULT" enabled="1" id="data-label" visible="1"/>
+    <TextField AnchorPane.leftAnchor="8" alignment="CENTER_LEFT" editable="true" focusTraversable="true" id="editAlt" layoutX="8" layoutY="32" prefColumnCount="12" prefHeight="32" prefWidth="168" promptText="Поиск по скинам" styleClass="text-input text-field " text="">
+      <font>
+        <Font name="System Regular" size="15"/>
+      </font>
+    </TextField>
+    <Data cursor="DEFAULT" enabled="1" id="data-editAlt" visible="1"/>
+    <Button alignment="CENTER" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="4" id="buttonAlt" layoutX="184" layoutY="32" prefHeight="32" prefWidth="40" styleClass="button " text="" textAlignment="CENTER" textFill="#333333" underline="false" wrapText="false">
+      <font>
+        <Font name="System Regular" size="15"/>
+      </font>
+    </Button>
+    <Data cursor="DEFAULT" enabled="1" id="data-buttonAlt" visible="1"/>
+  </children>
+</AnchorPane>
