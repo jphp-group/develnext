@@ -1,14 +1,18 @@
 <?php
 namespace ide\editors\form;
 
+use ide\forms\MessageBoxForm;
 use ide\misc\EventHandler;
 use ide\misc\EventHandlerBehaviour;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\event\UXScrollEvent;
+use php\gui\framework\DataUtils;
 use php\gui\layout\UXHBox;
+use php\gui\text\UXFont;
 use php\gui\UXButton;
 use php\gui\UXComboBox;
+use php\gui\UXData;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\UXSeparator;
@@ -67,7 +71,7 @@ class IdeActionsPane extends UXHBox
      */
     private $eventHandler;
 
-    public function __construct(UXDesigner $designer, UXDesignPane $designPane)
+    public function __construct(UXDesigner $designer, UXDesignPane $designPane, callable $resetStyleCallback = null)
     {
         parent::__construct();
 
@@ -165,6 +169,19 @@ class IdeActionsPane extends UXHBox
         $this->makeZoomPane();
         $this->makeAlignPane();
         $this->designPane = $designPane;
+
+        if ($resetStyleCallback) {
+            $ui->add(new UXSeparator('VERTICAL'));
+
+            $applySkinBtn = new UXButton('Сбросить стили', ico('brush16'));
+            $applySkinBtn->on('action', function () use ($resetStyleCallback) {
+                if (MessageBoxForm::confirm('Вы уверены, что хотите сбросить стили всех компонентов?')) {
+                    $resetStyleCallback();
+                }
+            });
+
+            $ui->add($applySkinBtn);
+        }
     }
 
     /**

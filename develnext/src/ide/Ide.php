@@ -864,6 +864,26 @@ class Ide extends Application
         return $file;
     }
 
+
+    /**
+     * @param string $suffix
+     * @return File
+     */
+    public function createTempDirectory(string $suffix)
+    {
+        $tempDir = $this->getFile("tmp/$suffix");
+
+        if (!fs::isDir($tempDir)) {
+            if (fs::exists($tempDir)) {
+                fs::delete($tempDir);
+            }
+        }
+
+        $tempDir->mkdirs();
+
+        return $tempDir;
+    }
+
     /**
      * Вернуть список всех зарегистрированных шаблонов проекта.
      *

@@ -1,16 +1,31 @@
 <?php
+
 namespace ide\project\control;
+
 use ide\editors\CodeEditor;
 use ide\editors\CodeEditorX;
+use ide\entity\ProjectSkin;
+use ide\forms\MessageBoxForm;
 use ide\Ide;
+use ide\misc\SimpleSingleCommand;
+use ide\project\behaviours\gui\SkinManagerForm;
+use ide\project\behaviours\gui\SkinSaveDialogForm;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\project\Project;
 use ide\utils\FileUtils;
 use ide\utils\StrUtils;
+use ide\utils\UiUtils;
 use php\gui\designer\UXCssCodeArea;
 use php\gui\designer\UXSyntaxTextArea;
+use php\gui\layout\UXHBox;
+use php\gui\layout\UXVBox;
 use php\gui\UXApplication;
+use php\gui\UXFileChooser;
+use php\gui\UXLabel;
 use php\gui\UXNode;
 use php\gui\layout\UXAnchorPane;
+use php\gui\UXSeparator;
+use php\lang\System;
 use php\lib\str;
 use php\util\Regex;
 
@@ -23,6 +38,11 @@ class DesignProjectControlPane extends AbstractProjectControlPane
      * @var CodeEditor
      */
     protected $editor;
+
+    /**
+     * @var UXLabel
+     */
+    protected $uiSkinName;
 
     /**
      * @var bool
@@ -69,6 +89,51 @@ class DesignProjectControlPane extends AbstractProjectControlPane
         }
     }
 
+
+    protected function makeActionsUi()
+    {
+        $pane = UiUtils::makeCommandPane([
+            '-',
+            SimpleSingleCommand::makeWithText('Выбрать скин', 'icons/brush16.png', function () {
+
+                if ($gui = GuiFrameworkProjectBehaviour::get()) {
+                    try {
+                        $manager = new SkinManagerForm();
+                        if ($manager->showDialog() && $manager->getResult()) {
+                            $gui->applySkin($manager->getResult());
+                            $this->refresh();
+                        }
+                    } catch (\Exception $e) {
+                        MessageBoxForm::warning($e->getMessage());
+                    }
+                }
+
+            }),
+            '-',
+            SimpleSingleCommand::makeWithText('Сохранить CSS как скин', 'icons/save16.png', function () {
+                $dialog = new SkinSaveDialogForm($this->editor->getFile());
+                $project = Ide::project();
+
+                $dialog->uidField->text = str::replace($project->getName(), ' ', '');
+                $dialog->nameField->text = $project->getName();
+                $dialog->authorField->text = System::getProperty('user.name');
+
+                $dialog->showAndWait();
+            })
+        ]);
+
+        $this->uiSkinName = new UXLabel();
+        $pane->children->insert(0, $this->uiSkinName);
+        $icon = ico('brush32');
+
+        UXHBox::setMargin($icon, [0, 5, 0, 0]);
+
+        $pane->children->insert(0, $icon);
+        $pane->spacing = 5;
+
+        return $pane;
+    }
+
     /**
      * @return UXNode
      */
@@ -79,7 +144,12 @@ class DesignProjectControlPane extends AbstractProjectControlPane
         $this->editor->setTabbed(false);
         $this->editor->loadContentToArea();
 
-        return $this->editor->makeUi();
+        $cssEditor = $this->editor->makeUi();
+
+        $ui = new UXVBox([$this->makeActionsUi(), new UXSeparator(), $cssEditor], 5);
+        UXVBox::setVgrow($cssEditor, 'ALWAYS');
+
+        return $ui;
     }
 
     /**
@@ -93,6 +163,20 @@ class DesignProjectControlPane extends AbstractProjectControlPane
             uiLater(function () {
                 $this->editor->requestFocus();
             });
+
+            $this->uiSkinName->text = '(Скин не выбран)';
+            $this->uiSkinName->textColor = 'gray';
+            $this->uiSkinName->font->bold = false;
+
+            if ($gui = GuiFrameworkProjectBehaviour::get()) {
+                $skin = $gui->getCurrentSkin();
+
+                if ($skin) {
+                    $this->uiSkinName->text = $skin->getName();
+                    $this->uiSkinName->textColor = 'black';
+                    $this->uiSkinName->font->bold = true;
+                }
+            }
         }
         // nop.
     }

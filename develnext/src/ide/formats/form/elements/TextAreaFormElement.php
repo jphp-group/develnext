@@ -54,4 +54,15 @@ class TextAreaFormElement extends AbstractFormElement
     {
         return $any instanceof UXTextArea;
     }
+
+    public function resetStyle(UXNode $node, UXNode $baseNode)
+    {
+        parent::resetStyle($node, $baseNode);
+
+        /** @var UXTextField $node */
+        /** @var UXTextField $baseNode */
+        $node->font = $baseNode->font;
+    }
+
+
 }

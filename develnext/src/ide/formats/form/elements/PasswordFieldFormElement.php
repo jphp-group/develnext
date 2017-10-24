@@ -59,4 +59,13 @@ class PasswordFieldFormElement extends AbstractFormElement
     {
         return $any instanceof UXPasswordField;
     }
+
+    public function resetStyle(UXNode $node, UXNode $baseNode)
+    {
+        parent::resetStyle($node, $baseNode);
+
+        /** @var UXTextField $node */
+        /** @var UXTextField $baseNode */
+        $node->font = $baseNode->font;
+    }
 }

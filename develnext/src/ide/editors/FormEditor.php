@@ -61,6 +61,7 @@ use php\gui\paint\UXColor;
 use php\gui\UXApplication;
 use php\gui\UXCustomNode;
 use php\gui\UXData;
+use php\gui\UXForm;
 use php\gui\UXGroup;
 use php\gui\UXLabel;
 use php\gui\UXNode;
@@ -528,6 +529,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
         if ($this->config->get('form.backgroundColor')) {
             $this->layout->backgroundColor = UXColor::of($this->config->get('form.backgroundColor'));
+        } else {
+            $this->layout->backgroundColor = null;
         }
 
         $this->refreshInspectorType();
@@ -1187,9 +1190,36 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
     }
 
+    public function resetContentStyles()
+    {
+        $testScene = new UXForm();
+
+        foreach ($this->getStylesheets() as $one) {
+            $testScene->addStylesheet($one);
+        }
+
+        $this->eachNode(function (UXNode $node, $nodeId, ?AbstractFormElement $element) use ($testScene) {
+            if ($nodeId) {
+                $baseNode = $element ? $element->createElement() : null;
+
+                if ($baseNode) {
+                    $testScene->add($baseNode);
+                    $baseNode->applyCss();
+
+                    $element->resetStyle($node, $baseNode);
+                    $node->applyCss();
+                }
+            }
+        });
+
+        $testScene->children->clear();
+    }
+
     protected function makeActionsUi(UXDesignPane $designPane)
     {
-        $this->actionsPane = $ui = new IdeActionsPane($this->designer, $designPane);
+        $this->actionsPane = $ui = new IdeActionsPane($this->designer, $designPane, function () {
+            $this->resetContentStyles();
+        });
 
         $ui->getEventHandler()->on('change', function () {
             $this->save();

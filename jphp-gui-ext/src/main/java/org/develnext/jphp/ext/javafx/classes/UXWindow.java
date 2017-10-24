@@ -214,6 +214,11 @@ public class UXWindow<T extends Window> extends BaseWrapper<Window> {
     }
 
     @Signature
+    public void clearStylesheets() {
+        getWrappedObject().getScene().getStylesheets().clear();
+    }
+
+    @Signature
     public void addEventFilter(final Environment env, String event, final Invoker invoker) {
         EventHandler<MouseEvent> mouseHandler = new EventHandler<MouseEvent>() {
             @Override

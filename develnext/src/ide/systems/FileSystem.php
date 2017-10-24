@@ -365,7 +365,7 @@ class FileSystem
             UXAnchorPane::setAnchor($wrapScroll, 0);
 
             $wrap = new UXAnchorPane();
-            $wrap->width = self::$editorSplitDividerWidth;
+            $wrap->width = static::$editorSplitDividerWidth;
             $wrap->add($wrapScroll);
             UXSplitPane::setResizeWithParent($wrap, false);
 
@@ -374,7 +374,7 @@ class FileSystem
             if ($type == 'tab') {
                 $wrap->observer('width')->addListener(function ($_, $value) {
                     if ($value > 50) {
-                        self::$editorSplitDividerWidth = $value;
+                        static::$editorSplitDividerWidth = $value;
                     }
                 });
 
@@ -480,7 +480,7 @@ class FileSystem
                 $editor = $e->sender->userData;
 
                 uiLater(function () use ($editor) {
-                    if (self::isOpened($editor->getFile())) {
+                    if (static::isOpened($editor->getFile())) {
                         Logger::debug("Leave tab '{$editor->getTitle()}'");
                         $editor->leave();
                     }
@@ -494,7 +494,7 @@ class FileSystem
                     Logger::debug("Opening selected tab '$tab->text'");
 
                     if (static::$editorSplitDividerWidth && $tab->content instanceof UXSplitPane) {
-                        $tab->content->dividerPositions = [(self::$editorSplitDividerWidth + 3) / $tab->content->layoutBounds['width']];
+                        $tab->content->dividerPositions = [(static::$editorSplitDividerWidth + 3) / $tab->content->layoutBounds['width']];
                     }
 
                     static::_openEditor($tab->userData, $param);

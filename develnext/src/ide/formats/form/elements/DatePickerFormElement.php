@@ -92,4 +92,13 @@ class DatePickerFormElement extends AbstractFormElement
     {
         return $any instanceof UXDatePicker;
     }
+
+    public function resetStyle(UXNode $node, UXNode $baseNode)
+    {
+        parent::resetStyle($node, $baseNode);
+
+        /** @var UXTextField $node */
+        /** @var UXTextField $baseNode */
+        $node->font = $baseNode->font;
+    }
 }

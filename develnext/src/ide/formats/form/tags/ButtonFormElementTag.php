@@ -19,5 +19,6 @@ class ButtonFormElementTag extends AbstractFormElementTag
 
     public function writeAttributes($node, DomElement $element)
     {
+
     }
 }

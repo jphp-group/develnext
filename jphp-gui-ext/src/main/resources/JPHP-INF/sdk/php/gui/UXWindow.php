@@ -253,6 +253,14 @@ abstract class UXWindow
     }
 
     /**
+     * --RU--
+     * Очистить от всех внешних стилей.
+     */
+    public function clearStylesheets()
+    {
+    }
+
+    /**
      * Make layout virtual.
      */
     public function makeVirtualLayout()

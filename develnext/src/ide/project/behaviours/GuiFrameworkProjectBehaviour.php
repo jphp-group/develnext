@@ -1,4 +1,5 @@
 <?php
+
 namespace ide\project\behaviours;
 
 use develnext\bundle\game2d\Game2DBundle;
@@ -16,6 +17,7 @@ use ide\editors\GameSpriteEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\editors\menu\ContextMenu;
 use ide\editors\ScriptModuleEditor;
+use ide\entity\ProjectSkin;
 use ide\formats\form\AbstractFormElement;
 use ide\formats\form\FormEditorSettings;
 use ide\formats\FxCssCodeFormat;
@@ -31,8 +33,10 @@ use ide\formats\templates\GuiFormFileTemplate;
 use ide\formats\templates\GuiLauncherConfFileTemplate;
 use ide\formats\templates\PhpClassFileTemplate;
 use ide\forms\ImagePropertyEditorForm;
+use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\IdeException;
+use ide\library\IdeLibrarySkinResource;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
@@ -44,10 +48,14 @@ use ide\project\Project;
 use ide\project\ProjectExporter;
 use ide\project\ProjectFile;
 use ide\project\ProjectIndexer;
+use ide\project\ProjectModule;
 use ide\project\ProjectTree;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
+use php\compress\ZipException;
+use php\compress\ZipFile;
+use php\desktop\Runtime;
 use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\framework\AbstractModule;
@@ -407,11 +415,11 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         }
 
         if ($this->uiSplashOnTop) {
-            $this->uiSplashOnTop->selected = (bool) $this->splashData['alwaysOnTop'];
+            $this->uiSplashOnTop->selected = (bool)$this->splashData['alwaysOnTop'];
         }
 
         if ($this->uiSplashAutoHide) {
-            $this->uiSplashAutoHide->selected = (bool) $this->splashData['autoHide'];
+            $this->uiSplashAutoHide->selected = (bool)$this->splashData['autoHide'];
         }
     }
 
@@ -874,6 +882,63 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $template->setInnerCode($code);
 
         $this->project->defineFile('src/JPHP-INF/.bootstrap', $template, true);
+    }
+
+    /**
+     * Удалить скин программы.
+     */
+    public function clearSkin()
+    {
+        $skinDir = $this->project->getSrcFile('.theme/skin');
+        fs::clean($skinDir);
+        fs::delete($skinDir);
+    }
+
+    /**
+     * Применить скин к программе.
+     * @param ProjectSkin $skin
+     */
+    public function applySkin(ProjectSkin $skin)
+    {
+        if ($skin->hasAnyScope(GuiFrameworkProjectBehaviour::class, 'gui')) {
+            $skinDir = $this->project->getSrcFile('.theme/skin');
+            fs::clean($skinDir);
+            fs::makeDir($skinDir);
+
+            try {
+                $skin->unpack($skinDir);
+                $this->reloadStylesheet();
+            } catch (ZipException $e) {
+                uiLaterAndWait(function () use ($e) {
+                    MessageBoxForm::warning(
+                        "Ошибка установки скина, невозможно распаковать архив с файлами скина.\n\n -> {$e->getMessage()}"
+                    );
+                });
+            }
+        } else {
+            uiLaterAndWait(function () {
+                MessageBoxForm::warning('Данный скин невозможно применить к проекту данного типа.');
+            });
+        }
+    }
+
+    /**
+     * @return ProjectSkin
+     */
+    public function getCurrentSkin(): ?ProjectSkin
+    {
+       $skinDir = $this->project->getSrcFile('.theme/skin');
+
+       if (!fs::isDir($skinDir)) return null;
+       if (!fs::isFile("$skinDir/skin.properties")) return null;
+
+       try {
+           $skin = ProjectSkin::createFromDir($skinDir);
+           return $skin;
+       } catch (IOException $e) {
+           Logger::warn("Unable to read skin information, {$e->getMessage()}");
+           return null;
+       }
     }
 
     public function updateSpriteManager()
