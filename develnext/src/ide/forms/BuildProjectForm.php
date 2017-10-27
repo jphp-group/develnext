@@ -5,6 +5,7 @@ use ide\build\AbstractBuildType;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\Logger;
+use ide\utils\UiUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
@@ -47,11 +48,11 @@ class BuildProjectForm extends AbstractIdeForm
         $this->list->setCellFactory(function (UXListCell $cell, AbstractBuildType $item = null, $empty) {
             if ($item) {
                 $titleName = new UXLabel($item->getName());
-                $titleName->style = '-fx-font-weight: bold;';
+                $titleName->style = '-fx-font-weight: bold;' . UiUtils::fontSizeStyle() . ";";
                 $titleName->padding = 0;
 
                 $titleDescription = new UXLabel($item->getDescription());
-                $titleDescription->style = '-fx-text-fill: gray;';
+                $titleDescription->style = '-fx-text-fill: gray;' . UiUtils::fontSizeStyle() . ";";
 
                 $box = new UXHBox([$titleName]);
                 $box->spacing = 0;
@@ -59,6 +60,7 @@ class BuildProjectForm extends AbstractIdeForm
                 if ($item->getConfigForm()) {
                     $settingsLink = new UXHyperlink('(настройки)');
                     $settingsLink->padding = [0, 5];
+                    $settingsLink->style = UiUtils::fontSizeStyle() . ";";
                     $settingsLink->on('action', function () use ($item) {
                         $item->showConfigDialog();
                     });

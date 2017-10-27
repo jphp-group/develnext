@@ -299,6 +299,7 @@ public class JavaFXExtension extends Extension {
         registerEventProvider(new MenuItemEventProvider());
         registerEventProvider(new MenuEventProvider());
         registerEventProvider(new ButtonBaseEventProvider());
+        registerEventProvider(new MenuButtonEventProvider());
         registerEventProvider(new ComboBoxBaseEventProvider());
         registerEventProvider(new ChoiceBoxEventProvider());
         registerEventProvider(new WebEngineEventProvider());

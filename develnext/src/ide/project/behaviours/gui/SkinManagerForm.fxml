@@ -20,7 +20,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <HBox xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="461.0" prefWidth="510.0" spacing="15.0" style="-fx-background-color: white;">
@@ -73,7 +72,7 @@
                   </Button>
                   <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <Button id="addButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="35.0" text="Добавить новый">
+                        <Button id="addButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-add" text="Добавить новый">
                            <padding>
                               <Insets left="15.0" right="15.0" />
                            </padding>

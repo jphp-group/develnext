@@ -3,6 +3,7 @@ namespace ide\editors\menu;
 
 use action\Geometry;
 use ide\editors\AbstractEditor;
+use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use php\desktop\Mouse;
@@ -10,9 +11,11 @@ use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXContextMenu;
 use php\gui\UXMenu;
+use php\gui\UXMenuButton;
 use php\gui\UXMenuItem;
 use ide\Ide;
 use php\gui\UXNode;
+use php\gui\UXSplitMenuButton;
 use php\lang\IllegalArgumentException;
 use php\lib\str;
 
@@ -327,5 +330,38 @@ class ContextMenu
 
 
         $node->on('click', $handle, __CLASS__ . '#contextMenu');
+    }
+
+    /**
+     * @param string $text
+     * @param mixed $icon
+     * @param callable|null $onClick
+     * @return UXMenuButton
+     */
+    public function makeButton(string $text = '', UXNode $icon = null, callable $onClick = null)
+    {
+        $button = new UXSplitMenuButton($text, $icon);
+        $button->items->setAll($this->getRoot()->items);
+        $button->maxHeight = 999;
+
+        $button->observer('showing')->addListener(function ($_, $value) use ($button) {
+            if ($value) {
+                $this->trigger('showing');
+
+                foreach ($button->items as $item) {
+                    if ($item && $item->userData instanceof AbstractMenuCommand) {
+                        $item->userData->onBeforeShow($item, $this->editor);
+                    }
+                }
+
+                uiLater(function () { $this->trigger('show'); });
+            }
+        });
+
+        if ($onClick) {
+            $button->on('action', $onClick);
+        }
+
+        return $button;
     }
 }

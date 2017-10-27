@@ -895,6 +895,24 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
     }
 
     /**
+     * Конвертирует скин в тему проекта.
+     */
+    public function convertSkinToTheme()
+    {
+        if ($this->getCurrentSkin()) {
+            FileUtils::copyDirectory(
+                $this->project->getSrcFile('.theme/skin'),
+                $this->project->getSrcFile('.theme')
+            );
+
+            fs::delete($this->project->getSrcFile('.theme/style.fx.css'));
+            fs::rename($this->project->getSrcFile('.theme/skin.css'), 'style.fx.css');
+
+            $this->clearSkin();
+        }
+    }
+
+    /**
      * Применить скин к программе.
      * @param ProjectSkin $skin
      */
@@ -931,6 +949,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
 
        if (!fs::isDir($skinDir)) return null;
        if (!fs::isFile("$skinDir/skin.properties")) return null;
+       if (!fs::isFile("$skinDir/skin.css")) return null;
 
        try {
            $skin = ProjectSkin::createFromDir($skinDir);

@@ -55,6 +55,14 @@ class ProjectSkin extends AbstractEntity
     private $scopes = [];
 
     /**
+     * @return ProjectSkin
+     */
+    public static function createEmpty()
+    {
+        return new ProjectSkin();
+    }
+
+    /**
      * @param $path
      * @return ProjectSkin
      * @throws IOException
@@ -109,9 +117,10 @@ class ProjectSkin extends AbstractEntity
     /**
      * @param mixed $cssSourceFile
      * @param mixed $zipDestFile
+     * @param array $additionalFiles
      * @return ZipFile
      */
-    public function saveToZip($cssSourceFile, $zipDestFile): ZipFile
+    public function saveToZip($cssSourceFile, $zipDestFile, array $additionalFiles = []): ZipFile
     {
         $zip = new ZipFile($zipDestFile, true);
 
@@ -127,6 +136,10 @@ class ProjectSkin extends AbstractEntity
 
         $zip->addFromString('skin.properties', str::join($properties, "\r\n"));
         $zip->add('skin.css', $cssSourceFile);
+
+        foreach ($additionalFiles as $name => $srcFile) {
+            $zip->add($name, $srcFile);
+        }
 
         return $zip;
     }
@@ -268,6 +281,15 @@ class ProjectSkin extends AbstractEntity
     public function setScopes($scopes)
     {
         $this->scopes = is_array($scopes) ? $scopes : str::split($scopes, '|');
+    }
+
+    /**
+     * Is Empty skin.
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return !$this->file;
     }
 
     /**

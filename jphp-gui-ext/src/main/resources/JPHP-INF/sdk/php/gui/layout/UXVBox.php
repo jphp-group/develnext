@@ -28,7 +28,7 @@ class UXVBox extends UXPane
     public $fillWidth = true;
 
     /**
-     * @param UXNode[] $nodes (optional)
+     * @param UXNode[] $nodes [optional]
      * @param float|int $spacing
      */
     public function __construct(array $nodes, $spacing = 0)

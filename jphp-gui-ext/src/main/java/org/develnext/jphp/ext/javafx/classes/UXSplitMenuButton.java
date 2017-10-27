@@ -43,5 +43,7 @@ public class UXSplitMenuButton extends UXMenuButton<SplitMenuButton> {
     public void __construct(String text, @Nullable Node graphic) {
         __construct(text);
         setGraphic(graphic);
+
+        getWrappedObject().fire();
     }
 }

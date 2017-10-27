@@ -9,6 +9,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\utils\FileUtils;
 use ide\utils\Json;
+use ide\utils\UiUtils;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXAnchorPane;
@@ -450,7 +451,7 @@ class FileSystem
 
         $tab->text = $editor->getTitle();
         $tab->tooltip = $editor->getTooltip();
-        $tab->style = $editor->getTabStyle();
+        $tab->style = UiUtils::fontSizeStyle() . "; " . $editor->getTabStyle();
         $tab->graphic = Ide::get()->getImage($editor->getIcon());
         $tab->content = static::makeUiForEditor($editor, 'tab');
         $tab->userData = $editor;

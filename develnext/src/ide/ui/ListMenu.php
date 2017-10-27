@@ -2,6 +2,7 @@
 namespace ide\ui;
 
 use ide\Ide;
+use ide\utils\UiUtils;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXLabel;
@@ -120,8 +121,11 @@ class ListMenu extends UXListView
             $titleName->style = '-fx-font-weight: normal;';
         }
 
+        $titleName->style .= UiUtils::fontSizeStyle() . ";";
+
         $titleDescription = new UXLabel($this->getDescriptionOfItem($page));
         $titleDescription->classes->add('dn-list-menu-description');
+        $titleDescription->style .= UiUtils::fontSizeStyle() . ";";
 
         $box = new UXHBox([$titleName]);
         $box->spacing = 0;
@@ -144,6 +148,7 @@ class ListMenu extends UXListView
         if ($page->getMenuCount() >= 0) {
             $label = new UXLabel($page->getMenuCount());
             $label->classes->add('dn-list-menu-count');
+            $label->style = UiUtils::fontSizeStyle();
 
             $list[] = $label;
         }

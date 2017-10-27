@@ -10,11 +10,13 @@ use ide\Ide;
 use ide\library\IdeLibrary;
 use ide\library\IdeLibrarySkinResource;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\utils\FileUtils;
 use php\gui\UXFileChooser;
 use php\gui\UXImageView;
 use php\gui\UXTextArea;
 use php\gui\UXTextField;
 use php\lib\fs;
+use php\lib\str;
 
 /**
  * Class SkinSaveDialogForm
@@ -112,7 +114,20 @@ class SkinSaveDialogForm extends AbstractIdeForm
                 $file = "$file.zip";
             }
 
-            $skin->saveToZip($this->cssFile, $file);
+            $dir = fs::parent($this->cssFile);
+            $additionalFiles = [];
+
+            fs::scan($dir, function ($filename) use ($dir, &$additionalFiles) {
+                if (fs::isFile($filename)) {
+                    $name = FileUtils::relativePath($dir, $filename);
+
+                    if (!str::startsWith($name, 'skin/') && $name !== 'skin.properties' && $name !== fs::name($this->cssFile)) {
+                        $additionalFiles[$name] = $filename;
+                    }
+                }
+            });
+
+            $skin->saveToZip($this->cssFile, $file, $additionalFiles);
             $this->toast('Скин успешно сохранен в файл');
         }
     }

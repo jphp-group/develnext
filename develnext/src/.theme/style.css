@@ -1,5 +1,5 @@
 .root {
-    -fx-font-size: 13px;
+    /*-fx-font-size: 13px;*/
 }
 
 .flat-button { -fx-background-color: #f1f1f1; }

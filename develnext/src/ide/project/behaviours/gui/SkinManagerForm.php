@@ -103,10 +103,10 @@ class SkinManagerForm extends AbstractIdeForm
      */
     public function doSelect()
     {
-        if (!$this->list->selectedItem) {
+        if ($this->list->selectedIndex < 0) {
             MessageBoxForm::warning('Выберите скин ...');
         } else {
-            $this->setResult($this->list->selectedItem->getSkin());
+            $this->setResult($this->list->selectedItem ? $this->list->selectedItem->getSkin() : ProjectSkin::createEmpty());
             $this->hide();
         }
     }
@@ -134,9 +134,8 @@ class SkinManagerForm extends AbstractIdeForm
             } catch (ZipException $e) {
                 MessageBoxForm::warning("Ошибка чтения zip файла, скин не был добавлен.", $this);
             } catch (IOException $e) {
-                MessageBoxForm::warning("Ошибка чтения файла, скин не был добавлен", $this);
+                MessageBoxForm::warning("Ошибка чтения файла, скин не был добавлен.", $this);
             }
-
         }
     }
 
