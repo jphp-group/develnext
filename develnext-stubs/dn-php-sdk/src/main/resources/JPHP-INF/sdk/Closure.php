@@ -38,4 +38,12 @@ class Closure
      * @return Closure Returns the newly created Closure object or FALSE on failure
      */
     static function bind(Closure $closure, $newthis, $newscope = 'static') { }
+
+    /**
+     * @param callable $callable
+     * @return Closure
+     */
+    static function fromCallable(callable $callable)
+    {
+    }
 }

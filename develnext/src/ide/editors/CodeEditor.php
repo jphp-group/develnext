@@ -845,7 +845,8 @@ class CodeEditor extends AbstractEditor
         $this->textArea->jumpToLineSpaceOffset($beginLine);
 
         waitAsync(250, function () use ($beginLine) {
-            $this->textArea->estimatedScrollY = ($this->textArea->lineHeight) * $beginLine;
+            //$this->textArea->estimatedScrollY = ($this->textArea->lineHeight) * $beginLine;
+            $this->textArea->moveTo($beginLine);
         });
     }
 

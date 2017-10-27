@@ -57,11 +57,13 @@ class UXAbstractCodeArea extends UXControl
     public $lineHeight;
 
     /**
+     * @readonly
      * @var float
      */
     public $estimatedScrollY = 0.0;
 
     /**
+     * @readonly
      * @var float
      */
     public $estimatedScrollX = 0.0;
@@ -76,6 +78,30 @@ class UXAbstractCodeArea extends UXControl
      * @param $pos
      */
     public function jumpToLine($line, $pos)
+    {
+    }
+
+    /**
+     * @param int $line
+     * @param int $pos [optional]
+     */
+    public function moveTo(int $line, int $pos): void
+    {
+    }
+
+    /**
+     * @param float $x
+     * @param float $y
+     */
+    public function scrollToPixel(float $x, float $y): void
+    {
+    }
+
+    /**
+     * @param float $deltaX
+     * @param float $deltaY
+     */
+    public function scrollBy(float $deltaX, float $deltaY): void
     {
     }
 

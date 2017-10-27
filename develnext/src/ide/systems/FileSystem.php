@@ -494,7 +494,7 @@ class FileSystem
                     Logger::debug("Opening selected tab '$tab->text'");
 
                     if (static::$editorSplitDividerWidth && $tab->content instanceof UXSplitPane) {
-                        $tab->content->dividerPositions = [(self::$editorSplitDividerWidth + 3) / $tab->content->layoutBounds['width']];
+                        $tab->content->dividerPositions = [(static::$editorSplitDividerWidth + 3) / $tab->content->layoutBounds['width']];
                     }
 
                     static::_openEditor($tab->userData, $param);

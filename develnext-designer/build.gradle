@@ -12,5 +12,5 @@ dependencies {
     //compile 'com.fifesoft:autocomplete:2.5.8'
 
     //compile group: 'org.dockfx', name: 'DockFX', version: '1.0-SNAPSHOT'
-    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '1.0.0-SNAPSHOT'
+    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.8.1'
 }

@@ -142,7 +142,12 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     @Signature
     @SuppressWarnings("unchecked")
     public boolean removeByIndex(Environment env, int index) {
-        return getWrappedObject().remove(index) != null;
+        try {
+            getWrappedObject().remove(index);
+            return true;
+        } catch (IndexOutOfBoundsException e) {
+            return false;
+        }
     }
 
     @Signature

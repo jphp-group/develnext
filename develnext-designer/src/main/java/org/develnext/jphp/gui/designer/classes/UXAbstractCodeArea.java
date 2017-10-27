@@ -144,24 +144,34 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
         return getWrappedObject().getEstimatedScrollY();
     }
 
-    @Setter
-    public void setEstimatedScrollY(double value) {
-        getWrappedObject().setEstimatedScrollY(value);
-    }
-
     @Getter
     public double getEstimatedScrollX() {
         return getWrappedObject().getEstimatedScrollX();
     }
 
-    @Setter
-    public void setEstimatedScrollX(double value) {
-        getWrappedObject().setEstimatedScrollX(value);
-    }
-
     @Getter
     public Bounds getCaretBounds() {
         return getWrappedObject().getCaretBounds().orElse(null);
+    }
+
+    @Signature
+    public void scrollToPixel(double x, double y) {
+        getWrappedObject().scrollToPixel(x, y);
+    }
+
+    @Signature
+    public void scrollBy(double deltaX, double deltaY) {
+        getWrappedObject().scrollBy(deltaX, deltaY);
+    }
+
+    @Signature
+    public void moveTo(int line, int pos) {
+        getWrappedObject().moveTo(line, pos);
+    }
+
+    @Signature
+    public void moveTo(int line) {
+        getWrappedObject().moveTo(line, getCaretOffset());
     }
 
     @Signature

@@ -75,6 +75,14 @@ function is_array($value)
 }
 
 /**
+ * @param mixed $value
+ * @return bool
+ */
+function is_iterable($value)
+{
+}
+
+/**
  * @param $value
  * @return bool
  */
