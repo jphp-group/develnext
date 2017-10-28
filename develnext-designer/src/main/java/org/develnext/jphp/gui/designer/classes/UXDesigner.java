@@ -1507,7 +1507,7 @@ public class UXDesigner extends BaseObject {
             sizeText = new Label();
             sizeText.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
             //sizeText.setMouseTransparent(true);
-            sizeText.setStyle("-fx-background-color: #fffe85; -fx-padding: 1px 7px; -fx-font-size: 1em; -fx-text-fill: black;");
+            sizeText.setStyle("-fx-background-color: #fffe85; -fx-padding: 1px 7px; -fx-font-size: 12; -fx-text-fill: black;");
             sizeText.setPrefHeight(20);
 
             sizeText.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> sizeText.setOpacity(0.01));

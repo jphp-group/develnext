@@ -22,7 +22,7 @@ class UXDirectoryTreeView extends UXTreeView
 
     /**
      * UXDirectoryTreeView constructor.
-     * @param string $directory (optional)
+     * @param string $directory [optional]
      */
     public function __construct($directory)
     {
