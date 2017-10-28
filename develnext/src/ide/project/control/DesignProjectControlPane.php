@@ -11,6 +11,7 @@ use ide\entity\ProjectSkin;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
+use ide\misc\SeparatorCommand;
 use ide\misc\SimpleSingleCommand;
 use ide\project\behaviours\gui\SkinManagerForm;
 use ide\project\behaviours\gui\SkinSaveDialogForm;
@@ -105,6 +106,7 @@ class DesignProjectControlPane extends AbstractProjectControlPane
 
         $menu = new ContextMenu(null, [
             new DesignProjectControlPane_SkinClearCommand($this),
+            '-',
             new DesignProjectControlPane_SkinConvertToTheme($this),
         ]);
 
@@ -137,23 +139,6 @@ class DesignProjectControlPane extends AbstractProjectControlPane
             '-',
             SimpleSingleCommand::makeWithText('Сохранить CSS как скин', 'icons/save16.png', function () {
                 $dialog = new SkinSaveDialogForm($this->editor->getFile());
-                $project = Ide::project();
-
-                $propsFile = $project->getSrcFile('.theme/skin.properties');
-
-                if ($propsFile->exists()) {
-                    $config = new Configuration($propsFile);
-                    $dialog->nameField->text = $config->get('name', $project->getName());
-                    $dialog->descField->text = $config->get('description');
-                    $dialog->uidField->text = $config->get('uid', str::replace($dialog->nameField->text, ' ', ''));
-                    $dialog->authorField->text = $config->get('author', System::getProperty('user.name'));
-                    $dialog->authorSiteField->text = $config->get('authorSite');
-                } else {
-                    $dialog->uidField->text = str::replace($project->getName(), ' ', '');
-                    $dialog->nameField->text = $project->getName();
-                    $dialog->authorField->text = System::getProperty('user.name');
-                }
-
                 $dialog->showAndWait();
             })
         ]);
@@ -236,6 +221,11 @@ class DesignProjectControlPane_SkinConvertToTheme extends AbstractMenuCommand
         return "Конвертировать скин в стили проекта";
     }
 
+    public function getIcon()
+    {
+        return 'icons/convert16.png';
+    }
+
     public function onExecute($e = null, AbstractEditor $editor = null)
     {
         if (MessageBoxForm::confirm('Все стили проекта будут заменены стилями скина, Вы уверены?')) {
@@ -271,7 +261,7 @@ class DesignProjectControlPane_SkinClearCommand extends AbstractMenuCommand
 
     public function getName()
     {
-        return "Убрать скин с проекта";
+        return "(Без скина)";
     }
 
     public function getIcon()

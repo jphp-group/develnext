@@ -8,48 +8,77 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="439.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <ComboBox id="fontCombobox" layoutX="14.0" layoutY="31.0" prefHeight="25.0" prefWidth="411.0" visibleRowCount="30" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
-      <Label layoutX="14.0" layoutY="14.0" prefHeight="17.0" prefWidth="214.0" text="Шрифт:" />
-      <Label layoutX="14.0" layoutY="68.0" prefHeight="17.0" prefWidth="150.0" text="Размер:" AnchorPane.rightAnchor="275.0" />
-      <Separator layoutX="14.0" layoutY="56.0" prefHeight="33.0" prefWidth="319.0" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" />
-      <Button id="applyButton" defaultButton="true" layoutX="14.0" layoutY="152.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" text="Применить" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="14.0">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <Button id="cancelButton" cancelButton="true" layoutX="153.0" layoutY="152.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" text="Отмена" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="145.0">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <HBox layoutX="14.0" layoutY="136.0" prefHeight="30.0" prefWidth="322.0" spacing="7.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
-         <children>
-            <ToggleButton id="thinWeightButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" selected="true" text="Обычный">
-               <toggleGroup>
-                  <ToggleGroup fx:id="weight" />
-               </toggleGroup>
-            </ToggleButton>
-            <ToggleButton id="italicButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Наклонный" toggleGroup="$weight">
-               <font>
-                  <Font name="System Italic" size="12.0" />
-               </font>
-            </ToggleButton>
-            <ToggleButton id="boldWeightButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Жирный" toggleGroup="$weight">
-               <font>
-                  <Font name="System Bold" size="12.0" />
-               </font>
-            </ToggleButton>
-            <ToggleButton id="italicBoldWeightButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Жирный + Наклонный" toggleGroup="$weight">
-               <font>
-                  <Font name="System Bold Italic" size="12.0" />
-               </font>
-            </ToggleButton>
-         </children>
-      </HBox>
-      <Label id="testLabel" alignment="CENTER" layoutX="14.0" layoutY="175.0" prefHeight="103.0" prefWidth="411.0" text="Test Text" AnchorPane.bottomAnchor="72.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="175.0" />
-      <Slider id="sizeSlider" layoutX="10.0" layoutY="93.0" majorTickUnit="10.0" minorTickCount="10" prefHeight="25.0" prefWidth="355.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="74.0" />
-      <TextField id="sizeField" alignment="CENTER" layoutX="351.0" layoutY="91.0" prefHeight="30.0" prefWidth="49.0" AnchorPane.rightAnchor="18.0" />
-   </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0"
+            prefWidth="439.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <ComboBox id="fontCombobox" editable="true" layoutX="14.0" layoutY="31.0" prefHeight="25.0" prefWidth="411.0"
+                  visibleRowCount="30" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0"/>
+        <Label layoutX="14.0" layoutY="14.0" prefHeight="17.0" prefWidth="214.0" text="Шрифт:">
+            <font>
+                <Font name="System" size="12.0"/>
+            </font>
+        </Label>
+        <Label layoutX="14.0" layoutY="68.0" prefHeight="17.0" prefWidth="150.0" text="Размер:"
+               AnchorPane.rightAnchor="275.0">
+            <font>
+                <Font name="System" size="12.0"/>
+            </font>
+        </Label>
+        <Separator layoutX="14.0" layoutY="56.0" prefHeight="33.0" prefWidth="319.0" AnchorPane.bottomAnchor="46.0"
+                   AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0"/>
+        <Button id="applyButton" defaultButton="true" layoutX="14.0" layoutY="152.0" mnemonicParsing="false"
+                prefHeight="30.0" prefWidth="120.0" text="Применить" AnchorPane.bottomAnchor="16.0"
+                AnchorPane.leftAnchor="14.0">
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+        </Button>
+        <Button id="cancelButton" cancelButton="true" layoutX="153.0" layoutY="152.0" mnemonicParsing="false"
+                prefHeight="30.0" prefWidth="120.0" text="Отмена" AnchorPane.bottomAnchor="16.0"
+                AnchorPane.leftAnchor="145.0">
+            <cursor>
+                <Cursor fx:constant="HAND"/>
+            </cursor>
+        </Button>
+        <HBox layoutX="14.0" layoutY="136.0" prefHeight="30.0" prefWidth="322.0" spacing="7.0"
+              AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0">
+            <children>
+                <ToggleButton id="thinWeightButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false"
+                              selected="true" text="Обычный">
+                    <toggleGroup>
+                        <ToggleGroup fx:id="weight"/>
+                    </toggleGroup>
+                    <font>
+                        <Font name="System" size="12.0"/>
+                    </font>
+                </ToggleButton>
+                <ToggleButton id="italicButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false"
+                              text="Наклонный" toggleGroup="$weight">
+                    <font>
+                        <Font name="System Italic" size="12.0"/>
+                    </font>
+                </ToggleButton>
+                <ToggleButton id="boldWeightButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false"
+                              text="Жирный" toggleGroup="$weight">
+                    <font>
+                        <Font name="System Bold" size="12.0"/>
+                    </font>
+                </ToggleButton>
+                <ToggleButton id="italicBoldWeightButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false"
+                              text="Жирный + Наклонный" toggleGroup="$weight">
+                    <font>
+                        <Font name="System Bold Italic" size="12.0"/>
+                    </font>
+                </ToggleButton>
+            </children>
+        </HBox>
+        <Label id="testLabel" alignment="CENTER" layoutX="14.0" layoutY="175.0" prefHeight="103.0" prefWidth="411.0"
+               text="Test Text" AnchorPane.bottomAnchor="72.0" AnchorPane.leftAnchor="14.0"
+               AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="175.0"/>
+        <Slider id="sizeSlider" layoutX="10.0" layoutY="93.0" majorTickUnit="10.0" minorTickCount="10" prefHeight="25.0"
+                prefWidth="355.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="10.0"
+                AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="74.0"/>
+        <TextField id="sizeField" alignment="CENTER" layoutX="351.0" layoutY="91.0" prefHeight="30.0" prefWidth="49.0"
+                   AnchorPane.rightAnchor="18.0"/>
+    </children>
 </AnchorPane>

@@ -9,6 +9,7 @@ use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
 use ide\scripts\AbstractScriptComponent;
 use ide\utils\Json;
+use ide\utils\UiUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXFlowPane;
 use php\gui\layout\UXVBox;
@@ -340,6 +341,7 @@ class FormElementTypePane
 
         if ($pane) {
             $pane->font = UXFont::of($pane->font->family, $pane->font->size, 'BOLD');
+            $pane->style = UiUtils::fontSizeStyle();
             $pane->textColor = 'gray';
             $pane->animated = false;
             $pane->expanded = true;
@@ -429,6 +431,7 @@ class FormElementTypePane
             $button->alignment = 'BASELINE_LEFT';
             $button->userData = $element;
             $button->graphic = Ide::get()->getImage($element->getIcon());
+            $button->style = UiUtils::fontSizeStyle();
 
 
             if ($button->graphic) {

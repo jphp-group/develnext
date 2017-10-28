@@ -6,6 +6,7 @@ use ide\editors\AbstractEditor;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
+use ide\utils\UiUtils;
 use php\desktop\Mouse;
 use php\gui\event\UXKeyEvent;
 use php\gui\event\UXMouseEvent;
@@ -341,8 +342,18 @@ class ContextMenu
     public function makeButton(string $text = '', UXNode $icon = null, callable $onClick = null)
     {
         $button = new UXSplitMenuButton($text, $icon);
-        $button->items->setAll($this->getRoot()->items);
+
+        /** @var UXMenuItem $item */
+        foreach ($this->getRoot()->items as $item) {
+            if (!$item) {
+                $button->items->add(UXMenuItem::createSeparator());
+            } else {
+                $button->items->add($item);
+            }
+        }
+
         $button->maxHeight = 999;
+        $button->style = UiUtils::fontSizeStyle() . "; ";
 
         $button->observer('showing')->addListener(function ($_, $value) use ($button) {
             if ($value) {

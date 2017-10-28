@@ -1,7 +1,15 @@
 <?php
 namespace ide\misc;
+use php\format\JsonProcessor;
+use php\io\File;
+use php\io\FileStream;
+use php\io\IOException;
+use php\io\MemoryStream;
+use php\io\Stream;
+use php\lib\fs;
 use php\lib\reflect;
 use php\lib\str;
+use php\util\Configuration;
 
 /**
  * Абстрактная сущность/модель.
@@ -83,5 +91,43 @@ abstract class AbstractEntity
         }
 
         return "Entity $name (" . str::join($props, ", ");
+    }
+
+    /**
+     * Save to json file.
+     *
+     * @param string|Stream $file
+     * @throws IOException
+     */
+    public function saveToFile($file)
+    {
+        $json = new JsonProcessor(JsonProcessor::SERIALIZE_PRETTY_PRINT);
+
+        $stream = $file instanceof Stream ? $file : new FileStream($file);
+
+        $json->formatTo($this->getProperties(), $stream);
+
+        if (!($file instanceof Stream)) {
+            $stream->close();
+        }
+    }
+
+    /**
+     * Load from json file.
+     *
+     * @param string|Stream $file
+     */
+    public function loadFromFile($file)
+    {
+        $json = new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS);
+
+        $stream = $file instanceof Stream ? $file : new FileStream($file);
+
+        $props = $json->parse($stream);
+        $this->setProperties($props);
+
+        if (!($file instanceof Stream)) {
+            $stream->close();
+        }
     }
 }

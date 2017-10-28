@@ -5,5 +5,4 @@ HBox, VBox, FlowPane, TilePane, GridPane {
 
 .FormEditor {
     -fx-background-color: #f2f2f2;
-    -fx-font-size: 13px;
 }

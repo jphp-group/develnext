@@ -1217,9 +1217,9 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function makeActionsUi(UXDesignPane $designPane)
     {
-        $this->actionsPane = $ui = new IdeActionsPane($this->designer, $designPane, function () {
+        $this->actionsPane = $ui = new IdeActionsPane($this->designer, $designPane/*, function () {
             $this->resetContentStyles();
-        });
+        }*/);
 
         $ui->getEventHandler()->on('change', function () {
             $this->save();

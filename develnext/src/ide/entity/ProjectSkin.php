@@ -6,6 +6,7 @@ use ide\misc\AbstractEntity;
 use php\compress\ZipException;
 use php\compress\ZipFile;
 use php\io\IOException;
+use php\io\MemoryStream;
 use php\io\Stream;
 use php\lib\arr;
 use php\lib\fs;
@@ -74,9 +75,9 @@ class ProjectSkin extends AbstractEntity
         $result->setUid(fs::normalize($path));
 
 
-        if (fs::isFile("$path/skin.properties")) {
-            Stream::tryAccess("$path/skin.properties", function (Stream $stream) use ($result) {
-                $result->setProperties((new Configuration($stream))->toArray());
+        if (fs::isFile("$path/skin.json")) {
+            Stream::tryAccess("$path/skin.json", function (Stream $stream) use ($result) {
+                $result->loadFromFile($stream);
             });
         }
 
@@ -99,14 +100,16 @@ class ProjectSkin extends AbstractEntity
 
         $zip = new ZipFile($file);
 
-        if ($zip->has('skin.properties')) {
-            $zip->read('skin.properties', function (array $stat, Stream $reader) use ($result) {
-                $result->setProperties((new Configuration($reader))->toArray());
+        if ($zip->has('skin.json')) {
+            $zip->read('skin.json', function (array $stat, Stream $reader) use ($result) {
+                $result->loadFromFile($reader);
 
                 if (!$result->getDescription() && $stat['comment']) {
                     $result->setDescription($stat['comment']);
                 }
             });
+        } else {
+            throw new IOException("skin.json not found");
         }
 
         $result->setFile($file);
@@ -122,19 +125,17 @@ class ProjectSkin extends AbstractEntity
      */
     public function saveToZip($cssSourceFile, $zipDestFile, array $additionalFiles = []): ZipFile
     {
-        $zip = new ZipFile($zipDestFile, true);
+        $stream = new MemoryStream();
+        $this->saveToFile($stream);
+        $stream->seek(0);
 
-        $properties = [];
-
-        foreach ($this->getProperties() as $key => $value) {
-            if (is_array($value)) {
-                $value = str::join($value, '|');
-            }
-
-            $properties[] = "$key=$value";
+        if (fs::isFile($zipDestFile)) {
+            fs::delete($zipDestFile);
         }
 
-        $zip->addFromString('skin.properties', str::join($properties, "\r\n"));
+        $zip = new ZipFile($zipDestFile, true);
+
+        $zip->addFromString('skin.json', "$stream");
         $zip->add('skin.css', $cssSourceFile);
 
         foreach ($additionalFiles as $name => $srcFile) {

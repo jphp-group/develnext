@@ -948,7 +948,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
        $skinDir = $this->project->getSrcFile('.theme/skin');
 
        if (!fs::isDir($skinDir)) return null;
-       if (!fs::isFile("$skinDir/skin.properties")) return null;
+       if (!fs::isFile("$skinDir/skin.json")) return null;
        if (!fs::isFile("$skinDir/skin.css")) return null;
 
        try {

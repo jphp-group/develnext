@@ -1,5 +1,6 @@
 <?php
 namespace ide\ui;
+use ide\utils\UiUtils;
 use php\gui\UXImageArea;
 use php\gui\layout\UXVBox;
 use php\gui\UXLabelEx;
@@ -51,6 +52,7 @@ class ImageBox extends UXVBox implements StreamLoadableBehaviour
         $nameLabel->alignment = 'TOP_CENTER';
         $nameLabel->paddingTop = 5;
         $nameLabel->width = $item->width;
+        $nameLabel->style = UiUtils::fontSizeStyle() . "; ";
 
         $this->add($nameLabel);
         $this->titleLabel = $nameLabel;

@@ -4,6 +4,7 @@ namespace ide\editors\form;
 use ide\forms\MessageBoxForm;
 use ide\misc\EventHandler;
 use ide\misc\EventHandlerBehaviour;
+use ide\utils\UiUtils;
 use php\gui\designer\UXDesigner;
 use php\gui\designer\UXDesignPane;
 use php\gui\event\UXScrollEvent;
@@ -79,6 +80,7 @@ class IdeActionsPane extends UXHBox
 
         $this->designer = $designer;
         $ui = $this;
+        $ui->style = UiUtils::fontSizeStyle() . ";";
 
         $ui->spacing = 4;
         $ui->padding = 5;

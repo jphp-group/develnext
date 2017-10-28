@@ -12,6 +12,7 @@ use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
 use ide\systems\WatcherSystem;
 use ide\utils\FileUtils;
+use ide\utils\UiUtils;
 use php\desktop\HotKeyManager;
 use php\desktop\Robot;
 use php\gui\designer\UXDesigner;
@@ -165,6 +166,7 @@ class MainForm extends AbstractIdeForm
 
         $tree = new UXDirectoryTreeView();
         $tree->position = [0, 0];
+        $tree->style = UiUtils::fontSizeStyle();
         $this->directoryTree->add($tree);
 
         UXAnchorPane::setAnchor($tree, 0);

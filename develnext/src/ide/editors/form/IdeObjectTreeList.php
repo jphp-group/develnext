@@ -8,6 +8,7 @@ use ide\editors\menu\ContextMenu;
 use ide\formats\form\AbstractFormElement;
 use ide\Ide;
 use ide\misc\EventHandlerBehaviour;
+use ide\utils\UiUtils;
 use php\gui\event\UXEvent;
 use php\gui\layout\UXHBox;
 use php\gui\UXButton;
@@ -150,6 +151,7 @@ class IdeObjectTreeList
     public function makeUi()
     {
         $ui = new UXComboBox();
+        $ui->style = UiUtils::fontSizeStyle() . '; ';
 
         $ui->on('action', function (UXEvent $event) {
             $this->trigger('change', [$event->sender->selected ? $event->sender->selected->value : null]);
@@ -167,6 +169,7 @@ class IdeObjectTreeList
             $btn = new UXButton('', ico('menu16'));
             $btn->tooltipText = 'Меню выбранного объекта';
             $btn->maxHeight = 999;
+            $btn->style = UiUtils::fontSizeStyle();
 
             $btn->on('action', function () use ($btn) {
                 $this->contextMenu->show($btn);

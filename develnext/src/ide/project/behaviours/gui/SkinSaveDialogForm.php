@@ -9,12 +9,16 @@ use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
 use ide\library\IdeLibrary;
 use ide\library\IdeLibrarySkinResource;
+use ide\Logger;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
+use ide\project\Project;
 use ide\utils\FileUtils;
 use php\gui\UXFileChooser;
 use php\gui\UXImageView;
 use php\gui\UXTextArea;
 use php\gui\UXTextField;
+use php\io\IOException;
+use php\lang\System;
 use php\lib\fs;
 use php\lib\str;
 
@@ -69,6 +73,58 @@ class SkinSaveDialogForm extends AbstractIdeForm
     }
 
     /**
+     * @event close
+     */
+    public function onClose()
+    {
+        try {
+            $this->makeSkin()->saveToFile(fs::pathNoExt($this->cssFile) . ".json");
+        } catch (IOException $e) {
+            Logger::warn("Unable to save skin.json, {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * @event showing
+     */
+    public function onShowing()
+    {
+        $skin = new ProjectSkin();
+
+        $file = fs::parent($this->cssFile) . "/skin.json";
+
+        if (fs::exists($file)) {
+            try {
+                $skin->loadFromFile($file);
+            } catch (IOException $e) {
+                Logger::warn("Unable to load skin.json, {$e->getMessage()}");
+            }
+        }
+
+        $project = Ide::project();
+
+        if ($project) {
+            if (!$skin->getUid()) {
+                $skin->setUid(str::replace($project->getName(), ' ', ''));
+            }
+
+            if (!$skin->getName()) {
+                $skin->setName($project->getName());
+            }
+
+            if (!$skin->getAuthor()) {
+                $skin->setAuthor(System::getProperty('user.name'));
+            }
+        }
+
+        $this->uidField->text = $skin->getUid();
+        $this->nameField->text = $skin->getName();
+        $this->descField->text = $skin->getDescription();
+        $this->authorField->text = $skin->getAuthor();
+        $this->authorSiteField->text = $skin->getAuthorSite();
+    }
+
+    /**
      * @event cancelButton.action
      */
     public function doCancel(): void
@@ -84,9 +140,19 @@ class SkinSaveDialogForm extends AbstractIdeForm
         $skin = $this->makeSkin();
         $ideLibrary = Ide::get()->getLibrary();
 
+        $skinFile = $ideLibrary->getResourceDirectory('skins') . "/{$skin->getUid()}.zip";
+
+        if (fs::isFile($skinFile)) {
+            if (!MessageBoxForm::confirm("Скин с ID '{$skin->getUid()}' уже существует в библиотеке, хотите заменить его?")) {
+                return;
+            }
+
+            fs::delete($skinFile);
+        }
+
         $zip = $skin->saveToZip(
             $this->cssFile,
-            $zipFile = $ideLibrary->getResourceDirectory('skins') . "/{$skin->getUid()}.zip"
+            $zipFile = $skinFile
         );
 
         if (fs::isFile($zipFile)) {
@@ -107,6 +173,7 @@ class SkinSaveDialogForm extends AbstractIdeForm
         $skin = $this->makeSkin();
 
         $dialog = new UXFileChooser();
+        $dialog->initialFileName = $skin->getUid() . ".zip";
         $dialog->extensionFilters = [['description' => 'Skin Files (*.zip)', 'extensions' => ['*.zip']]];
 
         if ($file = $dialog->showSaveDialog()) {
@@ -121,7 +188,7 @@ class SkinSaveDialogForm extends AbstractIdeForm
                 if (fs::isFile($filename)) {
                     $name = FileUtils::relativePath($dir, $filename);
 
-                    if (!str::startsWith($name, 'skin/') && $name !== 'skin.properties' && $name !== fs::name($this->cssFile)) {
+                    if (!str::startsWith($name, 'skin/') && $name !== 'skin.json' && $name !== fs::name($this->cssFile)) {
                         $additionalFiles[$name] = $filename;
                     }
                 }

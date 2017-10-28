@@ -84,7 +84,7 @@ class BackupProjectControlPane extends AbstractProjectControlPane
 
             if ($backup) {
                 $title = new UXLabel($backup->getName());
-                $title->font->bold = true;
+                $title->style = UiUtils::fontSizeStyle() . "; -fx-font-weight: bold;";
                 $createdAt = new Time($backup->getCreatedAt());
 
                 $createdAtText = $createdAt->toString('dd MMM, HH:mm:ss, yyyy г.', Locale::RUSSIAN());
@@ -102,7 +102,7 @@ class BackupProjectControlPane extends AbstractProjectControlPane
                     $title->style = '-fx-text-fill: blue';
                 }
 
-                $description->style = '-fx-text-fill: gray';
+                $description->style = '-fx-text-fill: gray; ' . UiUtils::fontSizeStyle();
 
                 $cell->graphic = new UXHBox([
                     ico('archive32'),

@@ -25,6 +25,8 @@ class IdeLibrarySkinResource extends IdeLibraryResource
 
     public function __construct($path = null)
     {
+        $this->path = $path;
+
         $skinFile = new File("$path.zip");
         $this->config = new Configuration();
 
@@ -41,6 +43,14 @@ class IdeLibrarySkinResource extends IdeLibraryResource
         }
     }
 
+    public function delete()
+    {
+        if (!fs::delete("{$this->path}.zip")) {
+            Logger::error("Failed to delete skin resource file {$this->path}.zip");
+        }
+    }
+
+
     /**
      * @return ProjectSkin
      */
@@ -48,6 +58,12 @@ class IdeLibrarySkinResource extends IdeLibraryResource
     {
         return $this->skin;
     }
+
+    function isValid()
+    {
+        return parent::isValid() && $this->skin && !$this->skin->isEmpty();
+    }
+
 
     /**
      * @return string

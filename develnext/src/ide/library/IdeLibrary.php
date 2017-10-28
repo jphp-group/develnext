@@ -236,6 +236,6 @@ class IdeLibrary
     public function delete(IdeLibraryResource $resource)
     {
         $resource->delete();
-        $this->update();
+        $this->updateCategory($resource->getCategory());
     }
 }

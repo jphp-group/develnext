@@ -1,13 +1,17 @@
 <?php
 namespace ide\project\behaviours\gui;
 
+use ide\editors\menu\ContextMenu;
 use ide\entity\ProjectSkin;
 use ide\forms\AbstractIdeForm;
 use ide\forms\MessageBoxForm;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
+use ide\library\IdeLibrary;
 use ide\library\IdeLibrarySkinResource;
+use ide\misc\SimpleSingleCommand;
 use ide\systems\IdeSystem;
+use ide\ui\ListExtendedItem;
 use ide\utils\FileUtils;
 use php\compress\ZipException;
 use php\gui\layout\UXStackPane;
@@ -20,6 +24,7 @@ use php\gui\UXListView;
 use php\io\File;
 use php\io\IOException;
 use php\lib\fs;
+use php\lib\str;
 use timer\AccurateTimer;
 
 /**
@@ -39,17 +44,58 @@ class SkinManagerForm extends AbstractIdeForm
     {
         parent::init();
 
+        $contextMenu = new ContextMenu(null, [
+            SimpleSingleCommand::makeWithText('Удалить из библиотеки', 'icons/trash16.gif', function () {
+                if ($this->list->selectedIndex > 0) {
+                    /** @var IdeLibrarySkinResource $skin */
+                    $skin = $this->list->selectedItem;
+
+                    if (MessageBoxForm::confirmDelete("скин {$skin->getSkin()->getName()}")) {
+                        Ide::get()->getLibrary()->delete($skin);
+                        $this->updateList();
+                    }
+                } else {
+                    MessageBoxForm::warning("Выберите скин для удаления.");
+                }
+            })
+        ]);
+
+        $contextMenu->linkTo($this->list);
+
         $this->icon->image = ico('brush32')->image;
 
         $this->list->setCellFactory(function (UXListCell $cell, ?IdeLibrarySkinResource $resource) {
             if ($resource) {
                 $cell->text = null;
                 if ($skin = $resource->getSkin()) {
-                    $cell->graphic = new UXLabel($skin->getName(), ico('brush16'));
+                    $desc = $skin->getDescription();
+
+                    if ($skin->getAuthor()) {
+                        if ($desc) $desc .= ", ";
+                        $desc .= "автор - " . $skin->getAuthor();
+                    }
+
+                    if ($skin->getAuthorSite()) {
+                        if ($desc) $desc .= " ";
+                        $desc .= "({$skin->getAuthorSite()})";
+                    }
+
+                    if ($skin->getVersion()) {
+                        if ($desc) $desc .= ", ";
+                        $desc .= "версия {$skin->getVersion()}";
+                    }
+
+                    if (!$desc) {
+                        $desc = "Описание отсутствует.";
+                    }
+
+                    $cell->graphic = new ListExtendedItem($skin->getName(), str::upperFirst($desc), ico('brush16'));
                 }
+
             } else {
-                $cell->text = '(Без скина)';
-                $cell->graphic = ico('brush16');
+                $cell->text = null;
+                $cell->graphic = $ui = new ListExtendedItem('(Без скина)', 'Убрать скин из проекта', ico('brush16'));
+                $ui->setTitleThin(true);
             }
         });
 
@@ -119,13 +165,23 @@ class SkinManagerForm extends AbstractIdeForm
         $dlg = new UXFileChooser();
         $dlg->extensionFilters = [['description' => 'Skin Files (*.zip)', 'extensions' => ['*.zip']]];
 
+        retry:
         if ($file = $dlg->execute()) {
             try {
                 if ($skin = ProjectSkin::createFromZip($file)) {
                     $ideLibrary = Ide::get()->getLibrary();
 
                     $skinDir = $ideLibrary->getResourceDirectory('skins');
-                    FileUtils::copyFile($file, "$skinDir/" . fs::name($file));
+
+                    $destFile = "$skinDir/" . $skin->getUid() . ".zip";
+
+                    if (fs::isFile($destFile)) {
+                        if (!MessageBoxForm::confirm("Скин с ID '{$skin->getUid()}' уже существует в библиотеке, хотите заменить его новым?")) {
+                            goto retry;
+                        }
+                    }
+
+                    FileUtils::copyFile($file, $destFile);
                     $ideLibrary->updateCategory('skins');
 
                     $this->updateList();
@@ -142,7 +198,13 @@ class SkinManagerForm extends AbstractIdeForm
     public function updateList()
     {
         $this->list->items->setAll([null]);
-        $this->list->items->addAll(Ide::get()->getLibrary()->getResources('skins'));
+        $resources = Ide::get()->getLibrary()->getResources('skins');
+
+        foreach ($resources as $resource) {
+            if ($resource->isValid()) {
+                $this->list->items->add($resource);
+            }
+        }
     }
 
     /**
