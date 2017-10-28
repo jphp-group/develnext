@@ -14,8 +14,6 @@ use Iterator;
  */
 class UXList implements Iterator, Countable, ArrayAccess
 {
-
-
     /**
      * @readonly
      * @var int
@@ -65,6 +63,14 @@ class UXList implements Iterator, Countable, ArrayAccess
      * @param iterable $objects
      */
     public function addAll(iterable $objects)
+    {
+    }
+
+    /**
+     * @param int $index
+     * @param $object
+     */
+    public function set(int $index, $object)
     {
     }
 

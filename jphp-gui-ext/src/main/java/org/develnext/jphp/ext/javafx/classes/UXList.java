@@ -5,34 +5,94 @@ import javafx.collections.ObservableList;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
+import php.runtime.annotation.Reflection.Abstract;
 import php.runtime.annotation.Reflection.Getter;
+import php.runtime.annotation.Reflection.Name;
 import php.runtime.annotation.Reflection.Signature;
+import php.runtime.common.Callback;
+import php.runtime.common.Messages;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.lang.ForeachIterator;
+import php.runtime.lang.exception.BaseTypeError;
 import php.runtime.lang.spl.ArrayAccess;
 import php.runtime.lang.spl.Countable;
 import php.runtime.lang.spl.iterator.Iterator;
 import php.runtime.memory.ArrayMemory;
 import php.runtime.memory.LongMemory;
 import php.runtime.memory.ObjectMemory;
+import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
+import php.runtime.reflection.support.ReflectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Reflection.Abstract
-@Reflection.Name(JavaFXExtension.NS + "UXList")
+@Abstract
+@Name(JavaFXExtension.NS + "UXList")
 public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterator, Countable, ArrayAccess {
     private int index = -1;
+    private Class<?> unwrapClass = null;
+    private Callback<T, Memory> unwrapCallback;
+    private Callback<Memory, T> wrapCallback;
 
     public UXList(Environment env, ObservableList<T> wrappedObject) {
         super(env, wrappedObject);
     }
 
+    public UXList(Environment env, ObservableList<T> wrappedObject, Class<?> unwrapClass) {
+        super(env, wrappedObject);
+        this.unwrapClass = unwrapClass;
+    }
+
+    public UXList(Environment env, ObservableList<T> wrappedObject, Callback<T, Memory> unwrapCallback, Callback<Memory, T> wrapCallback) {
+        super(env, wrappedObject);
+        this.unwrapCallback = unwrapCallback;
+        this.wrapCallback = wrapCallback;
+    }
+
+    public UXList(Environment env, ObservableList<T> wrappedObject, Class<T> unwrapClass, Callback<T, Memory> unwrapCallback, Callback<Memory, T> wrapCallback) {
+        super(env, wrappedObject);
+        this.unwrapClass = unwrapClass;
+        this.unwrapCallback = unwrapCallback;
+        this.wrapCallback = wrapCallback;
+    }
+
     public UXList(Environment env, ClassEntity clazz) {
         super(env, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Memory wrap(Environment env, T object) {
+        if (wrapCallback != null) {
+            return wrapCallback.call(object);
+        }
+
+        return Memory.wrap(env, object);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected T unwrap(Environment env, Memory object, String methodName) {
+        T unwrap = unwrapCallback != null ? unwrapCallback.call(object) : (T) Memory.unwrap(env, object);
+
+        if (unwrap == null) {
+            env.exception(BaseTypeError.class, "Argument passed to UXList::%s() must be not NULL");
+        }
+
+        if (unwrapClass != null && unwrap != null && !unwrapClass.isAssignableFrom(unwrap.getClass())) {
+            Class<? extends BaseWrapper> wrapper = MemoryOperation.getWrapper(unwrapClass);
+
+            String message = String.format(
+                    "Argument passed to UXList::%s() must be of the type %s type",
+                    methodName,
+                    wrapper == null ? unwrapClass.getName() : ReflectionUtils.getClassName(wrapper)
+            );
+
+            env.exception(BaseTypeError.class, message);
+        }
+
+        return unwrap;
     }
 
     @Signature
@@ -51,7 +111,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     @Signature
     @SuppressWarnings("unchecked")
     public int indexOf(Environment env, Memory object) {
-        return getWrappedObject().indexOf((T) Memory.unwrap(env, object));
+        return getWrappedObject().indexOf(unwrap(env, object, "indexOf"));
     }
 
     @Signature
@@ -60,7 +120,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         int index = indexOf(env, object);
 
         if (index != -1) {
-            getWrappedObject().add(index, (T) Memory.unwrap(env, newObject));
+            getWrappedObject().add(index, unwrap(env, newObject, "replace"));
             getWrappedObject().remove(index + 1);
         }
     }
@@ -68,7 +128,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     @Signature
     public boolean has(Environment env, Memory object) {
         for (T t : getWrappedObject()) {
-            if (Memory.wrap(env, t).equal(object)) {
+            if (wrap(env, t).equal(object)) {
                 return true;
             }
         }
@@ -77,16 +137,21 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     }
 
     @Signature
+    public void set(Environment env, int index, Memory object) {
+        getWrappedObject().set(index, unwrap(env, object, "set"));
+    }
+
+    @Signature
     @SuppressWarnings("unchecked")
     public boolean add(Environment env, Memory object) {
-        return getWrappedObject().add((T) Memory.unwrap(env, object));
+        return getWrappedObject().add(unwrap(env, object, "add"));
     }
 
     @Signature
     @SuppressWarnings("unchecked")
     public void insert(Environment env, int index, Memory object) {
         if (index >= 0) {
-            getWrappedObject().add(index, (T) Memory.unwrap(env, object));
+            getWrappedObject().add(index, unwrap(env, object, "insert"));
             return;
         }
 
@@ -122,7 +187,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         List<T> list = new ArrayList<>();
 
         while (iterator.next()) {
-            list.add((T) Memory.unwrap(env, iterator.getValue()));
+            list.add(unwrap(env, iterator.getValue(), "insertAll"));
         }
 
         if (index >= 0) {
@@ -135,7 +200,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
     @Signature
     @SuppressWarnings("unchecked")
     public boolean remove(Environment env, Memory object) {
-        return getWrappedObject().remove((T) Memory.unwrap(env, object));
+        return getWrappedObject().remove(unwrap(env, object, "remove"));
     }
 
 
@@ -162,7 +227,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         if (list.isEmpty()) {
             return Memory.NULL;
         } else {
-            return Memory.wrap(env, list.get(list.size() - 1));
+            return wrap(env, list.get(list.size() - 1));
         }
     }
 
@@ -173,7 +238,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
             return Memory.NULL;
         }
 
-        return Memory.wrap(env, getWrappedObject().get(index));
+        return wrap(env, getWrappedObject().get(index));
     }
 
     @Override
@@ -239,13 +304,13 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         ObservableList list = getWrappedObject();
         int index = memories[0].toInteger();
 
-        return index >= 0 && index < list.size() ? Memory.wrap(environment, list.get(index)) : Memory.NULL;
+        return index >= 0 && index < list.size() ? wrap(environment, (T) list.get(index)) : Memory.NULL;
     }
 
     @Override
     public Memory offsetSet(Environment environment, Memory... memories) {
         if (memories[0].isNull()) {
-            getWrappedObject().add((T) Memory.unwrap(environment, memories[1]));
+            getWrappedObject().add(unwrap(environment, memories[1], "offsetSet"));
         } else {
             insert(environment, memories[0].toInteger(), memories[1]);
             removeByIndex(environment, memories[0].toInteger() + 1);
