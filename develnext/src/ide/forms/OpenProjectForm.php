@@ -18,6 +18,7 @@ use ide\ui\FlowListViewDecorator;
 use ide\ui\ImageBox;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
+use ide\utils\UiUtils;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
@@ -101,10 +102,10 @@ class OpenProjectForm extends AbstractIdeForm
 
         $cellFactory = function (UXListCell $cell, IdeLibraryProjectResource $resource) {
             $titleName = new UXLabel($resource->getName());
-            $titleName->style = '-fx-font-weight: bold;';
+            $titleName->style = '-fx-font-weight: bold;' . UiUtils::fontSizeStyle() . ";";
 
             $titleDescription = new UXLabel($resource->getDescription());
-            $titleDescription->style = '-fx-text-fill: gray;';
+            $titleDescription->style = '-fx-text-fill: gray;' . UiUtils::fontSizeStyle() . ";";
 
             if (!$titleDescription->text) {
                 $titleDescription->text = _('project.open.empty.description');
@@ -114,6 +115,7 @@ class OpenProjectForm extends AbstractIdeForm
             $actions->spacing = 7;
 
             $openLink = new UXHyperlink(_('project.open.action'));
+            $openLink->style = UiUtils::fontSizeStyle() . ";";
             $openLink->on('click', function () use ($resource, $cell) {
                 $cell->listView->selectedIndex = $cell->listView->items->indexOf($resource);
                 $this->doCreate(UXEvent::makeMock($cell->listView));
@@ -121,6 +123,7 @@ class OpenProjectForm extends AbstractIdeForm
             $actions->add($openLink);
 
             $deleteLink = new UXHyperlink(_('project.open.action.delete'));
+            $deleteLink->style = UiUtils::fontSizeStyle() . ";";
             $deleteLink->on('click', function () use ($resource, $cell) {
                 $cell->listView->selectedIndex = $cell->listView->items->indexOf($resource);
                 $this->doDelete(UXEvent::makeMock($cell->listView));
@@ -188,15 +191,17 @@ class OpenProjectForm extends AbstractIdeForm
         $name = $item['name'] ?: _('project.open.unknown.project');
 
         $titleName = new UXLabel($name);
-        $titleName->style = '-fx-font-weight: bold;';
+        $titleName->style = '-fx-font-weight: bold;' . UiUtils::fontSizeStyle() . ";";
 
         $titleDescription = new UXLabel(_('project.open.updated.at') . ": " . (new Time($item['updatedAt']))->toString('dd.MM.yyyy HH:mm'));
-        $titleDescription->style = '-fx-text-fill: gray;';
+        $titleDescription->style = '-fx-text-fill: gray;' . UiUtils::fontSizeStyle() . ";";
 
         $actions = new UXHBox();
         $actions->spacing = 7;
+        $actions->style = UiUtils::fontSizeStyle();
 
         $openLink = new UXHyperlink(_('project.open.action'));
+        $openLink->style = UiUtils::fontSizeStyle();
         $openLink->on('click', function () use ($item) {
             $this->showPreloader(_('project.open.wait'));
             $form = new SharedProjectDetailForm($item['uid']);
@@ -210,6 +215,7 @@ class OpenProjectForm extends AbstractIdeForm
         $actions->add($openLink);
 
         $deleteLink = new UXHyperlink(_('project.open.action.delete'));
+        $deleteLink->style = UiUtils::fontSizeStyle();
         $deleteLink->on('click', function () use ($item, $name) {
             if (MessageBoxForm::confirmDelete($name, $this)) {
                 $response = Ide::service()->projectArchive()->delete($item['id']);

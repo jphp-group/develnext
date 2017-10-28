@@ -1,6 +1,7 @@
 <?php
 namespace ide\ui;
 
+use ide\utils\UiUtils;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\UXImageArea;
@@ -58,12 +59,13 @@ class ImageExtendedBox extends UXHBox implements StreamLoadableBehaviour
         $box->alignment = 'CENTER_LEFT';
 
         $nameLabel = new UXLabel();
-        $nameLabel->font->bold = true;
+        $nameLabel->style = UiUtils::fontSizeStyle() . "; -fx-font-weight: bold;";
 
         $box->add($nameLabel);
         $this->titleLabel = $nameLabel;
 
         $descLabel = new UXLabel();
+        $descLabel->style = UiUtils::fontSizeStyle() . ";";
         $box->add($descLabel);
         $this->descriptionLabel = $descLabel;
 

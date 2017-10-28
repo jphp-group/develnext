@@ -15,8 +15,8 @@ class UXHyperlink extends UXButtonBase
     public $visited = false;
 
     /**
-     * @param string $text (optional)
-     * @param UXNode $graphic (optional)
+     * @param string $text [optional]
+     * @param UXNode $graphic [optional]
      */
     public function __construct($text, UXNode $graphic)
     {
