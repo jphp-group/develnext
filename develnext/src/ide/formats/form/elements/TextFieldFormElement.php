@@ -53,4 +53,15 @@ class TextFieldFormElement extends AbstractFormElement
     {
         return get_class($any) == UXTextField::class;
     }
+
+    public function resetStyle(UXNode $node, UXNode $baseNode)
+    {
+        parent::resetStyle($node, $baseNode);
+
+        /** @var UXTextField $node */
+        /** @var UXTextField $baseNode */
+        $node->font = $baseNode->font;
+    }
+
+
 }

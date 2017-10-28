@@ -98,7 +98,7 @@ class UXTab
     /**
      * Getter and Setter for object data
      * @param string $name
-     * @param mixed $value (optional)
+     * @param mixed $value [optional]
      * @return mixed
      */
     public function data($name, $value)

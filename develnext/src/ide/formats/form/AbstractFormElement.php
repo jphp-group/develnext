@@ -302,4 +302,9 @@ abstract class AbstractFormElement
     {
         // nop.
     }
+
+    public function resetStyle(UXNode $node, UXNode $baseNode)
+    {
+        $node->style = '';
+    }
 }

@@ -20,17 +20,9 @@ public class ListViewEx<T> extends ListView<T> {
     public ListViewEx(ObservableList<T> items) {
         super(items);
 
-        getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                if (onAction != null) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            onAction.handle(new Event(ListViewEx.this, ListViewEx.this, EventType.ROOT));
-                        }
-                    });
-                }
+        getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            if (onAction != null) {
+                Platform.runLater(() -> onAction.handle(new Event(ListViewEx.this, ListViewEx.this, EventType.ROOT)));
             }
         });
     }

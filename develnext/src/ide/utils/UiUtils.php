@@ -1,5 +1,6 @@
 <?php
 namespace ide\utils;
+use ide\editors\menu\ContextMenu;
 use ide\Logger;
 use ide\misc\SeparatorCommand;
 use php\gui\layout\UXAnchorPane;
@@ -8,8 +9,10 @@ use ide\misc\AbstractCommand;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXVBox;
 use php\gui\UXApplication;
+use php\gui\UXMenuButton;
 use php\gui\UXNode;
 use php\gui\UXProgressIndicator;
+use php\gui\UXScreen;
 use php\gui\UXSeparator;
 use php\gui\UXTooltip;
 use php\gui\UXWindow;
@@ -21,6 +24,30 @@ use php\gui\UXWindow;
 class UiUtils
 {
     private function __construct() {}
+
+    static function fontSizeStyle()
+    {
+        return '-fx-font-size: ' . self::fontSize() . "px";
+    }
+
+    /**
+     * Размер шрифта по-умолчанию учитывая DPI экрана.
+     * @return int
+     */
+    static function fontSize()
+    {
+        $dpiPercent = UXScreen::getPrimary()->dpi / 96;
+
+        if ($dpiPercent < 1.1) {
+            return 12;
+        } else if ($dpiPercent < 1.5) {
+            return 13;
+        } else if ($dpiPercent < 2) {
+            return 14;
+        } else {
+            return 16;
+        }
+    }
 
     /**
      * @param AbstractCommand[] $commands
@@ -40,6 +67,11 @@ class UiUtils
 
         /** @var AbstractCommand $command */
         foreach ($commands as $name => $command) {
+            if ($command instanceof UXNode) {
+                $pane->add($command);
+                continue;
+            }
+
             if ($command == '-' || $command instanceof SeparatorCommand) {
                 $ui = new UXSeparator();
 

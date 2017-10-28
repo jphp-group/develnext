@@ -18,8 +18,10 @@ use php\gui\layout\UXPane;
 use php\gui\UXCustomNode;
 use php\gui\UXData;
 use php\gui\UXDialog;
+use php\gui\UXForm;
 use php\gui\UXLoader;
 use php\gui\UXNode;
+use php\gui\UXScene;
 use php\io\IOException;
 use php\io\MemoryStream;
 use php\io\Stream;
@@ -55,10 +57,16 @@ class GuiFormDumper extends AbstractFormDumper
     protected $xml;
 
     /**
+     * @var UXForm
+     */
+    protected $testScene;
+
+    /**
      * @param AbstractFormElementTag[] $formElementTags
      */
     function __construct(array $formElementTags)
     {
+        $this->testScene = new UXForm();
         $this->processor = new XmlProcessor();
         $this->formElementTags = $formElementTags;
 
@@ -155,7 +163,14 @@ class GuiFormDumper extends AbstractFormDumper
 
         $document = $this->processor->createDocument();
 
-        $element = $this->createElementTag($editor, $editor->getLayout(), $document, false);
+        $this->testScene->clearStylesheets();
+        $this->testScene->children->clear();
+
+        foreach ($editor->getStylesheets() as $stylesheet) {
+            $this->testScene->addStylesheet($stylesheet);
+        }
+
+        $element = $this->createElementTag($editor, $editor->getLayout(), $document, false, $testScene);
 
         if ($element == null) {
             Logger::warn("Unable to save editor '{$editor->getTitle()}'");
@@ -300,8 +315,14 @@ class GuiFormDumper extends AbstractFormDumper
 
                         if ($tag != null) {
                             //Logger::debug("Write " . reflect::typeOf($tag) . ", id = $node->id");
+                            $testNode = $tag->createTestNode($node, $this->testScene);
+
                             $tag->writeAttributes($node, $element);
                             $tag->writeContent($node, $element, $document, $this);
+
+                            if ($testNode) {
+                                $testNode->free();
+                            }
 
                             if ($tag->isFinal()) {
                                 break;

@@ -18,6 +18,7 @@ use php\gui\designer\UXDesignPropertyEditor;
 use php\gui\event\UXDragEvent;
 use php\gui\framework\DataUtils;
 use php\gui\layout\UXHBox;
+use php\gui\text\UXFont;
 use php\gui\UXButton;
 use php\gui\UXCheckbox;
 use php\gui\UXDragboard;
@@ -109,5 +110,15 @@ abstract class LabeledFormElement extends AbstractFormElement
             new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/RandomTextScriptGen'),
             new IdeLibraryScriptGeneratorResource('res://.dn/bundle/uiDesktop/scriptgen/LoadGraphicFromFileScriptGen'),
         ];
+    }
+
+    public function resetStyle(UXNode $node, UXNode $baseNode)
+    {
+        parent::resetStyle($node, $baseNode);
+
+        /** @var UXLabeled $node */
+        /** @var UXLabeled $baseNode */
+        $node->font = $baseNode->font ?: UXFont::getDefault();
+        $node->textColor = $baseNode->textColor;
     }
 }

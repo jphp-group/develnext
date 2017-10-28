@@ -6,7 +6,7 @@ use ide\action\AbstractSimpleActionType;
 use ide\action\Action;
 use ide\action\ActionScript;
 use ide\editors\argument\TextMethodsArgumentEditor;
-use php\lib\Str;
+use php\lib\str;
 use php\util\Regex;
 
 class IfTextActionType extends AbstractSimpleActionType
@@ -108,7 +108,7 @@ class IfTextActionType extends AbstractSimpleActionType
 
         $not = $action->not ? '!' : '';
 
-        switch ($this->method) {
+        switch ($action->method) {
             case 'regex':
                 return "if ({$not}Regex::match($string, $object))";
 
@@ -116,16 +116,16 @@ class IfTextActionType extends AbstractSimpleActionType
                 return "if ({$not}Regex::match($string, $object, Regex::CASE_INSENSITIVE))";
 
             case 'startsWith':
-                return "if ({$not}Str::startsWith($object, $string))";
+                return "if ({$not}str::startsWith($object, $string))";
 
             case 'endsWith':
-                return "if ({$not}Str::endsWith($object, $string))";
+                return "if ({$not}str::endsWith($object, $string))";
 
             case 'contains':
-                return "if ({$not}Str::contains($object, $string))";
+                return "if ({$not}str::contains($object, $string))";
 
             case 'equalsIgnoreCase':
-                return "if ({$not}Str::equalsIgnoreCase($object, $string))";
+                return "if ({$not}str::equalsIgnoreCase($object, $string))";
 
             case 'smaller':
                 if ($not) {

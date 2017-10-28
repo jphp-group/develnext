@@ -645,6 +645,11 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     }
 
     @Signature
+    public void applyCss() {
+        getWrappedObject().applyCss();
+    }
+
+    @Signature
     public Memory data(String name) {
         return JavaFxUtils.data(getWrappedObject(), name);
     }

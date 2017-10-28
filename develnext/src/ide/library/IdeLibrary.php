@@ -1,4 +1,5 @@
 <?php
+
 namespace ide\library;
 
 use Files;
@@ -22,14 +23,6 @@ class IdeLibrary
             'title' => 'Проекты',
             'type' => 'ide\library\IdeLibraryProjectResource',
         ],
-        'scripts' => [
-            'title' => 'Скрипты',
-            'type' => 'ide\library\IdeLibrarySnippetResource',
-        ],
-        'images' => [
-            'title' => 'Изображения',
-            'type' => 'ide\library\IdeLibraryImageResource',
-        ],
         'quests' => [
             'title' => 'Квесты',
             'type' => 'ide\library\IdeLibraryQuestResource',
@@ -41,6 +34,10 @@ class IdeLibrary
         'scriptGenerators' => [
             'title' => 'Генераторы скриптов',
             'type' => 'ide\library\IdeLibraryScriptGeneratorResource'
+        ],
+        'skins' => [
+            'title' => 'Скины',
+            'type' => 'ide\library\IdeLibrarySkinResource'
         ]
     ];
 
@@ -93,14 +90,17 @@ class IdeLibrary
         $directories = $this->directories;
         $directories[] = $this->defaultDirectory;
 
+
         if ($type = $this->categories[$code]) {
             $this->resources[$code] = [];
 
             foreach ($directories as $directory) {
                 Logger::info("Scan library resource directory - $directory/$code, type = $type[type]");
 
-                fs::scan("$directory/$code", function ($filename) use ($code, $type) {
-                    if (Str::endsWith($filename, '.resource') || Str::endsWith($filename, '.xml')) {
+                $filter = [
+                    'extensions' => ['resource', 'xml', 'zip'],
+                    'excludeDirs' => true,
+                    'callback' => function ($filename) use ($code, $type) {
                         $path = fs::pathNoExt($filename);
 
                         Logger::info("Add library ($code) resource $filename, type = $type[type]");
@@ -108,6 +108,11 @@ class IdeLibrary
                         /** @var IdeLibraryResource $resource */
                         try {
                             $resource = new $type['type']($path);
+
+                            if (!$resource->isValid()) {
+                                return;
+                            }
+
                             $resource->onRegister($this);
 
                             if ($resource->getUniqueId()) {
@@ -126,7 +131,9 @@ class IdeLibrary
                             Logger::exception("Failed to register ($code) resource '$path'", $e);
                         }
                     }
-                });
+                ];
+
+                fs::scan("$directory/$code", $filter);
             }
         }
     }
@@ -211,9 +218,24 @@ class IdeLibrary
         return new $info['type']($path);
     }
 
+    /**
+     * @param string $category
+     * @return string
+     */
+    public function getResourceDirectory($category)
+    {
+        $path = "$this->defaultDirectory/$category/";
+
+        if (!fs::isDir($path)) {
+            fs::makeDir($path);
+        }
+
+        return $path;
+    }
+
     public function delete(IdeLibraryResource $resource)
     {
         $resource->delete();
-        $this->update();
+        $this->updateCategory($resource->getCategory());
     }
 }

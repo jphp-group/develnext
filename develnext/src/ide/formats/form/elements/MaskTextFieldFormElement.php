@@ -58,4 +58,13 @@ class MaskTextFieldFormElement extends AbstractFormElement
     {
         return get_class($any) == UXMaskTextField::class;
     }
+
+    public function resetStyle(UXNode $node, UXNode $baseNode)
+    {
+        parent::resetStyle($node, $baseNode);
+
+        /** @var UXTextField $node */
+        /** @var UXTextField $baseNode */
+        $node->font = $baseNode->font;
+    }
 }

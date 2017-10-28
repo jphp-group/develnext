@@ -30,14 +30,11 @@ public class UXValue extends BaseWrapper<ObservableValue> {
 
     @Signature
     public WrapInvoker addListener(final Environment env, final Invoker invoker) {
-        ChangeListener changeListener = new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                try {
-                    invoker.callAny(oldValue, newValue);
-                } catch (Throwable throwable) {
-                    env.wrapThrow(throwable);
-                }
+        ChangeListener changeListener = (observable, oldValue, newValue) -> {
+            try {
+                invoker.callAny(oldValue, newValue);
+            } catch (Throwable throwable) {
+                env.wrapThrow(throwable);
             }
         };
 

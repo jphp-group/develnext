@@ -3,6 +3,7 @@ namespace ide\misc;
 
 use ide\editors\AbstractEditor;
 use ide\Ide;
+use ide\utils\UiUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\UXButton;
 use php\gui\UXMenuItem;
@@ -93,6 +94,7 @@ abstract class AbstractCommand
         $button->maxHeight = 9999;
         $button->padding = 3;
         $button->paddingLeft = $button->paddingRight = 7;
+        $button->style = UiUtils::fontSizeStyle() . "; ";
 
         $action = $this->makeAction();
         $button->on('action', $action);

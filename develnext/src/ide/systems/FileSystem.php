@@ -9,6 +9,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\utils\FileUtils;
 use ide\utils\Json;
+use ide\utils\UiUtils;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
 use php\gui\layout\UXAnchorPane;
@@ -365,7 +366,7 @@ class FileSystem
             UXAnchorPane::setAnchor($wrapScroll, 0);
 
             $wrap = new UXAnchorPane();
-            $wrap->width = self::$editorSplitDividerWidth;
+            $wrap->width = static::$editorSplitDividerWidth;
             $wrap->add($wrapScroll);
             UXSplitPane::setResizeWithParent($wrap, false);
 
@@ -374,7 +375,7 @@ class FileSystem
             if ($type == 'tab') {
                 $wrap->observer('width')->addListener(function ($_, $value) {
                     if ($value > 50) {
-                        self::$editorSplitDividerWidth = $value;
+                        static::$editorSplitDividerWidth = $value;
                     }
                 });
 
@@ -450,7 +451,7 @@ class FileSystem
 
         $tab->text = $editor->getTitle();
         $tab->tooltip = $editor->getTooltip();
-        $tab->style = $editor->getTabStyle();
+        $tab->style = UiUtils::fontSizeStyle() . "; " . $editor->getTabStyle();
         $tab->graphic = Ide::get()->getImage($editor->getIcon());
         $tab->content = static::makeUiForEditor($editor, 'tab');
         $tab->userData = $editor;
@@ -480,7 +481,7 @@ class FileSystem
                 $editor = $e->sender->userData;
 
                 uiLater(function () use ($editor) {
-                    if (self::isOpened($editor->getFile())) {
+                    if (static::isOpened($editor->getFile())) {
                         Logger::debug("Leave tab '{$editor->getTitle()}'");
                         $editor->leave();
                     }

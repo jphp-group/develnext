@@ -459,6 +459,15 @@ abstract class UXNode
     }
 
     /**
+     * If required, apply styles to this Node and its children, if any. This method does not normally need to
+     * be invoked directly but may be used in conjunction with {@link Parent#layout()} to size a Node before the
+     * next pulse, or if the {@link #getScene() Scene} is not in a {@link javafx.stage.Stage}.
+     */
+    public function applyCss()
+    {
+    }
+
+    /**
      * @param string $event
      * @param callable $handler
      * @param string $group

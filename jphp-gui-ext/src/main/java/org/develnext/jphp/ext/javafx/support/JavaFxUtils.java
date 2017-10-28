@@ -3,7 +3,9 @@ package org.develnext.jphp.ext.javafx.support;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumnBase;
 import javafx.stage.Window;
@@ -13,6 +15,7 @@ import php.runtime.annotation.Reflection.Nullable;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.invoke.Invoker;
+import php.runtime.memory.NativeMemory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -155,5 +158,33 @@ final public class JavaFxUtils {
         }
 
         return Memory.wrap(env, userData);
+    }
+
+    public static void saveEventHandler(Node target, String eventId, EventHandler eventHandler) {
+        Object userData = target.getUserData();
+
+        if (!(userData instanceof UserData)) {
+            target.setUserData(userData = new UserData(Memory.wrap(null, userData)));
+        }
+
+        ((UserData) userData).set("event#" + eventId, new NativeMemory<>(eventHandler));
+    }
+
+    public static EventHandler loadEventHandler(Node target, String eventId) {
+        Object userData = target.getUserData();
+
+        if (!(userData instanceof UserData)) {
+            target.setUserData(userData = new UserData(Memory.wrap(null, userData)));
+        }
+
+        if (((UserData) userData).has("event#" + eventId)) {
+            Memory memory = ((UserData) userData).get("event#" + eventId).toValue();
+
+            if (memory instanceof NativeMemory) {
+                return (EventHandler) ((NativeMemory) memory).getObject();
+            }
+        }
+
+        return null;
     }
 }

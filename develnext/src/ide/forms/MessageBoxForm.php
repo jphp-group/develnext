@@ -3,6 +3,7 @@ namespace ide\forms;
 
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
+use ide\utils\UiUtils;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
 use php\gui\UXApplication;
@@ -145,6 +146,8 @@ class MessageBoxForm extends AbstractIdeForm
             if ($i++ == 0) {
                 $ui->style = '-fx-font-weight: bold';
             }
+
+            $ui->style .= ";" . UiUtils::fontSizeStyle();
 
             $this->buttonBox->add($ui);
         }

@@ -77,7 +77,7 @@ class ProjectConfig
     /**
      * @param string $filename
      *
-     * @return Project
+     * @return ProjectConfig
      */
     public static function createForFile($filename)
     {

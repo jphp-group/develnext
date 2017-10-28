@@ -23,6 +23,7 @@ use ide\marker\target\CancelButtonMarkerTarget;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
 use ide\utils\PhpParser;
+use ide\utils\UiUtils;
 use php\format\ProcessorException;
 use php\gui\designer\UXPhpCodeArea;
 use php\gui\event\UXDragEvent;
@@ -377,11 +378,11 @@ class ActionConstructorForm extends AbstractIdeForm
     {
         if ($action) {
             $titleName = new UXLabel($action->getTitle());
-            $titleName->style = '-fx-font-weight: bold; -fx-text-fill: #383838;';
+            $titleName->style = '-fx-font-weight: bold; -fx-text-fill: #383838; ' . UiUtils::fontSizeStyle();
 
             if ($action->getDescription()) {
                 $titleDescription = new UXLabel($action->getDescription());
-                $titleDescription->style = '-fx-text-fill: gray;';
+                $titleDescription->style = '-fx-text-fill: gray; ' . UiUtils::fontSizeStyle();
                 $titleDescription->padding = 0;
             } else {
                 $titleDescription = null;
@@ -678,6 +679,7 @@ class ActionConstructorForm extends AbstractIdeForm
         $btn->maxWidth = 99999;
         $btn->alignment = 'CENTER_LEFT';
         $btn->text = $actionType->getTitle();
+        $btn->style = UiUtils::fontSizeStyle();
         $btn->data('type', get_class($actionType));
 
         $btn->userData = $actionType;
