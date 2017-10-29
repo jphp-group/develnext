@@ -150,9 +150,23 @@ class SkinSaveDialogForm extends AbstractIdeForm
             fs::delete($skinFile);
         }
 
+        $dir = fs::parent($this->cssFile);
+        $additionalFiles = [];
+
+        fs::scan($dir, function ($filename) use ($dir, &$additionalFiles) {
+            if (fs::isFile($filename)) {
+                $name = FileUtils::relativePath($dir, $filename);
+
+                if (!str::startsWith($name, 'skin/') && $name !== 'skin.json' && $name !== fs::name($this->cssFile)) {
+                    $additionalFiles[$name] = $filename;
+                }
+            }
+        });
+
         $zip = $skin->saveToZip(
             $this->cssFile,
-            $zipFile = $skinFile
+            $zipFile = $skinFile,
+            $additionalFiles
         );
 
         if (fs::isFile($zipFile)) {

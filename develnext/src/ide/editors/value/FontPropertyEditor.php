@@ -2,6 +2,7 @@
 namespace ide\editors\value;
 
 use ide\forms\FontPropertyEditorForm;
+use ide\forms\MessageBoxForm;
 use php\gui\event\UXMouseEvent;
 use php\gui\text\UXFont;
 use php\lib\Str;
@@ -16,13 +17,19 @@ class FontPropertyEditor extends TextPropertyEditor
         $this->textField->editable = false;
 
         $this->dialogButton->on('click', function (UXMouseEvent $e) {
-            $dialog = new FontPropertyEditorForm();
-            $dialog->title = $this->name;
+            if ($this->isFontInCss()) {
+                MessageBoxForm::warning("Шрифт переобределен в CSS стилях компонента");
+                $this->dialogButton->enabled = $this->textField->enabled = false;
+                $this->textField->text = "Определен в CSS";
+            } else {
+                $dialog = new FontPropertyEditorForm();
+                $dialog->title = $this->name;
 
-            $dialog->setResult($this->getNormalizedValue($this->getValue()));
+                $dialog->setResult($this->getNormalizedValue($this->getValue()));
 
-            if ($dialog->showDialog($e->screenX, $e->screenY)) {
-                $this->applyValue($dialog->getResult());
+                if ($dialog->showDialog($e->screenX, $e->screenY)) {
+                    $this->applyValue($dialog->getResult());
+                }
             }
         });
 
@@ -39,13 +46,27 @@ class FontPropertyEditor extends TextPropertyEditor
         return $value;
     }
 
-    public function updateUi($value, $noRefreshDesign = false)
+    public function isFontInCss()
+    {
+        if ($style = $this->designProperties->target->style) {
+            return str::contains(str::lower($style), "-fx-font-");
+        }
+
+        return false;
+    }
+
+    public function updateUi($value, $noRefreshDesign = false, $setText = true)
     {
         if ($value instanceof UXFont) {
             /** @var UXFont $value */
-            parent::updateUi("$value->family, $value->size, $value->style", $noRefreshDesign);
+            parent::updateUi("$value->family, $value->size, $value->style", $noRefreshDesign, $setText);
 
-            $this->textField->font = UXFont::of($value->name, $this->textField->font->size);
+            $this->textField->enabled = $this->dialogButton->enabled = !$this->isFontInCss();
+
+            if (!$this->textField->enabled && $setText) {
+                $this->textField->text = "Определен в CSS";
+            }
+            //$this->textField->font = UXFont::of($value->name, $this->textField->font->size);
         }
     }
 

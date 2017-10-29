@@ -7,10 +7,8 @@ use ide\forms\AbstractIdeForm;
 use ide\forms\MessageBoxForm;
 use ide\forms\mixins\DialogFormMixin;
 use ide\Ide;
-use ide\library\IdeLibrary;
 use ide\library\IdeLibrarySkinResource;
 use ide\misc\SimpleSingleCommand;
-use ide\systems\IdeSystem;
 use ide\ui\ListExtendedItem;
 use ide\utils\FileUtils;
 use php\compress\ZipException;
@@ -18,7 +16,6 @@ use php\gui\layout\UXStackPane;
 use php\gui\layout\UXVBox;
 use php\gui\UXFileChooser;
 use php\gui\UXImageView;
-use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
 use php\io\File;
@@ -45,6 +42,34 @@ class SkinManagerForm extends AbstractIdeForm
         parent::init();
 
         $contextMenu = new ContextMenu(null, [
+            SimpleSingleCommand::makeWithText('Выбрать', 'icons/ok16.png', function () {
+                $this->doSelect();
+            }),
+            '-',
+            SimpleSingleCommand::makeWithText('Экспортировать в файл', 'icons/save16.png', function () {
+                if ($this->list->selectedIndex > 0 && $this->list->selectedItem) {
+                    /** @var ProjectSkin $skin */
+                    $skin = $this->list->selectedItem->getSkin();
+
+                    $dialog = new UXFileChooser();
+                    $dialog->initialFileName = $skin->getUid() . ".zip";
+                    $dialog->extensionFilters = [['description' => 'Skin Files (*.zip)', 'extensions' => ['*.zip']]];
+
+                    if ($file = $dialog->showSaveDialog()) {
+                        if (fs::ext($file) != 'zip') {
+                            $file = "$file.zip";
+                        }
+
+                        $this->showPreloader('Сохранение ...');
+
+                        FileUtils::copyFileAsync($skin->getFile(), $file, function () {
+                            $this->hidePreloader();
+                            $this->toast('Скин успешно сохранен в файл.');
+                        });
+                    }
+                }
+            }),
+            '-',
             SimpleSingleCommand::makeWithText('Удалить из библиотеки', 'icons/trash16.gif', function () {
                 if ($this->list->selectedIndex > 0) {
                     /** @var IdeLibrarySkinResource $skin */

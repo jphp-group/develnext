@@ -1,5 +1,6 @@
 package org.develnext.jphp.ext.javafx.classes;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
@@ -12,6 +13,7 @@ import php.runtime.annotation.Reflection.Signature;
 import php.runtime.common.Callback;
 import php.runtime.common.Messages;
 import php.runtime.env.Environment;
+import php.runtime.env.TraceInfo;
 import php.runtime.invoke.Invoker;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.lang.ForeachIterator;
@@ -19,6 +21,7 @@ import php.runtime.lang.exception.BaseTypeError;
 import php.runtime.lang.spl.ArrayAccess;
 import php.runtime.lang.spl.Countable;
 import php.runtime.lang.spl.iterator.Iterator;
+import php.runtime.lang.support.ICloneableObject;
 import php.runtime.memory.ArrayMemory;
 import php.runtime.memory.LongMemory;
 import php.runtime.memory.ObjectMemory;
@@ -31,7 +34,7 @@ import java.util.List;
 
 @Abstract
 @Name(JavaFXExtension.NS + "UXList")
-public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterator, Countable, ArrayAccess {
+public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterator, Countable, ArrayAccess, ICloneableObject<UXList<T>> {
     private int index = -1;
     private Class<?> unwrapClass = null;
     private Callback<T, Memory> unwrapCallback;
@@ -77,7 +80,7 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         T unwrap = unwrapCallback != null ? unwrapCallback.call(object) : (T) Memory.unwrap(env, object);
 
         if (unwrap == null) {
-            env.exception(BaseTypeError.class, "Argument passed to UXList::%s() must be not NULL");
+            //env.exception(BaseTypeError.class, "Argument passed to UXList::%s() must be not NULL");
         }
 
         if (unwrapClass != null && unwrap != null && !unwrapClass.isAssignableFrom(unwrap.getClass())) {
@@ -231,6 +234,16 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         }
     }
 
+    @Signature
+    public boolean isEmpty() {
+        return getWrappedObject().isEmpty();
+    }
+
+    @Signature
+    public boolean isNotEmpty() {
+        return !isEmpty();
+    }
+
     @Override
     @Signature
     public Memory current(Environment env, Memory... args) {
@@ -336,5 +349,24 @@ public class UXList<T> extends BaseWrapper<ObservableList<T>> implements Iterato
         getWrappedObject().addListener((ListChangeListener<T>) c -> {
             invoker.callAny();
         });
+    }
+
+    @Signature
+    public Memory toArray(Environment env) {
+        ArrayMemory list = ArrayMemory.createListed(getCount());
+
+        for (T t : getWrappedObject()) {
+            list.add(wrap(env, t));
+        }
+
+        return list.toConstant();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public UXList<T> __clone(Environment environment, TraceInfo traceInfo) {
+        ObservableList<T> list = FXCollections.observableList(getWrappedObject());
+
+        return new UXList<>(environment, list, (Class<T>) this.unwrapClass, this.unwrapCallback, this.wrapCallback);
     }
 }

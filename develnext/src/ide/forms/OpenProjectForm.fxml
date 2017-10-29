@@ -1,82 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="541.0" prefWidth="681.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="541.0" prefWidth="681.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Separator layoutX="21.0" layoutY="46.0" prefHeight="32.0" prefWidth="573.0" AnchorPane.leftAnchor="21.0" AnchorPane.rightAnchor="20.0" />
-      <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="21.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
-      <Label layoutX="61.0" layoutY="14.0" prefHeight="32.0" prefWidth="533.0" text="{project.open.title}" AnchorPane.leftAnchor="61.0" AnchorPane.rightAnchor="20.0">
-         <font>
-            <Font name="Tahoma" size="17.0" />
-         </font>
-      </Label>
-      <Button id="pathButton" layoutX="22.0" layoutY="467.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" text="..." AnchorPane.bottomAnchor="21.0">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <Label layoutX="22.0" layoutY="443.0" prefHeight="24.0" prefWidth="559.0" text="{project.open.favorite.directory}:" AnchorPane.bottomAnchor="46.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="33.0" />
-      <TextField id="pathField" disable="true" editable="false" layoutX="54.0" layoutY="467.0" prefHeight="25.0" prefWidth="533.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="27.0" />
-      <TabPane id="tabPane" layoutX="31.0" layoutY="116.0" prefHeight="344.0" prefWidth="617.0" styleClass="dn-style" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="81.0" AnchorPane.leftAnchor="31.0" AnchorPane.rightAnchor="33.0" AnchorPane.topAnchor="116.0">
-        <tabs>
-          <Tab text="{project.open.favorites}">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ScrollPane id="projectList" fitToHeight="true" fitToWidth="true" prefHeight="292.0" prefWidth="550.0" style="-fx-border-color: transparent; -fx-border-width: 0px;" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
-                           <content>
-                              <FlowPane style="-fx-border-width: 0px;" />
-                           </content>
-                        </ScrollPane>
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-          <Tab text="{project.open.demos}">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ListView id="embeddedLibraryList" fixedCellSize="64.0" layoutX="26.0" layoutY="35.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-            <Tab styleClass="icon-library" text="{project.open.library}">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ListView id="libraryList" fixedCellSize="64.0" layoutX="26.0" layoutY="35.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
-                     </children>
-                  </AnchorPane>
-               </content>
-            </Tab>
-            <Tab text="{project.open.public}">
-              <content>
-                <AnchorPane id="sharedPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ListView id="sharedList" fixedCellSize="64.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
-                        <Label layoutX="3.0" layoutY="289.0" prefHeight="24.0" prefWidth="610.0" text="* {project.open.public.desc}" textFill="#a4a4a4" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" />
-                     </children></AnchorPane>
-              </content>
-            </Tab>
-        </tabs>
-      </TabPane>
-      <HBox alignment="CENTER_LEFT" layoutX="32.0" layoutY="76.0" prefHeight="28.0" prefWidth="617.0" spacing="10.0" AnchorPane.leftAnchor="32.0" AnchorPane.rightAnchor="32.0">
+      <VBox layoutX="21.0" layoutY="14.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Button id="openButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="{project.open.file}">
-               <padding>
-                  <Insets left="15.0" right="15.0" />
-               </padding>
-            </Button>
-            <Label prefHeight="24.0" text="{project.open.file.desc}" textFill="#6f6f6f" />
+            <HBox prefHeight="32.0" prefWidth="640.0" spacing="10.0">
+               <children>
+                  <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label maxWidth="1.7976931348623157E308" prefHeight="32.0" text="{project.open.title}" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font name="Tahoma" size="17.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <Separator prefHeight="9.0" prefWidth="661.0" />
+            <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="617.0" spacing="10.0">
+               <children>
+                  <Button id="openButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="{project.open.file}">
+                     <padding>
+                        <Insets left="15.0" right="15.0" />
+                     </padding>
+                  </Button>
+                  <Label prefHeight="24.0" text="{project.open.file.desc}" textFill="#6f6f6f" />
+               </children>
+            </HBox>
+            <TabPane id="tabPane" maxHeight="1.7976931348623157E308" styleClass="dn-style" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+              <tabs>
+                <Tab text="{project.open.favorites}">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ScrollPane id="projectList" fitToHeight="true" fitToWidth="true" prefHeight="292.0" prefWidth="550.0" style="-fx-border-color: transparent; -fx-border-width: 0px;" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
+                                 <content>
+                                    <FlowPane style="-fx-border-width: 0px;" />
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="{project.open.demos}">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ListView id="embeddedLibraryList" fixedCellSize="64.0" layoutX="26.0" layoutY="35.0" prefHeight="214.0" prefWidth="548.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                  <Tab styleClass="icon-library" text="{project.open.library}">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ListView id="libraryList" fixedCellSize="64.0" layoutX="26.0" layoutY="35.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                  <Tab text="{project.open.public}">
+                    <content>
+                      <AnchorPane id="sharedPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ListView id="sharedList" fixedCellSize="64.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+            <VBox>
+               <children>
+                  <Label prefHeight="24.0" text="{project.open.favorite.directory}:" />
+                  <HBox prefHeight="31.0" prefWidth="640.0" spacing="10.0">
+                     <children>
+                        <Button id="pathButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" text="...">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                        <TextField id="pathField" disable="true" editable="false" prefHeight="25.0" prefWidth="533.0" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
          </children>
-      </HBox>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </VBox>
    </children>
 </AnchorPane>

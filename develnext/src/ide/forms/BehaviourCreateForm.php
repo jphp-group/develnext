@@ -6,6 +6,7 @@ use ide\behaviour\IdeBehaviourManager;
 use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
+use ide\utils\UiUtils;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
@@ -184,6 +185,7 @@ class BehaviourCreateForm extends AbstractIdeForm
         foreach ($groupedSpecs as $name => $list) {
             $tab = new UXTab();
             $tab->text = $name;
+            $tab->style = UiUtils::fontSizeStyle();
             $tab->userData = new SharedValue($list);
 
             /** @var AbstractBehaviourSpec $spec */

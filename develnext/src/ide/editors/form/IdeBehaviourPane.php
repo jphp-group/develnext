@@ -11,6 +11,7 @@ use ide\forms\ScriptHelperForm;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
+use ide\utils\UiUtils;
 use php\gui\designer\UXDesignProperties;
 use php\gui\event\UXEvent;
 use php\gui\framework\behaviour\custom\AbstractBehaviour;
@@ -269,7 +270,7 @@ class IdeBehaviourPane
 
         $button->height = 30;
         $button->maxWidth = 10000;
-        $button->style = '-fx-font-weight: bold;';
+        $button->style = '-fx-font-weight: bold; ' . UiUtils::fontSizeStyle();
 
         $button->on('action', function () use ($targetId) {
             $target = $this->behaviourManager->getTarget($targetId);

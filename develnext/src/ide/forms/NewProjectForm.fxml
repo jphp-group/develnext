@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="509.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="509.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label layoutX="54.0" layoutY="14.0" prefHeight="32.0" prefWidth="533.0" text="{project.new.title}" AnchorPane.leftAnchor="54.0" AnchorPane.rightAnchor="13.0">
          <font>
@@ -16,27 +22,57 @@
       </Label>
       <ImageView id="icon" fitHeight="32.0" fitWidth="32.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
       <Separator layoutX="14.0" layoutY="46.0" prefHeight="32.0" prefWidth="573.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="13.0" />
-      <Label layoutX="26.0" layoutY="135.0" prefHeight="24.0" prefWidth="221.0" text="{project.new.select.template}:" />
+      <Label layoutX="26.0" layoutY="135.0" prefHeight="24.0" prefWidth="221.0" text="{project.new.select.template}:">
+         <font>
+            <Font size="12.0" />
+         </font></Label>
       <ListView id="templateList" layoutX="27.0" layoutY="159.0" prefHeight="188.0" prefWidth="548.0" AnchorPane.bottomAnchor="162.0" AnchorPane.leftAnchor="27.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="159.0" />
       <Separator layoutX="14.0" layoutY="306.0" prefHeight="32.0" prefWidth="573.0" AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="13.0" />
-      <Button id="createButton" layoutX="22.0" layoutY="344.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="111.0" styleClass="icon-ok" text="{project.new.btn.create}" AnchorPane.bottomAnchor="24.0">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
-      <Button id="cancelButton" layoutX="145.0" layoutY="344.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="111.0" text="{btn.cancel}" AnchorPane.bottomAnchor="24.0">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></Button>
-      <TextField id="pathField" disable="true" editable="false" layoutX="59.0" layoutY="400.0" prefHeight="25.0" prefWidth="515.0" AnchorPane.bottomAnchor="104.0" AnchorPane.leftAnchor="59.0" AnchorPane.rightAnchor="26.0" />
-      <Label layoutX="27.0" layoutY="376.0" prefHeight="24.0" prefWidth="221.0" text="{project.new.directory}:" AnchorPane.bottomAnchor="129.0" />
-      <Button id="pathButton" layoutX="27.0" layoutY="400.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" text="..." AnchorPane.bottomAnchor="104.0">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></Button>
+      <HBox layoutX="22.0" layoutY="450.0" spacing="10.0" AnchorPane.bottomAnchor="24.0">
+         <children>
+            <Button id="createButton" mnemonicParsing="false" prefHeight="35.0" styleClass="icon-ok" text="{project.new.btn.create}">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
+            </Button>
+            <Button id="cancelButton" mnemonicParsing="false" prefHeight="35.0" text="{btn.cancel}">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+               <font>
+                  <Font size="12.0" />
+               </font>
+               <padding>
+                  <Insets left="15.0" right="15.0" />
+               </padding>
+            </Button>
+         </children>
+      </HBox>
+      <VBox layoutX="27.0" layoutY="356.0" AnchorPane.leftAnchor="27.0" AnchorPane.rightAnchor="25.0">
+         <children>
+            <Label prefHeight="24.0" prefWidth="221.0" text="{project.new.directory}:">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            <HBox prefHeight="31.0" prefWidth="548.0" spacing="5.0">
+               <children>
+                  <Button id="pathButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" text="...">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <TextField id="pathField" disable="true" editable="false" prefHeight="25.0" prefWidth="515.0" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
       <Label layoutX="26.0" layoutY="72.0" prefHeight="24.0" prefWidth="221.0" text="{project.new.name}:">
          <font>
             <Font name="System Bold" size="12.0" />
@@ -50,6 +86,9 @@
             <Font size="15.0" />
          </font>
       </TextField>
-      <Label layoutX="392.0" layoutY="72.0" prefHeight="24.0" prefWidth="183.0" text="{project.new.package.name}:" AnchorPane.rightAnchor="25.0" />
+      <Label layoutX="392.0" layoutY="72.0" prefHeight="24.0" prefWidth="183.0" text="{project.new.package.name}:" AnchorPane.rightAnchor="25.0">
+         <font>
+            <Font size="12.0" />
+         </font></Label>
    </children>
 </AnchorPane>

@@ -13,8 +13,6 @@ namespace php\gui;
  */
 class UXComboBoxBase extends UXControl
 {
-
-
     /**
      * @var bool
      */
@@ -51,9 +49,21 @@ class UXComboBoxBase extends UXControl
     public $text;
 
     /**
+     * @var bool
+     */
+    public $popupVisible = false;
+
+    /**
      * Показать меню-попап.
      */
     public function showPopup()
+    {
+    }
+
+    /**
+     * Скрыть меню-попап.
+     */
+    public function hidePopup()
     {
     }
 }

@@ -9,6 +9,7 @@ use ide\library\IdeLibraryResource;
 use ide\misc\AbstractCommand;
 use ide\project\AbstractProjectTemplate;
 use ide\systems\ProjectSystem;
+use ide\utils\UiUtils;
 use php\gui\event\UXMouseEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXHBox;
@@ -94,10 +95,10 @@ class NewProjectForm extends AbstractIdeForm
                     $cell->graphic = null;
                 } else {
                     $titleName = new UXLabel($template->getName());
-                    $titleName->style = '-fx-font-weight: bold;';
+                    $titleName->style = '-fx-font-weight: bold;'.UiUtils::fontSizeStyle();
 
                     $titleDescription = new UXLabel($template->getDescription());
-                    $titleDescription->style = '-fx-text-fill: gray;';
+                    $titleDescription->style = '-fx-text-fill: gray;'.UiUtils::fontSizeStyle();
 
                     if (!$titleDescription->text && $template instanceof IdeLibraryResource) {
                         $titleDescription->text = 'Шаблонный проект без описания';

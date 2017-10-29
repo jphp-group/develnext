@@ -51,6 +51,11 @@ abstract class UXTextInputControl extends UXControl
      */
     public $editable;
 
+    /**
+     * @var int
+     */
+    public $caretPosition;
+
     public function copy() {}
     public function cut() {}
     public function paste() {}

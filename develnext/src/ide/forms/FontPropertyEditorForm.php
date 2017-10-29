@@ -2,6 +2,7 @@
 namespace ide\forms;
 
 use ide\forms\mixins\DialogFormMixin;
+use ide\utils\UiUtils;
 use InvalidArgumentException;
 use php\gui\framework\AbstractForm;
 use php\gui\text\UXFont;
@@ -10,7 +11,9 @@ use php\gui\UXComboBox;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXSlider;
+use php\gui\UXTextField;
 use php\gui\UXToggleButton;
+use php\lib\str;
 use php\util\Flow;
 
 /**
@@ -20,6 +23,7 @@ use php\util\Flow;
  * @property UXComboBox $fontCombobox
  * @property UXSlider $sizeSlider
  * @property UXTextField $sizeField
+ * @property UXButton $genCssButton
  * @property UXComboBox $customFontCombobox
  * @property UXButton $addFontButton
  * @property UXLabel $testLabel
@@ -33,10 +37,12 @@ class FontPropertyEditorForm extends AbstractIdeForm
 {
     use DialogFormMixin;
 
+    private $freeze = false;
+
     protected function init()
     {
         $this->watch('focused', function ($self, $prop, $old, $new) {
-            if (!$new) {
+            if (!$new && !$this->freeze) {
                 $this->hide();
             }
         });
@@ -46,6 +52,11 @@ class FontPropertyEditorForm extends AbstractIdeForm
         foreach (UXFont::getFamilies() as $family) {
             $this->fontCombobox->items->add($family);
         }
+
+        UiUtils::makeAutoCompleteComboBox($this->fontCombobox, function ($one, $text) {
+            var_dump($one, $text);
+            return str::startsWith(str::lower($one), str::trim(str::lower($text)));
+        });
 
         $this->fontCombobox->onCellRender(function (UXListCell $cell, $value) {
             try {
@@ -87,7 +98,8 @@ class FontPropertyEditorForm extends AbstractIdeForm
     protected function updateTestText()
     {
         uiLater(function () {
-            $this->testLabel->font = $this->getFont();
+            $font = $this->getFont();
+            $this->testLabel->font = $font;
         });
     }
 
@@ -131,6 +143,17 @@ class FontPropertyEditorForm extends AbstractIdeForm
         $italic = ($this->italicButton->selected || $this->italicBoldWeightButton->selected);
 
         return UXFont::of($this->fontCombobox->value, $this->sizeField->text, $weight, $italic);
+    }
+
+    /**
+     * @event genCssButton.action
+     */
+    public function actionGenStyle()
+    {
+        $this->freeze = true;
+        $dialog = new ShowTextDialogForm('Шрифт в виде css:', $this->getFont()->generateStyle(), true);
+        $dialog->showDialog();
+        $this->freeze = false;
     }
 
     /**

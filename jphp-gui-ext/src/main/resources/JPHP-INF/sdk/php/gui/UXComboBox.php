@@ -10,7 +10,10 @@ use Traversable;
  */
 class UXComboBox extends UXComboBoxBase
 {
-
+    /**
+     * @var UXTextField
+     */
+    public $editor;
 
     /**
      * Список.

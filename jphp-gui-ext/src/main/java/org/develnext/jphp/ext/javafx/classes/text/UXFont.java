@@ -171,6 +171,17 @@ public class UXFont extends BaseWrapper<Font> {
         return withNameAndSize(name, size, null, null);
     }
 
+    @Signature
+    public String generateStyle() {
+        String result = "-fx-font-family: " + getFamily() + ";\n";
+        result += "-fx-font-size: " + getSize() + ";\n";
+
+        result += "-fx-font-weight: " + (getBold() ? "bold" : "normal") + ";\n";
+        result += "-fx-font-style: " + (getItalic() ? "italic" : "normal") + ";";
+
+        return result;
+    }
+
     protected Font withNameAndSize(String name, double size, Boolean bold, Boolean italic) {
         Font font = getWrappedObject();
 

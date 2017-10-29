@@ -32,6 +32,7 @@ use php\gui\UXNode;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXSeparator;
 use php\lang\System;
+use php\lib\fs;
 use php\lib\str;
 use php\util\Configuration;
 use php\util\Regex;
@@ -84,6 +85,48 @@ class DesignProjectControlPane extends AbstractProjectControlPane
         if ($this->editor) {
             $this->editor->open();
             $this->editor->refreshUi();
+        }
+
+        if ($gui = GuiFrameworkProjectBehaviour::get()) {
+            $project = Ide::project();
+
+            $skin = $gui->getCurrentSkin();
+
+            if ($project->_skinChecked) return;
+
+            $project->_skinChecked = true;
+
+            if ($skin && $skin->getUid() && !Ide::get()->getLibrary()->getResource('skins', $skin->getUid())) {
+                if (MessageBoxForm::confirm("Проект содержит скин '{$skin->getName()}', которого нет в вашей библиотеке, хотите сохранить его в библиотеку?")) {
+
+                    $ideLibrary = Ide::get()->getLibrary();
+                    $skinFile = $ideLibrary->getResourceDirectory('skins') . "/{$skin->getUid()}.zip";
+
+                    $cssFile = $project->getSrcFile('.theme/skin/skin.css');
+
+                    $dir = fs::parent($cssFile);
+                    $additionalFiles = [];
+
+                    fs::scan($dir, function ($filename) use ($dir, &$additionalFiles, $cssFile) {
+                        if (fs::isFile($filename)) {
+                            $name = FileUtils::relativePath($dir, $filename);
+
+                            if ($name !== 'skin.json' && $name !== fs::name($cssFile)) {
+                                $additionalFiles[$name] = $filename;
+                            }
+                        }
+                    });
+
+                    $skin->saveToZip($cssFile, $skinFile, $additionalFiles);
+                    $ideLibrary->updateCategory('skins');
+
+                    if (fs::isFile($skinFile)) {
+                        Ide::toast('Скин успешно сохранен в библиотеке скинов');
+                    } else {
+                        MessageBoxForm::warning('Ошибка сохранения скина');
+                    }
+                }
+            }
         }
     }
 

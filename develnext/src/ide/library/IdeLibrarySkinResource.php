@@ -10,6 +10,7 @@ use php\io\IOException;
 use php\io\Stream;
 use php\lib\arr;
 use php\lib\fs;
+use php\lib\str;
 use php\util\Configuration;
 
 /**
@@ -50,6 +51,12 @@ class IdeLibrarySkinResource extends IdeLibraryResource
         }
     }
 
+    public function getUniqueId()
+    {
+        return str::replace(str::replace(
+            str::lower(fs::name($this->path)), ' ', '_'
+        ), '-', '_');
+    }
 
     /**
      * @return ProjectSkin

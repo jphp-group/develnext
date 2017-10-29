@@ -18,8 +18,6 @@ public class UXComboBoxBase<T extends ComboBoxBase> extends UXControl<ComboBoxBa
 
         void arm();
         void disarm();
-
-        void hide();
     }
 
     public UXComboBoxBase(Environment env, T wrappedObject) {
@@ -33,6 +31,25 @@ public class UXComboBoxBase<T extends ComboBoxBase> extends UXControl<ComboBoxBa
     @Signature
     public void showPopup() {
         getWrappedObject().show();
+    }
+
+    @Signature
+    public void hidePopup() {
+        getWrappedObject().hide();
+    }
+
+    @Getter
+    public boolean getPopupVisible() {
+        return getWrappedObject().isShowing();
+    }
+
+    @Setter
+    public void setPopupVisible(boolean value) {
+        if (value) {
+            showPopup();
+        } else {
+            hidePopup();
+        }
     }
 
     @Override

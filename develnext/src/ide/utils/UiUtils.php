@@ -3,12 +3,14 @@ namespace ide\utils;
 use ide\editors\menu\ContextMenu;
 use ide\Logger;
 use ide\misc\SeparatorCommand;
+use php\gui\event\UXKeyEvent;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use ide\misc\AbstractCommand;
 use php\gui\layout\UXPane;
 use php\gui\layout\UXVBox;
 use php\gui\UXApplication;
+use php\gui\UXComboBox;
 use php\gui\UXMenuButton;
 use php\gui\UXNode;
 use php\gui\UXProgressIndicator;
@@ -16,6 +18,7 @@ use php\gui\UXScreen;
 use php\gui\UXSeparator;
 use php\gui\UXTooltip;
 use php\gui\UXWindow;
+use php\lib\str;
 
 /**
  * Class UiUtils
@@ -27,7 +30,11 @@ class UiUtils
 
     static function fontSizeStyle()
     {
-        return '-fx-font-size: ' . self::fontSize() . "px";
+        static $result;
+
+        if ($result) return $result;
+
+        return $result = '-fx-font-size: ' . self::fontSize() . "px";
     }
 
     /**
@@ -36,16 +43,20 @@ class UiUtils
      */
     static function fontSize()
     {
+        static $result;
+
+        if ($result) return $result;
+
         $dpiPercent = UXScreen::getPrimary()->dpi / 96;
 
         if ($dpiPercent < 1.1) {
-            return 12;
+            return $result = 12;
         } else if ($dpiPercent < 1.5) {
-            return 13;
+            return $result = 13;
         } else if ($dpiPercent < 2) {
-            return 14;
+            return $result = 14;
         } else {
-            return 16;
+            return $result = 16;
         }
     }
 
@@ -178,5 +189,97 @@ class UiUtils
         if (UXApplication::isUiThread()) {
             Logger::warn("IO operation in UI Thread, $message");
         }
+    }
+
+    static function makeAutoCompleteComboBox(UXComboBox $comboBox, callable $findCallback = null)
+    {
+        $comboBox->editable = true;
+        $comboBox->visibleRowCount = 10;
+
+        $caretPos = -1;
+        $moveCaretToPos = false;
+
+        $data = $comboBox->items->toArray();
+
+        $moveCaret = function ($textLength) use ($comboBox, &$caretPos, &$moveCaretToPos) {
+            if ($caretPos === -1) {
+                $comboBox->editor->positionCaret($textLength);
+            } else {
+                $comboBox->editor->positionCaret($caretPos);
+            }
+
+            $moveCaretToPos = false;
+        };
+
+        $comboBox->on('keyPress', function (UXKeyEvent $e) use ($comboBox) {
+            $comboBox->hidePopup();
+        }, __CLASS__);
+
+        $comboBox->on('keyUp', function (UXKeyEvent $e)
+                                        use ($moveCaret, $comboBox, &$caretPos, &$moveCaretToPos, $data, $findCallback) {
+            $codeName = $e->codeName;
+
+            if ($codeName === 'Up') {
+                $caretPos = -1;
+                $moveCaret(str::length($comboBox->text));
+            } else if ($codeName === 'Down') {
+                if (!$comboBox->popupVisible) {
+                    $comboBox->popupVisible = true;
+                }
+
+                $caretPos = -1;
+                $moveCaret(str::length($comboBox->text));
+            } else if ($codeName === 'Backspace' || $codeName === 'Delete') {
+                $moveCaretToPos = true;
+                $caretPos = $comboBox->editor->caretPosition;
+            }
+
+            switch ($codeName) {
+                case 'Left':
+                case 'Right':
+                case 'Home':
+                case 'End':
+                case 'Tab':
+                    return;
+            }
+
+            if ($e->controlDown) return;
+
+            $text = str::lower($comboBox->text);
+            $items = [];
+
+            if (!$text) {
+                $items = $data;
+            } else {
+                foreach ($data as $one) {
+                    if ($findCallback) {
+                        if ($findCallback($one, $comboBox->text)) {
+                            $items[] = $one;
+                        }
+                    } else {
+                        if (str::startsWith(str::lower($one), $text)) {
+                            $items[] = $one;
+                        }
+                    }
+                }
+            }
+
+            $t = $comboBox->text;
+            $comboBox->items->setAll($items);
+            $comboBox->text = $t;
+
+            if (!$moveCaretToPos) {
+                $caretPos = -1;
+            }
+
+            $moveCaret(str::length($t));
+
+            if ($items) {
+                $comboBox->hidePopup();
+
+                uiLater([$comboBox, 'showPopup']);
+            }
+
+        }, __CLASS__);
     }
 }

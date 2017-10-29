@@ -21,10 +21,24 @@ class UXList implements Iterator, Countable, ArrayAccess
     public $count = 0;
 
     /**
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNotEmpty(): bool
+    {
+    }
+
+    /**
      * @param $object
      * @return int -1 if not found
      */
-    public function indexOf($object)
+    public function indexOf($object): int
     {
     }
 
@@ -32,7 +46,7 @@ class UXList implements Iterator, Countable, ArrayAccess
      * @param $object
      * @return bool
      */
-    public function has($object)
+    public function has($object): bool
     {
     }
 
@@ -47,7 +61,7 @@ class UXList implements Iterator, Countable, ArrayAccess
      * @param int $index
      * @param mixed $object
      */
-    public function insert($index, $object)
+    public function insert(int $index, $object)
     {
     }
 
@@ -85,7 +99,7 @@ class UXList implements Iterator, Countable, ArrayAccess
      * @param int $index
      * @param iterable $objects
      */
-    public function insertAll($index, iterable $objects)
+    public function insertAll(int $index, iterable $objects)
     {
     }
 
@@ -97,9 +111,9 @@ class UXList implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * @param $index
+     * @param int $index
      */
-    public function removeByIndex($index)
+    public function removeByIndex(int $index)
     {
     }
 
@@ -196,6 +210,20 @@ class UXList implements Iterator, Countable, ArrayAccess
      * @param callable $callback
      */
     public function addListener(callable $callback)
+    {
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+    }
+
+    /**
+     * Available to clone.
+     */
+    public function __clone()
     {
     }
 }

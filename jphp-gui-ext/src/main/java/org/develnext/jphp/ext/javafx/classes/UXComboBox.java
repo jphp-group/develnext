@@ -1,10 +1,7 @@
 package org.develnext.jphp.ext.javafx.classes;
 
 import javafx.collections.ObservableList;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.*;
 import javafx.util.Callback;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
 import php.runtime.Memory;
@@ -22,6 +19,7 @@ public class UXComboBox extends UXComboBoxBase {
     interface WrappedInterface {
         @Property ObservableList items();
         @Property int visibleRowCount();
+        @Property TextField editor();
     }
 
     public UXComboBox(Environment env, ComboBox wrappedObject) {

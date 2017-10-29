@@ -122,6 +122,15 @@ class UXFont
     }
 
     /**
+     * Generate CSS style of font.
+     *
+     * @return string
+     */
+    public function generateStyle(): string
+    {
+    }
+
+    /**
      * @param string $family
      * @param double $size
      *

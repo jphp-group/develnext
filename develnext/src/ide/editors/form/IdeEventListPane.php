@@ -20,6 +20,7 @@ use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
+use ide\utils\UiUtils;
 use php\desktop\Mouse;
 use php\gui\event\UXEvent;
 use php\gui\event\UXMouseEvent;
@@ -528,7 +529,7 @@ class IdeEventListPane
         $addButton = new UXButton("Добавить событие");
         $addButton->height = 30;
         $addButton->maxWidth = 10000;
-        $addButton->style = '-fx-font-weight: bold;';
+        $addButton->style = '-fx-font-weight: bold;' . UiUtils::fontSizeStyle();
         $addButton->graphic = Ide::get()->getImage('icons/plus16.png');
 
         $addButton->on('action', function (UXEvent $event) {
@@ -537,6 +538,7 @@ class IdeEventListPane
 
         $changeButton = new UXButton();
         $changeButton->size = [25, 25];
+        $changeButton->style = UiUtils::fontSizeStyle();
         $changeButton->graphic = Ide::get()->getImage('icons/exchange16.png');
         $changeButton->tooltipText = 'Поменять событие';
 
@@ -545,6 +547,7 @@ class IdeEventListPane
         });
 
         $deleteButton = new UXButton();
+        $deleteButton->style =  UiUtils::fontSizeStyle();
         $deleteButton->size = [25, 25];
         $deleteButton->graphic = Ide::get()->getImage('icons/delete16.png');
 
@@ -552,6 +555,7 @@ class IdeEventListPane
         $editButton->graphic = Ide::get()->getImage('icons/edit16.png');
         $editButton->height = 25;
         $editButton->maxWidth = 10000;
+        $editButton->style = UiUtils::fontSizeStyle();
         UXHBox::setHgrow($editButton, 'ALWAYS');
 
         $otherButtons = new UXHBox([$deleteButton, $changeButton, $editButton]);
@@ -560,17 +564,17 @@ class IdeEventListPane
         $otherButtons->maxWidth = 10000;
 
         $actions = new UXVBox([$addButton, $otherButtons]);
+        $actions->style = UiUtils::fontSizeStyle();
         $actions->fillWidth = true;
         $actions->spacing = 4;
         $actions->padding = 4;
         $actions->leftAnchor = 0;
         $actions->rightAnchor = 0;
 
-        $pane = new UXAnchorPane();
+        $pane = new UXVBox();
 
         $list = new UXListView();
-        UXAnchorPane::setAnchor($list, 2);
-        $list->topAnchor = 68;
+        UXVBox::setVgrow($list, 'ALWAYS');
         $list->id = 'list';
 
         $deleteButton->on('action', function () use ($list) {
@@ -647,7 +651,8 @@ class IdeEventListPane
                 $phpLink = new UXHyperlink('php');
 
                 $name = new UXLabel($eventType['name']);
-                $name->font = $name->font->withBold();
+                $name->style = UiUtils::fontSizeStyle() . "; -fx-font-weight: bold;";
+
                 if ($codeEmpty && !$actionCount) {
                     $name->textColor = 'gray';
                 }
@@ -689,6 +694,7 @@ class IdeEventListPane
                 }
 
                 $box->padding = [3, 3];
+                $box->style = UiUtils::fontSizeStyle();
 
                 $cell->graphic = $box;
             }
