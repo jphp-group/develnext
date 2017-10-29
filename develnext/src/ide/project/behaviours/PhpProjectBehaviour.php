@@ -396,8 +396,10 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
                             $includedFiles[FileUtils::hashName($filename)] = true;
 
-                            $module = new Module($filename, false, true);
+                            $fileStream = new FileStream($filename);
+                            $module = new Module($fileStream, false, true);
                             $module->dump($compiled, true);
+                            $fileStream->close();
                             return;
                         }
                     }
@@ -466,8 +468,12 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
                         $includedFiles[FileUtils::hashName($filename)] = true;
                         $scope->execute(function () use ($filename, $compiledFile) {
-                            $module = new Module($filename, false, true);
-                            $module->dump($compiledFile, true);
+                            $fileStream = new FileStream($filename);
+                            $module = new Module($fileStream, false, true);
+                            $stream = new FileStream($compiledFile, 'w+');
+                            $module->dump($stream, true);
+                            $stream->close();
+                            $fileStream->close();
                         });
                     }
                 });
@@ -481,16 +487,24 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
 
                     $filename = fs::normalize($filename);
 
-                    if ($log) $log(":compile $filename");
+                    if ($log) $log(":compile-gen $filename");
 
                     $compiledFile = fs::pathNoExt($filename) . '.phb';
 
                     $includedFiles[FileUtils::hashName($filename)] = true;
+
                     $scope->execute(function () use ($filename, $compiledFile) {
-                        $module = new Module($filename, false, true);
-                        $module->dump($compiledFile);
+                        $stream = new FileStream($compiledFile, 'w+');
+                        $fileStream = new FileStream($filename);
+                        $module = new Module($fileStream, false, true);
+                        $module->dump($stream);
+                        $stream->close();
+                        $fileStream->close();
                     });
-                    fs::delete($filename);
+
+                    if (!fs::delete($filename)) {
+                        $log("[WARNING]: Failed to delete file $filename");
+                    }
                 }
             });
 
