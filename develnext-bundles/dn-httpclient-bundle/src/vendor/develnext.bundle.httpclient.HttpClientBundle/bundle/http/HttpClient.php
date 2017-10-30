@@ -375,7 +375,7 @@ class HttpClient extends AbstractScript
             }
 
             if ($cookie) {
-                $connect->setRequestProperty('Cookie', str::join($cookie, '&'));
+                $connect->setRequestProperty('Cookie', str::join($cookie, '; '));
             }
 
             foreach ($this->headers as $name => $value) {
