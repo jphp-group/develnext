@@ -48,11 +48,32 @@
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <ScrollPane id="projectList" fitToHeight="true" fitToWidth="true" prefHeight="292.0" prefWidth="550.0" style="-fx-border-color: transparent; -fx-border-width: 0px;" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
-                                 <content>
-                                    <FlowPane style="-fx-border-width: 0px;" />
-                                 </content>
-                              </ScrollPane>
+                              <VBox layoutX="3.0" layoutY="3.0" spacing="5.0" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
+                                 <children>
+                                    <HBox prefHeight="39.0" prefWidth="630.0" spacing="5.0">
+                                       <children>
+                                          <Button id="projectSearchButton" maxHeight="1.7976931348623157E308" mnemonicParsing="false" styleClass="icon-flat-search">
+                                             <padding>
+                                                <Insets left="15.0" right="15.0" />
+                                             </padding>
+                                          </Button>
+                                          <TextField id="projectQueryField" prefHeight="39.0" prefWidth="379.0" promptText="введите ключевые слова для поиска" HBox.hgrow="ALWAYS">
+                                             <font>
+                                                <Font size="15.0" />
+                                             </font>
+                                          </TextField>
+                                       </children>
+                                    </HBox>
+                                    <ScrollPane id="projectList" fitToHeight="true" fitToWidth="true" prefHeight="292.0" prefWidth="550.0" style="-fx-border-color: transparent; -fx-border-width: 0px;" VBox.vgrow="ALWAYS">
+                                       <content>
+                                          <FlowPane style="-fx-border-width: 0px;" />
+                                       </content>
+                                    </ScrollPane>
+                                 </children>
+                                 <padding>
+                                    <Insets top="5.0" />
+                                 </padding>
+                              </VBox>
                            </children>
                         </AnchorPane>
                   </content>

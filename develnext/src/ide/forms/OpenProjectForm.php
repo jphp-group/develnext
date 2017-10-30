@@ -34,6 +34,7 @@ use php\gui\UXDirectoryChooser;
 use php\gui\UXFileChooser;
 use php\gui\UXForm;
 use php\gui\UXHyperlink;
+use php\gui\UXImageView;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
@@ -58,6 +59,8 @@ use php\time\Time;
  * @property UXListView $sharedList
  * @property UXListView $embeddedLibraryList
  * @property UXAnchorPane $sharedPane
+ * @property UXTextField $projectQueryField
+ * @property UXButton $projectSearchButton
  *
  * Class OpenProjectForm
  * @package ide\forms
@@ -245,14 +248,15 @@ class OpenProjectForm extends AbstractIdeForm
         return $line;
     }
 
-    public function update()
+    public function update(string $searchText = '')
     {
+        $searchText = str::lower($searchText);
         $emptyText = $this->projectListHelper->getEmptyListText();
 
         $this->projectListHelper->setEmptyListText(_('project.open.searching'));
         $this->projectListHelper->clear();
 
-        $th = new Thread(function () use ($emptyText) {
+        $th = new Thread(function () use ($emptyText, $searchText) {
             $projectDirectory = File::of(Ide::get()->getUserConfigValue('projectDirectory'));
 
             $projects = [];
@@ -281,6 +285,11 @@ class OpenProjectForm extends AbstractIdeForm
                 /** @var File $project */
                 $config = ProjectConfig::createForFile($project);
                 $template = $config->getTemplate();
+                $name = str::lower(fs::nameNoExt($project->getName()));
+
+                if ($searchText && !str::contains($name, $searchText)) {
+                    continue;
+                }
 
                 uiLater(function () use ($project, $template) {
                     $one = new ImageBox(72, 48);
@@ -389,7 +398,7 @@ class OpenProjectForm extends AbstractIdeForm
      */
     public function doShowing()
     {
-        $this->update();
+        $this->update($this->projectQueryField->text);
         $this->updateLibrary();
         $this->updateShared();
     }
@@ -431,10 +440,19 @@ class OpenProjectForm extends AbstractIdeForm
 
                 if (!FileUtils::deleteDirectory($directory)) {
                     Notifications::error(_('project.open.error.delete.title'), _('project.open.error.delete.description'));
-                    $this->update();
+                    $this->update($this->projectQueryField->text);
                 }
             }
         }
+    }
+
+    /**
+     * @event projectQueryField.keyUp
+     * @event projectSearchButton.action
+     */
+    public function doSearchProject()
+    {
+        $this->update($this->projectQueryField->text);
     }
 
     /**
@@ -474,7 +492,7 @@ class OpenProjectForm extends AbstractIdeForm
             $this->pathField->text = $path;
 
             Ide::get()->setUserConfigValue('projectDirectory', $path);
-            $this->update();
+            $this->update($this->projectQueryField->text);
         }
     }
 
