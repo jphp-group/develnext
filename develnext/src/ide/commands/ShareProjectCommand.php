@@ -43,8 +43,8 @@ class ShareProjectCommand extends AbstractProjectCommand
     {
         Ide::get()->on('start', function () {
             $func = function () {
-                self::$lastCheckUidWithAnonymous = null;
-                self::setLastCheckUid(null);
+                static::$lastCheckUidWithAnonymous = null;
+                static::setLastCheckUid(null);
             };
             Ide::accountManager()->on('login', $func);
             Ide::accountManager()->on('logout', $func);
@@ -69,8 +69,8 @@ class ShareProjectCommand extends AbstractProjectCommand
 
                     if ($uid && $notAlreadyChecked && $notSelfProject) {
                         if (!Ide::accountManager()->isAuthorized()) {
-                            if (self::$lastCheckUidWithAnonymous != $uid) {
-                                self::$lastCheckUidWithAnonymous = $uid;
+                            if (static::$lastCheckUidWithAnonymous != $uid) {
+                                static::$lastCheckUidWithAnonymous = $uid;
 
                                 Notifications::show(
                                     'Обнаружен проект',
@@ -82,18 +82,18 @@ class ShareProjectCommand extends AbstractProjectCommand
                             return;
                         }
 
-                        self::$lastCheckUid = $uid;
+                        static::$lastCheckUid = $uid;
 
                         Ide::service()->projectArchive()->getAsync($uid, function (ServiceResponse $response) use ($uid) {
                             if ($response->isSuccess()) {
-                                self::$busy = true;
+                                static::$busy = true;
 
                                 UXApplication::runLater(function () use ($response) {
                                     Notifications::show('Обнаружен проект', 'Мы обнаружили ссылку на общедоступный проект, вы можете его открыть.', 'INFORMATION');
                                     $dialog = new SharedProjectDetailForm($response->data()['uid']);
                                     $dialog->showAndWait();
 
-                                    self::$busy = false;
+                                    static::$busy = false;
                                 });
                             } else {
                                 Logger::error("Unable to get project, uid = $uid, {$response->toLog()}");
@@ -112,7 +112,7 @@ class ShareProjectCommand extends AbstractProjectCommand
      */
     public static function setLastCheckUid($lastCheckUid)
     {
-        self::$lastCheckUid = $lastCheckUid;
+        static::$lastCheckUid = $lastCheckUid;
     }
 
     public function getName()

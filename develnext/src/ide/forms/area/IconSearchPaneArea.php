@@ -77,8 +77,8 @@ class IconSearchPaneArea extends AbstractFormArea
             }
         }
 
-        if (self::$query) {
-            $this->queryField->text = self::$query;
+        if (static::$query) {
+            $this->queryField->text = static::$query;
 
             $this->doSearch();
         }
@@ -98,13 +98,13 @@ class IconSearchPaneArea extends AbstractFormArea
         }
 
         foreach ($data as $i => $item) {
-            if ($i >= self::PER_PAGE_SIZE) {
+            if ($i >= static::PER_PAGE_SIZE) {
                 $node = new ImageBox(72, 72);
                 $node->setTitle('Еще ...');
                 $node->setImage(ico('more32')->image);
 
                 $node->on('click', function (UXMouseEvent $e) {
-                    $this->search(self::$query, self::$sizes, (int) ($this->listHelper->count() / self::PER_PAGE_SIZE + 1));
+                    $this->search(static::$query, static::$sizes, (int) ($this->listHelper->count() / static::PER_PAGE_SIZE + 1));
                 });
                 $this->listHelper->add($node);
                 break;
@@ -184,9 +184,9 @@ class IconSearchPaneArea extends AbstractFormArea
 
     public function search($query, array $sizes = [], $page = 0)
     {
-        self::$query = $query;
-        self::$sizes = $sizes;
-        self::$page  = $page;
+        static::$query = $query;
+        static::$sizes = $sizes;
+        static::$page  = $page;
 
         if (!$query) {
             return;

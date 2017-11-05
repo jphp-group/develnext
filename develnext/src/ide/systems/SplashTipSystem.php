@@ -33,8 +33,8 @@ class SplashTipSystem
 
     static protected function init()
     {
-        if (!self::$initialized) {
-            self::$initialized = true;
+        if (!static::$initialized) {
+            static::$initialized = true;
 
             self::loadSource();
             self::reload();
@@ -43,13 +43,13 @@ class SplashTipSystem
 
     static public function reload()
     {
-        self::$databases = [];
+        static::$databases = [];
 
-        foreach (self::$sources as $source) {
+        foreach (static::$sources as $source) {
             try {
                 Logger::debug("Load tip database from '$source'");
 
-                self::$databases[] = new TipDatabase($source);
+                static::$databases[] = new TipDatabase($source);
             } catch (IOException $e) {
                 Logger::error("Unable to load tip database from '$source', {$e->getMessage()}");
             }
@@ -64,14 +64,14 @@ class SplashTipSystem
             while ($scanner->hasNextLine()) {
                 $name = $scanner->nextLine();
 
-                self::$sources[FileUtils::hashName($name)] = $name;
+                static::$sources[FileUtils::hashName($name)] = $name;
             }
         } catch (IOException $e) {
             ;
         }
 
-        if (!self::$sources) {
-            self::$first = true;
+        if (!static::$sources) {
+            static::$first = true;
         }
 
         self::addSource('res://.dn/splash/tips');
@@ -86,7 +86,7 @@ class SplashTipSystem
     static protected function save()
     {
         try {
-            Stream::putContents(IdeSystem::getFile('splashTips.source'), str::join(self::$sources, "\n"));
+            Stream::putContents(IdeSystem::getFile('splashTips.source'), str::join(static::$sources, "\n"));
         } catch (IOException $e) {
             ;
         }
@@ -94,13 +94,13 @@ class SplashTipSystem
 
     static function addSource($path)
     {
-        self::$sources[FileUtils::hashName($path)] = $path;
+        static::$sources[FileUtils::hashName($path)] = $path;
         self::save();
     }
 
     static function removeSource($path)
     {
-        unset(self::$sources[FileUtils::hashName($path)]);
+        unset(static::$sources[FileUtils::hashName($path)]);
         self::save();
     }
 
@@ -108,14 +108,14 @@ class SplashTipSystem
     {
         self::init();
 
-        if (self::$first) {
-            self::$first = false;
-            return arr::first(self::$databases)->getFirst($lang);
+        if (static::$first) {
+            static::$first = false;
+            return arr::first(static::$databases)->getFirst($lang);
         }
 
         $databases = [];
 
-        foreach (self::$databases as $database) {
+        foreach (static::$databases as $database) {
             if ($database && $database->hasLanguage($lang)) {
                 $databases[] = $database;
             }
