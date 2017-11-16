@@ -97,7 +97,7 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
         return analyzeExpressionForDetectType(env, expression, false);
     }
 
-    protected static List<Token> analyzeExpressionForDetectType(Environment env, String expression, boolean shortExpr) throws IOException {
+    private static List<Token> analyzeExpressionForDetectType(Environment env, String expression, boolean shortExpr) throws IOException {
         try {
             if (!shortExpr) {
                 expression += ";";
@@ -128,7 +128,7 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
                 if (token instanceof BreakStmtToken || token instanceof SemicolonToken || token instanceof NewExprToken || token instanceof ColonToken
                         || token instanceof CommentToken || token instanceof ReturnStmtToken || token instanceof CaseStmtToken
                         || token instanceof ExtendsStmtToken || token instanceof ImplementsStmtToken || token instanceof ClassStmtToken || token instanceof InterfaceStmtToken
-                        || token instanceof TraitStmtToken || token instanceof AsStmtToken) {
+                        || token instanceof TraitStmtToken || token instanceof AsStmtToken || token instanceof StaticExprToken || token instanceof GlobalStmtToken) {
                     break;
                 }
 

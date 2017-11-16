@@ -53,9 +53,10 @@ class SyntaxAnalyzer
 
     /**
      * @param $expression
+     * @param bool $shortExpr
      * @return SimpleToken[]
      */
-    public static function analyzeExpressionForDetectType($expression)
+    public static function analyzeExpressionForDetectType($expression, $shortExpr = false)
     {
     }
 

@@ -508,8 +508,7 @@ class AutoCompletePane
             $ch = $text[$i];
 
             if (Char::isPrintable($ch)
-                && (Char::isLetterOrDigit($ch)) || $ch == '_'
-            ) {
+                && (Char::isLetterOrDigit($ch)) || $ch == '_') {
                 $string .= $ch;
             } else {
                 if ($onlyName /*&& $ch != '$'*/) { // todo refactor for $
@@ -520,7 +519,7 @@ class AutoCompletePane
             }
         }
 
-        return Str::reverse($string);
+        return str::reverse($string);
     }
 
     public function add($string)
