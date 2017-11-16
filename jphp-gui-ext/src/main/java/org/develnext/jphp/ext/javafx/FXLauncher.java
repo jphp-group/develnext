@@ -13,6 +13,7 @@ import javafx.stage.StageStyle;
 import org.develnext.jphp.ext.javafx.classes.UXImage;
 import org.develnext.jphp.ext.javafx.support.ImageViewEx;
 import php.runtime.Memory;
+import php.runtime.env.DieException;
 import php.runtime.lang.spl.exception.RuntimeException;
 import php.runtime.launcher.Launcher;
 
@@ -90,6 +91,11 @@ public class FXLauncher extends Launcher {
         try {
             super.run(mustBootstrap, disableExtensions);
         } catch (Throwable e) {
+            if (e instanceof DieException) {
+                System.exit(((DieException) e).getExitCode());
+                return;
+            }
+
             e.printStackTrace();
 
             SwingUtilities.invokeLater(() -> {
