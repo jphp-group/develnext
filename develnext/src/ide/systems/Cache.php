@@ -17,8 +17,8 @@ class Cache
 
     public static function clear()
     {
-        self::$cacheImageView = [];
-        self::$cacheImage = [];
+        static::$cacheImageView = [];
+        static::$cacheImage = [];
     }
 
     /**
@@ -34,7 +34,7 @@ class Cache
             $key .= '_' . str::join($size, '_');
         }
 
-        if ($view = self::$cacheImageView[$key]) {
+        if ($view = static::$cacheImageView[$key]) {
             return $view;
         }
 
@@ -47,7 +47,7 @@ class Cache
             $view->preserveRatio = true;
         }
 
-        self::$cacheImageView[$key] = $view;
+        static::$cacheImageView[$key] = $view;
         return $view;
     }
 
@@ -61,7 +61,7 @@ class Cache
             $path = "res://$path";
         }
 
-        list($image, $time) = self::$cacheImage[$path];
+        list($image, $time) = static::$cacheImage[$path];
 
         if ($image) {
             return $image;
@@ -72,7 +72,7 @@ class Cache
         }
 
         $image = new UXImage($path);
-        self::$cacheImage[$path] = [$image, Time::millis()];
+        static::$cacheImage[$path] = [$image, Time::millis()];
 
         return $image;
     }
@@ -92,7 +92,7 @@ class Cache
         try {
             $hash = FileUtils::hashName($file);
 
-            list($image, $time) = self::$cacheImage[$hash];
+            list($image, $time) = static::$cacheImage[$hash];
 
             if ($image && $time && $time == $file->lastModified()) {
                 return $image;
@@ -103,7 +103,7 @@ class Cache
             }
 
             $image = new UXImage($file);
-            self::$cacheImage[$hash] = [$image, $file->lastModified()];
+            static::$cacheImage[$hash] = [$image, $file->lastModified()];
 
             return $image;
         } catch (\Exception $e) {

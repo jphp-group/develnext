@@ -143,8 +143,8 @@ class UiUtils
     {
         if ($ui instanceof UXTooltip) {
             $ui->on('show', function () use ($ui) {
-                if (self::$lastFocusedUi instanceof UXWindow) {
-                    self::$lastFocusedUi->toFront();
+                if (static::$lastFocusedUi instanceof UXWindow) {
+                    static::$lastFocusedUi->toFront();
                 }
             });
             return;
@@ -152,9 +152,9 @@ class UiUtils
 
         $ui->observer('focused')->addListener(function ($old, $new) use ($ui) {
             if ($new) {
-                self::$lastFocusedUi = $ui;
+                static::$lastFocusedUi = $ui;
             } else {
-                self::$lastFocusedUi = null;
+                static::$lastFocusedUi = null;
             }
         });
     }

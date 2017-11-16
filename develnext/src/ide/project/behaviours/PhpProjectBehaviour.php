@@ -590,7 +590,7 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         $opts->add($byteCodeCheckbox);
 
         $importTitle = new UXLabel('Метод импортирования классов:');
-        $importTypeSelect = new UXComboBox(self::$importTypes);
+        $importTypeSelect = new UXComboBox(static::$importTypes);
 
         $importTypeSelect->on('action', function () {
             uiLater(function () {

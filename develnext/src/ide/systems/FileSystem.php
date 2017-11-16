@@ -86,7 +86,7 @@ class FileSystem
      */
     static function clearCache()
     {
-        self::$cachedEditors = [];
+        static::$cachedEditors = [];
     }
 
     /**
@@ -94,7 +94,7 @@ class FileSystem
      */
     public static function getOpenedWindows()
     {
-        return self::$openedWindows;
+        return static::$openedWindows;
     }
 
 
@@ -134,19 +134,19 @@ class FileSystem
 
                 foreach (self::getOpenedTabs() as $tab) {
                     if ($tab->userData === $editor) {
-                        self::$freeze = true;
+                        static::$freeze = true;
                         Ide::get()->getMainForm()->{'fileTabPane'}->selectTab($tab);
-                        self::$freeze = false;
+                        static::$freeze = false;
 
                         break;
                     }
                 }
 
-                foreach (self::$openedWindows as $window) {
+                foreach (static::$openedWindows as $window) {
                     if ($window->userData === $editor) {
-                        self::$freeze = true;
+                        static::$freeze = true;
                         $window->toFront();
-                        self::$freeze = false;
+                        static::$freeze = false;
                         break;
                     }
                 }
@@ -653,18 +653,18 @@ class FileSystem
             }
 
             if ($win) {
-                self::$freeze = true;
+                static::$freeze = true;
                 $win->hide();
-                self::$freeze = false;
+                static::$freeze = false;
             }
         }
     }
 
     static function setClickOnAddTab(callable $callback = null)
     {
-        self::$addTabClick = $callback;
+        static::$addTabClick = $callback;
 
-        if (self::$addTab) {
+        if (static::$addTab) {
             if ($callback) {
                 self::showAddTab();
             } else {
@@ -717,13 +717,13 @@ class FileSystem
             $button->style = '-fx-background-radius: 0; -fx-border-radius: 0; -fx-border-width: 0';
 
             $button->on('click', function ($e) {
-                call_user_func(self::$addTabClick, $e);
+                call_user_func(static::$addTabClick, $e);
             });
 
             static::$addTab = $tab;
         }
 
-        if (self::$addTabClick) {
+        if (static::$addTabClick) {
             $fileTabPane->tabs->add(static::$addTab);
             static::$addTab->draggable = false;
         }
@@ -741,7 +741,7 @@ class FileSystem
 
         $index = $fileTabPane->selectedIndex;
 
-        if ($index >= $fileTabPane->tabs->count-1 || (self::$addTab && $index >= $fileTabPane->tabs->count-2)) {
+        if ($index >= $fileTabPane->tabs->count-1 || (static::$addTab && $index >= $fileTabPane->tabs->count-2)) {
             $index = 0;
         } else {
             $index += 1;

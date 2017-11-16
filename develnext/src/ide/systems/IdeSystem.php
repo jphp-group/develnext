@@ -206,11 +206,11 @@ class IdeSystem
 
     public static function setLoader($loader)
     {
-        self::$loader = $loader;
+        static::$loader = $loader;
     }
 
     public static function getLoader()
     {
-        return self::$loader;
+        return static::$loader;
     }
 }
