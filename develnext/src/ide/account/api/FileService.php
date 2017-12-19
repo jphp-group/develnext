@@ -16,7 +16,7 @@ use php\lib\fs;
  * Class FileService
  * @package ide\account\api
  *
- * @method uploadAsync($file, callable $callback = null)
+ * @method uploadFileAsync($file, callable $callback = null)
  */
 class FileService extends AbstractService
 {

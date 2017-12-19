@@ -308,6 +308,6 @@ task distIdeLinuxSetup(type: Tar, dependsOn: ['clean', 'distIdeLinux']) {
     }
 }
 
-task distAll(dependsOn: ['distWindowsPatch', 'distLinuxPatch', 'distIdeWindowsSetup', 'distIdeLinuxSetup']) {
+task distAll(dependsOn: ['distIdeWindowsSetup', 'distIdeLinuxSetup']) {
 
 }

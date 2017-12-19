@@ -26,6 +26,11 @@ class MacroScript extends AbstractScript
     public $runOnApply = false;
 
     /**
+     * @var string
+     */
+    public $description = '';
+
+    /**
      * @var int
      */
     protected $runCount = 0;

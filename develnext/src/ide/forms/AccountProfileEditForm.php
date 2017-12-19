@@ -140,7 +140,7 @@ class AccountProfileEditForm extends AbstractForm
             function ($callback) {
                 if ($this->avatarChanged) {
                     if ($this->avatarFile) {
-                        Ide::service()->file()->uploadAsync($this->avatarFile, function (ServiceResponse $response) use ($callback) {
+                        Ide::service()->file()->uploadFileAsync($this->avatarFile, function (ServiceResponse $response) use ($callback) {
                             if ($response->isSuccess()) {
                                 Ide::service()->account()->changeAvatarAsync($response->result('id'), function (ServiceResponse $response) use ($callback) {
                                     if ($response->isNotSuccess()) {
