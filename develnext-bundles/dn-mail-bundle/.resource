@@ -6,3 +6,5 @@ icon=develnext/bundle/mail/mail32.png
 
 class=develnext\\bundle\\mail\\MailBundle
 author=DevelNext
+
+support=desktop|web

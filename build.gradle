@@ -191,6 +191,7 @@ project(':develnext') {
         compile project(':develnext-store')
         compile project(':develnext-java-platform')
         compile project(':develnext-js-platform')
+        compile project(':develnext-web-platform')
 
         if (new File("./develnext-control/build.gradle").exists()) {
             compile project(':develnext-control')

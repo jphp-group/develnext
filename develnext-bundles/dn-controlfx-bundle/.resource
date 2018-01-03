@@ -6,3 +6,5 @@ icon=icons/develnext/bundle/controlfx/controlfx32.png
 
 class=develnext\\bundle\\controlfx\\ControlFXBundle
 author=DevelNext
+
+support=desktop

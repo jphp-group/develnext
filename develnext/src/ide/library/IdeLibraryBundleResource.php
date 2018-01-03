@@ -2,8 +2,10 @@
 namespace ide\library;
 use ide\bundle\AbstractBundle;
 use ide\Logger;
+use ide\project\Project;
 use ide\utils\FileUtils;
 use php\desktop\Runtime;
+use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
 
@@ -36,6 +38,23 @@ class IdeLibraryBundleResource extends IdeLibraryResource
     public function getGroup()
     {
         return $this->config->get('group', 'other');
+    }
+
+    /**
+     * @return array
+     */
+    public function getSupport(): array
+    {
+        return $this->config->getArray('support', ['desktop']);
+    }
+
+    /**
+     * @param Project $project
+     * @return bool
+     */
+    public function isSupport(Project $project): bool
+    {
+        return arr::has($this->getSupport(), $project->getTemplate()->getSupportContext(), true);
     }
 
     /**

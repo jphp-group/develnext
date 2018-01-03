@@ -237,6 +237,7 @@ class ProjectSystem
      * @param string $fileName
      * @param bool $showDialogAlreadyOpened
      * @param bool $showMigrationDialog
+     * @return Project|null
      */
     static function open($fileName, $showDialogAlreadyOpened = true, $showMigrationDialog = true)
     {

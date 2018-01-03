@@ -6,6 +6,12 @@ abstract class AbstractProjectTemplate
     abstract public function getName();
     abstract public function getDescription();
 
+    /**
+     * desktop, web, etc.
+     * @return string
+     */
+    abstract public function getSupportContext(): string;
+
     public function getIcon()
     {
         return $this->getIcon32();

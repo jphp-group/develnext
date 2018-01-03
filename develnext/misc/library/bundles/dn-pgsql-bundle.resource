@@ -6,3 +6,5 @@ icon=develnext/bundle/pgsql/pgsql.png
 
 class=develnext\\bundle\\sql\\PgSqlBundle
 author=DevelNext
+
+support=desktop|web

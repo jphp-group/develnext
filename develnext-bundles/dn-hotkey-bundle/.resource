@@ -6,3 +6,5 @@ icon=develnext/bundle/hotkey/hotkey48.png
 
 class=develnext\\bundle\\hotkey\\HotKeyBundle
 author=DevelNext
+
+support=desktop

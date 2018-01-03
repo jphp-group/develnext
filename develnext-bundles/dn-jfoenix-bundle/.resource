@@ -6,3 +6,5 @@ icon=icons/develnext/bundle/jfoenix/jfoenix.png
 
 class=develnext\\bundle\\jfoenix\\JFoenixBundle
 author=DevelNext
+
+support=desktop

@@ -496,9 +496,15 @@ class BundlesProjectControlPane extends AbstractProjectControlPane
         });
 
         foreach ($this->behaviour->getPublicBundleResources() as $resource) {
+            if (!$resource->isSupport(Ide::project())) {
+                continue;
+            }
+
             if ($resource->getGroup() == $groupCode || $groupCode == 'all') {
                 // skip if bundle already in project.
-                if ($this->behaviour->hasBundleInAnyEnvironment($resource->getBundle())) {
+                $bundle = $resource->getBundle();
+
+                if ($this->behaviour->hasBundleInAnyEnvironment($bundle)) {
                     uiLater(function () use ($resource) {
                         $this->projectBundleListPane->add($this->makeItemUi($resource));
                     });

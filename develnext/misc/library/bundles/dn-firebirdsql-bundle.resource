@@ -6,3 +6,5 @@ icon=develnext/bundle/firebird/firebird.png
 
 class=develnext\\bundle\\sql\\FireBirdSqlBundle
 author=DevelNext
+
+support=desktop|web

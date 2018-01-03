@@ -6,3 +6,5 @@ icon=develnext/bundle/jsoup/website32.png
 
 class=develnext\\bundle\\jsoup\\JsoupBundle
 author=DevelNext
+
+support=desktop|web

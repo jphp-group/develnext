@@ -6,3 +6,5 @@ icon=develnext/bundle/mysql/mysql.png
 
 class=develnext\\bundle\\sql\\MysqlBundle
 author=DevelNext
+
+support=desktop|web

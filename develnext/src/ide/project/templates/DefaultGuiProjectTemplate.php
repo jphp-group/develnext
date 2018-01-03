@@ -47,6 +47,11 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
         return 'icons/programEx32.png';
     }
 
+    public function getSupportContext(): string
+    {
+        return 'desktop';
+    }
+
     public function recoveryProject(Project $project)
     {
         if (!$project->hasBehaviour(BundleProjectBehaviour::class)) {
