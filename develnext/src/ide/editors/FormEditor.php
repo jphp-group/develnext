@@ -1820,10 +1820,12 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             });
 
             $this->markerNode = $designPane;
+            $designPane->size = $this->layout->size;
             $designPane->add($this->layout);
 
             $this->trigger('makeDesignPane', [$designPane]);
-            UXAnchorPane::setAnchor($this->layout, 0);
+
+            //UXAnchorPane::setAnchor($this->layout, 0);
         } else {
             $this->markerNode = $this->layout;
 

@@ -158,6 +158,7 @@ class GuiFormFormat extends AbstractFormFormat
     /**
      * @param $file
      *
+     * @param array $options
      * @return AbstractEditor
      */
     public function createEditor($file, array $options = [])

@@ -11,6 +11,8 @@ use ide\project\behaviours\RunBuildProjectBehaviour;
 use ide\project\behaviours\ShareProjectBehaviour;
 use ide\project\Project;
 use ide\systems\FileSystem;
+use ide\webplatform\editors\WebFormEditor;
+use ide\webplatform\formats\WebFormFormat;
 use ide\webplatform\project\behaviours\WebProjectBehaviour;
 
 /**
@@ -53,7 +55,7 @@ class WebProjectTemplate extends AbstractProjectTemplate
         $php = $project->register(new PhpProjectBehaviour());
         $project->register(new JavaPlatformBehaviour());
 
-        /** @var WebProjectBehaviour $gui */
+        /** @var WebProjectBehaviour $web */
         $web = $project->register(new WebProjectBehaviour());
 
         $project->register(new RunBuildProjectBehaviour());
@@ -65,7 +67,7 @@ class WebProjectTemplate extends AbstractProjectTemplate
         ]);
 
 
-        $project->on('create', function () use ($php, $bundle, $project) {
+        $project->on('create', function () use ($php, $bundle, $web, $project) {
             $project->makeDirectory("src/{$project->getPackageName()}/forms");
             $project->makeDirectory("src/{$project->getPackageName()}/modules");
 
@@ -78,8 +80,11 @@ class WebProjectTemplate extends AbstractProjectTemplate
                 "/src/{$project->getPackageName()}/modules",
             ]);
 
+            $mainForm = $project->createBlank('MainForm', WebFormFormat::class);
+
             $project->save();
             FileSystem::open($project->getMainProjectFile());
+            FileSystem::open($mainForm);
         });
 
         return $project;

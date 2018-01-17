@@ -62,6 +62,13 @@ public class UXRegion<T extends Region> extends UXParent<Region> {
         return new double[] {w, h};
     }
 
+    @Setter
+    public void setPrefSize(double[] size) {
+        if (size.length >= 2) {
+            getWrappedObject().setPrefSize(size[0], size[1]);
+        }
+    }
+
     @Getter
     public double getPaddingLeft() {
         return getWrappedObject().getPadding().getLeft();

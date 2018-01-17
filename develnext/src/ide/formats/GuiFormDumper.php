@@ -170,7 +170,7 @@ class GuiFormDumper extends AbstractFormDumper
             $this->testScene->addStylesheet($stylesheet);
         }
 
-        $element = $this->createElementTag($editor, $editor->getLayout(), $document, false, $testScene);
+        $element = $this->createElementTag($editor, $editor->getLayout(), $document, false);
 
         if ($element == null) {
             Logger::warn("Unable to save editor '{$editor->getTitle()}'");

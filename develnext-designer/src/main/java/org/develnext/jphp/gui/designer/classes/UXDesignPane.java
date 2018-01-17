@@ -66,23 +66,15 @@ public class UXDesignPane extends UXAnchorPane {
         scale = new Scale();
         getWrappedObject().getTransforms().add(scale);
 
-        getChildren().addListener(new ListChangeListener() {
-            @Override
-            public void onChanged(Change c) {
-                setZoom(zoom);
-            }
-        });
+        getChildren().addListener((ListChangeListener) c -> setZoom(zoom));
 
         getWrappedObject().getChildren().addListener((ListChangeListener<Node>) c -> {
             Platform.runLater(this::update);
         });
 
-        getWrappedObject().setOnMouseExited(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (!resizing) {
-                    getWrappedObject().getScene().setCursor(Cursor.DEFAULT);
-                }
+        getWrappedObject().setOnMouseExited(event -> {
+            if (!resizing) {
+                getWrappedObject().getScene().setCursor(Cursor.DEFAULT);
             }
         });
 
@@ -172,14 +164,11 @@ public class UXDesignPane extends UXAnchorPane {
             }
         });
 
-        getWrappedObject().addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (resizing) {
-                    resizing = false;
-                    update();
-                    event.consume();
-                }
+        getWrappedObject().addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            if (resizing) {
+                resizing = false;
+                update();
+                event.consume();
             }
         });
     }

@@ -1,31 +1,23 @@
 <?php
 namespace ide\project;
+
 use develnext\lexer\inspector\AbstractInspector;
 use Exception;
-use Files;
 use ide\formats\AbstractFileTemplate;
-use ide\formats\AbstractFormat;
 use ide\formats\IdeFormatOwner;
 use ide\forms\MainForm;
 use ide\Ide;
 use ide\IdeConfiguration;
+use ide\IdeException;
 use ide\Logger;
 use ide\systems\FileSystem;
-use ide\utils\FileHelper;
 use ide\utils\FileUtils;
-use php\gui\UXApplication;
 use php\io\File;
-use php\io\FileStream;
-use php\io\IOException;
-use php\io\Stream;
 use php\lang\ThreadPool;
 use php\lib\arr;
 use php\lib\fs;
-use php\lib\Items;
-use php\lib\reflect;
 use php\lib\Str;
 use php\time\Time;
-use php\util\Configuration;
 use php\util\Flow;
 use script\TimerScript;
 
@@ -337,6 +329,24 @@ class Project
         Logger::debug("Make directory in project: $directory");
 
         return File::of($directory)->mkdirs();
+    }
+
+    /**
+     * @param string $name
+     * @param string $formatClass
+     * @param array $options
+     * @return ProjectFile
+     * @throws IdeException
+     */
+    public function createBlank(string $name, string $formatClass, array $options = [])
+    {
+        $format = $this->getRegisteredFormat($formatClass);
+
+        if ($format == null) {
+            throw new IdeException("Format $formatClass not found");
+        }
+
+        return $format->createBlank($this, $name, $options);
     }
 
     /**

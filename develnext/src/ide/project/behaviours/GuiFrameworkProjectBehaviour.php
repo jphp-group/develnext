@@ -1140,7 +1140,7 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
             : null;
     }
 
-    public function createForm($name, $namespace = null)
+        public function createForm($name, $namespace = null)
     {
         if ($this->hasForm($name)) {
             $editor = $this->getFormEditor($name);

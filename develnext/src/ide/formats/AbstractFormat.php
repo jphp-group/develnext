@@ -11,6 +11,7 @@ use php\io\File;
 use php\lang\IllegalStateException;
 use php\lang\NotImplementedException;
 use php\lib\fs;
+use php\lib\reflect;
 
 /**
  * Class AbstractFormat

@@ -315,7 +315,7 @@ class FileSystem
 
         if (!$editor) {
             if (!fs::exists($path)) {
-                Logger::error("Unable fetch editor, $path is not found");
+                Logger::error("Unable fetch editor, path '$path' is not found");
             }
 
             return null;

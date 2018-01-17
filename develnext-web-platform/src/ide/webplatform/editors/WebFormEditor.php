@@ -1,0 +1,92 @@
+<?php
+namespace ide\webplatform\editors;
+
+use ide\action\ActionEditor;
+use ide\behaviour\IdeBehaviourManager;
+use ide\editors\FormEditor;
+use ide\formats\form\AbstractFormDumper;
+use ide\formats\form\SourceEventManager;
+use php\lib\fs;
+
+/**
+ * Class WebFormEditor
+ * @package ide\webplatform\editors
+ */
+class WebFormEditor extends FormEditor
+{
+    /**
+     * @var string
+     */
+    private $frmFile;
+
+    public function __construct($file, AbstractFormDumper $dumper)
+    {
+        $this->file = $file;
+        $this->formDumper = $dumper;
+
+        $this->eventManager = new SourceEventManager($file);
+
+        $this->codeFile = $file;
+        $this->frmFile = "$file.frm";
+
+        $this->initCodeEditor($this->codeFile);
+
+        $this->actionEditor = new ActionEditor($file . '.axml');
+        $this->actionEditor->setFormEditor($this);
+
+        $this->behaviourManager = new IdeBehaviourManager(fs::pathNoExt($file) . '.behaviour', function ($targetId, $has = false) {
+            $node = $targetId ? $this->layout->lookup("#$targetId") : $this;
+
+            if (!$node) {
+                return null;
+            }
+
+            if ($has) {
+                return true;
+            }
+
+            return $this->getFormat()->getFormElement($node);
+        });
+    }
+
+    /**
+     * @return string
+     */
+    public function getFrmFile(): string
+    {
+        return $this->frmFile;
+    }
+
+    public function getModules()
+    {
+        return []; // TODO.
+    }
+
+    /**
+     *
+     */
+    public function load()
+    {
+        $this->trigger('load:before');
+
+        $this->loaded = true;
+
+        if ($this->factory) {
+            $this->factory->reload();
+        }
+
+        $this->eventManager->load();
+        $this->formDumper->load($this);
+
+        $this->loadOthers();
+
+        $this->layout->backgroundColor = 'white';
+
+        $this->refreshInspectorType();
+
+        $this->trigger('load:after');
+
+        return true;
+    }
+
+}
