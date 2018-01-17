@@ -6,9 +6,50 @@ use php\gui\UXNode;
 
 class ButtonWebElement extends AbstractWebElement
 {
-    public function isOrigin($any)
+    /**
+     * @return string
+     */
+    public function uiSchemaClassName(): string
     {
-        return $any instanceof UXButton && $any->classes->has('ux-button');
+        return 'Button';
+    }
+
+    public function uiStylesheets(): array
+    {
+        return [
+            '/ide/webplatform/formats/form/ButtonWebElement.css'
+        ];
+    }
+
+    public function loadUiSchema(UXNode $view, array $uiSchema)
+    {
+        /** @var UXButton $view */
+        parent::loadUiSchema($view, $uiSchema);
+
+        if (isset($uiSchema['kind'])) {
+            $view->classes->add($uiSchema['kind']);
+        }
+
+        if (isset($uiSchema['text'])) {
+            $view->text = $uiSchema['text'];
+        }
+    }
+
+    public function uiSchema(UXNode $view): array
+    {
+        /** @var UXButton $view */
+        $schema = parent::uiSchema($view);
+
+        foreach (['primary', 'success', 'info', 'danger', 'warning', 'light', 'dark'] as $kind) {
+            if ($view->classes->has($kind)) {
+                $schema['kind'] = $kind;
+                break;
+            }
+        }
+
+        $schema['text'] = $view->text;
+
+        return $schema;
     }
 
     /**
@@ -29,13 +70,19 @@ class ButtonWebElement extends AbstractWebElement
         return "button%s";
     }
 
+    public function getDefaultSize()
+    {
+        return [120, 32];
+    }
+
     /**
      * @return UXNode
      */
-    public function createElement()
+    public function createViewElement(): UXNode
     {
-        $btn = new UXButton($this->getName());
-        $btn->classes->add('ux-button');
-        return $btn;
+        $view = new UXButton($this->getName());
+        $view->font->size = 14;
+        $view->classes->add('ux-button');
+        return $view;
     }
 }

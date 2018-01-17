@@ -5,12 +5,17 @@ use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormDumper;
 use ide\formats\form\AbstractFormElementTag;
 use ide\misc\EventHandlerBehaviour;
+use ide\utils\Json;
+use ide\webplatform\editors\WebFormEditor;
+use ide\webplatform\formats\form\AbstractWebElement;
 use php\format\JsonProcessor;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXPane;
 use php\gui\UXButton;
+use php\gui\UXLoader;
 use php\gui\UXNode;
 use php\io\IOException;
+use php\io\MemoryStream;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 
@@ -33,22 +38,40 @@ class WebFormDumper extends AbstractFormDumper
     private $formElementTags;
 
     /**
-     * WebFormDumper constructor.
+     * @var array
      */
-    public function __construct(array $formElementTags)
-    {
-        $this->json = new JsonProcessor(JsonProcessor::SERIALIZE_PRETTY_PRINT);
-        $this->formElementTags = $formElementTags;
-    }
+    private $formElementUiClasses;
 
     /**
-     * @param AbstractFormElementTag[] $formElementTags
+     * WebFormDumper constructor.
      */
-    public function setFormElementTags($formElementTags)
+    public function __construct()
     {
-        $this->formElementTags = $formElementTags;
+        $this->json = new JsonProcessor(JsonProcessor::SERIALIZE_PRETTY_PRINT);
     }
 
+    protected function loadFrmFile(WebFormEditor $editor, UXPane $layout)
+    {
+        $schema = Json::fromFile($editor->getFrmFile());
+
+        if ($layoutSchema = $schema['layout']) {
+            if (isset($layoutSchema['size'])) {
+                $layout->size = $layoutSchema['size'];
+            }
+
+            /** @var WebFormFormat $format */
+            $format = $editor->getFormat();
+
+            foreach ((array) $schema['layout']['_content'] as $item) {
+                if ($element = $format->getWebElementByUiClass($item['_'])) {
+                    $view = $element->createElement();
+                    $element->loadUiSchema($view, $item);
+
+                    $layout->add($view);
+                }
+            }
+        }
+    }
 
     public function load(FormEditor $editor)
     {
@@ -56,12 +79,24 @@ class WebFormDumper extends AbstractFormDumper
 
         /** @var UXAnchorPane $layout */
         try {
-            $layout = new UXAnchorPane();
-            $layout->size = [640, 480];
-            $layout->backgroundColor = 'yellow';
-            $layout->style = '-fx-border-width: 1; -fx-border-color: red;';
+            $loader = new UXLoader();
 
-            $layout->add(new UXButton('teeeeeeeeeeees'));
+            $memory = new MemoryStream();
+            $memory->write('<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480" prefWidth="640"
+	xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+</AnchorPane>
+');
+            $memory->seek(0);
+            $layout = $loader->load($memory);
+
+            $format = $editor->getFormat();
+
+            if ($editor instanceof WebFormEditor) {
+                $this->loadFrmFile($editor, $layout);
+            }
 
             if ($layout instanceof UXPane) {
                 $editor->setLayout($layout);
@@ -80,11 +115,33 @@ class WebFormDumper extends AbstractFormDumper
 
     public function save(FormEditor $editor)
     {
+        /** @var WebFormEditor $editor */
         $this->trigger('save', [$editor]);
 
         $designer = $editor->getDesigner();
 
         $layout = $editor->getLayout();
+
+        $uiContent = [];
+        foreach ($layout->children as $child) {
+            $element = $child->data('--web-element');
+
+            if ($element instanceof AbstractWebElement) {
+                $uiSchema = $element->uiSchema($child);
+                $uiContent[] = $uiSchema;
+            }
+        }
+
+        $uiFormSchema = [
+            'title' => 'MainForm',
+            'layout' => [
+                '_' => 'AnchorPane',
+                'size' => [$layout->width, $layout->height],
+                '_content' => $uiContent
+            ]
+        ];
+
+        Json::toFile($editor->getFrmFile(), $uiFormSchema);
     }
 
     /**

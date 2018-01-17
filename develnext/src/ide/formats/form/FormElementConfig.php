@@ -94,7 +94,7 @@ class FormElementConfig
      */
     protected function __construct($type)
     {
-        if (!Str::contains($type, '\\')) {
+        if (!Str::contains($type, '\\') && !Str::contains($type, '/')) {
             $type = __NAMESPACE__ . '\\elements\\' . $type;
         }
 
@@ -395,7 +395,9 @@ class FormElementConfig
             $kind = $eventType->getAttribute('kind');
             $idParameter = $eventType->getAttribute('idParameter');
 
-            $kind = "ide\\formats\\form\\event\\{$kind}Kind";
+            if (!str::contains($kind, '\\')) {
+                $kind = "ide\\formats\\form\\event\\{$kind}Kind";
+            }
 
             /** @var AbstractEventKind $kind */
             $kind = new $kind();

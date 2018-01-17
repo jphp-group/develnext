@@ -25,6 +25,14 @@ use php\util\Flow;
 class RunBuildProjectBehaviour extends AbstractProjectBehaviour
 {
     /**
+     * @return string
+     */
+    public function getMainClassName(): string
+    {
+        return 'org.develnext.jphp.ext.javafx.FXLauncher';
+    }
+
+    /**
      * ...
      */
     public function inject()

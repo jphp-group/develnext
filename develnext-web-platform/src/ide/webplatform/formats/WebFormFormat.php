@@ -20,6 +20,7 @@ use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\webplatform\editors\WebFormEditor;
+use ide\webplatform\formats\form\AbstractWebElement;
 use php\gui\UXNode;
 use php\io\File;
 use php\lib\fs;
@@ -38,6 +39,11 @@ class WebFormFormat extends AbstractFormFormat
     protected $dumper;
 
     /**
+     * @var AbstractWebElement[]
+     */
+    protected $formElementsByUiClass;
+
+    /**
      * WebFormFormat constructor.
      */
     public function __construct()
@@ -54,7 +60,7 @@ class WebFormFormat extends AbstractFormFormat
 
         $this->registerRelocationCommands();
 
-        $this->dumper = new WebFormDumper($this->formElementTags);
+        $this->dumper = new WebFormDumper();
     }
 
     public function getIcon()
@@ -74,7 +80,17 @@ class WebFormFormat extends AbstractFormFormat
      */
     public function createEditor($file, array $options = [])
     {
-        return new WebFormEditor($file, new WebFormDumper($this->formElementTags));
+        $editor = new WebFormEditor($file, new WebFormDumper());
+
+        foreach ($this->formElements as $element) {
+            if ($element instanceof AbstractWebElement) {
+                foreach ($element->uiStylesheets() as $stylesheet) {
+                    $editor->addStylesheet($stylesheet);
+                }
+            }
+        }
+
+        return $editor;
     }
 
     /**
@@ -206,8 +222,8 @@ class WebFormFormat extends AbstractFormFormat
     {
         parent::register($any);
 
-        if ($this->dumper) {
-            $this->dumper->setFormElementTags($this->formElementTags);
+        if ($any instanceof AbstractWebElement) {
+            $this->formElementsByUiClass[$any->uiSchemaClassName()] = $any;
         }
     }
 
@@ -228,5 +244,23 @@ class WebFormFormat extends AbstractFormFormat
         $this->register(new RelocationMenuCommand('Right', function (UXNode $node, $sizeX) {
             $node->x += $sizeX;
         }));
+    }
+
+    /**
+     * @param object|string $any
+     * @return \ide\formats\form\AbstractFormElement|mixed|null
+     */
+    public function getFormElement($any)
+    {
+        return $any instanceof UXNode && $any->data('--web-element') ? $any->data('--web-element') : parent::getFormElement($any);
+    }
+
+    /**
+     * @param string $uiClass
+     * @return AbstractWebElement
+     */
+    public function getWebElementByUiClass(string $uiClass): ?AbstractWebElement
+    {
+        return $this->formElementsByUiClass[$uiClass];
     }
 }

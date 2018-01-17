@@ -1,0 +1,32 @@
+<element>
+    <init>
+        <property code="visible" virtual="1" value="1" />
+        <property code="enabled" virtual="1" value="1" />
+    </init>
+
+    <properties group="general" title="Главное" sort="1000" />
+
+    <properties group="extra" title="Дополнительно" sort="2000" >
+        <property code="id" name="ID" editor="id" tooltip="Уникальный идентификатор элемента в рамках формы" />
+        <property code="style" name="CSS стиль" editor="text" tooltip="Набор fx css правил для стиля" />
+
+        <property code="visible" name="Видимость" editor="boolean" virtual="1" tooltip="Видимость элемента на форме в момент старта" />
+        <property code="enabled" name="Доступность" editor="boolean" virtual="1" tooltip="Доступность элемента на форме в момент старта" />
+
+        <property code="opacity" name="Непрозрачность" editor="floatSlider" min="0" max="1" tooltip="Уровень непрозрачности от 0 до 1, например, 0.5 - объект прозрачен наполовину" />
+
+        <property code="position" name="Позиция (X, Y)" editor="doubleArray" tooltip="Позиция по X (горизонтали) и по Y (вертикали)" />
+        <property code="size" name="Размеры (W, H)" editor="doubleArray" tooltip="Размеры, ширина (width) + высота (height)" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="click" name="Клик мышки" kind="ide\webplatform\formats\form\event\WebEventKind" icon="icons/mouseEx16.png" />
+
+        <eventType code="mouseDown" name="Нажатие мышки" kind="ide\webplatform\formats\form\event\WebEventKind" icon="icons/mouse16.png" />
+        <eventType code="mouseUp" name="Отжатие мышки" kind="ide\webplatform\formats\form\event\WebEventKind" icon="icons/mouse16.png" />
+
+        <eventType code="keyDown" name="Нажатие (при фокусе)" kind="ide\webplatform\formats\form\event\WebEventKind" icon="icons/key16.png" />
+        <eventType code="keyUp" name="Отжатие (при фокусе)" kind="ide\webplatform\formats\form\event\WebEventKind" icon="icons/key16.png" />
+        <eventType code="keyPress" name="Клавиатура (при фокусе)" kind="ide\webplatform\formats\form\event\WebEventKind" icon="icons/keyboard16.png" />
+    </eventTypes>
+</element>

@@ -8,14 +8,11 @@ use ide\account\api\FileService;
 use ide\account\api\NoticeService;
 use ide\account\api\ProfileService;
 use ide\account\api\ProjectArchiveService;
-use ide\account\api\ProjectService;
 use ide\account\api\ServiceResponse;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
-use ide\ui\Notifications;
 use ide\utils\Json;
-use php\lang\IllegalArgumentException;
 use php\lang\System;
 use script\TimerScript;
 
@@ -56,11 +53,6 @@ class ServiceManager
      * @var IdeService
      */
     protected $ideService;
-
-    /**
-     * @var ProjectService
-     */
-    protected $projectService;
 
     /**
      * @var ProjectArchiveService

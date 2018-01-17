@@ -230,7 +230,7 @@ class ExecuteProjectCommand extends AbstractCommand
             }, __CLASS__);
 
             ProjectSystem::saveOnlyRequired();
-            ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'java -cp ... org.develnext.jphp.ext.javafx.FXLauncher', function ($success) use ($dialog, $project, $ide) {
+            ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'java -cp ... ' . $this->behaviour->getMainClassName(), function ($success) use ($dialog, $project, $ide) {
                 if (!$success) {
                     $dialog->stopWithError();
                     $this->startButton->enabled = true;
@@ -242,7 +242,7 @@ class ExecuteProjectCommand extends AbstractCommand
                 try {
                     $classPaths = arr::toList($this->behaviour->getSourceDirectories(), $this->behaviour->getProfileModules(['jar']));
 
-                    $args = ['java', '-cp', str::join($classPaths, File::PATH_SEPARATOR), '-XX:+UseG1GC', '-Xms128M', '-Xmx512m', '-Dfile.encoding=UTF-8', '-Djphp.trace=true', 'org.develnext.jphp.ext.javafx.FXLauncher'];
+                    $args = ['java', '-cp', str::join($classPaths, File::PATH_SEPARATOR), '-XX:+UseG1GC', '-Xms128M', '-Xmx512m', '-Dfile.encoding=UTF-8', '-Djphp.trace=true', $this->behaviour->getMainClassName()];
 
                     Logger::debug("Run -> " . str::join($args, ' '));
 

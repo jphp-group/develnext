@@ -31,12 +31,6 @@ trait IdeFormatOwner
         }
 
         $this->formats[$class] = $format;
-
-        $createCommand = $format->createBlankCommand();
-
-        if ($createCommand) {
-            Ide::get()->registerCommand($createCommand, 'create');
-        }
     }
 
     /**

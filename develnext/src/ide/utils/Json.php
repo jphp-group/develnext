@@ -17,7 +17,7 @@ class Json
      */
     static function encode($object)
     {
-        $processor = new JsonProcessor();
+        $processor = new JsonProcessor(JsonProcessor::SERIALIZE_PRETTY_PRINT);
         return $processor->format($object);
     }
 

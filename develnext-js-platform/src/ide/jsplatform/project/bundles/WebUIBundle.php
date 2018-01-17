@@ -29,6 +29,13 @@ class WebUIBundle extends AbstractJarBundle
         ];
     }
 
+    function getJarDependencies()
+    {
+        return [
+            'web-ui', 'web', 'core', 'core-legacy'
+        ];
+    }
+
     public function onAdd(Project $project, AbstractBundle $owner = null)
     {
         parent::onAdd($project, $owner);

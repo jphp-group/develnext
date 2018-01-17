@@ -1,0 +1,27 @@
+
+.ux-button {
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+
+    -fx-background-insets: 0, 0, -1, 0;
+
+    -fx-background-color: #e6e6e6;
+}
+
+.ux-button.success {
+    -fx-text-fill: white;
+    -fx-background-color: #28a745;
+}
+
+.ux-button.success:hover {
+    -fx-background-color: #279b42;
+}
+
+.ux-button.primary {
+    -fx-text-fill: white;
+    -fx-background-color: #007bff;
+}
+
+.ux-button.primary:hover {
+    -fx-background-color: #006dec;
+}

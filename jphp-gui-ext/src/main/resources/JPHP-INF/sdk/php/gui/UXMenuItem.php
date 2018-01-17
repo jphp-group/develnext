@@ -66,7 +66,7 @@ class UXMenuItem
     public $userData = null;
 
     /**
-     * @param string $text (optional)
+     * @param string $text [optional]
      * @param UXNode $graphic
      */
     public function __construct($text, UXNode $graphic = null) { }

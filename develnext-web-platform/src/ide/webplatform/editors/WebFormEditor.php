@@ -5,7 +5,10 @@ use ide\action\ActionEditor;
 use ide\behaviour\IdeBehaviourManager;
 use ide\editors\FormEditor;
 use ide\formats\form\AbstractFormDumper;
+use ide\formats\form\AbstractFormElement;
 use ide\formats\form\SourceEventManager;
+use ide\webplatform\formats\form\AbstractWebElement;
+use php\gui\UXNode;
 use php\lib\fs;
 
 /**
@@ -60,6 +63,24 @@ class WebFormEditor extends FormEditor
     public function getModules()
     {
         return []; // TODO.
+    }
+
+    public function saveConfig()
+    {
+        // nop.
+    }
+
+    public function open($param = null)
+    {
+        $this->eachNode(function (UXNode $node, $nodeId, ?AbstractFormElement $element) {
+            if ($element instanceof AbstractWebElement) {
+                if (!$this->getDesigner()->isRegisteredNode($node)) {
+                    $this->registerNode($node);
+                }
+            }
+        });
+
+        return parent::open($param);
     }
 
     /**

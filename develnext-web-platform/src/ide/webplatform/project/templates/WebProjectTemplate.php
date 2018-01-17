@@ -14,6 +14,7 @@ use ide\systems\FileSystem;
 use ide\webplatform\editors\WebFormEditor;
 use ide\webplatform\formats\WebFormFormat;
 use ide\webplatform\project\behaviours\WebProjectBehaviour;
+use ide\webplatform\project\behaviours\WebRunBuildProjectBehaviour;
 
 /**
  * Class WebProjectTemplate
@@ -58,7 +59,7 @@ class WebProjectTemplate extends AbstractProjectTemplate
         /** @var WebProjectBehaviour $web */
         $web = $project->register(new WebProjectBehaviour());
 
-        $project->register(new RunBuildProjectBehaviour());
+        $project->register(new WebRunBuildProjectBehaviour());
         $project->register(new ShareProjectBehaviour());
         $project->register(new BackupProjectBehaviour());
 
