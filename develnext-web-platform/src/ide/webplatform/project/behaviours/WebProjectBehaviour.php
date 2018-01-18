@@ -117,7 +117,7 @@ class WebProjectBehaviour extends AbstractProjectBehaviour
 
         // Use bootstrap php file.
         $this->bootstrapTemplate->useFile($this->project->getSrcFile('JPHP-INF/.bootstrap.php'));
-        $this->bootstrapTemplate->setHotDeployEnabled(true);
+        $this->bootstrapTemplate->setHotDeployEnabled(false);
         $this->bootstrapTemplate->setWatchingDirs([
             './' . $this->project->getSrcDirectory(),
             './' . $this->project->getSrcGeneratedDirectory()
