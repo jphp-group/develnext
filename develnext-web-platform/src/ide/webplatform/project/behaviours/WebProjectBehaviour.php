@@ -11,17 +11,48 @@ use ide\project\AbstractProjectBehaviour;
 use ide\project\control\CommonProjectControlPane;
 use ide\systems\FileSystem;
 use ide\webplatform\formats\WebFormFormat;
+use ide\webplatform\project\behaviours\web\WebApplicationConfig;
+use ide\webplatform\project\behaviours\web\WebBootstrapScriptTemplate;
+use ide\webplatform\project\behaviours\web\WebMainUITemplate;
 use php\gui\event\UXEvent;
 use php\lib\str;
 
 class WebProjectBehaviour extends AbstractProjectBehaviour
 {
     /**
+     * @var WebBootstrapScriptTemplate
+     */
+    protected $bootstrapTemplate;
+
+    /**
+     * @var WebMainUITemplate
+     */
+    protected $mainUiTemplate;
+
+    /**
+     * @var WebApplicationConfig
+     */
+    protected $appConfig;
+
+
+    /**
+     * WebProjectBehaviour constructor.
+     */
+    public function __construct()
+    {
+        $this->bootstrapTemplate = new WebBootstrapScriptTemplate();
+        $this->mainUiTemplate = new WebMainUITemplate();
+        $this->appConfig = new WebApplicationConfig();
+    }
+
+    /**
      * ...
      */
     public function inject()
     {
+        $this->project->on('load', [$this, 'handleLoad']);
         $this->project->on('open', [$this, 'handleOpen']);
+        $this->project->on('save', [$this, 'handleSave']);
 
         $this->project->registerFormat($projectFormat = new ProjectFormat());
         $this->project->registerFormat($webFormFormat = new WebFormFormat());
@@ -48,24 +79,73 @@ class WebProjectBehaviour extends AbstractProjectBehaviour
         return self::PRIORITY_LIBRARY;
     }
 
+    /**
+     * @return WebBootstrapScriptTemplate
+     */
+    public function getBootstrapTemplate(): ?WebBootstrapScriptTemplate
+    {
+        return $this->bootstrapTemplate;
+    }
+
+    /**
+     * @return WebMainUITemplate
+     */
+    public function getMainUiTemplate(): WebMainUITemplate
+    {
+        return $this->mainUiTemplate;
+    }
+
+    /**
+     * @return WebApplicationConfig
+     */
+    public function getAppConfig(): WebApplicationConfig
+    {
+        return $this->appConfig;
+    }
+
+    public function handleLoad()
+    {
+        $this->appConfig->useFile($this->project->getSrcFile("application.conf"));
+        $this->appConfig->setServerHost('0.0.0.0');
+        $this->appConfig->setServerPort(5555);
+
+        $this->mainUiTemplate->useFile($this->project->getSrcFile("{$this->project->getPackageName()}/MainUI.php"));
+        $this->mainUiTemplate->setNamespace($this->project->getPackageName());
+        $this->mainUiTemplate->setClassName('MainUI');
+        $this->mainUiTemplate->setPath("/" . $this->project->getPackageName());
+        $this->mainUiTemplate->setForms(['MainForm' => "{$this->project->getPackageName()}\\forms\\MainForm"]);
+
+        // Use bootstrap php file.
+        $this->bootstrapTemplate->useFile($this->project->getSrcFile('JPHP-INF/.bootstrap.php'));
+        $this->bootstrapTemplate->setHotDeployEnabled(true);
+        $this->bootstrapTemplate->setWatchingDirs([
+            './' . $this->project->getSrcDirectory(),
+            './' . $this->project->getSrcGeneratedDirectory()
+        ]);
+
+        $this->bootstrapTemplate->setMainUiClass("{$this->project->getPackageName()}\\MainUI");
+    }
+
     public function handleOpen()
     {
         $tree = $this->project->getTree();
         $tree->addIgnoreExtensions([
-            'behaviour', 'axml', 'module', 'frm'
+            'behaviour', 'axml', 'module', 'frm', 'meta', 'pid'
         ]);
+        $tree->addIgnorePaths([
+            $this->project->getSrcFile('JPHP-INF/'),
+            $this->appConfig->getFile()
+        ]);
+
+        $this->bootstrapTemplate->save();
+        $this->mainUiTemplate->save();
+        $this->appConfig->saveFile();
     }
 
-    public function saveBootstrapScript()
+    public function handleSave()
     {
-        $template = new GuiLauncherConfFileTemplate();
-        $template->setFxSplashAlwaysOnTop($this->splashData['alwaysOnTop']);
-
-        if ($this->splashData['src']) {
-            $template->setFxSplash($this->splashData['src']);
-        }
-
-        $config = new IdeConfiguration($this->project->getSrcDirectory() . '/JPHP-INF/launcher.conf');
+        $this->bootstrapTemplate->save();
+        $this->mainUiTemplate->save();
+        $this->appConfig->saveFile();
     }
-
 }

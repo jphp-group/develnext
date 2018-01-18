@@ -13,11 +13,12 @@ class Json
     /**
      * @param $object
      *
+     * @param bool $pretty
      * @return string
      */
-    static function encode($object)
+    static function encode($object, bool $pretty = false)
     {
-        $processor = new JsonProcessor(JsonProcessor::SERIALIZE_PRETTY_PRINT);
+        $processor = new JsonProcessor($pretty ? JsonProcessor::SERIALIZE_PRETTY_PRINT : 0);
         return $processor->format($object);
     }
 
@@ -38,7 +39,7 @@ class Json
      */
     static function toFile($filename, $data)
     {
-        FileUtils::put($filename, self::encode($data));
+        FileUtils::put($filename, self::encode($data, true));
     }
 
     /**

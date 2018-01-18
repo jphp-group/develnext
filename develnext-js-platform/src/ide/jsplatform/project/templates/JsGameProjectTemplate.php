@@ -59,4 +59,13 @@ class JsGameProjectTemplate extends AbstractProjectTemplate
             $project->register(new ShareProjectBehaviour(), false);
         }
     }
+
+    /**
+     * desktop, web, etc.
+     * @return string
+     */
+    public function getSupportContext(): string
+    {
+
+    }
 }

@@ -31,9 +31,21 @@ class WebUIBundle extends AbstractJarBundle
 
     function getJarDependencies()
     {
-        return [
+        $libs = [
+            'jphp-httpserver-ext', 'jphp-zend-ext', 'javax.servlet-api',
             'web-ui', 'web', 'core', 'core-legacy'
         ];
+
+        $jettyVersion = "v20170317";
+        foreach (['client', 'http', 'io', 'security', 'server', 'servlet', 'util'] as $item) {
+            $libs[] = "jetty-$item.$jettyVersion";
+        }
+
+        foreach (['api', 'client', 'common', 'server', 'servlet'] as $item) {
+            $libs[] = "websocket-$item.$jettyVersion";
+        }
+
+        return $libs;
     }
 
     public function onAdd(Project $project, AbstractBundle $owner = null)

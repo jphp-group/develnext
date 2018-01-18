@@ -10,7 +10,10 @@ abstract class AbstractProjectTemplate
      * desktop, web, etc.
      * @return string
      */
-    abstract public function getSupportContext(): string;
+    public function getSupportContext(): string
+    {
+        return 'desktop';
+    }
 
     public function getIcon()
     {

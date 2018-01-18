@@ -103,7 +103,12 @@ abstract class AbstractEntity
     {
         $json = new JsonProcessor(JsonProcessor::SERIALIZE_PRETTY_PRINT);
 
-        $stream = $file instanceof Stream ? $file : new FileStream($file);
+        if ($file instanceof Stream) {
+            $stream = $file;
+        } else {
+            fs::ensureParent($file);
+            $stream = new FileStream($file, 'w+');
+        }
 
         $json->formatTo($this->getProperties(), $stream);
 
@@ -121,7 +126,7 @@ abstract class AbstractEntity
     {
         $json = new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS);
 
-        $stream = $file instanceof Stream ? $file : new FileStream($file);
+        $stream = $file instanceof Stream ? $file : new FileStream($file, 'r');
 
         $props = $json->parse($stream);
         $this->setProperties($props);

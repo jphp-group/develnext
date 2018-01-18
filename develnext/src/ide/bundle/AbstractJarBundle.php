@@ -40,7 +40,7 @@ abstract class AbstractJarBundle extends AbstractBundle
 
         foreach ($this->getJarDependencies() as $dep) {
             if (is_array($dep)) {
-                $result[] = new ProjectModule(str::split($dep, ':', 4), 'maven');
+                $result[] = new ProjectModule(str::join($dep, ':', 4), 'maven');
             } else {
                 $id = $this->findLibFile($dep);
 
