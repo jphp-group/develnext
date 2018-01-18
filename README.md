@@ -64,6 +64,10 @@ cd 3rd-party/RichTextFX
 cd ../3rd-party/jphp
 ./gradlew install
 
+// install wizard-framework for web
+cd ../3rd-party/wizard-framework
+./gradlew install
+
 cd ../../
 
 // for windows
