@@ -1,0 +1,5 @@
+<element extends="ide/webplatform/formats/form/LabeledWebElement">
+    <properties>
+
+    </properties>
+</element>

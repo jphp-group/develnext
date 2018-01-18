@@ -73,7 +73,7 @@ abstract class AbstractWebElement extends AbstractFormElement
     /**
      * @return UXNode
      */
-    final public function createElement()
+    public function createElement()
     {
         $view = $this->createViewElement();
         $view->data('--web-element', $this);

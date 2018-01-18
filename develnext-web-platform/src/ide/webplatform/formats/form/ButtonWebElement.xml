@@ -1,27 +1,17 @@
-<element extends="ide/webplatform/formats/form/NodeWebElement">
+<element extends="ide/webplatform/formats/form/LabeledWebElement">
     <properties>
-        <property code="text" name="Текст" editor="text" />
-        <property code="font" name="Шрифт" editor="font" />
-
-        <property code="textAlignment" name="Выравнивание текста" editor="enum">
-            <variants>
-                <variant value="LEFT">Левое</variant>
-                <variant value="CENTER">Центр</variant>
-                <variant value="RIGHT">Правое</variant>
-                <variant value="JUSTIFY">Растягивать</variant>
-            </variants>
-        </property>
-
         <property code="kind" name="Стиль" editor="cssClass">
             <variants>
                 <variant value="">Нет</variant>
                 <variant value="primary">Primary</variant>
+                <variant value="secondary">Secondary</variant>
                 <variant value="success">Success</variant>
                 <variant value="warning">Warning</variant>
                 <variant value="danger">Danger</variant>
                 <variant value="info">Info</variant>
-                <variant value="Light">Light</variant>
-                <variant value="Dark">Dark</variant>
+                <variant value="light">Light</variant>
+                <variant value="dark">Dark</variant>
+                <variant value="link">Link</variant>
             </variants>
         </property>
     </properties>

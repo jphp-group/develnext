@@ -2,23 +2,24 @@
 namespace ide\webplatform\formats\form;
 
 use php\gui\UXButton;
+use php\gui\UXLabelEx;
 use php\gui\UXNode;
 use php\lib\str;
 
-class ButtonWebElement extends LabeledWebElement
+class LabelWebElement extends LabeledWebElement
 {
     /**
      * @return string
      */
     public function uiSchemaClassName(): string
     {
-        return 'Button';
+        return 'Label';
     }
 
     public function uiStylesheets(): array
     {
         return [
-            '/ide/webplatform/formats/form/ButtonWebElement.css'
+            //'/ide/webplatform/formats/form/ButtonWebElement.css'
         ];
     }
 
@@ -26,26 +27,12 @@ class ButtonWebElement extends LabeledWebElement
     {
         /** @var UXButton $view */
         parent::loadUiSchema($view, $uiSchema);
-
-        if (isset($uiSchema['kind'])) {
-            $view->classes->add($uiSchema['kind']);
-        }
     }
 
     public function uiSchema(UXNode $view): array
     {
         /** @var UXButton $view */
         $schema = parent::uiSchema($view);
-
-        foreach (['primary', 'secondary', 'success', 'info', 'danger', 'warning', 'light', 'dark', 'link'] as $kind) {
-            if ($view->classes->has($kind)) {
-                $schema['kind'] = $kind;
-                break;
-            }
-        }
-
-        $schema['padding'] = [8, 8, 8, 8];
-
         return $schema;
     }
 
@@ -54,22 +41,22 @@ class ButtonWebElement extends LabeledWebElement
      */
     public function getName()
     {
-        return 'Кнопка';
+        return 'Текст';
     }
 
     public function getIcon()
     {
-        return 'icons/button16.png';
+        return 'icons/label16.png';
     }
 
     public function getIdPattern()
     {
-        return "button%s";
+        return "label%s";
     }
 
     public function getDefaultSize()
     {
-        return [120, 40];
+        return [100, 20];
     }
 
     /**
@@ -77,9 +64,9 @@ class ButtonWebElement extends LabeledWebElement
      */
     public function createViewElement(): UXNode
     {
-        $view = new UXButton($this->getName());
+        $view = new UXLabelEx($this->getName());
         $view->font->size = $this->getDefaultFontSize();
-        $view->classes->add('ux-button');
+        $view->classes->add('ux-label');
         return $view;
     }
 }

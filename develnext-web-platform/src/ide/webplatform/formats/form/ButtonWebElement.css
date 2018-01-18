@@ -12,7 +12,6 @@
     -fx-text-fill: white;
     -fx-background-color: #28a745;
 }
-
 .ux-button.success:hover {
     -fx-background-color: #279b42;
 }
@@ -21,7 +20,60 @@
     -fx-text-fill: white;
     -fx-background-color: #007bff;
 }
-
 .ux-button.primary:hover {
     -fx-background-color: #006dec;
+}
+
+.ux-button.danger {
+    -fx-text-fill: white;
+    -fx-background-color: #dc3545;
+}
+.ux-button.danger:hover {
+    -fx-background-color: #cb3140;
+}
+
+.ux-button.secondary {
+    -fx-text-fill: white;
+    -fx-background-color: #868e96;
+}
+.ux-button.secondary:hover {
+    -fx-background-color: #7e858d;
+}
+
+.ux-button.warning {
+    -fx-background-color: #ffc107;
+}
+.ux-button.warning:hover {
+    -fx-background-color: #f1b607;
+}
+
+.ux-button.info {
+    -fx-text-fill: white;
+    -fx-background-color: #17a2b8;
+}
+.ux-button.info:hover {
+    -fx-background-color: #1596aa;
+}
+
+.ux-button.light {
+    -fx-background-color: #f8f9fa;
+}
+.ux-button.light:hover {
+    -fx-background-color: #f1f2f3;
+}
+
+.ux-button.dark {
+    -fx-text-fill: white;
+    -fx-background-color: #343a40;
+}
+.ux-button.dark:hover {
+    -fx-background-color: #292d32;
+}
+
+.ux-button.link {
+    -fx-text-fill: #007bff;
+    -fx-background-color: transparent;
+}
+.ux-button.link:hover {
+    -fx-underline: true;
 }
