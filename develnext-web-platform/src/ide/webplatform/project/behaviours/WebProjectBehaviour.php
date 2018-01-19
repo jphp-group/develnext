@@ -109,8 +109,8 @@ class WebProjectBehaviour extends AbstractProjectBehaviour
         $this->appConfig->setServerHost('0.0.0.0');
         $this->appConfig->setServerPort(5555);
 
-        $this->mainUiTemplate->useFile($this->project->getSrcFile("{$this->project->getPackageName()}/MainUI.php"));
-        $this->mainUiTemplate->setNamespace($this->project->getPackageName());
+        $this->mainUiTemplate->useFile($this->project->getSrcFile("{$this->project->getPackageName()}/ui/MainUI.php"));
+        $this->mainUiTemplate->setNamespace($this->project->getPackageName() . "\\ui");
         $this->mainUiTemplate->setClassName('MainUI');
         $this->mainUiTemplate->setPath("/" . $this->project->getPackageName());
         $this->mainUiTemplate->setForms(['MainForm' => "{$this->project->getPackageName()}\\forms\\MainForm"]);
@@ -123,7 +123,7 @@ class WebProjectBehaviour extends AbstractProjectBehaviour
             './' . $this->project->getSrcGeneratedDirectory()
         ]);
 
-        $this->bootstrapTemplate->setMainUiClass("{$this->project->getPackageName()}\\MainUI");
+        $this->bootstrapTemplate->addUiClass("{$this->project->getPackageName()}\\ui\\MainUI");
     }
 
     public function handleOpen()
@@ -133,8 +133,8 @@ class WebProjectBehaviour extends AbstractProjectBehaviour
             'behaviour', 'axml', 'module', 'frm', 'meta', 'pid'
         ]);
         $tree->addIgnorePaths([
-            $this->project->getSrcFile('JPHP-INF/'),
-            $this->appConfig->getFile()
+            $this->project->getSrcFile('JPHP-INF/')->getRelativePath(),
+            $this->project->getAbsoluteFile($this->appConfig->getFile())->getRelativePath()
         ]);
 
         $this->bootstrapTemplate->save();

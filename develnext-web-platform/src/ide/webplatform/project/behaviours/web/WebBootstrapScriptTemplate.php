@@ -3,14 +3,15 @@ namespace ide\webplatform\project\behaviours\web;
 
 use ide\misc\AbstractMetaTemplate;
 use php\io\Stream;
+use php\lib\arr;
 use php\lib\str;
 
 class WebBootstrapScriptTemplate extends AbstractMetaTemplate
 {
     /**
-     * @var string
+     * @var array
      */
-    private $mainUiClass = '';
+    private $uiClasses = [];
 
     /**
      * @var array
@@ -27,14 +28,18 @@ class WebBootstrapScriptTemplate extends AbstractMetaTemplate
      */
     public function render(Stream $out)
     {
-        $mainUiClass = var_export($this->getMainUiClass(), true);
+        $mainUiClassCode = [];
+        foreach ($this->getUiClasses() as $class) {
+            $class = var_export($class, true);
+            $mainUiClassCode[] = "\t\$webUi->addUI($class);";
+        }
+        $mainUiClassCode = str::join($mainUiClassCode, "\r\n");
 
         $watchedCode = [];
         foreach ($this->getWatchingDirs() as $watchingDir) {
             $string = var_export($watchingDir, true);
             $watchedCode[$watchingDir] = "\$deployer->addDirWatcher($string)";
         }
-
         $watchedCode = str::join($watchedCode, "\r\n");
 
         if ($this->hotDeployEnabled) {
@@ -53,7 +58,8 @@ Stream::putContents('application.pid', getmypid());
  
     \$app = new WebApplication();
     \$app->addModule(\$webUi);
-    \$webUi->addUI($mainUiClass);
+    
+$mainUiClassCode
 
     \$app->launch();
 }, function () {
@@ -79,7 +85,8 @@ Stream::putContents('application.pid', getmypid());
 
 \$app = new WebApplication();
 \$app->addModule(\$webUi);
-\$webUi->addUI($mainUiClass);
+
+$mainUiClassCode
 
 \$app->launch();
             ");
@@ -103,19 +110,35 @@ Stream::putContents('application.pid', getmypid());
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getMainUiClass(): string
+    public function getUiClasses(): array
     {
-        return $this->mainUiClass;
+        return $this->uiClasses;
     }
 
     /**
-     * @param string $mainUiClass
+     * @param array $uiClasses
      */
-    public function setMainUiClass(string $mainUiClass)
+    public function setUiClasses(array $uiClasses)
     {
-        $this->mainUiClass = $mainUiClass;
+        $this->uiClasses = arr::combine($uiClasses, $uiClasses);
+    }
+
+    /**
+     * @param string $uiClass
+     */
+    public function addUiClass(string $uiClass)
+    {
+        $this->uiClasses[$uiClass] = $uiClass;
+    }
+
+    /**
+     * @param string $uiClass
+     */
+    public function removeUiClass(string $uiClass)
+    {
+        unset($this->uiClasses[$uiClass]);
     }
 
     /**
