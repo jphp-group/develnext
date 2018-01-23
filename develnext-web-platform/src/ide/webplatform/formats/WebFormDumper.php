@@ -54,6 +54,8 @@ class WebFormDumper extends AbstractFormDumper
     {
         $schema = Json::fromFile($editor->getFrmFile());
 
+        $layout->data('--web-form', true);
+
         if ($layoutSchema = $schema['layout']) {
             if (isset($layoutSchema['size'])) {
                 $layout->size = $layoutSchema['size'];

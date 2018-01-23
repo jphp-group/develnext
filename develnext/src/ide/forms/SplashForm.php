@@ -4,6 +4,8 @@ namespace ide\forms;
 use ide\Ide;
 use ide\Logger;
 use ide\systems\SplashTipSystem;
+use php\gui\effect\UXColorAdjustEffect;
+use php\gui\effect\UXSepiaToneEffect;
 use php\gui\event\UXEvent;
 use php\gui\framework\AbstractForm;
 use php\gui\layout\UXAnchorPane;
@@ -23,10 +25,12 @@ use php\time\Time;
 
 /**
  * @property UXLabel $version
+ * @property UXImageView $image
  * @property UXLabel $accountNameLabel
  * @property UXAnchorPane $accountAvatarImage
  * @property UXHBox $accountPane
  * @property UXLabel $tip
+ * @property UXHBox $tipBox
  */
 class SplashForm extends AbstractIdeForm
 {
@@ -38,6 +42,16 @@ class SplashForm extends AbstractIdeForm
 
         $versionCode = $this->_app->getConfig()->get('app.versionCode');
         $this->version->text = $this->_app->getVersion();
+
+        if ($this->_app->isSnapshotVersion()) {
+            $effect = new UXSepiaToneEffect();
+            $effect->level = 0.5;
+            $this->image->effects->add($effect);
+
+            $effect2 = new UXColorAdjustEffect();
+            $effect2->saturation = -1;
+            $this->tipBox->effects->add($effect2);
+        }
 
         if ($versionCode) {
             $this->versionCode->text = str::upperFirst($versionCode);

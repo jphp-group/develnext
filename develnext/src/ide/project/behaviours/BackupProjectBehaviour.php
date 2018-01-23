@@ -158,7 +158,9 @@ class BackupProjectBehaviour extends AbstractProjectBehaviour
 
     public function doClose()
     {
-        $this->timer->cancel();
+        if ($this->timer) {
+            $this->timer->cancel();
+        }
 
         if ($this->config->isAutoCloseTrigger()) {
             $this->makeAutoBackup();

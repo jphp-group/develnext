@@ -1,0 +1,15 @@
+<element>
+    <properties group="general" title="Главное">
+        <property code="title" name="Заголовок" editor="text" tooltip="Заголовок окна" virtual="1" />
+        <property code="alwaysOnTop" name="Поверх всех окон" editor="boolean" virtual="1" tooltip="Всегда отображать окно поверх всех других окон" />
+        <property code="resizable" name="Изменяемые размеры" editor="boolean" virtual="1" defaultValue="1"
+                  tooltip="Возможность изменять размеры окна - высоту и ширину" />
+    </properties>
+    <properties group="extra" title="Дополнительно">
+        <property code="backgroundColor" realCode="backgroundColor" name="Цвет фона" editor="color" virtual="1" defaultValue="" />
+        <property code="size" name="Размеры (W, H)" editor="doubleArray" tooltip="Размеры, ширина (width) + высота (height)" />
+    </properties>
+
+    <eventTypes>
+    </eventTypes>
+</element>

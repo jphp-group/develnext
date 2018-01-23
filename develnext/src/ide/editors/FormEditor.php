@@ -2345,6 +2345,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function updateProperties($node, array $onlyProperties = [])
     {
+        Logger::warn(reflect::typeOf($node));
         if ($node instanceof UXNode) {
             $factoryId = $node->data('-factory-id');
         } else {

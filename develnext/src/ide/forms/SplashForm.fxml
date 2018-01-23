@@ -30,7 +30,7 @@
             <Font size="20.0" name="System Bold" />
          </font>
       </Label>
-      <HBox layoutY="370" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" style="-fx-background-color: #1e4e7a;" alignment="CENTER">
+      <HBox layoutY="370" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" id="tipBox" style="-fx-background-color: #1e4e7a;" alignment="CENTER">
          <children>
             <Label id="tip" style="-fx-padding: 10px 10px; -fx-font-style: normal; -fx-font-size: 13px;" text="Если у проекта нет главной формы, используйте модуль загрузчик для действий при старте" textAlignment="CENTER" textFill="white">
             </Label>

@@ -1,2 +1,4 @@
+ide\webplatform\formats\form\FormWebElement
+
 ide\webplatform\formats\form\ButtonWebElement
 ide\webplatform\formats\form\LabelWebElement

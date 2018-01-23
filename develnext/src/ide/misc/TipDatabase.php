@@ -1,5 +1,6 @@
 <?php
 namespace ide\misc;
+use ide\systems\IdeSystem;
 use php\lib\arr;
 use php\lib\str;
 use php\util\Scanner;
@@ -46,6 +47,10 @@ class TipDatabase
                     }
 
                     if ($line[0] == '~') {
+                        if (IdeSystem::isJigsaw()) { // TODO FIX base64 in jphp.
+                            continue;
+                        }
+
                         $line = base64_decode(str::sub($line, 1));
                     }
 

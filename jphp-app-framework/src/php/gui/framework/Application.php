@@ -115,7 +115,7 @@ class Application
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->config->get('app.name');
     }
@@ -137,7 +137,7 @@ class Application
     /**
      * @return string
      */
-    public function getUuid()
+    public function getUuid(): string
     {
         if (!$this->config->has('app.uuid')) {
             $this->config->set('app.uuid', str::uuid());
@@ -149,23 +149,37 @@ class Application
     /**
      * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
-        return $this->config->get('app.version');
+        $version = $this->config->get('app.version');
+
+        if ($this->isSnapshotVersion()) {
+            $version = "$version (SNAPSHOT)";
+        }
+
+        return $version;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSnapshotVersion(): bool
+    {
+        return $this->config->getBoolean('app.versionSnapshot');
     }
 
     /**
      * @return int
      */
-    public function getVersionHash()
+    public function getVersionHash(): int
     {
-        return (int) $this->config->get('app.hash');
+        return $this->config->get('app.hash');
     }
 
     /**
      * @return string
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return $this->namespace;
     }
@@ -173,7 +187,7 @@ class Application
     /**
      * @return Configuration
      */
-    public function getConfig()
+    public function getConfig(): ?Configuration
     {
         return $this->config;
     }
@@ -181,7 +195,7 @@ class Application
     /**
      * @return Time
      */
-    public function getStartTime()
+    public function getStartTime(): ?Time
     {
         return $this->startTime;
     }
@@ -190,7 +204,7 @@ class Application
      * Returns user home directory of this app.
      * @return string
      */
-    public function getUserHome()
+    public function getUserHome(): string
     {
         $name = $this->getName();
         $uuid = $this->getUuid();

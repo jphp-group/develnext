@@ -53,7 +53,9 @@ class WebApplicationConfig extends Configuration
 
     public function saveFile()
     {
-        $this->save($this->file);
+        if ($this->file) {
+            $this->save($this->file);
+        }
     }
 
     public function setServerHost(string $host)

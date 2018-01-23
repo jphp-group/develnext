@@ -37,6 +37,10 @@ public class UXControl<T extends Control> extends UXRegion<Control> {
     @Setter
     public void setTooltipText(Memory value) {
         if (value.isNull()) {
+            if (getWrappedObject().tooltipProperty().isBound()) {
+                getWrappedObject().tooltipProperty().unbind();
+            }
+
             getWrappedObject().setTooltip(null);
             return;
         }
@@ -45,6 +49,11 @@ public class UXControl<T extends Control> extends UXRegion<Control> {
 
         if (tooltip == null) {
             tooltip = new Tooltip();
+
+            if (getWrappedObject().tooltipProperty().isBound()) {
+                getWrappedObject().tooltipProperty().unbind();
+            }
+
             getWrappedObject().setTooltip(tooltip);
         }
 

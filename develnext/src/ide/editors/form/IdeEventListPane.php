@@ -783,7 +783,8 @@ class IdeEventListPane
                     $this->hintNode->text = "";
                     $countLabel = new UXLabel("+{$count}");
                     $countLabel->textColor = 'blue';
-                    $countLabel->font = $countLabel->font->withSize(10)->withBold();
+                    $countLabel->font->bold = true;
+                    $countLabel->style = "-fx-font-size: 10px;";
 
                     $this->hintNode->graphic = new UXHBox([new UXLabel($this->hintNodeText), $countLabel]);
                     $this->hintNode->graphic->spacing = 2;

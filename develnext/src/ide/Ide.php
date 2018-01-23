@@ -1483,7 +1483,7 @@ class Ide extends Application
         $this->library->update();
 
         /** @var AccurateTimer $inactiveTimer */
-        $inactiveTimer = new AccurateTimer(5 * 60 * 1000, function () {
+        $inactiveTimer = new AccurateTimer(3 * 60 * 1000, function () {
             $this->idle = true;
             Logger::info("IDE is sleeping, idle mode ...");
             $this->trigger('idleOn');
@@ -1505,8 +1505,14 @@ class Ide extends Application
 
         $ideConfig = $this->getUserConfig('ide');
 
+        $defaultProjectDir = File::of(System::getProperty('user.home') . '/DevelNextProjects');
+
         if (!fs::isDir($ideConfig->get('projectDirectory'))) {
-            $ideConfig->set('projectDirectory', File::of(System::getProperty('user.home') . '/DevelNextProjects/'));
+            $ideConfig->set('projectDirectory', "$defaultProjectDir/");
+        }
+
+        if ($this->isSnapshotVersion()) {
+            $ideConfig->set('projectDirectory', "$defaultProjectDir.{$this->getVersionHash()}.SNAPSHOT");
         }
 
 

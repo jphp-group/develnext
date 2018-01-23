@@ -94,7 +94,7 @@ class ServiceManager
             }
         });
 
-        $timer = new TimerScript(20 * 1000, true, [$this, 'updateStatus']);
+        $timer = new TimerScript(40 * 1000, true, [$this, 'updateStatus']);
         $timer->start();
     }
 

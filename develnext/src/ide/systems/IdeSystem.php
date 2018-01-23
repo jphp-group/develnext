@@ -19,6 +19,11 @@ class IdeSystem
         return str::lower(System::getProperty('os.name'));
     }
 
+    static function isJigsaw(): bool
+    {
+        return !str::startsWith(System::getProperty("java.version"), "1.");
+    }
+
     /**
      * @return string
      */

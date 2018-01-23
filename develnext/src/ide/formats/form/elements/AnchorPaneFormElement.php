@@ -20,7 +20,6 @@ use php\gui\UXTextField;
 use php\gui\UXTitledPane;
 
 /**
- * Class ButtonFormElement
  * @package ide\formats\form
  */
 class AnchorPaneFormElement extends AbstractFormElement

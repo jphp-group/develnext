@@ -289,7 +289,7 @@ public class JavaFXExtension extends Extension {
 
     public static boolean isJigsaw() {
         String property = System.getProperty("java.version");
-        return property.startsWith("9-") || property.startsWith("9.");
+        return !property.startsWith("1.");
     }
 
     protected void registerEvents(CompileScope scope) {

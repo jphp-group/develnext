@@ -187,6 +187,7 @@ task distPatch(dependsOn: ['prepareDist']) {
 }
 
 
+
 task distIdeWindows(dependsOn: ['distIde']) {
     doLast {
         delete "$project.buildDir/install/$project.name/tools/jre"
@@ -272,6 +273,71 @@ task distIdeWindowsSetup(dependsOn: ['clean', 'distIdeWindows']) {
                 .renameTo(file("$project.buildDir/distributions/DevelNextSetup-${project.ext.distVersion}.exe"))
     }
 }
+
+task distIdeWindowsArchive(type: Zip, dependsOn: ['clean', 'distIdeWindows']) {
+    def installDir = "$project.buildDir/install/$project.name"
+    def timeStamp = new Date().format("dd-MM-yyyy-HH-mm")
+
+    archiveName "DevelNextWindows-${project.ext.distVersion}.${timeStamp}.zip"
+    includeEmptyDirs true
+
+    from installDir
+}
+
+task distIdeWindowsArchiveWithoutJRE(type: Zip, dependsOn: ['clean', 'distIdeWindows']) {
+    doFirst {
+        delete "$project.buildDir/install/$project.name/tools/jre"
+    }
+
+    def installDir = "$project.buildDir/install/$project.name"
+    def timeStamp = new Date().format("dd-MM-yyyy-HH-mm")
+
+    archiveName "DevelNextWindows-${project.ext.distVersion}.${timeStamp}.Without-JRE.zip"
+    includeEmptyDirs true
+
+    from installDir
+}
+
+task distIdeLinuxSetupWithoutJRE(type: Zip, dependsOn: ['clean', 'distIdeLinux']) {
+    doFirst {
+        delete "$project.buildDir/install/$project.name/tools/jre"
+    }
+
+    def installDir = "$project.buildDir/install/$project.name"
+    def timeStamp = new Date().format("dd-MM-yyyy-HH-mm")
+
+    archiveName "DevelNextLinux-${project.ext.distVersion}.${timeStamp}.Without-JRE.zip"
+    includeEmptyDirs true
+
+    from(installDir) {
+        exclude('*.sh')
+        exclude('DevelNext')
+        exclude('DevelNext.jar')
+        exclude('bin/develnext')
+        exclude('tools/apache-ant/bin/ant')
+        //exclude('tools/gradle/bin/gradle')
+        exclude('tools/jre/bin/java')
+        exclude('tools/Launch4jLinux/launch4j')
+        exclude('tools/Launch4jLinux/bin/windres')
+        exclude('tools/Launch4jLinux/bin/ld')
+    }
+
+    from(installDir) {
+        include('*.sh')
+        include('DevelNext')
+        include('DevelNext.jar')
+        include('bin/develnext')
+        include('tools/apache-ant/bin/ant')
+        //include('tools/gradle/bin/gradle')
+        include('tools/jre/bin/java')
+        include('tools/Launch4jLinux/launch4j')
+        include('tools/Launch4jLinux/bin/windres')
+        include('tools/Launch4jLinux/bin/ld')
+
+        fileMode = 0755
+    }
+}
+
 
 task distIdeLinuxSetup(type: Tar, dependsOn: ['clean', 'distIdeLinux']) {
     def installDir = "$project.buildDir/install/$project.name"
