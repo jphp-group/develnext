@@ -74,7 +74,7 @@ class IdeLibrary
         $this->defaultDirectory = File::of("$home/DevelNextLibrary");
 
         if ($ide->isSnapshotVersion()) {
-            $this->defaultDirectory = File::of("$home/DevelNextLibrary.SNAPSHOT");
+            $this->defaultDirectory = File::of("$home/DevelNextLibrary.{$ide->getVersionHash()}.SNAPSHOT");
         }
 
         $this->directories[] = $ide->getOwnFile("library");

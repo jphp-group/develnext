@@ -95,13 +95,14 @@ class IdeSystem
 
     /**
      * @param $path
+     * @param string $suffix
      * @return File
      */
-    static function getFile($path)
+    static function getFile($path, string $suffix = '')
     {
         $home = System::getProperty('user.home');
 
-        $ideHome = File::of("$home/.DevelNext");
+        $ideHome = File::of("$home/.DevelNext$suffix");
 
         if (!$ideHome->isDirectory()) {
             $ideHome->mkdirs();

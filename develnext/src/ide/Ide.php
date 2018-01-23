@@ -701,7 +701,7 @@ class Ide extends Application
         }
 
         try {
-            $config = new IdeConfiguration(IdeSystem::getFile("$name.conf"));
+            $config = new IdeConfiguration($this->getFile("$name.conf"));
         } catch (IOException $e) {
             // ...
         }
@@ -775,7 +775,9 @@ class Ide extends Application
      */
     public function getFile($path)
     {
-        return IdeSystem::getFile($path);
+        return IdeSystem::getFile($path,
+            $this->isSnapshotVersion() ? ".{$this->getVersionHash()}.SNAPSHOT" : ""
+        );
     }
 
     /**
