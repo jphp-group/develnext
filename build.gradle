@@ -220,6 +220,7 @@ project(':develnext') {
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
         //compile "org.develnext.jphp:jphp-zip-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-json-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-yaml-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-zend-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-sql-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-debugger:$jphpVersion"
