@@ -108,6 +108,11 @@ class ShareProjectArea extends AbstractFormArea
 
     public function reUpload($silent = false)
     {
+        if (Ide::get()->isSnapshotVersion()) {
+            MessageBoxForm::warning("Данная функция недоступна в SNAPSHOT версии среды");
+            return;
+        }
+
         $project = Ide::project();
         $project->save();
 
@@ -206,6 +211,11 @@ class ShareProjectArea extends AbstractFormArea
      */
     public function doShareButtonAction()
     {
+        if (Ide::get()->isSnapshotVersion()) {
+            MessageBoxForm::warning("Данная функция недоступна в SNAPSHOT версии среды");
+            return;
+        }
+
         if ($this->data['canWrite'] === false) {
             $this->doReUploadButtonAction();
             return;

@@ -2,6 +2,7 @@
 namespace ide\formats\templates;
 
 use ide\formats\AbstractFileTemplate;
+use php\lib\str;
 
 /**
  * Class PhpClassFileTemplate
@@ -28,6 +29,11 @@ class PhpClassFileTemplate extends AbstractFileTemplate
      * @var string[]
      */
     protected $imports;
+
+    /**
+     * @var string
+     */
+    protected $phpdoc;
 
     /**
      * PhpClassFileTemplate constructor.
@@ -76,6 +82,22 @@ class PhpClassFileTemplate extends AbstractFileTemplate
     }
 
     /**
+     * @return string
+     */
+    public function getPhpdoc(): string
+    {
+        return $this->phpdoc;
+    }
+
+    /**
+     * @param string $phpdoc
+     */
+    public function setPhpdoc(string $phpdoc)
+    {
+        $this->phpdoc = $phpdoc;
+    }
+
+    /**
      * @return array
      */
     public function getArguments()
@@ -94,10 +116,21 @@ class PhpClassFileTemplate extends AbstractFileTemplate
             $header .= "use $import;\n";
         }
 
+        $phpdoc = "";
+        if ($this->phpdoc) {
+            $lines = str::lines($this->phpdoc);
+            foreach ($lines as $i => $line) {
+                $lines[$i] = "* $line";
+            }
+
+            $phpdoc = "/**" . str::join($lines, "\n") . "\n*/";
+        }
+
         return [
             'CLASS'     => $this->class,
             'HEADER'    => $header,
             'EXTENDS'   => $this->extends ? "extends $this->extends" : "",
+            'PHPDOC'    => $phpdoc
         ];
     }
 }

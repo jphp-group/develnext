@@ -34,23 +34,16 @@ class WebProjectBehaviour extends AbstractProjectBehaviour
      */
     protected $appConfig;
 
-
-    /**
-     * WebProjectBehaviour constructor.
-     */
-    public function __construct()
-    {
-        $this->bootstrapTemplate = new WebBootstrapScriptTemplate();
-        $this->mainUiTemplate = new WebMainUITemplate();
-        $this->appConfig = new WebApplicationConfig();
-    }
-
     /**
      * ...
      */
     public function inject()
     {
-        $this->project->on('load', [$this, 'handleLoad']);
+        $this->bootstrapTemplate = new WebBootstrapScriptTemplate();
+        $this->mainUiTemplate = new WebMainUITemplate();
+        $this->appConfig = new WebApplicationConfig();
+
+        $this->project->on('recover', [$this, 'handleRecover']);
         $this->project->on('open', [$this, 'handleOpen']);
         $this->project->on('save', [$this, 'handleSave']);
 
@@ -103,7 +96,7 @@ class WebProjectBehaviour extends AbstractProjectBehaviour
         return $this->appConfig;
     }
 
-    public function handleLoad()
+    public function handleRecover()
     {
         $this->appConfig->useFile($this->project->getSrcFile("application.conf"));
         $this->appConfig->setServerHost('0.0.0.0');

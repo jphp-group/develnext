@@ -194,6 +194,8 @@ class ExecuteProjectCommand extends AbstractCommand
             return;
         }
 
+        $this->behaviour->onBeforeRun();
+
         $ide = Ide::get();
         $project = $ide->getOpenedProject();
 
@@ -273,6 +275,7 @@ class ExecuteProjectCommand extends AbstractCommand
                         }
                     });
 
+                    $this->behaviour->onAfterRun();
                 } catch (IOException $e) {
                     $this->stopButton->enabled = false;
                     $this->startButton->enabled = true;

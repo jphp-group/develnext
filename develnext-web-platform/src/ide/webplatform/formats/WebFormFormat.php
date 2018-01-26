@@ -137,6 +137,7 @@ class WebFormFormat extends AbstractFormFormat
         $template = new PhpClassFileTemplate($name, 'UIForm');
         $template->setNamespace($namespace);
         $template->setImports([UIForm::class]);
+        $template->setPhpdoc('@path /');
 
         $sources = $project->createFile($project->getAbsoluteFile("$file.php"), $template);
         $sources->applyTemplate($template);

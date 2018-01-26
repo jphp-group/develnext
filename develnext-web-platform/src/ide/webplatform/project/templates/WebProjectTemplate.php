@@ -83,9 +83,10 @@ class WebProjectTemplate extends AbstractProjectTemplate
 
             $mainForm = $project->createBlank('MainForm', WebFormFormat::class);
 
-            $project->save();
-            FileSystem::open($project->getMainProjectFile());
-            FileSystem::open($mainForm);
+            uiLater(function () use ($mainForm, $project) {
+                FileSystem::open($project->getMainProjectFile());
+                FileSystem::open($mainForm);
+            });
         });
 
         return $project;

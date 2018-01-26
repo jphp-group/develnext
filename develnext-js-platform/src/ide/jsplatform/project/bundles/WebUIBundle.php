@@ -8,6 +8,7 @@ use ide\bundle\AbstractJarBundle;
 use ide\bundle\std\JPHPCoreBundle;
 use ide\bundle\std\JPHPJsonBundle;
 use ide\bundle\std\JPHPXmlBundle;
+use ide\bundle\std\JPHPYamlBundle;
 use ide\Ide;
 use ide\Logger;
 use ide\project\Project;
@@ -26,6 +27,7 @@ class WebUIBundle extends AbstractJarBundle
             JPHPCoreBundle::class,
             JPHPJsonBundle::class,
             JPHPXmlBundle::class,
+            JPHPYamlBundle::class,
         ];
     }
 

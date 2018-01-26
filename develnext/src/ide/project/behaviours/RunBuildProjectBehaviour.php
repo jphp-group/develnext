@@ -32,6 +32,14 @@ class RunBuildProjectBehaviour extends AbstractProjectBehaviour
         return 'org.develnext.jphp.ext.javafx.FXLauncher';
     }
 
+    public function onAfterRun()
+    {
+    }
+
+    public function onBeforeRun()
+    {
+    }
+
     /**
      * ...
      */

@@ -16,6 +16,7 @@ use php\io\File;
 use php\lang\ThreadPool;
 use php\lib\arr;
 use php\lib\fs;
+use php\lib\reflect;
 use php\lib\Str;
 use php\time\Time;
 use php\util\Flow;
@@ -956,6 +957,7 @@ class Project
         }, true);
 
         foreach ($this->behaviours as $behaviour) {
+            Logger::info("Inject behaviour: " . reflect::typeOf($behaviour));
             $behaviour->inject();
         }
 

@@ -1,5 +1,7 @@
 <?php
+
 namespace ide\misc;
+
 use ide\Logger;
 use ide\utils\Json;
 use php\format\ProcessorException;
@@ -42,6 +44,8 @@ abstract class AbstractMetaTemplate extends AbstractEntity
      */
     public function useFile(string $file)
     {
+        Logger::debug("Use file: $file");
+
         $this->file = $file;
         $this->metaFile = "$file.meta";
         $this->load();
@@ -68,16 +72,18 @@ abstract class AbstractMetaTemplate extends AbstractEntity
      */
     public function save()
     {
-        if ($this->file) {
-            fs::ensureParent($this->file);
-            $this->saveToFile($this->metaFile);
+        if (!$this->file) {
+            throw new \Exception("Unable to save, file is not assigned");
+        }
 
-            $out = new FileStream($this->file, "w+");
-            try {
-                $this->render($out);
-            } finally {
-                $out->close();
-            }
+        fs::ensureParent($this->file);
+        $this->saveToFile($this->metaFile);
+
+        $out = new FileStream($this->file, "w+");
+        try {
+            $this->render($out);
+        } finally {
+            $out->close();
         }
     }
 }
