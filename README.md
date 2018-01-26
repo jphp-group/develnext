@@ -58,23 +58,23 @@ git submodule update --init
 
 // install rich text fx
 cd 3rd-party/RichTextFX
-./gradlew install
+gradlew install
 
 // install jphp
 cd ../3rd-party/jphp
-./gradlew install
+gradlew install
 
 // install wizard-framework for web
 cd ../3rd-party/wizard-framework
-./gradlew install
+gradlew npmInstall installGulp install
 
 cd ../../
 
 // for windows
-./gradlew distIdeWindows
+gradlew distIdeWindows
 
 // for linux
-./gradlew distIdeLinux
+gradlew distIdeLinux
 ```
 
 Найти собранный дистрибутив можно будет в папке `develnext/build/install/develnext`.
@@ -85,22 +85,3 @@ cd ../../
 ### Лицензия
 
 Under MPL 2.0 (https://www.mozilla.org/MPL/2.0/)
-
-*Обязательно*
-
-  - Не закрывать исходники продукта
-  - Прикладывать тексты лицензии
-   
-*Разрешено*
-
-  - Комерческое использование
-  - Распространение
-  - Модификация
-  - Патентные гарантия
-  - Приватное использование
-  - Саб-лицензирование
-   
-*Запрещено*
-  
-  - Нести ответственность
-  - Использование торговой марки продукта (названия и логотипов)
