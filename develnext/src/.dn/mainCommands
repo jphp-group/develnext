@@ -5,6 +5,7 @@ ide\commands\SaveProjectCommand
 ide\commands\ExportProjectCommand
 ide\commands\SaveProjectForLibraryCommand
 ide\commands\CloseProjectCommand
+ide\commands\LaunchNewIDECommand
 ide\commands\ExitCommand
 
 ide\commands\IdeLogShowCommand

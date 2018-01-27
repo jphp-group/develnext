@@ -14,6 +14,7 @@ use php\gui\layout\UXPane;
 use php\gui\UXButton;
 use php\gui\UXLoader;
 use php\gui\UXNode;
+use php\gui\UXParent;
 use php\io\IOException;
 use php\io\MemoryStream;
 use php\xml\DomDocument;
@@ -50,6 +51,29 @@ class WebFormDumper extends AbstractFormDumper
         $this->json = new JsonProcessor(JsonProcessor::SERIALIZE_PRETTY_PRINT);
     }
 
+    protected function createView(WebFormEditor $editor, array $uiSchema): UXNode
+    {
+        /** @var WebFormFormat $format */
+        $format = $editor->getFormat();
+
+        if ($element = $format->getWebElementByUiClass($uiSchema['_'])) {
+            $view = $element->createElement();
+            $element->loadUiSchema($view, $uiSchema);
+
+            if ($element->isLayout() && is_array($uiSchema['_content'])) {
+                foreach ($uiSchema['_content'] as $one) {
+                    if ($one) {
+                        $element->addToLayout($view, $this->createView($editor, $one), null, null);
+                    }
+                }
+            }
+
+            return $view;
+        }
+
+        return null;
+    }
+
     protected function loadFrmFile(WebFormEditor $editor, UXPane $layout)
     {
         $schema = Json::fromFile($editor->getFrmFile());
@@ -61,15 +85,11 @@ class WebFormDumper extends AbstractFormDumper
                 $layout->size = $layoutSchema['size'];
             }
 
-            /** @var WebFormFormat $format */
-            $format = $editor->getFormat();
-
             foreach ((array) $schema['layout']['_content'] as $item) {
-                if ($element = $format->getWebElementByUiClass($item['_'])) {
-                    $view = $element->createElement();
-                    $element->loadUiSchema($view, $item);
-
-                    $layout->add($view);
+                if ($item) {
+                    if ($view = $this->createView($editor, $item)) {
+                        $layout->add($view);
+                    }
                 }
             }
         }
@@ -115,6 +135,29 @@ class WebFormDumper extends AbstractFormDumper
         }
     }
 
+    private function uiSchema(UXNode $node): ?array
+    {
+        $element = $node->data('--web-element');
+
+        if ($element instanceof AbstractWebElement) {
+            $uiSchema = $element->uiSchema($node);
+
+            if ($element->isLayout()) {
+                $uiSchema['_content'] = [];
+
+                foreach ($element->getLayoutChildren($node) as $sub) {
+                    if ($s = $this->uiSchema($sub)) {
+                        $uiSchema['_content'][] = $s;
+                    }
+                }
+            }
+
+            return $uiSchema;
+        }
+
+        return null;
+    }
+
     public function save(FormEditor $editor)
     {
         /** @var WebFormEditor $editor */
@@ -125,11 +168,11 @@ class WebFormDumper extends AbstractFormDumper
         $layout = $editor->getLayout();
 
         $uiContent = [];
+        /** @var UXParent $child */
         foreach ($layout->children as $child) {
-            $element = $child->data('--web-element');
+            $uiSchema = $this->uiSchema($child);
 
-            if ($element instanceof AbstractWebElement) {
-                $uiSchema = $element->uiSchema($child);
+            if ($uiSchema) {
                 $uiContent[] = $uiSchema;
             }
         }

@@ -176,14 +176,14 @@ class ProjectSystem
             }
 
             AccurateTimer::executeAfter(1000, function () use ($projectDir, $files, $file, $afterOpen) {
-                ProjectSystem::open($projectDir . "/" . Items::first($files)->getName(), true, false);
+                if (ProjectSystem::open($projectDir . "/" . Items::first($files)->getName(), true, false)) {
+                    Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива", 3000);
 
-                Ide::get()->getMainForm()->toast("Проект был успешно импортирован из архива", 3000);
+                    Logger::info("Finish importing project.");
 
-                Logger::info("Finish importing project.");
-
-                if ($afterOpen) {
-                    $afterOpen();
+                    if ($afterOpen) {
+                        $afterOpen();
+                    }
                 }
             });
         } catch (IOException $e) {
@@ -237,17 +237,15 @@ class ProjectSystem
      * @param string $fileName
      * @param bool $showDialogAlreadyOpened
      * @param bool $showMigrationDialog
+     * @param bool $showWindowKind
      * @return Project|null
      */
-    static function open($fileName, $showDialogAlreadyOpened = true, $showMigrationDialog = true)
+    static function open($fileName, $showDialogAlreadyOpened = true, $showMigrationDialog = true, $showWindowKind = false)
     {
         Logger::info("Start opening project: $fileName");
 
         try {
             Ide::get()->getMainForm()->showPreloader('Открытие проекта ...');
-
-            static::clear();
-            static::close(false);
 
             $file = File::of($fileName);
 
@@ -256,21 +254,34 @@ class ProjectSystem
 
                 if ($project->isOpenedInOtherIde()) {
                     if ($showDialogAlreadyOpened) {
-                        $msg = new MessageBoxForm('Данный проект уже открыт в другом экземпляре среды!', ['ОК, открыть другой проект', 'Выход']);
+                        $msg = new MessageBoxForm('Данный проект уже открыт в другом экземпляре среды!', ['ОК, открыть другой проект']);
                         $msg->showDialog();
-
-                        if ($msg->getResultIndex() == 0) {
-                            uiLater(function () {
-                                $dialog = new OpenProjectForm();
-                                $dialog->showDialog();
-                            });
-                        }
                     }
 
-                    FileSystem::open('~welcome');
+                    if (!Ide::project()) {
+                        FileSystem::open('~welcome');
+                    }
+
                     Ide::get()->getMainForm()->hidePreloader();
-                    return;
+                    return null;
                 }
+
+                if (Ide::project() && $showWindowKind) {
+                    $msg = new MessageBoxForm("Проект можно открыть в отдельном окне, не закрывая текущий.\nВ каком окне открыть проект?", ['В текущем окне', 'В новом окне', 'Отмена']);
+                    $msg->showDialog();
+
+                    switch ($msg->getResultIndex()) {
+                        case 1:
+                            Ide::get()->startNew(["$fileName"]);
+                            // next... ->
+                        case 2:
+                            Ide::get()->getMainForm()->hidePreloader();
+                            return null;
+                    }
+                }
+
+                static::clear();
+                static::close(false);
 
                 $prVersion = $project->getConfig()->getIdeVersion();
 
@@ -288,6 +299,7 @@ class ProjectSystem
                         return;
                     }
                 }
+
 
                 if ($showMigrationDialog) {
                     if ($project->getConfig()->getTemplate()) {

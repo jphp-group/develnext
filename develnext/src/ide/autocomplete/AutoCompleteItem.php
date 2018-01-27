@@ -40,6 +40,11 @@ abstract class AutoCompleteItem
     private $style;
 
     /**
+     * @var AutoCompleteItem[]
+     */
+    private $subItems = [];
+
+    /**
      * @param $name
      * @param string $description
      * @param null $insert
@@ -54,6 +59,22 @@ abstract class AutoCompleteItem
 
         $this->insert = $insert !== null ? $insert : $name;
         $this->style = $style;
+    }
+
+    /**
+     * @param AutoCompleteItem $item
+     */
+    public function addSubItem(AutoCompleteItem $item)
+    {
+        $this->subItems[] = $item;
+    }
+
+    /**
+     * @return AutoCompleteItem[]
+     */
+    public function getSubItems(): array
+    {
+        return $this->subItems;
     }
 
     public function getInsert()
@@ -112,5 +133,37 @@ abstract class AutoCompleteItem
     public function setContent($content)
     {
         $this->content = $content;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription(string $description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @param UXImage|UXImageArea|string $icon
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+    }
+
+    /**
+     * @param string $insert
+     */
+    public function setInsert(?string $insert)
+    {
+        $this->insert = $insert;
     }
 }

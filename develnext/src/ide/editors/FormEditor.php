@@ -1141,6 +1141,13 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         if ($nodeId) {
+            $updateCodeEditor = false;
+
+            if ($element && $element->isNeedRegisterInSource() && $this->eventManager->unregisterTarget($nodeId)) {
+                $this->eventManager->load();
+                $updateCodeEditor = true;
+            }
+
             $binds = $this->eventManager->findBinds($nodeId);
 
             foreach ($binds as $bind) {
@@ -1148,8 +1155,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
 
             if ($this->eventManager->removeBinds($nodeId)) {
-                $this->codeEditor->loadContentToArea(false);
-                $this->codeEditor->doChange(true);
+                $updateCodeEditor = true;
             }
 
             foreach ($this->behaviourManager->getBehaviours($nodeId) as $one) {
@@ -1162,6 +1168,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             $this->behaviourManager->removeBehaviours($nodeId);
             $this->behaviourManager->save();
+
+            if ($updateCodeEditor) {
+                $this->codeEditor->loadContentToArea(false);
+                $this->codeEditor->doChange(true);
+            }
         }
 
         $this->leftPaneUi->refreshObjectTreeList();
@@ -2035,6 +2046,15 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $size = $element->getDefaultSize();
         }
 
+        if ($node->id && $element->isNeedRegisterInSource() && $element->getElementClass()) {
+            if ($this->eventManager->registerTarget($node->id, $element->getElementClass())) {
+                if ($this->codeEditor) {
+                    $this->codeEditor->loadContentToArea(false);
+                    $this->codeEditor->doChange(true);
+                }
+            }
+        }
+
         $selectionRectangle = $this->designer->getSelectionRectangle();
 
         if ($parent == null && $selectionRectangle->width >= 8 && $selectionRectangle->height >= 8) {
@@ -2080,6 +2100,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 foreach ($element->getInitProperties() as $key => $property) {
                     if ($property['virtual']) {
                         $data->set($key, $property['value']);
+                    } else if ($property['synthetic']) {
+                        $node->data($key, $property['value']);
                     } else if ($key !== 'width' && $key !== 'height') {
                         $node->{$key} = $property['value'];
                     }
@@ -2345,7 +2367,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     protected function updateProperties($node, array $onlyProperties = [])
     {
-        Logger::warn(reflect::typeOf($node));
         if ($node instanceof UXNode) {
             $factoryId = $node->data('-factory-id');
         } else {
@@ -2369,11 +2390,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             $properties->addProperty('general', 'position', 'Позиция (X, Y)', new DoubleArrayPropertyEditor());
 
             $editor = new BooleanPropertyEditor();
-            $editor->setAsDataProperty(null, true);
+            $editor->setAsVirtualProperty(null, true);
             $properties->addProperty('general', 'disabled', 'Отключеный', $editor);
 
             $editor = new BooleanPropertyEditor();
-            $editor->setAsDataProperty(null, true);
+            $editor->setAsVirtualProperty(null, true);
             $properties->addProperty('general', 'hidden', 'Скрытый', $editor);
 
             if ($this->propertiesPane) {

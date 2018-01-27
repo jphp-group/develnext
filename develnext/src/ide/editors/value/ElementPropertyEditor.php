@@ -1,6 +1,7 @@
 <?php
 namespace ide\editors\value;
 
+use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\Logger;
 use ide\misc\EventHandlerBehaviour;
@@ -202,17 +203,35 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
         };
     }
 
+    public function setAsSyntheticProperty($realCode = null, $native = false)
+    {
+        $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode, $native) {
+            $target = $this->designProperties->target;
+
+            $target->data($editor->code, $value);
+            $this->trigger('change');
+        };
+
+        $this->getter = function (ElementPropertyEditor $editor) use ($native) {
+            $target = $this->designProperties->target;
+
+            return $target->data($editor->code);
+        };
+
+        return $this;
+    }
+
     /**
      * @param null $realCode
      * @param bool $native
      * @return $this
      */
-    public function setAsDataProperty($realCode = null, $native = false)
+    public function setAsVirtualProperty($realCode = null, $native = false)
     {
         $this->setter = function (ElementPropertyEditor $editor, $value) use ($realCode, $native) {
             $target = $this->designProperties->target;
 
-            if ($target) {
+            if ($target instanceof UXNode) {
                 $data = DataUtils::get($target);
 
                 if ($data && !$native) {
@@ -232,7 +251,7 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
         $this->getter = function (ElementPropertyEditor $editor) use ($native) {
             $target = $this->designProperties->target;
 
-            if ($target) {
+            if ($target instanceof UXNode) {
                 $data = DataUtils::get($target);
 
                 if ($data && !$native) {
@@ -240,6 +259,8 @@ abstract class ElementPropertyEditor extends UXDesignPropertyEditor
                 } else {
                     return $target->data($editor->code);
                 }
+            } else if ($target instanceof AbstractEditor) {
+
             }
 
             return '';

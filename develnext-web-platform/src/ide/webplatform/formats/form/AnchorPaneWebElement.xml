@@ -1,0 +1,4 @@
+<element extends="ide/webplatform/formats/form/NodeWebElement">
+    <properties>
+    </properties>
+</element>

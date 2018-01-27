@@ -3,6 +3,7 @@ namespace ide\forms;
 
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
+use ide\Logger;
 use ide\project\ProjectConsoleOutput;
 use ide\systems\FileSystem;
 use php\gui\designer\UXCodeAreaScrollPane;
@@ -28,6 +29,7 @@ use php\io\Stream;
 use php\lang\Process;
 use php\lang\Thread;
 use php\lang\ThreadPool;
+use php\lib\char;
 use php\lib\str;
 use php\util\Regex;
 use php\util\Scanner;
@@ -301,6 +303,33 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
     public function addConsoleText($text, $color = null)
     {
+        $ANSI_CODES = array(
+            "off" => 0,
+            "bold" => 1,
+            "italic" => 3,
+            "underline" => 4,
+            "blink" => 5,
+            "inverse" => 7,
+            "hidden" => 8,
+            "gray" => 30,
+            "red" => 31,
+            "green" => 32,
+            "yellow" => 33,
+            "blue" => 34,
+            "magenta" => 35,
+            "cyan" => 36,
+            "silver" => "0;37",
+            "white" => 37,
+            "black_bg" => 40,
+            "red_bg" => 41,
+            "green_bg" => 42,
+            "yellow_bg" => 43,
+            "blue_bg" => 44,
+            "magenta_bg" => 45,
+            "cyan_bg" => 46,
+            "white_bg" => 47,
+        );
+
         if (!$color) {
             $color = '#333333';
         }
@@ -331,6 +360,18 @@ class BuildProgressForm extends AbstractIdeForm implements ProjectConsoleOutput
 
         if (str::startsWith($text, "[DEBUG] ") || $text[0] == ':' || str::trimLeft($text)[0] == '#') {
             $color = '#5c5c5c';
+        }
+
+        if (Regex::match("^\\u001B\\[[0-9\\;\\+]+[m]{1}", $text)) {
+            $spec_ch = chr(27);
+            foreach ($ANSI_CODES as $c => $code) {
+                if (str::startsWith($text, "{$spec_ch}[{$code}m")) {
+                    $color = $c;
+                    $text = str::sub($text, str::length($code) + 3);
+                    $text = str::replace($text, "{$spec_ch}[{$ANSI_CODES['off']}m", "");
+                    break;
+                }
+            }
         }
 
         if ($this->consoleArea) {

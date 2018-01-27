@@ -72,6 +72,10 @@ class WebProjectTemplate extends AbstractProjectTemplate
             $project->makeDirectory("src/{$project->getPackageName()}/forms");
             $project->makeDirectory("src/{$project->getPackageName()}/modules");
 
+            $project->makeDirectory("assets/css");
+            $project->makeDirectory("assets/js");
+            $project->makeDirectory("assets/images");
+
             $php->setImportType('simple');
 
             $bundle->addBundle(Project::ENV_ALL, WebUIBundle::class, false);

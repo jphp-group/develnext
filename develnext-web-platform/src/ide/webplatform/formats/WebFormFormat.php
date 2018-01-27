@@ -24,6 +24,7 @@ use ide\webplatform\formats\form\AbstractWebElement;
 use php\gui\UXNode;
 use php\io\File;
 use php\lib\fs;
+use php\lib\reflect;
 use php\lib\str;
 use php\util\Regex;
 
@@ -150,7 +151,7 @@ class WebFormFormat extends AbstractFormFormat
 
         Json::toFile("$file.php.frm", $frm);
 
-        return $file;
+        return "$file.php";
     }
 
     public function createBlankCommand()
@@ -253,7 +254,15 @@ class WebFormFormat extends AbstractFormFormat
      */
     public function getFormElement($any)
     {
-        return $any instanceof UXNode && $any->data('--web-element') ? $any->data('--web-element') : parent::getFormElement($any);
+        if ($any instanceof UXNode && $any->data('--web-element')) {
+            $element = $any->data('--web-element');
+
+            if ($element) {
+                return $element;
+            }
+        }
+
+        return parent::getFormElement($any);
     }
 
     /**

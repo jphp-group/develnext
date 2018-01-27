@@ -28,11 +28,11 @@ class FactoryEditor extends FormEditor
                 $properties->addGroup('prototype', 'Прототип');
 
                 $editor = new TextPropertyEditor();
-                $editor->setAsDataProperty();
+                $editor->setAsVirtualProperty();
                 $properties->addProperty('prototype', 'protoName', 'Название', $editor);
 
                 $editor = new TextPropertyEditor();
-                $editor->setAsDataProperty();
+                $editor->setAsVirtualProperty();
                 $properties->addProperty('prototype', 'protoDescription', 'Описание', $editor);
 
                 $this->propertiesPane->addProperties($properties);

@@ -1,6 +1,7 @@
 <?php
 namespace ide\webplatform\formats\form;
 
+use framework\web\ui\UILabel;
 use php\gui\UXButton;
 use php\gui\UXLabelEx;
 use php\gui\UXNode;
@@ -8,6 +9,11 @@ use php\lib\str;
 
 class LabelWebElement extends LabeledWebElement
 {
+    public function getElementClass()
+    {
+        return UILabel::class;
+    }
+
     /**
      * @return string
      */

@@ -2,6 +2,7 @@
 namespace ide\autocomplete\php;
 
 use develnext\lexer\inspector\AbstractInspector;
+use develnext\lexer\inspector\entry\MethodEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
 use develnext\lexer\inspector\entry\TypePropertyEntry;
 use ide\autocomplete\AutoComplete;
@@ -211,7 +212,28 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
         });
     }
 
-    protected function getTypeMethods(TypeEntry $type, $context = '', $parentContext = null)
+    static function findTypeMethod(AbstractInspector $inspector, string $accessType, TypeEntry $type, string $methodName): ?MethodEntry
+    {
+        if ($type->methods[$methodName]) {
+            return $type->methods[$methodName];
+        }
+
+        foreach ($type->extends as $one) {
+            $t = $inspector->findType($one->type);
+
+            if ($t) {
+                if ($method = self::findTypeMethod($inspector, $accessType, $t, $methodName)) {
+                    return $method;
+                }
+            } else {
+                Logger::warn("Unable to find '$one->type' class");
+            }
+        }
+
+        return null;
+    }
+
+    static function getTypeMethods(AbstractInspector $inspector, string $accessType, bool $considerGetters, TypeEntry $type, $context = '', $parentContext = null)
     {
         $result = [];
         $currentClass = $parentContext ?: $type->fulledName;
@@ -225,7 +247,7 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                 continue;
             }
 
-            switch ($this->accessType) {
+            switch ($accessType) {
                 case 'dynamic':
                     if ($method->static) continue 2;
                     break;
@@ -239,7 +261,7 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                 continue;
             }
 
-            if ($this->typeData['getters']) {
+            if ($considerGetters) {
                 if (!$method->data['non-getter']) {
                     if (str::startsWith($method->name, 'get') && str::length($method->name) > 3) {
                         if (sizeof($method->arguments) == 0) {
@@ -255,7 +277,11 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                 }
             }
 
+
+            Logger::error($method->name . " -> " . $method->modifier);
+
             if ($method->modifier != 'PUBLIC') {
+                // protected ...
                 if (!str::equalsIgnoreCase($currentClass, $context)) {
                     continue;
                 }
@@ -269,10 +295,10 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
         }
 
         foreach ($type->extends as $one) {
-            $t = $this->inspector->findType($one->type);
+            $t = $inspector->findType($one->type);
 
             if ($t) {
-                foreach ($this->getTypeMethods($t, $context, $currentClass) as $name => $prop) {
+                foreach (self::getTypeMethods($inspector, $accessType, $considerGetters, $t, $context, $currentClass) as $name => $prop) {
                     if (!$result[$name]) {
                         $result[$name] = $prop;
                     }
@@ -331,7 +357,7 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
 
             $this->typeData = $this->inspector->collectTypeData($type->fulledName);
 
-            return $this->getTypeMethods($type, $contextClass);
+            return $this->getTypeMethods($this->inspector, $this->accessType, $this->typeData['getters'], $type, $contextClass);
         } elseif ($reflection = $this->reflection) {
             foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
                 if ($method->isStatic() || $method->isAbstract()) {

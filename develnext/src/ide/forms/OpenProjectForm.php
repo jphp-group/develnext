@@ -469,8 +469,9 @@ class OpenProjectForm extends AbstractIdeForm
 
                 waitAsync(100, function () use ($file) {
                     try {
-                        ProjectSystem::open($file);
-                        $this->hide();
+                        if (ProjectSystem::open($file)) {
+                            $this->hide();
+                        }
                     } finally {
                         $this->hidePreloader();
                     }

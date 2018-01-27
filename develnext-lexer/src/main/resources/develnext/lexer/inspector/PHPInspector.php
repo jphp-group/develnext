@@ -17,6 +17,7 @@ use develnext\lexer\token\FunctionStmtToken;
 use develnext\lexer\token\MethodStmtToken;
 use develnext\lexer\token\SimpleToken;
 use develnext\lexer\Tokenizer;
+use framework\core\Annotations;
 use ide\Ide;
 use php\compress\ZipFile;
 use php\framework\Logger;
@@ -341,6 +342,35 @@ class PHPInspector extends AbstractInspector
         return $data;
     }
 
+    protected function parseTypes($string, SimpleToken $owner): array
+    {
+        if (!$string) {
+            return ['mixed' => 'mixed'];
+        }
+
+        $result = [];
+
+        foreach (str::split($string, '|') as $one) {
+            if ($one) {
+                $realType = str::split($one, '[]', 2)[0];
+
+                if (!arr::has($this->simpleTypes, $realType)) {
+                    $t = SyntaxAnalyzer::getRealName($realType, $owner, 'CLASS');
+
+                    if (str::endsWith($one, '[]')) {
+                        $t .= '[]';
+                    }
+
+                    $result[$one] = $t;
+                } else {
+                    $result[$one] = $one;
+                }
+            }
+        }
+
+        return $result;
+    }
+
     protected function parsePropertyDocType($comment, SimpleToken $owner)
     {
         $regex = Regex::of('\\@var[ ]+' . $this->typeNameRegex, Regex::CASE_INSENSITIVE | Regex::DOTALL)->with($comment);
@@ -349,24 +379,7 @@ class PHPInspector extends AbstractInspector
 
         if ($regex->find()) {
             $type = $regex->group(1);
-
-            foreach (str::split($type, '|') as $one) {
-                if ($one) {
-                    $realType = str::split($one, '[]', 2)[0];
-
-                    if (!arr::has($this->simpleTypes, $realType)) {
-                        $t = SyntaxAnalyzer::getRealName($realType, $owner, 'CLASS');
-
-                        if (str::endsWith($one, '[]')) {
-                            $t .= '[]';
-                        }
-
-                        $data['type'][$one] = $t;
-                    } else {
-                        $data['type'][$one] = $one;
-                    }
-                }
-            }
+            $data['type'] = $this->parseTypes($type, $owner);
         } else {
             $data['type']['mixed'] = 'mixed';
         }
@@ -445,7 +458,7 @@ class PHPInspector extends AbstractInspector
         foreach ($token->getMethods() as $method) {
             $entry->methods[str::lower($method->getShortName())] = $this->makeMethod($method, $token);
         }
-
+        
         $entry->properties = [];
         foreach ($token->getProperties() as $var) {
             $entry->properties[$var->getVariable()] = $this->makeProperty($var, $token);
@@ -466,6 +479,44 @@ class PHPInspector extends AbstractInspector
                 $entry->packages[$p] = $p;
             }
         }
+
+        Annotations::parse($token->getComment(), function ($name, $value) use ($entry, $token) {
+            switch ($name) {
+                case 'var':
+                case 'property':
+                    $parts = str::split($value, ' ', 2);
+                    $description = '';
+
+                    if (sizeof($parts) == 1) {
+                        $type = '';
+                        $prop = $parts[0];
+                    } else {
+                        $type = $parts[0];
+                        $prop = $parts[1];
+
+                        $parts = str::split($prop, ' ', 2);
+
+                        if (sizeof($parts) == 2) {
+                            $prop = $parts[0];
+                            $description = $parts[1];
+                        }
+                    }
+
+                    if ($prop[0] == '$') {
+                        $prop = str::sub($prop, 1);
+                    }
+
+                    $entry->properties[$prop] = $t = new TypePropertyEntry();
+                    $t->name = $prop;
+                    $t->data['type'] = $this->parseTypes($type, $token);
+                    $t->data['content'] = $description;
+
+                    break;
+            }
+
+            return true;
+        });
+
 
         return $entry;
     }

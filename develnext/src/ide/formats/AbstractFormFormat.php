@@ -95,6 +95,7 @@ abstract class AbstractFormFormat extends AbstractFormat
             return $element;
         }
 
+
         /** @var AbstractFormElement[] $candidates */
         $candidates = [];
 

@@ -483,7 +483,7 @@ class BackupProjectBehaviour extends AbstractProjectBehaviour
 
         $file = fs::scan($this->project->getRootDir(), ['extensions' => ['dnproject']])[0];
 
-        $project = ProjectSystem::open($file);
+        $project = ProjectSystem::open($file, true, true, false);
 
         if ($project) {
             // сохраняем старые настроки.

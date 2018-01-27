@@ -3,10 +3,12 @@ namespace ide\utils;
 
 use ide\Logger;
 use php\lang\SourceMap;
+use php\lib\arr;
 use php\lib\Char;
 use php\lib\fs;
 use php\lib\Str;
 use php\util\Flow;
+use php\util\Regex;
 use php\util\SharedValue;
 use phpx\parser\SourceToken;
 use phpx\parser\SourceTokenizer;
@@ -159,7 +161,13 @@ class PhpParser
 
         while ($scanner->hasNext()) {
             if ($i >= $from && $i <= $to) {
-                $content .= $lineBuilder($scanner->nextLine()) . "\n";
+                $line = $lineBuilder($scanner->nextLine(), $i);
+
+                if ($line === false) {
+                    continue;
+                }
+
+                $content .= $line . "\n";
             } else {
                 $content .= $scanner->nextLine() . "\n";
             }
@@ -366,6 +374,121 @@ class PhpParser
         }
 
         return null;
+    }
+
+    /**
+     * @param string $class
+     * @param string $property
+     * @param SourceTokenizer|null $tokenizer
+     * @return bool
+     */
+    public function removeVirtualProperty(string $class, string $property, SourceTokenizer $tokenizer = null)
+    {
+        return $this->setVirtualProperty($class, '~deleted', $property, '', $tokenizer);
+    }
+
+    /**
+     * @param string $class
+     * @param string $type
+     * @param string $property
+     * @param string $description
+     * @param SourceTokenizer|null $tokenizer
+     * @return bool
+     */
+    public function setVirtualProperty(string $class, string $type, string $property, string $description = '', SourceTokenizer $tokenizer = null): bool
+    {
+        $tokenizer = $this->getTokenizer($tokenizer);
+
+        /** @var SourceToken $prev */
+        $prev = null;
+
+        while ($next = $tokenizer->next()) {
+            switch ($next->type) {
+                case 'Comment':
+                    break;
+
+                case 'ClassStmt':
+                    if ($prev && $prev->type == 'Comment') {
+
+                        $next = $tokenizer->next();
+
+                        if ($next->type == 'Name' && (!$class || Str::equalsIgnoreCase($class, $next->word))) {
+                            $meta = $prev->getMeta();
+
+                            if ($meta['comment'] && $meta['kind'] === 'DOCTYPE') {
+                                $replaced = false;
+                                $shortType = $type;
+
+                                if (str::contains($shortType, '\\')) {
+                                    $shortType = arr::last(str::split($shortType, '\\'));
+                                }
+
+                                $this->processLines($prev->line, $next->line, function ($line) use ($property, $shortType, &$replaced) {
+                                    $tLine = str::trimLeft($line);
+
+                                    if (str::startsWith($tLine, '/**')) {
+                                        return $line;
+                                    }
+
+                                    $regex = new Regex('\\*[ ]+\\@property[ ]+([a-zA-Z0-9\\_\\|\\[\\]]+)[ ]+([\\$a-zA-Z0-9\\_]+)', 'i', $line);
+
+                                    if ($regex->find()) {
+                                        $name = $regex->group(2);
+
+                                        if ($name[0] == '$') $name = str::sub($name, 1);
+
+                                        if ($property === $name) {
+                                            $replaced = true;
+
+                                            if ($shortType === '~deleted') {
+                                                return false;
+                                            }
+
+                                            $regex->reset();
+                                            return $regex->replaceWithCallback(function ($r, $index) use ($property, $shortType) {
+                                                switch ($index) {
+                                                    case 0: return "\\\${$property}";
+                                                    case 1: return $shortType;
+                                                }
+
+                                                return '';
+                                            });
+                                        }
+                                    }
+
+                                    return $line;
+                                });
+
+                                if (!$replaced && $type !== '~deleted') {
+                                    $this->processLines($prev->line, $next->line, function ($line) use ($property, $shortType, $description, &$replaced) {
+                                        $tLine = str::trimLeft($line);
+
+                                        if (str::startsWith($tLine, '*/')) {
+                                            $replaced = true;
+                                            $prefix = str::sub($line, 0, str::length($line) - str::length($tLine));
+
+                                            return "$prefix* @property $shortType \${$property} $description\n$line";
+                                        }
+
+                                        return $line;
+                                    });
+                                }
+
+                                if ($replaced && $type !== $shortType) {
+                                    $this->addUseImports([[$type]]);
+                                }
+
+                                return $replaced;
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            $prev = $next;
+        }
+
+        return false;
     }
 
     /**

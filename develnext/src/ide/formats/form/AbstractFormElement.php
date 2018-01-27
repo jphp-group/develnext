@@ -89,6 +89,15 @@ abstract class AbstractFormElement
     }
 
     /**
+     * Append `@property` with id to source file.
+     * @return bool
+     */
+    public function isNeedRegisterInSource()
+    {
+        return false;
+    }
+
+    /**
      * @return UXNode
      */
     abstract public function createElement();
@@ -122,7 +131,7 @@ abstract class AbstractFormElement
         return [];
     }
 
-    public function addToLayout($layout, $node, $screenX, $screenY)
+    public function addToLayout($layout, $node, $screenX = null, $screenY = null)
     {
         // nop.
     }

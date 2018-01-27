@@ -2,3 +2,10 @@ ide\webplatform\formats\form\FormWebElement
 
 ide\webplatform\formats\form\ButtonWebElement
 ide\webplatform\formats\form\LabelWebElement
+ide\webplatform\formats\form\HyperlinkWebElement
+ide\webplatform\formats\form\TextFieldWebElement
+ide\webplatform\formats\form\TextAreaWebElement
+
+ide\webplatform\formats\form\AnchorPaneWebElement
+ide\webplatform\formats\form\VBoxWebElement
+ide\webplatform\formats\form\HBoxWebElement

@@ -54,7 +54,6 @@ class FontPropertyEditorForm extends AbstractIdeForm
         }
 
         UiUtils::makeAutoCompleteComboBox($this->fontCombobox, function ($one, $text) {
-            var_dump($one, $text);
             return str::startsWith(str::lower($one), str::trim(str::lower($text)));
         });
 

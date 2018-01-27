@@ -291,7 +291,8 @@ class FormElementConfig
             $this->initProperties[$code] = [
                 'code'    => $code,
                 'value'   => $property->getAttribute('value'),
-                'virtual' => (bool)$property->getAttribute('virtual'),
+                'virtual' => (bool) $property->getAttribute('virtual'),
+                'synthetic' => (bool) $property->getAttribute('synthetic'),
             ];
         }
     }
@@ -337,7 +338,11 @@ class FormElementConfig
                         }
 
                         if ($property->getAttribute('virtual')) {
-                            $editor->setAsDataProperty($realCode);
+                            $editor->setAsVirtualProperty($realCode);
+                        }
+
+                        if ($property->getAttribute('synthetic')) {
+                            $editor->setAsSyntheticProperty($realCode);
                         }
 
                         if ($property->getAttribute('css')) {

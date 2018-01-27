@@ -49,6 +49,7 @@ use framework\\core\\Event;
 use framework\\web\\HotDeployer;
 use framework\\web\\WebApplication;
 use framework\\web\\WebUI;
+use framework\\web\\WebAssets;
 use php\\io\\Stream;
 
 Stream::putContents('application.pid', getmypid());
@@ -57,6 +58,7 @@ Stream::putContents('application.pid', getmypid());
     \$webUi = new WebUI();
  
     \$app = new WebApplication();
+    \$app->addModule(new WebAssets('/assets', './assets'));
     \$app->addModule(\$webUi);
     
 $mainUiClassCode
@@ -84,6 +86,7 @@ Stream::putContents('application.pid', getmypid());
 \$webUi = new WebUI();
 
 \$app = new WebApplication();
+\$app->addModule(new WebAssets('/assets', './assets'));
 \$app->addModule(\$webUi);
 
 $mainUiClassCode

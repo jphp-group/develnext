@@ -36,6 +36,7 @@ import javafx.stage.StageStyle;
 import org.develnext.jphp.ext.javafx.classes.UXImage;
 import org.develnext.jphp.ext.javafx.classes.layout.UXPanel;
 import org.develnext.jphp.ext.javafx.classes.shape.UXPolygon;
+import org.develnext.jphp.ext.javafx.support.JavaFxUtils;
 import org.develnext.jphp.ext.javafx.support.control.*;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import php.runtime.annotation.Reflection.*;
@@ -1073,6 +1074,7 @@ public class UXDesigner extends BaseObject {
 
 
     private Deque<Node> pressedNodes = new LinkedList<>();
+    private Rectangle dragRect = null;
 
     @Signature
     public void registerNode(final Node node) {
@@ -1120,7 +1122,7 @@ public class UXDesigner extends BaseObject {
                 rectangle.setFill(new Color(1, 1, 1, 0.3));
                 rectangle.setMouseTransparent(true);
 
-                node.setUserData(rectangle);
+                dragRect = rectangle;
 
                 Bounds pt = area.screenToLocal(nodeScreenBounds);
                 rectangle.relocate(pt.getMinX(), pt.getMinY());
@@ -1134,8 +1136,9 @@ public class UXDesigner extends BaseObject {
         });
 
         node.addEventFilter(DragEvent.DRAG_EXITED, event -> {
-            if (node.getUserData() instanceof Rectangle) {
-                area.getChildren().remove(node.getUserData());
+            if (dragRect != null) {
+                area.getChildren().remove(dragRect);
+                dragRect = null;
             }
         });
 
@@ -1144,6 +1147,11 @@ public class UXDesigner extends BaseObject {
             Dragboard dragboard = event.getDragboard();
 
             Selection selection = getSelection(dragboard);
+
+            if (dragRect != null) {
+                area.getChildren().remove(dragRect);
+                dragRect = null;
+            }
 
             if (selection != null) {
                 if (node == selection.node) {

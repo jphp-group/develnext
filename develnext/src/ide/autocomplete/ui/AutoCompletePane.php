@@ -1,4 +1,5 @@
 <?php
+
 namespace ide\autocomplete\ui;
 
 use develnext\lexer\inspector\entry\TypeEntry;
@@ -27,6 +28,7 @@ use php\gui\UXClipboard;
 use php\gui\UXLabel;
 use php\gui\UXListCell;
 use php\gui\UXListView;
+use php\gui\UXNode;
 use php\gui\UXPopupWindow;
 use php\gui\UXSeparator;
 use php\gui\UXWebView;
@@ -48,9 +50,9 @@ class AutoCompletePane
     protected $ui;
 
     /**
-     * @var UXPopupWindow
+     * @var UXPopupWindow[]
      */
-    protected $uiDescription;
+    protected $uiDescription = [];
 
     /**
      * @var UXSyntaxTextArea
@@ -370,7 +372,10 @@ class AutoCompletePane
             $this->shown = false;
 
             $this->ui->hide();
-            $this->uiDescription->hide();
+
+            foreach ($this->uiDescription as $ui) {
+                $ui->hide();
+            }
         });
     }
 
@@ -530,80 +535,98 @@ class AutoCompletePane
     protected function updateDescription(AutoCompleteItem $item)
     {
         //$cell = new UXListCell();
-        $this->uiDescription->autoFix = true;
-        $name = $item->getName();
+        foreach ($this->uiDescription as $i => $ui) {
+            $it = $item;
 
-        if ($item instanceof MethodAutoCompleteItem) {
-            $name .= '()';
-        }
+            if ($i > 0) {
+                $it = $item->getSubItems()[$i - 1];
+            }
 
-        if ($item instanceof VariableAutoCompleteItem) {
-            $name = "\${$name}";
-        }
+            if (!$it) {
+                continue;
+            }
 
-        $this->uiDescription->layout->lookup('.title')->text = $name;
-        $this->uiDescription->layout->lookup('.description')->text = $item->getDescription();
+            $ui->autoFix = true;
+            $name = $it->getName();
 
-        /** @var UXHBox $header */
-        $header = $this->uiDescription->layout->lookup('.header');
-        if ($header->children->count > 1) {
-            $header->children->removeByIndex(0);
-        }
+            if ($it instanceof MethodAutoCompleteItem) {
+                $name .= '()';
+            }
 
-        if ($ic = $this->getImageOfItem($item)) {
-            $header->children->insert(0, $ic);
-        }
-        //$this->makeItemUi($cell, $item);
+            if ($it instanceof VariableAutoCompleteItem) {
+                $name = "\${$name}";
+            }
 
-        /** @var UXVBox $content */
-        $content = $this->uiDescription->layout->lookup('.content');
-        $content->children->clear();
+            $ui->layout->lookup('.title')->text = $name;
+            $ui->layout->lookup('.description')->text = $it->getDescription();
 
-        $contentValue = $item->getContent();
+            /** @var UXHBox $header */
+            $header = $ui->layout->lookup('.header');
+            if ($header->children->count > 1) {
+                $header->children->removeByIndex(0);
+            }
 
-        if ($contentValue['DEF'] || $contentValue['RU']) {
-            $content->add(new UXSeparator());
-            $content->add(new UXLabel($contentValue['RU'] ?: $contentValue['DEF']));
+            if ($ic = $this->getImageOfItem($it)) {
+                $header->children->insert(0, $ic);
+            }
+            //$this->makeItemUi($cell, $item);
+
+            /** @var UXVBox $content */
+            $content = $ui->layout->lookup('.content');
+            $content->children->clear();
+
+            $contentValue = $it->getContent();
+
+            if ($contentValue['DEF'] || $contentValue['RU']) {
+                $content->add(new UXSeparator());
+                $content->add(new UXLabel($contentValue['RU'] ?: $contentValue['DEF']));
+            }
         }
     }
 
-    private function makeDescriptionUi()
+    private function makeDescriptionUi($count = 1)
     {
-        $ui = new UXVBox();
-        $ui->spacing = 5;
-        $ui->padding = 10;
-        $ui->maxWidth = 650;
-        $ui->focusTraversable = false;
-        $ui->padding = 3;
+        foreach ($this->uiDescription as $ui) {
+            $ui->hide();
+        }
 
-        $title = new UXLabel("Title");
-        $title->classes->add('title');
+        $this->uiDescription = [];
 
-        $header = new UXHBox([$title]);
-        $header->classes->add('header');
-        $ui->add($header);
+        for ($i = 0; $i < $count; $i++) {
+            $ui = new UXVBox();
+            $ui->spacing = 5;
+            $ui->padding = 10;
+            $ui->maxWidth = 650;
+            $ui->focusTraversable = false;
+            $ui->padding = 3;
 
-        $desc = new UXLabel("Description");
-        $desc->classes->add('description');
-        $ui->add($desc);
+            $title = new UXLabel("Title");
+            $title->classes->add('title');
 
-        $content = new UXVBox();
-        $content->padding = $content->spacing = 5;
-        $content->classes->add('content');
-        $ui->add($content);
+            $header = new UXHBox([$title]);
+            $header->classes->add('header');
+            $ui->add($header);
 
-        $ui->classes->add('dn-autocomplete-description');
+            $desc = new UXLabel("Description");
+            $desc->classes->add('description');
+            $ui->add($desc);
 
-        $win = new UXPopupWindow();
-        $win->layout = $ui;
+            $content = new UXVBox();
+            $content->padding = $content->spacing = 5;
+            $content->classes->add('content');
+            $ui->add($content);
 
-        $this->uiDescription = $win;
+            $ui->classes->add('dn-autocomplete-description');
+
+            $win = new UXPopupWindow();
+            $win->layout = $ui;
+
+            $this->uiDescription[] = $win;
+        }
     }
 
     private function makeUi()
     {
-        $this->makeDescriptionUi();
-
         $ui = new UXVBox();
         $ui->height = 150;
         $ui->maxWidth = 650;
@@ -614,19 +637,35 @@ class AutoCompletePane
         $list->on('action', function () use ($list) {
             /** @var AutoCompleteItem $item */
             if ($item = $list->selectedItem) {
+                $this->makeDescriptionUi(sizeof($item->getSubItems()) + 1);
+
                 if ($item->getDescription() || $item->getContent()) {
                     $this->updateDescription($list->selectedItem);
 
-                    if ($this->uiDescription->visible) {
-                        $this->uiDescription->hide();
-                    }
+                    $offsetY = 0;
+                    /** @var UXPopupWindow $ui */
+                    foreach ($this->uiDescription as $i => $ui) {
+                        if ($ui->visible) {
+                            $ui->hide();
+                        }
 
-                    $this->uiDescription->show($this->area->form, $this->ui->x + $this->ui->width + 3, $this->ui->y + 3);
+                        $ui->show(
+                            $this->area->form,
+                            $this->ui->x + $this->ui->width + 3,
+                            $this->ui->y + (($i+1) * 3) + $offsetY
+                        );
+
+                        $offsetY += $ui->height;
+                    }
                 } else {
-                    $this->uiDescription->hide();
+                    foreach ($this->uiDescription as $ui) {
+                        $ui->hide();
+                    }
                 }
             } else {
-                $this->uiDescription->hide();
+                foreach ($this->uiDescription as $ui) {
+                    $ui->hide();
+                }
             }
         });
 
@@ -658,9 +697,20 @@ class AutoCompletePane
         $win->opacity = 0.7;*/
 
         $v = function () {
-            $this->uiDescription->x = $this->ui->x + $this->ui->width + 3;
-            $this->uiDescription->y = $this->ui->y + 3;
+            $offsetY = 0;
+
+            /**
+             * @var int $i
+             * @var UXPopupWindow $ui
+             */
+            foreach ($this->uiDescription as $i => $ui) {
+                $ui->x = $this->ui->x + $this->ui->width + 3;
+                $ui->y = $this->ui->y + (($i+1) * 3) + $offsetY;
+
+                $offsetY += $ui->height;
+            }
         };
+
         $win->observer('x')->addListener($v);
         $win->observer('y')->addListener($v);
 

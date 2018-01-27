@@ -1,0 +1,18 @@
+<element extends="ide/webplatform/formats/form/LabeledWebElement">
+    <init>
+        <property code="href" value="#" synthetic="1" />
+        <property code="target" value="_self" synthetic="1" />
+    </init>
+
+    <properties>
+        <property code="underline" editor="none" />
+
+        <property code="href" name="Адрес (href)" editor="text" synthetic="1" />
+        <property code="target" name="Способ открытия" editor="enum" synthetic="1">
+            <variants>
+                <variant value="_self">[self] В том же окне</variant>
+                <variant value="_blank">[blank] В новом окне</variant>
+            </variants>
+        </property>
+    </properties>
+</element>

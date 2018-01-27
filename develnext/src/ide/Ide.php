@@ -1784,9 +1784,10 @@ class Ide extends Application
     }
 
     /**
-     * Restart IDE, запустить рестарт IDE, работает только в production режиме.
+     * Запустить новый экземпляр ide.
+     * @param array $args
      */
-    public function restart()
+    public function startNew(array $args = [])
     {
         $jrePath = $this->getJrePath();
 
@@ -1796,8 +1797,20 @@ class Ide extends Application
             $javaBin = "$jrePath/bin/$javaBin";
         }
 
-        $process = new Process([$javaBin, '-jar', 'DevelNext.jar'], IdeSystem::getOwnFile(''), $this->makeEnvironment());
+        $args = flow([$javaBin, '-jar', 'DevelNext.jar'])->append($args)->toArray();
+
+        $process = new Process($args, IdeSystem::getOwnFile(''), $this->makeEnvironment());
         $process->start();
+
+        Ide::toast('Запуск DevelNext, подождите ...');
+    }
+
+    /**
+     * Restart IDE, запустить рестарт IDE, работает только в production режиме.
+     */
+    public function restart()
+    {
+        $this->startNew();
 
         if (Ide::project()) {
             Ide::get()->setUserConfigValue('lastProject', Ide::project()->getProjectFile());

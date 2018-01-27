@@ -120,10 +120,10 @@ class PhpClassFileTemplate extends AbstractFileTemplate
         if ($this->phpdoc) {
             $lines = str::lines($this->phpdoc);
             foreach ($lines as $i => $line) {
-                $lines[$i] = "* $line";
+                $lines[$i] = " * $line";
             }
 
-            $phpdoc = "/**" . str::join($lines, "\n") . "\n*/";
+            $phpdoc = "/**\n" . str::join($lines, "\n") . "\n */";
         }
 
         return [

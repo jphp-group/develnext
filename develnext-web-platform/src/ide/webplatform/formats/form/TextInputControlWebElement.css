@@ -1,0 +1,14 @@
+.ux-text-input-control {
+    -fx-background-color: #ced4da, white;
+    -fx-background-radius: 4;
+}
+
+.ux-text-input-control.text-area {
+    -fx-border-radius: 4;
+    -fx-border-color: #ced4da;
+}
+
+.ux-text-input-control.text-area .scroll-pane, .text-area .scroll-pane .content {
+    -fx-background-color: white;
+    -fx-background-radius: 4;
+}

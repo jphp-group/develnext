@@ -598,4 +598,27 @@ class SourceEventManager
 
         return null;
     }
+
+    public function registerTarget(string $id, string $getElementClass)
+    {
+        $parser = new PhpParser($this->loadContent());
+        if ($parser->setVirtualProperty($this->className, $getElementClass, $id)) {
+            $this->save($parser->getContent());
+            return true;
+        }
+
+        return false;
+    }
+
+    public function unregisterTarget(string $id): bool
+    {
+        $parser = new PhpParser($this->loadContent());
+
+        if ($parser->removeVirtualProperty($this->className, $id)) {
+            $this->save($parser->getContent());
+            return true;
+        }
+
+        return false;
+    }
 }

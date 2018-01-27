@@ -2,9 +2,11 @@
 namespace ide\webplatform\formats\form;
 
 
+use framework\web\ui\UINode;
 use ide\formats\form\AbstractFormElement;
 use php\gui\UXNode;
 use php\lib\reflect;
+use php\lib\str;
 
 /**
  * Class AbstractWebElement
@@ -22,6 +24,19 @@ abstract class AbstractWebElement extends AbstractFormElement
      * @return UXNode
      */
     abstract public function createViewElement(): UXNode;
+
+    /**
+     * @return string
+     */
+    public function getElementClass()
+    {
+        return UINode::class;
+    }
+
+    public function isNeedRegisterInSource()
+    {
+        return true;
+    }
 
     /**
      * @return array
@@ -78,5 +93,47 @@ abstract class AbstractWebElement extends AbstractFormElement
         $view = $this->createViewElement();
         $view->data('--web-element', $this);
         return $view;
+    }
+
+    /**
+     * @param array $schemaAlign
+     * @return string
+     */
+    public static function schemaAlignToViewAlign(array $schemaAlign): string
+    {
+        $alignment = str::upper(str::join($schemaAlign, '_'));
+
+        if ($alignment === 'CENTER_CENTER') {
+            $alignment = 'CENTER';
+        }
+
+        return $alignment;
+    }
+
+    /**
+     * @param string $viewAlign
+     * @return array
+     */
+    public static function viewAlignToSchemaAlign(string $viewAlign): array
+    {
+        $align = ['center', 'center'];
+
+        if (str::startsWith($viewAlign, 'TOP_')) {
+            $align[0] = 'top';
+        } else if (str::startsWith($viewAlign, 'BOTTOM_')) {
+            $align[0] = 'bottom';
+        }
+
+        if (str::endsWith($viewAlign, '_LEFT')) {
+            $align[1] = 'left';
+        }
+
+        if (str::endsWith($viewAlign, '_RIGHT')) {
+            $align[1] = 'right';
+        }
+
+        $schema['align'] = $align;
+
+        return $align;
     }
 }

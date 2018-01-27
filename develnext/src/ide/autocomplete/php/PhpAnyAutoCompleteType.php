@@ -186,6 +186,16 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                 );
 
                 $c->setContent($type->data['content']);
+
+                $constructor = TypeAccessAutoCompleteType::findTypeMethod(
+                    $this->inspector, 'dynamic', $type, '__construct'
+                );
+
+                if ($constructor) {
+                    $item = PhpCompleteUtils::methodAutoComplete2($constructor, false);
+                    $item->setName('Конструктор __construct');
+                    $c->addSubItem($item);
+                }
             }
 
             foreach ($context->getGlobalRegion()->getValues('use') as $one) {

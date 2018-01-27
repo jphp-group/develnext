@@ -2,15 +2,18 @@
 namespace ide\webplatform\formats\form;
 
 use framework\web\ui\UIButton;
+use framework\web\ui\UIHyperlink;
 use php\gui\UXButton;
+use php\gui\UXHyperlink;
 use php\gui\UXNode;
+use php\lib\num;
 use php\lib\str;
 
-class ButtonWebElement extends LabeledWebElement
+class HyperlinkWebElement extends LabeledWebElement
 {
     public function getElementClass()
     {
-        return UIButton::class;
+        return UIHyperlink::class;
     }
 
     /**
@@ -18,13 +21,12 @@ class ButtonWebElement extends LabeledWebElement
      */
     public function uiSchemaClassName(): string
     {
-        return 'Button';
+        return 'Hyperlink';
     }
 
     public function uiStylesheets(): array
     {
         return [
-            '/ide/webplatform/formats/form/ButtonWebElement.css'
         ];
     }
 
@@ -33,9 +35,8 @@ class ButtonWebElement extends LabeledWebElement
         /** @var UXButton $view */
         parent::loadUiSchema($view, $uiSchema);
 
-        if (isset($uiSchema['kind'])) {
-            $view->classes->add($uiSchema['kind']);
-        }
+        $view->data('href', $uiSchema['href']);
+        $view->data('target', $uiSchema['target'] ?: '_self');
     }
 
     public function uiSchema(UXNode $view): array
@@ -43,14 +44,17 @@ class ButtonWebElement extends LabeledWebElement
         /** @var UXButton $view */
         $schema = parent::uiSchema($view);
 
-        foreach (['primary', 'secondary', 'success', 'info', 'danger', 'warning', 'light', 'dark', 'link'] as $kind) {
-            if ($view->classes->has($kind)) {
-                $schema['kind'] = $kind;
-                break;
-            }
+        if ($view->data('href')) {
+            $schema['href'] = $view->data('href');
         }
 
-        $schema['padding'] = [8, 8, 8, 8];
+        if ($view->data('target') && $view->data('target') !== '_self') {
+            $schema['target'] = $view->data('target');
+        }
+
+        if ($schema['font']['underline']) {
+            unset($schema['font']['underline']);
+        }
 
         return $schema;
     }
@@ -60,22 +64,22 @@ class ButtonWebElement extends LabeledWebElement
      */
     public function getName()
     {
-        return 'Кнопка';
+        return 'Ссылка';
     }
 
     public function getIcon()
     {
-        return 'icons/button16.png';
+        return 'icons/hyperlink16.png';
     }
 
     public function getIdPattern()
     {
-        return "button%s";
+        return "link%s";
     }
 
     public function getDefaultSize()
     {
-        return [120, 40];
+        return [100, 20];
     }
 
     /**
@@ -83,9 +87,9 @@ class ButtonWebElement extends LabeledWebElement
      */
     public function createViewElement(): UXNode
     {
-        $view = new UXButton($this->getName());
+        $view = new UXHyperlink($this->getName());
         $view->font->size = $this->getDefaultFontSize();
-        $view->classes->add('ux-button');
+        $view->classes->add('ux-hyperlink');
         return $view;
     }
 }

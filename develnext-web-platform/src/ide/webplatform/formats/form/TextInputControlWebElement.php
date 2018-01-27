@@ -1,34 +1,50 @@
 <?php
 namespace ide\webplatform\formats\form;
 
-use framework\web\ui\UILabeled;
-use php\gui\UXLabeled;
+use framework\web\ui\UITextField;
 use php\gui\UXNode;
-use php\lib\str;
+use php\gui\UXTextField;
+use php\gui\UXTextInputControl;
 
-abstract class LabeledWebElement extends AbstractWebElement
+abstract class TextInputControlWebElement extends AbstractWebElement
 {
-    public function getElementClass()
-    {
-        return UILabeled::class;
-    }
-
-    public function getDefaultFontSize(): int
+    public function getDefaultFontSize()
     {
         return 15;
     }
 
+    public function uiStylesheets(): array
+    {
+        return [
+            '/ide/webplatform/formats/form/TextInputControlWebElement.css'
+        ];
+    }
+
+    public function getIdPattern()
+    {
+        return "edit%s";
+    }
+
+    public function getElementClass()
+    {
+        return UXTextInputControl::class;
+    }
+
     public function loadUiSchema(UXNode $view, array $uiSchema)
     {
-        /** @var UXLabeled $view */
+        /** @var UXTextField $view */
         parent::loadUiSchema($view, $uiSchema);
 
-        if (isset($uiSchema['text'])) {
-            $view->text = $uiSchema['text'];
+        $view->text = $uiSchema['text'];
+
+        if (isset($uiSchema['placeholder'])) {
+            $view->promptText = $uiSchema['placeholder'];
         }
 
-        if (isset($uiSchema['align'])) {
-            $view->alignment = self::schemaAlignToViewAlign($uiSchema['align']);
+        if (isset($uiSchema['editable']) && !$uiSchema['editable']) {
+            $view->editable = false;
+        } else {
+            $view->editable = true;
         }
 
         if (isset($uiSchema['font'])) {
@@ -47,16 +63,12 @@ abstract class LabeledWebElement extends AbstractWebElement
             if (isset($uiSchema['font']['italic'])) {
                 $view->font->italic = $uiSchema['font']['italic'];
             }
-
-            if (isset($uiSchema['font']['underline'])) {
-                $view->underline = $uiSchema['font']['underline'];
-            }
         }
     }
 
     public function uiSchema(UXNode $view): array
     {
-        /** @var UXLabeled $view */
+        /** @var UXTextField $view */
         $schema = parent::uiSchema($view);
 
         $font = [];
@@ -68,15 +80,22 @@ abstract class LabeledWebElement extends AbstractWebElement
         if ($view->font->name === 'System') { $font['name'] = $view->font->name; }
         if ($view->font->bold) { $font['bold'] = true; }
         if ($view->font->italic) { $font['italic'] = true; }
-        if ($view->underline) { $font['underline'] = true; }
 
         if ($font) {
             $schema['font'] = $font;
         }
 
+
         $schema['text'] = $view->text;
 
-        $schema['align'] = self::viewAlignToSchemaAlign($view->alignment);
+        if (!$view->editable) {
+            $schema['editable'] = $view->editable;
+        }
+
+        if ($view->promptText) {
+            $schema['placeholder'] = $view->promptText;
+        }
+
         return $schema;
     }
 }

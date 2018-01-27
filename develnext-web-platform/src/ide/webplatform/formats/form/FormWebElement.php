@@ -3,16 +3,17 @@ namespace ide\webplatform\formats\form;
 
 use framework\web\UIForm;
 use ide\webplatform\editors\WebFormEditor;
+use ide\webplatform\formats\WebFormFormat;
 use php\gui\UXLabel;
 use php\gui\UXNode;
+use php\lib\reflect;
 
 class FormWebElement extends AbstractWebElement
 {
     public function isOrigin($any)
     {
-        return $any instanceof UXNode && $any->data('--web-form');
+        return $any instanceof WebFormEditor;
     }
-
 
     public function getElementClass()
     {

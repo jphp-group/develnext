@@ -35,7 +35,7 @@ class WebUIBundle extends AbstractJarBundle
     {
         $libs = [
             'jphp-httpserver-ext', 'jphp-zend-ext', 'javax.servlet-api',
-            'web-ui', 'web', 'core', 'core-legacy'
+            'wizard-web-ui', 'wizard-web', 'wizard-core', 'wizard-core-legacy'
         ];
 
         $jettyVersion = "v20170317";

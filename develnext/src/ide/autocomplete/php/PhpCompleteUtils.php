@@ -126,6 +126,11 @@ abstract class PhpCompleteUtils
         return $description;
     }
 
+    /**
+     * @param FunctionEntry $method
+     * @param bool $bold
+     * @return MethodAutoCompleteItem
+     */
     static function methodAutoComplete2(FunctionEntry $method, $bold = true)
     {
         $insert = $method->name . '(';
