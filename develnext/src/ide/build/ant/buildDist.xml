@@ -34,7 +34,7 @@
             #ONE_JAR_CONTENT#
 
             <manifest>
-                <attribute name="Main-Class" value="org.develnext.jphp.ext.javafx.FXLauncher" />
+                <attribute name="Main-Class" value="#MAIN_CLASS#" />
             </manifest>
         </jar>
 

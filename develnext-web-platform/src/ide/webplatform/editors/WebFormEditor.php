@@ -52,6 +52,28 @@ class WebFormEditor extends FormEditor
         });
     }
 
+    private $data = [];
+
+    public function getRefactorRenameNodeType()
+    {
+        return parent::getRefactorRenameNodeType();
+    }
+
+
+    /**
+     * @param string $name
+     * @param null $value
+     * @return mixed
+     */
+    public function data(string $name, $value = null)
+    {
+        if (func_num_args() == 1) {
+            return $this->data[$name];
+        } else {
+            $this->data[$name] = $value;
+        }
+    }
+
     /**
      * @return string
      */

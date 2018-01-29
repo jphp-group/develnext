@@ -17,6 +17,7 @@ use ide\Logger;
 use ide\misc\AbstractCommand;
 use ide\project\Project;
 use ide\systems\FileSystem;
+use ide\systems\RefactorSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
 use ide\webplatform\editors\WebFormEditor;
@@ -60,6 +61,7 @@ class WebFormFormat extends AbstractFormFormat
         $this->register(new LockMenuCommand());
 
         $this->registerRelocationCommands();
+        $this->registerRefactor();
 
         $this->dumper = new WebFormDumper();
     }
@@ -218,6 +220,21 @@ class WebFormFormat extends AbstractFormFormat
                 }
             }
         }
+    }
+
+    private function registerRefactor()
+    {
+        RefactorSystem::onRename('WEB_FORM_FORMAT_ELEMENT_ID', function ($target, $newId) {
+            $editor = FileSystem::getSelectedEditor();
+
+            if ($editor instanceof WebFormEditor) {
+                $oldId = $editor->getNodeId($target);
+                $result = $editor->changeNodeId($target, $newId);
+                $editor->save();
+
+                return $result;
+            }
+        });
     }
 
     public function register($any)

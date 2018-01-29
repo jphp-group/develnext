@@ -971,7 +971,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     public function getRefactorRenameNodeType()
     {
-        return GuiFormFormat::REFACTOR_ELEMENT_ID_TYPE;
+        return 'WEB_FORM_FORMAT_ELEMENT_ID';
     }
 
     protected function reindexImpl(ProjectIndexer $indexer)
@@ -1068,6 +1068,11 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         $node->id = $newId;
 
         $this->behaviourManager->changeTargetId($oldId, $newId);
+
+        if ($element->isNeedRegisterInSource()) {
+            $this->eventManager->unregisterTarget($oldId);
+            $this->eventManager->registerTarget($newId, $element->getElementClass());
+        }
 
         $binds = $this->eventManager->renameBind($oldId, $newId, $eventsWithIdParam);
         foreach ($binds as $bind) {

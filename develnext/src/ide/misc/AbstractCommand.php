@@ -1,10 +1,10 @@
 <?php
 namespace ide\misc;
 
+use framework\core\Module;
 use ide\editors\AbstractEditor;
 use ide\Ide;
 use ide\utils\UiUtils;
-use php\gui\event\UXMouseEvent;
 use php\gui\UXButton;
 use php\gui\UXMenuItem;
 use php\gui\UXSeparator;
@@ -14,16 +14,26 @@ use php\lib\str;
  * Class AbstractCommand
  * @package ide\misc
  */
-abstract class AbstractCommand
+abstract class AbstractCommand extends Module
 {
     /**
      * @var mixed
      */
     protected $target;
 
+    /**
+     * AbstractCommand constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     abstract public function getName();
 
     abstract public function onExecute($e = null, AbstractEditor $editor = null);
+
+
 
     public function getUniqueId()
     {

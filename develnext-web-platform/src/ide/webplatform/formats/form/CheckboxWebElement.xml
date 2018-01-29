@@ -1,0 +1,8 @@
+<element extends="ide/webplatform/formats/form/LabeledWebElement">
+    <properties>
+        <property code="selected" name="Выделенный" editor="boolean" />
+    </properties>
+    <eventTypes>
+        <eventType code="action" name="Действие" kind="ActionEvent" icon="icons/ok16.png" />
+    </eventTypes>
+</element>

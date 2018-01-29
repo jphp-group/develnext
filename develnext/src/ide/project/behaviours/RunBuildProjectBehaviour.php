@@ -24,20 +24,23 @@ use php\util\Flow;
  */
 class RunBuildProjectBehaviour extends AbstractProjectBehaviour
 {
-    /**
-     * @return string
-     */
-    public function getMainClassName(): string
+    public function createExecuteCommand(): ExecuteProjectCommand
     {
-        return 'org.develnext.jphp.ext.javafx.FXLauncher';
+        return new ExecuteProjectCommand($this);
     }
 
-    public function onAfterRun()
+    public function createBuildCommand(): BuildProjectCommand
     {
-    }
+        $buildProjectCommand = new BuildProjectCommand();
+        $buildProjectCommand->register(new WindowsApplicationBuildType());
+        $buildProjectCommand->register(new SetupWindowsApplicationBuildType());
+        //$buildProjectCommand->register(new OneJarBuildType());
 
-    public function onBeforeRun()
-    {
+        $buildType = new AntOneJarBuildType();
+        $buildType->setMainClass('org.develnext.jphp.ext.javafx.FXLauncher');
+        $buildProjectCommand->register($buildType);
+
+        return $buildProjectCommand;
     }
 
     /**
@@ -45,16 +48,9 @@ class RunBuildProjectBehaviour extends AbstractProjectBehaviour
      */
     public function inject()
     {
-        $buildProjectCommand = new BuildProjectCommand();
-        $buildProjectCommand->register(new WindowsApplicationBuildType());
-        $buildProjectCommand->register(new SetupWindowsApplicationBuildType());
-        //$buildProjectCommand->register(new OneJarBuildType());
-        $buildProjectCommand->register(new AntOneJarBuildType());
-
-        Ide::get()->registerCommand(new ExecuteProjectCommand($this));
-        Ide::get()->registerCommand($buildProjectCommand);
+        Ide::get()->registerCommand($this->createExecuteCommand());
+        Ide::get()->registerCommand($this->createBuildCommand());
     }
-
 
     /**
      * @return array

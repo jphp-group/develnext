@@ -2,11 +2,13 @@
 namespace ide\commands;
 
 use facade\Async;
+use framework\core\EventSignal;
 use ide\editors\AbstractEditor;
 use ide\forms\BuildProgressForm;
 use ide\Ide;
 use ide\Logger;
 use ide\misc\AbstractCommand;
+use ide\misc\EventHandlerBehaviour;
 use ide\project\behaviours\RunBuildProjectBehaviour;
 use ide\project\Project;
 use ide\project\ProjectConsoleOutput;
@@ -52,10 +54,22 @@ class ExecuteProjectCommand extends AbstractCommand
     protected $behaviour;
 
     /**
+     * @var EventSignal
+     */
+    public $onRun;
+
+    /**
+     * @var EventSignal
+     */
+    public $onStop;
+
+    /**
      * @param RunBuildProjectBehaviour $behaviour
      */
     function __construct(RunBuildProjectBehaviour $behaviour)
     {
+        parent::__construct();
+
         Ide::get()->on('closeProject', function () {
             if ($this->isRunning()) {
                 $this->onStopExecute();
@@ -106,6 +120,8 @@ class ExecuteProjectCommand extends AbstractCommand
 
     public function onStopExecute(UXEvent $e = null, callable $callback = null)
     {
+        $this->onStop->trigger();
+
         $ide = Ide::get();
         $project = $ide->getOpenedProject();
 
@@ -177,14 +193,25 @@ class ExecuteProjectCommand extends AbstractCommand
         }
     }
 
-    public function tryShowConsole()
+    protected function createExecuteProcess(Project $project): Process
     {
-        $console = new BuildProgressForm();
+        $classPaths = arr::toList($this->behaviour->getSourceDirectories(), $this->behaviour->getProfileModules(['jar']));
 
-        /*$console = new UXRichTextArea();
-        $console->height = 150;
+        $args = [
+            'java',
+            '-cp',
+            str::join($classPaths, File::PATH_SEPARATOR),
+            '-XX:+UseG1GC', '-Xms128M', '-Xmx512m', '-Dfile.encoding=UTF-8', '-Djphp.trace=true',
+            'org.develnext.jphp.ext.javafx.FXLauncher'
+        ];
 
-        $console->appendText("Hi, I'm robot \n", '-fx-font-weight: bold; -fx-fill: green; -fx-font-family: "Courier New"; -fx-font-size: 12px;'); */
+        Logger::debug("Run -> " . str::join($args, ' '));
+
+        return new Process(
+            $args,
+            $project->getRootDir(),
+            Ide::get()->makeEnvironment()
+        );
     }
 
     public function onExecute($e = null, AbstractEditor $editor = null)
@@ -194,13 +221,10 @@ class ExecuteProjectCommand extends AbstractCommand
             return;
         }
 
-        $this->behaviour->onBeforeRun();
+        $this->onRun->trigger();
 
         $ide = Ide::get();
         $project = $ide->getOpenedProject();
-
-        // deprecated, see GradleProjectBehaviour.doOpen()
-        //FileUtils::deleteDirectory($project->getFile("build/"));
 
         $appPidFile = $project->getFile("application.pid");
         $appPidFile->delete();
@@ -232,7 +256,7 @@ class ExecuteProjectCommand extends AbstractCommand
             }, __CLASS__);
 
             ProjectSystem::saveOnlyRequired();
-            ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'java -cp ... ' . $this->behaviour->getMainClassName(), function ($success) use ($dialog, $project, $ide) {
+            ProjectSystem::compileAll(Project::ENV_DEV, $dialog, 'Run project ...', function ($success) use ($dialog, $project, $ide) {
                 if (!$success) {
                     $dialog->stopWithError();
                     $this->startButton->enabled = true;
@@ -242,19 +266,7 @@ class ExecuteProjectCommand extends AbstractCommand
                 }
 
                 try {
-                    $classPaths = arr::toList($this->behaviour->getSourceDirectories(), $this->behaviour->getProfileModules(['jar']));
-
-                    $args = ['java', '-cp', str::join($classPaths, File::PATH_SEPARATOR), '-XX:+UseG1GC', '-Xms128M', '-Xmx512m', '-Dfile.encoding=UTF-8', '-Djphp.trace=true', $this->behaviour->getMainClassName()];
-
-                    Logger::debug("Run -> " . str::join($args, ' '));
-
-                    //$args = [$ide->getGradleProgram(), 'run', '-Dfile.encoding=UTF-8', '--daemon'];
-
-                    $this->process = new Process(
-                        $args,
-                        $project->getRootDir(),
-                        $ide->makeEnvironment()
-                    );
+                    $this->process = $this->createExecuteProcess($project);
 
                     $this->process = $this->process->start();
                     $dialog->watchProcess($this->process);

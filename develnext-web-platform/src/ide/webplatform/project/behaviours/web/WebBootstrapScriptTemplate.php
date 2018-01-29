@@ -19,6 +19,16 @@ class WebBootstrapScriptTemplate extends AbstractMetaTemplate
     private $watchingDirs = [];
 
     /**
+     * @var array
+     */
+    private $watchingFiles = [];
+
+    /**
+     * @var array
+     */
+    private $sourceDirs = [];
+
+    /**
      * @var bool
      */
     private $hotDeployEnabled = false;
@@ -38,8 +48,19 @@ class WebBootstrapScriptTemplate extends AbstractMetaTemplate
         $watchedCode = [];
         foreach ($this->getWatchingDirs() as $watchingDir) {
             $string = var_export($watchingDir, true);
-            $watchedCode[$watchingDir] = "\$deployer->addDirWatcher($string)";
+            $watchedCode[] = "\$deployer->addDirWatcher($string)";
         }
+
+        foreach ($this->getWatchingFiles() as $watchingFile) {
+            $string = var_export($watchingFile, true);
+            $watchedCode[] = "\$deployer->addFileWatcher($string)";
+        }
+
+        foreach ($this->getSourceDirs() as $sourceDir) {
+            $string = var_export($sourceDir, true);
+            $watchedCode[] = "\$deployer->addSourceDir($string)";
+        }
+
         $watchedCode = str::join($watchedCode, "\r\n");
 
         if ($this->hotDeployEnabled) {
@@ -50,6 +71,7 @@ use framework\\web\\HotDeployer;
 use framework\\web\\WebApplication;
 use framework\\web\\WebUI;
 use framework\\web\\WebAssets;
+use framework\\web\\WebDevModule;
 use php\\io\\Stream;
 
 Stream::putContents('application.pid', getmypid());
@@ -58,6 +80,7 @@ Stream::putContents('application.pid', getmypid());
     \$webUi = new WebUI();
  
     \$app = new WebApplication();
+    \$app->addModule(new WebDevModule());
     \$app->addModule(new WebAssets('/assets', './assets'));
     \$app->addModule(\$webUi);
     
@@ -65,9 +88,11 @@ $mainUiClassCode
 
     \$app->launch();
 }, function () {
-    \$app = WebApplication::current();
-    \$app->trigger(new Event('restart', \$app));
-    \$app->shutdown();
+    if (WebApplication::isInitialized()) {
+        \$app = WebApplication::current();
+        \$app->trigger(new Event('restart', \$app));
+        \$app->shutdown();
+    }
 });
 
 $watchedCode
@@ -86,6 +111,7 @@ Stream::putContents('application.pid', getmypid());
 \$webUi = new WebUI();
 
 \$app = new WebApplication();
+\$app->addModule(new WebDevModule());
 \$app->addModule(new WebAssets('/assets', './assets'));
 \$app->addModule(\$webUi);
 
@@ -110,6 +136,22 @@ $mainUiClassCode
     public function setWatchingDirs(array $watchingDirs)
     {
         $this->watchingDirs = $watchingDirs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getWatchingFiles(): array
+    {
+        return $this->watchingFiles;
+    }
+
+    /**
+     * @param array $watchingFiles
+     */
+    public function setWatchingFiles(array $watchingFiles)
+    {
+        $this->watchingFiles = $watchingFiles;
     }
 
     /**
@@ -142,6 +184,22 @@ $mainUiClassCode
     public function removeUiClass(string $uiClass)
     {
         unset($this->uiClasses[$uiClass]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getSourceDirs(): array
+    {
+        return $this->sourceDirs;
+    }
+
+    /**
+     * @param array $sourceDirs
+     */
+    public function setSourceDirs(array $sourceDirs)
+    {
+        $this->sourceDirs = $sourceDirs;
     }
 
     /**

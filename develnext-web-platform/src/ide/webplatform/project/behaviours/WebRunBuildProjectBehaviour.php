@@ -1,23 +1,26 @@
 <?php
 namespace ide\webplatform\project\behaviours;
 
-
-use ide\Ide;
+use ide\build\AntOneJarBuildType;
+use ide\commands\BuildProjectCommand;
+use ide\commands\ExecuteProjectCommand;
 use ide\project\behaviours\RunBuildProjectBehaviour;
 
 class WebRunBuildProjectBehaviour extends RunBuildProjectBehaviour
 {
-    public function getMainClassName(): string
+    public function createBuildCommand(): BuildProjectCommand
     {
-        return 'php.runtime.launcher.Launcher';
+        $buildProjectCommand = new BuildProjectCommand();
+
+        $buildType = new AntOneJarBuildType();
+        $buildType->setMainClass('php.runtime.launcher.Launcher');
+        $buildProjectCommand->register($buildType);
+
+        return $buildProjectCommand;
     }
 
-    public function onAfterRun()
+    public function createExecuteCommand(): ExecuteProjectCommand
     {
-        Ide::toast("Открытие браузера, подождите ...");
-
-        waitAsync('4s', function () {
-            browse("http://localhost:5555/app");
-        });
+        return new WebExecuteProjectCommand($this);
     }
 }

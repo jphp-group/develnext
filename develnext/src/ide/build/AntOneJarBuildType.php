@@ -25,6 +25,27 @@ use php\util\Regex;
 class AntOneJarBuildType extends AbstractBuildType
 {
     /**
+     * @var string
+     */
+    private $mainClass;
+
+    /**
+     * @return string
+     */
+    public function getMainClass(): string
+    {
+        return $this->mainClass;
+    }
+
+    /**
+     * @param string $mainClass
+     */
+    public function setMainClass(string $mainClass)
+    {
+        $this->mainClass = $mainClass;
+    }
+
+    /**
      * @return string
      */
     function getName()
@@ -56,6 +77,14 @@ class AntOneJarBuildType extends AbstractBuildType
     function getBuildPath(Project $project)
     {
         return $project->getRootDir() . '/build/dist';
+    }
+
+    public function getConfig()
+    {
+        $config = parent::getConfig();
+        $config['mainClass'] = $this->getMainClass();
+
+        return $config;
     }
 
     public static function makeAntBuildFile(Project $project, array $config)
@@ -90,6 +119,8 @@ class AntOneJarBuildType extends AbstractBuildType
         $content = str::replace($content, '#JAR_CONTENT#', $jarContent);
         $content = str::replace($content, '#DIST_CONTENT#', '');
         $content = str::replace($content, '#LAUNCH4J_DIR#', Ide::get()->getLaunch4JPath());
+
+        $content = str::replace($content, '#MAIN_CLASS#', $config['mainClass']);
 
         if ($config['oneJar']) {
             $content = str::replace($content, '#L4J_JAR_FILE#', '${dist}/' . $project->getName() . '.jar');
