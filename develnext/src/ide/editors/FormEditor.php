@@ -1115,7 +1115,15 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         if ($gui) {
             return $gui->getObjectList($this->file);
         } else {
-            return [];
+            $items = [];
+
+            $this->eachNode(function (?UXNode $node, $nodeId, ?AbstractFormElement $element, int $level) use (&$items) {
+                if ($element) {
+                    $items[] = new ObjectListEditorItem($nodeId, $element->getIcon(), $nodeId, $level);
+                }
+            });
+
+            return $items;
         }
     }
 

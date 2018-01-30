@@ -286,8 +286,6 @@ class ExecuteProjectCommand extends AbstractCommand
                             Ide::get()->getMainForm()->hideBottom();
                         }
                     });
-
-                    $this->behaviour->onAfterRun();
                 } catch (IOException $e) {
                     $this->stopButton->enabled = false;
                     $this->startButton->enabled = true;

@@ -2,10 +2,14 @@
 .ux-progress-bar .bar {
     -fx-background-color: #007bff;
     -fx-background-insets: 0;
-    -fx-background-radius: 4;
+    -fx-background-radius: 4 0 0 4;
 }
 
 .ux-progress-bar .track {
     -fx-background-color: #e9ecef;
+    -fx-background-radius: 4;
+}
+
+.ux-progress-bar.fulled .bar {
     -fx-background-radius: 4;
 }

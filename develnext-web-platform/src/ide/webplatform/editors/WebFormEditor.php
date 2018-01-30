@@ -59,6 +59,18 @@ class WebFormEditor extends FormEditor
         return parent::getRefactorRenameNodeType();
     }
 
+    protected function makeDesigner($fullArea = false)
+    {
+        $designer = parent::makeDesigner($fullArea);
+
+        $this->designer->onNodeResize(function (UXNode $node, $width, $height) {
+            $node->{'webWidth'} = $width;
+            $node->{'webHeight'} = $height;
+        });
+
+        return $designer;
+    }
+
 
     /**
      * @param string $name

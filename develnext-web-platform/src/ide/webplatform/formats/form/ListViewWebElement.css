@@ -1,0 +1,36 @@
+
+.ux-list-view {
+    -fx-background-color: transparent;
+}
+
+.ux-list-view .label {
+    -fx-padding: 12 20;
+
+    -fx-max-width: 9999;
+    -fx-border-width: 0 1 1 1;
+    -fx-border-color: rgba(0,0,0,.125);
+    -fx-background-color: white;
+}
+
+.ux-list-view .label.one {
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-border-width: 1;
+}
+
+.ux-list-view .label.first {
+    -fx-border-radius: 5 5 0 0;
+    -fx-background-radius: 5 5 0 0;
+    -fx-border-width: 1 1 1 1;
+}
+
+.ux-list-view .label.last {
+    -fx-border-radius: 0 0 5 5;
+    -fx-background-radius: 0 0 5 5;
+    -fx-border-width: 0 1 1 1;
+}
+
+.ux-list-view .label.selected {
+    -fx-text-fill: white;
+    -fx-background-color: #007bff;
+}

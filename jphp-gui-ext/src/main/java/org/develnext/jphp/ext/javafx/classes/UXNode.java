@@ -859,9 +859,18 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
     }
 
     @Signature
-    public Memory __get(String name) {
-        Memory data = data("--property-" + name);
+    public Memory __get(Environment env, String name) throws Throwable {
+        Memory data = data("--property-" + name + "-getter");
 
+        if (data.isNotNull()) {
+            Invoker invoker = Invoker.create(env, data);
+
+            if (invoker != null) {
+                return invoker.call();
+            }
+        }
+
+        data = data("--property-" + name);
         return data;
     }
 

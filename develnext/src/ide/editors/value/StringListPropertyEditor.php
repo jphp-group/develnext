@@ -20,10 +20,10 @@ class StringListPropertyEditor extends TextPropertyEditor
 
                 $value = $target->{$editor->code};
 
-                if ($value instanceof UXList) {
+                if ($value instanceof UXList || is_array($value)) {
                     return Flow::of($value)->toString("\n");
                 } else {
-                    Logger::warn("Unable using StringList property editor for non UXList properties");
+                    Logger::warn("Unable using StringList property editor for non UXList or array properties");
                 }
             },
             function (ElementPropertyEditor $editor, $value) {
@@ -32,10 +32,9 @@ class StringListPropertyEditor extends TextPropertyEditor
                 $list = $target->{$editor->code};
 
                 if ($list instanceof UXList) {
-                    $list->clear();
-
-                    $lines = Str::split($value, "\n");
-                    $list->addAll($lines);
+                    $list->setAll(str::lines($value));
+                } else if (is_array($list)) {
+                    $target->{$editor->code} = str::lines($value);
                 }
             }
         );

@@ -277,9 +277,6 @@ class TypeAccessAutoCompleteType extends AutoCompleteType
                 }
             }
 
-
-            Logger::error($method->name . " -> " . $method->modifier);
-
             if ($method->modifier != 'PUBLIC') {
                 // protected ...
                 if (!str::equalsIgnoreCase($currentClass, $context)) {

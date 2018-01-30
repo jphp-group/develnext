@@ -3,6 +3,6 @@
         <property code="selected" name="Выделенный" editor="boolean" />
     </properties>
     <eventTypes>
-        <eventType code="action" name="Действие" kind="ActionEvent" icon="icons/ok16.png" />
+        <eventType code="action" name="Действие" kind="ide\webplatform\formats\form\event\WebEventKind" icon="icons/ok16.png" />
     </eventTypes>
 </element>

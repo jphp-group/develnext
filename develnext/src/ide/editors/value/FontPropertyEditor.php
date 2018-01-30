@@ -18,7 +18,7 @@ class FontPropertyEditor extends TextPropertyEditor
 
         $this->dialogButton->on('click', function (UXMouseEvent $e) {
             if ($this->isFontInCss()) {
-                MessageBoxForm::warning("Шрифт переобределен в CSS стилях компонента");
+                MessageBoxForm::warning("Шрифт переопределен в CSS стилях компонента");
                 $this->dialogButton->enabled = $this->textField->enabled = false;
                 $this->textField->text = "Определен в CSS";
             } else {

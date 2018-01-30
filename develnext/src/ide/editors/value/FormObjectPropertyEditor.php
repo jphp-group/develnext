@@ -1,6 +1,8 @@
 <?php
 namespace ide\editors\value;
 
+use ide\editors\common\ObjectListEditorButtonRender;
+use ide\editors\common\ObjectListEditorCellRender;
 use ide\editors\common\ObjectListEditorItem;
 use ide\editors\FormEditor;
 use ide\Ide;
@@ -35,27 +37,17 @@ class FormObjectPropertyEditor extends ElementPropertyEditor
     public function makeUi()
     {
         $combobox = new UXComboBox();
+        $combobox->padding = 3;
+        $combobox->visibleRowCount = 30;
+        $combobox->maxWidth = 300;
         $this->combobox = $combobox;
 
-        $combobox->onButtonRender(function (UXListCell $cell, ?ObjectListEditorItem $item) {
-            if ($item) {
-                $cell->text = $item->value;
-                $cell->graphic = Ide::getImage($item->graphic);
-            } else {
-                $cell->text = null;
-                $cell->graphic = null;
-            }
+        $combobox->on('action', function () use ($combobox) {
+            $this->applyValue($combobox->value ? $combobox->value->value : null, false);
         });
 
-        $combobox->onCellRender(function (UXListCell $cell, ?ObjectListEditorItem $item) {
-            if ($item) {
-                $cell->text = $item->value;
-                $cell->graphic = Ide::getImage($item->graphic);
-            } else {
-                $cell->text = null;
-                $cell->graphic = null;
-            }
-        });
+        $combobox->onCellRender(new ObjectListEditorCellRender());
+        $combobox->onButtonRender(new ObjectListEditorButtonRender());
 
         return $combobox;
     }

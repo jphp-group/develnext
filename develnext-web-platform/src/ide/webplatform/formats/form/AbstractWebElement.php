@@ -4,7 +4,9 @@ namespace ide\webplatform\formats\form;
 
 use framework\web\ui\UINode;
 use ide\formats\form\AbstractFormElement;
+use php\gui\layout\UXAnchorPane;
 use php\gui\UXNode;
+use php\gui\UXParent;
 use php\lib\reflect;
 use php\lib\str;
 
@@ -48,10 +50,18 @@ abstract class AbstractWebElement extends AbstractFormElement
 
     public function loadUiSchema(UXNode $view, array $uiSchema)
     {
-        foreach (['id', 'x', 'y', 'size'] as $prop) {
+        foreach (['id', 'x', 'y'] as $prop) {
             if (isset($uiSchema[$prop])) {
                 $view->{$prop} = $uiSchema[$prop];
             }
+        }
+
+        if (isset($uiSchema['width'])) {
+            $view->{'webWidth'} = $uiSchema['width'];
+        }
+
+        if (isset($uiSchema['height'])) {
+            $view->{'webHeight'} = $uiSchema['height'];
         }
     }
 
@@ -60,9 +70,14 @@ abstract class AbstractWebElement extends AbstractFormElement
         $schema = ['_' => $this->uiSchemaClassName()];
 
         $schema['id'] = $view->id;
-        $schema['x'] = (int) $view->x;
-        $schema['y'] = (int) $view->y;
-        $schema['size'] = [(int) $view->width, (int) $view->height];
+
+        if ($view->parent instanceof UXAnchorPane) {
+            $schema['x'] = (int)$view->x;
+            $schema['y'] = (int)$view->y;
+        }
+
+        $schema['width'] = $view->{'webWidth'};
+        $schema['height'] = $view->{'webHeight'};
         $schema['style'] = $view->data('--style');
 
         if ($view->opacity < 1) {
@@ -92,6 +107,50 @@ abstract class AbstractWebElement extends AbstractFormElement
     {
         $view = $this->createViewElement();
         $view->data('--web-element', $this);
+
+        foreach (['width', 'height'] as $prop) {
+            $webProp = 'web' . str::upperFirst($prop);
+
+            $updateWidth = function ($onlyPercent = true) use ($view, $webProp, $prop) {
+                if ($view->parent) {
+                    $webWidth = $view->data($webProp);
+
+                    if (str::endsWith($webWidth, '%')) {
+                        $newWidth = $view->parent->{$prop} * (((int)$webWidth) / 100);
+
+                        if ($newWidth !== $view->{$prop}) {
+                            $view->{$prop} = $newWidth;
+                        }
+                    } else {
+                        $view->{$prop} = (int)$webWidth;
+                    }
+                }
+            };
+
+            $view->observer('parent')->addListener(function ($_, $new) use ($updateWidth, $prop) {
+                if ($new instanceof UXParent) {
+                    $new->observer($prop)->addListener($updateWidth);
+                    $updateWidth(true);
+                }
+            });
+
+            $view->observer($prop)->addListener(function () use ($updateWidth) {
+                $updateWidth();
+            });
+
+            $view->data("--property-$webProp-getter", function () use ($view, $webProp) {
+                return $view->data($webProp);
+            });
+
+            $view->data("--property-$webProp-setter", function ($value) use ($view, $updateWidth, $webProp) {
+                $view->data($webProp, $value);
+                $updateWidth(false);
+            });
+        }
+
+        $view->{'webWidth'} = $this->getDefaultSize()[0];
+        $view->{'webHeight'} = $this->getDefaultSize()[1];
+
         return $view;
     }
 

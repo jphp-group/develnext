@@ -20,3 +20,4 @@ ide\editors\value\TabsPropertyEditor
 ide\editors\value\FormPropertyEditor
 ide\editors\value\TableViewColumnsPropertyEditor
 ide\editors\value\FloatSliderPropertyEditor
+ide\editors\value\FormObjectPropertyEditor

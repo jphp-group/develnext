@@ -55,7 +55,7 @@ class HBoxWebElement extends ContainerWebElement
         }
 
         if (isset($uiSchema['align'])) {
-            $view->align = self::schemaAlignToViewAlign($uiSchema['align']);
+            $view->alignment = self::schemaAlignToViewAlign($uiSchema['align']);
         }
     }
 

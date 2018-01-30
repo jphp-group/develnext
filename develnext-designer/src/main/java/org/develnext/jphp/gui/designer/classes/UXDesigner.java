@@ -87,6 +87,7 @@ public class UXDesigner extends BaseObject {
     protected Invoker onNodeClick;
     protected Invoker onNodePick;
     protected Invoker onChanged;
+    protected Invoker onNodeResize;
 
     protected ContextMenu contextMenu;
 
@@ -698,6 +699,11 @@ public class UXDesigner extends BaseObject {
         onChanged = invoker;
     }
 
+    @Signature
+    public void onNodeResize(@Nullable Invoker invoker) {
+        onNodeResize = invoker;
+    }
+
     protected double getCenterX(Node node) {
         if (node instanceof Circle) {
             return ((Circle) node).getRadius();
@@ -731,6 +737,12 @@ public class UXDesigner extends BaseObject {
     }
 
     protected void resizeNode(Node node, double width, double height) {
+        if (onNodeResize != null) {
+            if (onNodeResize.callAny(node, width, height).toBoolean()) {
+                return;
+            }
+        }
+
         Double topAnchor = AnchorPane.getTopAnchor(node);
         Double bottomAnchor = AnchorPane.getBottomAnchor(node);
         Double leftAnchor = AnchorPane.getLeftAnchor(node);
@@ -1113,6 +1125,11 @@ public class UXDesigner extends BaseObject {
                 Bounds nodeBounds = node.getLayoutBounds();
                 Bounds nodeScreenBounds = node.localToScreen(nodeBounds);
 
+                if (dragRect != null) {
+                    area.getChildren().remove(dragRect);
+                    dragRect = null;
+                }
+
                 Rectangle rectangle = new Rectangle(nodeBounds.getWidth(), nodeBounds.getHeight());
                 rectangle.getStyleClass().add(SYSTEM_ELEMENT_CSS_CLASS);
                 rectangle.setStrokeWidth(3);
@@ -1265,6 +1282,11 @@ public class UXDesigner extends BaseObject {
             }
 
             e.consume();
+
+            if (dragRect != null) {
+                area.getChildren().remove(dragRect);
+                dragRect = null;
+            }
         };
         //node.setOnMouseDragged(onMouseDragged);
         node.addEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);

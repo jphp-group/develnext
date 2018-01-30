@@ -77,6 +77,12 @@ class ProgressBarWebElement extends AbstractWebElement
             if ($new < 0) {
                 $bar->progress = 0;
             }
+
+            $bar->classes->remove('fulled');
+
+            if ($new > 0.99) {
+                $bar->classes->add('fulled');
+            }
         });
 
         return $bar;

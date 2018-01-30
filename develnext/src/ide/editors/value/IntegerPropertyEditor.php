@@ -11,6 +11,11 @@ use php\lib\String;
  */
 class IntegerPropertyEditor extends SimpleTextPropertyEditor
 {
+    /**
+     * @var UXSpinner
+     */
+    protected $spinner;
+
     public function getNormalizedValue($value)
     {
         return (int) $value;
@@ -23,7 +28,7 @@ class IntegerPropertyEditor extends SimpleTextPropertyEditor
 
     public function makeUi()
     {
-        $spinner = new UXSpinner();
+        $this->spinner = $spinner = new UXSpinner();
         $spinner->editable = true;
         $spinner->setIntegerValueFactory(-99999999, 99999999, 0);
 

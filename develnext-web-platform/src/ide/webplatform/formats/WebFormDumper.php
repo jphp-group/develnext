@@ -17,6 +17,7 @@ use php\gui\UXNode;
 use php\gui\UXParent;
 use php\io\IOException;
 use php\io\MemoryStream;
+use php\lib\str;
 use php\xml\DomDocument;
 use php\xml\DomElement;
 
@@ -79,13 +80,15 @@ class WebFormDumper extends AbstractFormDumper
         $schema = Json::fromFile($editor->getFrmFile());
 
         $layout->data('--web-form', true);
+        $editor->data('title', $schema['title']);
+        $editor->data('layout', str::split($schema['layout']['_'], '@')[1]);
 
-        if ($layoutSchema = $schema['layout']) {
+        if ($layoutSchema = $schema['components']['Layout']) {
             if (isset($layoutSchema['size'])) {
                 $layout->size = $layoutSchema['size'];
             }
 
-            foreach ((array) $schema['layout']['_content'] as $item) {
+            foreach ((array) $schema['components']['Layout']['_content'] as $item) {
                 if ($item) {
                     if ($view = $this->createView($editor, $item)) {
                         $layout->add($view);
@@ -177,12 +180,23 @@ class WebFormDumper extends AbstractFormDumper
             }
         }
 
+        $layoutId = 'Layout';
+
+        if ($editor->data('layout')) {
+            $layoutId .= '@'.$editor->data('layout');
+        }
+
         $uiFormSchema = [
-            'title' => 'MainForm',
+            'title' => $editor->data('title'),
+            'components' => [
+                'Layout' => [
+                    '_' => 'AnchorPane',
+                    'size' => [$layout->width, $layout->height],
+                    '_content' => $uiContent
+                ]
+            ],
             'layout' => [
-                '_' => 'AnchorPane',
-                'size' => [$layout->width, $layout->height],
-                '_content' => $uiContent
+                '_' => $layoutId,
             ]
         ];
 

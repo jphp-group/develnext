@@ -47,6 +47,7 @@ class VBoxWebElement extends ContainerWebElement
 
     public function loadUiSchema(UXNode $view, array $uiSchema)
     {
+        /** @var UXVBox $view */
         parent::loadUiSchema($view, $uiSchema);
 
         if (isset($uiSchema['spacing'])) {
@@ -54,7 +55,7 @@ class VBoxWebElement extends ContainerWebElement
         }
 
         if (isset($uiSchema['align'])) {
-            $view->align = self::schemaAlignToViewAlign($uiSchema['align']);
+            $view->alignment = self::schemaAlignToViewAlign($uiSchema['align']);
         }
     }
 

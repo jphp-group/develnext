@@ -8,7 +8,7 @@
 
     <properties group="extra" title="Дополнительно" sort="2000" >
         <property code="id" name="ID" editor="id" tooltip="Уникальный идентификатор элемента в рамках формы" />
-        <property code="style" name="CSS стиль" editor="text" tooltip="Набор fx css правил для стиля" />
+        <property code="--style" name="CSS стиль" editor="text" tooltip="Набор fx css правил для стиля" synthetic="1" />
 
         <property code="visible" name="Видимость" editor="boolean" virtual="1" tooltip="Видимость элемента на форме в момент старта" />
         <property code="enabled" name="Доступность" editor="boolean" virtual="1" tooltip="Доступность элемента на форме в момент старта" />
@@ -16,7 +16,8 @@
         <property code="opacity" name="Непрозрачность" editor="floatSlider" min="0" max="1" tooltip="Уровень непрозрачности от 0 до 1, например, 0.5 - объект прозрачен наполовину" />
 
         <property code="position" name="Позиция (X, Y)" editor="doubleArray" tooltip="Позиция по X (горизонтали) и по Y (вертикали)" />
-        <property code="size" name="Размеры (W, H)" editor="doubleArray" tooltip="Размеры, ширина (width) + высота (height)" />
+        <property code="webWidth" name="Ширина" editor="webSize" tooltip="" />
+        <property code="webHeight" name="Высота" editor="webSize" tooltip="" />
     </properties>
 
     <eventTypes>

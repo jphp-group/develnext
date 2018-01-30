@@ -215,28 +215,35 @@ class UXDesigner
     /**
      * @param callable $handler
      */
-    public function onAreaMouseUp(callable $handler)
+    public function onAreaMouseUp(?callable $handler)
     {
     }
 
     /**
      * @param callable $handler (MouseEvent $e): bool
      */
-    public function onNodeClick(callable $handler)
+    public function onNodeClick(?callable $handler)
     {
     }
 
     /**
      * @param callable $handler
      */
-    public function onNodePick(callable $handler)
+    public function onNodePick(?callable $handler)
+    {
+    }
+
+    /**
+     * @param callable $handler (UXNode $node, $width, $height)
+     */
+    public function onNodeResize(?callable $handler)
     {
     }
 
     /**
      * @param callable $handler
      */
-    public function onChanged(callable $handler)
+    public function onChanged(?callable $handler)
     {
     }
 
