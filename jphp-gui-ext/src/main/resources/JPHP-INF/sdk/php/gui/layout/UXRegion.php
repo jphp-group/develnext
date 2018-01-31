@@ -54,6 +54,16 @@ class UXRegion extends UXParent
     public $prefSize = [0.0, 0.0];
 
     /**
+     * @var float
+     */
+    public $prefWidth = 0.0;
+
+    /**
+     * @var float
+     */
+    public $prefHeight = 0.0;
+
+    /**
      * Внутренние отступы.
      * @var array|double
      */

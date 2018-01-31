@@ -1,0 +1,7 @@
+.ux-combobox {
+    -fx-background-color: #ced4da, white;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 5 0 5 5;
+    -fx-font-size: 15;
+    -fx-background-radius: 4;
+}

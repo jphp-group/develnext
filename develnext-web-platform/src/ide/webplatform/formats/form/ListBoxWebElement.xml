@@ -1,0 +1,9 @@
+<element extends="ide/webplatform/formats/form/NodeWebElement">
+    <properties>
+        <property code="items" name="Элементы" editor="stringList" />
+        <property code="selectedIndex" realCode="selected" min="0" name="Выделенный (индекс)" editor="integer" />
+    </properties>
+    <eventTypes>
+        <eventType code="action" name="Действие" kind="ide\webplatform\formats\form\event\WebEventKind" icon="icons/ok16.png" />
+    </eventTypes>
+</element>

@@ -10,6 +10,7 @@ use ide\formats\form\SourceEventManager;
 use ide\webplatform\formats\form\AbstractWebElement;
 use php\gui\UXNode;
 use php\lib\fs;
+use php\lib\str;
 
 /**
  * Class WebFormEditor
@@ -64,13 +65,31 @@ class WebFormEditor extends FormEditor
         $designer = parent::makeDesigner($fullArea);
 
         $this->designer->onNodeResize(function (UXNode $node, $width, $height) {
-            $node->{'webWidth'} = $width;
-            $node->{'webHeight'} = $height;
+            $oldWebWidth = $node->{'webWidth'};
+            $oldWebHeight = $node->{'webHeight'};
+
+            if (str::endsWith($oldWebWidth, '%') && $node->parent) {
+                $node->{'webWidth'} = ((int) round(($width / $node->parent->width) * 100)) . '%';
+            } else {
+                $node->{'webWidth'} = $width;
+            }
+
+            if (str::endsWith($oldWebHeight, '%') && $node->parent) {
+                $node->{'webHeight'} = ((int) round(($height / $node->parent->height) * 100)) . '%';
+            } else {
+                $node->{'webHeight'} = $height;
+            }
+
+            return true;
         });
 
         return $designer;
     }
 
+    public function refreshInspectorType()
+    {
+        // nop.
+    }
 
     /**
      * @param string $name

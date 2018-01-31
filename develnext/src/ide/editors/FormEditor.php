@@ -456,6 +456,8 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
             }
 
             foreach ($this->getObjectList() as $el) {
+                if ($el->element && $el->element->isNeedRegisterInSource()) continue;
+
                 $type->properties[$el->value] = $prop = new TypePropertyEntry();
                 $prop->name = $el->value;
                 $prop->data['content']['DEF'] = $el->element ? $el->element->getName() : '';

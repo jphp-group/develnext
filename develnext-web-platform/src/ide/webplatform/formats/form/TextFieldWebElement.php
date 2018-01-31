@@ -61,6 +61,7 @@ class TextFieldWebElement extends TextInputControlWebElement
     public function createViewElement(): UXNode
     {
         $field = new UXTextField();
+        $field->maxWidth = -INF;
         $field->font->size = $this->getDefaultFontSize();
         $field->classes->addAll(['ux-text-input-control', 'ux-text-field']);
         return $field;

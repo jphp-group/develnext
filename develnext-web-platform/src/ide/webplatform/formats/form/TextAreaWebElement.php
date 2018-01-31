@@ -56,6 +56,7 @@ class TextAreaWebElement extends TextInputControlWebElement
     public function createViewElement(): UXNode
     {
         $field = new UXTextArea();
+        $field->maxWidth = -INF;
         $field->font->size = $this->getDefaultFontSize();
         $field->classes->addAll(['ux-text-input-control', 'ux-text-area']);
         return $field;

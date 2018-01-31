@@ -70,6 +70,26 @@ public class UXRegion<T extends Region> extends UXParent<Region> {
     }
 
     @Getter
+    public double getPrefWidth() {
+        return getWrappedObject().getPrefWidth();
+    }
+
+    @Setter
+    public void setPrefWidth(double value) {
+        getWrappedObject().setPrefWidth(value);
+    }
+
+    @Getter
+    public double getPrefHeight() {
+        return getWrappedObject().getPrefHeight();
+    }
+
+    @Setter
+    public void setPrefHeight(double value) {
+        getWrappedObject().setPrefHeight(value);
+    }
+
+    @Getter
     public double getPaddingLeft() {
         return getWrappedObject().getPadding().getLeft();
     }

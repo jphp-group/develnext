@@ -1,12 +1,27 @@
 <element>
     <properties group="general" title="Главное">
         <property code="title" name="Заголовок" editor="text" tooltip="Заголовок окна" synthetic="1" />
-        <property code="layout" name="Компонент страницы" editor="formObject" tooltip="Компонент, который будет отображаться на странице" synthetic="1" />
+        <property code="layout" name="Тело" editor="formObject" tooltip="Компонент, который будет отображаться на странице" synthetic="1" />
+        <property code="footer" name="Нижняя часть" editor="formObject" tooltip="Компонент, который будет отображаться на странице" synthetic="1" />
     </properties>
 
     <properties group="extra" title="Дополнительно">
         <property code="backgroundColor" realCode="backgroundColor" name="Цвет фона" editor="color" virtual="1" defaultValue="" />
-        <property code="size" name="Размеры (W, H)" editor="doubleArray" tooltip="Размеры, ширина (width) + высота (height)" />
+        <!-- <property code="size" name="Размеры (W, H)" editor="doubleArray" tooltip="Размеры, ширина (width) + высота (height)" /> -->
+        <property code="widthKind" name="Ширина" editor="enum" synthetic="1">
+            <variants>
+                <variant value="">Как в редакторе</variant>
+                <variant value="FULL">100% от страницы</variant>
+                <variant value="CLEAR">Не определена</variant>
+            </variants>
+        </property>
+        <property code="heightKind" name="Высота" editor="enum" synthetic="1">
+            <variants>
+                <variant value="">Как в редакторе</variant>
+                <variant value="FULL">100% от страницы</variant>
+                <variant value="CLEAR">Не определена</variant>
+            </variants>
+        </property>
     </properties>
 
     <eventTypes>

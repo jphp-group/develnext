@@ -5,6 +5,7 @@ namespace ide\webplatform\formats\form;
 use framework\web\ui\UINode;
 use ide\formats\form\AbstractFormElement;
 use php\gui\layout\UXAnchorPane;
+use php\gui\layout\UXRegion;
 use php\gui\UXNode;
 use php\gui\UXParent;
 use php\lib\reflect;
@@ -63,6 +64,9 @@ abstract class AbstractWebElement extends AbstractFormElement
         if (isset($uiSchema['height'])) {
             $view->{'webHeight'} = $uiSchema['height'];
         }
+
+        $view->data('visible', $uiSchema['visible'] ?? true);
+        $view->data('enabled', $uiSchema['enabled'] ?? true);
     }
 
     public function uiSchema(UXNode $view): array
@@ -82,6 +86,14 @@ abstract class AbstractWebElement extends AbstractFormElement
 
         if ($view->opacity < 1) {
             $schema['opacity'] = $view->opacity;
+        }
+
+        if ($view->data('visible') === false) {
+            $schema['visible'] = false;
+        }
+
+        if ($view->data('enabled') === false) {
+            $schema['enabled'] = false;
         }
 
         return $schema;
@@ -107,6 +119,8 @@ abstract class AbstractWebElement extends AbstractFormElement
     {
         $view = $this->createViewElement();
         $view->data('--web-element', $this);
+        $view->data('visible', true);
+        $view->data('enabled', true);
 
         foreach (['width', 'height'] as $prop) {
             $webProp = 'web' . str::upperFirst($prop);
@@ -120,9 +134,17 @@ abstract class AbstractWebElement extends AbstractFormElement
 
                         if ($newWidth !== $view->{$prop}) {
                             $view->{$prop} = $newWidth;
+
+                            if ($view instanceof UXRegion) {
+                                $view->{"pref" . str::upperFirst($prop)} = $newWidth;
+                            }
                         }
                     } else {
-                        $view->{$prop} = (int)$webWidth;
+                        $view->{$prop} = (int) $webWidth;
+
+                        if ($view instanceof UXRegion) {
+                            $view->{"pref" . str::upperFirst($prop)} = $webWidth;
+                        }
                     }
                 }
             };

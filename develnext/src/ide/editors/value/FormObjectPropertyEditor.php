@@ -58,18 +58,25 @@ class FormObjectPropertyEditor extends ElementPropertyEditor
 
         $editor = FileSystem::getSelectedEditor();
 
+        $this->combobox->items->clear();
+        $objects = [ new ObjectListEditorItem('[нет]', null, '') ];
+
+        $this->combobox->items->addAll($objects);
+
         if ($editor instanceof FormEditor) {
-            $objects = $editor->getObjectList();
+            $objects = flow($objects)->append($editor->getObjectList());
 
             $this->combobox->items->setAll($objects);
 
-            foreach ($objects as $one) {
+            foreach ($objects as $i => $one) {
                 if ($one->value == $value) {
-                    $this->combobox->value = $value;
-                    break;
+                    $this->combobox->selectedIndex = $i;
+                    return;
                 }
             }
         }
+
+        $this->combobox->selectedIndex = 0;
     }
 
     /**

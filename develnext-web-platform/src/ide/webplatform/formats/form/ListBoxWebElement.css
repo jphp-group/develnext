@@ -1,0 +1,18 @@
+
+.ux-listbox {
+    -fx-background-color: #ced4da, white;
+    -fx-background-insets: 0, 1;
+    -fx-font-size: 15;
+    -fx-background-radius: 5;
+    -fx-padding: 7 0;
+}
+
+.ux-listbox .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0 13;
+}
+
+.ux-listbox .list-cell:selected {
+    -fx-text-fill: white;
+    -fx-background-color: #007bff;
+}

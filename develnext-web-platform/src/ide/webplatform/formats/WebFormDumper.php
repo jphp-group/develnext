@@ -83,9 +83,27 @@ class WebFormDumper extends AbstractFormDumper
         $editor->data('title', $schema['title']);
         $editor->data('layout', str::split($schema['layout']['_'], '@')[1]);
 
+        foreach (['width', 'height'] as $prop) {
+            switch ($schema['layout'][$prop]) {
+                case "100%":
+                    $editor->data($prop . 'Kind', 'FULL');
+                    break;
+                case "":
+                    $editor->data($prop . 'Kind', 'CLEAR');
+                    break;
+                default:
+                    $editor->data($prop . 'Kind', '');
+                    break;
+            }
+        }
+
         if ($layoutSchema = $schema['components']['Layout']) {
-            if (isset($layoutSchema['size'])) {
-                $layout->size = $layoutSchema['size'];
+            if (isset($layoutSchema['width'])) {
+                $layout->width = $layoutSchema['width'];
+            }
+
+            if (isset($layoutSchema['height'])) {
+                $layout->width = $layoutSchema['height'];
             }
 
             foreach ((array) $schema['components']['Layout']['_content'] as $item) {
@@ -186,18 +204,40 @@ class WebFormDumper extends AbstractFormDumper
             $layoutId .= '@'.$editor->data('layout');
         }
 
+        $widthKind = $editor->data('widthKind');
+        $heightKind = $editor->data('heightKind');
+
+        $width = $layout->width;
+        $height = $layout->height;
+
+        switch ($widthKind) {
+            case 'FULL': $width = '100%'; break;
+            case 'CLEAR': $width = null; break;
+        }
+
+        switch ($heightKind) {
+            case 'FULL': $height = '100%'; break;
+            case 'CLEAR': $height = ''; break;
+        }
+
+        $layoutSchema = ['_' => $layoutId];
+
+        if (!$editor->data('layout')) {
+            $layoutSchema['width'] = $width;
+            $layoutSchema['height'] = $height;
+        }
+
         $uiFormSchema = [
             'title' => $editor->data('title'),
             'components' => [
                 'Layout' => [
                     '_' => 'AnchorPane',
-                    'size' => [$layout->width, $layout->height],
+                    'width' => $layout->width,
+                    'height' => $layout->height,
                     '_content' => $uiContent
                 ]
             ],
-            'layout' => [
-                '_' => $layoutId,
-            ]
+            'layout' => $layoutSchema
         ];
 
         Json::toFile($editor->getFrmFile(), $uiFormSchema);

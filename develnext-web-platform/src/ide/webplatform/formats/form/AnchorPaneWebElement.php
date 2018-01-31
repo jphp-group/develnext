@@ -47,6 +47,9 @@ class AnchorPaneWebElement extends ContainerWebElement
         $panel = new UXPanel();
         $panel->backgroundColor = 'white';
         $panel->borderWidth = 0;
+        $panel->maxWidth = -INF;
+        $panel->maxHeight = -INF;
+
         return $panel;
     }
 
