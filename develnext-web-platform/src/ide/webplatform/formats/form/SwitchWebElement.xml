@@ -1,0 +1,12 @@
+<element extends="ide/webplatform/formats/form/CheckboxWebElement">
+    <properties>
+        <property code="iconSize" name="Размер иконки" editor="integer" />
+        <property code="iconGap" name="Отступ иконки" editor="integer" />
+        <property code="iconDisplay" name="Отображение иконки" editor="enum">
+            <variants>
+                <variant value="left">Левая сторона</variant>
+                <variant value="right">Правая сторона</variant>
+            </variants>
+        </property>
+    </properties>
+</element>

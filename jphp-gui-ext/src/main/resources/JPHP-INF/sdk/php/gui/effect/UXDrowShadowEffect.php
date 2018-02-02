@@ -57,10 +57,10 @@ class UXDropShadowEffect extends UXEffect
     public $size = [0.0, 0.0];
 
     /**
-     * @param double $radius (optional)
-     * @param UXColor|string $color (optional)
-     * @param double $offsetX (optional)
-     * @param double $offsetY (optional)
+     * @param double $radius [optional]
+     * @param UXColor|string $color [optional]
+     * @param double $offsetX [optional]
+     * @param double $offsetY [optional]
      */
     public function __construct($radius, $color, $offsetX, $offsetY)
     {

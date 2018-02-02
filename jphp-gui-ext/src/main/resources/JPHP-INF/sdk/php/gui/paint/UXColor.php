@@ -121,7 +121,7 @@ class UXColor
      * @param int $r
      * @param int $g
      * @param int $b
-     * @param double $opacity (optional)
+     * @param double $opacity [optional]
      * @return UXColor
      */
     public static function rgb($r, $g, $b, $opacity) {}

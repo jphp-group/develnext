@@ -6,6 +6,7 @@ ide\webplatform\formats\form\HyperlinkWebElement
 ide\webplatform\formats\form\TextFieldWebElement
 ide\webplatform\formats\form\TextAreaWebElement
 ide\webplatform\formats\form\CheckboxWebElement
+ide\webplatform\formats\form\SwitchWebElement
 ide\webplatform\formats\form\ProgressBarWebElement
 ide\webplatform\formats\form\ComboBoxWebElement
 ide\webplatform\formats\form\ListBoxWebElement

@@ -31,7 +31,7 @@ abstract class LabeledWebElement extends AbstractWebElement
             $view->alignment = self::schemaAlignToViewAlign($uiSchema['align']);
         }
 
-        if (isset($uiSchema['font'])) {
+        if (isset($uiSchema['font']) && $view->font) {
             if (isset($uiSchema['font']['size'])) {
                 $view->font->size = $uiSchema['font']['size'];
             }
@@ -61,17 +61,27 @@ abstract class LabeledWebElement extends AbstractWebElement
 
         $font = [];
 
-        if (intval($view->font->size) !== $this->getDefaultFontSize()) {
-            $font['size'] = $view->font->size;
-        }
+        if ($view->font) {
+            if (intval($view->font->size) !== $this->getDefaultFontSize()) {
+                $font['size'] = $view->font->size;
+            }
 
-        if ($view->font->name === 'System') { $font['name'] = $view->font->name; }
-        if ($view->font->bold) { $font['bold'] = true; }
-        if ($view->font->italic) { $font['italic'] = true; }
-        if ($view->underline) { $font['underline'] = true; }
+            if ($view->font->name === 'System') {
+                $font['name'] = $view->font->name;
+            }
+            if ($view->font->bold) {
+                $font['bold'] = true;
+            }
+            if ($view->font->italic) {
+                $font['italic'] = true;
+            }
+            if ($view->underline) {
+                $font['underline'] = true;
+            }
 
-        if ($font) {
-            $schema['font'] = $font;
+            if ($font) {
+                $schema['font'] = $font;
+            }
         }
 
         $schema['text'] = $view->text;

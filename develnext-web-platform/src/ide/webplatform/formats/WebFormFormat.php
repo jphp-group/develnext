@@ -148,7 +148,12 @@ class WebFormFormat extends AbstractFormFormat
 
         $frm = [
             'title' => $name,
-            'layout' => ["_" => "AnchorPane"]
+            'components' => [
+                'Layout' => [
+                    '_' => 'AnchorPane'
+                ]
+            ],
+            'layout' => ["_" => "Layout", "width" => "100%", "height" => "100%"]
         ];
 
         Json::toFile("$file.php.frm", $frm);

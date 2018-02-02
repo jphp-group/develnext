@@ -39,6 +39,7 @@ import php.runtime.invoke.Invoker;
 import php.runtime.invoke.ObjectInvokeHelper;
 import php.runtime.lang.BaseWrapper;
 import php.runtime.lang.ForeachIterator;
+import php.runtime.lang.IObject;
 import php.runtime.memory.*;
 import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
@@ -908,6 +909,17 @@ public class UXNode<T extends Node> extends BaseWrapper<Node> implements Eventab
         Memory memory = getReflection().getProperty(env, env.trace(), this, name, null, 0);
 
         return memory.isNotNull() ? Memory.TRUE : Memory.FALSE;
+    }
+
+    @Override
+    public IObject __getOriginInstance() {
+        Memory memory = JavaFxUtils.data(this.getWrappedObject(), "--node-instance");
+
+        if (memory.isObject()) {
+            return memory.toValue(ObjectMemory.class).value;
+        }
+
+        return super.__getOriginInstance();
     }
 
     @Override
