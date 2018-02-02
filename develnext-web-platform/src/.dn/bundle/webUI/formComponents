@@ -4,6 +4,7 @@ ide\webplatform\formats\form\ButtonWebElement
 ide\webplatform\formats\form\LabelWebElement
 ide\webplatform\formats\form\HyperlinkWebElement
 ide\webplatform\formats\form\TextFieldWebElement
+ide\webplatform\formats\form\PasswordFieldWebElement
 ide\webplatform\formats\form\TextAreaWebElement
 ide\webplatform\formats\form\CheckboxWebElement
 ide\webplatform\formats\form\SwitchWebElement

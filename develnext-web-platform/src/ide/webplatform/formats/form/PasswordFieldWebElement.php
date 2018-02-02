@@ -1,11 +1,11 @@
 <?php
 namespace ide\webplatform\formats\form;
 
-use framework\web\ui\UITextField;
+use framework\web\ui\UIPasswordField;
 use php\gui\UXNode;
-use php\gui\UXTextField;
+use php\gui\UXPasswordField;
 
-class TextFieldWebElement extends TextInputControlWebElement
+class PasswordFieldWebElement extends TextInputControlWebElement
 {
     public function getDefaultFontSize()
     {
@@ -14,7 +14,7 @@ class TextFieldWebElement extends TextInputControlWebElement
 
     public function getIcon()
     {
-        return 'icons/textField16.png';
+        return 'icons/passwordField16.png';
     }
 
     public function getIdPattern()
@@ -32,12 +32,12 @@ class TextFieldWebElement extends TextInputControlWebElement
      */
     public function getName()
     {
-        return "Поле ввода";
+        return "Поле для пароля";
     }
 
     public function getElementClass()
     {
-        return UITextField::class;
+        return UIPasswordField::class;
     }
 
     /**
@@ -45,7 +45,7 @@ class TextFieldWebElement extends TextInputControlWebElement
      */
     public function uiSchemaClassName(): string
     {
-        return 'TextField';
+        return 'PasswordField';
     }
 
     /**
@@ -53,10 +53,10 @@ class TextFieldWebElement extends TextInputControlWebElement
      */
     public function createViewElement(): UXNode
     {
-        $field = new UXTextField();
+        $field = new UXPasswordField();
         $field->maxWidth = -INF;
         $field->font->size = $this->getDefaultFontSize();
-        $field->classes->addAll(['ux-text-input-control', 'ux-text-field']);
+        $field->classes->addAll(['ux-text-input-control', 'ux-password-field']);
         return $field;
     }
 }
