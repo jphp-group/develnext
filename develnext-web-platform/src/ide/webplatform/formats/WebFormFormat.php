@@ -140,21 +140,28 @@ class WebFormFormat extends AbstractFormFormat
         $template = new PhpClassFileTemplate($name, 'UIForm');
         $template->setNamespace($namespace);
         $template->setImports([UIForm::class]);
-        $template->setPhpdoc('@path /');
+        $template->setPhpdoc('Form ' . $name);
 
         $sources = $project->createFile($project->getAbsoluteFile("$file.php"), $template);
         $sources->applyTemplate($template);
         $sources->updateTemplate(true);
 
-        $frm = [
-            'title' => $name,
-            'components' => [
-                'Layout' => [
-                    '_' => 'AnchorPane'
-                ]
-            ],
-            'layout' => ["_" => "Layout", "width" => "100%", "height" => "100%"]
-        ];
+        if ($options['frm']) {
+            $frm = $options['frm'];
+        } else {
+            $frm = [
+                'title' => $name,
+                'router' => $options['router'] ?? ['path' => null],
+                'centered' => true,
+                'closable' => true,
+                'components' => [
+                    'Layout' => [
+                        '_' => 'AnchorPane'
+                    ]
+                ],
+                'layout' => ["_" => "Layout", "width" => "100%", "height" => "100%"]
+            ];
+        }
 
         Json::toFile("$file.php.frm", $frm);
 

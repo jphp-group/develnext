@@ -15,7 +15,9 @@ import org.develnext.jphp.ext.javafx.support.ImageViewEx;
 import php.runtime.Memory;
 import php.runtime.env.DieException;
 import php.runtime.lang.spl.exception.RuntimeException;
+import php.runtime.launcher.LaunchException;
 import php.runtime.launcher.Launcher;
+import php.runtime.memory.StringMemory;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -115,6 +117,18 @@ public class FXLauncher extends Launcher {
                         splashStage.hide();
                     }
                 });
+            }
+        }
+    }
+
+    @Override
+    public void afterIncludeBootstrap() {
+        this.compileScope.triggerProgramShutdown(this.environment);
+        if (StringMemory.valueOf(this.config.getProperty("env.doFinal", "1")).toBoolean()) {
+            try {
+                this.environment.doFinal();
+            } catch (Throwable var2) {
+                throw new LaunchException(var2);
             }
         }
     }

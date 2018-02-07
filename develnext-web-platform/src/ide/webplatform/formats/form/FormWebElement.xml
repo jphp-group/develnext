@@ -1,8 +1,14 @@
 <element>
     <properties group="general" title="Главное">
+        <property code="routerPath" name="Путь (URL)" editor="text" tooltip="Путь (URL) по которому можно открыть форму в браузере" synthetic="1" />
         <property code="title" name="Заголовок" editor="text" tooltip="Заголовок окна" synthetic="1" />
         <property code="layout" name="Тело" editor="formObject" tooltip="Компонент, который будет отображаться на странице" synthetic="1" />
         <property code="footer" name="Нижняя часть" editor="formObject" tooltip="Компонент, который будет отображаться на странице" synthetic="1" />
+    </properties>
+
+    <properties group="modal" title="Диалог">
+        <property code="centered" name="Центровать" editor="boolean" tooltip="Центровать диалоговое окно формы" synthetic="1" />
+        <property code="closable" name="Закрываемость" editor="boolean" tooltip="Возможность закрыть диалоговое окно формы" synthetic="1" />
     </properties>
 
     <properties group="extra" title="Дополнительно">
@@ -25,5 +31,6 @@
     </properties>
 
     <eventTypes>
+        <eventType code="navigate" name="Переход" kind="ide\webplatform\formats\form\event\WebEventKind" icon="icons/loadingEvent16.png" />
     </eventTypes>
 </element>

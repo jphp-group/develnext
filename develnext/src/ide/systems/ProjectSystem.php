@@ -14,10 +14,12 @@ use ide\project\ProjectImporter;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use php\gui\UXApplication;
+use php\gui\UXButton;
 use php\gui\UXDialog;
 use php\gui\UXDirectoryChooser;
 use php\io\File;
 use php\io\IOException;
+use php\lang\Invoker;
 use php\lang\System;
 use php\lang\Thread;
 use php\lib\fs;
@@ -57,17 +59,18 @@ class ProjectSystem
 
         $th = new Thread(function () use ($project, $consoleOutput, $callback, $env, $hintCommand) {
             try {
-                $project->preCompile($env, function ($log) use ($consoleOutput) {
-                    uiLater(function () use ($consoleOutput, $log) {
-                        $consoleOutput->addConsoleLine($log, 'gray');
-                    });
-                });
+                $uiLater = Invoker::of('uiLater');
 
-                $project->compile($env, function ($log) use ($consoleOutput) {
-                    uiLater(function () use ($consoleOutput, $log) {
-                        $consoleOutput->addConsoleLine($log, 'blue');
-                    });
-                });
+                $logFunc = function ($color) use ($consoleOutput, $uiLater) {
+                    return function ($log) use ($color, $consoleOutput, $uiLater) {
+                        $uiLater(function () use ($log, $color, $consoleOutput) {
+                            $consoleOutput->addConsoleLine($log, $color);
+                        });
+                    };
+                };
+
+                $project->preCompile($env, $logFunc('gray'));
+                $project->compile($env, $logFunc('blue'));
 
                 uiLater(function () use ($consoleOutput, $project, $hintCommand) {
                     $consoleOutput->addConsoleLine('> ' . $hintCommand, 'green');

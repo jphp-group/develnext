@@ -315,6 +315,10 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
         return $this->getIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, true);
     }
 
+    public function setByteCodeEnabled($value) {
+        return $this->setIdeConfigValue(self::OPT_COMPILE_BYTE_CODE, $value);
+    }
+
     protected function collectZipLibraries()
     {
         $result = [];

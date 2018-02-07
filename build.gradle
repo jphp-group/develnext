@@ -6,6 +6,8 @@ rootProject.ext.jphpVersion = jphpVersion;
 
 if (Boolean.getBoolean("release")) {
     jphpVersion = projectVersion
+} else {
+    projectVersion += "-SNAPSHOT";
 }
 
 buildscript {

@@ -20,7 +20,7 @@ class WebMainUITemplate extends AbstractMetaTemplate
     /**
      * @var string
      */
-    private $path = '/app';
+    private $path = '/';
 
     /**
      * @var array
@@ -48,7 +48,7 @@ class WebMainUITemplate extends AbstractMetaTemplate
 
         $registerNotFoundCode = "";
         if ($this->notFoundForm) {
-            $registerFormsCode = "\$this->registerNotFoundForm('NotFound', new \\$registerNotFoundCode());";
+            $registerNotFoundCode = "\$this->registerNotFoundForm('NotFound', new \\$this->notFoundForm());";
         }
 
         $out->write("<?php

@@ -76,11 +76,6 @@ class Project
     protected $handlers = [];
 
     /**
-     * @var ProjectFile[]
-     */
-    protected $filesData = [];
-
-    /**
      * @var array
      */
     protected $ignoreRules = [];
@@ -932,7 +927,6 @@ class Project
             $dir->mkdirs();
         }
 
-        $this->filesData   = $this->config->createFiles($this);
         $this->template    = $this->config->getTemplate();
         $this->packageName = $this->config->getPackageName();
 
@@ -1007,7 +1001,6 @@ class Project
 
         $this->config->setTreeState($this->tree);
         $this->config->setOpenedFiles($files, FileSystem::getSelected(), $windowFiles);
-        $this->config->setProjectFiles($this->filesData);
         $this->config->setBehaviours($this->behaviours);
 
         $this->config->setProject($this);
@@ -1084,44 +1077,6 @@ class Project
     }
 
     /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    public function isSynchronizedFile($file)
-    {
-        $file = FileUtils::hashName($file);
-
-        $data = $this->filesData[$file];
-
-        return $data && !$data->isChanged();
-    }
-
-    /**
-     * Синхронизирует информацию о файле, вызывая события изменения файла.
-     *
-     * @param string $file
-     */
-    public function synchronizeFile($file)
-    {
-        if (!$this->isIgnoredPath($file) && FileSystem::isOpened($file) && !$this->isSynchronizedFile($file)) {
-            $this->trigger(__FUNCTION__, $file);
-
-            $this->fetchFile($file)->setSyncTime(Time::millis());
-        }
-    }
-
-    /**
-     * @param string $path
-     */
-    public function synchronizePath($path)
-    {
-        FileUtils::scan($path, function ($filename) {
-            $this->synchronizeFile($filename);
-        });
-    }
-
-    /**
      * @param $any
      *
      * @param bool $inject
@@ -1143,13 +1098,7 @@ class Project
      */
     protected function fetchFile($file)
     {
-        $hash = FileUtils::hashName($file);
-
-        if (!($o = $this->filesData[$hash])) {
-            return $this->filesData[$hash] = new ProjectFile($this, $file);
-        }
-
-        return $o;
+        return new ProjectFile($this, $file);
     }
 
     /**
@@ -1212,7 +1161,6 @@ class Project
 
         $this->inspectors = [];
         $this->configConfigurers = [];
-        $this->filesData = [];
         $this->indexer = null;
         $this->config = null;
         $this->handlers = [];

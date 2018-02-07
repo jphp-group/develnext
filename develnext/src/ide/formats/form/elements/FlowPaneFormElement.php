@@ -53,7 +53,7 @@ class FlowPaneFormElement extends AbstractFormElement
         return true;
     }
 
-    public function addToLayout($self, $node, $screenX, $screenY)
+    public function addToLayout($self, $node, $screenX = null, $screenY = null)
     {
         /** @var UXHBox $self */
         $node->position = $self->screenToLocal($screenX, $screenY);

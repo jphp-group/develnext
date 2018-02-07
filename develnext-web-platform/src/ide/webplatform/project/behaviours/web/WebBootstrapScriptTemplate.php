@@ -1,4 +1,5 @@
 <?php
+
 namespace ide\webplatform\project\behaviours\web;
 
 use ide\misc\AbstractMetaTemplate;
@@ -63,21 +64,20 @@ class WebBootstrapScriptTemplate extends AbstractMetaTemplate
 
         $watchedCode = str::join($watchedCode, "\r\n");
 
-        if ($this->hotDeployEnabled) {
-            $out->write("<?php
+        $out->write("<?php
 
 use framework\\core\\Event;
 use framework\\web\\HotDeployer;
 use framework\\web\\WebApplication;
-use framework\\web\\WebUI;
 use framework\\web\\WebAssets;
 use framework\\web\\WebDevModule;
+use framework\\app\\web\\WebServerAppModule;
 use php\\io\\Stream;
 
 Stream::putContents('application.pid', getmypid());
 
 \$deployer = new HotDeployer(function () {
-    \$webUi = new WebUI();
+    \$webUi = new WebServerAppModule();
  
     \$app = new WebApplication();
     \$app->addModule(new WebDevModule());
@@ -96,29 +96,12 @@ $mainUiClassCode
 });
 
 $watchedCode
-\$deployer->run();
             ");
+
+        if ($this->hotDeployEnabled) {
+            $out->write("\$deployer->run();");
         } else {
-            $out->write("<?php
-
-use framework\\core\\Event;
-use framework\\web\\WebApplication;
-use framework\\web\\WebUI;
-use php\\io\\Stream;
-
-Stream::putContents('application.pid', getmypid());
-
-\$webUi = new WebUI();
-
-\$app = new WebApplication();
-\$app->addModule(new WebDevModule());
-\$app->addModule(new WebAssets('/assets', './assets'));
-\$app->addModule(\$webUi);
-
-$mainUiClassCode
-
-\$app->launch();
-            ");
+            $out->write("\$deployer->directRun();");
         }
     }
 

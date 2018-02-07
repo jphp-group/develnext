@@ -118,8 +118,9 @@ class WebProjectBehaviour extends AbstractProjectBehaviour
         $this->mainUiTemplate->useFile($this->project->getSrcFile("{$this->project->getPackageName()}/ui/MainUI.php"));
         $this->mainUiTemplate->setNamespace($this->project->getPackageName() . "\\ui");
         $this->mainUiTemplate->setClassName('MainUI');
-        $this->mainUiTemplate->setPath("/" . $this->project->getPackageName());
+        $this->mainUiTemplate->setPath("/");
         $this->mainUiTemplate->setForms(['MainForm' => "{$this->project->getPackageName()}\\forms\\MainForm"]);
+        $this->mainUiTemplate->setNotFoundForm("{$this->project->getPackageName()}\\forms\\NotFoundForm");
 
         // Use bootstrap php file.
         $this->bootstrapTemplate->useFile($this->project->getSrcFile('JPHP-INF/.bootstrap.php'));

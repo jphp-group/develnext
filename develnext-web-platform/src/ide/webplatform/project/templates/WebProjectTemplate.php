@@ -1,4 +1,5 @@
 <?php
+
 namespace ide\webplatform\project\templates;
 
 use ide\jsplatform\project\bundles\WebUIBundle;
@@ -54,6 +55,7 @@ class WebProjectTemplate extends AbstractProjectTemplate
 
         /** @var PhpProjectBehaviour $php */
         $php = $project->register(new PhpProjectBehaviour());
+        $php->setByteCodeEnabled(false);
         $project->register(new JavaPlatformBehaviour());
 
         /** @var WebProjectBehaviour $web */
@@ -85,10 +87,40 @@ class WebProjectTemplate extends AbstractProjectTemplate
                 "/src/{$project->getPackageName()}/modules",
             ]);
 
-            $mainForm = $project->createBlank('MainForm', WebFormFormat::class);
+            $mainForm = $project->createBlank('MainForm', WebFormFormat::class, [
+                'router' => ['path' => '/']
+            ]);
 
-            uiLater(function () use ($mainForm, $project) {
+            $notFoundForm = $project->createBlank('NotFoundForm', WebFormFormat::class, ['frm' => [
+                'title' => '404. Not Found',
+                'router' => ['path' => null],
+                'components' => [
+                    'Layout' => [
+                        '_' => 'AnchorPane',
+                        '_content' => [
+                            [
+                                '_' => 'VBox',
+                                'id' => 'vbox',
+                                'width' => '100%',
+                                'height' => '100%',
+                                'align' => ['center', 'center'],
+                                '_content' => [[
+                                    '_' => 'Label',
+                                    'id' => 'label',
+                                    'text' => '404. Not Found.',
+                                    'width' => '100%',
+                                    'align' => ['center', 'center']
+                                ]]
+                            ]
+                        ]
+                    ]
+                ],
+                'layout' => ["_" => "Layout", "width" => "100%", "height" => "100%"]
+            ]]);
+
+            uiLater(function () use ($mainForm, $notFoundForm, $project) {
                 FileSystem::open($project->getMainProjectFile());
+                FileSystem::open($notFoundForm);
                 FileSystem::open($mainForm);
             });
         });

@@ -397,24 +397,6 @@ class ProjectConfig
     }
 
     /**
-     * @param Project $project
-     *
-     * @return ProjectFile[]
-     */
-    public function createFiles(Project $project)
-    {
-        $files = [];
-
-        /** @var DomElement $domFile */
-        /*foreach ($this->document->findAll('/project/files/file') as $domFile) {
-            $projectFile = ProjectFile::unserialize($project, $domFile);
-            $files[$projectFile->getNameHash()] = $projectFile;
-        }    */
-
-        return $files;
-    }
-
-    /**
      * @return array
      */
     public function getOpenedFiles()

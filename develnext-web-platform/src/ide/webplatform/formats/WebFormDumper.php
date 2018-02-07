@@ -82,6 +82,9 @@ class WebFormDumper extends AbstractFormDumper
         $layout->data('--web-form', true);
         $editor->data('title', $schema['title']);
         $editor->data('layout', str::split($schema['layout']['_'], '@')[1]);
+        $editor->data('routerPath', $schema['router']['path'] ?? '');
+        $editor->data('centered', $schema['centered'] ?? true);
+        $editor->data('closable', $schema['closable'] ?? true);
 
         foreach (['width', 'height'] as $prop) {
             switch ($schema['layout'][$prop]) {
@@ -97,13 +100,17 @@ class WebFormDumper extends AbstractFormDumper
             }
         }
 
+        if (isset($schema['size'])) {
+            [$layout->prefWidth, $layout->prefHeight] = $schema['size'];
+        }
+
         if ($layoutSchema = $schema['components']['Layout']) {
             if (isset($layoutSchema['width'])) {
-                $layout->width = $layoutSchema['width'];
+                $layout->prefWidth = $layoutSchema['width'];
             }
 
             if (isset($layoutSchema['height'])) {
-                $layout->width = $layoutSchema['height'];
+                $layout->prefHeight = $layoutSchema['height'];
             }
 
             foreach ((array) $schema['components']['Layout']['_content'] as $item) {
@@ -229,6 +236,10 @@ class WebFormDumper extends AbstractFormDumper
 
         $uiFormSchema = [
             'title' => $editor->data('title'),
+            'closable' => $editor->data('closable'),
+            'centered' => $editor->data('centered'),
+            'router' => ['path' => $editor->data('routerPath')],
+            'size' => [$layout->width, $layout->height],
             'components' => [
                 'Layout' => [
                     '_' => 'AnchorPane',

@@ -58,7 +58,7 @@ class ScrollPaneFormElement extends AbstractFormElement
         return true;
     }
 
-    public function addToLayout($self, $node, $screenX, $screenY)
+    public function addToLayout($self, $node, $screenX = null, $screenY = null)
     {
         /** @var UXScrollPane $self */
         $content = $self->content;

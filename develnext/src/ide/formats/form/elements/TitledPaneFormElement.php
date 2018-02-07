@@ -55,7 +55,7 @@ class TitledPaneFormElement extends AbstractFormElement
         return true;
     }
 
-    public function addToLayout($self, $node, $screenX, $screenY)
+    public function addToLayout($self, $node, $screenX = null, $screenY = null)
     {
         /** @var UXTitledPane $self */
 
