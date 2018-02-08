@@ -73,7 +73,7 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                 if ($regex->find()) {
                     $pos = $regex->end(0) + 1;
                 } else {
-                    $regex = Regex::of('(\\<\\?)', Regex::DOTALL | Regex::CASE_INSENSITIVE)->with($text);
+                    $regex = Regex::of('(\\<\\?(php)?)', Regex::DOTALL | Regex::CASE_INSENSITIVE)->with($text);
 
                     if ($regex->find()) {
                         $pos = $regex->end(0) + 1;
