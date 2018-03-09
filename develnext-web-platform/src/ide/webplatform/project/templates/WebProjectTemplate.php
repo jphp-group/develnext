@@ -2,6 +2,7 @@
 
 namespace ide\webplatform\project\templates;
 
+use ide\forms\MessageBoxForm;
 use ide\jsplatform\project\bundles\WebUIBundle;
 use ide\project\AbstractProjectTemplate;
 use ide\project\behaviours\BackupProjectBehaviour;
@@ -50,6 +51,8 @@ class WebProjectTemplate extends AbstractProjectTemplate
      */
     public function makeProject(Project $project)
     {
+        MessageBoxForm::warning('Веб проекты находятся в разработке, многие функции еще не работают и содержат ошибки.');
+
         /** @var BundleProjectBehaviour $bundle */
         $bundle = $project->register(new BundleProjectBehaviour());
 

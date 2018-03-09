@@ -538,24 +538,24 @@ class PHPInspector extends AbstractInspector
         $entry->endLine = $token->getEndLine();
         $entry->endPosition = $token->getEndPosition();
 
-        foreach ($token->getArguments() as $arg) {
-            $entry->arguments[$arg->getName()] = $this->makeArgument($arg);
-        }
-
         $data = $this->parseFunctionDocType($token->getComment(), $owner);
         $entry->data = $data;
 
         if ($data['return']) {
             $entry->data['returnType'] = $data['return'];
         } else {
-            if ($hintType = $token->getReturnHintType()) {
+            if ($cls = $token->getReturnHintTypeClass()) {
+                $entry->data['returnType'] = $cls->getName();
+            } else if ($hintType = $token->getReturnHintType()) {
                 $entry->data['returnType'] = str::lower($hintType);
-            } else if ($cls = $token->getReturnHintTypeClass()) {
-                $entry->data['returnType'] = $cls;
             }
+
+            $entry->data['returnNullable'] = $token->isReturnOptional();
         }
 
-        $entry->data['returnNullable'] = $token->isReturnOptional();
+        foreach ($token->getArguments() as $arg) {
+            $entry->arguments[$arg->getName()] = $this->makeArgument($arg);
+        }
 
         foreach ((array) $data['params'] as $name => $info) {
             if ($arg = $entry->arguments[$name]) {
@@ -598,7 +598,7 @@ class PHPInspector extends AbstractInspector
 
         $e->name = $arg->getName();
         $e->value = $arg->getValue() ? $arg->getValue()->getExprString() : null;
-        $e->type = $arg->getHintTypeClass() ? $arg->getHintTypeClass()->getWord() : str::lower($arg->getHintType());
+        $e->type = $arg->getHintTypeClass() ? $arg->getHintTypeClass()->getName() : str::lower($arg->getHintType());
         $e->optional = !!$arg->getValue();
         $e->nullable = $arg->isOptional();
 

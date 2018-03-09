@@ -55,7 +55,11 @@ public class AutoSpaceEnterHotkey extends AbstractHotkey {
                 if (!nextParagraphText.trim().startsWith("*")) {
                     offset = -(prefix.length() + 3);
 
-                    prefix.append(" *").append(" ").append(prefix.toString()).append("/");
+                    prefix.append(" *");
+
+                    String str = prefix.toString();
+
+                    prefix.append(" ").append(str).append("/");
                 } else {
                     prefix.append(" * ");
                 }

@@ -7,6 +7,7 @@ use ide\autocomplete\AutoComplete;
 use ide\autocomplete\AutoCompleteInsert;
 use ide\autocomplete\AutoCompleteItem;
 use ide\autocomplete\AutoCompleteType;
+use ide\autocomplete\ConstantAutoCompleteItem;
 use ide\autocomplete\MethodAutoCompleteItem;
 use ide\autocomplete\php\PhpAnyAutoCompleteType;
 use ide\autocomplete\PropertyAutoCompleteItem;
@@ -184,6 +185,66 @@ class AutoCompletePane
         }
     }
 
+    protected function tryShowHint(int $x = null, int $y = null): bool
+    {
+        Logger::debug("Try show hint");
+
+        if ($x === null && $y === null) {
+            $caretBounds = $this->area->caretBounds;
+            list($x, $y) = [$caretBounds['x'], $caretBounds['y']];
+
+            $x += $caretBounds['width'];
+            $y += $caretBounds['height'];
+        }
+
+        $hintShown = false;
+
+        if ($hintString = $this->getHintString()) {
+            [$offset, $string] = $hintString;
+
+            $region = $this->complete->findRegion($this->area->caretLine, $this->area->caretOffset);
+            $types = $this->complete->identifyType($string, $region);
+
+            if ($type = arr::first($types)) {
+                $type = $this->complete->fetchType($type);
+
+                $methods = $type->getMethods($this->complete, $region);
+                $method = flow($methods)
+                    ->findOne(function (MethodAutoCompleteItem $m) use ($string) {
+                        return str::endsWith($string, $m->getName());
+                    });
+
+                if (!$method) {
+                    foreach ($type->getConstants($this->complete, $region) as $c) {
+                        if (str::endsWith($string, $c->getName())) {
+                            foreach ($c->getSubItems() as $subC) {
+                                if ($subC instanceof MethodAutoCompleteItem) {
+                                    $method = $subC;
+                                    break 2;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ($method) {
+                    Logger::info("Show hint method '{$method->getName()}'");
+
+                    $this->makeDescriptionUi(1);
+                    $this->updateDescription($method);
+                    $this->showDescription($x, $y);
+                    $hintShown = false;
+                }
+            }
+        }
+
+        if (!$hintShown) {
+            $this->hideDescription();
+        }
+
+        return $hintShown;
+    }
+
     protected function init()
     {
         $this->area->observer('focused')->addListener(function ($old, $new) {
@@ -199,10 +260,18 @@ class AutoCompletePane
 
         $this->area->on('mouseDown', function () {
             $this->hide();
+            $this->complete->update($this->area->text, $this->area->caretPosition, $this->area->caretLine, $this->area->caretOffset);
+
+            $this->tryShowHint();
         });
 
         $this->area->on('keyDown', function (UXKeyEvent $e) {
-            if ($e->controlDown || $e->altDown || $e->shortcutDown) {
+            if ($e->altDown || $e->shortcutDown) {
+                $this->inserted = true;
+                return;
+            }
+
+            if ($e->controlDown && $e->codeName !== 'Space') {
                 $this->inserted = true;
                 return;
             }
@@ -235,6 +304,7 @@ class AutoCompletePane
 
                 case 'Esc':
                     $this->hide();
+                    $this->hideDescription();
                     $e->consume();
                     break;
 
@@ -251,14 +321,9 @@ class AutoCompletePane
         }, __CLASS__);
 
         $this->area->on('keyUp', function (UXKeyEvent $e) {
-
             switch ($e->codeName) {
                 case 'Up':
                 case 'Down':
-                    return;
-
-                case 'Left':
-                case 'Right':
                     return;
             }
 
@@ -272,6 +337,14 @@ class AutoCompletePane
                 return;
             }
 
+            switch ($e->codeName) {
+                case 'Left':
+                case 'Right':
+                    $this->tryShowHint();
+                    return;
+            }
+
+
             if ($this->area instanceof UXSyntaxTextArea) {
                 list($x, $y) = $this->area->getCaretScreenPosition();
                 $x += 20;
@@ -284,48 +357,52 @@ class AutoCompletePane
                 $y += $caretBounds['height'];
             }
 
-            if ($string = $this->getString()) {
-                $items = null;
+            $hintShown = $this->tryShowHint($x, $y);
 
-                if ($string != $this->lastString) {
-                    $region = $this->complete->findRegion($this->area->caretLine, $this->area->caretOffset);
-                    $types = $this->complete->identifyType($string, $region);
+            if (!$hintShown) {
+                if ($string = $this->getString()) {
+                    $items = null;
 
-                    if (arr::keys($this->types) != $types) {
-                        $this->types = [];
+                    if ($string != $this->lastString) {
+                        $region = $this->complete->findRegion($this->area->caretLine, $this->area->caretOffset);
+                        $types = $this->complete->identifyType($string, $region);
 
-                        foreach ($types as $type) {
-                            //if (!$this->hasType($type)) {
-                            $this->addType($type);
-                            //}
+                        if (arr::keys($this->types) != $types) {
+                            $this->types = [];
+
+                            foreach ($types as $type) {
+                                //if (!$this->hasType($type)) {
+                                $this->addType($type);
+                                //}
+                            }
                         }
+
+                        $items = $this->makeItems($this->getString(true));
                     }
 
-                    $items = $this->makeItems($this->getString(true));
+                    $this->lastString = $string;
+
+                    uiLater(function () use ($x, $y, $string, $items) {
+                        if ($items !== null) {
+                            $this->list->items->clear();
+                            $this->list->items->addAll($items);
+                            $this->list->selectedIndex = 0;
+                            $this->list->focusedIndex = 0;
+                            $this->list->scrollTo(0);
+
+                            //Logger::debug("Autocomplete list updated.");
+                        }
+
+                        if ($this->list->items->count) {
+                            $this->show($x, $y);
+                        } else {
+                            //Logger::debug("No auto complete items for: $string");
+                            $this->hide();
+                        }
+                    });
+                } else {
+                    $this->hide();
                 }
-
-                $this->lastString = $string;
-
-                UXApplication::runLater(function () use ($x, $y, $string, $items) {
-                    if ($items !== null) {
-                        $this->list->items->clear();
-                        $this->list->items->addAll($items);
-                        $this->list->selectedIndex = 0;
-                        $this->list->focusedIndex = 0;
-                        $this->list->scrollTo(0);
-
-                        //Logger::debug("Autocomplete list updated.");
-                    }
-
-                    if ($this->list->items->count) {
-                        $this->show($x, $y);
-                    } else {
-                        //Logger::debug("No auto complete items for: $string");
-                        $this->hide();
-                    }
-                });
-            } else {
-                $this->hide();
             }
         }, __CLASS__);
     }
@@ -334,6 +411,28 @@ class AutoCompletePane
      * @var AccurateTimer
      */
     protected $showTimer;
+
+    public function showDescription($x, $y)
+    {
+        if ($this->showTimer) {
+            $this->showTimer->free();
+        }
+
+        $this->showTimer = waitAsync(1, function () use ($x, $y) {
+            $this->showTimer = null;
+
+            foreach ($this->uiDescription as $uiDesc) {
+                $uiDesc->show($this->area->form, $x, $y);
+            }
+        });
+    }
+
+    public function hideDescription()
+    {
+        foreach ($this->uiDescription as $uiDesc) {
+            $uiDesc->hide();
+        }
+    }
 
     public function show($x, $y)
     {
@@ -475,6 +574,7 @@ class AutoCompletePane
 
                 $this->area->insertToCaret($insert);
                 $this->area->caretPosition += $altCaret;
+                uiLater([$this, 'tryShowHint']);
             });
 
             $this->lock = true;
@@ -496,18 +596,75 @@ class AutoCompletePane
         }
     }
 
+    public function getHintString(): array
+    {
+        $text = $this->area->text;
+
+        $i = $this->area->caretPosition;
+
+        $braces = ['(' => 0, '[' => 0, '{' => 0];
+
+        $hintMode = false;
+
+        $endChar = $text[$i - 1];
+        if (Char::isSpace($endChar) || Char::isPrintable($endChar) || str::contains('(,-+*/&|=%!~.<>"\'?^', $endChar)) {
+            $hintMode = true;
+        }
+
+        if (!$hintMode) {
+            return [];
+        } else {
+            // skip...
+            $found = false;
+            while ($i-- >= 0) {
+                $ch = $text[$i];
+
+                switch ($ch) {
+                    case ")":
+                        $braces['(']++;
+                        break;
+                    case "(":
+                        $braces['(']--;
+                        break;
+
+                    case "]":
+                        $braces['[']++;
+                        break;
+                    case "[":
+                        $braces['[']--;
+                        break;
+
+                    case "}":
+                        $braces['}']++;
+                        break;
+                    case "{":
+                        $braces['{']--;
+                        break;
+                }
+
+                if ($braces['('] < 0 && $braces['['] <= 0 && $braces['{'] === 0) {
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) return [];
+        }
+
+        return [$i, str::sub($text, 0, $i)];
+    }
+
     public function getString($onlyName = false)
     {
         $text = $this->area->text;
 
         $i = $this->area->caretPosition;
 
-        $string = '';
-        $braces = [];
-
-        if (Char::isSpace($text[$i - 1])) {
-            return $string;
+        if (!$onlyName) {
+            return str::sub($text, 0, $i);
         }
+
+        $string = '';
 
         while ($i-- >= 0) {
             $ch = $text[$i];
@@ -596,7 +753,7 @@ class AutoCompletePane
             $ui = new UXVBox();
             $ui->spacing = 5;
             $ui->padding = 10;
-            $ui->maxWidth = 650;
+            $ui->maxWidth = 800;
             $ui->focusTraversable = false;
             $ui->padding = 3;
 
@@ -652,7 +809,7 @@ class AutoCompletePane
                         $ui->show(
                             $this->area->form,
                             $this->ui->x + $this->ui->width + 3,
-                            $this->ui->y + (($i+1) * 3) + $offsetY
+                            $this->ui->y + (($i + 1) * 3) + $offsetY
                         );
 
                         $offsetY += $ui->height;
@@ -705,7 +862,7 @@ class AutoCompletePane
              */
             foreach ($this->uiDescription as $i => $ui) {
                 $ui->x = $this->ui->x + $this->ui->width + 3;
-                $ui->y = $this->ui->y + (($i+1) * 3) + $offsetY;
+                $ui->y = $this->ui->y + (($i + 1) * 3) + $offsetY;
 
                 $offsetY += $ui->height;
             }

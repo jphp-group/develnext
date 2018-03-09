@@ -83,7 +83,7 @@ class FunctionStmtToken extends SimpleToken
     }
 
     /**
-     * @return string
+     * @return NameToken
      */
     public function getReturnHintTypeClass()
     {
