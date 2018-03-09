@@ -41,7 +41,6 @@ class ScriptEvent extends \stdClass
         $this->target = $target ?: $sender;
     }
 
-
     public function done()
     {
         $this->usage -= 1;

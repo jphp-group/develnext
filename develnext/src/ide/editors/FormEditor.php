@@ -973,7 +973,7 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
     public function getRefactorRenameNodeType()
     {
-        return 'WEB_FORM_FORMAT_ELEMENT_ID';
+        return 'GUI_FORM_FORMAT_ELEMENT_ID';
     }
 
     protected function reindexImpl(ProjectIndexer $indexer)

@@ -116,7 +116,7 @@ class UIDesktopBundle extends AbstractJarBundle
     function getJarDependencies()
     {
         return [
-            'jphp-gui-ext', 'jphp-desktop-ext', 'jphp-zend-ext', 'jphp-app-framework'
+            'jphp-gui-ext', 'jphp-desktop-ext', 'jphp-zend-ext', 'jphp-app-framework', 'wizard-core',
         ];
     }
 

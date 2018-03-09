@@ -15,6 +15,7 @@ use ide\project\behaviours\PhpProjectBehaviour;
 use ide\project\behaviours\RunBuildProjectBehaviour;
 use ide\project\behaviours\ShareProjectBehaviour;
 use ide\project\Project;
+use ide\project\ProjectFile;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
 use ide\utils\Json;
@@ -85,6 +86,20 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
         $ideVersionHash = $project->getConfig()->getIdeVersionHash();
         if ($ideVersionHash < 2017022512) {
             $this->migrateFrom16RC2($project);
+        }
+
+        /*if ($ideVersionHash < 2018013112) {
+            $this->migrateFrom16x7($project);
+        }*/
+    }
+
+    private function migrateFrom16x7(Project $project)
+    {
+        /** @var GuiFrameworkProjectBehaviour $gui */
+        $gui = $project->getBehaviour(GuiFrameworkProjectBehaviour::class);
+
+        foreach ($gui->getModuleFiles() as $moduleFile) {
+            // convert modules.
         }
     }
 
@@ -287,6 +302,11 @@ class DefaultGuiProjectTemplate extends AbstractProjectTemplate
     {
         // check is < 16.5
         if ($project->getConfig()->getIdeVersionHash() < 2017022512) {
+            return true;
+        }
+
+        // check is < 17
+        if ($project->getConfig()->getIdeVersionHash() < 2018013112) {
             return true;
         }
 

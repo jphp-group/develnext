@@ -8,6 +8,7 @@ use ide\misc\GradleBuildConfig;
 use php\gui\designer\UXDesignProperties;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXApplication;
+use php\gui\UXImage;
 use php\gui\UXLabel;
 use php\gui\UXNode;
 

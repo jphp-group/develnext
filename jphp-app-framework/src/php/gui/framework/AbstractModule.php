@@ -1,6 +1,8 @@
 <?php
 namespace php\gui\framework;
 
+use framework\core\Component;
+use framework\core\Event;
 use php\format\JsonProcessor;
 use php\framework\Logger;
 use php\gui\framework\behaviour\custom\BehaviourLoader;
@@ -108,7 +110,11 @@ abstract class AbstractModule extends AbstractScript
         }
     }
 
-    private function loadScript(AbstractScript $script, array $meta)
+    /**
+     * @param AbstractScript|Component $script
+     * @param array $meta
+     */
+    private function loadScript($script, array $meta)
     {
         foreach ((array) $meta['props'] as $key => $value) {
             $script->{$key} = $value;
@@ -163,10 +169,16 @@ abstract class AbstractModule extends AbstractScript
     protected function applyImpl($target)
     {
         foreach ($this->__scripts as $script) {
-            $script->_owner = $this;
+            if ($script instanceof AbstractScript) {
+                $script->_owner = $this;
 
-            if (!$script->disabled) {
-                $script->apply($target);
+                if (!$script->disabled) {
+                    $script->apply($target);
+                }
+            } else if ($script instanceof Component) {
+                uiLater(function () use ($script) {
+                    $script->trigger(new Event('construct', $script));
+                });
             }
         }
 

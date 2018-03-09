@@ -80,9 +80,9 @@ Stream::putContents('application.pid', getmypid());
     \$webUi = new WebServerAppModule();
  
     \$app = new WebApplication();
-    \$app->addModule(new WebDevModule());
-    \$app->addModule(new WebAssets('/assets', './assets'));
-    \$app->addModule(\$webUi);
+    \$app->components->add(new WebDevModule());
+    \$app->components->add(new WebAssets('/assets', './assets'));
+    \$app->components->add(\$webUi);
     
 $mainUiClassCode
 

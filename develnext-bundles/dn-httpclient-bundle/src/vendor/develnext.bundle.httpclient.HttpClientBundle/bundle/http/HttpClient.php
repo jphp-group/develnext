@@ -3,6 +3,7 @@
 namespace bundle\http;
 
 use php\format\JsonProcessor;
+use php\format\ProcessorException;
 use php\framework\Logger;
 use php\gui\framework\AbstractScript;
 use php\io\File;
@@ -21,6 +22,9 @@ use php\time\Time;
 use php\util\Flow;
 use php\util\Scanner;
 use php\util\SharedValue;
+use php\xml\DomDocument;
+use php\xml\DomElement;
+use php\xml\XmlProcessor;
 
 /**
  * Class HttpClient
@@ -341,6 +345,16 @@ class HttpClient extends AbstractScript
                         $body = $data !== null ? "$data" : "$this->data";
                         break;
 
+                    case 'XML':
+                        $connect->setRequestProperty('Content-Type', 'text/xml');
+                        if ($data instanceof DomDocument) {
+                            $xml = new XmlProcessor();
+                            $data = $xml->format($data);
+                        }
+
+                        $body = $data !== null ? "$data" : "$this->data";
+                        break;
+
                     case 'URLENCODE':
                         $connect->setRequestProperty('Cache-Control', 'no-cache');
                         $connect->setRequestProperty('Content-Type', 'application/x-www-form-urlencoded');
@@ -421,29 +435,44 @@ class HttpClient extends AbstractScript
 
         $body = null;
 
-        switch ($this->responseType) {
-            case 'JSON':
-                $data = $inStream->readFully();
-                try {
-                    $body = (new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS))->parse($data);
-                } catch (\php\format\ProcessorException $e) {
-                    $response->statusCode(400);
-                    $response->statusMessage($e->getMessage());
-                }
+        try {
+            switch ($this->responseType) {
+                case 'JSON':
+                    $data = $inStream->readFully();
+                    try {
+                        $body = (new JsonProcessor(JsonProcessor::DESERIALIZE_AS_ARRAYS))->parse($data);
+                    } catch (\php\format\ProcessorException $e) {
+                        $response->statusCode(400);
+                        $response->statusMessage($e->getMessage());
+                    }
 
-                break;
+                    break;
 
-            case 'TEXT':
-                $data = $inStream->readFully();
-                $body = $data;
-                break;
+                case 'TEXT':
+                    $data = $inStream->readFully();
+                    $body = $data;
+                    break;
 
-            case 'STREAM':
-                $body = $inStream;
-                break;
+                case 'XML':
+                    try {
+                        $data = $inStream->readFully();
+                        $body = (new XmlProcessor())->parse($data);
+                    } catch (ProcessorException $e) {
+                        $response->statusCode(400);
+                        $response->statusMessage($e->getMessage());
+                    }
+                    break;
+
+                case 'STREAM':
+                    $body = $inStream;
+                    break;
+            }
+
+            $response->body($body);
+        } catch (SocketException | IOException $e) {
+            $response->statusCode(500);
+            $response->statusMessage($e->getMessage());
         }
-
-        $response->body($body);
 
         try {
             if ($response->statusCode() != 500) {

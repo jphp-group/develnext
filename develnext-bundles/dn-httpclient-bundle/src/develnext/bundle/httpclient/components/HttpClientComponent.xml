@@ -15,6 +15,7 @@
             <variants>
                 <variant value="NONE">Пустота</variant>
                 <variant value="JSON">Json</variant>
+                <variant value="XML">XML / SOAP</variant>
                 <variant value="URLENCODE">Простая форма (form/urlencoded)</variant>
                 <variant value="MULTIPART">Форма с файлами (multipart)</variant>
                 <variant value="TEXT">Текст (raw)</variant>
@@ -25,6 +26,7 @@
                 <variant value="JSON">Json</variant>
                 <variant value="STREAM">Stream поток</variant>
                 <variant value="TEXT">Текст</variant>
+                <variant value="XML">XML Документ</variant>
             </variants>
         </property>
         <property code="connectTimeout" name="Таймаут соединения" editor="integer" tooltip="Максимальное время ожидания отклика по ссылке в млсек." />

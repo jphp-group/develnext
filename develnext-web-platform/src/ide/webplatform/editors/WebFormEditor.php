@@ -57,7 +57,7 @@ class WebFormEditor extends FormEditor
 
     public function getRefactorRenameNodeType()
     {
-        return parent::getRefactorRenameNodeType();
+        return 'WEB_FORM_FORMAT_ELEMENT_ID';
     }
 
     protected function makeDesigner($fullArea = false)

@@ -1,6 +1,8 @@
 <?php
 namespace php\gui;
 
+use framework\core\Component;
+use framework\core\Event;
 use php\framework\Logger;
 use php\gui\animation\UXAnimationTimer;
 use php\gui\event\UXEvent;
@@ -133,6 +135,8 @@ class UXNodeWrapper
                         $handler(UXEvent::makeMock($this->node));
                     } else if ($this->node instanceof AbstractScript) {
                         $handler(new ScriptEvent($this->node));
+                    } else if ($this->node instanceof Component) {
+                        $handler(new Event('construct', $this->node));
                     } else {
                         $handler();
                     }

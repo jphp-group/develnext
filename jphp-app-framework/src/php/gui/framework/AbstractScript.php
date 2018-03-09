@@ -4,6 +4,7 @@ namespace php\gui\framework;
 use php\gui\event\UXEvent;
 use php\gui\UXForm;
 use php\lang\IllegalArgumentException;
+use php\lang\Invoker;
 use php\lib\reflect;
 
 
@@ -13,6 +14,7 @@ use php\lib\reflect;
  * @package php\gui\framework
  *
  *
+ * @deprecated
  * @packages framework
  */
 abstract class AbstractScript

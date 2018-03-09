@@ -11,6 +11,7 @@ use php\gui\UXNodeWrapper;
 use php\gui\UXWindow;
 use php\lang\IllegalArgumentException;
 use php\lang\IllegalStateException;
+use php\lib\arr;
 use php\lib\items;
 use php\lib\str;
 use php\util\Scanner;
@@ -94,6 +95,11 @@ class EventBinder
                         );
                     }
                     $methodName = $method->getName();
+                    $firstParam = $method->getParameters()[0];
+
+                    if ($firstParam && $firstParam->getType() && $firstParam->getType()->getName() === ScriptEvent::class) {
+
+                    }
 
                     $events[$event] = $methodName;
 
@@ -213,7 +219,7 @@ class EventBinder
     {
         $parts = Str::split($event, '.');
 
-        $eventName = items::pop($parts);
+        $eventName = arr::pop($parts);
 
         if ($parts) {
             $id = Str::join($parts, '.');
