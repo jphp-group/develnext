@@ -1,6 +1,7 @@
 package org.develnext.jphp.ext.javafx.bind;
 
 import javafx.scene.paint.Color;
+import org.develnext.jphp.ext.image.classes.PColor;
 import org.develnext.jphp.ext.javafx.classes.paint.UXColor;
 import php.runtime.Memory;
 import php.runtime.env.Environment;
@@ -18,6 +19,11 @@ public class ColorMemoryOperation extends MemoryOperation<Color> {
     public Color convert(Environment env, TraceInfo trace, Memory arg) throws Throwable {
         if (arg.instanceOf(UXColor.class)) {
             return arg.toObject(UXColor.class).getWrappedObject();
+        }
+
+        if (arg.instanceOf(PColor.class)) {
+            java.awt.Color c = arg.toObject(PColor.class).getColor();
+            return Color.rgb(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
         }
 
         try {

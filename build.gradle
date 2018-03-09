@@ -126,6 +126,7 @@ project(':jphp-gui-ext') {
     dependencies {
         compile "org.develnext.jphp:jphp-core:$jphpVersion"
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-graphic-ext:$jphpVersion"
     }
 }
 
@@ -195,10 +196,6 @@ project(':develnext') {
         compile project(':develnext-js-platform')
         compile project(':develnext-web-platform')
 
-        if (new File("./develnext-control/build.gradle").exists()) {
-            compile project(':develnext-control')
-        }
-
         // bundles.
         provided project(':develnext-bundles/dn-httpclient-bundle')
         provided project(':develnext-bundles/dn-jsoup-bundle')
@@ -213,7 +210,6 @@ project(':develnext') {
         provided project(':develnext-bundles/dn-hotkey-bundle')
         provided project(':jphp-zip-ext/dn-zip-bundle')
         provided project(':develnext-bundles/dn-jfoenix-bundle')
-        //provided project(':develnext-bundles/dn-controlfx-bundle')
 
         // stubs.
         compile project(':develnext-stubs/dn-php-sdk')

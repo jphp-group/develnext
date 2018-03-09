@@ -1,6 +1,7 @@
 <?php
 namespace php\gui;
 
+use php\graphic\Image;
 use php\gui\paint\UXColor;
 use php\io\File;
 use php\io\Stream;
@@ -13,8 +14,6 @@ use php\io\Stream;
  */
 class UXImage
 {
-
-
     /**
      * Ширина картинки.
      * @readonly
@@ -37,7 +36,7 @@ class UXImage
     public $progress;
 
     /**
-     * @param Stream|string $stream
+     * @param Stream|string|Image $stream
      * @param $requiredWidth (optional)
      * @param $requiredHeight (optional)
      * @param bool $proportional
@@ -92,6 +91,24 @@ class UXImage
      * @param string $format
      */
     public function save($to, $format = 'png')
+    {
+    }
+
+    /**
+     * Convert to native image.
+     * @return null|Image
+     */
+    public function toNative(): ?Image
+    {
+    }
+
+    /**
+     * Create from native image.
+     *
+     * @param Image $image
+     * @return UXImage
+     */
+    public static function ofNative(Image $image): ?UXImage
     {
     }
 

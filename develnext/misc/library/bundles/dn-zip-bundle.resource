@@ -13,3 +13,5 @@ class=develnext\\bundle\\zip\\ZipBundle
 author=DevelNext, Dmitriy Zayceff
 
 version=1.0
+
+support=desktop|web

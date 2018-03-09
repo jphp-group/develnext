@@ -38,9 +38,9 @@ class UXImageView extends UXNode
 
     /**
      * UXImageView constructor.
-     * @param UXImage|null $image
+     * @param UXImage|string|null $image
      */
-    public function __construct(UXImage $image = null)
+    public function __construct($image = null)
     {
     }
 }

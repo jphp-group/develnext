@@ -2,7 +2,6 @@
 include 'develnext-designer';
 
 include 'jphp-gui-ext',
-        'jphp-gui-controlfx-ext',
         'jphp-gui-jfoenix-ext',
         'jphp-desktop-ext',
         'jphp-desktop-hotkey-ext',
@@ -35,7 +34,6 @@ include 'develnext-bundles/dn-game2d-bundle'
 include 'develnext-bundles/dn-systemtray-bundle'
 include 'develnext-bundles/dn-hotkey-bundle'
 include 'develnext-bundles/dn-jfoenix-bundle'
-include 'develnext-bundles/dn-controlfx-bundle'
 
 // stubs
 include 'develnext-stubs/dn-php-sdk'
@@ -45,3 +43,5 @@ include 'develnext-stubs/dn-zend-php-sdk'
 include 'jphp-zip-ext'
 include 'jphp-zip-ext/jphp-zip-ext'
 include 'jphp-zip-ext/dn-zip-bundle'
+
+include 'sandbox'

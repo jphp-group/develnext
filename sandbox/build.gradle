@@ -1,0 +1,7 @@
+sourceSets {
+    main.resources.srcDirs = ['src']
+}
+
+dependencies {
+    compile project(':jphp-gui-ext')
+}

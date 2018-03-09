@@ -95,6 +95,7 @@ public class JavaFXExtension extends Extension {
         registerMemoryOperation(InsetsMemoryOperation.class);
         registerMemoryOperation(DurationMemoryOperation.class);
         registerMemoryOperation(ColorMemoryOperation.class);
+        registerMemoryOperation(ImageMemoryOperation.class);
         registerMemoryOperation(Rectangle2DMemoryOperation.class);
         registerMemoryOperation(BoundsMemoryOperation.class);
         registerMemoryOperation(IndexRangeMemoryOperation.class);

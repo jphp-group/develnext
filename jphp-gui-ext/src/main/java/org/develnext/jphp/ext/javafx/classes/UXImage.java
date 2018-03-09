@@ -5,13 +5,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import org.develnext.jphp.ext.image.classes.PImage;
 import org.develnext.jphp.ext.javafx.JavaFXExtension;
+import php.runtime.Memory;
 import php.runtime.annotation.Reflection;
 import php.runtime.annotation.Reflection.Property;
 import php.runtime.annotation.Reflection.Signature;
 import php.runtime.env.Environment;
 import php.runtime.ext.core.classes.stream.Stream;
 import php.runtime.lang.BaseWrapper;
+import php.runtime.memory.support.MemoryOperation;
 import php.runtime.reflection.ClassEntity;
 
 import javax.imageio.ImageIO;
@@ -44,22 +47,36 @@ public class UXImage extends BaseWrapper<Image> {
     }
 
     @Signature
-    public void __construct(Environment env, InputStream is) throws IOException {
-        __wrappedObject = new Image(is);
-
-        Stream.closeStream(env, is);
+    public void __construct(Environment env, Memory arg) throws IOException {
+        if (arg.instanceOf(PImage.class)) {
+            __wrappedObject = SwingFXUtils.toFXImage(arg.toObject(PImage.class).getImage(), null);
+        } else {
+            InputStream is = Stream.getInputStream(env, arg);
+            try {
+                __wrappedObject = new Image(is);
+            } finally {
+                Stream.closeStream(env, is);
+            }
+        }
     }
 
     @Signature
-    public void __construct(Environment env, InputStream is, double requiredWidth, double requiredHeight) throws IOException {
+    public void __construct(Environment env, Memory is, double requiredWidth, double requiredHeight) throws IOException {
         __construct(env, is, requiredWidth, requiredHeight, true);
     }
 
     @Signature
-    public void __construct(Environment env, InputStream is, double requiredWidth, double requiredHeight, boolean proportional) throws IOException {
-        __wrappedObject = new Image(is, requiredWidth, requiredHeight, proportional, false);
-
-        Stream.closeStream(env, is);
+    public void __construct(Environment env, Memory arg, double requiredWidth, double requiredHeight, boolean proportional) throws IOException {
+        if (arg.instanceOf(PImage.class)) {
+            __wrappedObject = SwingFXUtils.toFXImage(arg.toObject(PImage.class).resize((int) requiredWidth, (int) requiredHeight).getImage(), null);
+        } else {
+            InputStream is = Stream.getInputStream(env, arg);
+            try {
+                __wrappedObject = new Image(is, requiredWidth, requiredHeight, proportional, false);
+            } finally {
+                Stream.closeStream(env, is);
+            }
+        }
     }
 
     @Signature
@@ -106,6 +123,33 @@ public class UXImage extends BaseWrapper<Image> {
     @Signature
     public void save(OutputStream stream) throws IOException {
         save(stream, "png");
+    }
+
+    @Signature
+    public Memory toNative(Environment env) throws Throwable {
+        MemoryOperation operation = MemoryOperation.get(BufferedImage.class, null);
+
+        if (operation != null) {
+            BufferedImage image = SwingFXUtils.fromFXImage(this.getWrappedObject(), null);
+            image = convertToCompatible(image);
+
+            return operation.unconvert(env, env.trace(), image);
+        } else {
+            return Memory.NULL;
+        }
+    }
+
+    @Signature
+    public static UXImage ofNative(Environment env, Memory memory) throws Throwable {
+        MemoryOperation operation = MemoryOperation.get(BufferedImage.class, null);
+
+        if (operation != null) {
+            BufferedImage convert = (BufferedImage) operation.convert(env, env.trace(), memory);
+            WritableImage image = SwingFXUtils.toFXImage(convert, null);
+            return new UXImage(env, image);
+        }
+
+        return null;
     }
 
     public static BufferedImage convertToCompatible(BufferedImage image) {
