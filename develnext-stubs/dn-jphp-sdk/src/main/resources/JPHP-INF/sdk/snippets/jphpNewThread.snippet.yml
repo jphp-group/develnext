@@ -1,0 +1,9 @@
+
+id: jphpNewThread_block
+
+name: thread { ... }
+description:
+  en: Create new thread with callback
+  ru: Создать новый поток с функцией-обработчиком
+
+code: new Thread(fn => {#});

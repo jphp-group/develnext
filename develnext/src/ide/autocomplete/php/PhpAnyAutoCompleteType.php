@@ -2,6 +2,7 @@
 namespace ide\autocomplete\php;
 
 use develnext\lexer\inspector\AbstractInspector;
+use framework\localization\TranslationText;
 use ide\autocomplete\AutoComplete;
 use ide\autocomplete\AutoCompleteInsert;
 use ide\autocomplete\AutoCompleteRegion;
@@ -283,7 +284,7 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
     public function getStatements(AutoComplete $context, AutoCompleteRegion $region)
     {
         if (in_array($this->kind, ['~any'])) {
-            return [
+            $result = [
                 new StatementAutoCompleteItem('if', 'Условие (если)', 'if (#)'),
                 new StatementAutoCompleteItem('else', 'Иначе ...', 'else '),
                 new StatementAutoCompleteItem('elseif', 'Иначе если ...', 'elseif (#)'),
@@ -292,6 +293,7 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                 new StatementAutoCompleteItem('while', 'Цикл', 'while (#)'),
                 new StatementAutoCompleteItem('do', 'Цикл', 'do { '),
                 new StatementAutoCompleteItem('function', 'Объявление функции', 'function '),
+                new StatementAutoCompleteItem('fn', 'Анонимная функция (короткий синтаксис)', 'fn'),
                 new StatementAutoCompleteItem('class', 'Объявление класса', 'class '),
                 new StatementAutoCompleteItem('namespace', 'Объявление пространства имен', 'namespace '),
                 new StatementAutoCompleteItem('use', 'Подключение класса', 'use '),
@@ -345,6 +347,14 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
                 new StatementAutoCompleteItem('or', 'Логическое ИЛИ', 'or'),
                 new StatementAutoCompleteItem('xor', '', 'xor'),
             ];
+
+            foreach ($this->inspector->getSnippets() as $snippet) {
+                $desc = new TranslationText($snippet->description);
+
+                $result[] = new StatementAutoCompleteItem($snippet->name, $desc->get(Ide::get()->getLanguage()->getCode()), $snippet->code, 'icons/script16.png');
+            }
+
+            return $result;
         }
 
         return [];

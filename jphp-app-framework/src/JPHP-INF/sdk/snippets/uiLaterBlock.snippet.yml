@@ -1,0 +1,9 @@
+
+id: uiLater_block
+
+name: uiLater { ... }
+description:
+  ru: Выполнить позже в UI потоке
+  en: Execute the code in the UI thread
+
+code: uiLater(fn => {#});

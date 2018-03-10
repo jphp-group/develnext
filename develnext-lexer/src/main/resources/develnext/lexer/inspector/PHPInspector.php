@@ -58,6 +58,10 @@ class PHPInspector extends AbstractInspector
                 $this->loadZipSource($path, $options);
                 return true;
             default:
+                if (str::endsWith($path, ".snippet.yml")) {
+                    return $this->loadSnippet($path, $options);
+                }
+
                 if (arr::has($this->extensions, fs::ext($path))) {
                     return $this->loadPhpSource($path, $path, $options);
                 } else {
@@ -78,6 +82,10 @@ class PHPInspector extends AbstractInspector
                 $this->loadZipSource($path, [], true);
                 return true;
             default:
+                if (str::endsWith($path, ".snippet.yml")) {
+                    return $this->unloadSnippet($path);
+                }
+
                 if (arr::has($this->extensions, fs::ext($path))) {
                     $this->loadPhpSource($path, $path, [], true);
                     return true;
@@ -111,7 +119,15 @@ class PHPInspector extends AbstractInspector
             foreach ($zip->statAll() as $stat) {
                 $name = $stat['name'];
 
-                if (arr::has($this->extensions, fs::ext($name))) {
+                if (str::endsWith($name, '.snippet.yml')) {
+                    $zip->read($name, function ($stat, Stream $stream) use ($name, $path, $options, $unload) {
+                        if ($unload) {
+                            $this->unloadSnippet($stream, $options);
+                        } else {
+                            $this->loadSnippet($stream, $options);
+                        }
+                    });
+                } else if (arr::has($this->extensions, fs::ext($name))) {
                     $zip->read($name, function ($stat, Stream $stream) use ($name, $path, $options, $unload) {
                         if (!$this->loadPhpSource($stream, $name, $options, $unload)) {
                             // nop.

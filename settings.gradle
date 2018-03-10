@@ -17,6 +17,7 @@ include 'develnext-control';
 include 'develnext-java-platform';
 include 'develnext-js-platform';
 include 'develnext-web-platform';
+include 'develnext-wizard-platform';
 include 'develnext-lexer';
 include 'develnext-launcher';
 

@@ -1,6 +1,7 @@
 def javaVersion = '1.8';
 def projectVersion = '0.9.3';
 def jphpVersion = "0.9.3-SNAPSHOT";
+def wizardVersion = "1.0.0-SNAPSHOT";
 
 rootProject.ext.jphpVersion = jphpVersion;
 
@@ -195,6 +196,7 @@ project(':develnext') {
         compile project(':develnext-java-platform')
         compile project(':develnext-js-platform')
         compile project(':develnext-web-platform')
+        compile project(':develnext-wizard-platform')
 
         // bundles.
         provided project(':develnext-bundles/dn-httpclient-bundle')
@@ -213,6 +215,7 @@ project(':develnext') {
 
         // stubs.
         compile project(':develnext-stubs/dn-php-sdk')
+        compile project(':develnext-stubs/dn-jphp-sdk')
         compile project(':develnext-stubs/dn-zend-php-sdk')
 
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
@@ -222,6 +225,8 @@ project(':develnext') {
         compile "org.develnext.jphp:jphp-zend-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-sql-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-debugger:$jphpVersion"
+
+        compile "org.develnext.framework:modules/wizard-localization:$wizardVersion"
 
         //compile fileTree(dir: 'libs', include: '*.jar')
     }

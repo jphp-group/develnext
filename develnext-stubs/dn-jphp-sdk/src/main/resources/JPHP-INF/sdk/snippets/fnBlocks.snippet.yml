@@ -1,0 +1,21 @@
+
+- id: jphpFnWithoutArgs_block
+
+  name: fn { ... }
+  description:
+    en: Empty lambda without arguments.
+    ru: Пустая анонимная функция без аргументов.
+
+  code: fn => {#}
+
+- id: jphpFnInline_block
+
+  name: fn() => ...
+  description:
+    en: Inline empty lambda without arguments.
+    ru: Пустая анонимная функция в одну строчку.
+
+  code: "fn() => #"
+
+
+

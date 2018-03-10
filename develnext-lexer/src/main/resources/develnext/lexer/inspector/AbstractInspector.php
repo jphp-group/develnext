@@ -1,11 +1,14 @@
 <?php
+
 namespace develnext\lexer\inspector;
 
 use develnext\lexer\inspector\entry\ConstantEntry;
 use develnext\lexer\inspector\entry\FunctionEntry;
+use develnext\lexer\inspector\entry\SnippetEntry;
 use develnext\lexer\inspector\entry\TypeEntry;
 use ide\misc\EventHandlerBehaviour;
 use ide\utils\FileUtils;
+use php\io\Stream;
 use php\lib\fs;
 
 /**
@@ -18,6 +21,11 @@ abstract class AbstractInspector
      * @var FunctionEntry[]
      */
     protected $functions = [];
+
+    /**
+     * @var SnippetEntry[]
+     */
+    protected $snippets = [];
 
     /**
      * @var TypeEntry[]
@@ -84,6 +92,63 @@ abstract class AbstractInspector
                 $this->loadSourceWithCache($filename, $options);
             }
         }, 1);
+    }
+
+    /**
+     * @param $filename
+     * @param array $options
+     * @return bool
+     */
+    public function loadSnippet($filename, array $options = [])
+    {
+        $snippets = $filename instanceof Stream ? $filename->parseAs('yml') : fs::parseAs($filename, 'yml');
+
+        if (!$snippets[0]) {
+            $snippets = [$snippets];
+        }
+
+        $load = false;
+
+        foreach ($snippets as $snippet) {
+            $entry = new SnippetEntry();
+            $entry->id = $snippet['id'];
+            $entry->name = $snippet['name'];
+            $entry->code = $snippet['code'];
+            $entry->description = $snippet['description'];
+
+            if ($entry->code && $entry->name && $entry->id) {
+                $this->putSnippet($entry);
+                $load = true;
+            }
+        }
+
+        return $load;
+    }
+
+    /**
+     * @param $path
+     * @param array $options
+     * @return bool
+     */
+    public function unloadSnippet($path, array $options = [])
+    {
+        $snippets = $path instanceof Stream ? $path->parseAs('yml') : fs::parseAs($path, 'yml');
+
+        if (!$snippets[0]) {
+            $snippets = [$snippets];
+        }
+
+        $unload = false;
+        foreach ($snippets as $snippet) {
+            $snippet = $this->snippets[$snippet['id']];
+
+            if ($snippet) {
+                unset($this->snippets[$snippet->id]);
+                $unload = true;
+            }
+        }
+
+        return $unload;
     }
 
     public function loadSourceWithCache($filename, array $options = [])
@@ -172,6 +237,11 @@ abstract class AbstractInspector
         $this->typesByShort[fs::name($entry->fulledName)] = $entry;
     }
 
+    public function putSnippet(SnippetEntry $entry)
+    {
+        $this->snippets[$entry->id] = $entry;
+    }
+
     public function putFunction(FunctionEntry $entry)
     {
         $this->functions[$entry->fulledName] = $entry;
@@ -208,6 +278,22 @@ abstract class AbstractInspector
     public function getFunctions()
     {
         return $this->functions;
+    }
+
+    /**
+     * @return SnippetEntry[]
+     */
+    public function getSnippets(): array
+    {
+        return $this->snippets;
+    }
+
+    /**
+     * @param SnippetEntry[] $snippets
+     */
+    public function setSnippets(array $snippets)
+    {
+        $this->snippets = $snippets;
     }
 
     /**
@@ -253,6 +339,15 @@ abstract class AbstractInspector
     public function findFunction($name)
     {
         return $this->functions[$name];
+    }
+
+    /**
+     * @param $name
+     * @return SnippetEntry
+     */
+    public function findSnippet($name)
+    {
+        return $this->snippets[$name];
     }
 
     public function findMethod(TypeEntry $type = null, $name)
@@ -316,6 +411,7 @@ abstract class AbstractInspector
         $this->functions = [];
         $this->typesByShort = [];
         $this->packages = [];
+        $this->snippets = [];
 
         $this->cacheTags = [];
     }
