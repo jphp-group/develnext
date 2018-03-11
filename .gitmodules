@@ -4,15 +4,9 @@
 [submodule "3rd-party/jphp"]
 	path = 3rd-party/jphp
 	url = https://github.com/jphp-compiler/jphp
-[submodule "3rd-party/DockFX"]
-	path = 3rd-party/DockFX
-	url = https://github.com/develnext/DockFX
 [submodule "jphp-zip-ext"]
 	path = jphp-zip-ext
 	url = https://github.com/jphp-compiler/jphp-zip-ext.git
-[submodule "3rd-party/Flowless"]
-	path = 3rd-party/Flowless
-	url = https://github.com/TomasMikula/Flowless.git
 [submodule "3rd-party/wizard-framework"]
 	path = 3rd-party/wizard-framework
 	url = https://github.com/jphp-compiler/wizard-framework.git
