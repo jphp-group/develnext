@@ -1,8 +1,0 @@
-<element extends="NodeFormElement">
-    <properties>
-        <property code="text" name="Текст" editor="text" />
-        <property code="promptText" name="Подсказка ввода" editor="text" />
-        <property code="font" name="Шрифт" editor="font" />
-        <property code="editable" name="Редактируемое" editor="boolean" />
-    </properties>
-</element>

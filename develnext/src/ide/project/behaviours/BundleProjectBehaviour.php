@@ -329,26 +329,6 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
 
     protected function doPreCompileUseImports($env, callable $log = null)
     {
-        $gradle = GradleProjectBehaviour::get();
-
-        if ($gradle) {
-            $config = $gradle->getConfig();
-
-            foreach ($this->getPublicBundles(true) as $bundle) {
-                $config->removeSourceSet('main.resources.srcDirs', self::VENDOR_DIRECTORY . "/{$bundle->getVendorName()}");
-            }
-
-            foreach ($this->fetchAllBundles($env) as $bundle) {
-                if ($gradle) {
-                    $config = $gradle->getConfig();
-
-                    $config->addSourceSet('main.resources.srcDirs', self::VENDOR_DIRECTORY . "/{$bundle->getVendorName()}");
-                }
-            }
-
-            $config->save();
-        }
-
         if ($this->getIdeConfigValue(self::CONFIG_BUNDLE_KEY_USE_IMPORTS, false)) {
             $withSourceMap = Project::ENV_DEV == $env;
             static $prevImports = [];
@@ -788,11 +768,7 @@ class BundleProjectBehaviour extends AbstractProjectBehaviour
      */
     public function getSourceDirectories()
     {
-        if ($gradle = GradleProjectBehaviour::get()) {
-            return arr::toList($gradle->getConfig()->getSourceSets('main.resources.srcDirs'));
-        } else {
-            return ['src_generated/', 'src'];
-        }
+        return ['src_generated/', 'src'];
     }
 
     /**

@@ -1,5 +1,0 @@
-<element extends="ProgressIndicatorFormElement">
-    <properties>
-        <property code="-fx-progress-color" editor="none" />
-    </properties>
-</element>

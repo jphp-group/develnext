@@ -1,0 +1,7 @@
+<element extends="NodeFormElement" >
+    <properties>
+        <property code="-fx-progress-color" name="Цвет" editor="color" css="1" />
+
+        <property code="progress" name="Прогресс (%)" editor="integer" />
+    </properties>
+</element>

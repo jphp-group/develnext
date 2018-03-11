@@ -1,0 +1,33 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="orientation" name="Ориентация" editor="enum">
+            <variants>
+                <variant value="HORIZONTAL">Горизонтальная</variant>
+                <variant value="VERTICAL">Вертикальная</variant>
+            </variants>
+        </property>
+        <property code="hgap" name="Горизонтальный интервал" editor="float" />
+        <property code="vgap" name="Вертикальный интервал" editor="float" />
+        <property code="alignment" name="Выравнивание" editor="position" />
+        <property code="rowValignment" name="Строчное выравнивание" editor="enum">
+            <variants>
+                <variant value="TOP">Сверху</variant>
+                <variant value="CENTER">По-центру</variant>
+                <variant value="BASELINE">От основания</variant>
+                <variant value="BOTTOM">Снизу</variant>
+            </variants>
+        </property>
+        <property code="columnHalignment" name="Колоночное выравнивание" editor="enum">
+            <variants>
+                <variant value="LEFT">Левая сторона</variant>
+                <variant value="CENTER">По-центру</variant>
+                <variant value="RIGHT">Правая сторона</variant>
+            </variants>
+        </property>
+
+        <property code="paddingTop" name="Отступ (верх)" editor="float" />
+        <property code="paddingRight" name="Отступ (право)" editor="float" />
+        <property code="paddingBottom" name="Отступ (низ)" editor="float" />
+        <property code="paddingLeft" name="Отступ (лево)" editor="float" />
+    </properties>
+</element>

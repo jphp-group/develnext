@@ -1,0 +1,24 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="image" name="Изображение" editor="image" virtual="1" nativeImage="1" dummyValue="1" />
+        <property code="hoverImage" name="Изображение наведения" editor="image" virtual="1" nativeImage="1" />
+        <property code="clickImage" name="Изображение нажатия" editor="image" virtual="1" nativeImage="1" />
+
+        <property code="autoSize" name="Авторазмер" editor="boolean" />
+        <property code="centered" name="По центру" editor="boolean" />
+        <property code="stretch" name="Растягивать" editor="boolean" />
+        <property code="proportional" name="Пропорциональность" editor="boolean" />
+        <property code="mosaic" name="Мозайка" editor="boolean" />
+        <property code="mosaicGap" name="Отступы мозайки" editor="float" />
+
+        <property code="flipX" name="Отразить по X" editor="boolean" tooltip="Отразить изображение по оси X" />
+        <property code="flipY" name="Отразить по Y" editor="boolean" tooltip="Отразить изображение по оси Y" />
+    </properties>
+
+    <properties group="text" title="Маркировка" sort="1500">
+        <property code="text" name="Текст" editor="text" />
+        <property code="font" name="Шрифт" editor="font" />
+        <property code="textColor" name="Цвет текста" editor="color" />
+        <property code="backgroundColor" name="Цвет фона" editor="color" />
+    </properties>
+</element>

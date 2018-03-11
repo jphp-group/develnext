@@ -3,26 +3,15 @@ namespace ide\commands;
 
 use develnext\bundle\game2d\Game2DBundle;
 use Dialog;
-use Files;
 use ide\editors\AbstractEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\formats\GameSpriteFormat;
-use ide\formats\ScriptModuleFormat;
-use ide\forms\BuildProgressForm;
-use ide\forms\InputMessageBoxForm;
 use ide\Ide;
-use ide\misc\AbstractCommand;
 use ide\project\behaviours\BundleProjectBehaviour;
-use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
-use php\gui\UXDialog;
-use php\io\File;
-use php\lang\Process;
 use php\lib\Str;
-use php\time\Time;
-use php\util\Regex;
 
 class CreateGameSpriteProjectCommand extends AbstractMenuCommand
 {

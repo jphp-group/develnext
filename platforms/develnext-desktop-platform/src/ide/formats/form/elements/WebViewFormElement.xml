@@ -1,0 +1,13 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="url" name="URL" editor="text" virtual="1" />
+        <property code="contextMenuEnabled" name="Контекстное меню" editor="boolean" virtual="1" />
+        <property code="style" name="CSS стиль" editor="none" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="load" name="После загрузки" kind="ActionEvent" />
+        <eventType code="running" name="Перед загрузкой" kind="ActionEvent" />
+        <eventType code="fail" name="Ошибка загрузки" kind="ActionEvent" />
+    </eventTypes>
+</element>

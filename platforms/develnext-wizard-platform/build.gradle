@@ -13,6 +13,9 @@ sourceSets {
 
 
 dependencies {
+    compile project(":platforms/develnext-php-platform")
+    compile project(":platforms/develnext-java-platform")
+
     compile "org.develnext.framework:wizard-core:1.0.0-SNAPSHOT"
     compile "org.develnext.framework:modules/wizard-ide-support:1.0.0-SNAPSHOT"
     compile "org.develnext.framework:modules/wizard-httpclient:1.0.0-SNAPSHOT"

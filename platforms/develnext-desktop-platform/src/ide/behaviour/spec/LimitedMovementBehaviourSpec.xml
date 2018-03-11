@@ -1,0 +1,11 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property code="direction" name="Направления" editor="enum">
+            <variants>
+                <variant value="ALL">Все</variant>
+                <variant value="LEFT_RIGHT">Лево + Право</variant>
+                <variant value="TOP_BOTTOM">Верх + Низ</variant>
+            </variants>
+        </property>
+    </properties>
+</behaviour>

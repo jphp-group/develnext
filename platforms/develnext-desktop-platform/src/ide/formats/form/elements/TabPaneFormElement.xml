@@ -1,0 +1,35 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="tabs" name="Табы" editor="tabs" />
+        <property code="side" name="Сторона" editor="enum">
+            <variants>
+                <variant value="TOP">Верхняя</variant>
+                <variant value="BOTTOM">Нижняя</variant>
+                <variant value="LEFT">Левая</variant>
+                <variant value="RIGHT">Правая</variant>
+            </variants>
+        </property>
+        <property code="tabClosingPolicy" name="Закрытие табов" editor="enum">
+            <variants>
+                <variant value="SELECTED_TAB">Для активного</variant>
+                <variant value="ALL_TABS">Для всех</variant>
+                <variant value="UNAVAILABLE">Отключить</variant>
+            </variants>
+        </property>
+        <property code="draggable" name="Перетаскивание" editor="enum" virtual="1">
+            <variants>
+                <variant value="NONE">Нет</variant>
+                <variant value="ALL">Все табы</variant>
+                <variant value="ALL_EXCLUDE_FIRST">Все табы, кроме первого</variant>
+                <variant value="ALL_EXCLUDE_LAST">Все табы, кроме последнего</variant>
+                <variant value="ALL_EXCLUDE_FIRST_LAST">Все табы, кроме первого и последнего</variant>
+            </variants>
+        </property>
+    </properties>
+
+    <eventTypes>
+        <eventType code="change" name="Переход по табам" kind="ActionEvent" icon="icons/ok16.png" />
+        <eventType code="closeRequest" name="Перед закрытием таба" kind="ActionEvent" />
+        <eventType code="close" name="После закрытия таба" kind="ActionEvent" />
+    </eventTypes>
+</element>

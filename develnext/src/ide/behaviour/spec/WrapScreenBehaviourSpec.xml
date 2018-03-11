@@ -1,8 +1,0 @@
-<behaviour extends="BehaviourSpec">
-    <properties>
-        <property code="wrapLeft" name="Огибать слева?" editor="boolean" />
-        <property code="wrapRight" name="Огибать справа?" editor="boolean" />
-        <property code="wrapTop" name="Огибать сверху?" editor="boolean" />
-        <property code="wrapBottom" name="Огибать снизу?" editor="boolean" />
-    </properties>
-</behaviour>

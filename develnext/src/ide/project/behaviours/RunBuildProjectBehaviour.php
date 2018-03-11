@@ -2,21 +2,16 @@
 namespace ide\project\behaviours;
 
 use ide\build\AntOneJarBuildType;
-use ide\build\OneJarBuildType;
 use ide\build\SetupWindowsApplicationBuildType;
 use ide\build\WindowsApplicationBuildType;
 use ide\commands\BuildProjectCommand;
 use ide\commands\ExecuteProjectCommand;
 use ide\Ide;
-use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
-use ide\project\Project;
 use ide\utils\FileUtils;
-use php\io\File;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
-use php\util\Flow;
 
 /**
  * Class RunBuildProjectBehaviour
@@ -57,11 +52,7 @@ class RunBuildProjectBehaviour extends AbstractProjectBehaviour
      */
     public function getSourceDirectories()
     {
-        if ($gradle = GradleProjectBehaviour::get()) {
-            return arr::toList($gradle->getConfig()->getSourceSets('main.resources.srcDirs'));
-        } else {
-            return ['src_generated/', 'src'];
-        }
+        return ['src_generated/', 'src'];
     }
 
     /**

@@ -1,0 +1,8 @@
+<element extends="ButtonBaseFormElement">
+    <properties group="style" title="Стиль" sort="100">
+        <property code="color" name="Основной" editor="color" />
+        <property code="hoverColor" name="При наведении" editor="color" />
+        <property code="clickColor" name="При клике" editor="color" />
+        <property code="borderRadius" name="Радиус закругления" editor="float" />
+    </properties>
+</element>

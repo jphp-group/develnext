@@ -1,0 +1,8 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="columns" name="Колонки" editor="tableViewColumns" />
+        <property code="fixedCellSize" name="Размер ячеек" editor="integer" tooltip="Фиксированный размер ячеек" />
+        <property code="constrainedResizePolicy" name="Авторазмер колонок" editor="boolean" tooltip="Подгонять размеры колонок под ширину таблицы" />
+        <property code="tableMenuButtonVisible" name="Меню таблицы" editor="boolean" tooltip="Кнопка с меню для управления колонками таблицы" />
+    </properties>
+</element>

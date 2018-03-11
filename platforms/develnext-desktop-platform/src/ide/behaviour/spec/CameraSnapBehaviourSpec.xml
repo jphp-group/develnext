@@ -1,0 +1,11 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property code="direction" name="Направление" editor="enum" tooltip="В каких направлениях следовать за камерой?">
+            <variants>
+                <variant value="ALL">Любое</variant>
+                <variant value="HORIZONTAL">Горизонтальное</variant>
+                <variant value="VERTICAL">Вертикальное</variant>
+            </variants>
+        </property>
+    </properties>
+</behaviour>

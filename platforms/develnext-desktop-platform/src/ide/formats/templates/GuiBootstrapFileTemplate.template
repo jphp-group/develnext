@@ -1,0 +1,17 @@
+<?php
+
+// Generated.
+
+use php\framework\FrameworkPackageLoader;
+use php\gui\framework\Application;
+
+#BEFORE_CODE#
+
+$packageLoader = new FrameworkPackageLoader();
+$packageLoader->register();
+
+$app = new Application();
+#INNER_CODE#
+$app->launch();
+
+#AFTER_CODE#

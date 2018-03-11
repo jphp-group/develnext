@@ -1,5 +1,0 @@
-<element extends="TextInputControlFormElement">
-    <properties>
-        <property code="alignment" name="Выравнивание" editor="position" />
-    </properties>
-</element>

@@ -1,7 +1,0 @@
-<element extends="LabeledFormElement">
-    <properties>
-        <property code="animated" name="Анимированный" editor="boolean" />
-        <property code="collapsible" name="Сворачиваемый" editor="boolean" />
-        <property code="expanded" name="Открытый" editor="boolean" />
-    </properties>
-</element>

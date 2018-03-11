@@ -1,0 +1,13 @@
+<behaviour extends="BehaviourSpec">
+    <properties>
+        <property name="Интервал" code="duration" editor="integer" />
+        <property name="Задержка" code="delay" editor="integer" />
+        <property name="Когда запускать" code="when" editor="enum" tooltip="Когда применять анимацию">
+            <variants>
+                <variant value="ALWAYS">При старте</variant>
+                <variant value="HOVER">При наведении</variant>
+                <variant value="CLICK">При клике</variant>
+            </variants>
+        </property>
+    </properties>
+</behaviour>

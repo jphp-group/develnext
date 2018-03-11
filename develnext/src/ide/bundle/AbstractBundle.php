@@ -2,17 +2,11 @@
 namespace ide\bundle;
 
 use ide\library\IdeLibraryBundleResource;
-use ide\Logger;
-use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\Project;
 use ide\project\ProjectModule;
 use ide\VendorContainer;
-use php\io\IOException;
-use php\io\Stream;
 use php\lib\reflect;
-use php\lib\str;
 use php\util\Configuration;
-use php\util\Scanner;
 
 /**
  * Class AbstractBundle

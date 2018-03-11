@@ -1,0 +1,6 @@
+<behaviour extends="AnimationBehaviourSpec">
+    <properties>
+        <property name="Смещение по X" code="offsetX" editor="integer" />
+        <property name="Смещение по Y" code="offsetY" editor="integer" />
+    </properties>
+</behaviour>

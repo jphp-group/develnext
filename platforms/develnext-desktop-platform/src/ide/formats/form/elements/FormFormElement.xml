@@ -1,0 +1,59 @@
+<element>
+    <properties group="bindings" title="Функционал">
+        <property code="modules" name="Модули" editor="moduleList" tooltip="Подключенные модули к форме" formConfig="1" />
+        <property code="form.withPrototypes" name="Для прототипов" editor="boolean" tooltip="Возможность использовать компоненты формы как прототипы в других формах" formConfig="1" />
+    </properties>
+
+    <properties group="general" title="Главное">
+        <property code="form.title" name="Заголовок" editor="text" tooltip="Заголовок окна" formConfig="1" />
+        <property code="form.alwaysOnTop" name="Поверх всех окон" editor="boolean" formConfig="1" tooltip="Всегда отображать окно поверх всех других окон" />
+        <property code="form.resizable" name="Изменяемые размеры" editor="boolean" formConfig="1" defaultValue="1"
+                  tooltip="Возможность изменять размеры окна - высоту и ширину" />
+
+        <property code="form.maximized" name="На весь экран" editor="boolean" formConfig="1" tooltip="Раскрытость окна на весь экран при создании" />
+
+        <property code="form.style" name="Стиль" editor="enum" formConfig="1" defaultValue="DECORATED">
+            <variants>
+                <variant value="DECORATED">Стандарт</variant>
+                <variant value="UNDECORATED">Без рамок</variant>
+                <variant value="TRANSPARENT">Прозрачный</variant>
+                <variant value="UTILITY">Утилита</variant>
+                <variant value="WIDGET">Виджет</variant>
+            </variants>
+        </property>
+        <property code="form.modality" name="Модальность" editor="boolean" formConfig="1" defaultValue="0" />
+        <property code="form.icon" name="Иконка" editor="image" formConfig="1" defaultValue="" />
+    </properties>
+    <properties group="extra" title="Дополнительно">
+        <property code="form.backgroundColor" realCode="backgroundColor" name="Цвет фона" editor="color" formConfig="1" defaultValue="" />
+        <property code="classesString" name="CSS класс(ы)" editor="text" tooltip="Класс или несколько классов через пробел" />
+
+        <property code="size" name="Размеры (W, H)" editor="doubleArray" tooltip="Размеры, ширина (width) + высота (height)" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="click" name="Клик мышки" kind="MouseParamEvent" icon="icons/mouseEx16.png" />
+
+        <eventType code="mouseDown" name="Нажатие мышки" kind="MouseParamEvent" icon="icons/mouse16.png" />
+        <eventType code="mouseUp" name="Отжатие мышки" kind="MouseParamEvent" icon="icons/mouse16.png" />
+
+        <eventType code="mouseDrag" name="Таскание курсора" kind="MouseEvent" icon="icons/drag16.png" />
+        <eventType code="mouseMove" name="Движение курсора" kind="MouseEvent" icon="icons/cursor16.png" />
+
+        <eventType code="mouseEnter" name="Курсор на объекте" kind="MouseEvent" icon="icons/cursor16.png" />
+        <eventType code="mouseExit" name="Курсор вне объекта" kind="MouseEvent" icon="icons/cursor16.png" />
+
+        <eventType code="showing" name="Перед появлением" kind="WindowEvent" />
+        <eventType code="show" name="Появление" kind="WindowEvent" />
+        <eventType code="hide" name="Скрытие" kind="WindowEvent" />
+        <eventType code="close" name="Закрытие" kind="WindowEvent" />
+
+        <eventType code="keyDown" name="Нажатие клавиши" kind="KeyParamEvent" icon="icons/key16.png" />
+        <eventType code="keyUp" name="Отжатие клавиши" kind="KeyParamEvent" icon="icons/key16.png" />
+        <eventType code="keyPress" name="Клавиатура" kind="KeyEvent" icon="icons/keyboard16.png" />
+
+        <eventType code="scroll" name="Прокрутка" kind="ScrollParamEvent" icon="icons/scroll16.png" />
+
+        <eventType code="construct" name="Загрузка формы" kind="ActionEvent"  icon="icons/loadingEvent16.png" />
+    </eventTypes>
+</element>

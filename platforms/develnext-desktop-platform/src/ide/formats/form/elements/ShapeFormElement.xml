@@ -1,0 +1,10 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="smooth" name="Сглаживание" editor="boolean" />
+        <property code="fillColor" name="Цвет заливки" editor="color" />
+        <property code="strokeColor" name="Цвет оконтовки" editor="color" />
+        <property code="strokeWidth" name="Ширина оконтовки" editor="float" />
+
+        <property code="anchorFlags" editor="none" />
+    </properties>
+</element>

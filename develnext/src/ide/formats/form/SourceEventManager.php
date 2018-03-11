@@ -23,6 +23,8 @@ use phpx\parser\SourceTokenizer;
 /**
  * Class SourceEventManager
  * @package ide\formats\form
+ *
+ * TODO move to other namespace.
  */
 class SourceEventManager
 {

@@ -1,0 +1,6 @@
+<element extends="ComboBoxBaseFormElement">
+    <properties>
+        <property code="visibleRowCount" name="Количество видимых пунктов" editor="integer" />
+        <property code="items" name="Список" editor="stringList" />
+    </properties>
+</element>

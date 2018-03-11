@@ -15,6 +15,7 @@
 settings.xml
 
 /.gradle/
+
 build/
 
 gradle.properties

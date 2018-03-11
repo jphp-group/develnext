@@ -5,22 +5,13 @@ use ide\editors\AbstractEditor;
 use ide\editors\FormEditor;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\formats\GuiFormFormat;
-use ide\forms\BuildProgressForm;
-use ide\forms\InputMessageBoxForm;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
-use ide\misc\AbstractCommand;
-use ide\project\behaviours\GradleProjectBehaviour;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
 use ide\project\ProjectTree;
 use ide\systems\FileSystem;
 use ide\utils\FileUtils;
-use php\gui\UXDialog;
-use php\lang\Process;
-use php\lib\fs;
 use php\lib\Str;
-use php\time\Time;
-use php\util\Regex;
 
 class CreateFormProjectCommand extends AbstractMenuCommand
 {

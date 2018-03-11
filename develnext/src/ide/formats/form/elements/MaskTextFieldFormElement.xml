@@ -1,8 +1,0 @@
-<element extends="TextInputControlFormElement">
-    <properties>
-        <property code="text" editor="none" />
-        <property code="plainText" name="Текст" editor="text" />
-        <property code="mask" name="Маска" editor="text" />
-        <property code="placeholder" name="Плейсхолдер" editor="text" />
-    </properties>
-</element>

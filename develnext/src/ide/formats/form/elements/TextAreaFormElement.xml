@@ -1,5 +1,0 @@
-<element extends="TextInputControlFormElement">
-    <properties>
-        <property code="wrapText" name="Автоперенос" editor="boolean" />
-    </properties>
-</element>

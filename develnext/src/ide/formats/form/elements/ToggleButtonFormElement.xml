@@ -1,7 +1,0 @@
-<element extends="ButtonBaseFormElement">
-    <properties>
-        <property code="selected" name="Выделенный" editor="boolean" />
-        <property code="toggleGroup" name="Код группы" description="Код группы, чтобы объединить несколько переключателей"
-                  editor="text" virtual="1" />
-    </properties>
-</element>

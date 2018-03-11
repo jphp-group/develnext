@@ -1,7 +1,0 @@
-<behaviour extends="AnimationBehaviourSpec">
-    <properties>
-        <property name="Задержка" code="delay" editor="integer" tooltip="Через сколько млсек объект будет уничтожен" />
-        <property name="Интервал анимации" code="duration" editor="integer" />
-        <property name="Анимировать" code="animated" editor="boolean" tooltip="Уничтожение через плавное исчезание объекта" />
-    </properties>
-</behaviour>

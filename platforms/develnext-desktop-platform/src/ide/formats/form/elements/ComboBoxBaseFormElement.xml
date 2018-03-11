@@ -1,0 +1,10 @@
+<element extends="NodeFormElement">
+    <properties>
+        <property code="value" name="Значение" editor="text" />
+        <property code="promptText" name="Подсказка" editor="text" />
+        <property code="editable" name="Редактируемое" editor="boolean" />
+    </properties>
+    <eventTypes>
+        <eventType code="action" name="Действие" kind="ActionEvent" icon="icons/ok16.png" />
+    </eventTypes>
+</element>

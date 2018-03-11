@@ -1,6 +1,0 @@
-<element extends="ButtonBaseFormElement">
-  <properties>
-      <property code="textColor" editor="none" />
-      <property code="underline" editor="none" />
-  </properties>
-</element>

@@ -4,38 +4,25 @@ namespace ide\project\control;
 
 use ide\editors\AbstractEditor;
 use ide\editors\CodeEditor;
-use ide\editors\CodeEditorX;
 use ide\editors\menu\AbstractMenuCommand;
 use ide\editors\menu\ContextMenu;
 use ide\entity\ProjectSkin;
 use ide\forms\MessageBoxForm;
 use ide\Ide;
 use ide\Logger;
-use ide\misc\SeparatorCommand;
 use ide\misc\SimpleSingleCommand;
 use ide\project\behaviours\gui\SkinManagerForm;
 use ide\project\behaviours\gui\SkinSaveDialogForm;
 use ide\project\behaviours\GuiFrameworkProjectBehaviour;
-use ide\project\Project;
 use ide\utils\FileUtils;
-use ide\utils\StrUtils;
 use ide\utils\UiUtils;
-use php\gui\designer\UXCssCodeArea;
-use php\gui\designer\UXSyntaxTextArea;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
 use php\gui\text\UXFont;
-use php\gui\UXApplication;
-use php\gui\UXFileChooser;
 use php\gui\UXLabel;
 use php\gui\UXNode;
-use php\gui\layout\UXAnchorPane;
 use php\gui\UXSeparator;
-use php\lang\System;
 use php\lib\fs;
-use php\lib\str;
-use php\util\Configuration;
-use php\util\Regex;
 
 /**
  * @package ide\project\control

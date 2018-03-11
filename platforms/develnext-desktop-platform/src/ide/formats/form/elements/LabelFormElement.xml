@@ -1,0 +1,12 @@
+<element extends="LabeledFormElement">
+    <properties>
+        <property code="autoSize" name="Авторазмер" editor="boolean" />
+        <property code="autoSizeType" name="Тип авторазмера" editor="enum">
+            <variants>
+                <variant value="ALL">Все направления</variant>
+                <variant value="HORIZONTAL">По горизонтали</variant>
+                <variant value="VERTICAL">По вертикали</variant>
+            </variants>
+        </property>
+    </properties>
+</element>
