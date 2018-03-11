@@ -1,9 +1,0 @@
-<element extends="NodeFormElement">
-    <properties>
-        <property code="image" name="Изображение" editor="image" virtual="1" nativeImage="1" dummyValue="1" />
-        <property code="autoSize" name="Авторазмер" editor="boolean" />
-
-        <property code="velocityX" name="Скорость (Гориз.)" editor="float" tooltip="Скорость перемещения фона по X" virtual="1" />
-        <property code="velocityY" name="Скорость (Верт.)" editor="float" tooltip="Скорость перемещения фона по Y" virtual="1" />
-    </properties>
-</element>

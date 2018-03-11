@@ -1,0 +1,16 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="checkInterval" value="10000" />
+    </init>
+
+    <properties>
+        <property code="url" name="Сайт (http://)" editor="text" tooltip="" />
+        <property code="checkInterval" name="Интервал проверок" editor="integer" tooltip="Интервал в млсек для проверок сайта" />
+        <property code="autoStart" name="Автостарт" editor="boolean" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="online" name="Онлайн" kind="ObjectEvent" icon="develnext/bundle/httpclient/online16.png" />
+        <eventType code="offline" name="Оффлайн" kind="ObjectEvent" icon="develnext/bundle/httpclient/offline16.png" />
+    </eventTypes>
+</element>

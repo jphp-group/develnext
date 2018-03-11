@@ -150,30 +150,24 @@ project(':develnext') {
         compile project(':jphp-gui-richtext-ext')
         compile project(':jphp-app-framework')
         compile project(':develnext-doc')
-        compile project(':develnext-java-platform')
-        compile project(':develnext-js-platform')
-        compile project(':develnext-web-platform')
-        compile project(':develnext-wizard-platform')
 
-        // bundles.
-        provided project(':develnext-bundles/dn-httpclient-bundle')
-        provided project(':develnext-bundles/dn-jsoup-bundle')
-        provided project(':develnext-bundles/dn-mail-bundle')
-        provided project(':develnext-bundles/dn-sql-bundle')
-        provided project(':develnext-bundles/dn-sqlite-bundle')
-        provided project(':develnext-bundles/dn-mysql-bundle')
-        provided project(':develnext-bundles/dn-pgsql-bundle')
-        provided project(':develnext-bundles/dn-firebirdsql-bundle')
-        provided project(':develnext-bundles/dn-game2d-bundle')
-        provided project(':develnext-bundles/dn-systemtray-bundle')
-        provided project(':develnext-bundles/dn-hotkey-bundle')
-        provided project(':develnext-bundles/dn-zip-bundle')
-        provided project(':develnext-bundles/dn-jfoenix-bundle')
+        // platforms
+        file("$rootDir.path/platforms").listFiles().each { file ->
+            if (file.directory && file.name.startsWith("develnext-") && file.name.endsWith("-platform")) {
+                compile project(":platforms/$file.name")
+            }
+        }
+
+        // bundles
+        file("$rootDir.path/bundles").listFiles().each { file ->
+            if (file.directory && file.name.startsWith("dn-") && file.name.endsWith("-bundle")) {
+                provided project(":bundles/$file.name")
+            }
+        }
 
         // stubs.
         compile project(':develnext-stubs/dn-php-sdk')
         compile project(':develnext-stubs/dn-jphp-sdk')
-        compile project(':develnext-stubs/dn-zend-php-sdk')
 
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-zip-ext:$jphpVersion"

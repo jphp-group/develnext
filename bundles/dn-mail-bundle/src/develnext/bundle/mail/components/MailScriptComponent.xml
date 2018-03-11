@@ -1,0 +1,27 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="hostName" value="smtp.gmail.com" />
+        <property code="smtpPort" value="587" />
+        <property code="sslOnConnect" value="1" />
+        <property code="timeout" value="15000" />
+        <property code="mailCharset" value="UTF-8" />
+        <property code="mailFrom" value="" />
+    </init>
+
+    <properties group="general">
+        <property code="hostName" name="SMTP Хост" editor="text" tooltip="Хост к smtp серверу, отправляющему письма" />
+        <property code="smtpPort" name="SMTP Порт" editor="integer" tooltip="Порт от smtp сервера" />
+        <property code="sslOnConnect" name="SSL" editor="boolean" tooltip="Защищенное соединение SSL" />
+        <property code="login" name="Логин" editor="text" tooltip="Логин для авторизации на smtp сервер" />
+        <property code="password" name="Пароль" editor="text" tooltip="Пароль для авторизации на smtp сервер" />
+        <property code="timeout" name="Таймаут" editor="integer" tooltip="Время таймаута коннекта с сервером smtp в млсек." />
+        <property code="mailCharset" name="Кодировка писем" editor="text" tooltip="Кодировка писем по-умолчанию" />
+        <property code="mailFrom" name="Отправитель" editor="text" tooltip="Отправитель по-умолчанию" />
+    </properties>
+
+    <eventTypes>
+        <eventType code="sending" name="До отправки" kind="ObjectEvent" />
+        <eventType code="send" name="После отправки" kind="ObjectEvent" />
+        <eventType code="error" name="Ошибка отправки" kind="ObjectEvent" icon="icons/error16.png" />
+    </eventTypes>
+</element>

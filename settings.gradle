@@ -6,30 +6,30 @@ include 'jphp-desktop-hotkey-ext',
         'develnext';
 
 include 'develnext-doc';
-include 'develnext-java-platform';
-include 'develnext-js-platform';
-include 'develnext-web-platform';
-include 'develnext-wizard-platform';
 include 'develnext-lexer';
 include 'develnext-launcher';
 
 include 'jphp-gui-richtext-ext';
 
-include 'develnext-bundles/dn-httpclient-bundle'
-include 'develnext-bundles/dn-jsoup-bundle'
-include 'develnext-bundles/dn-mail-bundle'
-include 'develnext-bundles/dn-sql-bundle'
-include 'develnext-bundles/dn-sqlite-bundle'
-include 'develnext-bundles/dn-mysql-bundle'
-include 'develnext-bundles/dn-pgsql-bundle'
-include 'develnext-bundles/dn-firebirdsql-bundle'
-include 'develnext-bundles/dn-game2d-bundle'
-include 'develnext-bundles/dn-systemtray-bundle'
-include 'develnext-bundles/dn-hotkey-bundle'
-include 'develnext-bundles/dn-jfoenix-bundle'
-include 'develnext-bundles/dn-zip-bundle'
 
 // stubs
 include 'develnext-stubs/dn-php-sdk'
 include 'develnext-stubs/dn-jphp-sdk'
-include 'develnext-stubs/dn-zend-php-sdk'
+
+// platforms
+file("$rootDir.path/platforms").listFiles().each { file ->
+    if (file.directory && file.name.startsWith("develnext-") && file.name.endsWith("-platform")) {
+        println "include 'platforms/$file.name'"
+
+        include "platforms/$file.name"
+    }
+}
+
+// bundles
+file("$rootDir.path/bundles").listFiles().each { file ->
+    if (file.directory && file.name.startsWith("dn-") && file.name.endsWith("-bundle")) {
+        println "include 'bundles/$file.name'"
+
+        include "bundles/$file.name"
+    }
+}
