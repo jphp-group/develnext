@@ -21,6 +21,7 @@ use ide\project\ProjectExporter;
 use ide\project\ProjectImporter;
 use ide\systems\FileSystem;
 use ide\systems\ProjectSystem;
+use php\compress\ZipException;
 use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
@@ -200,7 +201,12 @@ class BackupProjectBehaviour extends AbstractProjectBehaviour
 
         $date = $now->toString('hhmmss-yyyymmdd');
 
-        $exporter->save($file = "{$this->getBackupDir()}/auto/Backup-$date.zip");
+        try {
+            $exporter->save($file = "{$this->getBackupDir()}/auto/Backup-$date.zip");
+        } catch (ZipException $e) {
+            Logger::warn("Failed to create backup '$file', {$e->getMessage()}");
+            return null;
+        }
 
         $backup = new Backup();
         $backup->setName($now->toString('dd MMM, HH:mm:ss, yyyy'));

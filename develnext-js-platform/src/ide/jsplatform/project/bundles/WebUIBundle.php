@@ -25,16 +25,16 @@ class WebUIBundle extends AbstractJarBundle
     {
         return [
             JPHPCoreBundle::class,
-            JPHPJsonBundle::class,
-            JPHPXmlBundle::class,
-            JPHPYamlBundle::class,
         ];
     }
 
     function getJarDependencies()
     {
         $libs = [
-            'jphp-httpserver-ext', 'jphp-zend-ext', 'javax.servlet-api',
+            'gson', 'jphp-json-ext',
+            'snakeyaml', 'jphp-yaml-ext',
+
+            'jphp-httpserver-ext', 'jphp-zend-ext', 'javax.servlet-api', 'jphp-xml-ext',
             'wizard-web-ui', 'wizard-web', 'wizard-core', 'wizard-core-legacy', 'wizard-app-web', 'wizard-app'
         ];
 
