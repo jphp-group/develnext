@@ -1,4 +1,5 @@
 <?php
+
 namespace ide\bundle;
 
 use ide\Ide;
@@ -32,6 +33,14 @@ abstract class AbstractJarBundle extends AbstractBundle
     }
 
     /**
+     * @return array
+     */
+    function getProvidedJarDependencies()
+    {
+        return [];
+    }
+
+    /**
      * @return ProjectModule[]
      */
     public function getProjectModules()
@@ -39,14 +48,18 @@ abstract class AbstractJarBundle extends AbstractBundle
         $result = [];
 
         foreach ($this->getJarDependencies() as $dep) {
-            if (is_array($dep)) {
-                $result[] = new ProjectModule(str::join($dep, ':', 4), 'maven');
-            } else {
-                $id = $this->findLibFile($dep);
+            $id = $this->findLibFile($dep);
 
-                if ($id) {
-                    $result[] = new ProjectModule($id, 'jarfile');
-                }
+            if ($id) {
+                $result[] = new ProjectModule($id, 'jarfile');
+            }
+        }
+
+        foreach ($this->getProvidedJarDependencies() as $dep) {
+            $id = $this->findLibFile($dep);
+
+            if ($id) {
+                $result[] = new ProjectModule($id, 'jarfile', true);
             }
         }
 
@@ -143,8 +156,12 @@ abstract class AbstractJarBundle extends AbstractBundle
      * @param $name
      * @return null|File
      */
-    private function findLibFile($name)
+    protected function findLibFile($name)
     {
+        if (fs::isFile($name)) {
+            return $name;
+        }
+
         /** @var File[] $libPaths */
         $libPaths = $this->getSearchLibPaths();
 

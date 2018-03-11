@@ -9,16 +9,19 @@ class ProjectModule
 {
     protected $id;
     protected $type;
+    protected $provided;
 
     /**
      * ProjectModule constructor.
      * @param string $id
      * @param string $type
+     * @param bool $provided
      */
-    public function __construct($id, $type)
+    public function __construct($id, $type, bool $provided = false)
     {
         $this->id = $id;
         $this->type = $type;
+        $this->provided = $provided;
     }
 
     /**
@@ -35,6 +38,14 @@ class ProjectModule
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isProvided(): bool
+    {
+        return $this->provided;
     }
 
     /**

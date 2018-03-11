@@ -12,9 +12,7 @@ use ide\project\behaviours\php\TreeCreatePhpFileMenuCommand;
 use ide\project\control\CommonProjectControlPane;
 use ide\project\Project;
 use ide\project\ProjectFile;
-use ide\project\ProjectModule;
 use ide\utils\FileUtils;
-use ide\zip\JarArchive;
 use php\compress\ZipFile;
 use php\framework\FrameworkPackageLoader;
 use php\gui\layout\UXHBox;
@@ -35,9 +33,6 @@ use php\lib\arr;
 use php\lib\fs;
 use php\lib\str;
 use php\net\URL;
-use php\util\LauncherClassLoader;
-use php\util\Shared;
-use php\util\SharedValue;
 
 /**
  * Class PhpProjectBehaviour
@@ -327,7 +322,10 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
             switch ($module->getType()) {
                 case 'zipfile':
                 case 'jarfile':
-                    $result[] = fs::abs($module->getId());
+                    if (!$module->isProvided()) {
+                        $result[] = fs::abs($module->getId());
+                    }
+
                     break;
             }
         }

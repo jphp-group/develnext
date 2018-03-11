@@ -120,7 +120,6 @@ class UIDesktopBundle extends AbstractJarBundle
         ];
     }
 
-
     public function onAdd(Project $project, AbstractBundle $owner = null)
     {
         parent::onAdd($project, $owner);
@@ -159,91 +158,5 @@ class UIDesktopBundle extends AbstractJarBundle
         if ($aManager = ActionManager::get()) {
             $aManager->unregisterInternalList('.dn/bundle/uiDesktop/actionTypes');
         }
-    }
-
-    public function getUseImports()
-    {
-        return [
-            UXNode::class,
-            UXEvent::class,
-            UXApplication::class,
-            UXAnimationTimer::class,
-            UXHBox::class,
-            UXAnchorPane::class,
-            UXClipboard::class,
-            UXColor::class,
-            UXContextMenuEvent::class,
-            UXDialog::class,
-            UXFont::class,
-            UXGeometry::class,
-            UXImage::class,
-            UXMedia::class,
-            UXMenu::class,
-            UXMenuItem::class,
-            UXButton::class,
-            UXTooltip::class,
-            UXToggleButton::class,
-            UXToggleGroup::class,
-            UXImageView::class,
-            UXImageArea::class,
-            UXSlider::class,
-            UXSpinner::class,
-            UXVBox::class,
-            UXTitledPane::class,
-            UXPanel::class,
-            UXFlowPane::class,
-            UXForm::class,
-            UXWindow::class,
-            UXAlert::class,
-            UXContextMenu::class,
-            UXControl::class,
-            UXDirectoryChooser::class,
-            UXFileChooser::class,
-            UXFlatButton::class,
-            UXHyperlink::class,
-            UXList::class,
-            UXListView::class,
-            UXComboBox::class,
-            UXChoiceBox::class,
-            UXLabel::class,
-            UXLabelEx::class,
-            UXLabeled::class,
-            UXListCell::class,
-            UXMediaPlayer::class,
-            UXParent::class,
-            UXPopupWindow::class,
-            UXPasswordField::class,
-            UXProgressIndicator::class,
-            UXProgressBar::class,
-            UXTab::class,
-            UXTabPane::class,
-            UXTreeView::class,
-            UXTrayNotification::class,
-            UXWebEngine::class,
-            UXWebView::class,
-            UXCell::class,
-            UXColorPicker::class,
-            UXCanvas::class,
-            UXStackPane::class,
-            UXPane::class,
-            UXScrollPane::class,
-
-            UXKeyEvent::class,
-            UXDragEvent::class,
-            UXMouseEvent::class,
-            UXWebEvent::class,
-            UXWindowEvent::class,
-
-            AbstractForm::class,
-            AbstractModule::class,
-
-            Animation::class,
-            Element::class,
-            Geometry::class,
-            Media::class,
-            Score::class,
-
-            Logger::class,
-        ];
     }
 }

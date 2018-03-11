@@ -4,6 +4,7 @@ namespace ide\bundle\std;
 use ide\bundle\AbstractBundle;
 use ide\bundle\AbstractJarBundle;
 use ide\project\behaviours\GradleProjectBehaviour;
+use ide\project\ProjectModule;
 use php\io\File;
 use php\io\FileStream;
 use php\io\IOException;
@@ -55,32 +56,15 @@ class JPHPRuntimeBundle extends AbstractJarBundle
      */
     function getJarDependencies()
     {
-        return ['jphp-runtime', 'dn-php-sdk', 'dn-jphp-sdk'];
+        return [
+            'jphp-runtime'
+        ];
     }
 
-    /**
-     * @return array
-     */
-    public function getUseImports()
+    function getProvidedJarDependencies()
     {
         return [
-            // php\lib
-            arr::class, bin::class, char::class, fs::class, str::class, num::class, reflect::class,
-
-            // php\io
-            Stream::class, File::class, IOException::class, FileStream::class, MemoryStream::class, ResourceStream::class, NetStream::class,
-
-            // php\util
-            Flow::class, Locale::class, Regex::class, Configuration::class,
-
-            // php\time
-            Time::class, TimeZone::class, TimeFormat::class,
-
-            // php\net
-            URL::class, Socket::class, SocketException::class, ServerSocket::class, Proxy::class,
-            
-            // php\lang
-            Thread::class, Environment::class, Process::class, System::class, Thread::class, ThreadGroup::class, ThreadPool::class,
+            'dn-php-sdk', 'dn-jphp-sdk'
         ];
     }
 }

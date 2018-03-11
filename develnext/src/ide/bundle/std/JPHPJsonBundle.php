@@ -28,11 +28,4 @@ class JPHPJsonBundle extends AbstractJarBundle
     {
         return ['gson', 'jphp-json-ext'];
     }
-
-    public function getUseImports()
-    {
-        return [
-            JsonProcessor::class, Json::class,
-        ];
-    }
 }
