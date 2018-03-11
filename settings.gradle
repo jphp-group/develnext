@@ -33,5 +33,3 @@ include 'develnext-bundles/dn-zip-bundle'
 include 'develnext-stubs/dn-php-sdk'
 include 'develnext-stubs/dn-jphp-sdk'
 include 'develnext-stubs/dn-zend-php-sdk'
-
-include 'sandbox'

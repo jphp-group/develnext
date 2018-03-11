@@ -1,7 +1,0 @@
-sourceSets {
-    main.resources.srcDirs = ['src']
-}
-
-dependencies {
-    compile "org.develnext.jphp:jphp-gui-ext:$jphpVersion"
-}
