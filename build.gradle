@@ -128,12 +128,6 @@ project(':jphp-desktop-hotkey-ext') {
     }
 }
 
-project(':jphp-parser') {
-    dependencies {
-        compile "org.develnext.jphp:jphp-core:$jphpVersion"
-    }
-}
-
 project(':jphp-app-framework') {
     dependencies {
         compile "org.develnext.jphp:jphp-core:$jphpVersion"
@@ -149,12 +143,12 @@ project(':develnext') {
         compile "org.develnext.jphp:jphp-gui-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-gui-desktop-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-gui-systemtray-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-parser-ext:$jphpVersion"
 
         compile project(':develnext-launcher')
         compile project(':develnext-designer')
         compile project(':jphp-gui-richtext-ext')
         compile project(':jphp-app-framework')
-        compile project(':jphp-parser')
         compile project(':develnext-doc')
         compile project(':develnext-java-platform')
         compile project(':develnext-js-platform')

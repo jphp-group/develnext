@@ -3,7 +3,6 @@ include 'develnext-designer';
 
 include 'jphp-desktop-hotkey-ext',
         'jphp-app-framework',
-        'jphp-parser',
         'develnext';
 
 include 'develnext-doc';
