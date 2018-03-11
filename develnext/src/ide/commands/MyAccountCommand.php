@@ -2,22 +2,15 @@
 
 namespace ide\commands;
 
-use action\Animation;
 use ide\editors\AbstractEditor;
 use ide\editors\menu\ContextMenu;
 use ide\Ide;
-use ide\Logger;
-use ide\marker\ArrowPointMarker;
 use ide\misc\AbstractCommand;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXPanel;
-use php\gui\text\UXFont;
-use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXImageArea;
-use php\gui\UXLabel;
 use php\gui\UXSeparator;
-use script\TimerScript;
 
 class MyAccountCommand extends AbstractCommand
 {

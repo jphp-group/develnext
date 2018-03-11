@@ -277,8 +277,6 @@ class GuiFrameworkProjectBehaviour extends AbstractProjectBehaviour
         $addMenu->add(new CreateGameSpriteProjectCommand());
         $addMenu->add(new GuiFrameworkProjectBehaviour_ProjectTreeMenuCommand($this));
 
-        Ide::get()->registerSettings(new FormEditorSettings());
-
         $this->actionManager = ActionManager::get();
         $this->spriteManager = new IdeSpriteManager($this->project);
 

@@ -1,8 +1,0 @@
-<scene> <!-- Игровая сцена -->
-    <object prototype="Player" x="10" y="20" />
-
-    <object prototype="Wall" x="0" y="0" />
-    <object prototype="Wall" x="32" y="0" />
-
-    <object prototype="Wall" x="0" y="400" w="300" visible="0" />
-</scene>

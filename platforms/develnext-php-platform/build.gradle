@@ -1,0 +1,13 @@
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+sourceSets {
+    main.resources.srcDirs = ['src']
+}
+
+
+dependencies {
+}

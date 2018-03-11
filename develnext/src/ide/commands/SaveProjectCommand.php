@@ -3,10 +3,6 @@ namespace ide\commands;
 
 use ide\editors\AbstractEditor;
 use ide\Ide;
-use ide\marker\ArrowPointMarker;
-use ide\marker\target\CurrentEditorMarkerTarget;
-use ide\misc\AbstractCommand;
-use php\gui\UXSeparator;
 
 /**
  * Class SaveProjectCommand

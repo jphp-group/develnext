@@ -1,7 +1,6 @@
 <?php
 namespace ide;
 
-use Files;
 use ide\account\AccountManager;
 use ide\account\ServiceManager;
 use ide\bundle\AbstractBundle;
@@ -15,35 +14,25 @@ use ide\l10n\L10n;
 use ide\library\IdeLibrary;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
-use ide\misc\GradleBuildConfig;
 use ide\project\AbstractProjectTemplate;
 use ide\project\control\AbstractProjectControlPane;
 use ide\project\Project;
 use ide\protocol\AbstractProtocolHandler;
 use ide\protocol\handlers\FileOpenProjectProtocolHandler;
-use ide\settings\AbstractSettings;
-use ide\settings\AllSettings;
 use ide\systems\Cache;
 use ide\systems\FileSystem;
 use ide\systems\IdeSystem;
 use ide\systems\ProjectSystem;
-use ide\systems\WatcherSystem;
 use ide\tool\IdeToolManager;
 use ide\ui\LazyLoadingImage;
 use ide\ui\Notifications;
 use ide\utils\FileUtils;
 use ide\utils\Json;
-use php\desktop\SystemTray;
-use php\desktop\TrayIcon;
-use php\gui\event\UXKeyboardManager;
-use php\gui\event\UXKeyEvent;
 use php\gui\framework\Application;
 use php\gui\JSException;
 use php\gui\layout\UXAnchorPane;
 use php\gui\UXAlert;
-use php\gui\UXApplication;
 use php\gui\UXButton;
-use php\gui\UXDialog;
 use php\gui\UXImage;
 use php\gui\UXImageView;
 use php\gui\UXMenu;
@@ -61,14 +50,11 @@ use php\lang\Thread;
 use php\lang\ThreadPool;
 use php\lib\arr;
 use php\lib\fs;
-use php\lib\Items;
 use php\lib\reflect;
 use php\lib\Str;
 use php\time\Time;
 use php\time\Timer;
-use php\util\Configuration;
 use php\util\Scanner;
-use script\TimerScript;
 use timer\AccurateTimer;
 
 
@@ -105,11 +91,6 @@ class Ide extends Application
      * @var AbstractCommand[]
      */
     protected $commands = [];
-
-    /**
-     * @var AbstractNavigation[]
-     */
-    protected $navigation = [];
 
     /**
      * @var callable
@@ -155,11 +136,6 @@ class Ide extends Application
      * @var boolean
      */
     protected $idle = false;
-
-    /**
-     * @var AbstractSettings[]
-     */
-    protected $settings = [];
 
     /**
      * @var L10n
@@ -913,66 +889,6 @@ class Ide extends Application
     }
 
     /**
-     * @param AbstractSettings $settings
-     */
-    public function registerSettings(AbstractSettings $settings)
-    {
-        $class = get_class($settings);
-
-        if (isset($this->settings[$class])) {
-            return;
-        }
-
-        $this->settings[$class] = $settings;
-        $settings->onRegister();
-    }
-
-    /**
-     * @param $class
-     */
-    public function unregisterSettings($class)
-    {
-        if ($settings = $this->settings[$class]) {
-            $settings->onUnregister();
-            unset($this->settings[$class]);
-        }
-    }
-
-    /**
-     * @param bool|true $ignoreAlways
-     */
-    public function unregisterAllSettings()
-    {
-        foreach ($this->settings as $settings) {
-            $this->unregisterSettings(get_class($settings));
-        }
-    }
-
-    /**
-     * @return AbstractSettings[]
-     */
-    public function getAllSettings()
-    {
-        return $this->settings;
-    }
-
-    /***
-     * @param AbstractNavigation $nav
-     */
-    public function registerNavigation(AbstractNavigation $nav)
-    {
-        $this->navigation[reflect::typeOf($nav)] = $nav;
-    }
-
-    /**
-     * @param $class
-     */
-    public function unregisterNavigation($class)
-    {
-        unset($this->navigation[$class]);
-    }
-
-    /**
      * Отменить регистрацию одной команды по ее имени класса.
      *
      * @param $commandClass
@@ -1320,36 +1236,6 @@ class Ide extends Application
     }
 
     /**
-     * @deprecated
-     * @param string $query
-     * @return bool
-     */
-    public function navigate($query)
-    {
-        foreach ($this->navigation as $nav) {
-            if ($nav->accept($query)) {
-                $nav->navigate($query);
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @deprecated
-     * @param $query
-     * @return callable
-     */
-    public function nav($query)
-    {
-        return function () use ($query) {
-            $this->navigate($query);
-        };
-    }
-
-    /**
      * Создать редактор для редактирования файла, формат по-умолчанию определяется автоматически,
      * с помощью ранее зарегистрированных редакторов.
      *
@@ -1451,17 +1337,10 @@ class Ide extends Application
             $this->registerFormat(new $format());
         }
 
-        $navs = $this->getInternalList('.dn/navigation');
-        foreach ($navs as $nav) {
-            $this->registerNavigation(new $nav());
-        }
-
         $projectTemplates = $this->getInternalList('.dn/projectTemplates');
         foreach ($projectTemplates as $projectTemplate) {
             $this->registerProjectTemplate(new $projectTemplate());
         }
-
-        $this->registerSettings(new AllSettings());
 
         $mainCommands = $this->getInternalList('.dn/mainCommands');
         $commands = [];

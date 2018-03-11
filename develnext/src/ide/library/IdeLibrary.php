@@ -23,10 +23,6 @@ class IdeLibrary
             'title' => 'Проекты',
             'type' => 'ide\library\IdeLibraryProjectResource',
         ],
-        'quests' => [
-            'title' => 'Квесты',
-            'type' => 'ide\library\IdeLibraryQuestResource',
-        ],
         'bundles' => [
             'title' => 'Пакеты расширений',
             'type' => 'ide\library\IdeLibraryBundleResource',

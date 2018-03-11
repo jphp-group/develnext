@@ -92,7 +92,7 @@ use timer\AccurateTimer;
  *
  * @property AbstractFormFormat $format
  */
-class FormEditor extends AbstractModuleEditor implements MarkerTargable
+class FormEditor extends AbstractModuleEditor
 {
     const BORDER_SIZE = 8;
 
@@ -1845,7 +1845,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
                 }
             });
 
-            $this->markerNode = $designPane;
             //$designPane->size = $this->layout->size;
             $designPane->add($this->layout);
 
@@ -1853,8 +1852,6 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
 
             UXAnchorPane::setAnchor($this->layout, 0);
         } else {
-            $this->markerNode = $this->layout;
-
             $this->layout->style = '-fx-border-width: 0px; -fx-border-style: none; -fx-border-color: silver;';
             $this->layout->backgroundColor = '#F7F7F7';
 
@@ -2566,10 +2563,5 @@ class FormEditor extends AbstractModuleEditor implements MarkerTargable
         }
 
         return $editorType;
-    }
-
-    function getMarkerNode()
-    {
-        return $this->markerNode;
     }
 }
