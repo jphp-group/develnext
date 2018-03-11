@@ -1,8 +1,7 @@
 
 include 'develnext-designer';
 
-include 'jphp-gui-jfoenix-ext',
-        'jphp-desktop-hotkey-ext',
+include 'jphp-desktop-hotkey-ext',
         'jphp-app-framework',
         'jphp-parser',
         'develnext';

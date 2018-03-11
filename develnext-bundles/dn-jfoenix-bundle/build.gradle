@@ -11,7 +11,7 @@ sourceSets {
 }
 
 dependencies {
-    compile (project(':jphp-gui-jfoenix-ext')) {
+    compile ("org.develnext.jphp:jphp-gui-jfoenix-ext:$jphpVersion") {
         exclude group: 'org.develnext', module: 'jphp-gui-ext'
     }
 }
