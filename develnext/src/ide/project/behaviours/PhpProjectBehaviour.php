@@ -4,7 +4,6 @@ namespace ide\project\behaviours;
 use develnext\lexer\inspector\PHPInspector;
 use Error;
 use ide\formats\PhpCodeFormat;
-use ide\Ide;
 use ide\Logger;
 use ide\project\AbstractProjectBehaviour;
 use ide\project\behaviours\php\TreeCreatePhpClassMenuCommand;
