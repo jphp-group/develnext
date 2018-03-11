@@ -9,7 +9,7 @@ repositories {
 project.version = '1.0'
 
 dependencies {
-    compile "org.develnext.jphp:jphp-runtime:$rootProject.ext.jphpVersion"
-    compile project(':jphp-gui-ext')
+    compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
+    compile "org.develnext.jphp:jphp-gui-ext:$jphpVersion"
     compile project(':develnext-designer')
 }

@@ -3,5 +3,5 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':jphp-gui-ext')
+    compile "org.develnext.jphp:jphp-gui-ext:$jphpVersion"
 }

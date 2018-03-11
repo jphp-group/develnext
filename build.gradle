@@ -1,14 +1,12 @@
 def javaVersion = '1.8';
-def projectVersion = '0.9.3';
-def jphpVersion = "0.9.3-SNAPSHOT";
-def wizardVersion = "1.0.0-SNAPSHOT";
 
-rootProject.ext.jphpVersion = jphpVersion;
-
-if (Boolean.getBoolean("release")) {
-    jphpVersion = projectVersion
-} else {
-    projectVersion += "-SNAPSHOT";
+buildscript {
+    ext {
+        projectGroup = "org.develnext"
+        projectVersion = '0.9.3' + (Boolean.getBoolean("release") ? "" : "-SNAPSHOT");
+        jphpVersion = "0.9.3-SNAPSHOT"
+        wizardVersion = "1.0.0-SNAPSHOT";
+    }
 }
 
 buildscript {
@@ -123,44 +121,10 @@ subprojects {
     }
 }
 
-project(':jphp-gui-ext') {
-    dependencies {
-        compile "org.develnext.jphp:jphp-core:$jphpVersion"
-        compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
-        compile "org.develnext.jphp:jphp-graphic-ext:$jphpVersion"
-    }
-}
-
-project(':jphp-game-ext') {
-    dependencies {
-        compile 'org.dyn4j:dyn4j:3.2.1'
-
-        compile (project(':jphp-gui-ext')) {
-            transitive = false
-        }
-
-        compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
-    }
-}
-
 project(':jphp-desktop-hotkey-ext') {
     dependencies {
         compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
         compile fileTree(dir: 'lib', include: ['*.jar'])
-    }
-}
-
-project(':jphp-systemtray-ext') {
-    dependencies {
-        compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
-        provided project(':jphp-gui-ext')
-    }
-}
-
-project(':jphp-desktop-ext') {
-    dependencies {
-        compile project(':jphp-gui-ext')
-        compile "org.develnext.jphp:jphp-runtime:$jphpVersion"
     }
 }
 
@@ -172,8 +136,8 @@ project(':jphp-parser') {
 
 project(':jphp-app-framework') {
     dependencies {
-        compile project(':jphp-gui-ext')
         compile "org.develnext.jphp:jphp-core:$jphpVersion"
+        compile "org.develnext.jphp:jphp-gui-ext:$jphpVersion"
     }
 }
 
@@ -182,15 +146,15 @@ project(':develnext') {
 
     dependencies {
         compile "org.develnext.jphp:jphp-core:$jphpVersion"
+        compile "org.develnext.jphp:jphp-gui-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-gui-desktop-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-gui-systemtray-ext:$jphpVersion"
 
         compile project(':develnext-launcher')
         compile project(':develnext-designer')
         compile project(':jphp-gui-richtext-ext')
         compile project(':jphp-app-framework')
-        compile project(':jphp-desktop-ext')
-        compile project(':jphp-systemtray-ext')
         compile project(':jphp-parser')
-        compile project(':jphp-zip-ext/jphp-zip-ext')
         compile project(':develnext-doc')
         compile project(':develnext-java-platform')
         compile project(':develnext-js-platform')
@@ -209,7 +173,7 @@ project(':develnext') {
         provided project(':develnext-bundles/dn-game2d-bundle')
         provided project(':develnext-bundles/dn-systemtray-bundle')
         provided project(':develnext-bundles/dn-hotkey-bundle')
-        provided project(':jphp-zip-ext/dn-zip-bundle')
+        provided project(':develnext-bundles/dn-zip-bundle')
         provided project(':develnext-bundles/dn-jfoenix-bundle')
 
         // stubs.
@@ -218,7 +182,7 @@ project(':develnext') {
         compile project(':develnext-stubs/dn-zend-php-sdk')
 
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
-        //compile "org.develnext.jphp:jphp-zip-ext:$jphpVersion"
+        compile "org.develnext.jphp:jphp-zip-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-json-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-yaml-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-zend-ext:$jphpVersion"

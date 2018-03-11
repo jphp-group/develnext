@@ -12,5 +12,5 @@ sourceSets {
 }
 
 dependencies {
-    compile "org.develnext.jphp:jphp-mail-ext:$rootProject.ext.jphpVersion"
+    compile "org.develnext.jphp:jphp-mail-ext:$jphpVersion"
 }

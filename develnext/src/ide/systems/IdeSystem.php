@@ -102,7 +102,7 @@ class IdeSystem
     {
         $home = System::getProperty('user.home');
 
-        $ideHome = File::of("$home/.DevelNext$suffix");
+        $ideHome = File::of("$home/.DevelNext17$suffix");
 
         if (!$ideHome->isDirectory()) {
             $ideHome->mkdirs();

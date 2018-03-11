@@ -104,9 +104,6 @@ class UIDesktopBundle extends AbstractJarBundle
     {
         return [
             JPHPCoreBundle::class,
-            JPHPJsonBundle::class,
-            JPHPXmlBundle::class,
-            JPHPYamlBundle::class,
         ];
     }
 
@@ -116,7 +113,17 @@ class UIDesktopBundle extends AbstractJarBundle
     function getJarDependencies()
     {
         return [
-            'jphp-gui-ext', 'jphp-desktop-ext', 'jphp-zend-ext', 'jphp-app-framework', 'wizard-core',
+            'jphp-gui-ext',
+            'jphp-graphic-ext',
+            'jphp-gui-desktop-ext',
+            'jphp-zend-ext',
+            'jphp-app-framework',
+            'jphp-xml-ext',
+
+            'gson', 'jphp-json-ext',
+            'snakeyaml', 'jphp-yaml-ext',
+
+            'wizard-core',
         ];
     }
 

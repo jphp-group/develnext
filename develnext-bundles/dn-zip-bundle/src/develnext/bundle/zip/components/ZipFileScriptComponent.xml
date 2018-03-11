@@ -1,0 +1,18 @@
+<element extends="ide\scripts\elements\AbstractComponent">
+    <init>
+        <property code="autoCreate" value="1" />
+        <property code="path" value="example.zip" />
+    </init>
+
+    <properties group="general" title="Главное">
+        <property code="path" name="Имя файла" editor="text" tooltip="Имя или путь к файлу" />
+        <property code="autoCreate" name="Создавать файл" editor="boolean" tooltip="Автоматически создавать файл, если его нет." />
+    </properties>
+
+    <eventTypes>
+        <eventType code="unpack" name="Распаковка одного файла" kind="ObjectEvent" />
+        <eventType code="unpackAll" name="Завершение распаковки" kind="ObjectEvent" />
+        <eventType code="pack" name="Запаковка одного файла" kind="ObjectEvent" />
+        <eventType code="packAll" name="Запаковка директории" kind="ObjectEvent" />
+    </eventTypes>
+</element>

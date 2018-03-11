@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DevelNext"
-#define MyAppVersion "16.7.0 (Autumn)"
+#define MyAppVersion "17.0.0 (Spring)"
 #define MyAppPublisher "develnext.org"
 #define MyAppURL "http://develnext.org"
 #define MyAppExeName "DevelNext.exe"
@@ -11,14 +11,14 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{CA74A9B0-AFDA-4D34-8CA1-5F2122F71ABF}
+AppId={{d23f773d-6fff-48b5-855d-50069c307eae}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={pf}\{#MyAppName} 17
 DefaultGroupName=DevelNext IDE
 OutputDir=../build/distributions/
 OutputBaseFilename=DevelNextSetup

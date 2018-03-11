@@ -12,5 +12,5 @@ sourceSets {
 }
 
 dependencies {
-    compile project(':jphp-systemtray-ext')
+    compile "org.develnext.jphp:jphp-gui-systemtray-ext:$jphpVersion"
 }
