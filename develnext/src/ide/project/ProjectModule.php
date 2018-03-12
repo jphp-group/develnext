@@ -1,5 +1,7 @@
 <?php
 namespace ide\project;
+use ide\utils\FileUtils;
+use php\lib\fs;
 
 /**
  * Class ProjectModule
@@ -7,6 +9,8 @@ namespace ide\project;
  */
 class ProjectModule
 {
+    const TYPE_DIR = 'dir';
+
     protected $id;
     protected $type;
     protected $provided;
@@ -22,6 +26,28 @@ class ProjectModule
         $this->id = $id;
         $this->type = $type;
         $this->provided = $provided;
+    }
+
+    /**
+     * @param $dirName
+     * @param bool $provided
+     * @return ProjectModule
+     */
+    public static function ofDir($dirName, bool $provided = false): ProjectModule
+    {
+        if (fs::isDir($dirName)) {
+            $dirName = fs::abs($dirName);
+        }
+
+        return new ProjectModule(FileUtils::hashName($dirName), self::TYPE_DIR, $provided);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDir(): bool
+    {
+        return $this->type === self::TYPE_DIR;
     }
 
     /**

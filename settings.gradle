@@ -11,11 +11,6 @@ include 'develnext-launcher';
 
 include 'jphp-gui-richtext-ext';
 
-
-// stubs
-include 'develnext-stubs/dn-php-sdk'
-include 'develnext-stubs/dn-jphp-sdk'
-
 // platforms
 file("$rootDir.path/platforms").listFiles().each { file ->
     if (file.directory && file.name.startsWith("develnext-") && file.name.endsWith("-platform")) {
@@ -31,5 +26,14 @@ file("$rootDir.path/bundles").listFiles().each { file ->
         println "include 'bundles/$file.name'"
 
         include "bundles/$file.name"
+    }
+}
+
+// stubs
+file("$rootDir.path/stubs").listFiles().each { file ->
+    if (file.directory && file.name.startsWith("dn-") && file.name.endsWith("-sdk")) {
+        println "include 'stubs/$file.name'"
+
+        include "stubs/$file.name"
     }
 }

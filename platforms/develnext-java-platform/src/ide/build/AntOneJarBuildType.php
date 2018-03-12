@@ -169,6 +169,8 @@ class AntOneJarBuildType extends AbstractBuildType
         $addedModuleNames = [];
 
         foreach ($project->getModules() as $module) {
+            if ($module->isProvided()) continue;
+
             if ($module->getType() == 'jarfile') {
                 $name = fs::name($module->getId());
 

@@ -1,0 +1,9 @@
+
+- id: var_type
+  name: doctype /** @var ...
+
+  description:
+    en: Doctype comment for inline variable
+    ru: Doctype комментарий для инлайн переменной
+
+  code: "/** @var # */"

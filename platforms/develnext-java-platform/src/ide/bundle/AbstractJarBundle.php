@@ -76,6 +76,14 @@ abstract class AbstractJarBundle extends AbstractBundle
         return $result;
     }
 
+    public function onRemove(Project $project, AbstractBundle $owner = null)
+    {
+        parent::onRemove($project, $owner);
+
+        $project->removeModule(ProjectModule::ofDir($this->getProjectVendorDirectory()));
+    }
+
+
     public function onAdd(Project $project, AbstractBundle $owner = null)
     {
         parent::onAdd($project, $owner);
@@ -94,6 +102,8 @@ abstract class AbstractJarBundle extends AbstractBundle
                 $zipFile = new ZipFile($filename);
                 try {
                     $vendorDirectory = $this->getVendorDirectory() . "/";
+
+                    $project->addModule(ProjectModule::ofDir($this->getProjectVendorDirectory()));
 
                     foreach ($zipFile->statAll() as $stat) {
                         $name = $stat['name'];
@@ -116,7 +126,6 @@ abstract class AbstractJarBundle extends AbstractBundle
                             });
                         }
                     }
-
                 } finally {
 
                 }

@@ -2,6 +2,7 @@
 namespace ide;
 
 use ide\project\Project;
+use ide\project\ProjectFile;
 use ide\utils\FileUtils;
 use php\io\File;
 use php\io\IOException;
@@ -74,7 +75,7 @@ trait VendorContainer
     /**
      * Возвращает директорию вендора в проекте.
      *
-     * @return project\ProjectFile|\php\io\File
+     * @return ProjectFile|\php\io\File
      */
     function getProjectVendorDirectory()
     {

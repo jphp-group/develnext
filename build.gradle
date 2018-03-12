@@ -59,7 +59,7 @@ subprojects {
     def bundleDirRoot = "${projectDir}/../../develnext/misc/library/bundles/";
     def bundleDir = "${bundleDirRoot}/${dirName}/";
 
-    if (it.name.startsWith("develnext-bundles") || it.name.endsWith("-bundle")) {
+    if (it.name.startsWith("bundles/") || it.name.endsWith("-bundle")) {
         println "-> Detecting bundle '$it.name' ...";
 
         def resFile = file("$projectDir/.resource")
@@ -119,6 +119,14 @@ subprojects {
             println "WARNING, Bundle '$it.name' doesn't have '$projectDir/.resource' file!";
         }
     }
+
+    if (it.name.startsWith("stubs/")) {
+        sourceSets {
+            main {
+                resources.srcDirs = ['src']
+            }
+        }
+    }
 }
 
 project(':jphp-desktop-hotkey-ext') {
@@ -164,10 +172,6 @@ project(':develnext') {
                 provided project(":bundles/$file.name")
             }
         }
-
-        // stubs.
-        compile project(':develnext-stubs/dn-php-sdk')
-        compile project(':develnext-stubs/dn-jphp-sdk')
 
         compile "org.develnext.jphp:jphp-xml-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-zip-ext:$jphpVersion"

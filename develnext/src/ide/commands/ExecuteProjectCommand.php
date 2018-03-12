@@ -195,7 +195,8 @@ class ExecuteProjectCommand extends AbstractCommand
 
     protected function createExecuteProcess(Project $project): Process
     {
-        $classPaths = arr::toList($this->behaviour->getSourceDirectories(), $this->behaviour->getProfileModules(['jar']));
+        $classPaths = flow($this->behaviour->getSourceDirectories(), $this->behaviour->getProfileModules(['jar']))
+            ->toArray();
 
         $args = [
             'java',

@@ -537,7 +537,7 @@ class Project
     public function copyModuleFiles($toDir)
     {
         foreach ($this->getModules() as $module) {
-            if (fs::isFile($module->getId())) {
+            if (!$module->isDir() && fs::isFile($module->getId())) {
                 if (FileUtils::copyFile($module->getId(), $toDir ."/". fs::name($module->getId())) == -1) {
                     throw new Exception("Unable to copy {$module->getId()} file");
                 }

@@ -8,6 +8,7 @@ use ide\commands\BuildProjectCommand;
 use ide\commands\ExecuteProjectCommand;
 use ide\Ide;
 use ide\project\AbstractProjectBehaviour;
+use ide\project\ProjectModule;
 use ide\utils\FileUtils;
 use php\lib\arr;
 use php\lib\fs;
@@ -52,27 +53,20 @@ class RunBuildProjectBehaviour extends AbstractProjectBehaviour
      */
     public function getSourceDirectories()
     {
-        return ['src_generated/', 'src'];
-    }
+        $result = [];
 
-    /**
-     * @return array
-     */
-    public function getRepositoryDirectories()
-    {
-        if ($gradle = GradleProjectBehaviour::get()) {
-            $result = $gradle->getConfig()->getDirectoryRepositories();
-
-            foreach ($gradle->getConfig()->getDependencies() as list($group, $artifactId, $version)) {
-                if (!$group && !$version && str::startsWith($artifactId, 'dir:')) {
-                    $result[] = str::sub($artifactId, 4);
+        if ($project = $this->project) {
+            foreach ($project->getModules() as $module) {
+                if ($module->isDir()) {
+                    $result[$module->getId()] = $module->getId();
                 }
             }
-
-            return $result;
         }
 
-        return [];
+        $result[] = 'src_generated/';
+        $result[] = 'src/';
+
+        return $result;
     }
 
     /**
@@ -85,19 +79,13 @@ class RunBuildProjectBehaviour extends AbstractProjectBehaviour
 
         if ($project = $this->project) {
             foreach ($project->getModules() as $module) {
+                if ($module->isDir()) continue;
+
                 switch ($module->getType()) {
                     default:
                         if (fs::exists($module->getId())) {
                             if (fs::isFile($module->getId())) {
                                 $result[] = fs::abs($module->getId());
-                            } elseif (fs::isDir($module->getId())) {
-                                fs::scan($module->getId(), function ($filename) use ($module, &$result) {
-                                    if (fs::name($filename) == fs::nameNoExt($module->getId())) {
-                                        return;
-                                    }
-
-                                    $result[] = fs::abs($filename);
-                                }, 1);
                             }
                         }
 
