@@ -2,6 +2,7 @@
 namespace develnext\lexer;
 
 use develnext\lexer\token\ClassStmtToken;
+use develnext\lexer\token\ConstStmtToken;
 use develnext\lexer\token\FunctionStmtToken;
 use develnext\lexer\token\SimpleToken;
 use php\lang\Environment;
@@ -48,6 +49,13 @@ class SyntaxAnalyzer
      * @return FunctionStmtToken[]
      */
     public function getFunctions()
+    {
+    }
+
+    /**
+     * @return ConstStmtToken[]
+     */
+    public function getConstants()
     {
     }
 

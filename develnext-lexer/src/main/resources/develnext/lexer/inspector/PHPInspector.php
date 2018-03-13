@@ -144,7 +144,7 @@ class PHPInspector extends AbstractInspector
     {
         $stream = $path instanceof Stream ? $path : Stream::of($path);
 
-        $result = ['classes' => [], 'functions' => []];
+        $result = ['classes' => [], 'functions' => [], 'constants' => []];
 
         try {
             try {
@@ -165,8 +165,24 @@ class PHPInspector extends AbstractInspector
 
                 $analyzer = new SyntaxAnalyzer($env, $tokenizer);
 
-                foreach ($analyzer->getClasses() as $class) {
+                foreach ($analyzer->getConstants() as $constant) {
+                    foreach ($constant->getItems() as $name => $value) {
+                        if ($unload) {
+                            $this->removeConstant($name);
+                        } else {
+                            $entry = new ConstantEntry();
+                            $entry->name = $name;
+                            $entry->value = $value->getExprString();
+                            $entry->token = $constant;
 
+                            $this->putConstant($entry);
+
+                            $result['constants'][] = $entry;
+                        }
+                    }
+                }
+
+                foreach ($analyzer->getClasses() as $class) {
                     if ($unload) {
                         $this->removeType($class->getFulledName());
                     } else {

@@ -64,7 +64,7 @@ class JPHPRuntimeBundle extends AbstractJarBundle
     function getProvidedJarDependencies()
     {
         return [
-            'dn-php-sdk', 'dn-jphp-sdk'
+            'dn-php-stub', 'dn-jphp-stub'
         ];
     }
 }

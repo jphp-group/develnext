@@ -1,5 +1,32 @@
 <?php
 
+const STR_PAD_LEFT = 0;
+const STR_PAD_RIGHT = 1;
+const STR_PAD_BOTH = 2;
+
+const HTML_SPECIALCHARS = 0;
+const HTML_ENTITIES = 1;
+const ENT_HTML_QUOTE_NONE = 0;
+const ENT_HTML_QUOTE_SINGLE = 1;
+const ENT_HTML_QUOTE_DOUBLE = 2;
+const ENT_COMPAT = ENT_HTML_QUOTE_DOUBLE;
+const ENT_QUOTES = ENT_HTML_QUOTE_SINGLE | ENT_HTML_QUOTE_DOUBLE;
+const ENT_NOQUOTES = ENT_HTML_QUOTE_NONE;
+
+const ENT_HTML401 = 0;
+const ENT_XML1 = 16;
+const ENT_XHTML = 32;
+const ENT_HTML5 = 48;
+
+const PHP_URL_SCHEME = 0;
+const PHP_URL_HOST = 1;
+const PHP_URL_PORT = 2;
+const PHP_URL_USER = 3;
+const PHP_URL_PASS = 4;
+const PHP_URL_PATH = 5;
+const PHP_URL_QUERY = 6;
+const PHP_URL_FRAGMENT = 7;
+
 /**
  * Calculates the crc32 polynomial of a string.
  *

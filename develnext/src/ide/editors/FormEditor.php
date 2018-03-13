@@ -1531,42 +1531,28 @@ class FormEditor extends AbstractModuleEditor
     {
         $complete = $this->codeEditor->getAutoComplete()->getComplete();
 
-        $complete->on('addFunctionArgument', function ($type, ArgumentStmtToken $arg, $index, FunctionStmtToken $func, AutoCompleteRegion $region) use ($complete) {
-            if ($index == 0 && $func instanceof MethodStmtToken) {
-                $comment = $func->getComment();
+        if ($complete) {
+            $complete->on('addFunctionArgument', function ($type, ArgumentStmtToken $arg, $index, FunctionStmtToken $func, AutoCompleteRegion $region) use ($complete) {
+                if ($index == 0 && $func instanceof MethodStmtToken) {
+                    $comment = $func->getComment();
 
-                if ($comment) {
-                    $regxp = new Regex('\\@event[ ]+([a-z0-9\\_\\-\\.\\+]+)', 'im', $comment);
+                    if ($comment) {
+                        $regxp = new Regex('\\@event[ ]+([a-z0-9\\_\\-\\.\\+]+)', 'im', $comment);
 
-                    if ($regxp->find()) {
-                        list($id, $event) = str::split($regxp->group(1), '.', 2);
+                        if ($regxp->find()) {
+                            list($id, $event) = str::split($regxp->group(1), '.', 2);
 
-                        $ownerName = $func->getOwnerName();
+                            $ownerName = $func->getOwnerName();
 
-                        foreach (Ide::project()->getInspectors() as $inspector) {
-                            if ($owner = $inspector->findType($ownerName)) {
-                                if (!$event) {
-                                    $helper = new TypeEntry();
-                                    $helper->name = "helper:$ownerName";
-                                    $helper->properties['sender'] = $p = new TypePropertyEntry();
-
-                                    $p->name = 'sender';
-                                    $p->data['type'][] = $ownerName;
-
-                                    return [
-                                        'name' => $arg->getName(),
-                                        'type' => $type,
-                                        'typeHelper' => $helper
-                                    ];
-                                }
-
-                                if ($prop = $owner->properties[$id]) {
-                                    if ($prop->data['type'] && $prop->modifier == 'PUBLIC' && !$prop->static) {
+                            foreach (Ide::project()->getInspectors() as $inspector) {
+                                if ($owner = $inspector->findType($ownerName)) {
+                                    if (!$event) {
                                         $helper = new TypeEntry();
                                         $helper->name = "helper:$ownerName";
-                                        $helper->properties['sender'] = $p = clone $prop;
+                                        $helper->properties['sender'] = $p = new TypePropertyEntry();
 
                                         $p->name = 'sender';
+                                        $p->data['type'][] = $ownerName;
 
                                         return [
                                             'name' => $arg->getName(),
@@ -1574,16 +1560,32 @@ class FormEditor extends AbstractModuleEditor
                                             'typeHelper' => $helper
                                         ];
                                     }
-                                }
 
-                                break;
+                                    if ($prop = $owner->properties[$id]) {
+                                        if ($prop->data['type'] && $prop->modifier == 'PUBLIC' && !$prop->static) {
+                                            $helper = new TypeEntry();
+                                            $helper->name = "helper:$ownerName";
+                                            $helper->properties['sender'] = $p = clone $prop;
+
+                                            $p->name = 'sender';
+
+                                            return [
+                                                'name' => $arg->getName(),
+                                                'type' => $type,
+                                                'typeHelper' => $helper
+                                            ];
+                                        }
+                                    }
+
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-            }
+            });
+        }
 
-        });
         return $this->codeEditor->makeUi();
     }
 

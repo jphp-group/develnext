@@ -1,5 +1,18 @@
 <?php
 
+const COUNT_NORMAL = 0;
+const COUNT_RECURSIVE = 1;
+
+const CASE_LOWER = 0;
+const CASE_UPPER = 1;
+
+const SORT_REGULAR = 0;
+const SORT_NUMERIC = 1;
+const SORT_STRING  = 2;
+const SORT_LOCALE_STRING  = 5;
+const SORT_NATURAL = 6;
+const SORT_FLAG_CASE = 8;
+    
 /**
  * @param array $array
  * @param int $case

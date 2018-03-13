@@ -6,8 +6,11 @@ import org.develnext.jphp.ext.javafx.classes.layout.UXRegion;
 import org.develnext.jphp.gui.designer.GuiDesignerExtension;
 import org.develnext.jphp.gui.designer.editor.syntax.AbstractCodeArea;
 import org.fxmisc.richtext.model.Paragraph;
+import php.runtime.Memory;
 import php.runtime.annotation.Reflection.*;
 import php.runtime.env.Environment;
+import php.runtime.memory.ArrayMemory;
+import php.runtime.memory.StringMemory;
 import php.runtime.reflection.ClassEntity;
 
 import java.util.Collection;
@@ -249,6 +252,22 @@ public class UXAbstractCodeArea<T extends AbstractCodeArea> extends UXRegion<Abs
 
         getWrappedObject().moveTo(getWrappedObject().position(line, pos).toOffset());
         getWrappedObject().requestFollowCaret();
+    }
+
+    @Signature
+    public Memory getParagraph(int line) {
+        try {
+            Paragraph<Collection<String>, String, Collection<String>> paragraph = getWrappedObject().getParagraph(line);
+
+            ArrayMemory result = ArrayMemory.createHashed();
+            result.put("text", paragraph.getText());
+            result.put("segments", ArrayMemory.ofStringCollection(paragraph.getSegments()));
+            result.put("style", ArrayMemory.ofStringCollection(paragraph.getParagraphStyle()));
+
+            return result.toConstant();
+        } catch (IndexOutOfBoundsException e) {
+            return Memory.NULL;
+        }
     }
 
     @Signature

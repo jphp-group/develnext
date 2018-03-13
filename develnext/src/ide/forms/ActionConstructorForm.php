@@ -11,6 +11,7 @@ use ide\editors\AbstractEditor;
 use ide\editors\CodeEditor;
 use ide\editors\FormEditor;
 use ide\editors\menu\ContextMenu;
+use ide\formats\PhpCodeFormat;
 use ide\forms\mixins\DialogFormMixin;
 use ide\forms\mixins\SavableFormMixin;
 use ide\Ide;
@@ -196,8 +197,11 @@ class ActionConstructorForm extends AbstractIdeForm
             });
         });
 
-        $this->liveCodeEditor = $liveCodeEditor = new CodeEditor(null, 'php');
-        $liveCodeEditor->setEmbedded(true);
+        /** @var CodeEditor $liveCodeEditor */
+        $this->liveCodeEditor = $liveCodeEditor = Ide::get()->createEditor(null, [
+            'withoutCommands' => false, 'embedded' => true
+        ], PhpCodeFormat::class);
+        $liveCodeEditor->setReadOnly(false);
 
         $this->liveCodeEditor->getTextArea()->on('keyUp', function (UXKeyEvent $e) {
             if ($e->codeName == 'Enter' && $e->controlDown) {

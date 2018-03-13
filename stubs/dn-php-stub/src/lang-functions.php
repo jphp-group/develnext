@@ -1,5 +1,33 @@
 <?php
 
+const PHP_MAXPATHLEN = 4096;
+const PHP_EOL = "\r\n";
+
+const PHP_INT_SIZE = 8;
+const PHP_INT_MAX = 0x7fffffffffffffff;
+const PHP_INT_MIN = 0x8000000000000000;
+
+const PHP_FLOAT_MAX = 1.7976931348623157e+308;
+const PHP_FLOAT_MIN = 4.9e-324;
+
+const DEBUG_BACKTRACE_PROVIDE_OBJECT = 1;
+const DEBUG_BACKTRACE_IGNORE_ARGS = 2;
+
+const EXTR_OVERWRITE  = 0;
+const EXTR_IF_EXISTS  = 6;
+const EXTR_PREFIX_ALL = 3;
+const EXTR_PREFIX_IF_EXISTS = 5;
+const EXTR_PREFIX_INVALID = 4;
+const EXTR_PREFIX_SAME = 2;
+const EXTR_REFS = 256;
+const EXTR_SKIP = 1;
+
+const PHP_OS = "";
+const PHP_OS_FAMILY = "";
+
+const PATH_SEPARATOR = ";";
+const DIRECTORY_SEPARATOR = "/";
+
 /**
  * Delay execution in seconds.
  * @param int $seconds

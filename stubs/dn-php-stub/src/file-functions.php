@@ -1,6 +1,33 @@
 <?php
 use php\io\Stream;
 
+const FILE_USE_INCLUDE_PATH = 1;
+const FILE_APPEND = 8;
+const LOCK_EX = 2;
+const FILE_IGNORE_NEW_LINES = 2;
+const FILE_SKIP_EMPTY_LINES = 4;
+
+const PATHINFO_DIRNAME = 1;
+const PATHINFO_BASENAME = 2;
+const PATHINFO_EXTENSION = 4;
+const PATHINFO_FILENAME = 8;
+
+const SEEK_END = 2;
+const SEEK_CUR = 1;
+const SEEK_SET = 0;
+
+const SCANDIR_SORT_ASCENDING = 0;
+const SCANDIR_SORT_DESCENDING = 1;
+const SCANDIR_SORT_NONE = 2;
+
+const GLOB_MARK = 2;
+const GLOB_NOSORT = 4;
+const GLOB_NOCHECK = 16;
+const GLOB_NOESCAPE = 64;
+const GLOB_BRACE = 1024;
+const GLOB_ONLYDIR = 8192;
+const GLOB_ERR = 1;
+
 /**
  * @param string $path
  * @param string $suffix
@@ -297,5 +324,25 @@ function mkdir($path, $mode = 0777, $recursive = false)
  * @return string|array
  */
 function pathinfo($path, $options = PATHINFO_DIRNAME | PATHINFO_BASENAME | PATHINFO_EXTENSION | PATHINFO_FILENAME)
+{
+}
+
+/**
+ * Find pathnames matching a pattern
+ *
+ * @param string $pattern
+ * @param int $flags [optional]
+ * Valid flags:
+ * GLOB_MARK - Adds a slash to each directory returned
+ * GLOB_NOSORT - Return files as they appear in the directory (no sorting). When this flag is not used, the pathnames are sorted alphabetically
+ * GLOB_NOCHECK - Return the search pattern if no files matching it were found
+ * GLOB_NOESCAPE - Backslashes do not quote metacharacters
+ * GLOB_BRACE - Expands {a,b,c} to match 'a', 'b', or 'c'
+ * GLOB_ONLYDIR - Return only directory entries which match the pattern
+ * GLOB_ERR - Stop on read errors (like unreadable directories), by default errors are ignored.
+ *
+ * @return array an array containing the matched files/directories, an empty array
+ */
+function glob(string $pattern, int $flags = null)
 {
 }

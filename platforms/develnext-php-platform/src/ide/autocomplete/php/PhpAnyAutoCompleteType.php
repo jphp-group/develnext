@@ -140,6 +140,10 @@ class PhpAnyAutoCompleteType extends AutoCompleteType
             $result['__NAMESPACE__'] = new ConstantAutoCompleteItem('__NAMESPACE__');
             $result['__LINE__'] = new ConstantAutoCompleteItem('__LINE__');
 
+            foreach ($this->inspector->getConstants() as $constant) {
+                $result[$constant->name] = new ConstantAutoCompleteItem($constant->name, "$constant->value");
+            }
+
             foreach ($this->inspector->getTypes() as $type) {
                 if ($type->data['deprecated']) {
                     continue;

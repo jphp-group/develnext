@@ -321,7 +321,7 @@ abstract class AbstractInspector
     }
 
     /**
-     * @return array
+     * @return ConstantEntry[]
      */
     public function getConstants()
     {

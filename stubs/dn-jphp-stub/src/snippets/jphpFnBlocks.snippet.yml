@@ -6,7 +6,10 @@
     en: Empty lambda without arguments.
     ru: Пустая анонимная функция без аргументов.
 
-  code: fn => {#}
+  code: >
+    fn => {
+        #
+    }
 
 - id: jphpFnInline_block
 

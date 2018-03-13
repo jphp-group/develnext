@@ -22,7 +22,7 @@ file("$rootDir.path/platforms").listFiles().each { file ->
 
 // bundles
 file("$rootDir.path/bundles").listFiles().each { file ->
-    if (file.directory && file.name.startsWith("dn-") && file.name.endsWith("-bundle")) {
+    if (file.directory && file.name.endsWith("-bundle")) {
         println "include 'bundles/$file.name'"
 
         include "bundles/$file.name"
@@ -31,7 +31,7 @@ file("$rootDir.path/bundles").listFiles().each { file ->
 
 // stubs
 file("$rootDir.path/stubs").listFiles().each { file ->
-    if (file.directory && file.name.startsWith("dn-") && file.name.endsWith("-sdk")) {
+    if (file.directory && file.name.endsWith("-stub")) {
         println "include 'stubs/$file.name'"
 
         include "stubs/$file.name"

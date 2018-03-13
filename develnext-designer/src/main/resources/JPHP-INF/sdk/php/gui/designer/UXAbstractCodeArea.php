@@ -190,4 +190,12 @@ class UXAbstractCodeArea extends UXControl
     public function setStylesheet($filename)
     {
     }
+
+    /**
+     * @param int $line
+     * @return array
+     */
+    public function getParagraph(int $line): ?array
+    {
+    }
 }

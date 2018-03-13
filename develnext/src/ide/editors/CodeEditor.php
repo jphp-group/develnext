@@ -2,6 +2,7 @@
 namespace ide\editors;
 
 use Files;
+use ide\autocomplete\AutoComplete;
 use ide\autocomplete\php\PhpAutoComplete;
 use ide\autocomplete\ui\AutoCompletePane;
 use ide\editors\menu\ContextMenu;
@@ -184,6 +185,12 @@ class CodeEditor extends AbstractEditor
         return $this->mode ? 'icons/' . $this->mode . 'File16.png' : null;
     }*/
 
+    /**
+     * CodeEditor constructor.
+     * @param string $file
+     * @param string $mode
+     * @param array $options
+     */
     public function __construct($file, $mode = 'php', $options = array())
     {
         parent::__construct($file);
@@ -191,7 +198,9 @@ class CodeEditor extends AbstractEditor
         $this->mode = $mode;
         //$this->sourceFile = $mode == 'php';
 
-        if (self::USE_NEW_EDITOR) {
+        $textArea = $options['textArea'] instanceof UXAbstractCodeArea ? $options['textArea'] : null;
+
+        if ($textArea === null) {
             switch ($mode) {
                 case 'php':
                     $this->textArea = new UXPhpCodeArea();
@@ -214,8 +223,7 @@ class CodeEditor extends AbstractEditor
                     break;
             }
         } else {
-            $this->textArea = new UXSyntaxTextArea();
-            $this->textArea->syntaxStyle = "text/$mode";
+            $this->textArea = $textArea;
         }
 
         $this->textArea->on('keyUp', function (UXKeyEvent $e) {
@@ -235,9 +243,8 @@ class CodeEditor extends AbstractEditor
             $this->doChange();
         });
 
-        if ($mode == 'php') {
-            $php = PhpProjectBehaviour::get();
-            $this->autoComplete = new AutoCompletePane($this->textArea, new PhpAutoComplete($php->getInspector()));
+        if ($options['autoComplete'] instanceof AutoComplete) {
+            $this->autoComplete = new AutoCompletePane($this->textArea, $options['autoComplete']);
         }
 
         $this->resetSettings();

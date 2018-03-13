@@ -254,7 +254,7 @@ class AutoCompletePane
         });
 
         $this->area->on('paste', function () {
-            $text = UXClipboard::getText();
+            $text = $this->prepareInsertForMultiline(UXClipboard::getText());
             $this->pasteUsesFromCode($text);
         });
 
@@ -295,6 +295,7 @@ class AutoCompletePane
                     if ($this->doPick()) {
                         $e->consume();
                     }
+
                     break;
 
                 case 'Left':
@@ -511,6 +512,27 @@ class AutoCompletePane
         }
     }
 
+    protected function prepareInsertForMultiline(string $insert): string
+    {
+        $insertLines = str::lines($insert);
+
+        if (sizeof($insertLines) > 1) {
+            $line = $this->area->getParagraph($this->area->caretLine)['text'];
+
+            $prefix = str::sub($line, 0,str::length($line) - str::length(str::trimLeft($line)));
+
+            foreach ($insertLines as $i => $l) {
+                if ($i === 0) continue;
+
+                $insertLines[$i] = "{$prefix}{$l}";
+            }
+
+            $insert = str::join($insertLines, "\n");
+        }
+
+        return $insert;
+    }
+
     protected function doPick()
     {
         //Logger::debug("do pick");
@@ -531,6 +553,7 @@ class AutoCompletePane
                     min(str::length($this->area->text), $this->area->caretPosition + 40));
 
                 $insert = $selected->getInsert();
+
                 Logger::debug("Insert to caret: " . $insert);
 
                 $altCaret = 0;
@@ -541,6 +564,8 @@ class AutoCompletePane
 
                     $insert = $in->getValue();
                 } else {
+                    $insert = $this->prepareInsertForMultiline($insert);
+
                     if (str::contains($insert, '#')) {
                         $altCaret = -(str::length($insert) - str::lastPos($insert, '#')) + 1;
                         $insert = str::replace($insert, '#', '');
@@ -579,6 +604,8 @@ class AutoCompletePane
 
             $this->lock = true;
             return true;
+        } else {
+
         }
     }
 

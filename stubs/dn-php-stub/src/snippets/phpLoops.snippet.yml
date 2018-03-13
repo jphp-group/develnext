@@ -1,0 +1,32 @@
+
+- id: for_simple
+  name: fori
+  description: "for ($i = 0; $i < ...; $i++) { ... }"
+
+  code: >
+    for ($i = 0; $i < #; $i++) {
+        // code ...
+    }
+
+
+- id: foreach_simple
+  name: foreachv
+
+  description: foreach ($arr as $value) { ... }
+
+  code: >
+    foreach (# as $value) {
+        // code ...
+    }
+
+
+- id: foreach_key_simple
+  name: foreachk
+
+  description: foreach ($arr as $key => $value) { ... }
+
+  code: >
+    foreach (# as $key => $value) {
+        // code ...
+    }
+  

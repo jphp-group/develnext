@@ -6,4 +6,7 @@ description:
   ru: Выполнить позже в UI потоке
   en: Execute the code in the UI thread
 
-code: uiLater(fn => {#});
+code: >
+  uiLater(fn => {
+      #
+  });

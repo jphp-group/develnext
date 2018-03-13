@@ -1,0 +1,50 @@
+- id: include
+  name: include ...;
+  description:
+    en: Include php from file/resource.
+    ru: Подключить php из файла/ресурса.
+
+  code: 'include #;'
+
+- id: include_once
+  name: include_once ...;
+  description:
+    en: Include once php from file/resource.
+    ru: Подключить один раз php из файла/ресурса.
+
+  code: 'include_once #;'
+
+- id: require
+  name: require ...;
+  description:
+    en: Require php from file/resource.
+    ru: Подключить php из файла/ресурса.
+
+  code: 'require #;'
+
+- id: require_once
+  name: require_once ...;
+  description:
+    en: Require once php from file/resource.
+    ru: Подключить один раз php из файла/ресурса.
+
+  code: 'require #;'
+
+- id: echo_line
+  name: echs
+  description:
+    en: 'echo "..."; // echo string'
+    ru: 'echo "..."; // вывод строки'
+
+  code: 'echo "#";'
+
+- id: if
+  name: ifc
+  description: if (...) { ... }
+
+  code: >
+    if (#) {
+        // code ...
+    }
+
+  

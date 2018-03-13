@@ -360,15 +360,17 @@ class IdeEventListPane
                 $actionConstructor = new ActionConstructorForm();
                 $actionConstructor->setContext($this->context);
 
-                $actionConstructor->getLiveCodeEditor()->getAutoComplete()->getComplete()->on(
-                    'addFunctionArgument',
-                    function ($type, ArgumentStmtToken $argument, $index, FunctionStmtToken $method, AutoCompleteRegion $region) {
-                        return $this->codeEditor
-                            ->getAutoComplete()
-                            ->getComplete()
-                            ->trigger('addFunctionArgument', [$type, $argument, $index, $method, $region]);
-                    }
-                );
+                if ($actionConstructor->getLiveCodeEditor()->getAutoComplete()) {
+                    $actionConstructor->getLiveCodeEditor()->getAutoComplete()->getComplete()->on(
+                        'addFunctionArgument',
+                        function ($type, ArgumentStmtToken $argument, $index, FunctionStmtToken $method, AutoCompleteRegion $region) {
+                            return $this->codeEditor
+                                ->getAutoComplete()
+                                ->getComplete()
+                                ->trigger('addFunctionArgument', [$type, $argument, $index, $method, $region]);
+                        }
+                    );
+                }
 
                 $actionConstructor->setLiveCode($this->codeEditor->getValue(), $bind['beginLine'], $bind['beginPosition']);
                     //$this->manager->getCodeOfMethod($selectedClass, $selectedMethod));

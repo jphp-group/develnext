@@ -1,10 +1,13 @@
 <?php
 namespace ide\formats;
 
+use ide\autocomplete\php\PhpAutoComplete;
 use ide\editors\AbstractEditor;
 use ide\editors\CodeEditor;
-use php\gui\designer\UXSyntaxAutoCompletion;
-use php\lib\Str;
+use ide\project\behaviours\PhpProjectBehaviour;
+use php\gui\designer\UXPhpCodeArea;
+use php\lib\arr;
+use php\lib\fs;
 
 /**
  * Class PhpCodeFormat
@@ -20,7 +23,15 @@ class PhpCodeFormat extends AbstractFormat
      */
     public function createEditor($file, array $options = [])
     {
-        $editor = new CodeEditor($file, 'php');
+        $codeEditorOptions = [
+            'textArea' => new UXPhpCodeArea()
+        ];
+
+        if ($php = PhpProjectBehaviour::get()) {
+            $codeEditorOptions['autoComplete'] = new PhpAutoComplete($php->getInspector());
+        }
+
+        $editor = new CodeEditor($file, 'php', $codeEditorOptions);
         $editor->setEmbedded((bool) $options['embedded']);
 
         if ($options['readOnly']) {
@@ -42,7 +53,7 @@ class PhpCodeFormat extends AbstractFormat
      */
     public function isValid($file)
     {
-        return Str::endsWith($file, '.php');
+        return arr::has(['php', 'phpt'], fs::ext($file));
     }
 
     /**
@@ -52,6 +63,5 @@ class PhpCodeFormat extends AbstractFormat
      */
     public function register($any)
     {
-
     }
 }

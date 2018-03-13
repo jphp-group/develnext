@@ -93,6 +93,11 @@ public class PSyntaxAnalyzer extends BaseWrapper<SyntaxAnalyzer> {
     }
 
     @Signature
+    public Collection<ConstStmtToken> getConstants() {
+        return new ArrayList<>(getWrappedObject().getConstants());
+    }
+
+    @Signature
     public static List<Token> analyzeExpressionForDetectType(Environment env, String expression) throws IOException {
         return analyzeExpressionForDetectType(env, expression, false);
     }

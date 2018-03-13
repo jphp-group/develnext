@@ -79,6 +79,10 @@ public class PhpCodeArea extends AbstractCodeArea {
         put(OpenTagToken.class, KEYWORD);
         put(ImplementsStmtToken.class, KEYWORD);
         put(LambdaStmtToken.class, KEYWORD);
+        put(IncludeExprToken.class, KEYWORD);
+        put(IncludeOnceExprToken.class, KEYWORD);
+        put(RequireExprToken.class, KEYWORD);
+        put(RequireOnceExprToken.class, KEYWORD);
 
         put(OperatorExprToken.class, OPERATOR);
     }};
