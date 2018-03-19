@@ -24,6 +24,14 @@ abstract class AbstractProjectTemplate
 
     /**
      * @param Project $project
+     * @return mixed
+     */
+    public function openProject(Project $project)
+    {
+    }
+
+    /**
+     * @param Project $project
      *
      * @return Project
      */

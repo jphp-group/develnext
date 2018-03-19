@@ -95,8 +95,9 @@ class BackupProjectBehaviour extends AbstractProjectBehaviour
         $this->controlPane = new BackupProjectControlPane($this);
 
         /** @var ProjectFormat $projectFormat */
-        $projectFormat = Ide::get()->getRegisteredFormat(ProjectFormat::class);
-        $projectFormat->addControlPane($this->controlPane);
+        if ($projectFormat = Ide::get()->getRegisteredFormat(ProjectFormat::class)) {
+            $projectFormat->addControlPane($this->controlPane);
+        }
 
         $this->makeMenu();
 

@@ -138,7 +138,17 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
     {
         $package = ['classes' => [], 'functions' => [], 'constants' => []];
 
-        foreach ([$this->project->getSrcFile(''), $this->project->getSrcFile('', true)] as $directory) {
+        $dirs = [];
+
+        if ($this->project->getSrcDirectory() !== null) {
+            $dirs[] = $this->project->getSrcFile('');
+        }
+
+        if ($this->project->getSrcGeneratedDirectory() !== null) {
+            $dirs[] = $this->project->getSrcFile('', true);
+        }
+
+        foreach ($dirs as $directory) {
             fs::scan($directory, function ($filename) use ($directory, &$package) {
                 if (fs::ext($filename) == 'php') {
                     $classname = FileUtils::relativePath($directory, $filename);
@@ -178,8 +188,11 @@ class PhpProjectBehaviour extends AbstractProjectBehaviour
                     'defaultPackages' => [$this->project->getPackageName()]
                 ];
 
-                $this->project->loadDirectoryForInspector($this->project->getFile("src/"), $options);
-                $this->project->loadDirectoryForInspector($this->project->getFile(self::GENERATED_DIRECTORY), $options);
+                $this->project->loadDirectoryForInspector($this->project->getSrcFile(""), $options);
+
+                if ($this->project->getSrcGeneratedDirectory() != null) {
+                    $this->project->loadDirectoryForInspector($this->project->getSrcFile("", true), $options);
+                }
             }))->start();
         }
     }

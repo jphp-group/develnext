@@ -826,6 +826,10 @@ class Project
     {
         Logger::info("Opening project ...");
 
+        if ($this->template) {
+            $this->template->openProject($this);
+        }
+
         $this->trigger(__FUNCTION__);
 
         //if (!$this->indexer->isValid()) { todo implement it

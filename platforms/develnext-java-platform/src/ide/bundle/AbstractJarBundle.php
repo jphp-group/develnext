@@ -157,7 +157,6 @@ abstract class AbstractJarBundle extends AbstractBundle
     protected function getSearchLibPaths()
     {
         return [
-            Ide::get()->getOwnFile('lib/')
         ];
     }
 
@@ -171,36 +170,6 @@ abstract class AbstractJarBundle extends AbstractBundle
             return $name;
         }
 
-        /** @var File[] $libPaths */
-        $libPaths = $this->getSearchLibPaths();
-
-        if (Ide::get()->isDevelopment()) {
-            $ownFile = Ide::get()->getOwnFile('build/install/develnext/lib');
-            $libPaths[] = $ownFile;
-        }
-
-        $regex = Regex::of('(\.[0-9]+|\-[0-9]+)');
-
-        $name = $regex->with($name)->replace('');
-
-        foreach ($libPaths as $libPath) {
-            foreach ($libPath->findFiles() as $file) {
-                $filename = $regex->with($file->getName())->replace('');
-
-                if (str::endsWith($filename, '.jar') || str::endsWith($filename, '-SNAPSHOT.jar')) {
-                    $filename = str::sub($filename, 0, Str::length($filename) - 4);
-
-                    if (str::endsWith($filename, '-SNAPSHOT')) {
-                        $filename = Str::sub($filename, 0, Str::length($filename) - 9);
-                    }
-
-                    if ($filename == $name) {
-                        return $file;
-                    }
-                }
-            }
-        }
-
-        return null;
+        return Ide::get()->findLibFile($name, $this->getSearchLibPaths());
     }
 }

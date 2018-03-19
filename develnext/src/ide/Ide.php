@@ -54,6 +54,7 @@ use php\lib\reflect;
 use php\lib\Str;
 use php\time\Time;
 use php\time\Timer;
+use php\util\Regex;
 use php\util\Scanner;
 use timer\AccurateTimer;
 
@@ -1696,5 +1697,45 @@ class Ide extends Application
         }
 
         $this->shutdown();
+    }
+
+    /**
+     * @param string $name
+     * @param array $libPaths
+     * @return null|File
+     */
+    public function findLibFile($name, array $libPaths = [])
+    {
+        /** @var File[] $libPaths */
+        $libPaths[] = $this->getOwnFile('lib/');
+
+        if ($this->isDevelopment()) {
+            $ownFile = $this->getOwnFile('build/install/develnext/lib');
+            $libPaths[] = $ownFile;
+        }
+
+        $regex = Regex::of('(\.[0-9]+|\-[0-9]+)');
+
+        $name = $regex->with($name)->replace('');
+
+        foreach ($libPaths as $libPath) {
+            foreach ($libPath->findFiles() as $file) {
+                $filename = $regex->with($file->getName())->replace('');
+
+                if (str::endsWith($filename, '.jar') || str::endsWith($filename, '-SNAPSHOT.jar')) {
+                    $filename = str::sub($filename, 0, Str::length($filename) - 4);
+
+                    if (str::endsWith($filename, '-SNAPSHOT')) {
+                        $filename = Str::sub($filename, 0, Str::length($filename) - 9);
+                    }
+
+                    if ($filename == $name) {
+                        return $file;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }
