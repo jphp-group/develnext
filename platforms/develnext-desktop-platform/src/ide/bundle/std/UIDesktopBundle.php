@@ -114,6 +114,7 @@ class UIDesktopBundle extends AbstractJarBundle
     {
         return [
             'jphp-gui-ext',
+            'jphp-gui-tabs-ext',
             'jphp-graphic-ext',
             'jphp-gui-desktop-ext',
             'jphp-zend-ext',

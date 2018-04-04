@@ -140,6 +140,7 @@ project(':jphp-app-framework') {
     dependencies {
         compile "org.develnext.jphp:jphp-core:$jphpVersion"
         compile "org.develnext.jphp:jphp-gui-ext:$jphpVersion"
+        compile project(':jphp-gui-tabs-ext')
     }
 }
 

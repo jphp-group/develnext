@@ -10,6 +10,7 @@ include 'develnext-lexer';
 include 'develnext-launcher';
 
 include 'jphp-gui-richtext-ext';
+include 'jphp-gui-tabs-ext';
 
 // platforms
 file("$rootDir.path/platforms").listFiles().each { file ->

@@ -18,6 +18,7 @@ use php\gui\UXApplication;
 use php\gui\UXButton;
 use php\gui\UXContextMenu;
 use php\gui\UXDialog;
+use php\gui\UXDndTabPane;
 use php\gui\UXForm;
 use php\gui\UXSplitPane;
 use php\gui\UXTab;
@@ -510,7 +511,8 @@ class FileSystem
         });
 
         static::addTab($tab, $editor->isPrependTab());
-        $tab->draggable = $editor->isDraggable();
+
+        UXDndTabPane::setDraggable($tab, $editor->isDraggable());
 
         return $tab;
     }
@@ -704,7 +706,7 @@ class FileSystem
 
         if (!static::$addTab) {
             $tab = new UXTab();
-            $tab->draggable = false;
+            UXDndTabPane::setDraggable($tab, false);
             $tab->closable = false;
             $tab->style = '-fx-cursor: hand; -fx-padding: 1px 0px;';
             $tab->graphic = Ide::get()->getImage('icons/plus16.png');
@@ -725,7 +727,7 @@ class FileSystem
 
         if (static::$addTabClick) {
             $fileTabPane->tabs->add(static::$addTab);
-            static::$addTab->draggable = false;
+            UXDndTabPane::setDraggable(static::$addTab, false);
         }
     }
 

@@ -12,6 +12,7 @@ use php\gui\event\UXEvent;
 use php\gui\layout\UXAnchorPane;
 use php\gui\layout\UXHBox;
 use php\gui\layout\UXVBox;
+use php\gui\UXDndTabPane;
 use php\gui\UXImage;
 use php\gui\UXLabel;
 use php\gui\UXMenu;
@@ -107,13 +108,13 @@ class MainForm extends AbstractIdeForm
 
         $this->headRightPane->spacing = 5;
 
-        $pane = UXTabPane::createDefaultDnDPane();
+        $pane = new UXDndTabPane();
 
         $parent = $this->fileTabPane->parent;
         $this->fileTabPane->free();
 
         /** @var UXTabPane $tabPane */
-        $tabPane = $pane ? $pane->children[0] : new UXTabPane();
+        $tabPane = $pane ?: new UXTabPane();
         $tabPane->id = 'fileTabPane';
         $tabPane->tabClosingPolicy = 'ALL_TABS';
         $tabPane->classes->add('dn-file-tab-pane');
