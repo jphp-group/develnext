@@ -140,7 +140,6 @@ project(':jphp-app-framework') {
     dependencies {
         compile "org.develnext.jphp:jphp-core:$jphpVersion"
         compile "org.develnext.jphp:jphp-gui-ext:$jphpVersion"
-        compile project(':jphp-gui-tabs-ext')
     }
 }
 
@@ -153,6 +152,8 @@ project(':develnext') {
         compile "org.develnext.jphp:jphp-gui-desktop-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-gui-systemtray-ext:$jphpVersion"
         compile "org.develnext.jphp:jphp-parser-ext:$jphpVersion"
+
+        compile project(':jphp-gui-tabs-ext')
 
         compile project(':develnext-launcher')
         compile project(':develnext-designer')
