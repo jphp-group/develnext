@@ -359,7 +359,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                 $region->setValue([
                     'name' => 'this',
                     'type' => $owner->getFulledName(),
-                ], 'variable');
+                ], 'variable', 'this');
             } else {
                 Logger::warn("Cannot find class for method when add function region, '{$token->getShortName()}' method");
             }
@@ -377,7 +377,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                     'name' => $arg->getName(),
                     'type' => $type,
                     'argument' => true,
-                ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1);
+                ], 'variable', $token->getStartLine(), $token->getStartPosition() + 1, $arg->getName());
             }
         }
 
@@ -403,7 +403,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                         $region->setValue([
                             'name' => $varName,
                             'type' => str::sub($type, 9)
-                        ], 'variable');
+                        ], 'variable', $varName);
 
                         break;
                     }
@@ -430,7 +430,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                         $region->setValue([
                             'name' => $varName,
                             'type' => $type,
-                        ], 'variable');
+                        ], 'variable', $varName);
                     }
                 }
 
@@ -451,7 +451,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                         $region->setValue([
                             'name' => $varName,
                             'type' => $type,
-                        ], 'variable');
+                        ], 'variable', $varName);
                     }
                 }
 
@@ -474,7 +474,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                         $region->setValue([
                             'name' => $varName,
                             'type' => $type ?: 'mixed',
-                        ], 'variable');
+                        ], 'variable', $varName);
                     }
                 }
             }
@@ -485,7 +485,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
                 $region->setValue([
                     'name' => $var->getName(),
                     'type' => 'mixed',
-                ], 'variable');
+                ], 'variable', $var->getName());
             }
         }
     }

@@ -137,10 +137,10 @@ class AutoComplete
         return $this->globalRegion;
     }
 
-    public function setValueOfRegion($value, $category, $line = 0, $pos = 0)
+    public function setValueOfRegion($value, $category, $line = 0, $pos = 0, string $uid = null)
     {
         if ($region = $this->findRegion($line, $pos)) {
-            $region->setValue($value, $category);
+            $region->setValue($value, $category, $uid);
         }
     }
 

@@ -200,6 +200,8 @@ class AutoCompletePane
         $hintShown = false;
 
         if ($hintString = $this->getHintString()) {
+            Logger::debug("Try to hint for string '$hintString' ...");
+
             [$offset, $string] = $hintString;
 
             $region = $this->complete->findRegion($this->area->caretLine, $this->area->caretOffset);
@@ -236,6 +238,8 @@ class AutoCompletePane
                     $hintShown = false;
                 }
             }
+        } else {
+            Logger::debug("Try show hint result is 'empty hint string'");
         }
 
         if (!$hintShown) {

@@ -96,15 +96,23 @@ class AutoCompleteRegion
             //&& $pos >= $this->fromPos && ($pos <= $this->toPos || $this->toPos == -1);
     }
 
-    public function setValue($value, $category)
+    public function setValue($value, $category, string $uid = null)
     {
-        $this->values[$category][] = $value;
+        if (isset($uid)) {
+            $this->values[$category][$uid] = $value;
+        } else {
+            $this->values[$category][] = $value;
+        }
     }
 
 
-    public function setValueAsRef(&$value, $category)
+    public function setValueAsRef(&$value, $category, string $uid = null)
     {
-        $this->values[$category][] =& $value;
+        if (isset($uid)) {
+            $this->values[$category][$uid] =& $value;
+        } else {
+            $this->values[$category][] =& $value;
+        }
     }
 
     public function getValues($category)
