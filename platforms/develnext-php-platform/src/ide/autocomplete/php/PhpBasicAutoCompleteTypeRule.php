@@ -353,7 +353,7 @@ class PhpBasicAutoCompleteTypeRule extends AutoCompleteTypeRule
         $vars = [];
 
         if ($token instanceof MethodStmtToken) {
-            if ($owner != null) {
+            if ($owner != null && !$token->isStatic()) {
                 $vars['this'] = $owner->getFulledName();
 
                 $region->setValue([
