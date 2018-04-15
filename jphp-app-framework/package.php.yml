@@ -7,12 +7,13 @@ plugins:
 - GitHub
 
 deps:
+  jphp-core: '*'
   jphp-gui-ext: '*'
 
 sources:
 - src
 
 github:
-  address: 'https://github.com/jphp-compiler/jphp'
+  address: 'https://github.com/jphp-compiler/jphp-repo'
   title: '%name%-%version%'
   tag-prefix: '%name%-'
