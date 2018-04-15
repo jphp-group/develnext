@@ -1,0 +1,18 @@
+
+name: jphp-app-framework
+version: 0.9.3
+description: JPHP App Framework for JavaFX and jphp-gui-ext.
+
+plugins:
+- GitHub
+
+deps:
+  jphp-gui-ext: '*'
+
+sources:
+- src
+
+github:
+  address: 'https://github.com/jphp-compiler/jphp'
+  title: '%name%-%version%'
+  tag-prefix: '%name%-'
