@@ -2,7 +2,7 @@
 include 'develnext-designer';
 
 include 'jphp-desktop-hotkey-ext',
-        'jphp-app-framework',
+        'dn-app-framework',
         'develnext';
 
 include 'develnext-doc';

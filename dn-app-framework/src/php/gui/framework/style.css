@@ -1,0 +1,162 @@
+.root {
+    /***************************************************************************
+     *                                                                         *
+     * The main color palette from which the rest of the colors are derived.   *
+     *                                                                         *
+     **************************************************************************/
+
+    /* A light grey that is the base color for objects.  Instead of using
+     * -fx-base directly, the sections in this file will typically use -fx-color.
+     */
+    /*-fx-base: #ececec;*/
+    -fx-accent: #c5c5c5;
+    -fx-default-button: #1c67b1;
+
+    -fx-focus-color: #2788d3;
+    -fx-faint-focus-color: #039ED322;
+
+    -fx-body-color: linear-gradient(to bottom,
+                        ladder(
+                                -fx-color,
+                                derive(-fx-color,8%) 85%,
+                                derive(-fx-color,10%) 90%
+                        ),
+                        derive(-fx-color,-3%));
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Hyperlink                                                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+.hyperlink {
+    -fx-padding: 0; /*0.166667em 0.25em 0.166667em 0.25em;*/ /* 2 3 2 3 */
+    -fx-content-display: LEFT;
+    -fx-border-color: transparent;
+    -fx-border-width: 0px;
+}
+.hyperlink,
+.hyperlink:hover,
+.hyperlink:hover:visited {
+    -fx-text-fill: -fx-default-button;
+}
+.hyperlink:armed,
+.hyperlink:visited,
+.hyperlink:hover:armed {
+    -fx-text-fill: -fx-default-button;
+}
+.hyperlink:hover,
+.hyperlink:hover:visited {
+    -fx-underline: true;
+}
+
+.hyperlink:visited,
+.hyperlink:visited:armed {
+    -fx-underline: false;
+}
+.hyperlink:focused {
+    -fx-border-style: segments(0.166667em, 0.166667em);
+    -fx-border-width: 0px;
+}
+.hyperlink:show-mnemonics > .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+.flat-button {
+    -fx-cursor: hand;
+}
+
+.tooltip {
+    -fx-font-size: 1em;
+}
+
+.combo-box > .list-cell:hover {
+    -fx-background-insets: 1 -3 1 1, 1 -2 1 1 ;
+    -fx-background-color: gray;
+}
+
+.without-focus, .without-focus:focused {
+    -fx-focus-color: transparent;
+}
+
+.scroll-pane.without-focus {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane.without-focus:focused {
+    -fx-background-insets: 0;
+}
+
+.scroll-pane.without-focus .corner {
+    -fx-background-insets: 0;
+}
+
+.nav {
+   /* -fx-hgap: 5;     */
+}
+
+.nav .nav-item {
+    -fx-padding: 5px 10px;
+}
+
+.nav .nav-item.selected {
+    -fx-font-weight: bold;
+    -fx-background-color: white;
+    -fx-border-color: silver;
+    -fx-border-radius: 3px;
+}
+
+.nav .nav-hint-text {
+    -fx-text-fill: gray;
+    -fx-padding:  0 0 0 10;
+}
+
+.nav .nav-hint-total {
+    -fx-text-fill: gray;
+    -fx-font-weight: bold;
+}
+
+.button, .combo-box-base, .list-view, .text-area, .text-field, .tab-header-area, .tab-pane, .tab-header-background {
+    -fx-background-radius: 2px;
+}
+
+.list-view {
+    -fx-background-radius: 0px;
+}
+
+.scroll-pane {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane:focused {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.split-pane:focused,
+.list-view:focused,
+.tree-view:focused,
+.table-view:focused,
+.tree-table-view:focused,
+.html-editor:contains-focus {
+    -fx-background-color: -fx-box-border, -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 0, 1;
+    -fx-background-radius: 0, 0, 0;
+}
+
+.text-area > .scroll-pane {
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 1;
+}
+
+.text-area:focused > .scroll-pane {
+    -fx-background-insets: -1.4, -0.3, 1;
+    -fx-background-radius: 2, 0, 0;
+    -fx-background-color: -fx-faint-focus-color, -fx-focus-color, -fx-background;
+}

@@ -1,0 +1,23 @@
+
+name: dn-mail-bundle
+version: 1.0.0
+author: DevelNext
+
+deps:
+  jphp-mail-ext: '*'
+
+sources:
+- src/vendor/develnext.bundle.mail.MailBundle
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  name: Mailer
+  class: develnext\bundle\mail\MailBundle
+  icon: develnext/bundle/mail/mail32.png
+  description: Пакет для отправки электронным писем (email) через smtp сервер.
+  description-file: develnext/bundle/mail/description.html
+  platforms: [desktop, web]
+  group: network

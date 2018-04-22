@@ -1,0 +1,18 @@
+name: dn-app-framework
+version: 1.0.0
+description: JPHP App Framework for JavaFX and jphp-gui-ext.
+
+deps:
+  jphp-core: '*'
+  jphp-gui-ext: '*'
+
+sources:
+- src
+
+includes:
+- php/gui/framework/functions.php
+
+config:
+  ignore:
+    - './out/**'
+    - './build.gradle'

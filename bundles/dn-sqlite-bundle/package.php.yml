@@ -1,0 +1,24 @@
+
+name: dn-sqlite-bundle
+version: 1.0.0
+author: DevelNext
+
+deps:
+  jphp-sqlite-ext: '*'
+  dn-sql-bundle: '%version%'
+
+sources:
+- src/vendor/develnext.bundle.sql.SqliteBundle
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  name: SQLite
+  class: develnext\bundle\sql\SqliteBundle
+  icon: develnext/bundle/sqlite/sqlite.png
+  description: Пакет для работы с бд SQLite 3.
+  description-file: develnext/bundle/sql/sqlite/description.html
+  platforms: [desktop, web]
+  group: database

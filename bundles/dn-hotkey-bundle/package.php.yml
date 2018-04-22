@@ -1,0 +1,20 @@
+
+name: dn-hotkey-bundle
+version: 1.0.0
+author: DevelNext
+
+sources:
+- src/vendor/develnext.bundle.hotkey.HotKeyBundle
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  name: Hot Key
+  class: develnext\bundle\hotkey\HotKeyBundle
+  icon: develnext/bundle/hotkey/hotkey48.png
+  description: Пакет для добавления системных горячих клавиш (hotkey).
+  description-file: develnext/bundle/hotkey/description.html
+  platforms: [desktop]
+  group: system

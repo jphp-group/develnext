@@ -1,0 +1,23 @@
+
+name: dn-jfoenix-bundle
+version: 1.0.0
+author: DevelNext
+
+deps:
+  jphp-gui-jfoenix-ext: '*'
+
+sources:
+- src/vendor/develnext.bundle.jfoenix.JFoenixBundle
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  name: Material UI
+  class: develnext\bundle\jfoenix\JFoenixBundle
+  icon: icons/develnext/bundle/jfoenix/jfoenix.png
+  description: JFoenix визуальные компоненты в Material дизайне.
+  description-file: develnext/bundle/jfoenix/description.html
+  platforms: [desktop]
+  group: other

@@ -1,0 +1,23 @@
+
+name: dn-systemtray-bundle
+version: 1.0.0
+author: DevelNext
+
+deps:
+  jphp-gui-systemtray-ext: '*'
+
+sources:
+- src/vendor/develnext.bundle.systemtray.SystemTrayBundle
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  name: System Tray
+  class: develnext\bundle\systemtray\SystemTrayBundle
+  icon: develnext/bundle/trayIcon/systemTray.png
+  description: Пакет для создания иконок в трей баре системы.
+  description-file: develnext/bundle/systemtray/description.html
+  platforms: [desktop]
+  group: system

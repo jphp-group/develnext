@@ -1,0 +1,20 @@
+
+name: dn-game2d-bundle
+version: 1.0.0
+author: DevelNext
+
+deps:
+  jphp-gui-game-ext: '*'
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  name: 2D Game
+  class: develnext\bundle\game2d\Game2DBundle
+  icon: develnext/bundle/game2d/game2d.png
+  description: Пакет для создания простых 2d игр.
+  description-file: develnext/bundle/game2d/description.html
+  platforms: [desktop]
+  group: game

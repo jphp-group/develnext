@@ -118,7 +118,7 @@ class UIDesktopBundle extends AbstractJarBundle
             'jphp-graphic-ext',
             'jphp-gui-desktop-ext',
             'jphp-zend-ext',
-            'jphp-app-framework',
+            'dn-app-framework',
             'jphp-xml-ext',
 
             'gson', 'jphp-json-ext',

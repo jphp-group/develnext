@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem;
+
 def javaVersion = '1.8';
 
 buildscript {
@@ -58,6 +60,17 @@ subprojects {
     def dirName = file(it.name).name;
     def bundleDirRoot = "${projectDir}/../../develnext/misc/library/bundles/";
     def bundleDir = "${bundleDirRoot}/${dirName}/";
+    def pkgFile = file("$projectDir/package.php.yml")
+
+    if (pkgFile.exists()) {
+        task publish(type: Exec) {
+            if (OperatingSystem.current().isWindows()) {
+                commandLine 'cmd', '/c', 'jppm', 'publish', '-yes'
+            } else {
+                commandLine 'jppm', 'publish', '-yes'
+            }
+        }
+    }
 
     if (it.name.startsWith("bundles/") || it.name.endsWith("-bundle")) {
         println "-> Detecting bundle '$it.name' ...";
@@ -136,7 +149,7 @@ project(':jphp-desktop-hotkey-ext') {
     }
 }
 
-project(':jphp-app-framework') {
+project(':dn-app-framework') {
     dependencies {
         compile "org.develnext.jphp:jphp-core:$jphpVersion"
         compile "org.develnext.jphp:jphp-gui-ext:$jphpVersion"
@@ -158,7 +171,7 @@ project(':develnext') {
         compile project(':develnext-launcher')
         compile project(':develnext-designer')
         compile project(':jphp-gui-richtext-ext')
-        compile project(':jphp-app-framework')
+        compile project(':dn-app-framework')
         compile project(':develnext-doc')
 
         // platforms

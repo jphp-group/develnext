@@ -21,6 +21,11 @@ build/
 gradle.properties
 secret.asc
 
+package.github.yml
+package-lock.php.yml
+
+vendor/
+
 develnext/misc/library/bundles/*/*.jar
 
 out/

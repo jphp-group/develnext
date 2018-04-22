@@ -14,6 +14,7 @@ use ide\l10n\L10n;
 use ide\library\IdeLibrary;
 use ide\misc\AbstractCommand;
 use ide\misc\EventHandlerBehaviour;
+use ide\project\AbstractProjectSupport;
 use ide\project\AbstractProjectTemplate;
 use ide\project\control\AbstractProjectControlPane;
 use ide\project\Project;
@@ -82,6 +83,11 @@ class Ide extends Application
      * @var AbstractProjectTemplate[]
      */
     protected $projectTemplates = [];
+
+    /**
+     * @var AbstractProjectSupport[]
+     */
+    protected $projectSupports = [];
 
     /**
      * @var AbstractExtension[]
@@ -874,6 +880,14 @@ class Ide extends Application
     }
 
     /**
+     * @return AbstractProjectSupport[]
+     */
+    public function getProjectSupports(): array
+    {
+        return $this->projectSupports;
+    }
+
+    /**
      * Зарегистрировать шаблон проекта.
      *
      * @param AbstractProjectTemplate $template
@@ -1277,6 +1291,32 @@ class Ide extends Application
     public function getAccountManager()
     {
         return $this->accountManager;
+    }
+
+    /**
+     * @param string|AbstractProjectSupport $support
+     * @throws IdeException
+     */
+    public function registerProjectSupport($support)
+    {
+        if (is_string($support)) {
+            $support = new $support();
+        }
+
+        if (isset($this->projectSupports[reflect::typeOf($support)])) {
+            return;
+        }
+
+
+        Logger::info("Register IDE project support " . reflect::typeOf($support));
+
+
+        if (!($support instanceof AbstractProjectSupport)) {
+            throw new IdeException("Unable to add project support " . reflect::typeOf($support) . ", is not correct type");
+        }
+
+        $this->projectSupports[reflect::typeOf($support)] = $support;
+        $support->onRegisterInIDE();
     }
 
     /**

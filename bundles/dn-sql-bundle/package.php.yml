@@ -1,0 +1,19 @@
+
+name: dn-sql-bundle
+version: 1.0.0
+author: DevelNext
+
+deps:
+  jphp-sql-ext: '*'
+
+sources:
+- src/vendor/develnext.bundle.sql.SqlBundle
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  hidden: true
+  name: SQLite
+  class: develnext\bundle\sql\SqlBundle

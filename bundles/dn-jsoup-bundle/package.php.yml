@@ -1,0 +1,23 @@
+
+name: dn-jsoup-bundle
+version: 1.0.0
+author: DevelNext
+
+deps:
+  jphp-jsoup-ext: '*'
+
+sources:
+- src/vendor/develnext.bundle.jsoup.JsoupBundle
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  name: JSoup
+  class: develnext\bundle\jsoup\JsoupBundle
+  icon: develnext/bundle/jsoup/website32.png
+  description: Пакет для парсинга html и сайтов в стиле апи jQuery.
+  description-file: develnext/bundle/jsoup/description.html
+  platforms: [desktop, web]
+  group: network

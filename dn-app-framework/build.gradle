@@ -1,0 +1,35 @@
+sourceSets {
+    main.resources.srcDirs = ['src']
+}
+
+task prepareDist << {
+    def classes = [];
+
+    fileTree(project.projectDir.path + "/src").filter { it.name.endsWith('.php') }.each {
+        def name = it.path.substring(0, it.path.length() - 4);
+
+        name = name.substring(project.projectDir.path.length() + 5);
+        name = name.replace("/", "\\");
+
+        switch (name) {
+            case "Async":
+            case "Files":
+            case ".packages\\framework":
+                return ;
+        }
+
+        classes.add(name)
+    }
+
+    File lstFile = new File(project.projectDir.path + "/src/JPHP-INF/packages/framework");
+
+    lstFile.getParentFile().mkdirs();
+
+    lstFile.withWriter { out ->
+        out.println("[classes]")
+
+        classes.each {
+            out.println it
+        }
+    }
+}

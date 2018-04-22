@@ -26,6 +26,15 @@ abstract class AbstractProjectBehaviour
     protected $project;
 
     /**
+     * @param Project $project
+     * @return bool
+     */
+    public function isFit(Project $project)
+    {
+        return false;
+    }
+
+    /**
      * ...
      */
     abstract public function inject();

@@ -71,6 +71,11 @@ class Project
     protected $behaviours = [];
 
     /**
+     * @var AbstractProjectSupport[]
+     */
+    protected $supports = [];
+
+    /**
      * @var array
      */
     protected $handlers = [];
@@ -830,6 +835,8 @@ class Project
             $this->template->openProject($this);
         }
 
+        $this->refreshSupports();
+
         $this->trigger(__FUNCTION__);
 
         //if (!$this->indexer->isValid()) { todo implement it
@@ -865,6 +872,40 @@ class Project
         $this->doTick();
 
         $this->tickTimer->start();
+    }
+
+    /**
+     * Refresh supports.
+     */
+    public function refreshSupports()
+    {
+        $time = Time::millis();
+        Logger::info("Refresh project supports ...");
+
+        $ide = Ide::get();
+
+        $supports = $this->supports;
+
+        foreach ($supports as $key => $support) {
+            if (!$support->isFit($this)) {
+                Logger::info("Unlink support '$key' from project");
+                $support->onUnlink($this);
+                unset($this->supports[$key]);
+            }
+        }
+
+        foreach ($ide->getProjectSupports() as $support) {
+            $cls = reflect::typeOf($support);
+
+            if (!isset($this->supports[$cls]) && $support->isFit($this)) {
+                Logger::info("Link support '$cls' to project");
+                $support->onLink($this);
+                $this->supports[$cls] = $support;
+            }
+        }
+
+        $time = Time::millis() - $time;
+        Logger::info("Refreshing project supports is done, time = {$time}ms.");
     }
 
     /**

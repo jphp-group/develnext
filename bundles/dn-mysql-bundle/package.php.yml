@@ -1,0 +1,24 @@
+
+name: dn-mysql-bundle
+version: 1.0.0
+author: DevelNext
+
+deps:
+  jphp-mysql-ext: '*'
+  dn-sql-bundle: '%version%'
+
+sources:
+- src/vendor/develnext.bundle.sql.MysqlBundle
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  name: MySQL
+  class: develnext\bundle\sql\MysqlBundle
+  icon: develnext/bundle/mysql/mysql.png
+  description: Пакет для работы с бд MySQL 5+.
+  description-file: develnext/bundle/sql/mysql/description.html
+  platforms: [desktop, web]
+  group: database

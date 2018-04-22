@@ -1,0 +1,24 @@
+
+name: dn-pgsql-bundle
+version: 1.0.0
+author: DevelNext
+
+deps:
+  jphp-pgsql-ext: '*'
+  dn-sql-bundle: '%version%'
+
+sources:
+- src/vendor/develnext.bundle.sql.PgSqlBundle
+
+config:
+  ignore:
+    - './out/**'
+
+ide-bundle:
+  name: PostgreSQL
+  class: develnext\bundle\sql\PgSqlBundle
+  icon: develnext/bundle/pgsql/pgsql.png
+  description: Пакет для работы с бд PostgreSQL 8+.
+  description-file: develnext/bundle/sql/pgsql/description.html
+  platforms: [desktop, web]
+  group: database
