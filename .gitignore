@@ -22,6 +22,7 @@ gradle.properties
 secret.asc
 
 package.github.yml
+package.hub.yml
 package-lock.php.yml
 
 vendor/

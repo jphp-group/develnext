@@ -3,12 +3,17 @@ name: dn-game2d-bundle
 version: 1.0.0
 author: DevelNext
 
+plugins: [Hub, Doc]
+
 deps:
   jphp-gui-game-ext: '*'
 
 config:
   ignore:
     - './out/**'
+doc:
+  url-prefix: 'https://github.com/jphp-compiler/develnext/blob/master/bundles/%name%/api-docs/'
+  langs: {en: English, ru: Русский}
 
 ide-bundle:
   name: 2D Game

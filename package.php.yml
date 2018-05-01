@@ -1,0 +1,8 @@
+
+name: develnext
+version: 99.99.99
+
+plugins: [Hub]
+
+hub:
+  login: d.zayceff@gmail.com

@@ -2,15 +2,24 @@ name: dn-app-framework
 version: 1.0.0
 description: JPHP App Framework for JavaFX and jphp-gui-ext.
 
+plugins: [Doc, Hub]
+
 deps:
-  jphp-core: '*'
-  jphp-gui-ext: '*'
+  jphp-core: '>=1.0.0'
+  jphp-gui-ext: '>=1.0.0'
 
 sources:
 - src
 
 includes:
 - php/gui/framework/functions.php
+
+hub:
+  login: d.zayceff@gmail.com
+
+doc:
+  url-prefix: 'https://github.com/jphp-compiler/develnext/blob/master/%name%/api-docs/'
+  langs: {en: English, ru: Русский}
 
 config:
   ignore:

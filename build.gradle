@@ -69,6 +69,39 @@ subprojects {
             } else {
                 commandLine 'jppm', 'publish', '-yes'
             }
+
+            workingDir = projectDir
+        }
+
+        task hubPublish(type: Exec, dependsOn: 'docBuild') {
+            doFirst {
+                if (!file(rootDir.path + "/package.hub.yml").isFile()) {
+                    throw new GradleException("'package.hub.yml' is not found, please run 'jppm hub:login' in root dir before 'hubPublish'!")
+                }
+
+                copy {
+                    from rootDir.path + "/package.hub.yml"
+                    into projectDir.path
+                }
+            }
+
+            if (OperatingSystem.current().isWindows()) {
+                commandLine 'cmd', '/c', 'jppm', 'hub:publish', '-yes', '-f'
+            } else {
+                commandLine 'jppm', 'hub:publish', '-yes', '-f'
+            }
+
+            workingDir = projectDir
+        }
+
+        task docBuild(type: Exec) {
+            if (OperatingSystem.current().isWindows()) {
+                commandLine 'cmd', '/c', 'jppm', 'doc:build', '-yes'
+            } else {
+                commandLine 'jppm', 'doc:build', '-yes'
+            }
+
+            workingDir = projectDir
         }
     }
 

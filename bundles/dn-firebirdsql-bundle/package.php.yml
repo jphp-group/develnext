@@ -3,6 +3,8 @@ name: dn-firebirdsql-bundle
 version: 1.0.0
 author: DevelNext
 
+plugins: [Hub, Doc]
+
 deps:
   jphp-firbirdsql-ext: '*'
   dn-sql-bundle: '%version%'
@@ -13,6 +15,9 @@ sources:
 config:
   ignore:
     - './out/**'
+doc:
+  url-prefix: 'https://github.com/jphp-compiler/develnext/blob/master/bundles/%name%/api-docs/'
+  langs: {en: English, ru: Русский}
 
 ide-bundle:
   name: FireBird SQL
